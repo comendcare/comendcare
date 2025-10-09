@@ -39,7 +39,6 @@ import { Milestone } from "@comend/lib/types"
 import Loading from "@/loading";
 import { MilestoneType, Organization, Roadmap as RoadmapType } from "@prisma/client"
 import { useSession } from "next-auth/react"
-import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
 import { EditResearchPlanForm } from "./edit-research-plan-form"
 import { StageOfActivityBadge } from "./public-roadmap-card"
 import { Separator } from "@comend/components/ui/separator"
@@ -51,8 +50,6 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@comend/components/ui/context-menu"
-import { NotificationBubble } from "./notification-bubble"
-import { useOnborda } from "./onborda/OnbordaContext"
 import {initializeRoadmapState} from "@/packages/lib/initialize-client-state";
 
 const selector = (state: RoadmapState) => ({
@@ -68,10 +65,6 @@ const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones,
     deleteNode: state.deleteNode,
     setMilestone: state.setMilestone
-})
-
-const onbordaSelector = (state: ResearchPlanOnbordaState) => ({
-    step: state.step
 })
 
 export function Roadmap({
@@ -113,19 +106,17 @@ export function Roadmap({
         deleteNode,
         setMilestone
     } = useRoadmapStore(useShallow(selector))
-    const { step } = useOnbordaStore(useShallow(onbordaSelector))
     const {data: session, status} = useSession()
     const pathname = usePathname()
     const { undo, redo } = useRoadmapStore.temporal.getState()
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
     const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false)
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
-    // controllig tabs in this upper level so we can manually control which tab is selected, based on which trigger button is clicked
+    // controlling tabs in this upper level so we can manually control which tab is selected, based on which trigger button is clicked
     const [tab, setTab] = useState<TabType>('projects')
     // const [sortBy, setSortBy] = useState('custom')
     const [sortBy, setSortBy] = useState('default')
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
-    const { isOnbordaVisible } = useOnborda()
     const contextMenuRef = useRef<HTMLDivElement>(null)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
 
@@ -139,8 +130,6 @@ export function Roadmap({
             // toast.error("You’re signed in but not part of an organization.")
             return
         }
-
-        let cancelled = false
 
         initializeRoadmapState({
             roadmapId: researchPlanId,
@@ -158,36 +147,7 @@ export function Roadmap({
                 return []
             })(),
         })
-
-        return () => {
-            cancelled = true
-        }
     }, [status, session?.user.organizationId, researchPlanId])
-
-    // 1) Safe initial state (runs on server too)
-    const [newFlowProjects, setNewFlowProjects] = useState<string | undefined>(() => {
-        if (typeof window === "undefined") return undefined
-        return window.functionalConsentedLocalStorage?.get("newFlowProjects")
-    })
-
-    // 2) Update after mount (browser only)
-    useEffect(() => {
-        // delay this by 1 second so the browser has time to set the localstorage flag (if the user has consented)
-        const t = setTimeout(() => {
-            if (typeof window !== "undefined") {
-                setNewFlowProjects(window.functionalConsentedLocalStorage?.get("newFlowProjects"))
-            }
-        }, 1000)
-        return () => clearTimeout(t)
-    }, [milestones, selectedView])
-
-    useEffect(() => {
-        if (step === ".onborda-select-a-template" && isOnbordaVisible) {
-            setTab('projects')
-            setNewMilestoneIsOpen(true)
-        }
-    }, [step])
-
 
     useEffect(() => {
         milestoneRemountKeyRef.current = milestoneRemountKey;  // Always sync ref with the latest state
@@ -296,7 +256,6 @@ export function Roadmap({
                                                 {"Interactive whiteboard to organize research plans. Project order changes in this view or the list stay separate."}
                                             </TooltipContent>
                                         </Tooltip>
-                                        {newFlowProjects && <NotificationBubble />}
                                     </TabsTrigger>
                                     <TabsTrigger value="list">List View</TabsTrigger>
                                 </TabsList>
@@ -420,7 +379,7 @@ export function Roadmap({
                                 // onClick={(e) => {e.stopPropagation(); e.preventDefault()}}
                                 defaultSize={40}
                                 minSize={25}
-                                className="bg-white h-full flex flex-col min-w-[400px] onborda-editing-project-details"
+                                className="bg-white h-full flex flex-col min-w-[400px]"
                             >
                                 <MilestoneDetailsPanel
                                     organization={organization}
@@ -636,7 +595,6 @@ const MilestoneDetailsPanel = ({
 const NoMilestonesCard = ({setNewMilestoneIsOpen, setTab}: {setNewMilestoneIsOpen: (val: boolean) => void, setTab: (val: TabType) => void}) => {
     const pathname = usePathname()
     const { setSelectedNodeIds } = useRoadmapStore(useShallow(selector))
-    const { startOnborda } = useOnborda()
 
     return (
         <div className="h-full w-full flex flex-col justify-center items-center gap-4 text-center">
@@ -660,7 +618,6 @@ const NoMilestonesCard = ({setNewMilestoneIsOpen, setTab}: {setNewMilestoneIsOpe
                     if (pathname.includes('app/research-plan')) {
                         setSelectedNodeIds([])
                         setTab('projects')
-                        startOnborda('research-plan-tour')
                     }
                 }}
         >
@@ -794,7 +751,7 @@ const RoadmapHeader = ({
                 </Tooltip>
             </span>
 
-            <span className="onborda-create-a-project flex flex-row items-center justify-end">
+            <span className="flex flex-row items-center justify-end">
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button 
