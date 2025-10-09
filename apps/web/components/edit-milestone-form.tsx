@@ -197,7 +197,7 @@ export function EditMilestoneForm({
     // } = useNotificationsStore(useShallow(notificationsSelector))
     const initializing = useRef(true)
     const {data: session, status} = useSession()
-    // const pathname = usePathname()
+    const pathname = usePathname()
     // const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
@@ -211,7 +211,7 @@ export function EditMilestoneForm({
     const [createBiosampleIsOpen, setCreateBiosampleIsOpen] = useState(false)
     const [createDiseaseModelIsOpen, setCreateDiseaseModelIsOpen] = useState(false)
     const [createClincalDatasetIsOpen, setCreateClinicalDatasetIsOpen] = useState(false)
-    // const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
+    const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
     const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
 
     useEffect(() => {
