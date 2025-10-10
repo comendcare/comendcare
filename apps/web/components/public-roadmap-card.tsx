@@ -31,7 +31,7 @@ export const RoadmapsCard = ({
         <Card className="organization-profile-tour-step4" data-testid="roadmaps-card">
             <CardHeader className="w-full pt-6 pb-2 space-y-4">
                 <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight" data-testid="roadmaps-heading">
+                    <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="roadmaps-heading">
                         Research plans
                     </CardTitle>
                     {pathname === "/app/profile" &&
@@ -104,7 +104,7 @@ export const RoadmapCard = ({
         >
             <Card className="organization-profile-tour-step4 flex flex-col gap-0">
                 <CardHeader className="w-full pt-6 pb-0 space-y-4">
-                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
+                    <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight">
                         {roadmap.title || 'Untitled Research Plan'}
                     </CardTitle>
                     <CardDescription>
