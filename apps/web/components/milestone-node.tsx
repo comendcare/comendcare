@@ -185,24 +185,24 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                                     <span className="text-green-900 text-nowrap">Linked Tools</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {(props.data?.biosamples || []).map(({biosample}) => {
+                                    {(props.data?.biosamples || []).map(({biosample}, index) => {
                                         return (
-                                            <Badge variant="green">
+                                            <Badge key={index} variant="green">
                                                 <TestTubeDiagonal className="h-4 w-4" />
                                                 {`${biosample.id}`}
                                             </Badge>
                                         )
                                     })}
-                                    {(props.data?.diseaseModels || []).map(({diseaseModel}) => {
+                                    {(props.data?.diseaseModels || []).map(({diseaseModel}, index) => {
                                         return (
-                                            <Badge variant="green">
+                                            <Badge key={index} variant="green">
                                                 <Rat className="h-4 w-4" />
                                                 {`${diseaseModel.id}`}
                                             </Badge>
                                         )
                                     })}
-                                    {(props.data?.tools || []).map(({tool}) => (
-                                        <Badge variant="green">
+                                    {(props.data?.tools || []).map(({tool}, index) => (
+                                        <Badge key={index} variant="green">
                                             <Database className="h-4 w-4" />
                                             {`${tool?.id}`}
                                         </Badge>
@@ -217,8 +217,8 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                                     <span className="text-orange-900 text-nowrap">Linked RFPs</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {props.data?.rfps.map(({rfp}) => (
-                                        <Badge variant="orange">
+                                    {props.data?.rfps.map(({rfp}, index) => (
+                                        <Badge key={index} variant="orange">
                                             <Megaphone className="h-4 w-4" />
                                             {`${rfp?.title}`}
                                         </Badge>

@@ -1,5 +1,5 @@
 import {formatMoney, standardizeYear} from "@comend/lib/utils";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Building2, Calendar, CircleDollarSign, HandCoins} from "lucide-react";
 import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";

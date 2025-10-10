@@ -16,7 +16,7 @@ import {deleteOrganization} from "@comend/lib/actions";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import {toast} from "sonner";
 import {Button} from "@comend/components/ui/button";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {useRouter} from "next/navigation";
 
 

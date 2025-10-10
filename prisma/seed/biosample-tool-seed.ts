@@ -2,7 +2,7 @@ import {createReadStream} from "fs";
 import * as readline from "readline";
 import prisma from "@comend/lib/prisma";
 import {withOrganizationAuth} from "packages/lib/auth";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {InputJsonObject} from "@prisma/client/runtime/library";
 import {customAlphabet} from "nanoid";
 

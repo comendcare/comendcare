@@ -4,7 +4,7 @@
 
 import InvitationBlocker from "./invitation-blocker";
 import React from "react";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 
 export default function InvitationGate({
                                            invitations,

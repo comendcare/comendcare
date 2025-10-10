@@ -439,25 +439,25 @@ export const TimelineItemContent = ({
             {(milestone?.biosamples?.length > 0 || milestone?.diseaseModels?.length > 0 || milestone?.tools?.length > 0) && (
                 <>
                     {(milestone.biosamples || []).map(({biosample}, index) => {
-                        const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
+                        const type = BIOSAMPLE_TYPE_OPTIONS.find((option, index) => option.value === biosample.types[0])
                         return (
-                            <Badge variant="green">
+                            <Badge key={index} variant="green">
                                 <TestTubeDiagonal className="h-4 w-4" />
                                 {`${biosample.id}`}
                             </Badge>
                         )
                     })}
                     {(milestone.diseaseModels || []).map(({diseaseModel}, index) => {
-                        const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
+                        const type = DISEASE_MODEL_TYPE_OPTIONS.find((option, index) => option.value === diseaseModel.types[0])
                         return (
-                            <Badge variant="green">
+                            <Badge key={index} variant="green">
                                 <Rat className="h-4 w-4" />
                                 {`${diseaseModel.id}`}
                             </Badge>
                         )
                     })}
                     {(milestone.tools || []).map(({tool}, index) => (
-                        <Badge variant="green">
+                        <Badge key={index} variant="green">
                             <Database className="h-4 w-4" />
                             {`${tool?.id}`}
                         </Badge>

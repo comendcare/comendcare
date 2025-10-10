@@ -14,7 +14,6 @@ import {
 import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
 import {
   BoldPlugin,
-  CodePlugin,
   ItalicPlugin,
   StrikethroughPlugin,
   SubscriptPlugin,
@@ -22,11 +21,6 @@ import {
   UnderlinePlugin,
 } from '@udecode/plate-basic-marks/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { insertEmptyCodeBlock } from '@udecode/plate-code-block';
-import {
-  CodeBlockPlugin,
-  CodeLinePlugin,
-} from '@udecode/plate-code-block/react';
 import {
   getParentNode,
   insertNodes,
@@ -54,9 +48,7 @@ export const format = (editor: SlateEditor, customFormatting: any) => {
     const [node] = parentEntry;
 
     if (
-      isElement(node) &&
-      !isType(editor, node, CodeBlockPlugin.key) &&
-      !isType(editor, node, CodeLinePlugin.key)
+      isElement(node)
     ) {
       customFormatting();
     }
@@ -129,11 +121,6 @@ export const autoformatMarks: AutoformatRule[] = [
     mode: 'mark',
     type: HighlightPlugin.key,
   },
-  {
-    match: '`',
-    mode: 'mark',
-    type: CodePlugin.key,
-  },
 ];
 
 export const autoformatBlocks: AutoformatRule[] = [
@@ -171,18 +158,6 @@ export const autoformatBlocks: AutoformatRule[] = [
     match: '> ',
     mode: 'block',
     type: BlockquotePlugin.key,
-  },
-  {
-    format: (editor) => {
-      insertEmptyCodeBlock(editor, {
-        defaultType: ParagraphPlugin.key,
-        insertNodesOptions: { select: true },
-      });
-    },
-    match: '```',
-    mode: 'block',
-    triggerAtBlockStart: false,
-    type: CodeBlockPlugin.key,
   },
   {
     match: '+ ',

@@ -1,6 +1,6 @@
 "use client"
 
-import { Prisma } from "@prisma/client"
+import type {Prisma} from "@prisma/client"
 import { Option } from "@comend/lib/types"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { useEffect, useState } from "react"

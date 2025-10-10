@@ -1,7 +1,7 @@
 import BlurImage from "@comend/components/blur-image"
 import { placeholderBlurhash, random } from "@comend/lib/utils"
 import Placeholder from "@/public/placeholder.png"
-import { Organization } from "@prisma/client"
+import type {Organization} from "@prisma/client"
 import {FolderKanban} from "lucide-react"
 import Link from "next/link"
 import prisma from "@comend/lib/prisma";

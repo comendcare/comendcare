@@ -7,50 +7,16 @@ export default async function RoadmapPage() {
     const session = await getSession();
     const orgId = session?.user.organizationId;
 
+    if (!orgId) return <NoOrganization/>
+
     const [organization, roadmaps] = await Promise.all([
         prisma.organization.findUnique({
             where: {id: orgId},
             select: {
                 id: true,
-                public: true,
-                verified: true,
-                published: true,
                 name: true,
-                description: true,
-                contactEmail: true,
-                logo: true,
-                image: true,
-                headerImage: true,
-                biopharmaConsentSettings: true,
                 subdomain: true,
                 customDomain: true,
-                statedGoal: true,
-                yearFounded: true,
-                incorporationStatus: true,
-                therapeuticsOfInterest: true,
-                therapeuticsInDevelopment: true,
-                website: true,
-                moneyRaised: true,
-                moneyDeployed: true,
-                researchBudget: true,
-                createdAt: true,
-                updatedAt: true,
-                user: true,
-                userId: true,
-                roadmaps: true,
-                members: true,
-                clients: true,
-                invitations: true,
-                membershipRequests: true,
-                conditions: true,
-                kanban: true,
-                milestones: true,
-                platformNotifications: true,
-                reviews: true,
-                savedCompanies: true,
-                tools: true,
-                rfps: true,
-                metadata: true
             },
         }),
         prisma.roadmap.findMany({
@@ -79,8 +45,7 @@ export default async function RoadmapPage() {
         }),
     ]);
 
-
-    if (!orgId || !organization) return <NoOrganization/>
+    if (!organization) return <NoOrganization />
 
     return (
         <RoadmapsPage

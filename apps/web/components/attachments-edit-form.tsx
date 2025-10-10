@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client"
+import type {Prisma} from "@prisma/client"
 import { ExternalAttachmentField } from "./external-attachment-field"
 import { Button } from "@comend/components/ui/button"
 import {

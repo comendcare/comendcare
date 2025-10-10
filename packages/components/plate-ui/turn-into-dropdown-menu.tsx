@@ -5,7 +5,6 @@ import React from 'react';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import {
   ParagraphPlugin,
   focusEditor,
@@ -92,12 +91,6 @@ const turnIntoItems = [
     keywords: ['collapsible', 'expandable'],
     label: 'Toggle list',
     value: TogglePlugin.key,
-  },
-  {
-    icon: <FileCodeIcon />,
-    keywords: ['```'],
-    label: 'Code',
-    value: CodeBlockPlugin.key,
   },
   {
     icon: <QuoteIcon />,

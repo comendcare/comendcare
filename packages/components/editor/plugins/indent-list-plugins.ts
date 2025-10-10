@@ -1,7 +1,6 @@
 'use client';
 
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { ParagraphPlugin } from '@udecode/plate-common/react';
 import { HEADING_LEVELS } from '@udecode/plate-heading';
 import { IndentPlugin } from '@udecode/plate-indent/react';
@@ -24,7 +23,6 @@ export const indentListPlugins = [
         ParagraphPlugin.key,
         ...HEADING_LEVELS,
         BlockquotePlugin.key,
-        CodeBlockPlugin.key,
         TogglePlugin.key,
       ],
     },
@@ -35,7 +33,6 @@ export const indentListPlugins = [
         ParagraphPlugin.key,
         ...HEADING_LEVELS,
         BlockquotePlugin.key,
-        CodeBlockPlugin.key,
         TogglePlugin.key,
       ],
     },

@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 
-import { Organization, Roadmap } from "@prisma/client";
+import type { Organization, Roadmap } from "@prisma/client";
 import { ResearchPlanTemplatesCard } from "./roadmap-templates";
 import Loading from "@/loading";
 import { initializeRoadmapState } from "@comend/lib/initialize-client-state";
@@ -15,7 +15,7 @@ import { useSession } from "next-auth/react";
 
 type Props = {
     orgId: string;
-    organization: Pick<Organization, "id" | "name" | "subdomain" | "customDomain" | "public" | "verified" | "published" | "image">;
+    organization: Pick<Organization, "id" | "name" | "subdomain" | "customDomain">;
     roadmaps: Array<Pick<Roadmap, "id" | "title" | "description" | "slug" | "image" | "createdAt" | "updatedAt" | "published" | "organizationId" | "userId">>;
 };
 

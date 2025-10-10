@@ -15,7 +15,7 @@ import {Button} from "@comend/components/ui/button";
 import {toast} from "sonner";
 import {acceptInvitation, declineAndDeleteInvitation} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {Avatar, AvatarFallback, AvatarImage} from "@/packages/components/ui/avatar";
 import {useSession} from "next-auth/react";
 import LoadingDots from "@/packages/components/icons/loading-dots";

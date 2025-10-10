@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@come
 import Image from "next/image"
 import { ProfilePhoto } from "@comend/components/profile-photo"
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge"
-import { Prisma } from "@prisma/client"
+import type {Prisma} from "@prisma/client"
 import StatusButton from "./milestone-status-button"
 
 // shape of the milestone objects that are returned from our call to getProjectRecommendations

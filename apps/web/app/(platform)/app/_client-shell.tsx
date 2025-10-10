@@ -41,7 +41,7 @@ import {
 } from "@/packages/components/ui/card";
 import researchPlanner from "@/public/screenshots/research-planner.png";
 import Image from "next/image"
-import {User} from "@prisma/client";
+import type {User} from "@prisma/client";
 
 export default function AppClientShell({
                                            user,

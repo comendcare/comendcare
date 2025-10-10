@@ -17,7 +17,7 @@ import ShareDialog from "~web/components/share-dialog";
 import {toast} from "sonner";
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {
     Tooltip,
     TooltipContent,

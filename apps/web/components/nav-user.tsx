@@ -45,7 +45,7 @@ import {
 } from "@comend/lib/types";
 import {mixpanelReset, mixpanelTrack} from "@comend/lib/mixpanel";
 import Spinner from "@/packages/components/ui/spinner";
-import {User} from "@prisma/client";
+import type {User} from "@prisma/client";
 
 type NavUserProps = {
     user: Partial<User>;
