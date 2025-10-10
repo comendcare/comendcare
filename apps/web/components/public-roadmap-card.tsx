@@ -11,7 +11,7 @@ import {ChevronsUpDown, Pencil, Plus, Variable} from "lucide-react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@comend/components/ui/table";
 import {Milestone, milestoneCategories, MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap} from "@comend/lib/types";
 import {Badge} from "@comend/components/ui/badge";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {PrivateNoResearchPlansColumn, PrivateNoResearchPlansRow, PublicNoResearchPlans} from "./no-research-plans";
 import {NoProjects} from "./no-projects";
 import {FunctionComponent, ReactElement, useState} from "react";

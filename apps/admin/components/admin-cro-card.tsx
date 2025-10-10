@@ -19,7 +19,7 @@ import {Milestone} from "@comend/lib/types";
 import {PropertyBadge} from "comend-pag-platform/components/property-badge";
 import AdminCROCardDropdownMenu from "./admin-cro-card-dropdown-menu";
 import ImageWithFallback from "@/packages/components/image-with-fallback";
-import {Company} from "@prisma/client";
+import type {Company} from "@prisma/client";
 import {Badge} from "@/packages/components/ui/badge";
 import {Popover, PopoverContent, PopoverTrigger} from "@/packages/components/ui/popover";
 import {ScrollArea} from "@/packages/components/ui/scroll-area";

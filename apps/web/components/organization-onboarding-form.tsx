@@ -29,7 +29,6 @@ import {
 } from "@comend/lib/fetchers";
 import {handleImageUpload} from "@comend/lib/upload";
 import LoadingDots from "@comend/components/icons/loading-dots";
-import {Member, Organization} from "@prisma/client";
 import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 

@@ -28,7 +28,7 @@ import {
     DialogTrigger
 } from "@comend/components/ui/dialog"
 import {RFP} from "@comend/lib/types"
-import {Prisma} from "@prisma/client"
+import type {Prisma} from "@prisma/client"
 import {getMilestones, getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import {Popover, PopoverContent, PopoverTrigger} from "@comend/components/ui/popover"

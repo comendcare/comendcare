@@ -6,7 +6,6 @@ import NoOrganization from "~web/components/no-organization";
 import {TooltipProvider} from "@comend/components/ui/tooltip";
 import PAGSettingsMembersTab from "~web/components/pag-settings-members-tab"
 import PAGSettingsInvitationsTab from "~web/components/pag-settings-invitations-tab"
-import {Invitation} from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 

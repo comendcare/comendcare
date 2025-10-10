@@ -11,7 +11,7 @@ import {
 } from "./types";
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "./utils";
 import {getSession, withOrganizationAuth, withUserAuth, withResearcherAuth} from "./auth";
-import {
+import type {
     Condition,
     MaterialAndDataAccessRequest,
     Organization,
