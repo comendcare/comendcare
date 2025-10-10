@@ -69,7 +69,6 @@ import { ColumnGroupElement } from './../plate-ui/column-group-element';
 import { CommentLeaf } from './../plate-ui/comment-leaf';
 import { DateElement } from './../plate-ui/date-element';
 import { EmojiInputElement } from './../plate-ui/emoji-input-element';
-import { ExcalidrawElement } from './../plate-ui/excalidraw-element';
 import { HeadingElement } from './../plate-ui/heading-element';
 import { HighlightLeaf } from './../plate-ui/highlight-leaf';
 import { HrElement } from './../plate-ui/hr-element';
@@ -113,7 +112,6 @@ export function DisplayPlateEditor({ value }: { value: any[] }) {
           [CommentsPlugin.key]: CommentLeaf,
           [DatePlugin.key]: DateElement,
           [EmojiInputPlugin.key]: EmojiInputElement,
-          [ExcalidrawPlugin.key]: ExcalidrawElement,
           [FilePlugin.key]: MediaFileElement,
           [HEADING_KEYS.h1]: withProps(HeadingElement, { variant: 'h1' }),
           [HEADING_KEYS.h2]: withProps(HeadingElement, { variant: 'h2' }),

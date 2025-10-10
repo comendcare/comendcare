@@ -71,7 +71,6 @@ import { BlockquoteElement } from "@comend/components/plate-ui/blockquote-elemen
 import { CodeBlockElement } from "@comend/components/plate-ui/code-block-element"
 import { CodeLineElement } from "@comend/components/plate-ui/code-line-element"
 import { CodeSyntaxLeaf } from "@comend/components/plate-ui/code-syntax-leaf"
-import { ExcalidrawElement } from "@comend/components/plate-ui/excalidraw-element"
 import { HrElement } from "@comend/components/plate-ui/hr-element"
 import { ImageElement } from "@comend/components/plate-ui/image-element"
 import { LinkElement } from "@comend/components/plate-ui/link-element"
@@ -230,7 +229,6 @@ const plateEditor = createPlateEditor({
                 [CodeBlockPlugin.key]: CodeBlockElement,
                 [CodeLinePlugin.key]: CodeLineElement,
                 [CodeSyntaxPlugin.key]: CodeSyntaxLeaf,
-                [ExcalidrawPlugin.key]: ExcalidrawElement,
                 [HorizontalRulePlugin.key]: HrElement,
                 [ImagePlugin.key]: ImageElement,
                 [LinkPlugin.key]: LinkElement,

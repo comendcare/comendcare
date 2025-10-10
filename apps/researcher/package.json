@@ -106,7 +106,6 @@
     "@udecode/plate-dnd": "^40.0.0",
     "@udecode/plate-docx": "^40.2.7",
     "@udecode/plate-emoji": "^40.0.0",
-    "@udecode/plate-excalidraw": "^40.0.0",
     "@udecode/plate-floating": "^40.0.0",
     "@udecode/plate-font": "^40.0.0",
     "@udecode/plate-heading": "^40.2.6",
