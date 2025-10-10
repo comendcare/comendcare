@@ -238,13 +238,11 @@ export function EditMilestoneForm({
     //     fetchSavedCompanies();
     // }, [session, status]);
 
-
     // state for adding fields
     const [hasBudget, setHasBudget] = useState(milestoneData?.budget || false)
     const [hasStartDate, setHasStartDate] = useState(milestoneData?.startDate || false)
     const [hasEndDate, setHasEndDate] = useState(milestoneData?.endDate || false)
 
-    console.log(`milestone data`, milestoneData)
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
@@ -527,10 +525,10 @@ export function EditMilestoneForm({
     // }, [tab])
 
     // Watch form changes, don't watch while initializing
-    // useEffect(() => {
-    //     const subscription = form.watch((values) => debounceUpdates(values))
-    //     return () => subscription.unsubscribe();
-    // }, [form.watch, debounceUpdates, form])
+    useEffect(() => {
+        const subscription = form.watch((values) => debounceUpdates(values))
+        return () => subscription.unsubscribe();
+    }, [form.watch, debounceUpdates, form])
 
     useEffect(() => {
         // Forces re-validation whenever the startDate or endDate changes
@@ -584,9 +582,9 @@ export function EditMilestoneForm({
                                     {/*<TabsTrigger className="relative data-[state=active]:bg-secondary" value="publications">*/}
                                     {/*    Publications*/}
                                     {/*</TabsTrigger>*/}
-                                    {/* <TabsTrigger className="relative data-[state=active]:bg-secondary" value="projects">
+                                    <TabsTrigger className="relative data-[state=active]:bg-secondary" value="projects">
                                         Similar projects
-                                    </TabsTrigger> */}
+                                    </TabsTrigger>
                                 </TabsList>
                             </div>
                             {isMigrating ? (
@@ -1165,9 +1163,9 @@ export function EditMilestoneForm({
                                     {/*        onAttach={(att) => addAttachmentToForm(form, att)}*/}
                                     {/*    />*/}
                                     {/*</TabsContent>*/}
-                                    {/* <TabsContent value="projects" className="space-y-4 w-full">
+                                    <TabsContent value="projects" className="space-y-4 w-full">
                                         <EditMilestoneDetailsProjectsTab projectId={milestoneData.id}/>
-                                    </TabsContent> */}
+                                    </TabsContent>
                                 </>
                             )}
                         </Tabs>
