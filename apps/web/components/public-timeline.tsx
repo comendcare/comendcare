@@ -25,7 +25,7 @@ export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilest
     }, [])
 
     return (
-        <ScrollArea style={{ height }} className="pr-4">
+        <ScrollArea style={{ height }} className="pr-4 bg-white rounded-md py-4">
             <div ref={contentRef}>
             <ol className="ml-4 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
                 {roadmap?.milestones?.sort((a: any, b: any) => {

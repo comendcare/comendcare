@@ -7,7 +7,7 @@ import {ProfilePhoto} from "@comend/components/profile-photo";
 import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
 import EditPAGProfileHeaderDialog from "~web/components/edit-pag-profile-header-dialog";
-import {Building2, Calendar, ExternalLink, HandCoins} from "lucide-react";
+import {Building2, Calendar, CircleDollarSign, ExternalLink, HandCoins} from "lucide-react";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {Dialog, DialogContent, DialogTrigger} from "@comend/components/ui/dialog";
 import ShareDialog from "~web/components/share-dialog";
@@ -90,15 +90,6 @@ export default function PAGProfilePage({
                                             <EditPAGProfileHeaderDialog organization={organization}/>
                                         </div>
                                         <div className="w-full flex flex-wrap gap-x-6">
-                                            {typeof organization?.moneyRaised === "number" && organization.moneyRaised > 0 && (
-                                                <div className="mt-2 flex items-center text-gray-500" data-testid="raised-chip">
-                                                    <HandCoins
-                                                        className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                        aria-hidden="true"
-                                                    />
-                                                    {formatMoney(organization?.moneyRaised)} raised
-                                                </div>
-                                            )}
                                             {organization?.yearFounded && (
                                                 <div className="mt-2 flex items-center text-gray-500" data-testid="founded-chip">
                                                     <Calendar
@@ -108,14 +99,32 @@ export default function PAGProfilePage({
                                                     in {standardizeYear(organization?.yearFounded ?? "")}
                                                 </div>
                                             )}
-                                            {organization?.incorporationStatus === "YES" &&
-                                                <div className="mt-2 flex items-center text-gray-500" data-testid="c3-chip">
-                                                    <Building2
+                                            {typeof organization?.moneyRaised === "number" && organization.moneyRaised > 0 && (
+                                                <div className="mt-2 flex items-center text-gray-500" data-testid="raised-chip">
+                                                    <HandCoins
                                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                        aria-hidden="true"/>
-                                                    {`501(c)(3)`}
+                                                        aria-hidden="true"
+                                                    />
+                                                    {formatMoney(organization?.moneyRaised)} raised
                                                 </div>
-                                            }
+                                            )}
+                                            {typeof organization?.moneyDeployed === "number" && organization.moneyDeployed > 0 && (
+                                                <div className="mt-2 flex items-center text-gray-500" data-testid="raised-chip">
+                                                    <CircleDollarSign
+                                                        className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                        aria-hidden="true"
+                                                    />
+                                                    {formatMoney(organization?.moneyDeployed)} deployed
+                                                </div>
+                                            )}
+                                            {/*{organization?.incorporationStatus === "YES" &&*/}
+                                            {/*    <div className="mt-2 flex items-center text-gray-500" data-testid="c3-chip">*/}
+                                            {/*        <Building2*/}
+                                            {/*            className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"*/}
+                                            {/*            aria-hidden="true"/>*/}
+                                            {/*        {`501(c)(3)`}*/}
+                                            {/*    </div>*/}
+                                            {/*}*/}
                                         </div>
                                     </div>
                                 </div>

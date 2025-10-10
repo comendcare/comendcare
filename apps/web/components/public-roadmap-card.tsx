@@ -7,19 +7,20 @@ import {PublicFlowView} from "./public-flow";
 import {PublicTimelineView} from "./public-timeline";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import {Button} from "@comend/components/ui/button";
-import { ChevronsUpDown, Pencil, Plus, Variable } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@comend/components/ui/table";
-import { Milestone, milestoneCategories, MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap } from "@comend/lib/types";
-import { Badge } from "@comend/components/ui/badge";
-import { Organization } from "@prisma/client";
-import { PrivateNoResearchPlansColumn, PrivateNoResearchPlansRow, PublicNoResearchPlans } from "./no-research-plans";
-import { NoProjects } from "./no-projects";
-import { FunctionComponent, ReactElement, useState } from "react";
+import {ChevronsUpDown, Pencil, Plus, Variable} from "lucide-react";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@comend/components/ui/table";
+import {Milestone, milestoneCategories, MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap} from "@comend/lib/types";
+import {Badge} from "@comend/components/ui/badge";
+import {Organization} from "@prisma/client";
+import {PrivateNoResearchPlansColumn, PrivateNoResearchPlansRow, PublicNoResearchPlans} from "./no-research-plans";
+import {NoProjects} from "./no-projects";
+import {FunctionComponent, ReactElement, useState} from "react";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/packages/components/ui/tooltip";
 
 export const RoadmapsCard = ({
-    roadmaps,
-    organization,
-}: {
+                                 roadmaps,
+                                 organization,
+                             }: {
     roadmaps: any[],
     organization: Partial<Organization>,
 }) => {
@@ -31,7 +32,7 @@ export const RoadmapsCard = ({
             <CardHeader className="w-full pt-6 pb-2 space-y-4">
                 <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
                     <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight" data-testid="roadmaps-heading">
-                    Research Plans
+                        Research plans
                     </CardTitle>
                     {pathname === "/app/profile" &&
                         <Button
@@ -40,23 +41,23 @@ export const RoadmapsCard = ({
                             className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
                         >
                             Edit research plan
-                            <Pencil />
+                            <Pencil/>
                         </Button>
                     }
                 </div>
             </CardHeader>
 
             <CardContent className="px-8">
-                {(roadmaps && roadmaps.length > 0) 
-                    ? <RoadmapsTable 
-                        roadmaps={roadmaps} 
-                        rowClickCallback={(roadmap) => 
+                {(roadmaps && roadmaps.length > 0)
+                    ? <RoadmapsTable
+                        roadmaps={roadmaps}
+                        rowClickCallback={(roadmap) =>
                             router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}` : '#')
                         }
                     />
-                    : (pathname === "/app/profile" 
-                        ? <PrivateNoResearchPlansColumn />
-                        : <PublicNoResearchPlans organizationName={organization.name}/>
+                    : (pathname === "/app/profile"
+                            ? <PrivateNoResearchPlansColumn/>
+                            : <PublicNoResearchPlans organizationName={organization.name}/>
                     )
                 }
             </CardContent>
@@ -65,31 +66,31 @@ export const RoadmapsCard = ({
 }
 
 export const RoadmapCard = ({
-    roadmap, 
-    urlMilestone, 
-    setUrlMilestone, 
-    urlView,
-    setUrlView,
-    subdomain, 
-    isPublic,
-    externalLinks
-}: { 
-    roadmap: any, 
+                                roadmap,
+                                urlMilestone,
+                                setUrlMilestone,
+                                urlView,
+                                setUrlView,
+                                subdomain,
+                                isPublic,
+                                externalLinks
+                            }: {
+    roadmap: any,
     urlMilestone?: string | undefined,
     setUrlMilestone?: (id: string | undefined) => void,
     urlView?: string | undefined,
     setUrlView?: (view: string | undefined) => void,
-    subdomain: string | undefined, 
-    isPublic: boolean ,
+    subdomain: string | undefined,
+    isPublic: boolean,
     externalLinks: boolean
 }) => {
     const params = useSearchParams()
     if (!roadmap) {
-        return <PublicNoResearchPlans />
+        return <PublicNoResearchPlans/>
     }
 
     if (roadmap?.milestones && roadmap.milestones.length <= 0) {
-        return <NoProjectsCard isPublic={isPublic} />
+        return <NoProjectsCard isPublic={isPublic}/>
     }
 
     return (
@@ -98,10 +99,11 @@ export const RoadmapCard = ({
             // defaultValue={urlView === 'list' || params.get('view') === 'list' ? 'list' : 'flow'} // flow default
             value={urlView === 'list' || params.get('view') === 'list' ? 'list' : 'flow'}
             className="w-full"
-            onValueChange={setUrlView ? setUrlView: () => {}}
+            onValueChange={setUrlView ? setUrlView : () => {
+            }}
         >
-            <Card className="organization-profile-tour-step4">
-                <CardHeader className="w-full pt-6 pb-2 space-y-4">
+            <Card className="organization-profile-tour-step4 flex flex-col gap-0">
+                <CardHeader className="w-full pt-6 pb-0 space-y-4">
                     <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
                         {roadmap.title || 'Untitled Research Plan'}
                     </CardTitle>
@@ -109,35 +111,36 @@ export const RoadmapCard = ({
                         {roadmap.description}
                     </CardDescription>
                     <div className="flex gap-2">
-                        {RESEARCH_PLAN_TYPES.filter(typeOption => roadmap.modalities.includes(typeOption.value)).map((type: Option, index) => <Badge key={index} variant={'secondary'} className="text-sm">{type.label}</Badge>)}
+                        {RESEARCH_PLAN_TYPES.filter(typeOption => roadmap.modalities.includes(typeOption.value)).map((type: Option, index) =>
+                            <ResearchPlanTypeBadge key={index} label={type.label}/>)}
                         <StageOfActivityBadge milestones={roadmap.milestones}/>
                     </div>
 
-                    <TabsList className="w-min">
-                        <TabsTrigger value="flow">
+                    <TabsList className="w-min rounded-t-md rounded-b-none z-10 -py-2">
+                        <TabsTrigger value="flow" className="data-[state=active]:shadow-none rounded-b-none -mb-2 py-2.5">
                             Flow View
                         </TabsTrigger>
-                        <TabsTrigger value="list">
+                        <TabsTrigger value="list" className="data-[state=active]:shadow-none rounded-b-none -mb-2 py-2.5">
                             List View
                         </TabsTrigger>
                     </TabsList>
                 </CardHeader>
 
-                <CardContent className="px-8">
-                    <TabsContent value="flow" className="space-y-4 w-full">
-                        <div className="h-[40vh] w-full">
-                            <PublicFlowView 
-                                roadmap={roadmap} 
+                <CardContent className="bg-secondary mx-6 mb-6 rounded-b-md rounded-r-md -mt-1 p-1">
+                    <TabsContent value="flow" className="w-full p-0 mt-0">
+                        <div className="h-[60vh] w-full bg-white rounded-b-md rounded-r-md">
+                            <PublicFlowView
+                                roadmap={roadmap}
                                 subdomain={subdomain}
-                                urlMilestone={urlMilestone || undefined} 
+                                urlMilestone={urlMilestone || undefined}
                                 setUrlMilestone={setUrlMilestone || undefined}
                                 externalLinks={externalLinks}
                             />
                         </div>
                     </TabsContent>
-                    <TabsContent value="list" className="space-y-4 w-full">
-                        <PublicTimelineView 
-                            roadmap={roadmap} 
+                    <TabsContent value="list" className="w-full p-0 mt-0">
+                        <PublicTimelineView
+                            roadmap={roadmap}
                             subdomain={subdomain}
                             externalLinks={externalLinks}
                             urlMilestone={urlMilestone}
@@ -150,27 +153,30 @@ export const RoadmapCard = ({
     );
 };
 
-export const NoProjectsCard = ({isPublic}: {isPublic: Boolean}) => {
+export const NoProjectsCard = ({isPublic}: { isPublic: Boolean }) => {
     const router = useRouter()
-    
+
     return (
         <Card className="organization-profile-tour-step4">
             <CardContent className="px-8 pt-4">
-                <NoProjects />
+                <NoProjects/>
             </CardContent>
         </Card>
     )
 }
 
-export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], rowClickCallback: (roadmap: any) => void}) => {
+export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
+    roadmaps: any[],
+    rowClickCallback: (roadmap: any) => void
+}) => {
     const router = useRouter()
 
     return (
         <Table>
             <TableHeader>
                 <TableRow className="pointer-events-none">
-                <TableHead className="w-full">Therapeutic Strategy</TableHead>
-                <TableHead className="w-fit text-nowrap">Stage</TableHead>
+                    <TableHead className="w-full">Therapeutic strategy</TableHead>
+                    <TableHead className="self-end text-right w-fit text-nowrap">Stage</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -186,7 +192,8 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
                             colSpan={2}
                         >
                             {roadmapsForModality.map(roadmap => (
-                                <TableRow key={roadmap.id} className="cursor-pointer" onClick={() => rowClickCallback(roadmap)}>
+                                <TableRow key={roadmap.id} className="cursor-pointer"
+                                          onClick={() => rowClickCallback(roadmap)}>
                                     <TableCell>
                                         <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
                                         {/* {roadmap.description && (
@@ -194,7 +201,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
                                         )} */}
                                     </TableCell>
                                     <TableCell className="flex justify-end items-center">
-                                        <StageOfActivityBadge milestones={roadmap.milestones} />
+                                        <StageOfActivityBadge milestones={roadmap.milestones}/>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -203,12 +210,13 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
                 })}
                 {roadmaps.filter(roadmap => roadmap.modalities.length === 0 || roadmap.modalities.includes("OTHER")).length > 0 && (
                     // group research plans with no type or 'other' type together in the table
-                    <CollapsibleTableGroup 
+                    <CollapsibleTableGroup
                         label={'Other'}
                         colSpan={2}
                     >
                         {roadmaps.filter(roadmap => roadmap.modalities.length === 0 || roadmap.modalities.includes("OTHER")).map(roadmap => (
-                            <TableRow key={roadmap.id} className="cursor-pointer" onClick={() => rowClickCallback(roadmap)}>
+                            <TableRow key={roadmap.id} className="cursor-pointer"
+                                      onClick={() => rowClickCallback(roadmap)}>
                                 <TableCell>
                                     <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
                                     {/* {roadmap.description && (
@@ -216,7 +224,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
                                     )} */}
                                 </TableCell>
                                 <TableCell className="flex justify-end items-center">
-                                    <StageOfActivityBadge milestones={roadmap.milestones} />
+                                    <StageOfActivityBadge milestones={roadmap.milestones}/>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -224,7 +232,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
                 )}
                 {roadmaps.length <= 0 && (
                     <div className="p-4">
-                        <PrivateNoResearchPlansRow />
+                        <PrivateNoResearchPlansRow/>
                     </div>
                 )}
             </TableBody>
@@ -232,13 +240,17 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {roadmaps: any[], ro
     )
 }
 
-export const CollapsibleTableGroup = ({label, colSpan, children}: {label: string, colSpan: number, children?: React.ReactNode}) => {
+export const CollapsibleTableGroup = ({label, colSpan, children}: {
+    label: string,
+    colSpan: number,
+    children?: React.ReactNode
+}) => {
     const [isOpen, setIsOpen] = useState(true)
 
     return (
         <>
-            <TableRow 
-                data-state={undefined} 
+            <TableRow
+                data-state={undefined}
                 className="!appearance-none cursor-pointer bg-gray-50"
                 onClick={() => setIsOpen(prev => !prev)}
             >
@@ -254,9 +266,35 @@ export const CollapsibleTableGroup = ({label, colSpan, children}: {label: string
     )
 }
 
-export const StageOfActivityBadge = ({milestones}: {milestones: Milestone[]}) => {
+export const StageOfActivityBadge = ({milestones}: { milestones: Milestone[] }) => {
     const stage = getStage(milestones)
     return (
-        <Badge variant={stage.variant as any} className="text-sm">{stage.label}</Badge>
+        <TooltipProvider delayDuration={0}>
+            <Tooltip>
+                <TooltipTrigger>
+                    <Badge variant={stage.variant as any} className="text-sm">{stage.label}</Badge>
+                </TooltipTrigger>
+
+                <TooltipContent className="max-w-80">
+                    Stage
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    )
+}
+
+export const ResearchPlanTypeBadge = ({label}: { label: string }) => {
+    return (
+        <TooltipProvider delayDuration={0}>
+            <Tooltip>
+                <TooltipTrigger>
+                    <Badge variant={'secondary'} className="text-sm">{label}</Badge>
+                </TooltipTrigger>
+
+                <TooltipContent className="max-w-80">
+                    Therapeutic approach
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
     )
 }

@@ -1,7 +1,7 @@
 import {formatMoney, standardizeYear} from "@comend/lib/utils";
 import {Organization} from "@prisma/client";
 import {ProfilePhoto} from "@comend/components/profile-photo";
-import {Building2, Calendar, HandCoins} from "lucide-react";
+import {Building2, Calendar, CircleDollarSign, HandCoins} from "lucide-react";
 import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";
 import {Card} from "@/packages/components/ui/card";
 
@@ -34,6 +34,15 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                             {/*<ComendVerifiedBadge verified={organization.verified}/>*/}
                         </div>
                         <div className="w-full flex flex-wrap gap-x-6">
+                            {organization?.yearFounded && (
+                                <div className="mt-2 flex items-center text-gray-500">
+                                    <Calendar
+                                        className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                        aria-hidden="true"/>
+                                    Founded
+                                    in {standardizeYear(organization?.yearFounded ?? "")}
+                                </div>
+                            )}
                             {typeof organization?.moneyRaised === "number" && organization.moneyRaised > 0 && (
                                 <div className="mt-2 flex items-center text-gray-500">
                                     <HandCoins
@@ -43,13 +52,13 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                                     {formatMoney(organization?.moneyRaised)} raised
                                 </div>
                             )}
-                            {organization?.yearFounded && (
-                                <div className="mt-2 flex items-center text-gray-500">
-                                    <Calendar
+                            {typeof organization?.moneyDeployed === "number" && organization.moneyDeployed > 0 && (
+                                <div className="mt-2 flex items-center text-gray-500" data-testid="raised-chip">
+                                    <CircleDollarSign
                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                        aria-hidden="true"/>
-                                    Founded
-                                    in {standardizeYear(organization?.yearFounded ?? "")}
+                                        aria-hidden="true"
+                                    />
+                                    {formatMoney(organization?.moneyDeployed)} deployed
                                 </div>
                             )}
                             {/*{organization?.incorporationStatus === "YES" &&*/}
