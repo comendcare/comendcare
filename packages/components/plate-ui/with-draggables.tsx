@@ -3,7 +3,6 @@
 import type { FC } from 'react';
 
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import {
   ParagraphPlugin,
   createNodesWithHOC,
@@ -85,13 +84,6 @@ export const withDraggables = (components: any) => {
       key: BlockquotePlugin.key,
       draggableProps: {
         className: '[&_.slate-gutterLeft]:px-0 [&_.slate-gutterLeft]:pb-0',
-      },
-    },
-    {
-      key: CodeBlockPlugin.key,
-      draggableProps: {
-        className:
-          '[&_.slate-gutterLeft]:pt-6 [&_.slate-gutterLeft]:px-0 [&_.slate-gutterLeft]:pb-0',
       },
     },
     {

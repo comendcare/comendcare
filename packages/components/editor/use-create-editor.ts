@@ -9,11 +9,6 @@ import {
   UnderlinePlugin,
 } from '@udecode/plate-basic-marks/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import {
-  CodeBlockPlugin,
-  CodeLinePlugin,
-  CodeSyntaxPlugin,
-} from '@udecode/plate-code-block/react';
 import { CommentsPlugin } from '@udecode/plate-comments/react';
 import {
   ParagraphPlugin,
@@ -53,10 +48,6 @@ import { TogglePlugin } from '@udecode/plate-toggle/react';
 import { editorPlugins } from './../editor/plugins/editor-plugins';
 import { FixedToolbarPlugin } from './../editor/plugins/fixed-toolbar-plugin';
 import { BlockquoteElement } from './../plate-ui/blockquote-element';
-import { CodeBlockElement } from './../plate-ui/code-block-element';
-import { CodeLeaf } from './../plate-ui/code-leaf';
-import { CodeLineElement } from './../plate-ui/code-line-element';
-import { CodeSyntaxLeaf } from './../plate-ui/code-syntax-leaf';
 import { ColumnElement } from './../plate-ui/column-element';
 import { ColumnGroupElement } from './../plate-ui/column-group-element';
 import { CommentLeaf } from './../plate-ui/comment-leaf';
@@ -113,10 +104,6 @@ export const useCreateEditor = ({ value }: { value?: Value | undefined | null })
           [AudioPlugin.key]: MediaAudioElement,
           [BlockquotePlugin.key]: BlockquoteElement,
           [BoldPlugin.key]: withProps(PlateLeaf, { as: 'strong' }),
-          [CodeBlockPlugin.key]: CodeBlockElement,
-          [CodeLinePlugin.key]: CodeLineElement,
-          [CodePlugin.key]: CodeLeaf,
-          [CodeSyntaxPlugin.key]: CodeSyntaxLeaf,
           [ColumnItemPlugin.key]: ColumnElement,
           [ColumnPlugin.key]: ColumnGroupElement,
           [CommentsPlugin.key]: CommentLeaf,

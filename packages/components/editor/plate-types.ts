@@ -3,10 +3,6 @@
 import type React from 'react';
 
 import type { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import type {
-  CodeBlockPlugin,
-  CodeLinePlugin,
-} from '@udecode/plate-code-block/react';
 import type { TCommentText } from '@udecode/plate-comments';
 import type { TElement, TText } from '@udecode/plate-common';
 import type { ParagraphPlugin } from '@udecode/plate-common/react';
@@ -138,16 +134,6 @@ export interface MyBlockquoteElement extends MyBlockElement {
   type: typeof BlockquotePlugin.key;
 }
 
-export interface MyCodeBlockElement extends MyBlockElement {
-  children: MyCodeLineElement[];
-  type: typeof CodeBlockPlugin.key;
-}
-
-export interface MyCodeLineElement extends TElement {
-  children: PlainText[];
-  type: typeof CodeLinePlugin.key;
-}
-
 export interface MyTableElement extends TTableElement, MyBlockElement {
   children: MyTableRowElement[];
   type: typeof TablePlugin.key;
@@ -189,7 +175,6 @@ export type MyNestableBlock = MyParagraphElement;
 
 export type MyRootBlock =
   | MyBlockquoteElement
-  | MyCodeBlockElement
   | MyH1Element
   | MyH2Element
   | MyH3Element

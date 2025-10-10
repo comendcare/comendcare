@@ -5,7 +5,6 @@ import React from 'react';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import {
   type PlateEditor,
   ParagraphPlugin,
@@ -100,11 +99,6 @@ const groups: Group[] = [
         icon: <TableIcon />,
         label: 'Table',
         value: TablePlugin.key,
-      },
-      {
-        icon: <FileCodeIcon />,
-        label: 'Code',
-        value: CodeBlockPlugin.key,
       },
       {
         icon: <QuoteIcon />,
