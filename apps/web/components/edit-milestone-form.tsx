@@ -244,6 +244,7 @@ export function EditMilestoneForm({
     const [hasStartDate, setHasStartDate] = useState(milestoneData?.startDate || false)
     const [hasEndDate, setHasEndDate] = useState(milestoneData?.endDate || false)
 
+    console.log(`milestone data`, milestoneData)
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
