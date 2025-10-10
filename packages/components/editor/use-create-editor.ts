@@ -21,7 +21,6 @@ import { HEADING_KEYS } from '@udecode/plate-heading';
 import { TocPlugin } from '@udecode/plate-heading/react';
 import { HighlightPlugin } from '@udecode/plate-highlight/react';
 import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
-import { KbdPlugin } from '@udecode/plate-kbd/react';
 import { ColumnItemPlugin, ColumnPlugin } from '@udecode/plate-layout/react';
 import { LinkPlugin } from '@udecode/plate-link/react';
 import {
@@ -57,14 +56,13 @@ import { HeadingElement } from './../plate-ui/heading-element';
 import { HighlightLeaf } from './../plate-ui/highlight-leaf';
 import { HrElement } from './../plate-ui/hr-element';
 import { ImageElement } from './../plate-ui/image-element';
-import { KbdLeaf } from './../plate-ui/kbd-leaf';
 import { LinkElement } from './../plate-ui/link-element';
 import { MediaAudioElement } from './../plate-ui/media-audio-element';
 import { MediaEmbedElement } from './../plate-ui/media-embed-element';
 import { MediaFileElement } from './../plate-ui/media-file-element';
 import { MediaVideoElement } from './../plate-ui/media-video-element';
 import { MentionElement } from './../plate-ui/mention-element';
-import { MentionInputElement } from './../plate-ui/mention-input-element';
+// import { MentionInputElement } from './../plate-ui/mention-input-element';
 import { ParagraphElement } from './../plate-ui/paragraph-element';
 import { withPlaceholders } from './../plate-ui/placeholder';
 import { SlashInputElement } from './../plate-ui/slash-input-element';
@@ -120,10 +118,9 @@ export const useCreateEditor = ({ value }: { value?: Value | undefined | null })
           [HorizontalRulePlugin.key]: HrElement,
           [ImagePlugin.key]: ImageElement,
           [ItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),
-          [KbdPlugin.key]: KbdLeaf,
           [LinkPlugin.key]: LinkElement,
           [MediaEmbedPlugin.key]: MediaEmbedElement,
-          [MentionInputPlugin.key]: MentionInputElement,
+          // [MentionInputPlugin.key]: MentionInputElement,
           [MentionPlugin.key]: MentionElement,
           [ParagraphPlugin.key]: ParagraphElement,
           [SlashInputPlugin.key]: SlashInputElement,
