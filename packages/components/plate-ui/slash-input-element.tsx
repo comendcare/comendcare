@@ -5,7 +5,6 @@ import React from 'react';
 import { withRef } from '@udecode/cn';
 import { AIChatPlugin } from '@udecode/plate-ai/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { type PlateEditor, ParagraphPlugin } from '@udecode/plate-common/react';
 import { DatePlugin } from '@udecode/plate-date/react';
 import { HEADING_KEYS } from '@udecode/plate-heading';
@@ -128,12 +127,6 @@ const groups: Group[] = [
         keywords: ['collapsible', 'expandable'],
         label: 'Toggle',
         value: TogglePlugin.key,
-      },
-      {
-        icon: <Code2 />,
-        keywords: ['```'],
-        label: 'Code Block',
-        value: CodeBlockPlugin.key,
       },
       {
         icon: <Table />,

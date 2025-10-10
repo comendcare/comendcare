@@ -22,7 +22,7 @@ import {
     DialogClose,
 } from "@comend/components/ui/dialog"
 import { DISEASE_MODEL_TYPE_OPTIONS, editDiseaseModelForm } from "@comend/lib/types"
-import { Prisma } from "@prisma/client"
+import type {Prisma} from "@prisma/client"
 import { getDonorData, getOrganizationFromOrganizationId } from "@comend/lib/fetchers"
 import { useSession } from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"

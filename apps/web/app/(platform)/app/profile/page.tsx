@@ -28,8 +28,8 @@ export default async function ProfilePage(props: IndexPageProps) {
     const orgId = session?.user?.organizationId;
     if (!orgId) return <NoOrganization />;
 
-    // 1) Organization (server/prisma)
-    const organization = await prisma.organization.findUnique({
+    // Phase 1: kick off everything that only needs orgId, in parallel
+    const organizationPromise = prisma.organization.findUnique({
         where: { id: orgId },
         select: {
             id: true,
@@ -57,19 +57,11 @@ export default async function ProfilePage(props: IndexPageProps) {
             createdAt: true,
             updatedAt: true,
             userId: true,
-            members: {
-                select: {
-                    user: true
-                }
-            }
-            // include only what you actually render
+            members: { select: { user: true } },
         },
     });
 
-    if (!organization) return <NoOrganization />;
-
-    // 2) Conditions (server)
-    const conditions = await getConditionsDataFromOrgId(orgId, {
+    const conditionsPromise = getConditionsDataFromOrgId(orgId, {
         id: true,
         name: true,
         summary: true,
@@ -86,6 +78,13 @@ export default async function ProfilePage(props: IndexPageProps) {
         associatedConditions: true,
         associatedWith: true,
     });
+
+    const [organization, conditions] = await Promise.all([
+        organizationPromise,
+        conditionsPromise,
+    ]);
+
+    if (!organization) return <NoOrganization />;
 
     // 3) Public data keyed by subdomain (server)
     const subdomain = organization.subdomain ?? null;

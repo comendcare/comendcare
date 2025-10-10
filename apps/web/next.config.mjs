@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+import bundleAnalyzer from '@next/bundle-analyzer'
+
 const nextConfig = {
     eslint: {
         ignoreDuringBuilds: true,
@@ -155,4 +157,10 @@ const nextConfig = {
     },
 }
 
-export default nextConfig
+let wrapped = (c) => c
+if (process.env.ANALYZE === 'true') {
+    const { default: analyzer } = await import('@next/bundle-analyzer')
+    wrapped = analyzer({ enabled: true })
+}
+
+export default wrapped(nextConfig)

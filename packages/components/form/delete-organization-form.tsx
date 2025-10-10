@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import va from "@vercel/analytics";
 import { useSession } from "next-auth/react";
 import { deleteOrganization } from "./../../../packages/lib/actions";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 
 export default function DeleteOrganizationForm({
                                                    organization,

@@ -3,7 +3,7 @@ import CROReviewDialog from "~web/components/marketplace/cro-review-dialog";
 import CRORatingSection from "~web/components/marketplace/cro-rating-section";
 import {Card, CardContent} from "@comend/components/ui/card";
 import Image from "next/image";
-import {CompanyWithReviewsAndServices} from "@comend/lib/types";
+import type {CompanyWithReviewsAndServices} from "@comend/lib/types";
 
 export default function CROMarketplaceProfileReviewsTab({cro}: { cro: CompanyWithReviewsAndServices }) {
     if (!cro) {

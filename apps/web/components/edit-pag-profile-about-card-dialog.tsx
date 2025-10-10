@@ -26,7 +26,7 @@ import {Button} from "@comend/components/ui/button";
 import {updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import React, {useEffect, useState} from "react";
 import {Info, Pencil} from "lucide-react";
 import MultipleSelector from "@comend/components/ui/multiple-selector";

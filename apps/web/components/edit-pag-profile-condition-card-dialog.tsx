@@ -32,7 +32,7 @@ import {
 } from "@comend/components/ui/dialog";
 import {formatNumberWithCommas, toKebabCase} from "@comend/lib/utils"; // ← added to normalize creatable values
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
 import {researchFormSchema} from "./research-onboarding-form";
 

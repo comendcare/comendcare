@@ -1,15 +1,34 @@
-import {getSession} from "@/packages/lib/auth"
-import {Roadmap} from "~web/components/roadmap"
-import NoOrganization from "~web/components/no-organization";
-import {getMilestoneTypes, getOrganizationFromOrganizationId} from "@/packages/lib/fetchers";
+import { getSession } from "@/packages/lib/auth"
+import { Roadmap } from "~web/components/roadmap"
+import NoOrganization from "~web/components/no-organization"
+import {
+    getMilestoneTypes,
+    getOrganizationFromOrganizationId,
+    getRoadmap,
+    getRoadmapEdges,
+    getRoadmapMilestones,
+    getRoadmapNodes,
+} from "@/packages/lib/fetchers"
 
-export default async function RoadmapPage({params}: { params: { id: string } }) {
+export default async function RoadmapPage({
+                                              params,
+                                              searchParams,
+                                          }: {
+    params: { id: string }
+    searchParams: { [key: string]: string | string[] | undefined }
+}) {
     const session = await getSession()
     const orgId = session?.user.organizationId
+    if (!orgId) return <NoOrganization />
 
-    if (!orgId) return <NoOrganization/>
-
-    const [milestoneTypesRes, organizationRes] = await Promise.all([
+    const [
+        milestoneTypesSettle,
+        organizationSettle,
+        roadmapSettle,
+        milestonesSettle,
+        nodesSettle,
+        edgesSettle,
+    ] = await Promise.allSettled([
         getMilestoneTypes({
             id: true,
             label: true,
@@ -19,50 +38,98 @@ export default async function RoadmapPage({params}: { params: { id: string } }) 
         }),
         getOrganizationFromOrganizationId(orgId, {
             id: true,
-            public: true,
-            verified: true,
-            published: true,
             name: true,
-            description: true,
-            contactEmail: true,
-            logo: true,
-            image: true,
-            headerImage: true,
-            biopharmaConsentSettings: true,
             subdomain: true,
-            customDomain: true,
-            statedGoal: true,
-            yearFounded: true,
-            incorporationStatus: true,
-            therapeuticsOfInterest: true,
-            therapeuticsInDevelopment: true,
-            website: true,
-            moneyRaised: true,
-            moneyDeployed: true,
-            researchBudget: true,
+            published: true,
+        }),
+        getRoadmap(orgId, params.id, {
+            id: true,
+            title: true,
+            description: true,
+            content: true,
+            slug: true,
+            image: true,
             createdAt: true,
             updatedAt: true,
+            published: true,
+            organizationId: true,
+            organization: true,
             user: true,
-            userId: true,
-            roadmaps: true,
-            members: true,
-            clients: true,
-            invitations: true,
-            membershipRequests: true,
-            conditions: true,
-            kanban: true,
-            milestones: true,
-            platformNotifications: true,
-            reviews: true,
-            savedCompanies: true,
-            tools: true,
-            rfps: true,
-            metadata: true
+            modalities: true,
+            metadata: true,
         }),
-    ]);
+        getRoadmapMilestones(orgId, params.id, {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+            title: true,
+            description: true,
+            notes: true,
+            status: true,
+            budget: true,
+            endDate: true,
+            startDate: true,
+            private: true,
+            otherTypeDetails: true,
+            timelineOrder: true,
+            nodeType: true,
+            roadmapId: true,
+            organizationId: true,
+            nodeId: true,
+            metadata: true,
+            node: true,
+            contacts: true,
+            attachments: true,
+            types: { include: { milestoneType: true } },
+            tools: { include: { tool: true } },
+            rfps: { include: { rfp: true } },
+        }),
+        getRoadmapNodes(orgId, params.id, {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+            positionX: true,
+            positionY: true,
+            origin: true,
+            roadmapId: true,
+        }),
+        getRoadmapEdges(orgId, params.id, {
+            id: true,
+            source: true,
+            target: true,
+            type: true,
+            data: true,
+            roadmapId: true,
+        }),
+    ])
 
-    const milestoneTypes = milestoneTypesRes.success ? (milestoneTypesRes.data ?? []) : [];
-    const organization = organizationRes.success ? organizationRes.data : undefined;
+    // Helper to unwrap settled results safely
+    const ok = <T,>(s: PromiseSettledResult<T>): T | undefined =>
+        s.status === "fulfilled" ? s.value : undefined
+
+    const milestoneTypesRes = ok(milestoneTypesSettle)
+    const organizationRes = ok(organizationSettle)
+    const roadmapRes = ok(roadmapSettle)
+    const milestonesRes = ok(milestonesSettle)
+    const nodesRes = ok(nodesSettle)
+    const edgesRes = ok(edgesSettle)
+
+    if (!roadmapRes?.success || !roadmapRes.data) {
+        return <NoOrganization />
+    }
+
+    const milestoneTypes = milestoneTypesRes?.success
+        ? milestoneTypesRes.data ?? []
+        : []
+
+    const organization = organizationRes?.success ? organizationRes.data : undefined
+
+    const initMilestones = milestonesRes?.success ? milestonesRes.data : []
+    const initNodes = nodesRes?.success ? nodesRes.data : []
+    const initEdges = edgesRes?.success ? edgesRes.data : []
+
+    const urlNode = searchParams.project
+    const urlView = searchParams.view
 
     return (
         <Roadmap
@@ -71,6 +138,12 @@ export default async function RoadmapPage({params}: { params: { id: string } }) 
             orgSubdomain={organization?.subdomain}
             orgIsPublished={!!organization?.published}
             researchPlanId={params.id}
+            initRoadmap={roadmapRes.data}
+            initEdges={initEdges}
+            initNodes={initNodes}
+            initMilestones={initMilestones}
+            urlNode={urlNode}
+            urlView={urlView}
         />
     )
 }

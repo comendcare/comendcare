@@ -32,7 +32,7 @@ import {Button} from "@comend/components/ui/button";
 import {updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import React, {useEffect, useState} from "react";
 import MoneyInput from "@comend/components/money-input";
 import {years} from "@comend/lib/utils";

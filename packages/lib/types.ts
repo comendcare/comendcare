@@ -1,4 +1,4 @@
-import {
+import type {
     Column,
     RequestComment,
     PostComment,
@@ -9,7 +9,6 @@ import {
     MilestoneType,
     Organization,
     Post,
-    Prisma,
     Review,
     ReviewFeedback,
     RFP as DBRFP,
@@ -25,7 +24,17 @@ import {
     DiseaseModel,
     Invitation
 } from "@prisma/client";
+import {Prisma} from "@prisma/client";
 import {z} from "zod";
+
+export const mechanisms = [
+    {id: "GENETIC_MUTATION", name: "Genetic mutation"},
+    {id: "CHROMOSOMAL_ABNORMALITY", name: "Chromosomal abnormality"},
+    {id: "IMMUNE_DYSFUNCTION", name: "Immune dysfunction"},
+    {id: "METABOLIC_DEFECT", name: "Metabolic pathway defect"},
+    {id: "MITOCHONDRIAL_ABNORMALITY", name: "Mitochondrial abnormality"},
+    {id: "EPIGENETIC_MODIFICATION", name: "Epigenetic modification"}
+];
 
 export const orgForAnalyticsInclude = Prisma.validator<Prisma.OrganizationSelect>()({
     id: true,

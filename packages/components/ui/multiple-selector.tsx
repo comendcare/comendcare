@@ -10,6 +10,8 @@ import {Command, CommandGroup, CommandItem, CommandList} from './command';
 import {cn, sleep} from './../../../packages/lib/utils';
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "./hover-card";
 import {ScrollArea} from './scroll-area';
+import {DynamicIcon, IconName} from 'lucide-react/dynamic'
+
 
 export interface Option {
     value: string;
@@ -17,6 +19,11 @@ export interface Option {
     disable?: boolean;
     /** fixed option that can't be removed. */
     fixed?: boolean;
+    /** 
+     * Pass in the lucide icon's name and the icon will by fetched dynamically (lower case)
+     *  https://lucide.dev/guide/packages/lucide-react#dynamic-icon-component
+     */
+    icon?: IconName;
 
     /** Group the options by providing key. */
     [key: string]: string | boolean | undefined | null;
@@ -495,6 +502,9 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                             data-fixed={option.fixed}
                                             data-disabled={disabled || undefined}
                                         >
+                                            {option.icon && (
+                                                <DynamicIcon name={option.icon} className="h-4 w-4" />
+                                            )}
                                             {typeof option.img === 'string' && (
                                                 <img className="h-8 w-8 rounded-full mr-2 my-1" src={option.img}
                                                      alt="Option icon"/>

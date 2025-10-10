@@ -16,7 +16,7 @@ import React, {useEffect, useState} from "react";
 import {faker} from "@faker-js/faker";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {MOLECULAR_MECHANISMS, Option, optionSchema} from "@comend/lib/types";
 
 export const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>

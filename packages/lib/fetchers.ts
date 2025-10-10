@@ -11,7 +11,7 @@ import {
 } from "./types";
 import {formatMoney, getProfileCompletionChecks, getStage, logError} from "./utils";
 import {getSession, withOrganizationAuth, withUserAuth, withResearcherAuth} from "./auth";
-import {
+import type {
     Condition,
     MaterialAndDataAccessRequest,
     Organization,
@@ -807,6 +807,32 @@ export async function getPublicMilestoneDetails(
             select: {
                 ...select,
                 types: select.types ? ({include: {milestoneType: true}}) : undefined,
+                biosamples: select.biosamples ? ({
+                    include: {
+                        biosample: {
+                            include: {
+                                milestones: {
+                                    include: {milestone: true},
+                                    where: {milestone: {private: {equals: false}}}
+                                }
+                            }
+                        },
+                    },
+                    where: {biosample: {private: {equals: false}}}
+                }) : undefined,
+                diseaseModels: select.diseaseModels ? ({
+                    include: {
+                        diseaseModel: {
+                            include: {
+                                milestones: {
+                                    include: {milestone: true},
+                                    where: {milestone: {private: {equals: false}}}
+                                }
+                            }
+                        },
+                    },
+                    where: {diseaseModel: {private: {equals: false}}}
+                }) : undefined,
                 tools: select.tools ? ({
                     include: {
                         tool: {
@@ -1267,6 +1293,99 @@ export const getRoadmaps = withOrganizationAuth(
     }
 )
 
+export const getRoadmapEdges = withOrganizationAuth(
+    async (
+        authOrg: Organization,
+        roadmapId: string | null | undefined,
+        select: Prisma.EdgeSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        if (!roadmapId) return {success: false, error: "No roadmap id provided."}
+        if (!authOrg) return {success: false, error: `No organization found.`}
+
+        try {
+            const edges = await prisma.edge.findMany({
+                where: {
+                    roadmapId
+                },
+                select
+            })
+
+            return {success: true, data: edges}
+        } catch (error: any) {
+            logError("Error fetching roadmap edges", error);
+            return {success: false, error: "Internal server error."};
+        }
+
+    }
+)
+
+export const getRoadmapNodes = withOrganizationAuth(
+    async (
+        authOrg: Organization,
+        roadmapId: string | null | undefined,
+        select: Prisma.NodeSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        if (!roadmapId) return {success: false, error: "No roadmap id provided."}
+        if (!authOrg) return {success: false, error: `No organization found.`}
+
+        try {
+            const nodes = await prisma.node.findMany({
+                where: {
+                    roadmapId
+                },
+                select
+            })
+
+            return {success: true, data: nodes}
+        } catch (error: any) {
+            logError("Error fetching roadmap nodes", error);
+            return {success: false, error: "Internal server error."};
+        }
+
+    }
+)
+
+export const getRoadmapMilestones = withOrganizationAuth(
+    async (
+        authOrg: Organization,
+        roadmapId: string | null | undefined,
+        select: Prisma.MilestoneSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        if (!roadmapId) return {success: false, error: "No roadmap id provided."}
+        if (!authOrg) return {success: false, error: `No organization found.`}
+
+        try {
+            const milestones = await prisma.milestone.findMany({
+                where: {
+                    organizationId: authOrg.id,
+                    roadmapId
+                },
+                select
+            })
+
+            return {success: true, data: milestones}
+        } catch (error: any) {
+            logError("Error fetching roadmap milestones", error);
+            return {success: false, error: "Internal server error."};
+        }
+    }
+) 
+
 export const getRoadmap = withOrganizationAuth(
     async (
         authOrg: Organization,
@@ -1293,45 +1412,7 @@ export const getRoadmap = withOrganizationAuth(
                     organizationId: organization.id,
                     id: roadmapId
                 },
-                // include: {
-                //     nodes: {
-                //         include: {data: true},
-                //         orderBy: [{ createdAt: "desc" }]
-                //     },
-                //     milestones: {
-                //         include: {
-                //             node: true,
-                //             contacts: true,
-                //             attachments: true,
-                //             types: {include: { milestoneType: true }},
-                //             tools: {include: {tool: true}},
-                //             rfps: {include: {rfp: true}}
-                //         },
-                //         orderBy: [{ createdAt: "desc" }]
-                //     },
-                //     edges: true,
-                //     organization: true
-                // }
-                select: {
-                    ...select,
-                    nodes: {
-                        include: {data: true},
-                        orderBy: [{createdAt: "desc"}]
-                    },
-                    milestones: {
-                        include: {
-                            node: true,
-                            contacts: true,
-                            attachments: true,
-                            types: {include: {milestoneType: true}},
-                            biosamples: {include: {biosample: true}},
-                            diseaseModels: {include: {diseaseModel: true}},
-                            tools: {include: {tool: true}},
-                            rfps: {include: {rfp: true}}
-                        },
-                        orderBy: [{createdAt: "desc"}]
-                    }
-                }
+                select
             })
 
             return {success: true, data: roadmap}

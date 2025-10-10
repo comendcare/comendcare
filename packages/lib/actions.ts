@@ -1,16 +1,16 @@
 "use server"
 
 import prisma from "./prisma"
-import {
+import type {
     Roadmap,
     Organization,
-    Prisma,
     User,
     Invitation,
     PlatformNotification,
     Review,
     Institution, Condition,
 } from "@prisma/client"
+import {Prisma} from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {authOptions, withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "./auth"
 import {getSession} from "./auth"
@@ -54,6 +54,7 @@ import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/lib
 import z from "zod"
 import {writeRawEvent} from "./raw-events";
 import crypto from "node:crypto";
+import {customerIOOnResearchPlanCreated} from "./customer-io";
 
 const PATHS = [
     "/app",
@@ -2490,7 +2491,7 @@ export const updateDiseaseModel = withOrganizationAuth(
                     organization: {connect: {id: organization.id}},
                     metadata: diseaseModelData.metadata as InputJsonObject,
                     ...(diseaseModelData.gene
-                        ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
+                        ? ({gene: {connect: {symbol: diseaseModelData.gene.value.toUpperCase()}}})
                         : {gene: {disconnect: true}}),
                     ...(diseaseModelData.institution
                         ? {
@@ -2606,7 +2607,7 @@ export const createDiseaseModel = withOrganizationAuth(
                     organization: {connect: {id: organization.id}},
                     metadata: diseaseModelData.metadata as InputJsonObject,
                     ...(diseaseModelData.gene
-                        ? ({gene: {connect: {symbol: diseaseModelData.gene.value}}})
+                        ? ({gene: {connect: {symbol: diseaseModelData.gene.value.toUpperCase()}}})
                         : undefined),
                     ...(diseaseModelData.institution
                         ? ({
@@ -2747,7 +2748,7 @@ export const createDataTool = withOrganizationAuth(
                     organization: {connect: {id: organization.id}},
                     metadata: dataToolData.metadata as InputJsonObject,
                     ...(dataToolData.gene
-                        ? ({gene: {connect: {symbol: dataToolData.gene.value}}})
+                        ? ({gene: {connect: {symbol: dataToolData.gene.value.toUpperCase()}}})
                         : undefined),
                     ...((
                         data.cohortSize !== undefined &&
@@ -2896,7 +2897,7 @@ export const updateDataTool = withOrganizationAuth(
                     metadata: dataToolData.metadata as InputJsonObject,
                     ...(dataToolData.gene ? ({
                         gene: {
-                            connect: {symbol: dataToolData.gene.value}
+                            connect: {symbol: dataToolData.gene.value.toUpperCase()}
                         }
                     }) : {gene: {disconnect: true}}),
                     ...(dataToolData.institution
@@ -3028,7 +3029,8 @@ export const createBiosample = withOrganizationAuth(
                     organization: {connect: {id: organization.id}},
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene
-                        ? ({gene: {connect: {symbol: biosampleData.gene.value}}})
+                        // transform symbol to uppercase because all genes are uppercase in our database
+                        ? ({gene: {connect: {symbol: biosampleData.gene.value.toUpperCase() }}})
                         : undefined),
                     ...(biosampleData.institution
                         ? ({
@@ -3252,7 +3254,7 @@ export const updateBiosample = withOrganizationAuth(
                             : false,
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene
-                        ? {gene: {connect: {symbol: biosampleData.gene.value}}}
+                        ? {gene: {connect: {symbol: biosampleData.gene.value.toUpperCase()}}}
                         : {gene: {disconnect: true}}),
                     ...(biosampleData.institution
                         ? {
@@ -3520,7 +3522,7 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene ? ({
                         gene: {
-                            connect: {symbol: biosampleData.gene.value}
+                            connect: {symbol: biosampleData.gene.value.toUpperCase()}
                         }
                     }) : {gene: {disconnect: true}}),
                     ...(biosampleData.institution ? ({
@@ -3609,7 +3611,7 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene ? ({
                         gene: {
-                            connect: {symbol: biosampleData.gene.value}
+                            connect: {symbol: biosampleData.gene.value.toUpperCase()}
                         }
                     }) : undefined),
                     ...(biosampleData.institution ? ({
@@ -4109,6 +4111,21 @@ export const createRoadmap = withOrganizationAuth(
                     userName: actor?.userName,
                 },
             });
+
+            try {
+                if (actor?.userId) {
+                    await customerIOOnResearchPlanCreated(actor.userId, {
+                        roadmapId: roadmap.id,
+                        orgId: organization.id,
+                        orgSubdomain: organization.subdomain,
+                        templateId: roadmapTemplate?.id,
+                        title: finalRoadmap?.title ?? roadmapTemplate?.title,
+                        numMilestones: finalRoadmap?.milestones.length ?? 0,
+                    });
+                }
+            } catch (e) {
+                console.error("customerIOOnResearchPlanCreated failed:", e);
+            }
 
             // This is to make it so that saving shows the newly created projects from the roadmap
             revalidatePath("/app/marketplace/service-providers")
@@ -4886,13 +4903,15 @@ export const updateMilestones = withOrganizationAuth(
                 milestones.map(async (milestone: any) => {
                     const previousMilestone = await prisma.milestone.findUnique({
                         where: {nodeId: milestone.nodeId},
-                        include: {
-                            node: true,
-                            contacts: true,
-                            attachments: true,
-                            types: {include: {milestoneType: true}},
-                            tools: {include: {tool: true}},
-                            rfps: {include: {rfp: true}},
+                        select: {
+                            id: true,
+                            private: true,
+                            // node: true,
+                            // contacts: true,
+                            // attachments: true,
+                            // types: {include: {milestoneType: true}},
+                            // tools: {include: {tool: true}},
+                            // rfps: {include: {rfp: true}},
                         },
                     });
 

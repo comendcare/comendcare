@@ -6,15 +6,34 @@ import { Session } from "next-auth";
 
 // NodeJS CustomerIO docs: https://customer.io/docs/cdp/sources/connections/servers/node/
 
+const IS_PROD = (() => {
+    // Highest precedence: Vercel’s environment flag if present
+    if (process.env.VERCEL_ENV) return process.env.VERCEL_ENV === "production"
+    // Fallback to your own flags
+    const env = process.env.NEXT_PUBLIC_NODE_ENV ?? process.env.NODE_ENV
+    return env === "production"
+})();
+
+type AnalyticsCall = (args: any) => Promise<void> | void
+class NoopAnalytics {
+    identify: AnalyticsCall = async () => {}
+    track:    AnalyticsCall = async () => {}
+    page:     AnalyticsCall = async () => {}
+    group:    AnalyticsCall = async () => {}
+    alias:    AnalyticsCall = async () => {}
+}
+
 class CustomerIO {
     static instance: CustomerIO
-    analytics: Analytics
+    analytics: Analytics | NoopAnalytics
 
-    constructor() {
-        this.analytics = new Analytics({
-            writeKey: process.env.CUSTOMER_IO_WRITE_KEY || '',
-            host: 'https://cdp.customer.io',
-        })
+    private constructor() {
+        this.analytics = IS_PROD
+            ? new Analytics({
+                writeKey: process.env.CUSTOMER_IO_WRITE_KEY || "",
+                host: "https://cdp.customer.io",
+            })
+            : new NoopAnalytics()
     }
 
     static getInstance(): CustomerIO {
@@ -36,8 +55,7 @@ export async function customerIOIdentify(distinctId: string, session: Session) {
 }
 
 export async function getCustomerIOInstance(): Promise<CustomerIO> {
-    if (!CustomerIO.instance) CustomerIO.instance = new CustomerIO()
-    return CustomerIO.instance
+    return CustomerIO.getInstance()
 }
 
 export async function customerIOTrack(data: { userId: string | undefined, event: string, properties: any}) {
@@ -82,4 +100,20 @@ export async function sendCustomerIOContactEmail(emailPayload: any) {
     } catch (e) {
         console.error(`Error sending email`, e)
     }
+}
+
+export async function customerIOOnResearchPlanCreated(userId: string, props: Record<string, any> = {}) {
+    const instance = await getCustomerIOInstance()
+
+    // 2a) Track the event (good for campaigns & analytics)
+    instance.analytics.track({
+        userId,
+        event: "created_research_plan",
+        properties: props
+    })
+
+    instance.analytics.identify({
+        userId,
+        traits: { "has_research_plan": true, ...props }
+    })
 }

@@ -4,7 +4,6 @@ import prisma from "@comend/lib/prisma";
 import crypto from "node:crypto";
 import { buildPubmedQuery, type OrgQueryConfig } from "~web/lib/pubmed-query";
 import { getPubMedSearchResultIds, getPubMedSearchResultData } from "@comend/lib/pubmed";
-import { PrismaClient } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs"; // ensure Node runtime

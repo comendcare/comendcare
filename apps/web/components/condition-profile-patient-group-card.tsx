@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@comend/components/ui/
 import { faker } from "@faker-js/faker";
 import { motion } from "framer-motion";
 import { createDicebearAvatar } from "@comend/lib/utils";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 
 interface CardProps {
     children: ReactNode;

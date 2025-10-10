@@ -18,7 +18,7 @@ import { updateOrganization } from "@comend/lib/actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Organization } from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import { useEffect, useState } from "react";
 import { Pencil } from "lucide-react";
 import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";

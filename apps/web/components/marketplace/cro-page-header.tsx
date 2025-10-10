@@ -175,12 +175,12 @@ export default async function CROPageHeader({
             <div className="flex flex-col justify-start items-end space-y-2 col-span-1 w-full justify-self-end">
                 <ServiceProviderWebsiteButton cro={company}/>
                 {/*<SaveCRODialog cro={company} type={"page"} location={"Service Provider Profile"}/>*/}
-                <SaveCROButton
-                    cro={company}
-                    type={"page"}
-                    location={"Service Provider Profile"}
-                    savedCompanyIds={savedCompanyIds}
-                />
+                {/*<SaveCROButton*/}
+                {/*    cro={company}*/}
+                {/*    type={"page"}*/}
+                {/*    location={"Service Provider Profile"}*/}
+                {/*    savedCompanyIds={savedCompanyIds}*/}
+                {/*/>*/}
                 <ContactCroDialog cro={company}/>
             </div>
         </div>

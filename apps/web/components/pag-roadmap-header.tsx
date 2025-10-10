@@ -1,4 +1,4 @@
-import { Organization } from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 import { Building2, Calendar, HandCoins } from "lucide-react";
 import { formatMoney, standardizeYear } from "@comend/lib/utils";

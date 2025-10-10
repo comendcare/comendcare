@@ -2,7 +2,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend
 import Link from "next/link";
 import {truncate} from "@comend/lib/utils";
 import React from "react";
-import {Company} from "@prisma/client";
+import type {Company} from "@prisma/client";
 import {Separator} from "@comend/components/ui/separator";
 import {Badge} from "@comend/components/ui/badge";
 import { Popover, PopoverTrigger, PopoverContent } from "@comend/components/ui/popover"
@@ -135,12 +135,12 @@ export function CROCardHeaderContents({cro, milestone, location, savedCompanyIds
                     </CardTitle>
                 </Link>
                 {/*<SaveCRODialog cro={cro} type={"card"} milestone={milestone} location={location}/>*/}
-                <SaveCROButton
-                    cro={cro}
-                    type={"card"}
-                    location={location}
-                    savedCompanyIds={savedCompanyIds}
-                />
+                {/*<SaveCROButton*/}
+                {/*    cro={cro}*/}
+                {/*    type={"card"}*/}
+                {/*    location={location}*/}
+                {/*    savedCompanyIds={savedCompanyIds}*/}
+                {/*/>*/}
             </div>
             <Link
                 href={

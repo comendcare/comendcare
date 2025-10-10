@@ -3,7 +3,6 @@
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import { SoftBreakPlugin } from '@udecode/plate-break/react';
 import { CalloutPlugin } from '@udecode/plate-callout/react';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import {
   TableCellHeaderPlugin,
   TableCellPlugin,
@@ -17,7 +16,6 @@ export const softBreakPlugin = SoftBreakPlugin.configure({
         hotkey: 'enter',
         query: {
           allow: [
-            CodeBlockPlugin.key,
             BlockquotePlugin.key,
             TableCellPlugin.key,
             TableCellHeaderPlugin.key,

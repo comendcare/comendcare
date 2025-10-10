@@ -28,7 +28,7 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {GripVertical, Megaphone, Microscope, User, Lock, Calendar, DollarSign} from "lucide-react"
+import {GripVertical, Megaphone, Microscope, User, Lock, Calendar, DollarSign, Database, Rat, TestTubeDiagonal} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu";
@@ -406,9 +406,9 @@ export const TimelineItemContent = ({
                 </div>
             )}
         </div>
-        <p className={"mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-1"}>
+        {/* <p className={"mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-1"}>
             {milestone.description}
-        </p>
+        </p> */}
 
         <span className="flex flex-wrap gap-2 items-center">
             {(milestone?.types || []).map((milestoneType, index) => (
@@ -439,27 +439,27 @@ export const TimelineItemContent = ({
             {(milestone?.biosamples?.length > 0 || milestone?.diseaseModels?.length > 0 || milestone?.tools?.length > 0) && (
                 <>
                     {(milestone.biosamples || []).map(({biosample}, index) => {
-                        const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
+                        const type = BIOSAMPLE_TYPE_OPTIONS.find((option, index) => option.value === biosample.types[0])
                         return (
-                            <Badge key={index} variant="violet" className="min-w-fit w-fit font-normal">
-                                <Microscope size={16} />
-                                {`${biosample.donorId} --- ${type?.label || ''}`}
+                            <Badge key={index} variant="green">
+                                <TestTubeDiagonal className="h-4 w-4" />
+                                {`${biosample.id}`}
                             </Badge>
                         )
                     })}
                     {(milestone.diseaseModels || []).map(({diseaseModel}, index) => {
-                        const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
+                        const type = DISEASE_MODEL_TYPE_OPTIONS.find((option, index) => option.value === diseaseModel.types[0])
                         return (
-                            <Badge key={index} variant="yellow" className="min-w-fit w-fit font-normal">
-                                <Microscope size={16} />
-                                {`${diseaseModel.id} --- ${type?.label}`}
+                            <Badge key={index} variant="green">
+                                <Rat className="h-4 w-4" />
+                                {`${diseaseModel.id}`}
                             </Badge>
                         )
                     })}
                     {(milestone.tools || []).map(({tool}, index) => (
-                        <Badge key={index} variant="emerald" className="min-w-fit w-fit font-normal">
-                            <Microscope size={16} />
-                            {tool?.title}
+                        <Badge key={index} variant="green">
+                            <Database className="h-4 w-4" />
+                            {`${tool?.id}`}
                         </Badge>
                     ))}
                 </>
@@ -467,9 +467,9 @@ export const TimelineItemContent = ({
             {milestone?.rfps?.length > 0 && (
                 <>
                     {milestone.rfps.map(({rfp}, index) => (
-                        <Badge key={index} variant="orange" className="min-w-fit w-fit font-normal">
-                            <Megaphone size={16} />
-                            {rfp?.title}
+                        <Badge variant="orange">
+                            <Megaphone className="h-4 w-4" />
+                            {`${rfp?.title}`}
                         </Badge>
                     ))}
                 </>

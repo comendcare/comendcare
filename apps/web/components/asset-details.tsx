@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client"
+import type {Prisma} from "@prisma/client"
 import {HoverCard} from "@comend/components/ui/hover-card";
 import { cn } from "@comend/lib/utils"
 import { PrivateBadge } from "./private-badge"
