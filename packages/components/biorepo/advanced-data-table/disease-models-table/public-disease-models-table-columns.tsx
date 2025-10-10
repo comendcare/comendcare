@@ -48,6 +48,8 @@ export function useDiseaseModelsTableColumns(presetName?: Preset): ColumnDef<any
                     </Link>
                 </div>
             ),
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
         },
         {
             id: "sortId.id", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -60,7 +62,8 @@ export function useDiseaseModelsTableColumns(presetName?: Preset): ColumnDef<any
                     <p>{row.original.id || 'No Model ID'}</p>
                 </div>
             ),
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
             meta: { label: "Model ID" }
         },
         {
@@ -79,7 +82,8 @@ export function useDiseaseModelsTableColumns(presetName?: Preset): ColumnDef<any
                     })}
                 </>
             ),
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
             enableColumnFilter: true,
             meta: {
                 label: "Type",
@@ -99,7 +103,8 @@ export function useDiseaseModelsTableColumns(presetName?: Preset): ColumnDef<any
                     <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
                 </div>
             ),
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
             meta: { label: "Condition" }
         },
         {
@@ -108,7 +113,8 @@ export function useDiseaseModelsTableColumns(presetName?: Preset): ColumnDef<any
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Strain"/>
             ),
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
             meta: {
                 label: "Strain"
             }
@@ -122,7 +128,8 @@ export function useDiseaseModelsTableColumns(presetName?: Preset): ColumnDef<any
             cell: ({row}) => (
                 <>{row.original.gene?.symbol}</>
             ),
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
             meta: { label: "Gene" }
         },
         {
@@ -131,7 +138,8 @@ export function useDiseaseModelsTableColumns(presetName?: Preset): ColumnDef<any
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Genotype"/>
             ),
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
             meta: {
                 label: "Genotype"
             }
@@ -145,8 +153,30 @@ export function useDiseaseModelsTableColumns(presetName?: Preset): ColumnDef<any
             cell: ({row}) => {
                 return <>{row.original.institution?.name}</>
             },
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
             meta: { label: "Storage Facility" }
+        },
+        {
+            id: "contacts",
+            accessorKey: "contacts",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Point of Contact"/>
+            ),
+            cell: ({row}) => (
+                <ul className="flex flex-col gap-2">
+                    {row.original.contacts?.map((contact: any, index: number) => (
+                        <li key={index}>
+                            {contact.name || contact.email || contact.affiliation}
+                        </li>
+                    ))}
+                </ul>
+            ),
+            enableSorting: false,
+            enableHiding: preset !== 'profile',
+            meta: {
+                label: "Point of Contact"
+            }
         },
         {
             id: "links",
@@ -171,7 +201,7 @@ export function useDiseaseModelsTableColumns(presetName?: Preset): ColumnDef<any
                 </ul>
             ),
             enableSorting: false,
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
             meta: { label: "Links" }
         },
         {
@@ -186,14 +216,14 @@ export function useDiseaseModelsTableColumns(presetName?: Preset): ColumnDef<any
                 </div>
             ),
             enableSorting: false,
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
             meta: { label: "Description" }
         },
     ]
 
     const presets: Record<Preset, string[]> = {
         default: columns.map((c) => c.id as string),
-        profile: ["type.label", "pointOfContact.name", "links"],
+        profile: ["type.label", "contacts", "links", "gene.symbol", "genotype.genotype"],
     };
 
     const wanted = new Set(presets[preset]);

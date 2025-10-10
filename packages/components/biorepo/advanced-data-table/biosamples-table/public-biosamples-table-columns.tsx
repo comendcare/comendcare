@@ -58,6 +58,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                     </Link>
                 </div>
             ),
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile'
         },
         {
             id: "donor.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -71,8 +73,9 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                     <p>{row.original.donorId}</p>
                 </div>
             ),
-            enableHiding: true,
-            meta: { label: "Public Donor ID" }
+            enableHiding: preset !== 'profile',
+            meta: { label: "Public Donor ID" },
+            enableSorting: preset !== 'profile'
         },
         {
             id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -85,7 +88,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                     <p>{row.original.id || 'No Sample ID'}</p>
                 </div>
             ),
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
             meta: { label: "Sample ID" }
         },
         {
@@ -104,7 +108,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                     })}
                 </>
             ),
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
             meta: { label: "Type" }
         },
         {
@@ -118,7 +123,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                     <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
                 </div>
             ),
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
             meta: { label: "Condition" }
         },
         {
@@ -130,7 +136,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
             cell: ({row}) => (
                 <>{row.original.gene?.symbol}</>
             ),
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
             meta: { label: "Gene" }
         },
         {
@@ -139,7 +146,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Genotype"/>
             ),
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
             meta: {
                 label: "Genotype"
             }
@@ -180,7 +188,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                     }
                 </>
             ),
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
             meta: { label: "Available Quantity" }
         },
         {
@@ -192,8 +201,28 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
             cell: ({row}) => {
                 return <>{row.original.institution?.name}</>
             },
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
+            enableSorting: preset !== 'profile',
             meta: { label: "Storage Facility" }
+        },
+        {
+            id: "contacts",
+            accessorKey: "contacts",
+            header: ({column}) => (
+                <DataTableColumnHeader column={column} title="Point of Contact"/>
+            ),
+            cell: ({row}) => (
+                <ul className="flex flex-col gap-2">
+                    {row.original.contacts?.map((contact: any, index: number) => (
+                        <li key={index}>
+                            {contact.name || contact.email || contact.affiliation}
+                        </li>
+                    ))}
+                </ul>
+            ),
+            enableHiding: preset !== 'profile',
+            enableSorting: false,
+            meta: { label: "Point of Contact" }
         },
         {
             id: "links",
@@ -218,7 +247,7 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                 </ul>
             ),
             enableSorting: false,
-            enableHiding: true,
+            enableHiding: preset !== 'profile',
             meta: { label: "Links" }
         },
         // {
@@ -241,7 +270,7 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
 
     const presets: Record<Preset, string[]> = {
         default: columns.map((c) => c.id as string),
-        profile: ["type.label", "pointOfContact.name", "links"],
+        profile: ["type.label", "contacts", "links", "gene.symbol", "genotype.genotype"],
     };
 
     const wanted = new Set(presets[preset]);

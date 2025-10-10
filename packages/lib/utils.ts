@@ -18,6 +18,20 @@ import {
 } from "./types";
 import Papa from "papaparse";
 
+const dateFmtUTC = new Intl.DateTimeFormat("en-US", {
+    timeZone: "UTC",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+});
+
+export function formatDateUTC(d?: string | Date) {
+    if (!d) return "";
+    const dd = new Date(d);
+    if (isNaN(dd.getTime())) return "";
+    return dateFmtUTC.format(dd);
+}
+
 export function runInProduction<T>(fn: () => T | Promise<T>) {
     if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
         return fn();
