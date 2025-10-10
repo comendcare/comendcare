@@ -22,7 +22,6 @@ import {
 } from '@udecode/plate-common/react';
 import { DatePlugin } from '@udecode/plate-date/react';
 import { EmojiInputPlugin } from '@udecode/plate-emoji/react';
-import { ExcalidrawPlugin } from '@udecode/plate-excalidraw/react';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 import { TocPlugin } from '@udecode/plate-heading/react';
 import { HighlightPlugin } from '@udecode/plate-highlight/react';

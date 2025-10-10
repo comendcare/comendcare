@@ -15,7 +15,6 @@ import { HeadingPlugin } from "@udecode/plate-heading/react"
 import { HorizontalRulePlugin } from "@udecode/plate-horizontal-rule/react"
 import { LinkPlugin } from "@udecode/plate-link/react"
 import { ImagePlugin, MediaEmbedPlugin } from "@udecode/plate-media/react"
-import { ExcalidrawPlugin } from "@udecode/plate-excalidraw/react"
 import { TogglePlugin } from "@udecode/plate-toggle/react"
 import { ColumnPlugin, ColumnItemPlugin } from "@udecode/plate-layout/react"
 import { CaptionPlugin } from "@udecode/plate-caption/react"
@@ -113,7 +112,6 @@ const plateEditor = createPlateEditor({
             render: { afterEditable: () => <LinkFloatingToolbar /> }
         }),
         ImagePlugin,
-        ExcalidrawPlugin,
         TogglePlugin,
         ColumnPlugin,
         MediaEmbedPlugin,

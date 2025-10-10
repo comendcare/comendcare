@@ -12,7 +12,6 @@ import {
   type WithDraggableOptions,
   withDraggable as withDraggablePrimitive,
 } from '@udecode/plate-dnd';
-import { ExcalidrawPlugin } from '@udecode/plate-excalidraw/react';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 import { ColumnPlugin } from '@udecode/plate-layout/react';
 import {
@@ -104,13 +103,6 @@ export const withDraggables = (components: any) => {
     },
     {
       key: MediaEmbedPlugin.key,
-      draggableProps: {
-        className:
-          '[&_.slate-gutterLeft]:pt-0 [&_.slate-gutterLeft]:px-0 [&_.slate-gutterLeft]:pb-0',
-      },
-    },
-    {
-      key: ExcalidrawPlugin.key,
       draggableProps: {
         className:
           '[&_.slate-gutterLeft]:pt-0 [&_.slate-gutterLeft]:px-0 [&_.slate-gutterLeft]:pb-0',

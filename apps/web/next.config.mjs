@@ -157,8 +157,10 @@ const nextConfig = {
     },
 }
 
-const withBundleAnalyzer = bundleAnalyzer({
-    enabled: process.env.ANALYZE === 'true',
-})
+let wrapped = (c) => c
+if (process.env.ANALYZE === 'true') {
+    const { default: analyzer } = await import('@next/bundle-analyzer')
+    wrapped = analyzer({ enabled: true })
+}
 
-export default withBundleAnalyzer(nextConfig)
+export default wrapped(nextConfig)
