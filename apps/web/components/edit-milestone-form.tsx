@@ -187,6 +187,7 @@ export function EditMilestoneForm({
     orgIsPublished: boolean
     onClose: () => void
 }) {
+    const [isInitialized, setIsInitialized] = useState(false)
     const {setMilestone, selectedNodeIds} = useRoadmapStore(useShallow(selector))
     // const {recommendations, setRecommendations} = useCROSearchStore(useShallow(recommendationsSelector))
     // const {
@@ -211,23 +212,23 @@ export function EditMilestoneForm({
     const [createBiosampleIsOpen, setCreateBiosampleIsOpen] = useState(false)
     const [createDiseaseModelIsOpen, setCreateDiseaseModelIsOpen] = useState(false)
     const [createClincalDatasetIsOpen, setCreateClinicalDatasetIsOpen] = useState(false)
-    const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
-    const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
+    // const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
+    // const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
 
-    useEffect(() => {
-        async function fetchSavedCompanies() {
-            const res = await getSavedCompaniesFromOrganizationId(
-                session?.user?.organizationId,
-                { companyId: true }
-            );
+    // useEffect(() => {
+    //     async function fetchSavedCompanies() {
+    //         const res = await getSavedCompaniesFromOrganizationId(
+    //             session?.user?.organizationId,
+    //             { companyId: true }
+    //         );
 
-            if (res.success && res.data) {
-                setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
-            }
-        }
+    //         if (res.success && res.data) {
+    //             setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
+    //         }
+    //     }
 
-        fetchSavedCompanies();
-    }, [session, status]);
+    //     fetchSavedCompanies();
+    // }, [session, status]);
 
 
     // state for adding fields
@@ -416,10 +417,6 @@ export function EditMilestoneForm({
         //     } as Milestone], {limit: 3})
         // }
 
-        // toast('Success!', {
-        //     position: "bottom-left",
-        //     description: 'The changes to your milestone have been successfully saved.'
-        // })
         setIsMigrating(false)
     }
 
@@ -432,7 +429,7 @@ export function EditMilestoneForm({
 
     const handleMilestoneFormSubmitCallback = useCallback(
         handleMilestoneFormSubmit,
-        [milestoneData, session?.user.organizationId, setMilestone, milestoneTypes]
+        [milestoneData, setMilestone, milestoneTypes]
     )
 
     const handleShare = async () => {
@@ -459,9 +456,9 @@ export function EditMilestoneForm({
 
     const init = async () => {
         if (session?.user.organizationId) {
-            const biosamples = await getBiosamples(session.user.organizationId)
+            console.log(`start init`)
+            const biosamples = await getBiosamples(session.user.organizationId, { id: true })
             const formattedBiosamples: Option[] = biosamples.data.map((biosample: Biosample, index: number) => {
-                const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
                 return (
                     {
                         value: biosample.id, 
@@ -473,9 +470,8 @@ export function EditMilestoneForm({
                     }
                 )
             })
-            const diseaseModels = await getDiseaseModels(session.user.organizationId)
+            const diseaseModels = await getDiseaseModels(session.user.organizationId, { id: true })
             const formattedDiseaseModels: Option[] = diseaseModels.data.map((diseaseModel: DiseaseModel) => {
-                const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
                 return (
                     {
                         value: diseaseModel.id, 
@@ -486,7 +482,7 @@ export function EditMilestoneForm({
                     }
                 )
             })
-            const datasamples = await getDatasamples(session.user.organizationId)
+            const datasamples = await getDatasamples(session.user.organizationId, { id: true })
             const formattedDatasamples: Option[] = datasamples.data.map((datasample: Tool) => {
                 return (
                     {
@@ -503,29 +499,31 @@ export function EditMilestoneForm({
             const rfpsResponse = await getRFPs(session.user.organizationId, {
                 id: true,
                 title: true,
-                description: true,
-                openTo: true,
-                startDate: true,
-                endDate: true,
-                contacts: true,
-                attachments: true,
-                budget: true,
-                private: true,
-                headerImage: true,
-                milestones: true
+                // description: true,
+                // openTo: true,
+                // startDate: true,
+                // endDate: true,
+                // contacts: true,
+                // attachments: true,
+                // budget: true,
+                // private: true,
+                // headerImage: true,
+                // milestones: true
             })
             if (rfpsResponse.success && rfpsResponse.data) {
                 setFetchedRFPs(rfpsResponse.data || [])
             }
+
+            console.log(`end init`)
         }
 
         // get milestone types from database
         const response = await getMilestoneTypes({
             id: true,
             label: true,
-            services: true,
-            categories: true,
-            description: true
+            // services: true,
+            // categories: true,
+            // description: true
         })
         if (response.success && response.data) {
             setMilestoneTypes(response.data || [])
@@ -555,10 +553,10 @@ export function EditMilestoneForm({
     // }, [tab])
 
     // Watch form changes, don't watch while initializing
-    useEffect(() => {
-        const subscription = form.watch((values) => debounceUpdates(values))
-        return () => subscription.unsubscribe();
-    }, [form.watch, debounceUpdates, form])
+    // useEffect(() => {
+    //     const subscription = form.watch((values) => debounceUpdates(values))
+    //     return () => subscription.unsubscribe();
+    // }, [form.watch, debounceUpdates, form])
 
     useEffect(() => {
         // Forces re-validation whenever the startDate or endDate changes
@@ -612,9 +610,9 @@ export function EditMilestoneForm({
                                     {/*<TabsTrigger className="relative data-[state=active]:bg-secondary" value="publications">*/}
                                     {/*    Publications*/}
                                     {/*</TabsTrigger>*/}
-                                    <TabsTrigger className="relative data-[state=active]:bg-secondary" value="projects">
+                                    {/* <TabsTrigger className="relative data-[state=active]:bg-secondary" value="projects">
                                         Similar projects
-                                    </TabsTrigger>
+                                    </TabsTrigger> */}
                                 </TabsList>
                             </div>
                             {isMigrating ? (
@@ -1193,9 +1191,9 @@ export function EditMilestoneForm({
                                     {/*        onAttach={(att) => addAttachmentToForm(form, att)}*/}
                                     {/*    />*/}
                                     {/*</TabsContent>*/}
-                                    <TabsContent value="projects" className="space-y-4 w-full">
+                                    {/* <TabsContent value="projects" className="space-y-4 w-full">
                                         <EditMilestoneDetailsProjectsTab projectId={milestoneData.id}/>
-                                    </TabsContent>
+                                    </TabsContent> */}
                                 </>
                             )}
                         </Tabs>
@@ -1333,7 +1331,7 @@ export function EditMilestoneForm({
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
+            {/* <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
                 <DialogContent className="min-w-fit">
                     {organization && "subdomain" in organization && typeof organization.subdomain === "string" ? (
                         <ShareDialog
@@ -1369,7 +1367,7 @@ export function EditMilestoneForm({
                         <div className="text-sm text-muted-foreground">Loading organization...</div>
                     )}
                 </DialogContent>
-            </Dialog>
+            </Dialog> */}
         </>
     )
 }

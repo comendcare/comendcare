@@ -344,10 +344,11 @@ export function Roadmap({
                                 className="m-0 h-[calc(100vh-10rem)]"
                             >
                                 {milestones.length > 0 ? (
-                                    <PrivateFlowView
-                                        width={defaultLayout[0]}
-                                        contextMenuRef={contextMenuRef} 
-                                    />
+                                    <></>
+                                    // <PrivateFlowView
+                                    //     width={defaultLayout[0]}
+                                    //     contextMenuRef={contextMenuRef} 
+                                    // />
                                 ): (
                                     <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
                                 )}

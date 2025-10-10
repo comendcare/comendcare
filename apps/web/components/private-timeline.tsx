@@ -115,7 +115,7 @@ export const TimelineView = ({sortBy, contextMenuRef}: {sortBy: string, contextM
 
     return (
         <ScrollArea className="w-full h-full px-10 pt-0">
-            <DndContext
+            {/* <DndContext
                 accessibility={{
                     announcements
                 }}
@@ -135,7 +135,7 @@ export const TimelineView = ({sortBy, contextMenuRef}: {sortBy: string, contextM
                         timelineOrder: index
                     })))
                 }}
-            >
+            > */}
                 <ol className="ml-2 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
                     <SortableContext 
                         disabled={sortBy !== "custom"}
@@ -194,7 +194,7 @@ export const TimelineView = ({sortBy, contextMenuRef}: {sortBy: string, contextM
                         ))}
                     </SortableContext>
                 </ol>
-            </DndContext>
+            {/* </DndContext> */}
         </ScrollArea>
     )
 }

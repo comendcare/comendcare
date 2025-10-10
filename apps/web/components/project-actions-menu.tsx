@@ -43,80 +43,80 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
 
     const {setSelectedNodeIds, addMilestones} = useRoadmapStore(useShallow(selector))
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        async function fetchOrgData() {
-            if (session?.user.organizationId) {
-                try {
-                    const response = await getOrganizationFromOrganizationId(session.user.organizationId, {
-                        id: true,
-                        public: true,
-                        verified: true,
-                        published: true,
-                        name: true,
-                        description: true,
-                        contactEmail: true,
-                        logo: true,
-                        image: true,
-                        headerImage: true,
-                        biopharmaConsentSettings: true,
-                        subdomain: true,
-                        customDomain: true,
-                        statedGoal: true,
-                        yearFounded: true,
-                        incorporationStatus: true,
-                        therapeuticsOfInterest: true,
-                        therapeuticsInDevelopment: true,
-                        website: true,
-                        moneyRaised: true,
-                        moneyDeployed: true,
-                        researchBudget: true,
-                        // address1                  String?
-                        // address2                  String?
-                        // formattedAddress          String?
-                        // city                      String?
-                        // region                    String?
-                        // postalCode                String?
-                        // country                   String?
-                        // lat                       String?
-                        // lng                       String?
-                        createdAt: true,
-                        updatedAt: true,
-                        user: true,
-                        userId: true,
-                        roadmaps: true,
-                        members: true,
-                        clients: true,
-                        invitations: true,
-                        membershipRequests: true,
-                        conditions: true,
-                        kanban: true,
-                        milestones: true,
-                        platformNotifications: true,
-                        reviews: true,
-                        savedCompanies: true,
-                        tools: true,
-                        rfps: true,
-                        metadata: true
-                    })
+    //     async function fetchOrgData() {
+    //         if (session?.user.organizationId) {
+    //             try {
+    //                 const response = await getOrganizationFromOrganizationId(session.user.organizationId, {
+    //                     id: true,
+    //                     public: true,
+    //                     verified: true,
+    //                     published: true,
+    //                     name: true,
+    //                     description: true,
+    //                     contactEmail: true,
+    //                     logo: true,
+    //                     image: true,
+    //                     headerImage: true,
+    //                     biopharmaConsentSettings: true,
+    //                     subdomain: true,
+    //                     customDomain: true,
+    //                     statedGoal: true,
+    //                     yearFounded: true,
+    //                     incorporationStatus: true,
+    //                     therapeuticsOfInterest: true,
+    //                     therapeuticsInDevelopment: true,
+    //                     website: true,
+    //                     moneyRaised: true,
+    //                     moneyDeployed: true,
+    //                     researchBudget: true,
+    //                     // address1                  String?
+    //                     // address2                  String?
+    //                     // formattedAddress          String?
+    //                     // city                      String?
+    //                     // region                    String?
+    //                     // postalCode                String?
+    //                     // country                   String?
+    //                     // lat                       String?
+    //                     // lng                       String?
+    //                     createdAt: true,
+    //                     updatedAt: true,
+    //                     user: true,
+    //                     userId: true,
+    //                     roadmaps: true,
+    //                     members: true,
+    //                     clients: true,
+    //                     invitations: true,
+    //                     membershipRequests: true,
+    //                     conditions: true,
+    //                     kanban: true,
+    //                     milestones: true,
+    //                     platformNotifications: true,
+    //                     reviews: true,
+    //                     savedCompanies: true,
+    //                     tools: true,
+    //                     rfps: true,
+    //                     metadata: true
+    //                 })
 
-                    // Map the response to the correct structure if needed
-                    if (response.success && response.data) {
-                        setOrganization(response.data);
-                    } else {
-                        console.error(response.error)
-                        toast.error(response.error)
-                    }
+    //                 // Map the response to the correct structure if needed
+    //                 if (response.success && response.data) {
+    //                     setOrganization(response.data);
+    //                 } else {
+    //                     console.error(response.error)
+    //                     toast.error(response.error)
+    //                 }
 
-                } catch (error) {
-                    console.error("Error fetching organizations:", error);
-                    toast.error("Couldn't get organizations");
-                }
-            }
-        }
+    //             } catch (error) {
+    //                 console.error("Error fetching organizations:", error);
+    //                 toast.error("Couldn't get organizations");
+    //             }
+    //         }
+    //     }
 
-        fetchOrgData()
-    }, [session])
+    //     fetchOrgData()
+    // }, [session])
 
     const handleEdit = () => {
         if (milestone.nodeId) setSelectedNodeIds([milestone.nodeId])
@@ -127,20 +127,20 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
         setShareIsOpen(true)
     }
 
-    const handleDuplicate = async () => {
-        const newNodes = await addMilestones([{
-            // nodeType: milestone.nodeType || milestone.nodeType,
-            // title: milestone.title,
-            // description: milestone.description,
-            // types: milestone.types || [],
-            // status: milestone.status,
-            // tools: milestone.tools,
-            // rfps: milestone.rfps,
-            // contacts: milestone.contacts,
-            ...milestone
-        }], "Duplicate")
-        if (newNodes && newNodes.length > 0) setSelectedNodeIds([newNodes[0].id])
-    }
+    // const handleDuplicate = async () => {
+    //     const newNodes = await addMilestones([{
+    //         // nodeType: milestone.nodeType || milestone.nodeType,
+    //         // title: milestone.title,
+    //         // description: milestone.description,
+    //         // types: milestone.types || [],
+    //         // status: milestone.status,
+    //         // tools: milestone.tools,
+    //         // rfps: milestone.rfps,
+    //         // contacts: milestone.contacts,
+    //         ...milestone
+    //     }], "Duplicate")
+    //     if (newNodes && newNodes.length > 0) setSelectedNodeIds([newNodes[0].id])
+    // }
 
     const handleDelete = async () => {
         // override default delete behaviour with our custom dialog
