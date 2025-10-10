@@ -13,6 +13,7 @@ import Onborda from "~web/components/onborda/Onborda";
 import OnboardingCard from "~web/components/onboarding-card";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/packages/lib/auth";
+import CustomerIOSnippet from "@/packages/components/customerio";
 
 
 // Set up Playfair Display and Source Sans 3 fonts
@@ -119,6 +120,7 @@ export default async function RootLayout({
                     />
                 </>
             )}
+            <CustomerIOSnippet />
         </head>
         <body>
         <Suspense fallback={<Loading/>}>

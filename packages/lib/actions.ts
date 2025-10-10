@@ -54,6 +54,7 @@ import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/lib
 import z from "zod"
 import {writeRawEvent} from "./raw-events";
 import crypto from "node:crypto";
+import {customerIOOnResearchPlanCreated} from "./customer-io";
 
 const PATHS = [
     "/app",
@@ -4110,6 +4111,21 @@ export const createRoadmap = withOrganizationAuth(
                     userName: actor?.userName,
                 },
             });
+
+            try {
+                if (actor?.userId) {
+                    await customerIOOnResearchPlanCreated(actor.userId, {
+                        roadmapId: roadmap.id,
+                        orgId: organization.id,
+                        orgSubdomain: organization.subdomain,
+                        templateId: roadmapTemplate?.id,
+                        title: finalRoadmap?.title ?? roadmapTemplate?.title,
+                        numMilestones: finalRoadmap?.milestones.length ?? 0,
+                    });
+                }
+            } catch (e) {
+                console.error("customerIOOnResearchPlanCreated failed:", e);
+            }
 
             // This is to make it so that saving shows the newly created projects from the roadmap
             revalidatePath("/app/marketplace/service-providers")
