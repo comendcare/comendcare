@@ -30,7 +30,7 @@ export const PagProfileAboutCard = ({
     return (
         <Card className="organization-profile-tour-step1" data-testid="about-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight" data-testid="about-title">
+                <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="about-title">
                     About us
                 </CardTitle>
                 {organization && editable && <EditPagProfileAboutCardDialog organization={organization} />}

@@ -67,7 +67,7 @@ export const PAGProfileConditionsCard = ({
         return (
             <Card data-testid="conditions-card">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight" data-testid="conditions-title">
+                    <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="conditions-title">
                         Conditions
                     </CardTitle>
                 </CardHeader>
@@ -80,7 +80,7 @@ export const PAGProfileConditionsCard = ({
         return (
             <Card className="organization-profile-tour-step2" data-testid="conditions-card">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight" data-testid="conditions-title">
+                    <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="conditions-title">
                         Conditions
                     </CardTitle>
                     {showEditDialog && <EditPAGProfileConditionCardDialog organization={organization} />}
@@ -106,7 +106,7 @@ export const PAGProfileConditionsCard = ({
             <TooltipProvider>
                 <Card className="organization-profile-tour-step2" data-testid="conditions-card">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight" data-testid="conditions-title">
+                        <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="conditions-title">
                             {condition?.name ?? "No name condition"}
                         </CardTitle>
                         {showEditDialog && <EditPAGProfileConditionCardDialog organization={organization} />}
@@ -131,13 +131,13 @@ export const PAGProfileConditionsCard = ({
                                     <ul className="flex flex-col list-disc list-inside">
                                         {condition?.prevalenceNumerator && condition?.prevalenceDenominator && (
                                             <li data-testid="epi-prevalence">
-                                                <span className="font-bold">{condition?.prevalenceNumerator}</span> in{" "}
-                                                <span className="font-bold">{condition?.prevalenceDenominator}</span> prevalence
+                                                <span className="font-semibold">{condition?.prevalenceNumerator}</span> in{" "}
+                                                <span className="font-semibold">{condition?.prevalenceDenominator}</span> prevalence
                                             </li>
                                         )}
                                         {condition?.numberOfPatientsEngaged && (
                                             <li data-testid="epi-patients-engaged">
-                        <span className="font-bold">
+                        <span className="font-semibold">
                           {formatNumberWithCommas(condition?.numberOfPatientsEngaged.toString())}
                         </span>{" "}
                                                 patients engaged
@@ -145,7 +145,7 @@ export const PAGProfileConditionsCard = ({
                                         )}
                                         {condition?.nationalEstimatedPopulation && (
                                             <li data-testid="epi-us-population">
-                        <span className="font-bold">
+                        <span className="font-semibold">
                           {formatNumberWithCommas(condition?.nationalEstimatedPopulation.toString())}
                         </span>{" "}
                                                 patients in the US
@@ -153,7 +153,7 @@ export const PAGProfileConditionsCard = ({
                                         )}
                                         {condition?.globalEstimatedPopulation && (
                                             <li data-testid="epi-global-population">
-                        <span className="font-bold">
+                        <span className="font-semibold">
                           {formatNumberWithCommas(condition?.globalEstimatedPopulation.toString())}
                         </span>{" "}
                                                 patients globally
