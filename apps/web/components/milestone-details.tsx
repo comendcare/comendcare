@@ -139,8 +139,8 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                             </h2>
                         </div>
                         <ol className="flex flex-col justify-start gap-2">
-                            {milestone.contacts.map((contact: any) => (
-                                <div className="bg-secondary w-full rounded-md p-4">
+                            {milestone.contacts.map((contact: any, index: number) => (
+                                <div key={index} className="bg-secondary w-full rounded-md p-4">
                                     <h4 className="font-semibold text-md flex gap-2 items-center text-wrap">
                                         <User className="h-4 w-4"/>
                                         {contact.name}
