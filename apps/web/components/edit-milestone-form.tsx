@@ -12,7 +12,7 @@ import {
     FormItem,
     FormMessage,
     FormDescription,
-} from "@comend/components/ui/form"
+} from "@comend/components/ui/form" 
 import {Input} from "@comend/components/ui/input"
 import {AutosizeTextarea, Textarea} from "@comend/components/ui/textarea"
 import {Button} from "@comend/components/ui/button"
@@ -80,7 +80,7 @@ import Link from "next/link"
 import Loading from "@/loading";
 import {getMilestoneTypes} from "@comend/lib/fetchers"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
-import {Globe, Lock, Plus, X, Store, Share, Trash, TestTubeDiagonal, Rat, Database, Megaphone} from "lucide-react"
+import {Globe, Lock, Plus, X, Share, Trash} from "lucide-react"
 import {badgeVariants} from "@comend/components/ui/badge"
 import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onbordaStore"
 import {mixpanelTrack} from "@comend/lib/mixpanel"
@@ -261,7 +261,7 @@ export function EditMilestoneForm({
                         {
                             value: biosample.id, 
                             type: 'Biosamples', 
-                            icon: TestTubeDiagonal,
+                            icon: 'test-tube-diagonal',
                             // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
                             label: `${biosample.id}`,
                             biosample
@@ -274,7 +274,7 @@ export function EditMilestoneForm({
                         {
                             value: diseaseModel.id, 
                             label: `${diseaseModel.id}`,
-                            icon: Rat,
+                            icon: 'rat',
                             type: 'Disease Models',
                             diseaseModel
                         }
@@ -285,7 +285,7 @@ export function EditMilestoneForm({
                         {
                             value: tool?.id, 
                             label: `${tool?.id}`, 
-                            icon: Database,
+                            icon: 'database',
                             type: 'Clinical Datasets',
                             datasample: tool,
                         }
@@ -466,7 +466,7 @@ export function EditMilestoneForm({
                     {
                         value: biosample.id, 
                         type: 'Biosamples', 
-                        icon: TestTubeDiagonal,
+                        icon: "test-tube-diagonal",
                         // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
                         label: `${biosample.id}`,
                         biosample
@@ -480,7 +480,7 @@ export function EditMilestoneForm({
                     {
                         value: diseaseModel.id, 
                         label: `${diseaseModel.id}`,
-                        icon: Rat,
+                        icon: 'rat',
                         type: 'Disease Models',
                         diseaseModel
                     }
@@ -492,7 +492,7 @@ export function EditMilestoneForm({
                     {
                         value: datasample.id, 
                         label: datasample.id, 
-                        icon: Database,
+                        icon: 'database',
                         type: 'Clinical Datasets',
                         datasample
                     }
@@ -785,7 +785,7 @@ export function EditMilestoneForm({
                                                                     ...rfp,
                                                                     value: rfp.id,
                                                                     label: rfp.title,
-                                                                    icon: Megaphone
+                                                                    icon: 'megaphone'
                                                                 } as Option))}
                                                                 onChange={field.onChange}
                                                                 defaultOptions={fetchedRFPs.map(rfp => ({

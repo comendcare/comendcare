@@ -14,14 +14,7 @@ import { Tabs, TabsTrigger, TabsList, TabsContent } from "@comend/components/ui/
 import { PrivateFlowView } from "~web/components/private-flow"
 import { EditMilestoneForm } from "./edit-milestone-form"
 import {useEffect, useMemo, useRef, useState} from "react"
-import { usePathname, useSearchParams } from "next/navigation"
-import {
-    getMilestones,
-    getMilestoneTypes,
-    getOrganizationFromOrganizationId,
-    getPublicMilestoneDetails,
-    getRoadmap
-} from "@comend/lib/fetchers"
+import { usePathname } from "next/navigation"
 import { TimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "@comend/components/ui/button"
 import { cn, parseCSV } from "@comend/lib/utils"
@@ -46,7 +39,6 @@ import { Milestone } from "@comend/lib/types"
 import Loading from "@/loading";
 import { MilestoneType, Organization, Roadmap as RoadmapType } from "@prisma/client"
 import { useSession } from "next-auth/react"
-import { ResearchPlanOnbordaState, useOnbordaStore } from "@/state/onborda/onbordaStore"
 import { EditResearchPlanForm } from "./edit-research-plan-form"
 import { StageOfActivityBadge } from "./public-roadmap-card"
 import { Separator } from "@comend/components/ui/separator"
@@ -58,8 +50,6 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@comend/components/ui/context-menu"
-import { NotificationBubble } from "./notification-bubble"
-import { useOnborda } from "./onborda/OnbordaContext"
 import {initializeRoadmapState} from "@/packages/lib/initialize-client-state";
 
 const selector = (state: RoadmapState) => ({
@@ -77,28 +67,35 @@ const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone
 })
 
-const onbordaSelector = (state: ResearchPlanOnbordaState) => ({
-    step: state.step
-})
-
 export function Roadmap({
-                            milestoneTypes,
-                            organization,
-                            orgSubdomain,
-                            orgIsPublished,
-                            researchPlanId,
-                        }: {
+    milestoneTypes,
+    organization,
+    orgSubdomain,
+    orgIsPublished,
+    researchPlanId,
+    initRoadmap,
+    initEdges,
+    initNodes,
+    initMilestones,
+    urlNode,
+    urlView,
+}: {
     milestoneTypes: MilestoneType[];
     organization?: Organization;
     orgSubdomain?: string;
     orgIsPublished: boolean;
     researchPlanId: string;
-}) {    // Zustand state management
+    initRoadmap: any;
+    initEdges: any[];
+    initNodes: any[];
+    initMilestones: any[];
+    urlNode: string | string[] | undefined;
+    urlView: string | string[] | undefined;
+}) {
     const { defaultLayout } = useSidebarStore()
     const { 
         roadmapId,
         details,
-        initialized,
         selectedView,
         setSelectedView,
         selectedNodeIds, 
@@ -109,26 +106,19 @@ export function Roadmap({
         deleteNode,
         setMilestone
     } = useRoadmapStore(useShallow(selector))
-    const { step } = useOnbordaStore(useShallow(onbordaSelector))
     const {data: session, status} = useSession()
     const pathname = usePathname()
-    const searchParams = useSearchParams()
     const { undo, redo } = useRoadmapStore.temporal.getState()
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
-    const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false)
+    // const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false)
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
-    // controllig tabs in this upper level so we can manually control which tab is selected, based on which trigger button is clicked
+    // controlling tabs in this upper level so we can manually control which tab is selected, based on which trigger button is clicked
     const [tab, setTab] = useState<TabType>('projects')
     // const [sortBy, setSortBy] = useState('custom')
     const [sortBy, setSortBy] = useState('default')
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
-    const { isOnbordaVisible } = useOnborda()
     const contextMenuRef = useRef<HTMLDivElement>(null)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
-    const focusRef = useRef<any>(null);
-
-    // stable string for deps
-    const searchParamsString = useMemo(() => searchParams.toString(), [searchParams])
 
     useEffect(() => {
         // Don’t call the API until we know the session status
@@ -141,101 +131,23 @@ export function Roadmap({
             return
         }
 
-        let cancelled = false
-        const init = async () => {
-            const response = await getRoadmap(orgId, researchPlanId, {
-                id: true,
-                title: true,
-                description: true,
-                content: true,
-                slug: true,
-                image: true,
-                createdAt: true,
-                updatedAt: true,
-                published: true,
-                organizationId: true,
-                organization: true,
-                user: true,
-                edges: true,
-                milestones: true,
-                nodes: true,
-                modalities: true,
-                metadata: true,
-            })
-
-            if (cancelled) return
-
-            if (response.success && response.data) {
-                const urlNode = new URLSearchParams(searchParamsString).get("milestone")
-                const urlView = new URLSearchParams(searchParamsString).get("view")
-
-                initializeRoadmapState({
-                    roadmapId: researchPlanId,
-                    details: response.data,
-                    nodes: response.data.nodes,
-                    edges: response.data.edges,
-                    milestones: response.data.milestones,
-                    selectedView: urlView,
-                    selectedNodeIds: urlNode ? [urlNode] : [],
-                })
-                // optional: toast.success("Research Plan loaded")
-            } else {
-                console.error(`Could not initialize active roadmap with id ${researchPlanId}. Error: ${response.error}`)
-                toast.error(`Could not initialize active roadmap with id ${researchPlanId}. Error: ${response.error}`)
-            }
-        }
-
-        // Init notifications
-        // let notifications = await getAllNotifications({
-        //     id: true,
-        //     type: true,
-        //     title: true,
-        //     message: true,
-        //     link: true,
-        //     createdAt: true,
-        //     updatedAt: true,
-        //     lastViewedAt: true,
-        // })
-        // if (notifications.success && notifications.data) {
-        //     initializeNotificationsState({
-        //         notifications: notifications.data
-        //     })
-        //     console.log(`Notificaions initialized...`)
-        // } else {
-        //     console.error(notifications.error)
-        //     toast.error(notifications.error)
-        // }
-
-        void init()
-        return () => {
-            cancelled = true
-        }
-    }, [status, session?.user.organizationId, researchPlanId, searchParamsString])
-
-    // 1) Safe initial state (runs on server too)
-    const [newFlowProjects, setNewFlowProjects] = useState<string | undefined>(() => {
-        if (typeof window === "undefined") return undefined
-        return window.functionalConsentedLocalStorage?.get("newFlowProjects")
-    })
-
-    // 2) Update after mount (browser only)
-    useEffect(() => {
-        // delay this by 1 second so the browser has time to set the localstorage flag (if the user has consented)
-        const t = setTimeout(() => {
-            if (typeof window !== "undefined") {
-                setNewFlowProjects(window.functionalConsentedLocalStorage?.get("newFlowProjects"))
-            }
-        }, 1000)
-        return () => clearTimeout(t)
-    }, [milestones, selectedView])
-
-    useEffect(() => {
-        if (step === ".onborda-select-a-template" && isOnbordaVisible) {
-            setTab('projects')
-            setNewMilestoneIsOpen(true)
-        }
-    }, [step])
-
+        initializeRoadmapState({
+            roadmapId: researchPlanId,
+            details: initRoadmap,
+            nodes: initNodes || [],
+            edges: initEdges || [],
+            milestones: initMilestones || [],
+            selectedView: (() => {
+                if (typeof urlView === 'string') return urlView
+                return undefined
+            })(),
+            selectedNodeIds: (() => {
+                if (typeof urlNode === 'string') return [urlNode]
+                if (Array.isArray(urlNode)) return urlNode
+                return []
+            })(),
+        })
+    }, [status, session?.user.organizationId, researchPlanId])
 
     useEffect(() => {
         milestoneRemountKeyRef.current = milestoneRemountKey;  // Always sync ref with the latest state
@@ -272,7 +184,7 @@ export function Roadmap({
     }, [selectedNodeIds, milestoneRemountKey, redo, undo, saveState]);
 
     useEffect(() => {
-        const params = new URLSearchParams(searchParams.toString())
+        const params = new URLSearchParams()
 
         if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
             params.set("project", selectedNodeIds[0])
@@ -289,7 +201,7 @@ export function Roadmap({
         // ensure shallow url update
         const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
         window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
-    }, [selectedNodeIds, selectedView, pathname, searchParams])
+    }, [selectedNodeIds, selectedView, pathname])
     
     const handleMilestonePanelChange = (open: boolean) => {
         if (!open) { setSelectedNodeIds([]) }
@@ -304,7 +216,7 @@ export function Roadmap({
         document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
     }
 
-    if (!roadmapId || !initialized) {
+    if (!roadmapId) {
         return <Loading />
     }
 
@@ -326,7 +238,7 @@ export function Roadmap({
                             setTab={setTab}
                             setNewMilestoneIsOpen={setNewMilestoneIsOpen}
                             milestoneTypes={milestoneTypes}
-                            setBulkImportIsOpen={setBulkImportIsOpen}
+                            // setBulkImportIsOpen={setBulkImportIsOpen}
                             orgSubdomain={orgSubdomain}
                         />
                         <Tabs defaultValue={selectedView ? selectedView : "flow"} onValueChange={handleTabChange} className="flex flex-col gap-4">
@@ -344,7 +256,6 @@ export function Roadmap({
                                                 {"Interactive whiteboard to organize research plans. Project order changes in this view or the list stay separate."}
                                             </TooltipContent>
                                         </Tooltip>
-                                        {newFlowProjects && <NotificationBubble />}
                                     </TabsTrigger>
                                     <TabsTrigger value="list">List View</TabsTrigger>
                                 </TabsList>
@@ -468,7 +379,7 @@ export function Roadmap({
                                 // onClick={(e) => {e.stopPropagation(); e.preventDefault()}}
                                 defaultSize={40}
                                 minSize={25}
-                                className="bg-white h-full flex flex-col min-w-[400px] onborda-editing-project-details"
+                                className="bg-white h-full flex flex-col min-w-[400px]"
                             >
                                 <MilestoneDetailsPanel
                                     organization={organization}
@@ -484,7 +395,7 @@ export function Roadmap({
                         </>
                     )}
 
-                    <Dialog open={bulkImportIsOpen} onOpenChange={(open: boolean) => {
+                    {/* <Dialog open={bulkImportIsOpen} onOpenChange={(open: boolean) => {
                         setBulkImportIsOpen(open)
                     }}>
                         <DialogContent className="flex flex-col justify-start">
@@ -553,7 +464,7 @@ export function Roadmap({
                                 }}
                             />
                         </DialogContent>
-                    </Dialog>
+                    </Dialog> */}
 
                     <NewMilestoneDialogForm 
                         open={newMilestoneIsOpen}
@@ -684,7 +595,6 @@ const MilestoneDetailsPanel = ({
 const NoMilestonesCard = ({setNewMilestoneIsOpen, setTab}: {setNewMilestoneIsOpen: (val: boolean) => void, setTab: (val: TabType) => void}) => {
     const pathname = usePathname()
     const { setSelectedNodeIds } = useRoadmapStore(useShallow(selector))
-    const { startOnborda } = useOnborda()
 
     return (
         <div className="h-full w-full flex flex-col justify-center items-center gap-4 text-center">
@@ -708,7 +618,6 @@ const NoMilestonesCard = ({setNewMilestoneIsOpen, setTab}: {setNewMilestoneIsOpe
                     if (pathname.includes('app/research-plan')) {
                         setSelectedNodeIds([])
                         setTab('projects')
-                        startOnborda('research-plan-tour')
                     }
                 }}
         >
@@ -747,7 +656,7 @@ const RoadmapHeader = ({
     setTab, 
     setNewMilestoneIsOpen, 
     milestoneTypes, 
-    setBulkImportIsOpen,
+    // setBulkImportIsOpen,
     orgSubdomain
 }: {
     researchPlanId: string,
@@ -755,7 +664,7 @@ const RoadmapHeader = ({
     setTab: any, 
     setNewMilestoneIsOpen: any, 
     milestoneTypes: any, 
-    setBulkImportIsOpen: any,
+    // setBulkImportIsOpen: any,
     orgSubdomain: string | undefined
 }) => {
     const {data: session, status} = useSession()
@@ -765,7 +674,6 @@ const RoadmapHeader = ({
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1024)
     const [editResearchPlanIsOpen, setEditResearchPlanIsOpen] = useState(false)
     const [shareIsOpen, setShareIsOpen] = useState(false)
-    const [organization, setOrganization] = useState<Organization | {}>({})
 
     useEffect(() => {
         const el = parentRef.current;
@@ -782,80 +690,6 @@ const RoadmapHeader = ({
 
         return () => observer.disconnect();
     }, []);
-
-    useEffect(() => {
-        async function fetchOrgData() {
-            if (session?.user.organizationId) {
-                try {
-                    const response = await getOrganizationFromOrganizationId(session.user.organizationId, {
-                        id: true,
-                        public: true,
-                        verified: true,
-                        published: true,
-                        name: true,
-                        description: true,
-                        contactEmail: true,
-                        logo: true,
-                        image: true,
-                        headerImage: true,
-                        biopharmaConsentSettings: true,
-                        subdomain: true,
-                        customDomain: true,
-                        statedGoal: true,
-                        yearFounded: true,
-                        incorporationStatus: true,
-                        therapeuticsOfInterest: true,
-                        therapeuticsInDevelopment: true,
-                        website: true,
-                        moneyRaised: true,
-                        moneyDeployed: true,
-                        researchBudget: true,
-                        // address1                  String?
-                        // address2                  String?
-                        // formattedAddress          String?
-                        // city                      String?
-                        // region                    String?
-                        // postalCode                String?
-                        // country                   String?
-                        // lat                       String?
-                        // lng                       String?
-                        createdAt: true,
-                        updatedAt: true,
-                        user: true,
-                        userId: true,
-                        roadmaps: true,
-                        members: true,
-                        clients: true,
-                        invitations: true,
-                        membershipRequests: true,
-                        conditions: true,
-                        kanban: true,
-                        milestones: true,
-                        platformNotifications: true,
-                        reviews: true,
-                        savedCompanies: true,
-                        tools: true,
-                        rfps: true,
-                        metadata: true
-                    })
-
-                    // Map the response to the correct structure if needed
-                    if (response.success && response.data) {
-                        setOrganization(response.data);
-                    } else {
-                        console.error(response.error)
-                        toast.error(response.error)
-                    }
-
-                } catch (error) {
-                    console.error("Error fetching organizations:", error);
-                    toast.error("Couldn't get organizations");
-                }
-            }
-        }
-
-        fetchOrgData()
-    }, [session])
 
     useEffect(() => {
         setIsCollapsed(parentWidth <= 1024)
@@ -917,8 +751,8 @@ const RoadmapHeader = ({
                 </Tooltip>
             </span>
 
-            <span className="onborda-create-a-project flex flex-row items-center justify-end">
-                <Tooltip>
+            <span className="flex flex-row items-center justify-end">
+                {/* <Tooltip>
                     <TooltipTrigger asChild>
                         <Button 
                             onClick={() => {
@@ -929,14 +763,13 @@ const RoadmapHeader = ({
                             size={isCollapsed ? "icon" : "default"}
                         >
                             <Import />
-                            {/* If the header is < size MD, collapse the button to just the icon (hide text) */}
                             {!isCollapsed && <p>{`Import projects`}</p>}
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-80">
                         <p>{`Import projects from a .csv file`}</p>
                     </TooltipContent>
-                </Tooltip>
+                </Tooltip> */}
 
                 <Button 
                     variant={"ghost"}  
@@ -1053,15 +886,18 @@ const RoadmapHeader = ({
 
             <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
                 <DialogContent className="min-w-fit">
-                    { "subdomain" in organization && typeof organization.subdomain === "string" ? (
+                    {typeof orgSubdomain === "string" ? (
                         <ShareDialog
-                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlanId}`}
-                            organization={organization}
+                            url={`${orgSubdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlanId}`}
+                            organization={{
+                                id: session?.user.organizationId || undefined,
+                                subdomain: orgSubdomain
+                            }}
                             // postMessage={`A new project ${milestone.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
                             // postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
                             // embeddedResearchPlanLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${researchPlanId}`}
                             embeddedResearchPlanData={{
-                                embeddedResearchPlanLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${researchPlanId}`,
+                                embeddedResearchPlanLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${orgSubdomain}/research-plan/${researchPlanId}`,
                                 resarchPlanId: researchPlanId,
                                 researchPlanTitle: researchPlanDetails.title || ''
                             }}

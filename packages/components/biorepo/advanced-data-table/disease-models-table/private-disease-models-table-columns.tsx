@@ -291,6 +291,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                             <Link 
                                 className="line-clamp-2 underline" 
                                 href={attachment.link || "/"}
+                                target="_blank"
                                 onClick={(e) => e.stopPropagation()}
                             >
                             {attachment.name || attachment.link}
