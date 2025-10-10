@@ -807,6 +807,32 @@ export async function getPublicMilestoneDetails(
             select: {
                 ...select,
                 types: select.types ? ({include: {milestoneType: true}}) : undefined,
+                biosamples: select.biosamples ? ({
+                    include: {
+                        biosample: {
+                            include: {
+                                milestones: {
+                                    include: {milestone: true},
+                                    where: {milestone: {private: {equals: false}}}
+                                }
+                            }
+                        },
+                    },
+                    where: {biosample: {private: {equals: false}}}
+                }) : undefined,
+                diseaseModels: select.diseaseModels ? ({
+                    include: {
+                        diseaseModel: {
+                            include: {
+                                milestones: {
+                                    include: {milestone: true},
+                                    where: {milestone: {private: {equals: false}}}
+                                }
+                            }
+                        },
+                    },
+                    where: {diseaseModel: {private: {equals: false}}}
+                }) : undefined,
                 tools: select.tools ? ({
                     include: {
                         tool: {

@@ -15,13 +15,6 @@ export default function LandingFooter() {
                         <Image className="w-48" src={logo} alt="Comend Logo"/>
                     </div>
 
-                    <p className="inline-flex items-center self-center place-self-center justify-center">
-                        Made with ❤️ by
-                        <LinkPreview url={"https://www.comendcare.com/"} target="_blank">
-                            <Image className="w-24 inline" src={logo} alt={"Comend Logo"}/>
-                        </LinkPreview>
-                    </p>
-
                     {/* Ensure icons are centered on mobile and justified on larger screens */}
                     <ul className="flex gap-6 place-self-end justify-center">
                         {/*<li>*/}
