@@ -37,7 +37,7 @@ import { NewMilestoneDialogForm, TabType } from "./new-milestone-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@comend/components/ui/select"
 import { Milestone } from "@comend/lib/types"
 import Loading from "@/loading";
-import { MilestoneType, Organization, Roadmap as RoadmapType } from "@prisma/client"
+import { Biosample, DiseaseModel, MilestoneType, Organization, RFP, Roadmap as RoadmapType, Tool } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { EditResearchPlanForm } from "./edit-research-plan-form"
 import { StageOfActivityBadge } from "./public-roadmap-card"
@@ -77,6 +77,10 @@ export function Roadmap({
     initEdges,
     initNodes,
     initMilestones,
+    biosampleOptions,
+    diseaseModelOptions,
+    clinicalDatasetOptions,
+    rfpOptions,
     urlNode,
     urlView,
 }: {
@@ -89,6 +93,10 @@ export function Roadmap({
     initEdges: any[];
     initNodes: any[];
     initMilestones: any[];
+    biosampleOptions: Partial<Biosample>[];
+    diseaseModelOptions: Partial<DiseaseModel>[];
+    clinicalDatasetOptions: Partial<Tool>[];
+    rfpOptions: Partial<RFP>[];
     urlNode: string | string[] | undefined;
     urlView: string | string[] | undefined;
 }) {
@@ -390,6 +398,11 @@ export function Roadmap({
                                     )}
                                     handlePanelChange={handleMilestonePanelChange}
                                     orgIsPublished={orgIsPublished}
+                                    biosampleOptions={biosampleOptions}
+                                    diseaseModelOptions={diseaseModelOptions}
+                                    clinicalDatasetOptions={clinicalDatasetOptions}
+                                    rfpOptions={rfpOptions}
+                                    milestoneTypeOptions={milestoneTypes}
                                 />
                             </ResizablePanel>
                         </>
@@ -552,12 +565,22 @@ const MilestoneDetailsPanel = ({
     remountKey,
     milestone,
     orgIsPublished,
+    biosampleOptions,
+    diseaseModelOptions,
+    clinicalDatasetOptions,
+    rfpOptions,
+    milestoneTypeOptions,
     handlePanelChange
 }: {
     organization: Organization | undefined,
     remountKey: number,
     milestone: Milestone | undefined
     orgIsPublished: boolean,
+    biosampleOptions: Partial<Biosample>[],
+    diseaseModelOptions: Partial<DiseaseModel>[],
+    clinicalDatasetOptions: Partial<Tool>[],
+    rfpOptions: Partial<RFP>[],
+    milestoneTypeOptions: Partial<MilestoneType>[],
     handlePanelChange: (open: boolean) => void
 }) => {
     const { 
@@ -584,6 +607,11 @@ const MilestoneDetailsPanel = ({
                 key={milestoneRemountKey}
                 milestoneData={milestone}
                 orgIsPublished={orgIsPublished}
+                biosampleOptions={biosampleOptions}
+                diseaseModelOptions={diseaseModelOptions}
+                clinicalDatasetOptions={clinicalDatasetOptions}
+                rfpOptions={rfpOptions}
+                milestoneTypeOptions={milestoneTypeOptions}
                 onClose={handleClose}
             />
         )
