@@ -4,8 +4,6 @@ import type { PlateEditor } from '@udecode/plate-common/react';
 
 import { insertCallout } from '@udecode/plate-callout';
 import { CalloutPlugin } from '@udecode/plate-callout/react';
-import { insertCodeBlock } from '@udecode/plate-code-block';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import {
   type TElement,
   type TNodeEntry,
@@ -69,7 +67,6 @@ const insertBlockMap: Record<
   [AudioPlugin.key]: (editor) =>
     insertAudioPlaceholder(editor, { select: true }),
   [CalloutPlugin.key]: (editor) => insertCallout(editor, { select: true }),
-  [CodeBlockPlugin.key]: (editor) => insertCodeBlock(editor, { select: true }),
   [EquationPlugin.key]: (editor) => insertEquation(editor, { select: true }),
   [FilePlugin.key]: (editor) => insertFilePlaceholder(editor, { select: true }),
   [INDENT_LIST_KEYS.todo]: insertList,

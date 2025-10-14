@@ -6,7 +6,7 @@ import {
     DialogTitle,
 } from "@comend/components/ui/dialog"
 import {toast} from "sonner";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {Button} from "@comend/components/ui/button";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@comend/components/ui/accordion";

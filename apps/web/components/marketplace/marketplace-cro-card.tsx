@@ -2,7 +2,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend
 import Link from "next/link";
 import {truncate} from "@comend/lib/utils";
 import React from "react";
-import {Company} from "@prisma/client";
+import type {Company} from "@prisma/client";
 import {Separator} from "@comend/components/ui/separator";
 import {Badge} from "@comend/components/ui/badge";
 import { Popover, PopoverTrigger, PopoverContent } from "@comend/components/ui/popover"

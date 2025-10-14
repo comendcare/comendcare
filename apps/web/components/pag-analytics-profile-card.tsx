@@ -1,6 +1,5 @@
 import {Users, UserCircle, CircleDollarSign, Earth, ExternalLink} from "lucide-react"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/packages/components/ui/card";
-import { Prisma } from "@prisma/client";
 import {formatMoney, formatNumberWithCommas} from "@/packages/lib/utils";
 import {Button, buttonVariants} from "@comend/components/ui/button";
 import {OrganizationForAnalytics} from "@/packages/lib/types";

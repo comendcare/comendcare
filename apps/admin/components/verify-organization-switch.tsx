@@ -14,7 +14,7 @@ import {
 } from "@comend/components/ui/form"
 import {Switch} from "@comend/components/ui/switch"
 import {toggleOrganizationVerified} from "@comend/lib/actions"
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 
 const FormSchema = z.object({
     verified: z.boolean().default(false).optional(),

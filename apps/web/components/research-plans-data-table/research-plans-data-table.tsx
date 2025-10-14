@@ -19,7 +19,7 @@ import {
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@comend/components/ui/table";
-import { Roadmap } from "@prisma/client"
+import type {Roadmap} from "@prisma/client"
 import { useRouter } from "next/navigation"
 
 interface DataTableProps<TData, TValue> {

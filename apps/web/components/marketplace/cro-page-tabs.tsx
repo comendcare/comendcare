@@ -11,7 +11,7 @@ import {
 import { Briefcase, Users } from "lucide-react";
 import CROMarketplaceProfileServicesTab from "@comend/components/cro-marketplace-profile-services-tab";
 import CROMarketplaceProfileReviewsTab from "~web/components/marketplace/cro-marketplace-profile-reviews-tab";
-import {CompanyWithReviewsAndServices} from "@comend/lib/types";
+import type {CompanyWithReviewsAndServices} from "@comend/lib/types";
 import { Skeleton } from "@comend/components/ui/skeleton";
 
 export default function CROPageTabs({company}: {company: CompanyWithReviewsAndServices}) {

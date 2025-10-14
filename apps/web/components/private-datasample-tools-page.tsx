@@ -8,7 +8,7 @@ import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-dat
 import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/shell";
 import { getClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/private-clinical-datasets-table-columns";
 import { ClinicalDatasetsTable } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/private-clinical-datasets-table"
-import { Tool } from "@prisma/client";
+import type { Tool } from "@prisma/client";
 import { SearchParams } from "@/packages/components/types";
 import { revalidate } from "@/packages/lib/revalidate";
 import { useEffect, useRef, useState } from "react";

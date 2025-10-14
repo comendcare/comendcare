@@ -6,7 +6,6 @@ import NoOrganization from "~web/components/no-organization";
 import {TooltipProvider} from "@comend/components/ui/tooltip";
 import PAGSettingsMembersTab from "~web/components/pag-settings-members-tab"
 import PAGSettingsInvitationsTab from "~web/components/pag-settings-invitations-tab"
-import {Invitation} from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -23,54 +22,13 @@ export default async function TeamPage() {
             verified: true,
             published: true,
             name: true,
-            description: true,
-            contactEmail: true,
-            logo: true,
-            image: true,
-            headerImage: true,
-            biopharmaConsentSettings: true,
-            subdomain: true,
-            customDomain: true,
-            statedGoal: true,
-            yearFounded: true,
-            incorporationStatus: true,
-            therapeuticsOfInterest: true,
-            therapeuticsInDevelopment: true,
-            website: true,
-            moneyRaised: true,
-            moneyDeployed: true,
-            researchBudget: true,
-            // address1                  String?
-            // address2                  String?
-            // formattedAddress          String?
-            // city                      String?
-            // region                    String?
-            // postalCode                String?
-            // country                   String?
-            // lat                       String?
-            // lng                       String?
-            createdAt: true,
-            updatedAt: true,
-            user: true,
-            userId: true,
-            roadmaps: true,
             members: {
                 include: {
                     user: true
                 }
             },
-            clients: true,
             invitations: true,
             membershipRequests: true,
-            conditions: true,
-            kanban: true,
-            milestones: true,
-            platformNotifications: true,
-            reviews: true,
-            savedCompanies: true,
-            tools: true,
-            rfps: true,
-            metadata: true
         })
         if (response.success) {
             organization = response.data

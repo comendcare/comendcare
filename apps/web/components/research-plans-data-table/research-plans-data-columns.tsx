@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { RESEARCH_PLAN_TYPES } from "@comend/lib/types"
-import { Roadmap } from "@prisma/client"
+import type {Roadmap} from "@prisma/client"
 import { Badge } from "@comend/components/ui/badge"
 
 interface CustomColumnMeta {

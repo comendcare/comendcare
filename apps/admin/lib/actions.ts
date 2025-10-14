@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@comend/lib/prisma"
-import {Company} from "@prisma/client"
+import type {Company} from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withAdminAuth} from "./auth"
 import {getSession} from "@/packages/lib/auth"

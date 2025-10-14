@@ -30,7 +30,7 @@ import {handleImageUpload} from "@comend/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import MoneyInput from "@comend/components/money-input";
 import { checkSubdomainAvailability, getConditionsFromOrganizationId } from "@comend/lib/fetchers";
 import { EditableProfilePhoto } from "./editable-profile-photo";

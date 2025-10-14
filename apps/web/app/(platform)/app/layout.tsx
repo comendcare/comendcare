@@ -4,7 +4,7 @@ import {authOptions} from "@/packages/lib/auth";
 import prisma from "@/packages/lib/prisma";
 import AppClientShell from "./_client-shell";
 import InvitationGate from "~web/components/invitation-gate";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {Button} from "@/packages/components/ui/button";
 import Link from "next/link";
 import {SidebarTrigger} from "@/packages/components/ui/sidebar";

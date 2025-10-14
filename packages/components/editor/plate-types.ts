@@ -3,15 +3,9 @@
 import type React from 'react';
 
 import type { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import type {
-  CodeBlockPlugin,
-  CodeLinePlugin,
-} from '@udecode/plate-code-block/react';
 import type { TCommentText } from '@udecode/plate-comments';
 import type { TElement, TText } from '@udecode/plate-common';
 import type { ParagraphPlugin } from '@udecode/plate-common/react';
-import type { TExcalidrawElement } from '@udecode/plate-excalidraw';
-import type { ExcalidrawPlugin } from '@udecode/plate-excalidraw/react';
 import type { HEADING_KEYS } from '@udecode/plate-heading';
 import type { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
 import type { TLinkElement } from '@udecode/plate-link';
@@ -140,16 +134,6 @@ export interface MyBlockquoteElement extends MyBlockElement {
   type: typeof BlockquotePlugin.key;
 }
 
-export interface MyCodeBlockElement extends MyBlockElement {
-  children: MyCodeLineElement[];
-  type: typeof CodeBlockPlugin.key;
-}
-
-export interface MyCodeLineElement extends TElement {
-  children: PlainText[];
-  type: typeof CodeLinePlugin.key;
-}
-
 export interface MyTableElement extends TTableElement, MyBlockElement {
   children: MyTableRowElement[];
   type: typeof TablePlugin.key;
@@ -187,19 +171,10 @@ export interface MyHrElement extends MyBlockElement {
   type: typeof HorizontalRulePlugin.key;
 }
 
-export interface MyExcalidrawElement
-  extends TExcalidrawElement,
-    MyBlockElement {
-  children: [EmptyText];
-  type: typeof ExcalidrawPlugin.key;
-}
-
 export type MyNestableBlock = MyParagraphElement;
 
 export type MyRootBlock =
   | MyBlockquoteElement
-  | MyCodeBlockElement
-  | MyExcalidrawElement
   | MyH1Element
   | MyH2Element
   | MyH3Element

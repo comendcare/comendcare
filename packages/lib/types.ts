@@ -1,4 +1,4 @@
-import {
+import type {
     Column,
     RequestComment,
     PostComment,
@@ -9,7 +9,6 @@ import {
     MilestoneType,
     Organization,
     Post,
-    Prisma,
     Review,
     ReviewFeedback,
     RFP as DBRFP,
@@ -25,6 +24,7 @@ import {
     DiseaseModel,
     Invitation
 } from "@prisma/client";
+import {Prisma} from "@prisma/client";
 import {z} from "zod";
 
 export const mechanisms = [

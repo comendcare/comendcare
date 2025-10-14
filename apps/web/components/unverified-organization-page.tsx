@@ -1,5 +1,5 @@
 import Image from "next/image"
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 
 
 export default function UnverifiedOrganizationPage({organization}: {organization: Partial<Organization>}) {

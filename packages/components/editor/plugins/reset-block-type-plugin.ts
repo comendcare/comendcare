@@ -3,12 +3,6 @@
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import { CalloutPlugin } from '@udecode/plate-callout/react';
 import {
-  isCodeBlockEmpty,
-  isSelectionAtCodeBlockStart,
-  unwrapCodeBlock,
-} from '@udecode/plate-code-block';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
-import {
   isBlockAboveEmpty,
   isSelectionAtBlockStart,
 } from '@udecode/plate-common';
@@ -29,12 +23,6 @@ const resetBlockTypesCommonRule = {
   ],
 };
 
-const resetBlockTypesCodeBlockRule = {
-  defaultType: ParagraphPlugin.key,
-  types: [CodeBlockPlugin.key],
-  onReset: unwrapCodeBlock,
-};
-
 export const resetBlockTypePlugin = ResetNodePlugin.configure({
   options: {
     rules: [
@@ -47,16 +35,6 @@ export const resetBlockTypePlugin = ResetNodePlugin.configure({
         ...resetBlockTypesCommonRule,
         hotkey: 'Backspace',
         predicate: isSelectionAtBlockStart,
-      },
-      {
-        ...resetBlockTypesCodeBlockRule,
-        hotkey: 'Enter',
-        predicate: isCodeBlockEmpty,
-      },
-      {
-        ...resetBlockTypesCodeBlockRule,
-        hotkey: 'Backspace',
-        predicate: isSelectionAtCodeBlockStart,
       },
     ],
   },

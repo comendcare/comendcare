@@ -13,7 +13,7 @@ import {
 } from "@comend/components/ui/form"
 import {Switch} from "@comend/components/ui/switch"
 import {toggleOrganizationPublished} from "@comend/lib/actions"
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import React from "react";
 import { Info } from "lucide-react"
