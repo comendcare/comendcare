@@ -462,6 +462,7 @@ export function EditMilestoneForm({
     const init = async () => {
         if (session?.user.organizationId) {
             console.log(`start init`)
+            console.log(`biosample options`, biosampleOptions)
             const formattedBiosamples: Option[] = (biosampleOptions || []).map((biosample: Partial<Biosample>,) => {
                 return (
                     {
@@ -474,6 +475,7 @@ export function EditMilestoneForm({
                     }
                 )
             })
+            console.log(`disease model options`, diseaseModelOptions)
             const formattedDiseaseModels: Option[] = (diseaseModelOptions || []).map((diseaseModel: Partial<DiseaseModel>) => {
                 return (
                     {
@@ -485,6 +487,7 @@ export function EditMilestoneForm({
                     }
                 )
             })
+            console.log(`clinical dataset options`, clinicalDatasetOptions)
             const formattedDatasamples: Option[] = (clinicalDatasetOptions || []).map((datasample: Partial<Tool>) => {
                 return (
                     {
@@ -758,12 +761,12 @@ export function EditMilestoneForm({
                                                                     icon: 'megaphone'
                                                                 } as Option))}
                                                                 onChange={field.onChange}
-                                                                defaultOptions={rfpOptions.map(rfp => ({
+                                                                defaultOptions={rfpOptions?.map(rfp => ({
                                                                     ...rfp,
                                                                     value: rfp.id,
                                                                     label: rfp.title,
                                                                 } as Option))}
-                                                                options={rfpOptions.map(rfp => ({
+                                                                options={rfpOptions?.map(rfp => ({
                                                                     ...rfp,
                                                                     value: rfp.id,
                                                                     label: rfp.title
@@ -1357,8 +1360,8 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                                 {...field}
                                 maxSelected={3}
                                 badgeClassName={badgeVariants({variant: "lightBlue"})}
-                                defaultOptions={milestoneTypes.map(type => ({...type, value: type.id}))}
-                                options={milestoneTypes.map(type => ({...type, value: type.id}))}
+                                defaultOptions={milestoneTypes?.map(type => ({...type, value: type.id}))}
+                                options={milestoneTypes?.map(type => ({...type, value: type.id}))}
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
                                 placeholder="Project type"
@@ -1374,7 +1377,7 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                 )}
             />
 
-            {types.map((type: any) => type?.value).includes("OTHER") && (
+            {types?.map((type: any) => type?.value).includes("OTHER") && (
                 <>
                     <div>
                         <FormLabel className="text-md">{`Type Description`}</FormLabel>

@@ -117,6 +117,10 @@ export default async function RoadmapPage({
         s.status === "fulfilled" ? s.value : undefined
 
     const milestoneTypesRes = ok(milestoneTypesSettle)
+    const biosamplesRes = ok(biosamplesSettle)
+    const diseaseModelsRes = ok(diseaseModelsSettle)
+    const clinicalDatasetsRes = ok(clinicalDatasetsSettle)
+    const rfpRes = ok(rfpSettle)
     const organizationRes = ok(organizationSettle)
     const roadmapRes = ok(roadmapSettle)
     const milestonesRes = ok(milestonesSettle)
@@ -127,9 +131,13 @@ export default async function RoadmapPage({
         return <NoOrganization />
     }
 
-    const milestoneTypes = milestoneTypesRes?.success
-        ? milestoneTypesRes.data ?? []
-        : []
+    const milestoneTypes = milestoneTypesRes?.success ? milestoneTypesRes.data ?? [] : []
+    const biosampleOptions = biosamplesRes?.data ? biosamplesRes.data ?? [] : []
+    const diseaseModelOptions = diseaseModelsRes?.data ? diseaseModelsRes.data ?? [] : []
+    const clinicalDatasetOptions = clinicalDatasetsRes?.data ? clinicalDatasetsRes.data ?? [] : []
+    const rfpOptions = rfpRes?.success ? rfpRes.data ?? [] : []
+
+    console.log(`results`, biosampleOptions)
 
     const organization = organizationRes?.success ? organizationRes.data : undefined
 
@@ -151,10 +159,10 @@ export default async function RoadmapPage({
             initEdges={initEdges}
             initNodes={initNodes}
             initMilestones={initMilestones}
-            biosampleOptions={biosamplesSettle.data}
-            diseaseModelOptions={diseaseModelsSettle.data}
-            clinicalDatasetOptions={clinicalDatasetsSettle.data}
-            rfpOptions={rfpSettle.data}
+            biosampleOptions={biosampleOptions}
+            diseaseModelOptions={diseaseModelOptions}
+            clinicalDatasetOptions={clinicalDatasetOptions}
+            rfpOptions={rfpOptions}
             urlNode={urlNode}
             urlView={urlView}
         />
