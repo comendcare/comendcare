@@ -25,8 +25,8 @@ export function AssetBulkImportDialog() {
                 const result = await parseCSV(
                     file,
                     [
-                        {key: 'title', required: true, defaultValue: 'Untitled Tool', isValid: (entry) => typeof entry === 'string' && entry.length > 0},
-                        {key: 'description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'}
+                        {key: 'Title', required: true, defaultValue: 'Untitled Tool', isValid: (entry) => typeof entry === 'string' && entry.length > 0},
+                        {key: 'Description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'}
                     ]
                 )
     
