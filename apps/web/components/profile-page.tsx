@@ -6,7 +6,6 @@ import {PAGProfileRFPsHoverableCard} from "~web/components/pag-profile-rfps-card
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
-import EditPAGProfileHeaderDialog from "~web/components/edit-pag-profile-header-dialog";
 import {Building2, Calendar, CircleDollarSign, ExternalLink, HandCoins} from "lucide-react";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {Dialog, DialogContent, DialogTrigger} from "@comend/components/ui/dialog";
@@ -17,6 +16,8 @@ import {EditablePAGBannerPhoto} from "./editable-pag-banner-photo";
 import {PAGProfileToolsCard} from "./pag-profile-tools-card";
 import Link from "next/link";
 import { SearchParams } from "@/packages/components/types";
+import dynamic from "next/dynamic";
+import LoadingDots from "@/packages/components/icons/loading-dots";
 
 type ToolCounts = {
     biosampleCount: number;
@@ -34,6 +35,24 @@ type PAGProfilePageProps = {
     rootDomain: string;
     searchParams: SearchParams
 };
+
+
+const EditPAGProfileHeaderDialog = dynamic(
+    () =>
+        import("~web/components/edit-pag-profile-header-dialog").then(
+            (m) => m.default
+        ),
+    {
+        ssr: false,
+        loading: () => (
+            <Button
+                variant="ghost"
+            >
+                <LoadingDots color="#808080" />
+            </Button>
+        ),
+    }
+);
 
 export default function PAGProfilePage({
                                            organization,
