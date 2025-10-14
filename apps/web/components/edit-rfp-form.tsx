@@ -424,7 +424,7 @@ export function EditRFPForm({
             <ScrollArea className={"max-h-[60vh] -mr-2 pr-3"} type={"always"}>
                 <ScrollBar />
                 <div
-                    className="space-y-6 m-1"
+                    className="space-y-6 m-1 pb-12"
                 >
                     <FormField
                         control={form.control}
@@ -506,7 +506,7 @@ export function EditRFPForm({
                     <ContactsFormField form={form} />
                     <AttachmentsFormField form={form} />
 
-                    <span className="flex gap-2 w-full justify-end">
+                    <span className="absolute bottom-0 right-4 z-900 flex gap-2 w-fit">
                         <DialogClose asChild>
                             <Button 
                                 variant={"secondary"}
@@ -549,17 +549,19 @@ export function EditRFPForm({
                             </DialogContent>
                         </Dialog>
                         <DialogClose disabled={!form.formState.isValid}>
-                            <Button
-                                disabled={!form.formState.isValid}
-                                variant={"cta"}
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    handleFormSubmit(form.getValues())
-                                    if (closeDialog) closeDialog()
-                                }}
-                            >
-                                Save Changes
-                            </Button>
+                            <div className="bg-white rounded-md p-0">
+                                <Button
+                                    disabled={!form.formState.isValid}
+                                    variant={"cta"}
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        handleFormSubmit(form.getValues())
+                                        if (closeDialog) closeDialog()
+                                    }}
+                                >
+                                    Save Changes
+                                </Button>
+                            </div>
                         </DialogClose>
                     </span>
                 </div>

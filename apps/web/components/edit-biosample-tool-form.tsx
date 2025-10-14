@@ -341,14 +341,14 @@ export function EditBiosampleToolForm({
                 <ScrollBar />
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
-                    className="space-y-6 m-1"
+                    className="space-y-6 m-1 pb-12"
                 >
                     <AdditionalBiosampleFields form={form} formData={formData}/>
 
                     <Separator className="w-full"/>
                     <DonorFormFields form={form} />
 
-                    <span className="flex gap-2 w-full justify-end">
+                    <span className="absolute bottom-0 right-4 z-900 flex gap-2 w-fit">
                         <DialogClose asChild>
                             <Button 
                                 variant={"secondary"} 
@@ -364,23 +364,25 @@ export function EditBiosampleToolForm({
                         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                             <DeleteBiosampleDialog toolId={toolData.id} closeDialog={closeDialog}/>
                         </Dialog>
-                        <Button
-                            disabled={!form.formState.isValid || isSaving}
-                            variant={"cta"}
-                            onClick={(e) => {
-                                e.preventDefault()
-                                handleFormSubmit(form.getValues())
-                            }}
-                        >
-                            {isSaving 
-                                ? (
-                                    <div className="w-[81px] flex justify-center items-center">
-                                        <LoadingDots/>
-                                    </div>
-                                ) 
-                                : ("Save Changes")
-                            }
-                        </Button>
+                        <div className="bg-white rounded-md p-0">
+                            <Button
+                                disabled={!form.formState.isValid || isSaving}
+                                variant={"cta"}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    handleFormSubmit(form.getValues())
+                                }}
+                            >
+                                {isSaving 
+                                    ? (
+                                        <div className="w-[81px] flex justify-center items-center">
+                                            <LoadingDots/>
+                                        </div>
+                                    ) 
+                                    : ("Save Changes")
+                                }
+                            </Button>
+                        </div>
                     </span>
                 </form>
             </ScrollArea>
