@@ -354,6 +354,7 @@ export function Roadmap({
                                 {milestones.length > 0 ? (
                                     <PrivateFlowView
                                         width={defaultLayout[0]}
+                                        organization={organization}
                                         contextMenuRef={contextMenuRef} 
                                     />
                                 ): (
@@ -369,6 +370,7 @@ export function Roadmap({
                                 {milestones.length > 0 ? (
                                     <TimelineView
                                         sortBy={sortBy} 
+                                        organization={organization}
                                         contextMenuRef={contextMenuRef} 
                                     />
                                 ): (

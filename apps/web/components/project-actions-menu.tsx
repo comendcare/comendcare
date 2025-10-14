@@ -33,10 +33,10 @@ const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones
 })
 
-export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
+export const ProjectActionsMenu = ({milestone, organization}: { milestone: Milestone, organization?: Partial<Organization> }) => {
     const {data: session, status} = useSession()
     const [isOpen, setIsOpen] = useState(false)
-    const [organization, setOrganization] = useState<Organization | {}>({})
+    // const [organization, setOrganization] = useState<Organization | {}>({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [shareIsOpen, setShareIsOpen] = useState(false)
     const popoverRef = useRef<HTMLInputElement>(null)
@@ -249,7 +249,7 @@ export const ProjectActionsMenu = ({milestone}: { milestone: Milestone }) => {
 
             <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
                 <DialogContent className="min-w-fit">
-                    { "subdomain" in organization && typeof organization.subdomain === "string" ? (
+                    { organization && "subdomain" in organization && typeof organization.subdomain === "string" ? (
                         <ShareDialog
                             url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
                             organization={organization}

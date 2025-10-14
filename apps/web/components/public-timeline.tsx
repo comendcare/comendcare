@@ -5,12 +5,21 @@ import {cn} from "@comend/lib/utils"
 import {DraggableTimelineItem, TimelineItemContent} from "./private-timeline"
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
+import { Organization } from "@prisma/client";
 
-export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilestone, setUrlMilestone}: {
+export const PublicTimelineView = ({
+    roadmap, 
+    subdomain, 
+    externalLinks, 
+    urlMilestone, 
+    organization,
+    setUrlMilestone
+}: {
     roadmap: any,
     subdomain: string | undefined,
     externalLinks: boolean,
     urlMilestone?: string | undefined,
+    organization?: Partial<Organization>,
     setUrlMilestone?: (id: string) => void | undefined
 }) => {
     const contentRef = useRef<HTMLDivElement>(null)
@@ -53,8 +62,13 @@ export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilest
                     externalLinks
                         ?
                         <TimelineElementLink key={index} subdomain={subdomain} item={item} urlMilestone={urlMilestone}/>
-                        : <TimelineElementButton key={index} item={item} setUrlMilestone={setUrlMilestone}
-                                                    urlMilestone={urlMilestone}/>
+                        : <TimelineElementButton 
+                                key={index} 
+                                item={item} 
+                                setUrlMilestone={setUrlMilestone}
+                                organization={organization}     
+                                urlMilestone={urlMilestone}
+                            />
                 ))}
             </ol>
             </div>
@@ -105,9 +119,10 @@ const TimelineElementLink = ({key, subdomain, item, urlMilestone}: {
     )
 }
 
-const TimelineElementButton = ({key, item, setUrlMilestone, urlMilestone}: {
+const TimelineElementButton = ({key, item, organization, setUrlMilestone, urlMilestone}: {
     key: number,
     item: any,
+    organization?: Partial<Organization>,
     setUrlMilestone?: (id: string) => void | undefined,
     urlMilestone?: string | undefined
 }) => {
@@ -138,7 +153,7 @@ const TimelineElementButton = ({key, item, setUrlMilestone, urlMilestone}: {
                     item={item}
                     externalLinkIcon={false}
                 /> */}
-                <TimelineItemContent milestone={item} isDraggable={false} isPrivate={false} />
+                <TimelineItemContent milestone={item} isDraggable={false} isPrivate={false} organization={organization} />
             </button>
         </li>
     )

@@ -1301,7 +1301,7 @@ export function EditMilestoneForm({
                 </DialogContent>
             </Dialog>
 
-            {/* <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
+            <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
                 <DialogContent className="min-w-fit">
                     {organization && "subdomain" in organization && typeof organization.subdomain === "string" ? (
                         <ShareDialog
@@ -1337,7 +1337,7 @@ export function EditMilestoneForm({
                         <div className="text-sm text-muted-foreground">Loading organization...</div>
                     )}
                 </DialogContent>
-            </Dialog> */}
+            </Dialog>
         </>
     )
 }
