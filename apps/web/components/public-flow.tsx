@@ -73,10 +73,10 @@ export const PublicFlowView = ({
         minZoom={0.1}
     >
         <Background variant={BackgroundVariant.Dots} />
-        <MiniMap
+        {/* <MiniMap
             nodeColor='#757575'
             maskColor='rgb(200, 200, 200, 0.8)' 
-        />
+        /> */}
     </ReactFlow>
     )
 }
