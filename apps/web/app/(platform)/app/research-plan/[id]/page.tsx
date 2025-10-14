@@ -2,12 +2,16 @@ import { getSession } from "@/packages/lib/auth"
 import { Roadmap } from "~web/components/roadmap"
 import NoOrganization from "~web/components/no-organization"
 import {
-    getMilestoneTypes,
-    getOrganizationFromOrganizationId,
-    getRoadmap,
-    getRoadmapEdges,
-    getRoadmapMilestones,
-    getRoadmapNodes,
+    getBiosamples, 
+    getDatasamples, 
+    getDiseaseModels, 
+    getMilestoneTypes, 
+    getOrganizationFromOrganizationId, 
+    getRFPs, 
+    getRoadmap, 
+    getRoadmapEdges, 
+    getRoadmapMilestones, 
+    getRoadmapNodes
 } from "@/packages/lib/fetchers"
 
 export default async function RoadmapPage({
@@ -28,13 +32,14 @@ export default async function RoadmapPage({
         milestonesSettle,
         nodesSettle,
         edgesSettle,
+        biosamplesSettle,
+        diseaseModelsSettle,
+        clinicalDatasetsSettle,
+        rfpSettle,
     ] = await Promise.allSettled([
         getMilestoneTypes({
             id: true,
             label: true,
-            services: true,
-            categories: true,
-            description: true,
         }),
         getOrganizationFromOrganizationId(orgId, {
             id: true,
@@ -101,6 +106,10 @@ export default async function RoadmapPage({
             data: true,
             roadmapId: true,
         }),
+        getBiosamples(orgId, { id: true }),
+        getDiseaseModels(orgId, { id: true }),
+        getDatasamples(orgId, { id: true }),
+        getRFPs(orgId, {id: true, title: true})
     ])
 
     // Helper to unwrap settled results safely
@@ -108,6 +117,10 @@ export default async function RoadmapPage({
         s.status === "fulfilled" ? s.value : undefined
 
     const milestoneTypesRes = ok(milestoneTypesSettle)
+    const biosamplesRes = ok(biosamplesSettle)
+    const diseaseModelsRes = ok(diseaseModelsSettle)
+    const clinicalDatasetsRes = ok(clinicalDatasetsSettle)
+    const rfpRes = ok(rfpSettle)
     const organizationRes = ok(organizationSettle)
     const roadmapRes = ok(roadmapSettle)
     const milestonesRes = ok(milestonesSettle)
@@ -118,9 +131,11 @@ export default async function RoadmapPage({
         return <NoOrganization />
     }
 
-    const milestoneTypes = milestoneTypesRes?.success
-        ? milestoneTypesRes.data ?? []
-        : []
+    const milestoneTypes = milestoneTypesRes?.success ? milestoneTypesRes.data ?? [] : []
+    const biosampleOptions = biosamplesRes?.data ? biosamplesRes.data ?? [] : []
+    const diseaseModelOptions = diseaseModelsRes?.data ? diseaseModelsRes.data ?? [] : []
+    const clinicalDatasetOptions = clinicalDatasetsRes?.data ? clinicalDatasetsRes.data ?? [] : []
+    const rfpOptions = rfpRes?.success ? rfpRes.data ?? [] : []
 
     const organization = organizationRes?.success ? organizationRes.data : undefined
 
@@ -142,6 +157,10 @@ export default async function RoadmapPage({
             initEdges={initEdges}
             initNodes={initNodes}
             initMilestones={initMilestones}
+            biosampleOptions={biosampleOptions}
+            diseaseModelOptions={diseaseModelOptions}
+            clinicalDatasetOptions={clinicalDatasetOptions}
+            rfpOptions={rfpOptions}
             urlNode={urlNode}
             urlView={urlView}
         />

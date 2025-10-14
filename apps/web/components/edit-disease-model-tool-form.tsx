@@ -234,7 +234,7 @@ export function EditDiseaseModelToolForm({
                 <ScrollBar />
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
-                    className="space-y-6 m-1"
+                    className="space-y-6 m-1 pb-12"
                 >
                     <FormItem className="flex gap-2 items-center">
                         <FormLabel className="flex items-center gap-1 grow">
@@ -513,7 +513,7 @@ export function EditDiseaseModelToolForm({
                         )}
                     />
 
-                    <span className="flex gap-2 w-full justify-end">
+                    <span className="absolute bottom-0 right-4 z-900 flex gap-2 w-fit">
                         <DialogClose asChild>
                             <Button 
                                 variant={"secondary"} 
@@ -529,6 +529,7 @@ export function EditDiseaseModelToolForm({
                         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                             <DeleteDiseaseModelDialog toolId={toolData.id} closeDialog={closeDialog}/>
                         </Dialog>
+                        <div className="bg-white rounded-md p-0">
                             <Button
                                 disabled={!form.formState.isValid || isSaving}
                                 variant={"cta"}
@@ -546,6 +547,7 @@ export function EditDiseaseModelToolForm({
                                     : ("Save Changes")
                                 }
                             </Button>
+                        </div>
                     </span>
                 </form>
             </ScrollArea>

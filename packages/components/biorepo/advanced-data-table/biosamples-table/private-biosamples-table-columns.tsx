@@ -362,7 +362,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                             row.original.quantity >= 0 
                         )
                             ? `${row.original.quantity}${row.original.quantityUnit}`
-                            : `unknown`
+                            : ``
                     }
                 </>
             ),

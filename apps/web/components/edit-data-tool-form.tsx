@@ -259,7 +259,7 @@ export function EditDataToolForm({
                 <ScrollBar />
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
-                    className="space-y-6 m-1"
+                    className="space-y-6 m-1 pb-12"
                 >
                     <FormItem className="flex gap-2 items-center">
                         <FormLabel className="flex items-center gap-1 grow">
@@ -538,7 +538,7 @@ export function EditDataToolForm({
                         )}
                     />
 
-                    <span className="flex gap-2 w-full justify-end">
+                    <span className="absolute bottom-0 right-4 z-900 flex gap-2 w-fit">
                         <DialogClose asChild>
                             <Button 
                                 variant={"secondary"} 
@@ -554,23 +554,25 @@ export function EditDataToolForm({
                         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                             <DeleteAssetDialog toolId={toolData.id} closeDialog={closeDialog}/>
                         </Dialog>
-                        <Button
-                            disabled={!form.formState.isValid || isSaving}
-                            variant={"cta"}
-                            onClick={(e) => {
-                                e.preventDefault()
-                                handleFormSubmit(form.getValues())
-                            }}
-                        >
-                            {isSaving 
-                                ? (
-                                    <div className="w-[81px] flex justify-center items-center">
-                                        <LoadingDots/>
-                                    </div>
-                                ) 
-                                : ("Save Changes")
-                            }
-                        </Button>
+                        <div className="bg-white rounded-md p-0">
+                            <Button
+                                disabled={!form.formState.isValid || isSaving}
+                                variant={"cta"}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    handleFormSubmit(form.getValues())
+                                }}
+                            >
+                                {isSaving 
+                                    ? (
+                                        <div className="w-[81px] flex justify-center items-center">
+                                            <LoadingDots/>
+                                        </div>
+                                    ) 
+                                    : ("Save Changes")
+                                }
+                            </Button>
+                        </div>
                     </span>
                 </form>
             </ScrollArea>
