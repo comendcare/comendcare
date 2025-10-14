@@ -4943,6 +4943,7 @@ export const updateMilestones = withOrganizationAuth(
                                         connect: {id: type.milestoneTypeId || type.milestoneType.id},
                                     },
                                 })),
+
                             },
                             biosamples: {
                                 deleteMany: {},
