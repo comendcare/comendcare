@@ -137,8 +137,6 @@ export default async function RoadmapPage({
     const clinicalDatasetOptions = clinicalDatasetsRes?.data ? clinicalDatasetsRes.data ?? [] : []
     const rfpOptions = rfpRes?.success ? rfpRes.data ?? [] : []
 
-    console.log(`results`, biosampleOptions)
-
     const organization = organizationRes?.success ? organizationRes.data : undefined
 
     const initMilestones = milestonesRes?.success ? milestonesRes.data : []

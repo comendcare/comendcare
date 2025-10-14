@@ -197,8 +197,7 @@ export function EditMilestoneForm({
     milestoneTypeOptions: Partial<MilestoneType>[],
     onClose: () => void
 }) {
-    const [isInitialized, setIsInitialized] = useState(false)
-    const {setMilestone, selectedNodeIds} = useRoadmapStore(useShallow(selector))
+    const {setMilestone} = useRoadmapStore(useShallow(selector))
     // const {recommendations, setRecommendations} = useCROSearchStore(useShallow(recommendationsSelector))
     // const {
     //     initialized: notificationsInitialized,

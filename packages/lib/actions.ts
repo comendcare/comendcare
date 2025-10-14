@@ -4943,17 +4943,7 @@ export const updateMilestones = withOrganizationAuth(
                                         connect: {id: type.milestoneTypeId || type.milestoneType.id},
                                     },
                                 })),
-                                // deleteMany: {
-                                //     NOT: (milestone.types || []).map((type: any) => ({ milestoneTypeId: type.milestoneTypeId })),
-                                // },
-                                // createMany: {
-                                //     skipDuplicates: true,
-                                //     data: (milestone.types || []).map((type: any) => ({
-                                //         milestoneType: {
-                                //             connect: {id: type.milestoneTypeId || type.milestoneType.id},
-                                //         },
-                                //     })),
-                                // },
+
                             },
                             biosamples: {
                                 deleteMany: {},
@@ -4962,17 +4952,6 @@ export const updateMilestones = withOrganizationAuth(
                                         connect: {id: tool.toolId || tool.biosample.id},
                                     },
                                 })),
-                                // deleteMany: {
-                                //     NOT: (milestone.biosamples || []).map((biosample: any) => ({ id: biosample.id })),
-                                // },
-                                // createMany: {
-                                //     skipDuplicates: true,
-                                //     data: (milestone.biosamples || []).map((biosample: any) => ({
-                                //         biosample: {
-                                //             connect: {id: biosample.biosampleId || biosample.biosample.id},
-                                //         },
-                                //     })),
-                                // },
                             },
                             diseaseModels: {
                                 deleteMany: {},
@@ -4981,17 +4960,6 @@ export const updateMilestones = withOrganizationAuth(
                                         connect: {id: tool.toolId || tool.diseaseModel.id},
                                     },
                                 })),
-                                // deleteMany: {
-                                //     NOT: (milestone.diseaseModels || []).map((diseaseModel: any) => ({ id: diseaseModel.id })),
-                                // },
-                                // createMany: {
-                                //     skipDuplicates: true,
-                                //     data: (milestone.diseaseModels || []).map((diseaseModel: any) => ({
-                                //         diseaseModel: {
-                                //             connect: {id: diseaseModel.diseaseModelId || diseaseModel.diseaseModel.id},
-                                //         },
-                                //     })),
-                                // },
                             },
                             tools: {
                                 deleteMany: {},
@@ -5000,17 +4968,6 @@ export const updateMilestones = withOrganizationAuth(
                                         connect: {id: tool.toolId || tool.tool.id},
                                     },
                                 })),
-                                // deleteMany: {
-                                //     NOT: (milestone.tools || []).map((tool: any) => ({ id: tool.id })),
-                                // },
-                                // createMany: {
-                                //     skipDuplicates: true,
-                                //     data: (milestone.tools || []).map((tool: any) => ({
-                                //         tool: {
-                                //             connect: {id: tool.toolId || tool.tool.id},
-                                //         },
-                                //     })),
-                                // },
                             },
                             rfps: {
                                 deleteMany: {},
@@ -5019,17 +4976,6 @@ export const updateMilestones = withOrganizationAuth(
                                         connect: {id: rfp.rfpId || rfp.rfp.id},
                                     },
                                 })),
-                                // deleteMany: {
-                                //     NOT: (milestone.rfps || []).map((rfp: any) => ({ id: rfp.id })),
-                                // },
-                                // createMany: {
-                                //     skipDuplicates: true,
-                                //     data: (milestone.rfps || []).map((rfp: any) => ({
-                                //         rfp: {
-                                //             connect: {id: rfp.rfpId || rfp.rfp.id},
-                                //         },
-                                //     })),
-                                // },
                             },
                             timelineOrder: milestone.timelineOrder,
                             otherTypeDetails: milestone.otherTypeDetails,
@@ -5057,32 +5003,6 @@ export const updateMilestones = withOrganizationAuth(
                                     })),
                                 },
                             },
-                            // attachments: {
-                            //     deleteMany: {
-                            //         NOT: (milestone.attachments || []).map((a: any) => ({ link: a.link })),
-                            //     },
-                            //     createMany: {
-                            //         skipDuplicates: true,
-                            //         data: (milestone.attachments || []).map((attachment: any) => ({
-                            //             link: attachment.link,
-                            //             name: attachment.name ?? null,
-                            //         })),
-                            //     },
-                            //     },
-                            //     contacts: {
-                            //     deleteMany: {
-                            //         NOT: (milestone.contacts || []).map((c: any) => ({ email: c.email })),
-                            //     },
-                            //     createMany: {
-                            //         skipDuplicates: true,
-                            //         data: (milestone.contacts || []).map((contact: any) => ({
-                            //             name: contact.name,
-                            //             email: contact.email,
-                            //             role: contact.role ?? null,
-                            //             affiliation: contact.affiliation ?? null,
-                            //         })),
-                            //     },
-                            // },
                             openTo: milestone.openTo || [],
                             status: milestone.status || "PLANNED",
                             private: milestone.private ?? false, // <-- preserve explicit false
