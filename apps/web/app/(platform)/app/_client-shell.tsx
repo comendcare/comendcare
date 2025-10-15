@@ -4,7 +4,6 @@ import {SidebarInset, SidebarProvider, SidebarTrigger} from "@comend/components/
 import {AppSidebar} from "~web/components/app-sidebar";
 import {useIsMobile} from "@comend/lib/hooks/use-mobile";
 import {MobileWarning} from "~web/components/mobile-warning";
-import {NavUser} from "~web/components/nav-user";
 import {
     InvitationWithOrganization,
     MemberRequestWithUserAndOrganization,
@@ -42,6 +41,17 @@ import {
 import researchPlanner from "@/public/screenshots/research-planner.png";
 import Image from "next/image"
 import type {User} from "@prisma/client";
+import dynamic from "next/dynamic";
+
+const NavUser = dynamic(
+    () => import("~web/components/nav-user").then(m => m.NavUser),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="h-8 w-8 rounded-lg bg-gray-200 animate-pulse" aria-label="Loading user menu" />
+        ),
+    }
+);
 
 export default function AppClientShell({
                                            user,
