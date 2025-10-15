@@ -198,7 +198,7 @@ export interface BiosampleSearchState {
     searchResults: any[] | undefined
     setSearchResults: (results: any[]) => void
     filters: FiltersType,
-    setFilters: (updatedFilters: FiltersType) => void,
+    setFilters: (updatedFilters: FiltersType) => Promise<void>,
     recommendations: Recommendation[] | undefined
     // setRecommendations: (milestones: Milestone[], options?: SetRecommendationsOptions) => Promise<Recommendation[]>,
     totalResults: undefined | number,

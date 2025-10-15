@@ -124,7 +124,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
     }
 
     const clearAll = () => {
-        setFilters({ ...filters, conditions: [], genes: [], types: [] });
+        setFilters({ ...filters, conditions: [], genes: [], types: [], organizations: [] });
 
         // Handle setting universal filters in other marketplaces (if relevant)
         setOrganizationFilters({...organizationFilters, conditions: [], genes: []})
@@ -135,7 +135,8 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
     const activeCount =
         (filters.conditions?.length || 0) +
         (filters.genes?.length || 0) + 
-        (filters.types?.length || 0);
+        (filters.types?.length || 0) +
+        (filters.organizations?.length || 0)
 
     const handleAsyncGeneSearch = async (query: string): Promise<Option[]> => {
         if (!query) return []; // Return empty if no input
@@ -183,6 +184,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
             return [];
         }
     };
+
 
     return (
         <div className="w-full mx-auto flex flex-col gap-y-2">
@@ -380,6 +382,19 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                                 {BIOSAMPLE_TYPE_OPTIONS.find((o) => o.value === item.value)?.label || item.value}
                                 <button
                                     onClick={() => removeFilterItem("types", item.value)}
+                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+
+                        {/* organizations */}
+                        {(filters.organizations || []).map((item) => (
+                            <Badge key={`organizations-${item.value}`} variant="secondary" className="text-xs">
+                                {item.label}
+                                <button
+                                    onClick={() => removeFilterItem("organizations", item.value)}
                                     className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
                                 >
                                     <X className="h-3 w-3" />

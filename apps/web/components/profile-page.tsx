@@ -189,7 +189,7 @@ export default function PAGProfilePage({
                                     />
                                     <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                                     {/* tools card handles it's own data state via zustand - necessary for pagination to work properly */}
-                                    <PAGProfileToolsCard organizationId={organization.id} toolCounts={toolCounts} searchParams={searchParams}/>
+                                    <PAGProfileToolsCard organization={organization} toolCounts={toolCounts} searchParams={searchParams}/>
                                 </div>
                             </div>
                         </div>

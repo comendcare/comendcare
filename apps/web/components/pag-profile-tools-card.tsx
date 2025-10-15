@@ -16,6 +16,7 @@ import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/sea
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
 import { SearchParams } from "@/packages/components/types";
 import { useQueryState } from "nuqs";
+import type { Organization } from "@prisma/client";
 
 const biosamplesSelector = (state: BiosampleSearchState) => ({
     searchResults: state.searchResults,
@@ -43,7 +44,7 @@ const getInitState = (counts: {biosampleCount: number, diseaseModelCount: number
     return 'biosamples'
 }
 
-export const PAGProfileToolsCard = ({organizationId, toolCounts, searchParams} : {organizationId: string, toolCounts: {biosampleCount: number, diseaseModelCount: number, clinicalDatasetCount: number}, searchParams?: SearchParams | undefined}) => {
+export const PAGProfileToolsCard = ({organization, toolCounts, searchParams} : {organization: Partial<Organization>, toolCounts: {biosampleCount: number, diseaseModelCount: number, clinicalDatasetCount: number}, searchParams?: SearchParams | undefined}) => {
     const [section, setSection] = useState<'biosamples' | 'disease-models' | 'clinical-datasets'>(getInitState(toolCounts))
     const [sort, setSort] = useQueryState("sort");
     const { 
@@ -78,19 +79,19 @@ export const PAGProfileToolsCard = ({organizationId, toolCounts, searchParams} :
             conditions: [],
             genes: [],
             types: [],
-            organizations: [{label: '', value: organizationId}]
+            organizations: [{label: organization.name || '', value: organization.id || ''}]
         })
         setDiseaseModelFilters({
             conditions: [],
             genes: [],
             types: [],
-            organizations: [{label: '', value: organizationId}]
+            organizations: [{label: organization.name || '', value: organization.id || ''}]
         })
         setClinicalDatasetFilters({
             conditions: [],
             genes: [],
             types: [],
-            organizations: [{label: '', value: organizationId}]
+            organizations: [{label: organization.name || '', value: organization.id || ''}]
         })
     }, [])
 

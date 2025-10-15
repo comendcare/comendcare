@@ -25,6 +25,7 @@ import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketp
 // import {SavedCompany, SavedOrganization} from "@prisma/client";
 // import {useSession} from "next-auth/react";
 import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@/packages/lib/initialize-client-state"
+import { truncate } from "@/packages/lib/utils"
 
 const croSelector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -68,7 +69,11 @@ export default function MarketplacePage() {
     )
     const diseaseModelColumns = useDiseaseModelsTableColumns()
     const clinicalDatasetColumns = useClinicalDatasetsTableColumns()
-    const [isInitialized, setIsInitialized] = useState(false)
+    const [crosInitialized, setCROsInitialized] = useState(false)
+    const [pagsInitialized, setPagsInitialized] = useState(false)
+    const [biosamplesInitialized, setBiosamplesInitialized] = useState(false)
+    const [diseaseModelsInitialized, setDiseaseModelsInitialized] = useState(false)
+    const [clinicalDatasetsInitialized, setClinicalDatasetsInitialized] = useState(false)
     // const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
     // const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
 
@@ -121,6 +126,7 @@ export default function MarketplacePage() {
                 tags: [] as any[],
             }
             await initializeCROSearch(parsedCROFilters)
+            setCROsInitialized(true)
             console.log(`CRO search initialized...`)
 
             const parsedPAGFilters = {
@@ -131,6 +137,7 @@ export default function MarketplacePage() {
                 modalities: [] as any[],
             }
             await initializeOrganizationSearch(parsedPAGFilters)
+            setPagsInitialized(true)
             console.log(`Organization search initialized...`)
 
             const parsedBiosampleFilters = {
@@ -140,6 +147,7 @@ export default function MarketplacePage() {
                 organizations: [] as any[],
             }
             await initializeBiosampleSearch(parsedBiosampleFilters)
+            setBiosamplesInitialized(true)
             console.log(`Biosample search initialized...`)
 
             const parsedDiseaseModelFilters = {
@@ -149,6 +157,7 @@ export default function MarketplacePage() {
                 organizations: [] as any[],
             }
             await initializeDiseaseModelSearch(parsedDiseaseModelFilters)
+            setDiseaseModelsInitialized(true)
             console.log(`Disease Model search initialized...`)
 
             const parsedClinicalDatasetFilters = {
@@ -158,9 +167,8 @@ export default function MarketplacePage() {
                 organizations: [] as any[]
             }
             await initializeClinicalDatasetSearch(parsedClinicalDatasetFilters)
+            setClinicalDatasetsInitialized(true)
             console.log(`Clinical Dataset search initialized...`)
-
-            setIsInitialized(true)
         }
 
         init()
@@ -184,7 +192,7 @@ export default function MarketplacePage() {
                         </Button>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        {(isInitialized && croStore.searchResults && croStore.searchResults.length > 0 )
+                        {(crosInitialized && croStore.searchResults && croStore.searchResults.length > 0 )
                             ? (
                                 <>
                                     {croStore.searchResults?.slice(0, 3).map((cro, index) => (
@@ -222,7 +230,7 @@ export default function MarketplacePage() {
                         </Button>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        {(isInitialized && ([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0))
+                        {(pagsInitialized && ([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0))
                             ? (
                                 <>
                                     {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].slice(0, 3).map((organization, index) => (
@@ -260,7 +268,7 @@ export default function MarketplacePage() {
                         </Button>
                     </div>
                     <ol className="w-full">
-                        {(isInitialized && biosampleStore.searchResults && biosampleStore.searchResults.length > 0 )
+                        {(biosamplesInitialized && biosampleStore.searchResults && biosampleStore.searchResults.length > 0 )
                             ? (
                                 <>
                                     <div className="max-w-7xl w-full overflow-auto">
@@ -275,7 +283,7 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                (isInitialized && biosampleStore.initialized )
+                                (biosamplesInitialized && biosampleStore.initialized )
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
@@ -317,7 +325,7 @@ export default function MarketplacePage() {
                         </Button>
                     </div>
                     <ol className="w-full">
-                        {(isInitialized && diseaseModelStore.searchResults && diseaseModelStore.searchResults.length > 0 )
+                        {(diseaseModelsInitialized && diseaseModelStore.searchResults && diseaseModelStore.searchResults.length > 0 )
                             ? (
                                 <>
                                     <div className="max-w-7xl w-full overflow-auto">
@@ -326,7 +334,7 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                (isInitialized && diseaseModelStore.initialized) 
+                                (diseaseModelsInitialized && diseaseModelStore.initialized) 
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
@@ -368,7 +376,7 @@ export default function MarketplacePage() {
                         </Button>
                     </div>
                     <ol className="w-full">
-                        {(isInitialized && clinicalDatasetStore.searchResults && clinicalDatasetStore.searchResults.length > 0 )
+                        {(clinicalDatasetsInitialized && clinicalDatasetStore.searchResults && clinicalDatasetStore.searchResults.length > 0 )
                             ? (
                                 <>
                                     <div className="max-w-7xl w-full overflow-auto">
@@ -377,7 +385,7 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                (isInitialized && clinicalDatasetStore.initialized)
+                                (clinicalDatasetsInitialized && clinicalDatasetStore.initialized)
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">

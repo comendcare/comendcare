@@ -15,9 +15,11 @@ const selector = (state: DiseaseModelSearchState) => ({
 })
 
 export function DiseaseModelSearchResults({
-    searchParams
+    searchParams,
+    isInitialized,
 }: {
     searchParams?: SearchParams | undefined
+    isInitialized: boolean
 }) {
     const { 
         searchResults,
@@ -27,7 +29,7 @@ export function DiseaseModelSearchResults({
 
     setSortBy(searchParams?.sort)
 
-    if (!searchResults) {
+    if (!isInitialized || !searchResults) {
         return (
             <div className="h-full w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                 <Skeleton className="h-[286px] w-full"/>

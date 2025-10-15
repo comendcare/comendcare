@@ -9,7 +9,7 @@ export default function ClinicalDatasetsPage() {
         <main className="flex flex-col w-full items-center h-full mx-auto">
             <div className="flex flex-col gap-4 p-2 w-full">
                 <ClinicalDatasetMarketplaceIntegratedSearchAndFilter />
-                <ClinicalDatasetSearchResults />
+                <ClinicalDatasetSearchResults isInitialized={true} />
             </div>
         </main>
     )

@@ -211,7 +211,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                                 toolCounts.diseaseModelCount > 0 || 
                                 toolCounts.clinicalDatasetCount > 0
                             ) && 
-                                <PAGProfileToolsCard organizationId={organization.id} toolCounts={toolCounts} searchParams={searchParams}/>
+                                <PAGProfileToolsCard organization={organization} toolCounts={toolCounts} searchParams={searchParams}/>
                             }
                         </div>
                     </div>
