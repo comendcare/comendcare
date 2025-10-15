@@ -2329,7 +2329,8 @@ export const getDiseaseModels = withOrganizationAuth(
             query: {};
             client: {};
         }>,
-        input?: GetDiseaseModelSchema
+        input?: GetDiseaseModelSchema,
+        publicOnly: boolean = false
     ): Promise<{
         data: DiseaseModel[],
         pageCount: number
@@ -2339,7 +2340,8 @@ export const getDiseaseModels = withOrganizationAuth(
                 const [data, total] = await prisma.$transaction([
                     prisma.diseaseModel.findMany({
                         where: {
-                            organizationId: organization.id
+                            organizationId: organization.id,
+                            ...(publicOnly ? {private: false} : undefined)
                         },
                         // include: {
                         //     attachments: true,
@@ -2439,7 +2441,8 @@ export const getDiseaseModels = withOrganizationAuth(
                     take: input.perPage,
                     where: {
                         ...where,
-                        organizationId: organization.id
+                        organizationId: organization.id,
+                        ...(publicOnly ? {private: false} : undefined)
                     },
                     include: {
                         attachments: true,
@@ -2451,7 +2454,13 @@ export const getDiseaseModels = withOrganizationAuth(
                     },
                     orderBy,
                 }),
-                prisma.diseaseModel.count({where: {...where, organizationId: organization.id}}),
+                prisma.diseaseModel.count({
+                    where: {
+                        ...where, 
+                        organizationId: organization.id,
+                        ...(publicOnly ? {private: false} : undefined)
+                    }
+                }),
             ]);
 
             const pageCount = Math.ceil(total / input.perPage);
@@ -2480,7 +2489,8 @@ export const getBiosamples = withOrganizationAuth(
             query: {};
             client: {};
         }>,
-        input?: GetBiosamplesSchema
+        input?: GetBiosamplesSchema,
+        publicOnly: boolean = false
     ): Promise<{
         data: Biosample[],
         pageCount: number
@@ -2490,19 +2500,9 @@ export const getBiosamples = withOrganizationAuth(
                 const [data, total] = await prisma.$transaction([
                     prisma.biosample.findMany({
                         where: {
-                            organizationId: organization.id
+                            organizationId: organization.id,
+                            ...(publicOnly ? {private: false} : undefined)
                         },
-                        // include: {
-                        //     milestones: {include: {milestone: true}},
-                        //     contacts: true,
-                        //     attachments: true,
-                        //     gene: true,
-                        //     donor: {
-                        //         include: {diagnoses: {include: {type: true}}}
-                        //     },
-                        //     institution: true,
-                        //     materialAndDataAccessRequests: true
-                        // },
                         select,
                         orderBy: {createdAt: "asc"},
                     }),
@@ -2626,7 +2626,8 @@ export const getBiosamples = withOrganizationAuth(
                     take: input.perPage,
                     where: {
                         ...where,
-                        organizationId: organization.id
+                        organizationId: organization.id,
+                        ...(publicOnly ? {private: false} : undefined)
                     },
                     include: {
                         milestones: {include: {milestone: true}},
@@ -2641,7 +2642,13 @@ export const getBiosamples = withOrganizationAuth(
                     },
                     orderBy,
                 }),
-                prisma.biosample.count({where: {...where, organizationId: organization.id}}),
+                prisma.biosample.count({
+                    where: {
+                        ...where, 
+                        organizationId: organization.id, 
+                        ...(publicOnly ? {private: false} : undefined)
+                    }
+                }),
             ]);
 
             const pageCount = Math.ceil(total / input.perPage);
@@ -2803,14 +2810,16 @@ export const getDatasamples = withOrganizationAuth(
             query: {};
             client: {};
         }>,
-        input?: GetBiosamplesSchema
+        input?: GetBiosamplesSchema,
+        publicOnly: boolean = false
     ) => {
         try {
             if (!input) {
                 const [data, total] = await prisma.$transaction([
                     prisma.tool.findMany({
                         where: {
-                            organizationId: organization.id
+                            organizationId: organization.id,
+                            ...(publicOnly ? {private: false} : undefined)
                         },
                         // include: {
                         //     organization: {include: {conditions: {include: {condition: true}}}},
@@ -2917,7 +2926,8 @@ export const getDatasamples = withOrganizationAuth(
                     take: input.perPage,
                     where: {
                         ...where,
-                        organizationId: organization.id
+                        organizationId: organization.id,
+                        ...(publicOnly ? {private: false} : undefined)
                     },
                     include: {
                         organization: {include: {conditions: {include: {condition: true}}}},
@@ -2929,7 +2939,13 @@ export const getDatasamples = withOrganizationAuth(
                     },
                     orderBy,
                 }),
-                prisma.tool.count({where}),
+                prisma.tool.count({
+                    where: {
+                        ...where, 
+                        organizationId: organization.id, 
+                        ...(publicOnly ? {private: false} : undefined)
+                    }
+                }),
             ]);
 
             const pageCount = Math.ceil(total / input.perPage);

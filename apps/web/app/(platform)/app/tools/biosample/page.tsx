@@ -63,7 +63,7 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
             organiztion: true,
             materialAndDataAccessRequests: true
         },
-        {...search, q: globalFilter, filters: validFilters}
+        {...search, q: globalFilter, filters: validFilters},
     )
 
     // not part of an org

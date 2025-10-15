@@ -128,6 +128,8 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                             columns={columns}
                             searchParams={searchParams}
                             onSelectionChange={setRowSelection}
+                            showPagination={true}
+                            interactive={true}
                         />
                     </React.Suspense>
                 </FeatureFlagsProvider>

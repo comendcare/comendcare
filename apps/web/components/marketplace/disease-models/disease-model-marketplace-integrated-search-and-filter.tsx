@@ -71,17 +71,17 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
     // Keep local input in sync with store (e.g., external changes)
     useEffect(() => setQuery(searchTerm), [searchTerm]);
 
-    // initial fetch on mount
-    useEffect(() => {
-        initializeDiseaseModelSearch({
-            types: [] as any[],
-            genes: [] as any[],
-            conditions: [] as any[],
-            organizations: [] as any[],
-        })
-        console.log(`Disease Model search initialized...`)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // // initial fetch on mount
+    // useEffect(() => {
+    //     initializeDiseaseModelSearch({
+    //         types: [] as any[],
+    //         genes: [] as any[],
+    //         conditions: [] as any[],
+    //         organizations: [] as any[],
+    //     })
+    //     console.log(`Disease Model search initialized...`)
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, []);
 
     const handleInputChangeCallback = useCallback(
         (search: string) => {

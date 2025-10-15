@@ -30,12 +30,24 @@ const globalFilterFn = (row: any, columnIds: string[], filterValue: any) => {
     return sampleId.includes(search) || donorId.includes(search);
 }
 
-export function BiosamplesTable({data, pageCount, columns, onSelectionChange, searchParams}: {
+export function BiosamplesTable({
+    data, 
+    pageCount, 
+    columns, 
+    onSelectionChange, 
+    searchParams,
+    showFilters = true,
+    showPagination = true,
+    interactive = true
+}: {
     data: Tool[],
     pageCount: number,
     columns: ColumnDef<any>[],
     onSelectionChange?: (selectedRows: Tool[]) => void,
-    searchParams: SearchParams
+    searchParams: SearchParams,
+    showFilters?: boolean,
+    showPagination?: boolean,
+    interactive?: boolean
 }) {
     const [editingTool, setEditingTool] = useState<any | undefined>(undefined)
     const {enableAdvancedFilter, filterFlag} = useFeatureFlags()
@@ -43,7 +55,7 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
         data,
         columns,
         pageCount,
-        enableAdvancedFilter,
+        enableAdvancedFilter: showFilters && enableAdvancedFilter,
         initialState: {
             sorting: [],
             columnPinning: {right: ["actions"], left: ["select"]},
@@ -66,6 +78,7 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
         <>
             <DataTable
                 table={table}
+                showPagination={showPagination}
                 noResults={
                     (data.length === 0 && Object.keys(searchParams).length === 0) 
                     ? (
@@ -91,36 +104,40 @@ export function BiosamplesTable({data, pageCount, columns, onSelectionChange, se
                     setEditingTool(row?.original)
                 }
             >
-                {enableAdvancedFilter ? (
-                    <DataTableAdvancedToolbar table={table}>
-                        <DataTableFilterList
-                            table={table}
-                            shallow={shallow}
-                            debounceMs={debounceMs}
-                            throttleMs={throttleMs}
-                            align="start"
-                        />
-                    </DataTableAdvancedToolbar>
-                ) : (
-                    <DataTableToolbar table={table} enableSearch={true}/>
+                {showFilters && (
+                    enableAdvancedFilter ? (
+                        <DataTableAdvancedToolbar table={table}>
+                            <DataTableFilterList
+                                table={table}
+                                shallow={shallow}
+                                debounceMs={debounceMs}
+                                throttleMs={throttleMs}
+                                align="start"
+                            />
+                        </DataTableAdvancedToolbar>
+                    ) : (
+                        <DataTableToolbar table={table} enableSearch={true}/>
+                    )
                 )}
             </DataTable>
 
-            <Dialog 
-                open={!!editingTool}
-                onOpenChange={(open) => !open && setEditingTool(undefined)}
-            >
-                <DialogPortal>
-                    <div onClick={(e) => e.stopPropagation()}>
-                        <EditAssetDialog
-                            key={editingTool?.id}
-                            data={editingTool} 
-                            type={'biosample'}
-                            closeDialog={() => {setEditingTool(undefined)}}
-                        />
-                    </div>
-                </DialogPortal>
-            </Dialog>
+            {interactive && (
+                <Dialog 
+                    open={!!editingTool}
+                    onOpenChange={(open) => !open && setEditingTool(undefined)}
+                >
+                    <DialogPortal>
+                        <div onClick={(e) => e.stopPropagation()}>
+                            <EditAssetDialog
+                                key={editingTool?.id}
+                                data={editingTool} 
+                                type={'biosample'}
+                                closeDialog={() => {setEditingTool(undefined)}}
+                            />
+                        </div>
+                    </DialogPortal>
+                </Dialog>
+            )}
         </>
     );
 }

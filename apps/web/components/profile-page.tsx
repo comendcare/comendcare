@@ -17,8 +17,9 @@ import {EditablePAGBannerPhoto} from "./editable-pag-banner-photo";
 import {PAGProfileToolsCard} from "./pag-profile-tools-card";
 import Link from "next/link";
 import { SearchParams } from "@/packages/components/types";
+import type { Biosample, DiseaseModel, Tool } from "@prisma/client";
 
-type ToolCounts = {
+export type ToolCounts = {
     biosampleCount: number;
     diseaseModelCount: number;
     clinicalDatasetCount: number;
@@ -29,6 +30,12 @@ type PAGProfilePageProps = {
     conditions: any[];
     roadmaps: any[];
     toolCounts: ToolCounts;
+    biosamples: Biosample[];
+    biosamplesPageCount: number;
+    diseaseModels: DiseaseModel[];
+    diseaseModelsPageCount: number;
+    clinicalDatasets: Tool[];
+    clinicalDatasetsPageCount: number;
     rfps: any[];
     isOwner: boolean;
     rootDomain: string;
@@ -40,6 +47,12 @@ export default function PAGProfilePage({
                                            conditions,
                                            roadmaps,
                                            toolCounts,
+                                           biosamples,
+                                           biosamplesPageCount,
+                                           diseaseModels,
+                                           diseaseModelsPageCount,
+                                           clinicalDatasets,
+                                           clinicalDatasetsPageCount,
                                            rfps,
                                            isOwner,
                                            rootDomain,
@@ -189,7 +202,17 @@ export default function PAGProfilePage({
                                     />
                                     <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                                     {/* tools card handles it's own data state via zustand - necessary for pagination to work properly */}
-                                    <PAGProfileToolsCard organization={organization} toolCounts={toolCounts} searchParams={searchParams}/>
+                                    <PAGProfileToolsCard 
+                                        organization={organization}
+                                        searchParams={searchParams}
+                                        toolCounts={toolCounts}
+                                        biosamples={biosamples}
+                                        biosamplesPageCount={biosamplesPageCount}
+                                        diseaseModels={diseaseModels}
+                                        diseaseModelsPageCount={diseaseModelsPageCount}
+                                        clinicalDatasets={clinicalDatasets}
+                                        clinicalDatasetsPageCount={clinicalDatasetsPageCount}
+                                    />
                                 </div>
                             </div>
                         </div>
