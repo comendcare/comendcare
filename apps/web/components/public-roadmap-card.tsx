@@ -73,6 +73,7 @@ export const RoadmapCard = ({
                                 setUrlView,
                                 subdomain,
                                 isPublic,
+                                organization,
                                 externalLinks
                             }: {
     roadmap: any,
@@ -82,6 +83,7 @@ export const RoadmapCard = ({
     setUrlView?: (view: string | undefined) => void,
     subdomain: string | undefined,
     isPublic: boolean,
+    organization?: Partial<Organization>,
     externalLinks: boolean
 }) => {
     const params = useSearchParams()
@@ -144,6 +146,7 @@ export const RoadmapCard = ({
                             subdomain={subdomain}
                             externalLinks={externalLinks}
                             urlMilestone={urlMilestone}
+                            organization={organization}
                             setUrlMilestone={setUrlMilestone}
                         />
                     </TabsContent>

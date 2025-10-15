@@ -111,6 +111,7 @@ export default async function EmbeddedResearchPlanPage({params}: {params: {domai
                                     roadmap={roadmap}
                                     subdomain={params.domain || undefined}
                                     isPublic={true}
+                                    organization={organization}
                                     externalLinks={true}
                                 />
                             </div>

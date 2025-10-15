@@ -2321,7 +2321,16 @@ export const getResearcherWithMergedData = withUserAuth(async () => {
 });
 
 export const getDiseaseModels = withOrganizationAuth(
-    async (organization: Organization, input?: GetDiseaseModelSchema): Promise<{
+    async (
+        organization: Organization, 
+        select: Prisma.DiseaseModelSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>,
+        input?: GetDiseaseModelSchema
+    ): Promise<{
         data: DiseaseModel[],
         pageCount: number
     }> => {
@@ -2332,14 +2341,15 @@ export const getDiseaseModels = withOrganizationAuth(
                         where: {
                             organizationId: organization.id
                         },
-                        include: {
-                            attachments: true,
-                            contacts: true,
-                            organization: {include: {conditions: {include: {condition: true}}}},
-                            gene: true,
-                            institution: true,
-                            milestones: {include: {milestone: true}},
-                        },
+                        // include: {
+                        //     attachments: true,
+                        //     contacts: true,
+                        //     organization: {include: {conditions: {include: {condition: true}}}},
+                        //     gene: true,
+                        //     institution: true,
+                        //     milestones: {include: {milestone: true}},
+                        // },
+                        select,
                         orderBy: {createdAt: "asc"},
                     }),
                     prisma.diseaseModel.count({where: {organizationId: organization.id}}),
@@ -2462,7 +2472,16 @@ function prismaOrderByFromColumnId(id: string, desc: boolean): any {
 }
 
 export const getBiosamples = withOrganizationAuth(
-    async (organization: Organization, input?: GetBiosamplesSchema): Promise<{
+    async (
+        organization: Organization, 
+        select: Prisma.BiosampleSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>,
+        input?: GetBiosamplesSchema
+    ): Promise<{
         data: Biosample[],
         pageCount: number
     }> => {
@@ -2473,17 +2492,18 @@ export const getBiosamples = withOrganizationAuth(
                         where: {
                             organizationId: organization.id
                         },
-                        include: {
-                            milestones: {include: {milestone: true}},
-                            contacts: true,
-                            attachments: true,
-                            gene: true,
-                            donor: {
-                                include: {diagnoses: {include: {type: true}}}
-                            },
-                            institution: true,
-                            materialAndDataAccessRequests: true
-                        },
+                        // include: {
+                        //     milestones: {include: {milestone: true}},
+                        //     contacts: true,
+                        //     attachments: true,
+                        //     gene: true,
+                        //     donor: {
+                        //         include: {diagnoses: {include: {type: true}}}
+                        //     },
+                        //     institution: true,
+                        //     materialAndDataAccessRequests: true
+                        // },
+                        select,
                         orderBy: {createdAt: "asc"},
                     }),
                     prisma.biosample.count({where: {organizationId: organization.id}}),
@@ -2775,7 +2795,16 @@ export const getAllBiosamples = withResearcherAuth(
 );
 
 export const getDatasamples = withOrganizationAuth(
-    async (organization: Organization, input?: GetBiosamplesSchema) => {
+    async (
+        organization: Organization, 
+        select: Prisma.ToolSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>,
+        input?: GetBiosamplesSchema
+    ) => {
         try {
             if (!input) {
                 const [data, total] = await prisma.$transaction([
@@ -2783,14 +2812,15 @@ export const getDatasamples = withOrganizationAuth(
                         where: {
                             organizationId: organization.id
                         },
-                        include: {
-                            organization: {include: {conditions: {include: {condition: true}}}},
-                            milestones: {include: {milestone: true}},
-                            contacts: true,
-                            attachments: true,
-                            institution: true,
-                            gene: true,
-                        },
+                        // include: {
+                        //     organization: {include: {conditions: {include: {condition: true}}}},
+                        //     milestones: {include: {milestone: true}},
+                        //     contacts: true,
+                        //     attachments: true,
+                        //     institution: true,
+                        //     gene: true,
+                        // },
+                        select,
                         orderBy: {createdAt: "asc"},
                     }),
                     prisma.tool.count({where: {organizationId: organization.id}}),

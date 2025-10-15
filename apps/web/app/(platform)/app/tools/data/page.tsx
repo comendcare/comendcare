@@ -25,6 +25,30 @@ export default async function DataToolsPage(props: IndexPageProps) {
 
     const {data, pageCount} = await getDatasamples(
         session?.user.organizationId,
+        {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+
+            title: true,
+            cohortSize: true,
+            description: true,
+            contacts: true,
+            attachments: true,
+            private: true,
+            // pinned: true,
+            // metadata: true,
+            types: true,
+            notes: true,
+
+            institutionId: true,
+            institution: true,
+            geneId: true,
+            gene: true,
+            organizationId: true,
+            organization: {include: {conditions: {include: {condition: true}}}},
+            milestones: {include: {milestone: true}},
+        },
         {...search, q: globalFilter, filters: validFilters}
     )
 

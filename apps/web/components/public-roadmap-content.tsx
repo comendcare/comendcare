@@ -45,6 +45,7 @@ export function PublicRoadmapContent({organization, roadmap, subdomain, mileston
                     setUrlMilestone={setMilestone}
                     urlView={view}
                     setUrlView={setView}
+                    organization={organization}
                 />
             </div>
             {roadmap.milestones && roadmap.milestones.length > 0 && (
