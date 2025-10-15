@@ -254,8 +254,28 @@ export interface CROSearchState {
 export const useCROSearchStore = create<CROSearchState>()(
     temporal((set, get) => ({
             initialized: false,
-            initState: (filters: FiltersType) => {
-                set({ initialized: true, recommendations: [], filters })
+            initState: async (filters: FiltersType) => {
+                set({ 
+                    recommendations: [], 
+                    filters, 
+                    searchTerm: '', 
+                    lastFetchedPage: 1, 
+                    sortBy: "alphabetical" ,
+                })
+
+                const { results, total } = await getUpdatedSearchResults({
+                    ...get(),
+                    sortBy: "alphabetical",
+                    lastFetchedPage: 1,
+                }, true)
+
+                set({ 
+                    initialized: true, 
+                    sortBy: "alphabetical", 
+                    searchResults: results, 
+                    lastFetchedPage: 1, 
+                    totalResults: total 
+                })
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {

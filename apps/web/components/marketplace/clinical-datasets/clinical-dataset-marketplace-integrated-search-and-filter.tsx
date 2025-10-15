@@ -1,26 +1,15 @@
 "use client"
 
 import {useCallback, useEffect, useMemo, useRef, useState} from "react"
-import {Funnel, SearchIcon, X} from "lucide-react"
-import {cn} from "@comend/lib/utils"
+import {Funnel, X} from "lucide-react"
 import {useShallow} from "zustand/react/shallow"
-
 import {Button} from "@comend/components/ui/button"
 import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"
 import {Badge} from "@comend/components/ui/badge"
 import {Separator} from "@comend/components/ui/separator"
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
-
 import MultipleSelector from "@comend/components/ui/multiple-selector"
-import {useCROSearchStore, CROSearchState} from "@/state/search/croSearchStore"
-import {
-    BUSINESS_TYPES,
-    CRO_CERTIFICATIONS,
-    CRO_TAGS,
-    MILESTONE_TYPE_OPTIONS,
-    TOOL_TYPE_OPTIONS,
-} from "@comend/lib/types"
+import {TOOL_TYPE_OPTIONS} from "@comend/lib/types"
 import {debounce} from "lodash";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/packages/components/ui/dialog";
 import type { Option } from "@comend/lib/types"
@@ -28,9 +17,10 @@ import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/sea
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
+import { initializeClinicalDatasetSearch } from "@/packages/lib/initialize-client-state"
 
 export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
-    const {searchTerm, sortBy, setSortBy, setSearchTerm, filters, setFilters, totalResults} = useClinicalDatasetSearchStore(
+    const {searchTerm, setSearchTerm, filters, setFilters, totalResults} = useClinicalDatasetSearchStore(
         useShallow((state: ClinicalDatasetSearchState) => ({
             searchTerm: state.searchTerm,
             setSearchTerm: state.setSearchTerm,
@@ -83,8 +73,13 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
 
     // initial fetch on mount
     useEffect(() => {
-        // reset to trigger initial load using store's logic
-        setSearchTerm(searchTerm || "");
+        initializeClinicalDatasetSearch({
+            types: [] as any[],
+            genes: [] as any[],
+            conditions: [] as any[],
+            organizations: [] as any[]
+        })
+        console.log(`Clinical Dataset search initialized...`)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

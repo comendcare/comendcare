@@ -25,6 +25,7 @@ import { OrganizationMarketplaceListElement } from "~web/components/marketplace/
 import {getSavedCompaniesFromOrganizationId, getSavedOrganizationsFromOrganizationId} from "@/packages/lib/fetchers";
 import {SavedCompany, SavedOrganization} from "@prisma/client";
 import {useSession} from "next-auth/react";
+import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@/packages/lib/initialize-client-state"
 
 const croSelector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -68,52 +69,95 @@ export default function MarketplacePage() {
     const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
     const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
 
+    // useEffect(() => {
+    //     async function fetchData() {
+    //         const savedOrganizationsResponse = await getSavedOrganizationsFromOrganizationId(session?.user?.organizationId || undefined, {
+    //             id: true,
+    //             organizationId: true,
+    //             organization: true,
+    //             savedOrganizationId: true,
+    //             savedOrganization: true,
+    //             updatedAt: true,
+    //             createdAt: true,
+    //             metadata: true
+    //         });
+    //         if (savedOrganizationsResponse.success) {
+    //             const savedOrganizationData = savedOrganizationsResponse.data as SavedOrganization[];
+    //             setSavedOrganizationIds(new Set(savedOrganizationData.map((c: SavedOrganization) => c.savedOrganizationId)));
+    //         } else {
+    //             console.error(savedOrganizationsResponse.error);
+    //         }
+    //     }
+
+    //     fetchData();
+    // }, [session, status])
+
     useEffect(() => {
-        async function fetchData() {
-            const savedOrganizationsResponse = await getSavedOrganizationsFromOrganizationId(session?.user?.organizationId || undefined, {
-                id: true,
-                organizationId: true,
-                organization: true,
-                savedOrganizationId: true,
-                savedOrganization: true,
-                updatedAt: true,
-                createdAt: true,
-                metadata: true
-            });
-            if (savedOrganizationsResponse.success) {
-                const savedOrganizationData = savedOrganizationsResponse.data as SavedOrganization[];
-                setSavedOrganizationIds(new Set(savedOrganizationData.map((c: SavedOrganization) => c.savedOrganizationId)));
-            } else {
-                console.error(savedOrganizationsResponse.error);
-            }
+        console.log(`start init...`)
+        const parsedCROFilters = {
+            categories: [] as any[],
+            milestoneTypes: [] as any[],
+            types: [] as any[],
+            certifications: [] as any[],
+            tags: [] as any[],
         }
+        initializeCROSearch(parsedCROFilters)
+        console.log(`CRO search initialized...`)
 
-        fetchData();
-    }, [session, status])
+        const parsedPAGFilters = {
+            genes: [] as any[],
+            conditions: [] as any[],
+            systems: [] as any[],
+            mechanisms: [] as any[],
+            modalities: [] as any[],
+        }
+        initializeOrganizationSearch(parsedPAGFilters)
+        console.log(`Organization search initialized...`)
 
-    useEffect(() => {
-        croStore.setSearchTerm("")
-        organizationStore.setSearchTerm("")
-        biosampleStore.setSearchTerm("")
-        diseaseModelStore.setSearchTerm("")
-        clinicalDatasetStore.setSearchTerm("")
+        const parsedBiosampleFilters = {
+            types: [] as any[],
+            genes: [] as any[],
+            conditions: [] as any[],
+            organizations: [] as any[],
+        }
+        initializeBiosampleSearch(parsedBiosampleFilters)
+        console.log(`Biosample search initialized...`)
+
+        const parsedDiseaseModelFilters = {
+            types: [] as any[],
+            genes: [] as any[],
+            conditions: [] as any[],
+            organizations: [] as any[],
+        }
+        initializeDiseaseModelSearch(parsedDiseaseModelFilters)
+        console.log(`Disease Model search initialized...`)
+
+        const parsedClinicalDatasetFilters = {
+            types: [] as any[],
+            genes: [] as any[],
+            conditions: [] as any[],
+            organizations: [] as any[]
+        }
+        initializeClinicalDatasetSearch(parsedClinicalDatasetFilters)
+        console.log(`Clinical Dataset search initialized...`)
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useEffect(() => {
-        async function fetchSavedCompanies() {
-            const res = await getSavedCompaniesFromOrganizationId(
-                session?.user?.organizationId,
-                { companyId: true }
-            );
+    // useEffect(() => {
+    //     async function fetchSavedCompanies() {
+    //         const res = await getSavedCompaniesFromOrganizationId(
+    //             session?.user?.organizationId,
+    //             { companyId: true }
+    //         );
 
-            if (res.success && res.data) {
-                setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
-            }
-        }
+    //         if (res.success && res.data) {
+    //             setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
+    //         }
+    //     }
 
-        fetchSavedCompanies();
-    }, [session, status]);
+    //     fetchSavedCompanies();
+    // }, [session, status]);
 
     return (
         <div className="flex flex-col w-full h-full mx-auto gap-8">

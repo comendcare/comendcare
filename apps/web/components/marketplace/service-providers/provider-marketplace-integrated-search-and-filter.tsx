@@ -22,6 +22,7 @@ import {
 } from "@comend/lib/types"
 import {debounce} from "lodash";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/packages/components/ui/dialog";
+import { initializeCROSearch } from "@/packages/lib/initialize-client-state"
 
 export function ProviderMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, sortBy, setSortBy, setSearchTerm, filters, setFilters, totalResults} = useCROSearchStore(
@@ -53,6 +54,29 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
     useEffect(() => setQuery(searchTerm), [searchTerm])
 
     useEffect(() => {
+        const parsedCROFilters = {
+            // categories: parseQuery(queryCategories),
+            // milestoneTypes: parseQuery(queryMilestoneTypes)
+            //     .map(query => {
+            //         const milestoneType = (milestoneTypes.data || []).find(milestone => milestone.id === query.value)
+            //         if (!milestoneType) return undefined
+            //         return {
+            //             label: milestoneType.label,
+            //             value: milestoneType.id
+            //         }
+            //     })
+            //     .filter(query => query !== undefined),
+            // types: parseQuery(queryTypes),
+            // certifications: parseQuery(queryCertifications),
+            // tags: parseQuery(queryTags),
+            categories: [] as any[],
+            milestoneTypes: [] as any[],
+            types: [] as any[],
+            certifications: [] as any[],
+            tags: [] as any[],
+        }
+        initializeCROSearch(parsedCROFilters)
+        console.log(`CRO search initialized...`)
         setSearchTerm("") // initial fetch on page load
     }, [])
 

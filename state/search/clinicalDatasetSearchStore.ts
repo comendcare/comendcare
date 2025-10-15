@@ -87,41 +87,6 @@ function generateFiltersString(filters: FiltersType): string {
     return typesenseFilters;
 }
 
-const generateRecommendations = async (milestones: Milestone[]) => {
-    let recommendationResults: Recommendation[] = []
-
-    await Promise.all(
-        milestones.map(async (milestone) => {
-            const newFilters = {
-                categories: Array.from(
-                    new Set((milestone?.types || []).flatMap(type => type?.milestoneType?.categories || []))
-                )
-                    .map(categoryValue => (ASSOCIATED_CATEGORIES.find(c => c.value === categoryValue)))
-                    .filter(c => c !== undefined)
-                    .map(c => ({label: c?.label, value: c?.value})),
-                types: [],
-                certifications: [],
-                tags: []
-            }
-            const {results: newSearchResults} = await getUpdatedSearchResults({
-                searchTerm: '',
-                sortBy: "alphabetical",
-                filters: newFilters,
-                page: 1,
-            }, true)
-
-            recommendationResults = recommendationResults.concat(newSearchResults.map((result: any) => {
-                return ({
-                    content: result,
-                    milestone
-                } as Recommendation)
-            }))
-        })
-    )
-
-    return recommendationResults
-}
-
 const getUpdatedSearchResults = async (
     state: any,
     isNewSearch: boolean = true
@@ -212,11 +177,6 @@ const getUpdatedSearchResults = async (
     }
 };
 
-type SetRecommendationsOptions = {
-    limit?: number,
-    priority?: string // milestone id
-}
-
 export interface ClinicalDatasetSearchState {
     initialized: boolean,
     initState: (filters: FiltersType) => void,
@@ -246,8 +206,23 @@ export interface ClinicalDatasetSearchState {
 export const useClinicalDatasetSearchStore = create<ClinicalDatasetSearchState>()(
     temporal((set, get) => ({
             initialized: false,
-            initState: (filters: FiltersType) => {
-                set({ initialized: true, recommendations: [], filters })
+            initState: async (filters: FiltersType) => {
+                set({ 
+                    recommendations: [], 
+                    filters,
+                    searchTerm: "",
+                    sortBy: undefined,
+                    page: 1,
+                })
+
+                const { results, total, totalPages } = await getUpdatedSearchResults(get(), true)
+
+                set({
+                    searchResults: results,
+                    totalPages,
+                    totalResults: total,
+                    initialized: true,
+                })
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {

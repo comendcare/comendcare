@@ -178,11 +178,6 @@ const getUpdatedSearchResults = async (
     }
 };
 
-type SetRecommendationsOptions = {
-    limit?: number,
-    priority?: string // milestone id
-}
-
 export interface BiosampleSearchState {
     initialized: boolean,
     initState: (filters: FiltersType) => void,
@@ -212,15 +207,29 @@ export interface BiosampleSearchState {
 export const useBiosampleSearchStore = create<BiosampleSearchState>()(
     temporal((set, get) => ({
             initialized: false,
-            initState: (filters: FiltersType) => {
-                set({ initialized: true, recommendations: [], filters })
+            initState: async (filters: FiltersType) => {
+                set({ 
+                    recommendations: [], 
+                    filters,
+                    searchTerm: "",
+                    sortBy: undefined,
+                    page: 1,
+                })
+
+                const { results, total, totalPages } = await getUpdatedSearchResults(get(), true)
+
+                set({
+                    searchResults: results,
+                    totalPages,
+                    totalResults: total,
+                    initialized: true,
+                })
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
                 const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     searchTerm: newSearch,
-                    lastFetchedPage: 1,
                 }, true)
 
                 if (newSearch.length > 0) {
@@ -255,7 +264,6 @@ export const useBiosampleSearchStore = create<BiosampleSearchState>()(
                 const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     sortBy,
-                    lastFetchedPage: 1,
                 }, true)
                 set({ sortBy, searchResults: results, totalPages, page: 1, totalResults: total })
             },

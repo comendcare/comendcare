@@ -32,6 +32,7 @@ import type { Option } from "@comend/lib/types";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore";
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
+import { initializeOrganizationSearch } from "@/packages/lib/initialize-client-state";
 
 // Helpers to normalize options
 const MECHANISM_OPTIONS = mechanisms.map((m: any) => ({
@@ -114,8 +115,35 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
 
     // initial fetch on mount
     useEffect(() => {
+        // init organization/PAG search store
+        const parsedPAGFilters = {
+            // genes: parseQuery(queryTypes),
+            // conditions: parseQuery(queryTypes),
+            // systems: parseQuery(querySystems).map(query => {
+            //     const system = (ASSOCIATED_SYSTEMS || []).find(system => system.value === query.value)
+            //     if (!system) return undefined
+            //     return system
+            // }).filter(query => query !== undefined),
+            // mechanisms: parseQuery(queryMechanisms).map(query => {
+            //     const mechanism = (MOLECULAR_MECHANISMS || []).find(mechanism => mechanism.value === query.value)
+            //     if (!mechanism) return undefined
+            //     return mechanism
+            // }).filter(query => query !== undefined),
+            // modalities: parseQuery(queryModalities).map(query => {
+            //     const modality = (MODALITIES || []).find(modalities => modalities.value === query.value)
+            //     if (!modality) return undefined
+            //     return modality
+            // }).filter(query => query !== undefined),
+            genes: [] as any[],
+            conditions: [] as any[],
+            systems: [] as any[],
+            mechanisms: [] as any[],
+            modalities: [] as any[],
+        }
+        initializeOrganizationSearch(parsedPAGFilters)
+        console.log(`Organization search initialized...`)
         // reset to trigger initial load using store's logic
-        setSearchTerm(searchTerm || "");
+        setSearchTerm("");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
