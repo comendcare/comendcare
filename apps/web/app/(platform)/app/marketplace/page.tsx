@@ -7,8 +7,7 @@ import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/a
 import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table"
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
 import { Button } from "@/packages/components/ui/button"
-import { Card, CardContent, CardDescription, CardTitle } from "@/packages/components/ui/card"
-import { PulsatingButton } from "@/packages/components/ui/pulsating-button"
+import { Card, CardContent, CardTitle } from "@/packages/components/ui/card"
 import { Skeleton } from "@/packages/components/ui/skeleton"
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
@@ -21,10 +20,10 @@ import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
 import { CROMarketplaceCard } from "~web/components/marketplace/marketplace-cro-card"
 import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card"
-import { OrganizationMarketplaceListElement } from "~web/components/marketplace/marketplace-pag-list-element"
-import {getSavedCompaniesFromOrganizationId, getSavedOrganizationsFromOrganizationId} from "@/packages/lib/fetchers";
-import {SavedCompany, SavedOrganization} from "@prisma/client";
-import {useSession} from "next-auth/react";
+// import { OrganizationMarketplaceListElement } from "~web/components/marketplace/marketplace-pag-list-element"
+// import {getSavedCompaniesFromOrganizationId, getSavedOrganizationsFromOrganizationId} from "@/packages/lib/fetchers";
+// import {SavedCompany, SavedOrganization} from "@prisma/client";
+// import {useSession} from "next-auth/react";
 import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@/packages/lib/initialize-client-state"
 
 const croSelector = (state: CROSearchState) => ({
@@ -57,7 +56,7 @@ const clinicalDatsetSelector = (state: ClinicalDatasetSearchState) => ({
 })
 
 export default function MarketplacePage() {
-    const {data: session, status} = useSession()
+    // const {data: session, status} = useSession()
     const croStore = useCROSearchStore(useShallow(croSelector))
     const organizationStore = useOrganizationSearchStore(useShallow(organizationSelector))
     const biosampleStore = useBiosampleSearchStore(useShallow(biosampleSelector))
@@ -66,8 +65,8 @@ export default function MarketplacePage() {
     const biosampleColumns = useBiosamplesTableColumns()
     const diseaseModelColumns = useDiseaseModelsTableColumns()
     const clinicalDatasetColumns = useClinicalDatasetsTableColumns()
-    const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
-    const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
+    // const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
+    // const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
 
     // useEffect(() => {
     //     async function fetchData() {
@@ -91,6 +90,21 @@ export default function MarketplacePage() {
 
     //     fetchData();
     // }, [session, status])
+
+    // useEffect(() => {
+    //     async function fetchSavedCompanies() {
+    //         const res = await getSavedCompaniesFromOrganizationId(
+    //             session?.user?.organizationId,
+    //             { companyId: true }
+    //         );
+
+    //         if (res.success && res.data) {
+    //             setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
+    //         }
+    //     }
+
+    //     fetchSavedCompanies();
+    // }, [session, status]);
 
     useEffect(() => {
         console.log(`start init...`)
@@ -144,21 +158,6 @@ export default function MarketplacePage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // useEffect(() => {
-    //     async function fetchSavedCompanies() {
-    //         const res = await getSavedCompaniesFromOrganizationId(
-    //             session?.user?.organizationId,
-    //             { companyId: true }
-    //         );
-
-    //         if (res.success && res.data) {
-    //             setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
-    //         }
-    //     }
-
-    //     fetchSavedCompanies();
-    // }, [session, status]);
-
     return (
         <div className="flex flex-col w-full h-full mx-auto gap-8">
             <div className="flex flex-col gap-8">
@@ -183,7 +182,8 @@ export default function MarketplacePage() {
                                             cro={cro}
                                             key={index}
                                             location={"Marketplace"}
-                                            savedCompanyIds={savedCompanyIds}
+                                            // savedCompanyIds={savedCompanyIds}
+                                            savedCompanyIds={new Set()}
                                         />
                                     ))}
                                 </>
@@ -220,7 +220,8 @@ export default function MarketplacePage() {
                                             organization={organization}
                                             key={index}
                                             isPublic={false}
-                                            savedOrganizationIds={savedOrganizationIds}
+                                            // savedOrganizationIds={savedOrganizationIds}
+                                            savedOrganizationIds={new Set()}
                                         />
                                     ))}
                                 </>
@@ -235,11 +236,6 @@ export default function MarketplacePage() {
                         }
                     </ol>
                 </div>
-
-                {/* <div className="p-10 flex flex-col gap-2 bg-blue-light rounded-lg mb-6">
-                    <h2 className="text-2xl font-semibold">Toolkit</h2>
-                    <p>Find tools that belong to patient groups on the Comend platform. Sign up with a researcher profile to request access to public tools, like biosamples, disease models, and clinical datasets.</p>
-                </div> */}
         
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
