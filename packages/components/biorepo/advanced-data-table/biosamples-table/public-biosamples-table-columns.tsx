@@ -29,7 +29,7 @@ function useColumnsPreset(explicit?: Preset) {
     return "default";
 }
 
-export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[] {
+export function useBiosamplesTableColumns(enableSorting: boolean = true, enableHiding: boolean = true, presetName?: Preset): ColumnDef<any>[] {
     const preset = useColumnsPreset(presetName);
 
     const columns: ColumnDef<any>[] = [
@@ -58,8 +58,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                     </Link>
                 </div>
             ),
-            enableHiding: preset !== 'profile',
-            enableSorting: preset !== 'profile'
+            enableHiding: enableHiding,
+            enableSorting: enableSorting
         },
         {
             id: "donor.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -73,9 +73,9 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                     <p>{row.original.donorId}</p>
                 </div>
             ),
-            enableHiding: preset !== 'profile',
+            enableHiding: enableHiding,
             meta: { label: "Public Donor ID" },
-            enableSorting: preset !== 'profile'
+            enableSorting: enableSorting
         },
         {
             id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -88,8 +88,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                     <p>{row.original.id || 'No Sample ID'}</p>
                 </div>
             ),
-            enableHiding: preset !== 'profile',
-            enableSorting: preset !== 'profile',
+            enableHiding: enableHiding,
+            enableSorting: enableSorting,
             meta: { label: "Sample ID" }
         },
         {
@@ -108,8 +108,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                     })}
                 </>
             ),
-            enableHiding: preset !== 'profile',
-            enableSorting: preset !== 'profile',
+            enableHiding: enableHiding,
+            enableSorting: enableSorting,
             meta: { label: "Type" }
         },
         {
@@ -123,8 +123,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                     <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
                 </div>
             ),
-            enableHiding: preset !== 'profile',
-            enableSorting: preset !== 'profile',
+            enableHiding: enableHiding,
+            enableSorting: enableSorting,
             meta: { label: "Condition" }
         },
         {
@@ -136,8 +136,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
             cell: ({row}) => (
                 <>{row.original.gene?.symbol}</>
             ),
-            enableHiding: preset !== 'profile',
-            enableSorting: preset !== 'profile',
+            enableHiding: enableHiding,
+            enableSorting: enableSorting,
             meta: { label: "Gene" }
         },
         {
@@ -146,8 +146,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Genotype"/>
             ),
-            enableHiding: preset !== 'profile',
-            enableSorting: preset !== 'profile',
+            enableHiding: enableHiding,
+            enableSorting: enableSorting,
             meta: {
                 label: "Genotype"
             }
@@ -188,8 +188,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                     }
                 </>
             ),
-            enableHiding: preset !== 'profile',
-            enableSorting: preset !== 'profile',
+            enableHiding: enableHiding,
+            enableSorting: enableSorting,
             meta: { label: "Available Quantity" }
         },
         {
@@ -201,8 +201,8 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
             cell: ({row}) => {
                 return <>{row.original.institution?.name}</>
             },
-            enableHiding: preset !== 'profile',
-            enableSorting: preset !== 'profile',
+            enableHiding: enableHiding,
+            enableSorting: enableSorting,
             meta: { label: "Storage Facility" }
         },
         {
@@ -220,7 +220,7 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                     ))}
                 </ul>
             ),
-            enableHiding: preset !== 'profile',
+            enableHiding: enableHiding,
             enableSorting: false,
             meta: { label: "Point of Contact" }
         },
@@ -247,7 +247,7 @@ export function useBiosamplesTableColumns(presetName?: Preset): ColumnDef<any>[]
                 </ul>
             ),
             enableSorting: false,
-            enableHiding: preset !== 'profile',
+            enableHiding: enableHiding,
             meta: { label: "Links" }
         },
         // {

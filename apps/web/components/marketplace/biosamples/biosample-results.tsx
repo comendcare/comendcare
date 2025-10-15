@@ -23,7 +23,7 @@ export function BiosampleSearchResults({
         searchResults,
         setSortBy
     } = useBiosampleSearchStore(useShallow(selector))
-    const columns = useBiosamplesTableColumns()
+    const columns = useBiosamplesTableColumns() // by default sorting & hiding are enabled
 
     setSortBy(searchParams?.sort)
 

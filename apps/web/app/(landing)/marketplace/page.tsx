@@ -54,7 +54,10 @@ export default function MarketplacePage() {
     const biosampleStore = useBiosampleSearchStore(useShallow(biosampleSelector))
     const diseaseModelStore = useDiseaseModelSearchStore(useShallow(diseaseModelSelector))
     const clinicalDatasetStore = useClinicalDatasetSearchStore(useShallow(clinicalDatsetSelector))
-    const biosampleColumns = useBiosamplesTableColumns()
+    const biosampleColumns = useBiosamplesTableColumns(
+        false, // disable sorting
+        false, // disable hiding
+    )
     const diseaseModelColumns = useDiseaseModelsTableColumns()
     const clinicalDatasetColumns = useClinicalDatasetsTableColumns()
     const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());

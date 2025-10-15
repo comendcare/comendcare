@@ -179,7 +179,7 @@ const getUpdatedSearchResults = async (
 
 export interface ClinicalDatasetSearchState {
     initialized: boolean,
-    initState: (filters: FiltersType) => void,
+    initState: (filters: FiltersType) => Promise<void>,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string | string[] | undefined,

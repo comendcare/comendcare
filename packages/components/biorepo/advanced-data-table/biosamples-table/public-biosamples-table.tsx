@@ -9,13 +9,20 @@ import { SearchParams } from "typesense/lib/Typesense/Documents";
 import { useBiosampleSearchStore } from "../../../../../state/search/biosampleSearchStore";
 import {DataTableToolbar} from "./../data-table/data-table-toolbar";
 
-export function BiosamplesTable({data, pageCount, columns, onSelectionChange, searchParams, showPagination = true}: {
+export function BiosamplesTable({
+    data, 
+    pageCount, 
+    columns, 
+    onSelectionChange, 
+    searchParams, 
+    showPagination = true,
+}: {
     data: Tool[],
     pageCount: number,
     columns: ColumnDef<any>[],
     onSelectionChange?: (selectedRows: Tool[]) => void,
     searchParams: SearchParams,
-    showPagination?: boolean
+    showPagination?: boolean,
 }) {
     const {table, shallow, debounceMs, throttleMs} = useDataTable({
         data,

@@ -1,7 +1,8 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { BiosampleSearchResults } from "~web/components/marketplace/biosamples/biosample-results";
 import { BiosampleMarketplaceIntegratedSearchAndFilter } from "~web/components/marketplace/biosamples/biosample-marketplace-integrated-search-and-filter";
 import { SearchParams } from "@/packages/components/types";
+import { initializeBiosampleSearch } from "@/packages/lib/initialize-client-state";
 
 interface IndexPageProps {
     searchParams: Promise<SearchParams>

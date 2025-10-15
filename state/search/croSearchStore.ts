@@ -230,7 +230,7 @@ type SetRecommendationsOptions = {
 
 export interface CROSearchState {
     initialized: boolean,
-    initState: (filters: FiltersType) => void,
+    initState: (filters: FiltersType) => Promise<void>,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string,

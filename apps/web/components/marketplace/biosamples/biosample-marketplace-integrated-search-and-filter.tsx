@@ -71,17 +71,17 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
     // Keep local input in sync with store (e.g., external changes)
     useEffect(() => setQuery(searchTerm), [searchTerm]);
 
-    // initial fetch on mount - initialize automatically calls first typesense search
-    useEffect(() => {
-        initializeBiosampleSearch({
-            types: [] as any[],
-            genes: [] as any[],
-            conditions: [] as any[],
-            organizations: [] as any[],
-        })
-        console.log(`Biosample search initialized...`)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // // initial fetch on mount - initialize automatically calls first typesense search
+    // useEffect(() => {
+    //     initializeBiosampleSearch({
+    //         types: [] as any[],
+    //         genes: [] as any[],
+    //         conditions: [] as any[],
+    //         organizations: [] as any[],
+    //     })
+    //     console.log(`Biosample search initialized...`)
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, []);
 
     const handleInputChangeCallback = useCallback(
         (search: string) => {

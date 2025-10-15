@@ -180,7 +180,8 @@ const getUpdatedSearchResults = async (
 
 export interface BiosampleSearchState {
     initialized: boolean,
-    initState: (filters: FiltersType) => void,
+    setInit: (initState: boolean) => void,
+    initState: (filters: FiltersType) => Promise<void>,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string | string[] | undefined,
@@ -207,6 +208,9 @@ export interface BiosampleSearchState {
 export const useBiosampleSearchStore = create<BiosampleSearchState>()(
     temporal((set, get) => ({
             initialized: false,
+            setInit: (initState: boolean) => {
+                set({initialized: initState})
+            },
             initState: async (filters: FiltersType) => {
                 set({ 
                     recommendations: [], 
