@@ -2,7 +2,7 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import { Database, Rat, TestTubeDiagonal } from "lucide-react";
 import { cn } from "@comend/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/packages/components/ui/button";
 import { BiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table";
 import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
@@ -16,7 +16,16 @@ import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-dat
 import { ToolCounts } from "./profile-page";
 import { useRouter } from "next/navigation";
 
-const getInitState = (counts: {biosampleCount: number, diseaseModelCount: number, clinicalDatasetCount: number}) => {
+const getInitState = (
+    counts: {
+        biosampleCount: number, 
+        diseaseModelCount: number, 
+        clinicalDatasetCount: number
+    }, 
+    searchParams: SearchParams | undefined
+): string => {
+    if (searchParams && searchParams.view && typeof searchParams.view === 'string') return  searchParams.view
+
     if (counts.biosampleCount > 0) return 'biosamples'
     if (counts.diseaseModelCount > 0) return 'disease-models'
     if (counts.clinicalDatasetCount > 0) return 'clinical-datasets'
@@ -45,16 +54,36 @@ export const PAGProfileToolsCard = ({
     clinicalDatasets: Tool[];
     clinicalDatasetsPageCount: number;
 }) => {
-    console.log(`biosamples`, biosamples)
-    const [section, setSection] = useState<'biosamples' | 'disease-models' | 'clinical-datasets'>(getInitState(toolCounts))
+    const [isInitialized, setIsInitialized] = useState<boolean>(false)    
+    const [section, setSection] = useState<string | undefined>(undefined)
     const biosampleColumns = useBiosamplesTableColumns(
         false, // disable sorting
         false, // disable hiding
         "profile",
     )
-    const diseaseModelColumns = useDiseaseModelsTableColumns("profile")
-    const clinicalDatasetColumns = useClinicalDatasetsTableColumns("profile")
+    const diseaseModelColumns = useDiseaseModelsTableColumns(
+        false, // disable sorting
+        false, // disable hiding
+        "profile"
+    )
+    const clinicalDatasetColumns = useClinicalDatasetsTableColumns(
+        false, // disable sorting
+        false, // disable hiding
+        "profile"
+    )
     const router = useRouter();
+
+    useEffect(() => {
+        console.log(`start init`)
+        setSection(getInitState(toolCounts, searchParams))
+        setIsInitialized(true)
+        console.log(`finish init`)
+    }, [])
+
+
+    useEffect(() => {
+        console.log(`isInitalized changed`, isInitialized)
+    }, [isInitialized])
 
     return (
         <Card className="organization-profile-tour-step5">
@@ -66,7 +95,12 @@ export const PAGProfileToolsCard = ({
                             <Button
                                 variant={"link"}
                                 onClick={async () => {
-                                    router.push(window.location.pathname, { scroll: false })
+                                    // setIsInitialized(false)
+                                    // router.push(window.location.pathname, { scroll: false })
+                                    const searchParams = new URLSearchParams()
+                                    searchParams.set("page", "1")
+                                    searchParams.set("view", "biosamples")
+                                    router.push(`?${searchParams.toString()}`, {scroll: false})
                                     setSection("biosamples");
                                 }}
                                 className={cn(
@@ -84,7 +118,12 @@ export const PAGProfileToolsCard = ({
                             <Button
                                 variant={"link"}
                                 onClick={async () => {
-                                    router.push(window.location.pathname, { scroll: false })
+                                    // setIsInitialized(false)
+                                    // router.push(window.location.pathname, { scroll: false })
+                                    const searchParams = new URLSearchParams()
+                                    searchParams.set("page", "1")
+                                    searchParams.set("view", "disease-models")
+                                    router.push(`?${searchParams.toString()}`, {scroll: false})
                                     setSection("disease-models");
                                 }}
                                 className={cn(
@@ -102,7 +141,12 @@ export const PAGProfileToolsCard = ({
                             <Button
                                 variant={"link"}
                                 onClick={async () => {
-                                    router.push(window.location.pathname, { scroll: false })
+                                    // setIsInitialized(false)
+                                    // router.push(window.location.pathname, { scroll: false })
+                                    const searchParams = new URLSearchParams()
+                                    searchParams.set("page", "1")
+                                    searchParams.set("view", "clinical-datasets")
+                                    router.push(`?${searchParams.toString()}`, {scroll: false})
                                     setSection('clinical-datasets')
                                 }}
                                 className={cn(
@@ -120,7 +164,12 @@ export const PAGProfileToolsCard = ({
                 </CardTitle>
             </CardHeader>
             <CardContent className="w-full max-w-full">
-                {section === 'biosamples' && (
+                {!isInitialized && (
+                    <div className="bg-gray-100 rounded-md w-full h-[200px]">
+
+                    </div>
+                )}
+                {(isInitialized && section === 'biosamples') && (
                     <div className="max-w-7xl w-full overflow-auto">
                         <FeatureFlagsProvider showFilters={false}>
                             <BiosamplesTable
@@ -135,7 +184,7 @@ export const PAGProfileToolsCard = ({
                         </FeatureFlagsProvider>
                     </div>
                 )}
-                {section === 'disease-models' && (
+                {(isInitialized && section === 'disease-models') && (
                     <div className="max-w-7xl w-full overflow-auto">
                         <FeatureFlagsProvider showFilters={false}>
                             <DiseaseModelsTable
@@ -150,7 +199,7 @@ export const PAGProfileToolsCard = ({
                         </FeatureFlagsProvider>
                     </div>
                 )}
-                {section === 'clinical-datasets' && (
+                {(isInitialized && section === 'clinical-datasets') && (
                     <div className="max-w-7xl w-full overflow-auto">
                         <FeatureFlagsProvider showFilters={false}>
                             <ClinicalDatasetsTable

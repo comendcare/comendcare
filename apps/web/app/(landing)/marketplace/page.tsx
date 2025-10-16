@@ -58,8 +58,14 @@ export default function MarketplacePage() {
         false, // disable sorting
         false, // disable hiding
     )
-    const diseaseModelColumns = useDiseaseModelsTableColumns()
-    const clinicalDatasetColumns = useClinicalDatasetsTableColumns()
+    const diseaseModelColumns = useDiseaseModelsTableColumns(
+        false, // disable sorting
+        false, // disable hiding
+    )
+    const clinicalDatasetColumns = useClinicalDatasetsTableColumns(
+        false, // disable sorting
+        false, // disable hiding
+    )
     const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
 
     useEffect(() => {

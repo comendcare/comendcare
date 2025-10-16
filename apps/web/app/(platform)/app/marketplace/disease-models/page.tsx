@@ -18,7 +18,7 @@ const selector = (state: DiseaseModelSearchState) => ({
     setFilters: state.setFilters
 })
 
-export default async function DiseaseModelsPage(props: IndexPageProps) {
+export default function DiseaseModelsPage(props: IndexPageProps) {
     const {initialized, filters, setFilters} = useDiseaseModelSearchStore(useShallow(selector))
     const [searchParams, setSearchParams] = useState({})
     const [isInitialized, setIsInitialized] = useState(false)

@@ -67,8 +67,14 @@ export default function MarketplacePage() {
         false, // disable sorting
         false, // disable hiding
     )
-    const diseaseModelColumns = useDiseaseModelsTableColumns()
-    const clinicalDatasetColumns = useClinicalDatasetsTableColumns()
+    const diseaseModelColumns = useDiseaseModelsTableColumns(
+        false, // disable sorting,
+        false, // disable hiding
+    )
+    const clinicalDatasetColumns = useClinicalDatasetsTableColumns(
+        false, // disable sorting,
+        false, // disable hiding
+    )
     const [crosInitialized, setCROsInitialized] = useState(false)
     const [pagsInitialized, setPagsInitialized] = useState(false)
     const [biosamplesInitialized, setBiosamplesInitialized] = useState(false)

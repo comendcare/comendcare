@@ -18,7 +18,7 @@ const selector = (state: ClinicalDatasetSearchState) => ({
     setFilters: state.setFilters
 })
 
-export default async function ClinicalDatasetsPage(props: IndexPageProps) {
+export default function ClinicalDatasetsPage(props: IndexPageProps) {
     const {initialized, filters, setFilters} = useClinicalDatasetSearchStore(useShallow(selector))
     const [searchParams, setSearchParams] = useState({})
     const [isInitialized, setIsInitialized] = useState(false)

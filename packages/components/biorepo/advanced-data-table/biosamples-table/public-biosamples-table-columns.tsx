@@ -58,8 +58,8 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
                     </Link>
                 </div>
             ),
-            enableHiding: enableHiding,
-            enableSorting: enableSorting
+            enableHiding,
+            enableSorting,
         },
         {
             id: "donor.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -73,9 +73,9 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
                     <p>{row.original.donorId}</p>
                 </div>
             ),
-            enableHiding: enableHiding,
+            enableHiding,
+            enableSorting,
             meta: { label: "Public Donor ID" },
-            enableSorting: enableSorting
         },
         {
             id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -88,8 +88,8 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
                     <p>{row.original.id || 'No Sample ID'}</p>
                 </div>
             ),
-            enableHiding: enableHiding,
-            enableSorting: enableSorting,
+            enableHiding,
+            enableSorting,
             meta: { label: "Sample ID" }
         },
         {
@@ -108,8 +108,8 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
                     })}
                 </>
             ),
-            enableHiding: enableHiding,
-            enableSorting: enableSorting,
+            enableHiding,
+            enableSorting,
             meta: { label: "Type" }
         },
         {
@@ -123,8 +123,8 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
                     <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
                 </div>
             ),
-            enableHiding: enableHiding,
-            enableSorting: enableSorting,
+            enableHiding,
+            enableSorting,
             meta: { label: "Condition" }
         },
         {
@@ -136,8 +136,8 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
             cell: ({row}) => (
                 <>{row.original.gene?.symbol}</>
             ),
-            enableHiding: enableHiding,
-            enableSorting: enableSorting,
+            enableHiding,
+            enableSorting,
             meta: { label: "Gene" }
         },
         {
@@ -146,8 +146,8 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
             header: ({column}) => (
                 <DataTableColumnHeader column={column} title="Genotype"/>
             ),
-            enableHiding: enableHiding,
-            enableSorting: enableSorting,
+            enableHiding,
+            enableSorting,
             meta: {
                 label: "Genotype"
             }
@@ -188,8 +188,8 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
                     }
                 </>
             ),
-            enableHiding: enableHiding,
-            enableSorting: enableSorting,
+            enableHiding,
+            enableSorting,
             meta: { label: "Available Quantity" }
         },
         {
@@ -201,8 +201,8 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
             cell: ({row}) => {
                 return <>{row.original.institution?.name}</>
             },
-            enableHiding: enableHiding,
-            enableSorting: enableSorting,
+            enableHiding,
+            enableSorting,
             meta: { label: "Storage Facility" }
         },
         {
@@ -220,7 +220,7 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
                     ))}
                 </ul>
             ),
-            enableHiding: enableHiding,
+            enableHiding,
             enableSorting: false,
             meta: { label: "Point of Contact" }
         },
@@ -247,7 +247,7 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
                 </ul>
             ),
             enableSorting: false,
-            enableHiding: enableHiding,
+            enableHiding,
             meta: { label: "Links" }
         },
         // {
