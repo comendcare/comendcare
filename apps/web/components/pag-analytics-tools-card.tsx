@@ -93,7 +93,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                 </div>
 
                 {/* Open Access Requests */}
-                <div className="pt-4 border-t">
+                {/* <div className="pt-4 border-t">
                     <div className="flex items-center justify-between">
                         <span className="flex flex-row items-center justify-center gap-x-2 text-sm font-medium">
                             Open access requests
@@ -127,7 +127,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                             {organization.materialAndDataAccessRequests.length}
                         </div>
                     </div>
-                </div>
+                </div> */}
             </CardContent>
         </Card>
     );

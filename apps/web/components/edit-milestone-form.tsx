@@ -1176,8 +1176,8 @@ export function EditMilestoneForm({
             </Form>
 
             <Dialog open={createBiosampleIsOpen} onOpenChange={setCreateBiosampleIsOpen}>
-                <DialogContent>
-                    <DialogHeader>
+                <DialogContent className="gap-0">
+                    <DialogHeader className="pb-4">
                         <DialogTitle>
                             Create Biosample Tool
                         </DialogTitle>
@@ -1208,8 +1208,8 @@ export function EditMilestoneForm({
             </Dialog>
 
             <Dialog open={createDiseaseModelIsOpen} onOpenChange={setCreateDiseaseModelIsOpen}>
-                <DialogContent>
-                    <DialogHeader>
+                <DialogContent className="gap-0">
+                    <DialogHeader className="pb-4">
                         <DialogTitle>
                             Create Disease Model Tool
                         </DialogTitle>
@@ -1239,8 +1239,8 @@ export function EditMilestoneForm({
             </Dialog>
 
             <Dialog open={createClincalDatasetIsOpen} onOpenChange={setCreateClinicalDatasetIsOpen}>
-                <DialogContent>
-                    <DialogHeader>
+                <DialogContent className="gap-0">
+                    <DialogHeader className="pb-4">
                         <DialogTitle>
                             Create Data Tool
                         </DialogTitle>
@@ -1270,8 +1270,8 @@ export function EditMilestoneForm({
             </Dialog>
 
             <Dialog open={createRFPIsOpen} onOpenChange={setCreateRFPIsOpen}>
-                <DialogContent>
-                    <DialogHeader>
+                <DialogContent className="gap-0">
+                    <DialogHeader className="pb-4">
                         <DialogTitle>
                             Create an RFP
                         </DialogTitle>

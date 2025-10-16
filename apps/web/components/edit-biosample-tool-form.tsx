@@ -20,6 +20,7 @@ import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
     DialogClose,
+    DialogFooter,
 } from "@comend/components/ui/dialog"
 import { BIOSAMPLE_TYPE_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS } from "@comend/lib/types"
 import type {Prisma} from "@prisma/client"
@@ -347,45 +348,45 @@ export function EditBiosampleToolForm({
 
                     <Separator className="w-full"/>
                     <DonorFormFields form={form} />
-
-                    <span className="absolute bottom-0 right-4 z-900 flex gap-2 w-fit">
-                        <DialogClose asChild>
-                            <Button 
-                                variant={"secondary"} 
-                                onClick={() => {if (closeDialog) closeDialog()}}
-                            >
-                                Cancel
-                            </Button>
-                        </DialogClose>
-
-                        <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
-                            Delete Tool
-                        </Button>
-                        <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                            <DeleteBiosampleDialog toolId={toolData.id} closeDialog={closeDialog}/>
-                        </Dialog>
-                        <div className="bg-white rounded-md p-0">
-                            <Button
-                                disabled={!form.formState.isValid || isSaving}
-                                variant={"cta"}
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    handleFormSubmit(form.getValues())
-                                }}
-                            >
-                                {isSaving 
-                                    ? (
-                                        <div className="w-[81px] flex justify-center items-center">
-                                            <LoadingDots/>
-                                        </div>
-                                    ) 
-                                    : ("Save Changes")
-                                }
-                            </Button>
-                        </div>
-                    </span>
                 </form>
             </ScrollArea>
+
+            <DialogFooter className="pt-1">
+                <DialogClose asChild>
+                    <Button 
+                        variant={"secondary"} 
+                        onClick={() => {if (closeDialog) closeDialog()}}
+                    >
+                        Cancel
+                    </Button>
+                </DialogClose>
+
+                <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
+                    Delete Tool
+                </Button>
+                <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+                    <DeleteBiosampleDialog toolId={toolData.id} closeDialog={closeDialog}/>
+                </Dialog>
+                <div className="bg-white rounded-md p-0">
+                    <Button
+                        disabled={!form.formState.isValid || isSaving}
+                        variant={"cta"}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleFormSubmit(form.getValues())
+                        }}
+                    >
+                        {isSaving 
+                            ? (
+                                <div className="w-[81px] flex justify-center items-center">
+                                    <LoadingDots/>
+                                </div>
+                            ) 
+                            : ("Save Changes")
+                        }
+                    </Button>
+                </div>
+            </DialogFooter>
         </Form>
     )
 }
