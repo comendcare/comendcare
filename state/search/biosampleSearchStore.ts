@@ -178,14 +178,10 @@ const getUpdatedSearchResults = async (
     }
 };
 
-type SetRecommendationsOptions = {
-    limit?: number,
-    priority?: string // milestone id
-}
-
 export interface BiosampleSearchState {
     initialized: boolean,
-    initState: (filters: FiltersType) => void,
+    setInit: (initState: boolean) => void,
+    initState: (filters: FiltersType) => Promise<void>,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string | string[] | undefined,
@@ -202,7 +198,7 @@ export interface BiosampleSearchState {
     searchResults: any[] | undefined
     setSearchResults: (results: any[]) => void
     filters: FiltersType,
-    setFilters: (updatedFilters: FiltersType) => void,
+    setFilters: (updatedFilters: FiltersType) => Promise<void>,
     recommendations: Recommendation[] | undefined
     // setRecommendations: (milestones: Milestone[], options?: SetRecommendationsOptions) => Promise<Recommendation[]>,
     totalResults: undefined | number,
@@ -212,15 +208,32 @@ export interface BiosampleSearchState {
 export const useBiosampleSearchStore = create<BiosampleSearchState>()(
     temporal((set, get) => ({
             initialized: false,
-            initState: (filters: FiltersType) => {
-                set({ initialized: true, recommendations: [], filters })
+            setInit: (initState: boolean) => {
+                set({initialized: initState})
+            },
+            initState: async (filters: FiltersType) => {
+                set({ 
+                    recommendations: [], 
+                    filters,
+                    searchTerm: "",
+                    sortBy: undefined,
+                    page: 1,
+                })
+
+                const { results, total, totalPages } = await getUpdatedSearchResults(get(), true)
+
+                set({
+                    searchResults: results,
+                    totalPages,
+                    totalResults: total,
+                    initialized: true,
+                })
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
                 const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     searchTerm: newSearch,
-                    lastFetchedPage: 1,
                 }, true)
 
                 if (newSearch.length > 0) {
@@ -255,7 +268,6 @@ export const useBiosampleSearchStore = create<BiosampleSearchState>()(
                 const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     sortBy,
-                    lastFetchedPage: 1,
                 }, true)
                 set({ sortBy, searchResults: results, totalPages, page: 1, totalResults: total })
             },

@@ -15,19 +15,21 @@ const selector = (state: BiosampleSearchState) => ({
 })
 
 export function BiosampleSearchResults({
-    searchParams
+    searchParams,
+    isInitialized
 }: {
-    searchParams?: SearchParams | undefined
+    searchParams?: SearchParams | undefined,
+    isInitialized: boolean
 }) {
     const { 
         searchResults,
         setSortBy
     } = useBiosampleSearchStore(useShallow(selector))
-    const columns = useBiosamplesTableColumns()
+    const columns = useBiosamplesTableColumns() // by default sorting & hiding are enabled
 
     setSortBy(searchParams?.sort)
 
-    if (!searchResults) {
+    if (!isInitialized || !searchResults) {
         return (
             <div className="h-full w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                 <Skeleton className="h-[286px] w-full"/>

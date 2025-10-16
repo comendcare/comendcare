@@ -12,7 +12,7 @@ import {Shell} from "@/packages/components/biorepo/advanced-data-table/lib/shell
 import {
     useDiseaseModelsTableColumns
 } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/private-disease-models-table-columns";
-import {Tool} from "@prisma/client";
+import type {DiseaseModel, Tool} from "@prisma/client";
 import {SearchParams} from "typesense/lib/Typesense/Documents";
 import {useEffect, useRef, useState} from "react";
 import {revalidate} from "@/packages/lib/revalidate";
@@ -24,7 +24,7 @@ import {setDiseaseModelsVisibility} from "@/packages/lib/actions";
 import {DiseaseModelBulkImportDialog} from "./disease-model-bulk-import-dialog";
 
 export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
-    data: Tool[],
+    data: DiseaseModel[],
     pageCount: number,
     searchParams: SearchParams
 }) => {
