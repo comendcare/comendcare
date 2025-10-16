@@ -50,14 +50,6 @@ import {
     SavedCompany,
     Tool
 } from "@prisma/client"
-import {
-    getAssets,
-    getBiosamples,
-    getDatasamples,
-    getDiseaseModels,
-    getRFPs,
-    getSavedCompaniesFromOrganizationId
-} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group"
 import {ExternalContactField} from "./external-contact-field"

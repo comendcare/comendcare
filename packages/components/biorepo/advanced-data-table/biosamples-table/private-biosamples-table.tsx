@@ -10,7 +10,7 @@ import {DataTableToolbar} from "./../data-table/data-table-toolbar";
 import {useDataTable} from "./../../../../../packages/lib/hooks/use-data-table";
 import {ColumnDef, Row} from "@tanstack/react-table";
 import {useFeatureFlags} from "../lib/feature-flags-provider";
-import {Tool} from "@prisma/client";
+import type {Biosample, Tool} from "@prisma/client";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { EditAssetDialog, NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
@@ -40,7 +40,7 @@ export function BiosamplesTable({
     showPagination = true,
     interactive = true
 }: {
-    data: Tool[],
+    data: Biosample[],
     pageCount: number,
     columns: ColumnDef<any>[],
     onSelectionChange?: (selectedRows: Tool[]) => void,

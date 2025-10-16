@@ -10,7 +10,7 @@ import {
     getPublicToolCountsForOrganization,
     getBiosamples,
     getDiseaseModels,
-    getDatasamples
+    getClinicalDatasets
 } from "@comend/lib/fetchers"
 import PAGPublicProfileHeader from "~web/components/pag-public-profile-header";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
@@ -149,6 +149,28 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
         notFound()
     }
 
+    let conditions = null
+    if (organization) {
+        const response = await getConditionsDataFromOrgId(organization?.id, {
+            id: true,
+            name: true,
+            summary: true,
+            prevalenceNumerator: true,
+            prevalenceDenominator: true,
+            numberOfPatientsEngaged: true,
+            nationalEstimatedPopulation: true,
+            globalEstimatedPopulation: true,
+            diseaseCategories: true,
+            causalGenes: true,
+            associatedGenes: true
+        })
+        if (response.success) {
+            conditions = response.data
+        } else {
+            console.error(response.error)
+        }
+    }
+
     const {data: biosamples, pageCount: biosamplesPageCount} = await getBiosamples(
         organization.id,
         {
@@ -186,7 +208,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
             geneId: true,
             gene: true,
             organizationId: true,
-            organiztion: true,
+            organization: true,
             materialAndDataAccessRequests: true
         },
         {...search, q: globalFilter, filters: validFilters},
@@ -225,7 +247,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
         true // public only
     )
 
-    const {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount} = await getDatasamples(
+    const {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount} = await getClinicalDatasets(
         organization.id,
         {
             id: true,
@@ -254,28 +276,6 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
         {...search, q: globalFilter, filters: validFilters},
         true // public only
     )
-
-    let conditions = null
-    if (organization) {
-        const response = await getConditionsDataFromOrgId(organization?.id, {
-            id: true,
-            name: true,
-            summary: true,
-            prevalenceNumerator: true,
-            prevalenceDenominator: true,
-            numberOfPatientsEngaged: true,
-            nationalEstimatedPopulation: true,
-            globalEstimatedPopulation: true,
-            diseaseCategories: true,
-            causalGenes: true,
-            associatedGenes: true
-        })
-        if (response.success) {
-            conditions = response.data
-        } else {
-            console.error(response.error)
-        }
-    }
 
     if (!organization.verified) {
         // Render unverified organization state

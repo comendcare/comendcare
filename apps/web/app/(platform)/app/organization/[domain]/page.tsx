@@ -1,6 +1,16 @@
 import prisma from "@comend/lib/prisma"
 import {notFound} from "next/navigation"
-import {getOrganizationData, getConditionsDataFromOrgId, getPublicClinicalDatasetsForOrganization, getPublicRFPsForOrganization, getPublicRoadmapsForOrganization, getPublicToolCountsForOrganization, getBiosamples, getDiseaseModels, getDatasamples} from "@comend/lib/fetchers"
+import {
+    getOrganizationData, 
+    getConditionsDataFromOrgId, 
+    getPublicClinicalDatasetsForOrganization, 
+    getPublicRFPsForOrganization, 
+    getPublicRoadmapsForOrganization, 
+    getPublicToolCountsForOrganization, 
+    getBiosamples, 
+    getDiseaseModels,
+    getClinicalDatasets
+} from "@comend/lib/fetchers"
 import PAGPublicProfileHeader from "~web/components/pag-public-profile-header";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
 import {PagProfileAboutCard} from "~web/components/pag-profile-about-card";
@@ -200,7 +210,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
             geneId: true,
             gene: true,
             organizationId: true,
-            organiztion: true,
+            organization: true,
             materialAndDataAccessRequests: true
         },
         {...search, q: globalFilter, filters: validFilters},
@@ -239,7 +249,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
         true // public only
     )
 
-    const {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount} = await getDatasamples(
+    const {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount} = await getClinicalDatasets(
         organization.id,
         {
             id: true,

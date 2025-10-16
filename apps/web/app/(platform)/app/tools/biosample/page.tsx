@@ -60,7 +60,7 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
             geneId: true,
             gene: true,
             organizationId: true,
-            organiztion: true,
+            organization: true,
             materialAndDataAccessRequests: true
         },
         {...search, q: globalFilter, filters: validFilters},

@@ -6,7 +6,7 @@ import PAGProfilePage from "~web/components/profile-page";
 import {
     getBiosamples,
     getConditionsDataFromOrgId,
-    getDatasamples,
+    getClinicalDatasets,
     getDiseaseModels,
     getPublicRFPsForOrganization,
     getPublicRoadmapsForOrganization,
@@ -168,7 +168,7 @@ export default async function ProfilePage(props: IndexPageProps) {
             geneId: true,
             gene: true,
             organizationId: true,
-            organiztion: true,
+            organization: true,
             materialAndDataAccessRequests: true
         },
         {...search, q: globalFilter, filters: validFilters},
@@ -207,7 +207,7 @@ export default async function ProfilePage(props: IndexPageProps) {
         true // public only
     )
 
-    const {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount} = await getDatasamples(
+    const {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount} = await getClinicalDatasets(
         session?.user.organizationId,
         {
             id: true,

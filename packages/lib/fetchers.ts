@@ -19,7 +19,8 @@ import type {
     Researcher,
     User,
     Biosample,
-    DiseaseModel
+    DiseaseModel,
+    Tool
 } from "@prisma/client";
 import {promises as fs} from "fs";
 import path from "path";
@@ -40,6 +41,7 @@ import {BIOSAMPLE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS, Option} from "./types";
 import {mergeResearcherData} from "./../../apps/researcher/lib/utils";
 import {
     GetBiosamplesSchema,
+    GetClinicalDatasetsSchema,
     GetDiseaseModelSchema
 } from "./validations";
 import {notFound, redirect} from "next/navigation";
@@ -2320,156 +2322,203 @@ export const getResearcherWithMergedData = withUserAuth(async () => {
     return {success: true, data: merged};
 });
 
-export const getDiseaseModels = withOrganizationAuth(
-    async (
-        organization: Organization, 
-        select: Prisma.DiseaseModelSelect<InternalArgs & {
-            result: {};
-            model: {};
-            query: {};
-            client: {};
-        }>,
-        input?: GetDiseaseModelSchema,
-        publicOnly: boolean = false
-    ): Promise<{
-        data: DiseaseModel[],
-        pageCount: number
-    }> => {
-        try {
-            if (!input) {
-                const [data, total] = await prisma.$transaction([
-                    prisma.diseaseModel.findMany({
-                        where: {
-                            organizationId: organization.id,
-                            ...(publicOnly ? {private: false} : undefined)
-                        },
-                        // include: {
-                        //     attachments: true,
-                        //     contacts: true,
-                        //     organization: {include: {conditions: {include: {condition: true}}}},
-                        //     gene: true,
-                        //     institution: true,
-                        //     milestones: {include: {milestone: true}},
-                        // },
-                        select,
-                        orderBy: {createdAt: "asc"},
-                    }),
-                    prisma.diseaseModel.count({where: {organizationId: organization.id}}),
-                ]);
+export const getDiseaseModels = async (
+    organizationId: string | null | undefined,
+    select: Prisma.DiseaseModelSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+    input?: GetDiseaseModelSchema,
+    publicOnly: boolean = false
+): Promise<{data: DiseaseModel[], pageCount: number}> => {
+    if (publicOnly) { // allow any requester to fetch public data
+        if (!organizationId) return {data: [], pageCount: 0}
+        const organization = await prisma.organization.findUnique({
+            where: {id: organizationId}
+        })
+        if (!organization) return {data: [], pageCount: 0}
+        
+        return await fetchDiseaseModels(
+            organization,
+            select,
+            input,
+            publicOnly
+        )
+    }
 
-                return {data, pageCount: 1};
-            }
+    // only allow members of the organization to fetch private data
+    return (await withOrganizationAuth(
+        async (
+            organization: Organization,
+            select: Prisma.DiseaseModelSelect<InternalArgs & {
+                result: {};
+                model: {};
+                query: {};
+                client: {};
+            }>,
+            input?: GetDiseaseModelSchema,
+            publicOnly: boolean = false
+        ) => {
+            return await fetchDiseaseModels(
+                organization,
+                select,
+                input,
+                publicOnly
+            )
+        }
+    ))(organizationId, select, input, publicOnly)
+}
 
-            const offset = (input.page - 1) * input.perPage;
-            const advancedTable =
-                input.filterFlag === "advancedFilters"
-
-            let where: any = {};
-            console.log(`input`, input)
-
-            if (advancedTable) {
-                const preProcessedFilters: any = input.filters.map(filter => ({
-                    ...filter,
-                    ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
-                }))
-
-                where = filterColumns({
-                    filters: preProcessedFilters,
-                    joinOperator: input.joinOperator,
-                })
-            } else {
-                const filters: any[] = []
-
-                if (input.private.length == 1) {
-                    // private only has two options, we only filter if ONE of them
-                    // is selected...
-                    filters.push({
-                        id: 'private',
-                        value: input.private[0],
-                        variant: 'select',
-                        operator: 'eq',
-                        filterId: nanoid()
-                    })
-                }
-
-                if (input.types.length > 0) {
-                    filters.push({
-                        id: 'types',
-                        value: input.types,
-                        variant: 'multiSelect',
-                        operator: 'inArray',
-                        filterId: nanoid()
-                    })
-                }
-
-                where = filterColumns({
-                    filters,
-                    joinOperator: "and"
-                }) || {}
-            }
-
-            // add global filter
-            if (input.q) {
-                // custom filtering for types - if any of the type labels include the query, include biosamples
-                // with these types
-                const queriedTypes = DISEASE_MODEL_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
-
-                where.OR = [
-                    { id: { contains: input.q, mode: "insensitive" } },
-                    { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
-                    { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
-                    { description: {contains: input.q, mode: "insensitive"}},
-                    { genotype: {contains: input.q, mode: "insensitive"}},
-                    { strain: {contains: input.q, mode: "insensitive"}},
-                    // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
-                    // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
-                    // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
-                ];
-
-                if (queriedTypes) {
-                    where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
-                }
-            }
-
-            const orderBy = input.sort.length
-                ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
-                : [{ createdAt: { sort: "asc" } }];
-
+const fetchDiseaseModels = async (
+    organization: Organization, 
+    select: Prisma.DiseaseModelSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+    input?: GetDiseaseModelSchema,
+    publicOnly: boolean = false
+): Promise<{
+    data: DiseaseModel[],
+    pageCount: number
+}> => {
+    try {
+        if (!input) {
             const [data, total] = await prisma.$transaction([
                 prisma.diseaseModel.findMany({
-                    skip: offset,
-                    take: input.perPage,
                     where: {
-                        ...where,
                         organizationId: organization.id,
                         ...(publicOnly ? {private: false} : undefined)
                     },
-                    include: {
-                        attachments: true,
-                        contacts: true,
-                        organization: {include: {conditions: {include: {condition: true}}}},
-                        gene: true,
-                        institution: true,
-                        milestones: {include: {milestone: true}},
-                    },
-                    orderBy,
+                    // include: {
+                    //     attachments: true,
+                    //     contacts: true,
+                    //     organization: {include: {conditions: {include: {condition: true}}}},
+                    //     gene: true,
+                    //     institution: true,
+                    //     milestones: {include: {milestone: true}},
+                    // },
+                    select,
+                    orderBy: {createdAt: "asc"},
                 }),
-                prisma.diseaseModel.count({
-                    where: {
-                        ...where, 
-                        organizationId: organization.id,
-                        ...(publicOnly ? {private: false} : undefined)
-                    }
-                }),
+                prisma.diseaseModel.count({where: {organizationId: organization.id}}),
             ]);
 
-            const pageCount = Math.ceil(total / input.perPage);
-            return {data, pageCount};
-        } catch {
-            return {data: [], pageCount: 0};
+            return {data, pageCount: 1};
         }
+
+        const offset = (input.page - 1) * input.perPage;
+        const advancedTable =
+            input.filterFlag === "advancedFilters"
+
+        let where: any = {};
+        console.log(`input`, input)
+
+        if (advancedTable) {
+            const preProcessedFilters: any = input.filters.map(filter => ({
+                ...filter,
+                ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
+            }))
+
+            where = filterColumns({
+                filters: preProcessedFilters,
+                joinOperator: input.joinOperator,
+            })
+        } else {
+            const filters: any[] = []
+
+            if (input.private.length == 1) {
+                // private only has two options, we only filter if ONE of them
+                // is selected...
+                filters.push({
+                    id: 'private',
+                    value: input.private[0],
+                    variant: 'select',
+                    operator: 'eq',
+                    filterId: nanoid()
+                })
+            }
+
+            if (input.types.length > 0) {
+                filters.push({
+                    id: 'types',
+                    value: input.types,
+                    variant: 'multiSelect',
+                    operator: 'inArray',
+                    filterId: nanoid()
+                })
+            }
+
+            where = filterColumns({
+                filters,
+                joinOperator: "and"
+            }) || {}
+        }
+
+        // add global filter
+        if (input.q) {
+            // custom filtering for types - if any of the type labels include the query, include biosamples
+            // with these types
+            const queriedTypes = DISEASE_MODEL_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+
+            where.OR = [
+                { id: { contains: input.q, mode: "insensitive" } },
+                { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
+                { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                { description: {contains: input.q, mode: "insensitive"}},
+                { genotype: {contains: input.q, mode: "insensitive"}},
+                { strain: {contains: input.q, mode: "insensitive"}},
+                // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
+                // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
+                // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
+            ];
+
+            if (queriedTypes) {
+                where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
+            }
+        }
+
+        const orderBy = input.sort.length
+            ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+            : [{ createdAt: { sort: "asc" } }];
+
+        const [data, total] = await prisma.$transaction([
+            prisma.diseaseModel.findMany({
+                skip: offset,
+                take: input.perPage,
+                where: {
+                    ...where,
+                    organizationId: organization.id,
+                    ...(publicOnly ? {private: false} : undefined)
+                },
+                include: {
+                    attachments: true,
+                    contacts: true,
+                    organization: {include: {conditions: {include: {condition: true}}}},
+                    gene: true,
+                    institution: true,
+                    milestones: {include: {milestone: true}},
+                },
+                orderBy,
+            }),
+            prisma.diseaseModel.count({
+                where: {
+                    ...where, 
+                    organizationId: organization.id,
+                    ...(publicOnly ? {private: false} : undefined)
+                }
+            }),
+        ]);
+
+        const pageCount = Math.ceil(total / input.perPage);
+        return {data, pageCount};
+    } catch {
+        return {data: [], pageCount: 0};
     }
-)
+}
 
 function prismaOrderByFromColumnId(id: string, desc: boolean): any {
     const parts = id.split(".")
@@ -2480,184 +2529,228 @@ function prismaOrderByFromColumnId(id: string, desc: boolean): any {
     }, {})
 }
 
-export const getBiosamples = withOrganizationAuth(
-    async (
-        organization: Organization, 
-        select: Prisma.BiosampleSelect<InternalArgs & {
-            result: {};
-            model: {};
-            query: {};
-            client: {};
-        }>,
-        input?: GetBiosamplesSchema,
-        publicOnly: boolean = false
-    ): Promise<{
-        data: Biosample[],
-        pageCount: number
-    }> => {
-        try {
-            if (!input) {
-                const [data, total] = await prisma.$transaction([
-                    prisma.biosample.findMany({
-                        where: {
-                            organizationId: organization.id,
-                            ...(publicOnly ? {private: false} : undefined)
-                        },
-                        select,
-                        orderBy: {createdAt: "asc"},
-                    }),
-                    prisma.biosample.count({where: {organizationId: organization.id}}),
-                ]);
+export const getBiosamples = async (
+    organizationId: string | null | undefined,
+    select: Prisma.BiosampleSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+    input?: GetBiosamplesSchema,
+    publicOnly: boolean = false
+): Promise<{data: Biosample[], pageCount: number}> => {
+    if (publicOnly) { // allow any requester to fetch public data
+        if (!organizationId) return {data: [], pageCount: 0}
+        const organization = await prisma.organization.findUnique({
+            where: {id: organizationId}
+        })
+        if (!organization) return {data: [], pageCount: 0}
+        
+        return await fetchBiosamples(
+            organization,
+            select,
+            input,
+            publicOnly
+        )
+    }
 
-                return {data, pageCount: 1};
-            }
+    // only allow members of the organization to fetch private data
+    return (await withOrganizationAuth(
+        async (
+            organization: Organization,
+            select: Prisma.BiosampleSelect<InternalArgs & {
+                result: {};
+                model: {};
+                query: {};
+                client: {};
+            }>,
+            input?: GetBiosamplesSchema,
+            publicOnly: boolean = false
+        ) => {
+            return await fetchBiosamples(
+                organization,
+                select,
+                input,
+                publicOnly
+            )
+        }
+    ))(organizationId, select, input, publicOnly)
+}
 
-            const offset = (input.page - 1) * input.perPage;
-            const advancedTable =
-                input.filterFlag === "advancedFilters"
+const fetchBiosamples = async (
+    organization: Organization, 
+    select: Prisma.BiosampleSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+    input?: GetBiosamplesSchema,
+    publicOnly: boolean = false
+) => {
+    try {
+        if (!input) {
+            const [data, total] = await prisma.$transaction([
+                prisma.biosample.findMany({
+                    where: {
+                        organizationId: organization.id,
+                        ...(publicOnly ? {private: false} : undefined)
+                    },
+                    select,
+                    orderBy: {createdAt: "asc"},
+                }),
+                prisma.biosample.count({where: {organizationId: organization.id}}),
+            ]);
 
-            let where: any = {};
+            return {data, pageCount: 1};
+        }
 
-            if (advancedTable) {
-                const preProcessedFilters: any = input.filters.map(filter => ({
-                    ...filter,
-                    ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
-                    ...(filter.id === "donor.diagnoses" && Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
-                    ...(filter.id === "gene" && {value: {symbol: filter.value}}),
-                    ...(filter.id === "institution" && {value: {name: filter.value}}),
-                    ...(filter.id === "milestones" && Array.isArray(filter.value) ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} : undefined)
-                }))
+        const offset = (input.page - 1) * input.perPage;
+        const advancedTable =
+            input.filterFlag === "advancedFilters"
 
-                where = filterColumns({
-                    filters: preProcessedFilters,
-                    joinOperator: input.joinOperator,
+        let where: any = {};
+
+        if (advancedTable) {
+            const preProcessedFilters: any = input.filters.map(filter => ({
+                ...filter,
+                ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
+                ...(filter.id === "donor.diagnoses" && Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
+                ...(filter.id === "gene" && {value: {symbol: filter.value}}),
+                ...(filter.id === "institution" && {value: {name: filter.value}}),
+                ...(filter.id === "milestones" && Array.isArray(filter.value) ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} : undefined)
+            }))
+
+            where = filterColumns({
+                filters: preProcessedFilters,
+                joinOperator: input.joinOperator,
+            })
+        } else {
+            const filters: any[] = []
+            if (input.title) {
+                filters.push({
+                    id: 'title',
+                    value: input.title,
+                    variant: 'text',
+                    operator: 'iLike',
+                    filterId: nanoid()
                 })
-            } else {
-                const filters: any[] = []
-                if (input.title) {
-                    filters.push({
-                        id: 'title',
-                        value: input.title,
-                        variant: 'text',
-                        operator: 'iLike',
-                        filterId: nanoid()
-                    })
-                }
-
-                if (input.private.length == 1) {
-                    // private only has two options, we only filter if ONE of them
-                    // is selected...
-                    filters.push({
-                        id: 'private',
-                        value: input.private[0],
-                        variant: 'select',
-                        operator: 'eq',
-                        filterId: nanoid()
-                    })
-                }
-
-                if (input.types.length > 0) {
-                    filters.push({
-                        id: 'types',
-                        value: input.types,
-                        variant: 'multiSelect',
-                        operator: 'inArray',
-                        filterId: nanoid()
-                    })
-                }
-
-                if (input.quantity) {
-                    filters.push({
-                        id: 'quantity',
-                        value: input.quantity,
-                        variant: 'range',
-                        operator: 'isBetween',
-                        filterId: nanoid()
-                    })
-                }
-
-                where = filterColumns({
-                    filters,
-                    joinOperator: "and"
-                }) || {}
             }
 
-            // add global filter
-            if (input.q) {
-                // custom filtering for types - if any of the type labels include the query, include biosamples
-                // with these types
-                const queriedTypes = BIOSAMPLE_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+            if (input.private.length == 1) {
+                // private only has two options, we only filter if ONE of them
+                // is selected...
+                filters.push({
+                    id: 'private',
+                    value: input.private[0],
+                    variant: 'select',
+                    operator: 'eq',
+                    filterId: nanoid()
+                })
+            }
 
-                where.OR = [
-                    { id: { contains: input.q, mode: "insensitive" } },
-                    { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
-                    { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
-                    { genotype: {contains: input.q, mode: "insensitive"}},
-                    // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
-                    // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
-                    // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
-                    { donor: { internalId: { contains: input.q, mode: "insensitive" } } },
-                    { donor: { id: {contains: input.q, mode: "insensitive" } } },
-                    {
-                        donor: {
-                            diagnoses: {
-                                some: {
-                                    type: {
-                                        label: { contains: input.q, mode: "insensitive" },
-                                    },
+            if (input.types.length > 0) {
+                filters.push({
+                    id: 'types',
+                    value: input.types,
+                    variant: 'multiSelect',
+                    operator: 'inArray',
+                    filterId: nanoid()
+                })
+            }
+
+            if (input.quantity) {
+                filters.push({
+                    id: 'quantity',
+                    value: input.quantity,
+                    variant: 'range',
+                    operator: 'isBetween',
+                    filterId: nanoid()
+                })
+            }
+
+            where = filterColumns({
+                filters,
+                joinOperator: "and"
+            }) || {}
+        }
+
+        // add global filter
+        if (input.q) {
+            // custom filtering for types - if any of the type labels include the query, include biosamples
+            // with these types
+            const queriedTypes = BIOSAMPLE_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+
+            where.OR = [
+                { id: { contains: input.q, mode: "insensitive" } },
+                { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
+                { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                { genotype: {contains: input.q, mode: "insensitive"}},
+                // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
+                // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
+                // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
+                { donor: { internalId: { contains: input.q, mode: "insensitive" } } },
+                { donor: { id: {contains: input.q, mode: "insensitive" } } },
+                {
+                    donor: {
+                        diagnoses: {
+                            some: {
+                                type: {
+                                    label: { contains: input.q, mode: "insensitive" },
                                 },
                             },
                         },
                     },
-                ];
+                },
+            ];
 
-                if (queriedTypes) {
-                    where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
-                }
+            if (queriedTypes) {
+                where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
             }
-
-            const orderBy = input.sort.length
-                ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
-                : [{ createdAt: { sort: "asc" } }];
-
-            const [data, total] = await prisma.$transaction([
-                prisma.biosample.findMany({
-                    skip: offset,
-                    take: input.perPage,
-                    where: {
-                        ...where,
-                        organizationId: organization.id,
-                        ...(publicOnly ? {private: false} : undefined)
-                    },
-                    include: {
-                        milestones: {include: {milestone: true}},
-                        contacts: true,
-                        attachments: true,
-                        gene: true,
-                        donor: {
-                            include: {diagnoses: {include: {type: true}}}
-                        },
-                        institution: true,
-                        materialAndDataAccessRequests: true
-                    },
-                    orderBy,
-                }),
-                prisma.biosample.count({
-                    where: {
-                        ...where, 
-                        organizationId: organization.id, 
-                        ...(publicOnly ? {private: false} : undefined)
-                    }
-                }),
-            ]);
-
-            const pageCount = Math.ceil(total / input.perPage);
-            return {data, pageCount};
-        } catch {
-            return {data: [], pageCount: 0};
         }
+
+        const orderBy = input.sort.length
+            ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+            : [{ createdAt: { sort: "asc" } }];
+
+        const [data, total] = await prisma.$transaction([
+            prisma.biosample.findMany({
+                skip: offset,
+                take: input.perPage,
+                where: {
+                    ...where,
+                    organizationId: organization.id,
+                    ...(publicOnly ? {private: false} : undefined)
+                },
+                include: {
+                    milestones: {include: {milestone: true}},
+                    contacts: true,
+                    attachments: true,
+                    gene: true,
+                    donor: {
+                        include: {diagnoses: {include: {type: true}}}
+                    },
+                    institution: true,
+                    materialAndDataAccessRequests: true
+                },
+                orderBy,
+            }),
+            prisma.biosample.count({
+                where: {
+                    ...where, 
+                    organizationId: organization.id, 
+                    ...(publicOnly ? {private: false} : undefined)
+                }
+            }),
+        ]);
+
+        const pageCount = Math.ceil(total / input.perPage);
+        return {data, pageCount};
+    } catch {
+        return {data: [], pageCount: 0};
     }
-)
+}
 
 export const getAllBiosamples = withResearcherAuth(
     async (
@@ -2801,160 +2894,210 @@ export const getAllBiosamples = withResearcherAuth(
     }
 );
 
-export const getDatasamples = withOrganizationAuth(
-    async (
-        organization: Organization, 
-        select: Prisma.ToolSelect<InternalArgs & {
-            result: {};
-            model: {};
-            query: {};
-            client: {};
-        }>,
-        input?: GetBiosamplesSchema,
-        publicOnly: boolean = false
-    ) => {
-        try {
-            if (!input) {
-                const [data, total] = await prisma.$transaction([
-                    prisma.tool.findMany({
-                        where: {
-                            organizationId: organization.id,
-                            ...(publicOnly ? {private: false} : undefined)
-                        },
-                        // include: {
-                        //     organization: {include: {conditions: {include: {condition: true}}}},
-                        //     milestones: {include: {milestone: true}},
-                        //     contacts: true,
-                        //     attachments: true,
-                        //     institution: true,
-                        //     gene: true,
-                        // },
-                        select,
-                        orderBy: {createdAt: "asc"},
-                    }),
-                    prisma.tool.count({where: {organizationId: organization.id}}),
-                ]);
+export const getClinicalDatasets = async (
+    organizationId: string | null | undefined,
+    select: Prisma.ToolSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+    input?: GetClinicalDatasetsSchema,
+    publicOnly: boolean = false
+): Promise<{data: Tool[], pageCount: number}> => {
+    if (publicOnly) { // allow any requester to fetch public data
+        if (!organizationId) return {data: [], pageCount: 0}
+        const organization = await prisma.organization.findUnique({
+            where: {id: organizationId}
+        })
+        if (!organization) return {data: [], pageCount: 0}
+        
+        return await fetchClinicalDatsets(
+            organization,
+            select,
+            input,
+            publicOnly
+        )
+    }
 
-                return {data, pageCount: 1};
-            }
+    // only allow members of the organization to fetch private data
+    return (await withOrganizationAuth(
+        async (
+            organization: Organization,
+            select: Prisma.ToolSelect<InternalArgs & {
+                result: {};
+                model: {};
+                query: {};
+                client: {};
+            }>,
+            input?: GetClinicalDatasetsSchema,
+            publicOnly: boolean = false
+        ) => {
+            return await fetchClinicalDatsets(
+                organization,
+                select,
+                input,
+                publicOnly
+            )
+        }
+    ))(organizationId, select, input, publicOnly)
+}
 
-            const offset = (input.page - 1) * input.perPage;
-            const advancedTable =
-                input.filterFlag === "advancedFilters"
-
-            let where: any = {};
-
-            if (advancedTable) {
-                const preProcessedFilters: any = input.filters.map(filter => ({
-                    ...filter,
-                    ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
-                }))
-
-                where = filterColumns({
-                    filters: preProcessedFilters,
-                    joinOperator: input.joinOperator,
-                })
-            } else {
-                const filters: any[] = []
-                if (input.title) {
-                    filters.push({
-                        id: 'title',
-                        value: input.title,
-                        variant: 'text',
-                        operator: 'iLike',
-                        filterId: nanoid()
-                    })
-                }
-
-                if (input.private.length == 1) {
-                    // private only has two options, we only filter if ONE of them
-                    // is selected...
-                    filters.push({
-                        id: 'private',
-                        value: input.private[0],
-                        variant: 'select',
-                        operator: 'eq',
-                        filterId: nanoid()
-                    })
-                }
-
-                if (input.types.length > 0) {
-                    filters.push({
-                        id: 'types',
-                        value: input.types,
-                        variant: 'multiSelect',
-                        operator: 'inArray',
-                        filterId: nanoid()
-                    })
-                }
-
-                where = filterColumns({
-                    filters,
-                    joinOperator: "and"
-                }) || {}
-            }
-
-            // add global filter
-            if (input.q) {
-                // custom filtering for types - if any of the type labels include the query, include biosamples
-                // with these types
-                const queriedTypes = TOOL_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
-
-                where.OR = [
-                    { id: { contains: input.q, mode: "insensitive" } },
-                    { title: {contains: input.q, mode: "insensitive"}},
-                    { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
-                    { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
-                    { description: {contains: input.q, mode: "insensitive"}},
-                    // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
-                    // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
-                    // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
-                ];
-
-                if (queriedTypes) {
-                    where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
-                }
-            }
-
-            const orderBy = input.sort.length
-                ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
-                : [{ createdAt: { sort: "asc" } }];
-
+const fetchClinicalDatsets = async (
+    organization: Organization, 
+    select: Prisma.ToolSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+    input?: GetClinicalDatasetsSchema,
+    publicOnly: boolean = false
+): Promise<{
+    data: Tool[],
+    pageCount: number
+}> => {
+    try {
+        if (!input) {
             const [data, total] = await prisma.$transaction([
                 prisma.tool.findMany({
-                    skip: offset,
-                    take: input.perPage,
                     where: {
-                        ...where,
                         organizationId: organization.id,
                         ...(publicOnly ? {private: false} : undefined)
                     },
-                    include: {
-                        organization: {include: {conditions: {include: {condition: true}}}},
-                        milestones: {include: {milestone: true}},
-                        contacts: true,
-                        attachments: true,
-                        institution: true,
-                        gene: true,
-                    },
-                    orderBy,
+                    // include: {
+                    //     organization: {include: {conditions: {include: {condition: true}}}},
+                    //     milestones: {include: {milestone: true}},
+                    //     contacts: true,
+                    //     attachments: true,
+                    //     institution: true,
+                    //     gene: true,
+                    // },
+                    select,
+                    orderBy: {createdAt: "asc"},
                 }),
-                prisma.tool.count({
-                    where: {
-                        ...where, 
-                        organizationId: organization.id, 
-                        ...(publicOnly ? {private: false} : undefined)
-                    }
-                }),
+                prisma.tool.count({where: {organizationId: organization.id}}),
             ]);
 
-            const pageCount = Math.ceil(total / input.perPage);
-            return {data, pageCount};
-        } catch {
-            return {data: [], pageCount: 0};
+            return {data, pageCount: 1};
         }
+
+        const offset = (input.page - 1) * input.perPage;
+        const advancedTable =
+            input.filterFlag === "advancedFilters"
+
+        let where: any = {};
+
+        if (advancedTable) {
+            const preProcessedFilters: any = input.filters.map(filter => ({
+                ...filter,
+                ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
+            }))
+
+            where = filterColumns({
+                filters: preProcessedFilters,
+                joinOperator: input.joinOperator,
+            })
+        } else {
+            const filters: any[] = []
+            if (input.title) {
+                filters.push({
+                    id: 'title',
+                    value: input.title,
+                    variant: 'text',
+                    operator: 'iLike',
+                    filterId: nanoid()
+                })
+            }
+
+            if (input.private.length == 1) {
+                // private only has two options, we only filter if ONE of them
+                // is selected...
+                filters.push({
+                    id: 'private',
+                    value: input.private[0],
+                    variant: 'select',
+                    operator: 'eq',
+                    filterId: nanoid()
+                })
+            }
+
+            if (input.types.length > 0) {
+                filters.push({
+                    id: 'types',
+                    value: input.types,
+                    variant: 'multiSelect',
+                    operator: 'inArray',
+                    filterId: nanoid()
+                })
+            }
+
+            where = filterColumns({
+                filters,
+                joinOperator: "and"
+            }) || {}
+        }
+
+        // add global filter
+        if (input.q) {
+            // custom filtering for types - if any of the type labels include the query, include biosamples
+            // with these types
+            const queriedTypes = TOOL_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+
+            where.OR = [
+                { id: { contains: input.q, mode: "insensitive" } },
+                { title: {contains: input.q, mode: "insensitive"}},
+                { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
+                { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                { description: {contains: input.q, mode: "insensitive"}},
+                // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
+                // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
+                // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
+            ];
+
+            if (queriedTypes) {
+                where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
+            }
+        }
+
+        const orderBy = input.sort.length
+            ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+            : [{ createdAt: { sort: "asc" } }];
+
+        const [data, total] = await prisma.$transaction([
+            prisma.tool.findMany({
+                skip: offset,
+                take: input.perPage,
+                where: {
+                    ...where,
+                    organizationId: organization.id,
+                    ...(publicOnly ? {private: false} : undefined)
+                },
+                include: {
+                    organization: {include: {conditions: {include: {condition: true}}}},
+                    milestones: {include: {milestone: true}},
+                    contacts: true,
+                    attachments: true,
+                    institution: true,
+                    gene: true,
+                },
+                orderBy,
+            }),
+            prisma.tool.count({
+                where: {
+                    ...where, 
+                    organizationId: organization.id, 
+                    ...(publicOnly ? {private: false} : undefined)
+                }
+            }),
+        ]);
+
+        const pageCount = Math.ceil(total / input.perPage);
+        return {data, pageCount};
+    } catch {
+        return {data: [], pageCount: 0};
     }
-)
+}
 
 interface GetRequestsInput {
     searchTerm: string
