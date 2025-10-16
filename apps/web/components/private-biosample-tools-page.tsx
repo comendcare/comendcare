@@ -9,7 +9,7 @@ import {Shell} from "@/packages/components/biorepo/advanced-data-table/lib/shell
 import {
     useBiosamplesTableColumns
 } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table-columns";
-import {Tool} from "@prisma/client";
+import type {Biosample} from "@prisma/client";
 import {BiosampleBulkImportDialog} from "./biosample-bulk-import-dialog";
 import {SearchParams} from "@/packages/components/types";
 import {useEffect, useRef, useState} from "react";
@@ -21,7 +21,7 @@ import { setBiosamplesVisibility } from "@/packages/lib/actions";
 import { useSession } from "next-auth/react";
 
 export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
-    data: Tool[],
+    data: Biosample[],
     pageCount: number,
     searchParams: SearchParams
 }) => {
@@ -128,6 +128,8 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                             columns={columns}
                             searchParams={searchParams}
                             onSelectionChange={setRowSelection}
+                            showPagination={true}
+                            interactive={true}
                         />
                     </React.Suspense>
                 </FeatureFlagsProvider>

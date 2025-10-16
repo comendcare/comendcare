@@ -4,38 +4,28 @@ import { Database, Rat, TestTubeDiagonal } from "lucide-react";
 import { cn } from "@comend/lib/utils";
 import { useEffect, useState } from "react";
 import { Button } from "@/packages/components/ui/button";
-import { BiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table";
+import { BiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table";
 import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
 import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns";
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
-import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table";
-import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table";
-import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
-import { useShallow } from "zustand/react/shallow";
-import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore";
-import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
+import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/private-disease-models-table";
+import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/private-clinical-datasets-table";
 import { SearchParams } from "@/packages/components/types";
-import { useQueryState } from "nuqs";
+import type { Organization, Biosample, DiseaseModel, Tool } from "@prisma/client";
+import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
+import { ToolCounts } from "./profile-page";
+import { useRouter } from "next/navigation";
 
-const biosamplesSelector = (state: BiosampleSearchState) => ({
-    searchResults: state.searchResults,
-    setFilters: state.setFilters,
-    setSortBy: state.setSortBy,
-})
+const getInitState = (
+    counts: {
+        biosampleCount: number, 
+        diseaseModelCount: number, 
+        clinicalDatasetCount: number
+    }, 
+    searchParams: SearchParams | undefined
+): string => {
+    if (searchParams && searchParams.view && typeof searchParams.view === 'string') return  searchParams.view
 
-const diseaseModelsSelector = (state: DiseaseModelSearchState) => ({
-    searchResults: state.searchResults,
-    setFilters: state.setFilters,
-    setSortBy: state.setSortBy,
-})
-
-const clinicalDatasetsSelector = (state: ClinicalDatasetSearchState) => ({
-    searchResults: state.searchResults,
-    setFilters: state.setFilters,
-    setSortBy: state.setSortBy,
-})
-
-const getInitState = (counts: {biosampleCount: number, diseaseModelCount: number, clinicalDatasetCount: number}) => {
     if (counts.biosampleCount > 0) return 'biosamples'
     if (counts.diseaseModelCount > 0) return 'disease-models'
     if (counts.clinicalDatasetCount > 0) return 'clinical-datasets'
@@ -43,51 +33,49 @@ const getInitState = (counts: {biosampleCount: number, diseaseModelCount: number
     return 'biosamples'
 }
 
-export const PAGProfileToolsCard = ({organizationId, toolCounts, searchParams} : {organizationId: string, toolCounts: {biosampleCount: number, diseaseModelCount: number, clinicalDatasetCount: number}, searchParams?: SearchParams | undefined}) => {
-    const [section, setSection] = useState<'biosamples' | 'disease-models' | 'clinical-datasets'>(getInitState(toolCounts))
-    const [sort, setSort] = useQueryState("sort");
-    const { 
-        searchResults: biosamples,
-        setFilters: setBiosampleFilters,
-        setSortBy: setBiosampleSortBy,
-    } = useBiosampleSearchStore(useShallow(biosamplesSelector))
-    const biosampleColumns = useBiosamplesTableColumns("profile")
-    const { 
-        searchResults: diseaseModels,
-        setFilters: setDiseaseModelFilters,
-        setSortBy: setDiseaseModelSortBy,
-    } = useDiseaseModelSearchStore(useShallow(diseaseModelsSelector))
-    const diseaseModelColumns = useDiseaseModelsTableColumns("profile")
-    const { 
-        searchResults: clinicalDatasets,
-        setFilters: setClinicalDatasetFilters,
-        setSortBy: setClinicalDatasetSortBy,
-    } = useClinicalDatasetSearchStore(useShallow(clinicalDatasetsSelector))
-    const clinicalDatasetColumns = useClinicalDatasetsTableColumns("profile")
-
-    if (section === 'biosamples') setBiosampleSortBy(searchParams?.sort)
-    if (section === 'disease-models') setDiseaseModelSortBy(searchParams?.sort)
-    if (section === 'clinical-datasets') setClinicalDatasetSortBy(searchParams?.sort)
+export const PAGProfileToolsCard = ({
+    organization, 
+    searchParams,
+    toolCounts,
+    biosamples,
+    biosamplesPageCount,
+    diseaseModels,
+    diseaseModelsPageCount,
+    clinicalDatasets,
+    clinicalDatasetsPageCount,
+} : {
+    organization: Partial<Organization>,
+    searchParams?: SearchParams | undefined,
+    toolCounts: ToolCounts,
+    biosamples: Biosample[];
+    biosamplesPageCount: number;
+    diseaseModels: DiseaseModel[];
+    diseaseModelsPageCount: number;
+    clinicalDatasets: Tool[];
+    clinicalDatasetsPageCount: number;
+}) => {
+    const [isInitialized, setIsInitialized] = useState<boolean>(false)    
+    const [section, setSection] = useState<string | undefined>(undefined)
+    const biosampleColumns = useBiosamplesTableColumns(
+        false, // disable sorting
+        false, // disable hiding
+        "profile",
+    )
+    const diseaseModelColumns = useDiseaseModelsTableColumns(
+        false, // disable sorting
+        false, // disable hiding
+        "profile"
+    )
+    const clinicalDatasetColumns = useClinicalDatasetsTableColumns(
+        false, // disable sorting
+        false, // disable hiding
+        "profile"
+    )
+    const router = useRouter();
 
     useEffect(() => {
-        setBiosampleFilters({
-            conditions: [],
-            genes: [],
-            types: [],
-            organizations: [{label: '', value: organizationId}]
-        })
-        setDiseaseModelFilters({
-            conditions: [],
-            genes: [],
-            types: [],
-            organizations: [{label: '', value: organizationId}]
-        })
-        setClinicalDatasetFilters({
-            conditions: [],
-            genes: [],
-            types: [],
-            organizations: [{label: '', value: organizationId}]
-        })
+        setSection(getInitState(toolCounts, searchParams))
+        setIsInitialized(true)
     }, [])
 
     return (
@@ -96,11 +84,16 @@ export const PAGProfileToolsCard = ({organizationId, toolCounts, searchParams} :
                 <CardTitle className="w-full flex flex-col items-start justify-between gap-4">
                     Toolkit
                     <div className="text-muted-foreground text-sm flex flex-wrap gap-2 justify-end">
-                        {toolCounts.biosampleCount > 0 && (
+                        {(toolCounts.biosampleCount > 0) && (
                             <Button
                                 variant={"link"}
                                 onClick={async () => {
-                                    await setSort(null)
+                                    // setIsInitialized(false)
+                                    // router.push(window.location.pathname, { scroll: false })
+                                    const searchParams = new URLSearchParams()
+                                    searchParams.set("page", "1")
+                                    searchParams.set("view", "biosamples")
+                                    router.push(`?${searchParams.toString()}`, {scroll: false})
                                     setSection("biosamples");
                                 }}
                                 className={cn(
@@ -114,11 +107,16 @@ export const PAGProfileToolsCard = ({organizationId, toolCounts, searchParams} :
                                 Biosamples ({toolCounts.biosampleCount})
                             </Button>
                         )}
-                        {toolCounts.diseaseModelCount > 0 && (
+                        {(toolCounts.diseaseModelCount > 0) && (
                             <Button
                                 variant={"link"}
                                 onClick={async () => {
-                                    await setSort(null)
+                                    // setIsInitialized(false)
+                                    // router.push(window.location.pathname, { scroll: false })
+                                    const searchParams = new URLSearchParams()
+                                    searchParams.set("page", "1")
+                                    searchParams.set("view", "disease-models")
+                                    router.push(`?${searchParams.toString()}`, {scroll: false})
                                     setSection("disease-models");
                                 }}
                                 className={cn(
@@ -132,11 +130,16 @@ export const PAGProfileToolsCard = ({organizationId, toolCounts, searchParams} :
                                 Disease Models ({toolCounts.diseaseModelCount})
                             </Button>
                         )}
-                        {toolCounts.clinicalDatasetCount > 0 && (
+                        {(toolCounts.clinicalDatasetCount > 0) && (
                             <Button
                                 variant={"link"}
                                 onClick={async () => {
-                                    await setSort(null)
+                                    // setIsInitialized(false)
+                                    // router.push(window.location.pathname, { scroll: false })
+                                    const searchParams = new URLSearchParams()
+                                    searchParams.set("page", "1")
+                                    searchParams.set("view", "clinical-datasets")
+                                    router.push(`?${searchParams.toString()}`, {scroll: false})
                                     setSection('clinical-datasets')
                                 }}
                                 className={cn(
@@ -154,37 +157,54 @@ export const PAGProfileToolsCard = ({organizationId, toolCounts, searchParams} :
                 </CardTitle>
             </CardHeader>
             <CardContent className="w-full max-w-full">
-                {section === 'biosamples' && (
-                    <div className="max-w-7xl w-full overflow-auto">
-                        <BiosamplesTable
-                            data={biosamples || []}
-                            pageCount={1}
-                            columns={biosampleColumns}
-                            searchParams={{}}
-                            showPagination={toolCounts.biosampleCount > 10}
-                        />
+                {!isInitialized && (
+                    <div className="bg-gray-100 rounded-md w-full h-[200px]">
+
                     </div>
                 )}
-                {section === 'disease-models' && (
+                {(isInitialized && section === 'biosamples') && (
                     <div className="max-w-7xl w-full overflow-auto">
-                        <DiseaseModelsTable
-                            data={diseaseModels || []}
-                            pageCount={1}
-                            columns={diseaseModelColumns}
-                            searchParams={{}}
-                            showPagination={toolCounts.diseaseModelCount > 10}
-                        />
+                        <FeatureFlagsProvider showFilters={false}>
+                            <BiosamplesTable
+                                data={biosamples as any[] || []}
+                                pageCount={biosamplesPageCount}
+                                columns={biosampleColumns}
+                                searchParams={{}}
+                                showFilters={false}
+                                interactive={false}
+                                showPagination={toolCounts.biosampleCount > 10}
+                            />
+                        </FeatureFlagsProvider>
                     </div>
                 )}
-                {section === 'clinical-datasets' && (
+                {(isInitialized && section === 'disease-models') && (
                     <div className="max-w-7xl w-full overflow-auto">
-                        <ClinicalDatasetsTable
-                            data={clinicalDatasets || []}
-                            pageCount={1}
-                            columns={clinicalDatasetColumns}
-                            searchParams={{}}
-                            showPagination={toolCounts.clinicalDatasetCount > 10}
-                        />
+                        <FeatureFlagsProvider showFilters={false}>
+                            <DiseaseModelsTable
+                                data={diseaseModels as any[] || []}
+                                pageCount={diseaseModelsPageCount}
+                                columns={diseaseModelColumns}
+                                searchParams={{}}
+                                showFilters={false}
+                                interactive={false}
+                                showPagination={toolCounts.diseaseModelCount > 10}
+                            />
+                        </FeatureFlagsProvider>
+                    </div>
+                )}
+                {(isInitialized && section === 'clinical-datasets') && (
+                    <div className="max-w-7xl w-full overflow-auto">
+                        <FeatureFlagsProvider showFilters={false}>
+                            <ClinicalDatasetsTable
+                                data={clinicalDatasets || []}
+                                pageCount={clinicalDatasetsPageCount}
+                                columns={clinicalDatasetColumns}
+                                searchParams={{}}
+                                showFilters={false}
+                                interactive={false}
+                                showPagination={toolCounts.clinicalDatasetCount > 10}
+                            />
+                        </FeatureFlagsProvider>
                     </div>
                 )}
             </CardContent>
