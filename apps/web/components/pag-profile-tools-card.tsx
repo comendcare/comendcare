@@ -74,16 +74,9 @@ export const PAGProfileToolsCard = ({
     const router = useRouter();
 
     useEffect(() => {
-        console.log(`start init`)
         setSection(getInitState(toolCounts, searchParams))
         setIsInitialized(true)
-        console.log(`finish init`)
     }, [])
-
-
-    useEffect(() => {
-        console.log(`isInitalized changed`, isInitialized)
-    }, [isInitialized])
 
     return (
         <Card className="organization-profile-tour-step5">

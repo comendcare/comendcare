@@ -452,7 +452,6 @@ export function EditMilestoneForm({
 
     const init = async () => {
         if (session?.user.organizationId) {
-            console.log(`start init`)
             console.log(`biosample options`, biosampleOptions)
             const formattedBiosamples: Option[] = (biosampleOptions || []).map((biosample: Partial<Biosample>,) => {
                 return (
@@ -491,8 +490,6 @@ export function EditMilestoneForm({
                 )
             })
             setFetchedTools([...formattedBiosamples, ...formattedDiseaseModels, ...formattedDatasamples])
-
-            console.log(`end init`)
         }
 
         // if (milestoneData) {
