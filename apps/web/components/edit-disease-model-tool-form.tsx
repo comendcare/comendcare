@@ -20,6 +20,7 @@ import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
     DialogClose,
+    DialogFooter,
 } from "@comend/components/ui/dialog"
 import { DISEASE_MODEL_TYPE_OPTIONS, editDiseaseModelForm } from "@comend/lib/types"
 import type {Prisma} from "@prisma/client"
@@ -234,7 +235,7 @@ export function EditDiseaseModelToolForm({
                 <ScrollBar />
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
-                    className="space-y-6 m-1"
+                    className="space-y-6 m-1 pb-12"
                 >
                     <FormItem className="flex gap-2 items-center">
                         <FormLabel className="flex items-center gap-1 grow">
@@ -512,43 +513,45 @@ export function EditDiseaseModelToolForm({
                             </FormItem>
                         )}
                     />
-
-                    <span className="flex gap-2 w-full justify-end">
-                        <DialogClose asChild>
-                            <Button 
-                                variant={"secondary"} 
-                                onClick={() => {if (closeDialog) closeDialog()}}
-                            >
-                                Cancel
-                            </Button>
-                        </DialogClose>
-
-                        <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
-                            Delete Tool
-                        </Button>
-                        <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                            <DeleteDiseaseModelDialog toolId={toolData.id} closeDialog={closeDialog}/>
-                        </Dialog>
-                            <Button
-                                disabled={!form.formState.isValid || isSaving}
-                                variant={"cta"}
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    handleFormSubmit(form.getValues())
-                                }}
-                            >
-                                {isSaving 
-                                    ? (
-                                        <div className="w-[81px] flex justify-center items-center">
-                                            <LoadingDots/>
-                                        </div>
-                                    ) 
-                                    : ("Save Changes")
-                                }
-                            </Button>
-                    </span>
                 </form>
             </ScrollArea>
+
+            <DialogFooter className="pt-1">
+                <DialogClose asChild>
+                    <Button 
+                        variant={"secondary"} 
+                        onClick={() => {if (closeDialog) closeDialog()}}
+                    >
+                        Cancel
+                    </Button>
+                </DialogClose>
+
+                <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
+                    Delete Tool
+                </Button>
+                <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+                    <DeleteDiseaseModelDialog toolId={toolData.id} closeDialog={closeDialog}/>
+                </Dialog>
+                <div className="bg-white rounded-md p-0">
+                    <Button
+                        disabled={!form.formState.isValid || isSaving}
+                        variant={"cta"}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleFormSubmit(form.getValues())
+                        }}
+                    >
+                        {isSaving 
+                            ? (
+                                <div className="w-[81px] flex justify-center items-center">
+                                    <LoadingDots/>
+                                </div>
+                            ) 
+                            : ("Save Changes")
+                        }
+                    </Button>
+                </div>
+            </DialogFooter>
         </Form>
     )
 }

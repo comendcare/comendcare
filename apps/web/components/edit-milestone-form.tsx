@@ -177,17 +177,27 @@ type SimpleAttachment = { name: string; link: string };
 // }
 
 export function EditMilestoneForm({
-                                      organization,
-                                      milestoneData,
-                                      orgIsPublished,
-                                      onClose
-                                  }: {
+    organization,
+    milestoneData,
+    orgIsPublished,
+    biosampleOptions,
+    diseaseModelOptions,
+    clinicalDatasetOptions,
+    rfpOptions,
+    milestoneTypeOptions,
+    onClose
+}: {
     organization: Organization | undefined
     milestoneData: Milestone
     orgIsPublished: boolean
+    biosampleOptions: Partial<Biosample>[],
+    diseaseModelOptions: Partial<DiseaseModel>[],
+    clinicalDatasetOptions: Partial<Tool>[],
+    rfpOptions: Partial<RFP>[],
+    milestoneTypeOptions: Partial<MilestoneType>[],
     onClose: () => void
 }) {
-    const {setMilestone, selectedNodeIds} = useRoadmapStore(useShallow(selector))
+    const {setMilestone} = useRoadmapStore(useShallow(selector))
     // const {recommendations, setRecommendations} = useCROSearchStore(useShallow(recommendationsSelector))
     // const {
     //     initialized: notificationsInitialized,
@@ -200,9 +210,7 @@ export function EditMilestoneForm({
     const pathname = usePathname()
     // const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
-    const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const [fetchedTools, setFetchedTools] = useState<Option[]>([])
-    const [fetchedRFPs, setFetchedRFPs] = useState<RFP[]>([])
     const [tab, setTab] = useState<string>("edit")
     // const {step} = useOnbordaStore(useShallow(onbordaSelector))
     // const {isOnbordaVisible} = useOnborda()
@@ -211,24 +219,23 @@ export function EditMilestoneForm({
     const [createBiosampleIsOpen, setCreateBiosampleIsOpen] = useState(false)
     const [createDiseaseModelIsOpen, setCreateDiseaseModelIsOpen] = useState(false)
     const [createClincalDatasetIsOpen, setCreateClinicalDatasetIsOpen] = useState(false)
-    const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
-    const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
+    // const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
+    // const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
 
-    useEffect(() => {
-        async function fetchSavedCompanies() {
-            const res = await getSavedCompaniesFromOrganizationId(
-                session?.user?.organizationId,
-                { companyId: true }
-            );
+    // useEffect(() => {
+    //     async function fetchSavedCompanies() {
+    //         const res = await getSavedCompaniesFromOrganizationId(
+    //             session?.user?.organizationId,
+    //             { companyId: true }
+    //         );
 
-            if (res.success && res.data) {
-                setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
-            }
-        }
+    //         if (res.success && res.data) {
+    //             setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
+    //         }
+    //     }
 
-        fetchSavedCompanies();
-    }, [session, status]);
-
+    //     fetchSavedCompanies();
+    // }, [session, status]);
 
     // state for adding fields
     const [hasBudget, setHasBudget] = useState(milestoneData?.budget || false)
@@ -256,7 +263,6 @@ export function EditMilestoneForm({
             openTo: milestoneData?.openTo || [],
             tools: [
                 ...(milestoneData?.biosamples || []).map(({biosample}) => {
-                    const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
                     return (
                         {
                             value: biosample.id, 
@@ -269,7 +275,6 @@ export function EditMilestoneForm({
                     )
                 }),
                 ...(milestoneData?.diseaseModels || []).map(({diseaseModel}) => {
-                    const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
                     return (
                         {
                             value: diseaseModel.id, 
@@ -416,10 +421,6 @@ export function EditMilestoneForm({
         //     } as Milestone], {limit: 3})
         // }
 
-        // toast('Success!', {
-        //     position: "bottom-left",
-        //     description: 'The changes to your milestone have been successfully saved.'
-        // })
         setIsMigrating(false)
     }
 
@@ -432,7 +433,7 @@ export function EditMilestoneForm({
 
     const handleMilestoneFormSubmitCallback = useCallback(
         handleMilestoneFormSubmit,
-        [milestoneData, session?.user.organizationId, setMilestone, milestoneTypes]
+        [milestoneData, setMilestone, milestoneTypeOptions]
     )
 
     const handleShare = async () => {
@@ -459,12 +460,12 @@ export function EditMilestoneForm({
 
     const init = async () => {
         if (session?.user.organizationId) {
-            const biosamples = await getBiosamples(session.user.organizationId)
-            const formattedBiosamples: Option[] = biosamples.data.map((biosample: Biosample, index: number) => {
-                const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
+            console.log(`start init`)
+            console.log(`biosample options`, biosampleOptions)
+            const formattedBiosamples: Option[] = (biosampleOptions || []).map((biosample: Partial<Biosample>,) => {
                 return (
                     {
-                        value: biosample.id, 
+                        value: biosample.id || '', 
                         type: 'Biosamples', 
                         icon: "test-tube-diagonal",
                         // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
@@ -473,12 +474,11 @@ export function EditMilestoneForm({
                     }
                 )
             })
-            const diseaseModels = await getDiseaseModels(session.user.organizationId)
-            const formattedDiseaseModels: Option[] = diseaseModels.data.map((diseaseModel: DiseaseModel) => {
-                const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
+            console.log(`disease model options`, diseaseModelOptions)
+            const formattedDiseaseModels: Option[] = (diseaseModelOptions || []).map((diseaseModel: Partial<DiseaseModel>) => {
                 return (
                     {
-                        value: diseaseModel.id, 
+                        value: diseaseModel.id || '', 
                         label: `${diseaseModel.id}`,
                         icon: 'rat',
                         type: 'Disease Models',
@@ -486,12 +486,12 @@ export function EditMilestoneForm({
                     }
                 )
             })
-            const datasamples = await getDatasamples(session.user.organizationId)
-            const formattedDatasamples: Option[] = datasamples.data.map((datasample: Tool) => {
+            console.log(`clinical dataset options`, clinicalDatasetOptions)
+            const formattedDatasamples: Option[] = (clinicalDatasetOptions || []).map((datasample: Partial<Tool>) => {
                 return (
                     {
-                        value: datasample.id, 
-                        label: datasample.id, 
+                        value: datasample.id || '', 
+                        label: `${datasample.id}`, 
                         icon: 'database',
                         type: 'Clinical Datasets',
                         datasample
@@ -500,35 +500,7 @@ export function EditMilestoneForm({
             })
             setFetchedTools([...formattedBiosamples, ...formattedDiseaseModels, ...formattedDatasamples])
 
-            const rfpsResponse = await getRFPs(session.user.organizationId, {
-                id: true,
-                title: true,
-                description: true,
-                openTo: true,
-                startDate: true,
-                endDate: true,
-                contacts: true,
-                attachments: true,
-                budget: true,
-                private: true,
-                headerImage: true,
-                milestones: true
-            })
-            if (rfpsResponse.success && rfpsResponse.data) {
-                setFetchedRFPs(rfpsResponse.data || [])
-            }
-        }
-
-        // get milestone types from database
-        const response = await getMilestoneTypes({
-            id: true,
-            label: true,
-            services: true,
-            categories: true,
-            description: true
-        })
-        if (response.success && response.data) {
-            setMilestoneTypes(response.data || [])
+            console.log(`end init`)
         }
 
         // if (milestoneData) {
@@ -688,7 +660,7 @@ export function EditMilestoneForm({
                                                 {formData?.types?.length === 3 &&
                                                     <FormDescription>{`Maximum selection is 3 types.`}</FormDescription>}
                                             </div>
-                                            <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypes}/>
+                                            <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypeOptions}/>
 
                                             <FormLabel>{`Project Status`}</FormLabel>
                                             <StatusFormField
@@ -788,12 +760,12 @@ export function EditMilestoneForm({
                                                                     icon: 'megaphone'
                                                                 } as Option))}
                                                                 onChange={field.onChange}
-                                                                defaultOptions={fetchedRFPs.map(rfp => ({
+                                                                defaultOptions={rfpOptions?.map(rfp => ({
                                                                     ...rfp,
                                                                     value: rfp.id,
                                                                     label: rfp.title,
                                                                 } as Option))}
-                                                                options={fetchedRFPs.map(rfp => ({
+                                                                options={rfpOptions?.map(rfp => ({
                                                                     ...rfp,
                                                                     value: rfp.id,
                                                                     label: rfp.title
@@ -1204,8 +1176,8 @@ export function EditMilestoneForm({
             </Form>
 
             <Dialog open={createBiosampleIsOpen} onOpenChange={setCreateBiosampleIsOpen}>
-                <DialogContent>
-                    <DialogHeader>
+                <DialogContent className="gap-0">
+                    <DialogHeader className="pb-4">
                         <DialogTitle>
                             Create Biosample Tool
                         </DialogTitle>
@@ -1219,7 +1191,6 @@ export function EditMilestoneForm({
                             setCreateBiosampleIsOpen(false)
 
                             if (newBiosample) {
-                                const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === newBiosample.types[0])
                                 form.setValue("tools", [
                                     ...(form.getValues("tools") || []),
                                     {
@@ -1237,8 +1208,8 @@ export function EditMilestoneForm({
             </Dialog>
 
             <Dialog open={createDiseaseModelIsOpen} onOpenChange={setCreateDiseaseModelIsOpen}>
-                <DialogContent>
-                    <DialogHeader>
+                <DialogContent className="gap-0">
+                    <DialogHeader className="pb-4">
                         <DialogTitle>
                             Create Disease Model Tool
                         </DialogTitle>
@@ -1252,7 +1223,6 @@ export function EditMilestoneForm({
                             setCreateDiseaseModelIsOpen(false)
 
                             if (newDiseaseModel) {
-                                const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === newDiseaseModel.types[0])
                                 form.setValue("tools", [
                                     ...(form.getValues("tools") || []),
                                     {
@@ -1269,8 +1239,8 @@ export function EditMilestoneForm({
             </Dialog>
 
             <Dialog open={createClincalDatasetIsOpen} onOpenChange={setCreateClinicalDatasetIsOpen}>
-                <DialogContent>
-                    <DialogHeader>
+                <DialogContent className="gap-0">
+                    <DialogHeader className="pb-4">
                         <DialogTitle>
                             Create Data Tool
                         </DialogTitle>
@@ -1300,8 +1270,8 @@ export function EditMilestoneForm({
             </Dialog>
 
             <Dialog open={createRFPIsOpen} onOpenChange={setCreateRFPIsOpen}>
-                <DialogContent>
-                    <DialogHeader>
+                <DialogContent className="gap-0">
+                    <DialogHeader className="pb-4">
                         <DialogTitle>
                             Create an RFP
                         </DialogTitle>
@@ -1389,8 +1359,8 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                                 {...field}
                                 maxSelected={3}
                                 badgeClassName={badgeVariants({variant: "lightBlue"})}
-                                defaultOptions={milestoneTypes.map(type => ({...type, value: type.id}))}
-                                options={milestoneTypes.map(type => ({...type, value: type.id}))}
+                                defaultOptions={milestoneTypes?.map(type => ({...type, value: type.id}))}
+                                options={milestoneTypes?.map(type => ({...type, value: type.id}))}
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
                                 placeholder="Project type"
@@ -1406,7 +1376,7 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                 )}
             />
 
-            {types.map((type: any) => type?.value).includes("OTHER") && (
+            {types?.map((type: any) => type?.value).includes("OTHER") && (
                 <>
                     <div>
                         <FormLabel className="text-md">{`Type Description`}</FormLabel>

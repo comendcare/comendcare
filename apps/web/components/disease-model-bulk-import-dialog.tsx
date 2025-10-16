@@ -23,8 +23,8 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<z.infer
     const institutionsResponse = await fetch(`/api/institutions?search=${encodeURIComponent(diseaseModel['Storage Facility'].trim() || '')}`)
     const foundInstitutions = await institutionsResponse.json()
 
-    const contactNames = (diseaseModel['Contact Name'] || "").split(",")
-    const contactEmails = (diseaseModel['Contact Email'] || "").split(",")
+    const contactNames = (diseaseModel['Point of Contact Name'] || "").split(",")
+    const contactEmails = (diseaseModel['Point of Contact Email'] || "").split(",")
 
     const contactsLength = Math.max(contactNames.length, contactEmails.length)
     const contacts = []
@@ -119,8 +119,8 @@ export function DiseaseModelBulkImportDialog() {
                         {key: 'Gene', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Storage Facility', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                        {key: 'Contact Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                        {key: 'Contact Email', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Point of Contact Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Point of Contact Email', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Link Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Link URL', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Genotype', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},

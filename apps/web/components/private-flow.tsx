@@ -25,6 +25,7 @@ import { isOnboarded, setOnboarded} from "@comend/lib/utils"
 import { debounce } from "lodash"
 import { CustomEdge } from "./custom-edge"
 import { useOnborda } from "./onborda/OnbordaContext"
+import { Organization } from "@prisma/client"
 
 const proOptions = { hideAttribution: true }
 
@@ -43,9 +44,11 @@ const selector = (state: RoadmapState) => ({
 
 export const PrivateFlowView = ({
     width,
+    organization,
     contextMenuRef,
 }: {
     width: number,
+    organization?: Organization,
     contextMenuRef: React.RefObject<HTMLDivElement>,
 }) => {
     const {
@@ -248,6 +251,7 @@ export const PrivateFlowView = ({
             // last node is the onboarding node, localNodes are sorted by their creation date
             onboardingMilestone: index === 0,
             contextMenuRef,
+            organization: organization
         },
     }))
 

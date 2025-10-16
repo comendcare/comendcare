@@ -25,8 +25,8 @@ export const NewToolDialog = ({type}: {type: 'biosample' | 'data' | 'diseaseMode
                 {type === 'diseaseModel' && 'Create Disease Model'}
                 {type === 'data' && 'Create Clinical Dataset'}
             </Button>
-            <DialogContent>
-                <DialogHeader>
+            <DialogContent className="gap-0">
+                <DialogHeader className="pb-4">
                     <DialogTitle>
                         {type === 'biosample' && 'Create Biosample'}
                         {type === 'diseaseModel' && 'Create Disease Model'}
@@ -52,8 +52,8 @@ export const NewToolDialog = ({type}: {type: 'biosample' | 'data' | 'diseaseMode
 
 export const EditAssetDialog = ({children, data, type, closeDialog}: {children?: ReactNode, data: Partial<Asset>, type: 'biosample' | 'data' | 'diseaseModel', closeDialog: () => void}) => {
     return (
-        <DialogContent>
-            <DialogHeader>
+        <DialogContent className="gap-0">
+            <DialogHeader className="pb-4">
                 <DialogTitle>
                     Edit a Tool
                 </DialogTitle>

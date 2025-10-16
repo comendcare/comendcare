@@ -34,6 +34,7 @@ import { ProjectActionsMenu } from "./project-actions-menu"
 import { Separator } from "@/packages/components/ui/separator"
 import { Tooltip, TooltipContent } from "@/packages/components/ui/tooltip"
 import { TooltipTrigger } from "@/packages/components/plate-ui/tooltip"
+import { Organization } from "@prisma/client"
 
 export type MilestoneNodeType = Node<
     Milestone & {
@@ -41,6 +42,7 @@ export type MilestoneNodeType = Node<
         focused?: boolean
         subdomain?: string | undefined,
         externalLink?: boolean,
+        organization?: Organization,
         setUrlMilestone?: (id: string) => void | undefined,
     },
     "PROJECT" | "ASSET" | "RFP"
@@ -107,7 +109,7 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
             <CardHeader className="py-4">
                 {props.data?.contextMenuRef && (
                     <div className="absolute top-0 right-0 p-2">
-                        <ProjectActionsMenu milestone={props.data as Milestone}/>
+                        <ProjectActionsMenu milestone={props.data as Milestone} organization={props?.data?.organization}/>
                     </div>
                 )}
                 <CardTitle className="text-gray-900">
