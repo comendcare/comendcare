@@ -7,7 +7,10 @@ import {
     getPublicRFPsForOrganization,
     getPublicClinicalDatasetsForOrganization,
     getPublicRoadmapsForOrganization,
-    getPublicToolCountsForOrganization
+    getPublicToolCountsForOrganization,
+    getBiosamples,
+    getDiseaseModels,
+    getDatasamples
 } from "@comend/lib/fetchers"
 import PAGPublicProfileHeader from "~web/components/pag-public-profile-header";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
@@ -22,6 +25,8 @@ import UnpublishedOrganizationPage from "~web/components/unpublished-organizatio
 import {Mail, Share} from "lucide-react";
 import { PAGProfileToolsCard } from "~web/components/pag-profile-tools-card";
 import { SearchParams } from "@/packages/components/types";
+import { biosampleSearchParamsCache } from "@/packages/lib/validations";
+import { getValidFilters } from "@/packages/lib/data-table";
 
 interface IndexPageProps {
     params: {domain: string},
@@ -56,6 +61,10 @@ export async function generateStaticParams() {
 export default async function OrganizationHomePage(props: IndexPageProps) {
     const searchParams = await props.searchParams
     const domain = decodeURIComponent(props.params.domain)
+    const search = biosampleSearchParamsCache.parse(searchParams);
+    const validFilters = getValidFilters(search.filters);
+    const globalFilter = search.q ?? "";
+
     const [organization, roadmaps, toolCounts, rfps] = await Promise.all([
         getOrganizationData(domain, {
             id: true,
@@ -140,6 +149,112 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
         notFound()
     }
 
+    const {data: biosamples, pageCount: biosamplesPageCount} = await getBiosamples(
+        organization.id,
+        {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+            description: true,
+            contacts: true,
+            attachments: true,
+            private: true,
+            types: true,
+            genotype: true,
+            variant: true,
+            availability: true,
+            quantity: true,
+            quantityUnit: true,
+            currentCountry: true,
+            countryOfCollection: true,
+            preservationMethod: true,
+            anatomicalSite: true,
+            methodOfTransport: true,
+            collectionDate: true,
+            ageAtCollection: true,
+            price: true,
+            priceUnit: true,
+            notes: true,
+
+            milestones: {include: {milestone: true}},
+            donorId: true,
+            donor: {
+                include: {diagnoses: {include: {type: true}}}
+            },
+            institutionId: true,
+            institution: true,
+            geneId: true,
+            gene: true,
+            organizationId: true,
+            organiztion: true,
+            materialAndDataAccessRequests: true
+        },
+        {...search, q: globalFilter, filters: validFilters},
+        true // public only
+    )
+
+    const {data: diseaseModels, pageCount: diseaseModelsPageCount} = await getDiseaseModels(
+        organization.id,
+        {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+
+            description: true,
+            contacts: true,
+            attachments: true,
+            private: true,
+            // pinned: true,
+            // metadata: true,
+            types: true,
+            genotype: true,
+            strain: true,
+            notes: true,
+
+            institutionId: true,
+            institution: true,
+            geneId: true,
+            gene: true,
+            conditionId: true,
+            condition: true,
+            organizationId: true,
+            organization: {include: {conditions: {include: {condition: true}}}},
+            milestones: {include: {milestone: true}},
+        },
+        {...search, q: globalFilter, filters: validFilters},
+        true // public only
+    )
+
+    const {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount} = await getDatasamples(
+        organization.id,
+        {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+
+            title: true,
+            cohortSize: true,
+            description: true,
+            contacts: true,
+            attachments: true,
+            private: true,
+            // pinned: true,
+            // metadata: true,
+            types: true,
+            notes: true,
+
+            institutionId: true,
+            institution: true,
+            geneId: true,
+            gene: true,
+            organizationId: true,
+            organization: {include: {conditions: {include: {condition: true}}}},
+            milestones: {include: {milestone: true}},
+        },
+        {...search, q: globalFilter, filters: validFilters},
+        true // public only
+    )
+
     let conditions = null
     if (organization) {
         const response = await getConditionsDataFromOrgId(organization?.id, {
@@ -211,7 +326,17 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                                 toolCounts.diseaseModelCount > 0 || 
                                 toolCounts.clinicalDatasetCount > 0
                             ) && 
-                                <PAGProfileToolsCard organization={organization} toolCounts={toolCounts} searchParams={searchParams}/>
+                                <PAGProfileToolsCard 
+                                    organization={organization as any} 
+                                    toolCounts={toolCounts} 
+                                    searchParams={searchParams}
+                                    biosamples={biosamples}
+                                    biosamplesPageCount={biosamplesPageCount}
+                                    diseaseModels={diseaseModels}
+                                    diseaseModelsPageCount={diseaseModelsPageCount}
+                                    clinicalDatasets={clinicalDatasets}
+                                    clinicalDatasetsPageCount={clinicalDatasetsPageCount}
+                                />
                             }
                         </div>
                     </div>
