@@ -537,45 +537,45 @@ export function EditDataToolForm({
                             </FormItem>
                         )}
                     />
-
-                    <span className="absolute bottom-0 right-4 z-900 flex gap-2 w-fit">
-                        <DialogClose asChild>
-                            <Button 
-                                variant={"secondary"} 
-                                onClick={() => {if (closeDialog) closeDialog()}}
-                            >
-                                Cancel
-                            </Button>
-                        </DialogClose>
-
-                        <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
-                            Delete Tool
-                        </Button>
-                        <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                            <DeleteAssetDialog toolId={toolData.id} closeDialog={closeDialog}/>
-                        </Dialog>
-                        <div className="bg-white rounded-md p-0">
-                            <Button
-                                disabled={!form.formState.isValid || isSaving}
-                                variant={"cta"}
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    handleFormSubmit(form.getValues())
-                                }}
-                            >
-                                {isSaving 
-                                    ? (
-                                        <div className="w-[81px] flex justify-center items-center">
-                                            <LoadingDots/>
-                                        </div>
-                                    ) 
-                                    : ("Save Changes")
-                                }
-                            </Button>
-                        </div>
-                    </span>
                 </form>
             </ScrollArea>
+
+            <DialogFooter className="pt-1">
+                <DialogClose asChild>
+                    <Button 
+                        variant={"secondary"} 
+                        onClick={() => {if (closeDialog) closeDialog()}}
+                    >
+                        Cancel
+                    </Button>
+                </DialogClose>
+
+                <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
+                    Delete Tool
+                </Button>
+                <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+                    <DeleteAssetDialog toolId={toolData.id} closeDialog={closeDialog}/>
+                </Dialog>
+                <div className="bg-white rounded-md p-0">
+                    <Button
+                        disabled={!form.formState.isValid || isSaving}
+                        variant={"cta"}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleFormSubmit(form.getValues())
+                        }}
+                    >
+                        {isSaving 
+                            ? (
+                                <div className="w-[81px] flex justify-center items-center">
+                                    <LoadingDots/>
+                                </div>
+                            ) 
+                            : ("Save Changes")
+                        }
+                    </Button>
+                </div>
+            </DialogFooter>
         </Form>
     )
 }

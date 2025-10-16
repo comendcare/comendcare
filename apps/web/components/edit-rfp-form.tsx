@@ -505,67 +505,67 @@ export function EditRFPForm({
 
                     <ContactsFormField form={form} />
                     <AttachmentsFormField form={form} />
-
-                    <span className="absolute bottom-0 right-4 z-900 flex gap-2 w-fit">
-                        <DialogClose asChild>
-                            <Button 
-                                variant={"secondary"}
-                                onClick={() => {if (closeDialog) closeDialog()}}
-                            >
-                                Cancel
-                            </Button>
-                        </DialogClose>
-                        <Dialog>
-                            <DialogTrigger asChild className={cn(rfpData.id ? "" : "hidden")}>
-                                <Button type="button" variant="destructive">
-                                    Delete RFP
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>
-                                        Are you absolutely sure?
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        {`This action cannot be undone. This will permanently delete your RFP and it's data.`}
-                                    </DialogDescription>
-                                    <DialogFooter>
-                                        <DialogClose>
-                                            <Button type="button">
-                                                Cancel
-                                            </Button>
-                                        </DialogClose>
-                                        <DialogClose>
-                                            <Button
-                                                type="button"
-                                                variant={"destructive"}
-                                                onClick={handleDeleteRFP}
-                                            >
-                                                Delete RFP
-                                            </Button>
-                                        </DialogClose>
-                                    </DialogFooter>
-                                </DialogHeader>
-                            </DialogContent>
-                        </Dialog>
-                        <DialogClose disabled={!form.formState.isValid}>
-                            <div className="bg-white rounded-md p-0">
-                                <Button
-                                    disabled={!form.formState.isValid}
-                                    variant={"cta"}
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        handleFormSubmit(form.getValues())
-                                        if (closeDialog) closeDialog()
-                                    }}
-                                >
-                                    Save Changes
-                                </Button>
-                            </div>
-                        </DialogClose>
-                    </span>
                 </div>
             </ScrollArea>
+
+            <DialogFooter className="pt-1">
+                <DialogClose asChild>
+                    <Button 
+                        variant={"secondary"}
+                        onClick={() => {if (closeDialog) closeDialog()}}
+                    >
+                        Cancel
+                    </Button>
+                </DialogClose>
+                <Dialog>
+                    <DialogTrigger asChild className={cn(rfpData.id ? "" : "hidden")}>
+                        <Button type="button" variant="destructive">
+                            Delete RFP
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>
+                                Are you absolutely sure?
+                            </DialogTitle>
+                            <DialogDescription>
+                                {`This action cannot be undone. This will permanently delete your RFP and it's data.`}
+                            </DialogDescription>
+                            <DialogFooter>
+                                <DialogClose>
+                                    <Button type="button">
+                                        Cancel
+                                    </Button>
+                                </DialogClose>
+                                <DialogClose>
+                                    <Button
+                                        type="button"
+                                        variant={"destructive"}
+                                        onClick={handleDeleteRFP}
+                                    >
+                                        Delete RFP
+                                    </Button>
+                                </DialogClose>
+                            </DialogFooter>
+                        </DialogHeader>
+                    </DialogContent>
+                </Dialog>
+                <DialogClose disabled={!form.formState.isValid}>
+                    <div className="bg-white rounded-md p-0">
+                        <Button
+                            disabled={!form.formState.isValid}
+                            variant={"cta"}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                handleFormSubmit(form.getValues())
+                                if (closeDialog) closeDialog()
+                            }}
+                        >
+                            Save Changes
+                        </Button>
+                    </div>
+                </DialogClose>
+            </DialogFooter>
         </Form>
     )
 }
