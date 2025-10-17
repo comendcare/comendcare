@@ -57,18 +57,18 @@ export const PAGProfileToolsCard = ({
     const [isInitialized, setIsInitialized] = useState<boolean>(false)    
     const [section, setSection] = useState<string | undefined>(undefined)
     const biosampleColumns = useBiosamplesTableColumns(
-        false, // disable sorting
-        false, // disable hiding
+        true, // enable sorting
+        true, // enable hiding
         "profile",
     )
     const diseaseModelColumns = useDiseaseModelsTableColumns(
-        false, // disable sorting
-        false, // disable hiding
+        true, // enable sorting
+        true, // enable hiding
         "profile"
     )
     const clinicalDatasetColumns = useClinicalDatasetsTableColumns(
-        false, // disable sorting
-        false, // disable hiding
+        true, // enable sorting
+        true, // enable hiding
         "profile"
     )
     const router = useRouter();
@@ -88,9 +88,8 @@ export const PAGProfileToolsCard = ({
                             <Button
                                 variant={"link"}
                                 onClick={async () => {
-                                    // setIsInitialized(false)
-                                    // router.push(window.location.pathname, { scroll: false })
                                     const searchParams = new URLSearchParams()
+                                    searchParams.set("sort", "")
                                     searchParams.set("page", "1")
                                     searchParams.set("view", "biosamples")
                                     router.push(`?${searchParams.toString()}`, {scroll: false})
@@ -111,9 +110,8 @@ export const PAGProfileToolsCard = ({
                             <Button
                                 variant={"link"}
                                 onClick={async () => {
-                                    // setIsInitialized(false)
-                                    // router.push(window.location.pathname, { scroll: false })
                                     const searchParams = new URLSearchParams()
+                                    searchParams.set("sort", "")
                                     searchParams.set("page", "1")
                                     searchParams.set("view", "disease-models")
                                     router.push(`?${searchParams.toString()}`, {scroll: false})
@@ -134,9 +132,8 @@ export const PAGProfileToolsCard = ({
                             <Button
                                 variant={"link"}
                                 onClick={async () => {
-                                    // setIsInitialized(false)
-                                    // router.push(window.location.pathname, { scroll: false })
                                     const searchParams = new URLSearchParams()
+                                    searchParams.set("sort", "")
                                     searchParams.set("page", "1")
                                     searchParams.set("view", "clinical-datasets")
                                     router.push(`?${searchParams.toString()}`, {scroll: false})
@@ -157,55 +154,59 @@ export const PAGProfileToolsCard = ({
                 </CardTitle>
             </CardHeader>
             <CardContent className="w-full max-w-full">
-                {!isInitialized && (
-                    <div className="bg-gray-100 rounded-md w-full h-[200px]">
-
-                    </div>
-                )}
-                {(isInitialized && section === 'biosamples') && (
-                    <div className="max-w-7xl w-full overflow-auto">
-                        <FeatureFlagsProvider showFilters={false}>
-                            <BiosamplesTable
-                                data={biosamples as any[] || []}
-                                pageCount={biosamplesPageCount}
-                                columns={biosampleColumns}
-                                searchParams={{}}
-                                showFilters={false}
-                                interactive={false}
-                                showPagination={toolCounts.biosampleCount > 10}
-                            />
-                        </FeatureFlagsProvider>
-                    </div>
-                )}
+                {(isInitialized && section === 'biosamples') && 
+                    (biosamples.length === 0 ? (
+                        <div className="bg-gray-100 rounded-md w-full h-[200px]" />
+                    ) : (
+                        <div className="max-w-7xl w-full overflow-auto">
+                            <FeatureFlagsProvider showFilters={false}>
+                                <BiosamplesTable
+                                    data={biosamples as any[] || []}
+                                    pageCount={biosamplesPageCount}
+                                    columns={biosampleColumns}
+                                    searchParams={{}}
+                                    interactive={false}
+                                    showPagination={toolCounts.biosampleCount > 10}
+                                />
+                            </FeatureFlagsProvider>
+                        </div>
+                    ))
+                }
                 {(isInitialized && section === 'disease-models') && (
-                    <div className="max-w-7xl w-full overflow-auto">
-                        <FeatureFlagsProvider showFilters={false}>
-                            <DiseaseModelsTable
-                                data={diseaseModels as any[] || []}
-                                pageCount={diseaseModelsPageCount}
-                                columns={diseaseModelColumns}
-                                searchParams={{}}
-                                showFilters={false}
-                                interactive={false}
-                                showPagination={toolCounts.diseaseModelCount > 10}
-                            />
-                        </FeatureFlagsProvider>
-                    </div>
+                    diseaseModels.length === 0 ? (
+                        <div className="bg-gray-100 rounded-md w-full h-[200px]" />
+                    ) : (
+                        <div className="max-w-7xl w-full overflow-auto">
+                            <FeatureFlagsProvider showFilters={false}>
+                                <DiseaseModelsTable
+                                    data={diseaseModels as any[] || []}
+                                    pageCount={diseaseModelsPageCount}
+                                    columns={diseaseModelColumns}
+                                    searchParams={{}}
+                                    interactive={false}
+                                    showPagination={toolCounts.diseaseModelCount > 10}
+                                />
+                            </FeatureFlagsProvider>
+                        </div>
+                    )
                 )}
                 {(isInitialized && section === 'clinical-datasets') && (
-                    <div className="max-w-7xl w-full overflow-auto">
-                        <FeatureFlagsProvider showFilters={false}>
-                            <ClinicalDatasetsTable
-                                data={clinicalDatasets || []}
-                                pageCount={clinicalDatasetsPageCount}
-                                columns={clinicalDatasetColumns}
-                                searchParams={{}}
-                                showFilters={false}
-                                interactive={false}
-                                showPagination={toolCounts.clinicalDatasetCount > 10}
-                            />
-                        </FeatureFlagsProvider>
-                    </div>
+                    clinicalDatasets.length === 0 ? (
+                        <div className="bg-gray-100 rounded-md w-full h-[200px]" />
+                    ) : (
+                        <div className="max-w-7xl w-full overflow-auto">
+                            <FeatureFlagsProvider showFilters={false}>
+                                <ClinicalDatasetsTable
+                                    data={clinicalDatasets || []}
+                                    pageCount={clinicalDatasetsPageCount}
+                                    columns={clinicalDatasetColumns}
+                                    searchParams={{}}
+                                    interactive={false}
+                                    showPagination={toolCounts.clinicalDatasetCount > 10}
+                                />
+                            </FeatureFlagsProvider>
+                        </div>
+                    )
                 )}
             </CardContent>
         </Card>
