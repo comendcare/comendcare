@@ -32,6 +32,7 @@ import type { Option } from "@comend/lib/types";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore";
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
+import { initializeOrganizationSearch } from "@/packages/lib/initialize-client-state";
 
 // Helpers to normalize options
 const MECHANISM_OPTIONS = mechanisms.map((m: any) => ({
@@ -112,12 +113,22 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
     // Keep local input in sync with store (e.g., external changes)
     useEffect(() => setQuery(searchTerm), [searchTerm]);
 
-    // initial fetch on mount
-    useEffect(() => {
-        // reset to trigger initial load using store's logic
-        setSearchTerm(searchTerm || "");
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // // initial fetch on mount
+    // useEffect(() => {
+    //     // init organization/PAG search store
+    //     const parsedPAGFilters = {
+    //         genes: [] as any[],
+    //         conditions: [] as any[],
+    //         systems: [] as any[],
+    //         mechanisms: [] as any[],
+    //         modalities: [] as any[],
+    //     }
+    //     initializeOrganizationSearch(parsedPAGFilters)
+    //     console.log(`Organization search initialized...`)
+    //     // reset to trigger initial load using store's logic
+    //     // setSearchTerm("");
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, []);
 
     const handleInputChangeCallback = useCallback(
         (text: string) => {

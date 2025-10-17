@@ -73,8 +73,8 @@ export const NewRFPDialog = ({iconOnly = false}: {iconOnly?: boolean}) => {
                     {`Create RFP`}
                 </Button>
             )}
-            <DialogContent>
-                <DialogHeader>
+            <DialogContent className="gap-0">
+                <DialogHeader className="pb-4">
                     <DialogTitle>
                         Create an RFP
                     </DialogTitle>
@@ -101,8 +101,8 @@ export const EditRFPDialog = ({children, data}: {children: ReactNode, data: Part
                 <button className="cursor-pointer">{children}</button>
             </DialogTrigger>
 
-            <DialogContent>
-                <DialogHeader>
+            <DialogContent className="gap-0">
+                <DialogHeader className="pb-4">
                     <DialogTitle>
                         Edit an RFP
                     </DialogTitle>

@@ -179,8 +179,8 @@ export const NewToolDialog = ({type}: { type: ToolType }) => {
                 {title}
             </Button>
 
-            <DialogContent>
-                <DialogHeader>
+            <DialogContent className="gap-0">
+                <DialogHeader className="pb-4">
                     <DialogTitle>{title}</DialogTitle>
                     <DialogDescription>
                         {`Create your Tool here. Click save when you're done.`}
@@ -208,8 +208,8 @@ export const EditAssetDialog = ({
     // This component is meant to be rendered *inside* a <Dialog> already.
     // If you prefer this to control its own open state, wrap with <Dialog> + trigger like NewToolDialog.
     return (
-        <DialogContent>
-            <DialogHeader>
+        <DialogContent className="gap-0">
+            <DialogHeader className="pb-4">
                 <DialogTitle>Edit a Tool</DialogTitle>
                 <DialogDescription>
                     {`Edit your Tool here. Click save when you're done.`}

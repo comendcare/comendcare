@@ -51,7 +51,7 @@ export default async function DiseaseModelToolsPage(props: IndexPageProps) {
             organization: {include: {conditions: {include: {condition: true}}}},
             milestones: {include: {milestone: true}},
         },
-        {...search, q: globalFilter, filters: validFilters}
+        {...search, q: globalFilter, filters: validFilters},
     )
 
     // not part of an org

@@ -195,7 +195,17 @@ export default async function OrganizationRoadmapPage({
                 slug: true,
                 edges: true,
                 milestones: true,
-                nodes: true,
+                nodes: {
+                    select: {
+                        id: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        positionX: true,
+                        positionY: true,
+                        origin: true,
+                        roadmapId: true,
+                    }
+                },
                 modalities: true
             }),
     ])

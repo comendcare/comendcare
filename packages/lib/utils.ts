@@ -155,7 +155,7 @@ export const getCookie = (name: string) => {
 }
 
 export const getStage = (milestones: Milestone[]): {value: string, label: string, variant: string} => {
-    const relevantMilestoneTypes = milestones
+    const relevantMilestoneTypes = (milestones || [])
         .filter(milestone => milestone.status === "INPROGRESS" && !milestone.private)
         .flatMap(milestone => milestone.types)
         .map(type => type?.milestoneTypeId)

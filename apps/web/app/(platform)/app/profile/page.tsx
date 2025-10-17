@@ -4,11 +4,16 @@ import { authOptions } from "@/packages/lib/auth";
 import prisma from "@/packages/lib/prisma";
 import PAGProfilePage from "~web/components/profile-page";
 import {
+    getBiosamples,
     getConditionsDataFromOrgId,
+    getClinicalDatasets,
+    getDiseaseModels,
     getPublicRFPsForOrganization,
     getPublicRoadmapsForOrganization,
     getPublicToolCountsForOrganization
 } from "@comend/lib/fetchers";
+import { biosampleSearchParamsCache } from "@/packages/lib/validations"
+import { getValidFilters } from "@/packages/lib/data-table";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +32,13 @@ export default async function ProfilePage(props: IndexPageProps) {
     const session = await getServerSession(authOptions);
     const orgId = session?.user?.organizationId;
     if (!orgId) return <NoOrganization />;
+
+    // const session = await getSession()
+    // const orgId = session?.user.organizationId
+    // const searchParams = await props.searchParams;
+    const search = biosampleSearchParamsCache.parse(searchParams);
+    const validFilters = getValidFilters(search.filters);
+    const globalFilter = search.q ?? "";
 
     // Phase 1: kick off everything that only needs orgId, in parallel
     const organizationPromise = prisma.organization.findUnique({
@@ -119,6 +131,112 @@ export default async function ProfilePage(props: IndexPageProps) {
         ])
         : [[], {}, []];
 
+    const {data: biosamples, pageCount: biosamplesPageCount} = await getBiosamples(
+        session?.user.organizationId,
+        {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+            description: true,
+            contacts: true,
+            attachments: true,
+            private: true,
+            types: true,
+            genotype: true,
+            variant: true,
+            availability: true,
+            quantity: true,
+            quantityUnit: true,
+            currentCountry: true,
+            countryOfCollection: true,
+            preservationMethod: true,
+            anatomicalSite: true,
+            methodOfTransport: true,
+            collectionDate: true,
+            ageAtCollection: true,
+            price: true,
+            priceUnit: true,
+            notes: true,
+
+            milestones: {include: {milestone: true}},
+            donorId: true,
+            donor: {
+                include: {diagnoses: {include: {type: true}}}
+            },
+            institutionId: true,
+            institution: true,
+            geneId: true,
+            gene: true,
+            organizationId: true,
+            organization: true,
+            materialAndDataAccessRequests: true
+        },
+        {...search, q: globalFilter, filters: validFilters},
+        true // public only
+    )
+
+    const {data: diseaseModels, pageCount: diseaseModelsPageCount} = await getDiseaseModels(
+        session?.user.organizationId,
+        {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+
+            description: true,
+            contacts: true,
+            attachments: true,
+            private: true,
+            // pinned: true,
+            // metadata: true,
+            types: true,
+            genotype: true,
+            strain: true,
+            notes: true,
+
+            institutionId: true,
+            institution: true,
+            geneId: true,
+            gene: true,
+            conditionId: true,
+            condition: true,
+            organizationId: true,
+            organization: {include: {conditions: {include: {condition: true}}}},
+            milestones: {include: {milestone: true}},
+        },
+        {...search, q: globalFilter, filters: validFilters},
+        true // public only
+    )
+
+    const {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount} = await getClinicalDatasets(
+        session?.user.organizationId,
+        {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+
+            title: true,
+            cohortSize: true,
+            description: true,
+            contacts: true,
+            attachments: true,
+            private: true,
+            // pinned: true,
+            // metadata: true,
+            types: true,
+            notes: true,
+
+            institutionId: true,
+            institution: true,
+            geneId: true,
+            gene: true,
+            organizationId: true,
+            organization: {include: {conditions: {include: {condition: true}}}},
+            milestones: {include: {milestone: true}},
+        },
+        {...search, q: globalFilter, filters: validFilters},
+        true // public only
+    )
+
     const isOwner = session?.user?.membership?.role === "owner";
 
     const safeOrg = {
@@ -139,6 +257,12 @@ export default async function ProfilePage(props: IndexPageProps) {
             conditions={conditions?.success ? conditions.data : []}
             roadmaps={roadmaps}
             toolCounts={toolCounts}
+            biosamples={biosamples}
+            biosamplesPageCount={biosamplesPageCount}
+            diseaseModels={diseaseModels}
+            diseaseModelsPageCount={diseaseModelsPageCount}
+            clinicalDatasets={clinicalDatasets}
+            clinicalDatasetsPageCount={clinicalDatasetsPageCount}
             rfps={rfps}
             isOwner={!!isOwner}
             rootDomain={process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? "comend.io"}

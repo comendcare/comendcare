@@ -15,7 +15,7 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
     return (
         <div className="space-y-4 w-full">
             <div className="space-y-2 sm:flex-auto">
-                <h2 className="text-xl font-semibold leading-6 text-gray-900">
+                <h2 className="text-2xl font-semibold leading-6 text-gray-900">
                     {session?.user?.name ? `Hello, ${session.user.name.split(" ")[0]}` : `Hello`}
                 </h2>
                 <p className="text-sm text-gray-700">
@@ -42,6 +42,7 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="flex flex-row items-center justify-start gap-x-2">
+                            <Workflow className="h-5 w-5"/>
                             Research plans
                             <Button
                                 asChild
@@ -54,7 +55,7 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                                 </Link>
                             </Button>
                         </CardTitle>
-                        <Workflow className="h-4 w-4 text-muted-foreground"/>
+                        {/* <Workflow className="h-4 w-4 text-muted-foreground"/> */}
                     </CardHeader>
                     <CardContent>
                         <div className="text-3xl font-semibold">{organization.roadmaps.length}</div>
@@ -66,6 +67,7 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="flex flex-row items-center justify-start gap-x-2">
+                            <Microscope className="h-5 w-5"/>
                             Tools
                             <Button
                                 asChild
@@ -78,7 +80,7 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                                 </Link>
                             </Button>
                         </CardTitle>
-                        <Microscope className="h-4 w-4 text-muted-foreground"/>
+                        {/* <Microscope className="h-4 w-4 text-muted-foreground"/> */}
                     </CardHeader>
                     <CardContent>
                         <div className="text-3xl font-semibold">
@@ -92,6 +94,7 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="flex flex-row items-center justify-start gap-x-2">
+                            <Megaphone className="h-5 w-5"/>
                             RFPs
                             <Button
                                 asChild
@@ -104,7 +107,7 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                                 </Link>
                             </Button>
                         </CardTitle>
-                        <Megaphone className="h-4 w-4 text-muted-foreground"/>
+                        {/* <Megaphone className="h-4 w-4 text-muted-foreground"/> */}
                     </CardHeader>
                     <CardContent>
                         <div className="text-3xl font-semibold">{organization.rfps.length}</div>

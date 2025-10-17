@@ -1,26 +1,15 @@
 "use client"
 
 import {useCallback, useEffect, useMemo, useRef, useState} from "react"
-import {Funnel, SearchIcon, X} from "lucide-react"
-import {cn} from "@comend/lib/utils"
+import {Funnel, X} from "lucide-react"
 import {useShallow} from "zustand/react/shallow"
-
 import {Button} from "@comend/components/ui/button"
 import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"
 import {Badge} from "@comend/components/ui/badge"
 import {Separator} from "@comend/components/ui/separator"
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
-
 import MultipleSelector from "@comend/components/ui/multiple-selector"
-import {useCROSearchStore, CROSearchState} from "@/state/search/croSearchStore"
-import {
-    BIOSAMPLE_TYPE_OPTIONS,
-    BUSINESS_TYPES,
-    CRO_CERTIFICATIONS,
-    CRO_TAGS,
-    MILESTONE_TYPE_OPTIONS,
-} from "@comend/lib/types"
+import {BIOSAMPLE_TYPE_OPTIONS} from "@comend/lib/types"
 import {debounce} from "lodash";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/packages/components/ui/dialog";
@@ -30,7 +19,7 @@ import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/sea
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
 
 export function BiosampleMarketplaceIntegratedSearchAndFilter() {
-    const {searchTerm, sortBy, setSortBy, setSearchTerm, filters, setFilters, totalResults} = useBiosampleSearchStore(
+    const {searchTerm, setSearchTerm, filters, setFilters, totalResults} = useBiosampleSearchStore(
         useShallow((state: BiosampleSearchState) => ({
             searchTerm: state.searchTerm,
             setSearchTerm: state.setSearchTerm,
@@ -81,12 +70,17 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
     // Keep local input in sync with store (e.g., external changes)
     useEffect(() => setQuery(searchTerm), [searchTerm]);
 
-    // initial fetch on mount
-    useEffect(() => {
-        // reset to trigger initial load using store's logic
-        setSearchTerm(searchTerm || "");
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // // initial fetch on mount - initialize automatically calls first typesense search
+    // useEffect(() => {
+    //     initializeBiosampleSearch({
+    //         types: [] as any[],
+    //         genes: [] as any[],
+    //         conditions: [] as any[],
+    //         organizations: [] as any[],
+    //     })
+    //     console.log(`Biosample search initialized...`)
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, []);
 
     const handleInputChangeCallback = useCallback(
         (search: string) => {
@@ -129,7 +123,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
     }
 
     const clearAll = () => {
-        setFilters({ ...filters, conditions: [], genes: [], types: [] });
+        setFilters({ ...filters, conditions: [], genes: [], types: [], organizations: [] });
 
         // Handle setting universal filters in other marketplaces (if relevant)
         setOrganizationFilters({...organizationFilters, conditions: [], genes: []})
@@ -140,7 +134,8 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
     const activeCount =
         (filters.conditions?.length || 0) +
         (filters.genes?.length || 0) + 
-        (filters.types?.length || 0);
+        (filters.types?.length || 0) +
+        (filters.organizations?.length || 0)
 
     const handleAsyncGeneSearch = async (query: string): Promise<Option[]> => {
         if (!query) return []; // Return empty if no input
@@ -188,6 +183,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
             return [];
         }
     };
+
 
     return (
         <div className="w-full mx-auto flex flex-col gap-y-2">
@@ -385,6 +381,19 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                                 {BIOSAMPLE_TYPE_OPTIONS.find((o) => o.value === item.value)?.label || item.value}
                                 <button
                                     onClick={() => removeFilterItem("types", item.value)}
+                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+
+                        {/* organizations */}
+                        {(filters.organizations || []).map((item) => (
+                            <Badge key={`organizations-${item.value}`} variant="secondary" className="text-xs">
+                                {item.label}
+                                <button
+                                    onClick={() => removeFilterItem("organizations", item.value)}
                                     className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
                                 >
                                     <X className="h-3 w-3" />

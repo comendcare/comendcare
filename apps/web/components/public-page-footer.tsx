@@ -26,7 +26,7 @@ export default function PublicPageFooter() {
                 <div
                     className="flex flex-col items-center space-y-8 sm:grid sm:grid-cols-2 sm:space-y-0">
                     <p className="inline-flex items-center self-start place-self-start justify-start">
-                        Made with ❤️ by
+                        Built with ❤️ on 
                         <LinkPreview url={"https://www.comendcare.com/"} target="_blank">
                             <Image className="w-24 inline" src={logo} alt={"Comend Logo"}/>
                         </LinkPreview>
@@ -66,7 +66,7 @@ export default function PublicPageFooter() {
                                 className="text-gray-700 transition hover:opacity-75"
                             >
                                 <span className="sr-only">LinkedIn</span>
-                                <Linkedin className="size-8"/>
+                                <Linkedin className="size-[33px] -mb-[1.25px]"/>
                             </a>
                         </li>
 
@@ -77,7 +77,7 @@ export default function PublicPageFooter() {
                                 target="_blank"
                                 className="text-gray-700 transition hover:opacity-75 mb-0 -ml-1"
                             >
-                                <span className="sr-only">Twitter</span>
+                                <span className="sr-only">X</span>
                                 <XIcon className="size-8" />
                             </a>
                         </li>

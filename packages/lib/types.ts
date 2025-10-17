@@ -1152,6 +1152,12 @@ export const MILESTONE_TYPE_OPTIONS: any[] = [
         services: ['Biomarker Services', 'Clinical Data Registry', 'Patient-Reported Outcome Studies', 'Post-Marketing (Phase 4) Studies', 'RWE/HEOR Data Analysis', 'RWE/HEOR/Market Access Data Analytics', 'Real World Evidence (RWE) Studies', 'Real-World Evidence'],
         categories: ['clinical study'],
         description: 'Occurs after FDA approval to monitor long-term effects and rare side effects that may not have appeared in earlier phases.'
+    }, {
+        id: 'OTHER',
+        label: 'Other',
+        services: [],
+        categories: [],
+        description: ''
     }
 ];
 
@@ -1255,7 +1261,7 @@ export const milestoneCategories = {
         types: ['GENETHERAPYPRODUCTION', 'GPMANUFACTURING']
     },
     'PRECLINICAL': {
-        option: {value: 'PRECLINICA', label: 'Preclinical', variant: 'indigo'},
+        option: {value: 'PRECLINICAL', label: 'Preclinical', variant: 'indigo'},
         types: ['ASSAYDEVELOPMENT', 'EFFICASYSTUDY', 'DOSEFINDINGSTUDY', 'TOXICOLOGYSTUDY', 'BIODISTRIBUTIONSTUDY']
     },
     'CLINICAL_TRIAL': {

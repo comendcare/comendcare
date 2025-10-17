@@ -11,6 +11,7 @@ import {
 } from "./../../../ui/tooltip";
 import { type FlagConfig, flagConfig } from "./../../../../../packages/lib/config/flag";
 import { Tabs, TabsList, TabsTrigger } from "./../../../ui/tabs";
+import { cn } from "@comend/lib/utils";
 
 type FilterFlag = FlagConfig["featureFlags"][number]["value"];
 
@@ -35,9 +36,10 @@ export function useFeatureFlags() {
 interface FeatureFlagsProviderProps {
   additionalButtons?: React.ReactNode;
   children: React.ReactNode;
+  showFilters?: boolean
 }
 
-export function FeatureFlagsProvider({ additionalButtons, children }: FeatureFlagsProviderProps) {
+export function FeatureFlagsProvider({ additionalButtons, children, showFilters = true }: FeatureFlagsProviderProps) {
   const [filterFlag, setFilterFlag] = useQueryState<FilterFlag | null>(
     "filterFlag",
     {
@@ -74,7 +76,7 @@ export function FeatureFlagsProvider({ additionalButtons, children }: FeatureFla
 
   return (
     <FeatureFlagsContext.Provider value={contextValue}>
-      <div className="w-full overflow-x-auto p-1">
+      <div className={cn("w-full overflow-x-auto p-1", !showFilters && "hidden")}>
         <div className="flex gap-2 w-full">
           <Tabs 
             value={filterFlag || flagConfig.featureFlags[0].value }
