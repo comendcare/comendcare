@@ -14,28 +14,28 @@ interface IndexPageProps {
 
 const selector = (state: ClinicalDatasetSearchState) => ({
     initialized: state.initialized,
-    filters: state.filters,
-    setFilters: state.setFilters
+    setSortBy: state.setSortBy
 })
 
 export default function ClinicalDatasetsPage(props: IndexPageProps) {
-    const {initialized, filters, setFilters} = useClinicalDatasetSearchStore(useShallow(selector))
-    const [searchParams, setSearchParams] = useState({})
+    const {initialized, setSortBy} = useClinicalDatasetSearchStore(useShallow(selector))
     const [isInitialized, setIsInitialized] = useState(false)
  
     // initial fetch on mount - initialize automatically calls first typesense search
     useEffect(() => {
         const init = async () => {
             const searchParams = await props.searchParams;
-            setSearchParams(searchParams)
             
             if (!initialized) {
-                initializeClinicalDatasetSearch({
-                    types: [] as any[],
-                    genes: [] as any[],
-                    conditions: [] as any[],
-                    organizations: [] as any[]
-                })
+                initializeClinicalDatasetSearch(
+                    {
+                        types: [] as any[],
+                        genes: [] as any[],
+                        conditions: [] as any[],
+                        organizations: [] as any[]
+                    },
+                    searchParams?.sort
+                )
                 console.log(`Clinical Dataset search initialized...`)
             }
 
@@ -47,11 +47,20 @@ export default function ClinicalDatasetsPage(props: IndexPageProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    useEffect(() => {
+        const updateSearchParams = async () => {
+            const searchParams = await props.searchParams
+            setSortBy(searchParams?.sort)
+        }
+
+        updateSearchParams()
+    }, [props])
+
     return (
         <main className="max-w-7xl flex flex-col w-full px-4 pb-20 items-center h-full mx-auto">
             <div className="flex flex-col gap-4 p-2 w-full">
                 <ClinicalDatasetMarketplaceIntegratedSearchAndFilter />
-                <ClinicalDatasetSearchResults searchParams={searchParams} isInitialized={isInitialized}/>
+                <ClinicalDatasetSearchResults isInitialized={isInitialized}/>
             </div>
         </main>
     )

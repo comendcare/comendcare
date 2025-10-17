@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { useShallow } from "zustand/react/shallow";
 import { Skeleton } from "@comend/components/ui/skeleton";
@@ -15,19 +15,21 @@ const selector = (state: BiosampleSearchState) => ({
 })
 
 export function BiosampleSearchResults({
-    searchParams,
+    // searchParams,
     isInitialized
 }: {
-    searchParams?: SearchParams | undefined,
+    // searchParams?: SearchParams | undefined,
     isInitialized: boolean
 }) {
     const { 
         searchResults,
-        setSortBy
+        // setSortBy
     } = useBiosampleSearchStore(useShallow(selector))
     const columns = useBiosamplesTableColumns() // by default sorting & hiding are enabled
 
-    setSortBy(searchParams?.sort)
+    // useEffect(() => {
+    //     setSortBy(searchParams?.sort)
+    // }, [searchParams?.sort])
 
     if (!isInitialized || !searchResults) {
         return (

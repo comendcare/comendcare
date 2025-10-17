@@ -7,6 +7,7 @@ import { SearchParams } from "@/packages/components/types";
 import { initializeBiosampleSearch } from "@/packages/lib/initialize-client-state";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
 import { useShallow } from "zustand/react/shallow";
+import { PrivateBiosampleToolsPage } from "~web/components/private-biosample-tools-page";
 
 interface IndexPageProps {
     searchParams: Promise<SearchParams>
@@ -14,28 +15,28 @@ interface IndexPageProps {
 
 const selector = (state: BiosampleSearchState) => ({
     initialized: state.initialized,
-    filters: state.filters,
-    setFilters: state.setFilters
+    setSortBy: state.setSortBy
 })
 
 export default function BiosamplesPage(props: IndexPageProps) {
-    const {initialized, filters, setFilters} = useBiosampleSearchStore(useShallow(selector))
-    const [searchParams, setSearchParams] = useState({})
+    const {initialized, setSortBy} = useBiosampleSearchStore(useShallow(selector))
     const [isInitialized, setIsInitialized] = useState(false)
  
     // initial fetch on mount - initialize automatically calls first typesense search
     useEffect(() => {
         const init = async () => {
             const searchParams = await props.searchParams;
-            setSearchParams(searchParams)
             
             if (!initialized) {
-                await initializeBiosampleSearch({
-                    types: [] as any[],
-                    genes: [] as any[],
-                    conditions: [] as any[],
-                    organizations: [] as any[],
-                })
+                await initializeBiosampleSearch(
+                    {
+                        types: [] as any[],
+                        genes: [] as any[],
+                        conditions: [] as any[],
+                        organizations: [] as any[],
+                    },
+                    searchParams?.sort
+                )
                 console.log(`Biosample search initialized...`)
             }
 
@@ -47,11 +48,20 @@ export default function BiosamplesPage(props: IndexPageProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    useEffect(() => {
+        const updateSearchParams = async () => {
+            const searchParams = await props.searchParams
+            setSortBy(searchParams?.sort)
+        }
+
+        updateSearchParams()
+    }, [props])
+
     return (
         <main className="max-w-7xl flex flex-col w-full px-4 pb-20 items-center h-full mx-auto">
             <div className="flex flex-col gap-4 p-2 w-full">
                 <BiosampleMarketplaceIntegratedSearchAndFilter />
-                <BiosampleSearchResults searchParams={searchParams} isInitialized={isInitialized}/>
+                <BiosampleSearchResults isInitialized={isInitialized}/>
             </div>
         </main>
     )
