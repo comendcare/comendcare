@@ -40,7 +40,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
         {
             id: "select",
             header: ({ table }) => (
-                <div className="-ml-1">
+                <div className="-ml-1 pr-1">
                     <Checkbox
                         checked={
                             table.getIsAllPageRowsSelected() ||
