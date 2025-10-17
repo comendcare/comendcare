@@ -181,7 +181,7 @@ const getUpdatedSearchResults = async (
 export interface BiosampleSearchState {
     initialized: boolean,
     setInit: (initState: boolean) => void,
-    initState: (filters: FiltersType) => Promise<void>,
+    initState: (filters: FiltersType, sortBy?: string | string[] | undefined) => Promise<void>,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string | string[] | undefined,
@@ -211,12 +211,12 @@ export const useBiosampleSearchStore = create<BiosampleSearchState>()(
             setInit: (initState: boolean) => {
                 set({initialized: initState})
             },
-            initState: async (filters: FiltersType) => {
+            initState: async (filters: FiltersType, sortBy?: string | string[] | undefined) => {
                 set({ 
                     recommendations: [], 
                     filters,
                     searchTerm: "",
-                    sortBy: undefined,
+                    sortBy,
                     page: 1,
                 })
 

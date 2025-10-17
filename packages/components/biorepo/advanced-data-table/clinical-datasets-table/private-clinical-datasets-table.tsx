@@ -44,7 +44,7 @@ export function ClinicalDatasetsTable({
     enableAdvancedFilter: showFilters && enableAdvancedFilter,
     initialState: {
       sorting: [],
-      columnPinning: { right: ["actions"] },
+      columnPinning: { right: ["actions"], left: ["select"] },
     },
     getRowId: (originalRow) => originalRow.id,
     shallow: false,

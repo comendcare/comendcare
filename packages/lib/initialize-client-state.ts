@@ -42,30 +42,30 @@ export async function initializeOrganizationSearch(filters: PAGMarketplaceFilter
     }
 }
 
-export async function initializeBiosampleSearch(filters: BiosampleMarketplaceFiltersType) {
+export async function initializeBiosampleSearch(filters: BiosampleMarketplaceFiltersType, sortBy?: string | string[] | undefined) {
     if (typeof window !== "undefined") {
         const initBiosampleSearchState = useBiosampleSearchStore.getState().initState;
 
         // Call Zustand's initState directly
-        await initBiosampleSearchState(filters)
+        await initBiosampleSearchState(filters, sortBy)
     }
 }
 
-export async function initializeDiseaseModelSearch(filters: DiseaseModelMarketplaceFiltersType) {
+export async function initializeDiseaseModelSearch(filters: DiseaseModelMarketplaceFiltersType, sortBy?: string | string[] | undefined) {
     if (typeof window !== "undefined") {
         const initDiseaseModelSearchState = useDiseaseModelSearchStore.getState().initState;
 
         // Call Zustand's initState directly
-        await initDiseaseModelSearchState(filters)
+        await initDiseaseModelSearchState(filters, sortBy)
     }
 }
 
-export async function initializeClinicalDatasetSearch(filters: ClinicalDatasetMarketplaceFiltersType) {
+export async function initializeClinicalDatasetSearch(filters: ClinicalDatasetMarketplaceFiltersType, sortBy?: string | string[] | undefined) {
     if (typeof window !== "undefined") {
         const initClinicalDatasetSearchState = useClinicalDatasetSearchStore.getState().initState;
 
         // Call Zustand's initState directly
-        await initClinicalDatasetSearchState(filters)
+        await initClinicalDatasetSearchState(filters, sortBy)
     }
 }
 

@@ -180,7 +180,7 @@ const getUpdatedSearchResults = async (
 
 export interface DiseaseModelSearchState {
     initialized: boolean,
-    initState: (filters: FiltersType) => Promise<void>,
+    initState: (filters: FiltersType, sortBy?: string | string[] | undefined) => Promise<void>,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string | string[] | undefined,
@@ -207,12 +207,12 @@ export interface DiseaseModelSearchState {
 export const useDiseaseModelSearchStore = create<DiseaseModelSearchState>()(
     temporal((set, get) => ({
             initialized: false,
-            initState: async (filters: FiltersType) => {
+            initState: async (filters: FiltersType, sortBy?: string | string[] | undefined) => {
                 set({ 
                     recommendations: [], 
                     filters,
                     searchTerm: "",
-                    sortBy: undefined,
+                    sortBy,
                     page: 1,
                 })
 

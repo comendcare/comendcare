@@ -41,7 +41,9 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
 
     const hasAnyRFPs = (milestone?.rfps?.length ?? 0) > 0
     const hasAnyAttachments = (milestone?.attachments?.length ?? 0) > 0
-
+    const hasAnyContacts = (milestone?.contacts?.length ?? 0) > 0
+    const hasBudget = typeof milestone?.budget === "number"
+ 
     return (
         <Card className="w-full border-2 border-gray-300">
             <CardHeader className="py-4">
@@ -114,7 +116,7 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                     </section>
                 )}
 
-                {typeof milestone?.budget === "number" && (
+                {hasBudget && (
                     <section className="flex flex-col gap-3">
                         {/* <Separator className="bg-gray-300 h-[2px] rounded-full"/> */}
                         <div className="flex items-center justify-between">
@@ -130,7 +132,7 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                 )}
 
 
-                {milestone.contacts && (
+                {hasAnyContacts && (
                     <section className="flex flex-col gap-3">
                         <Separator className="bg-gray-300 h-[2px] rounded-full"/>
                         <div className="flex items-center justify-between">
