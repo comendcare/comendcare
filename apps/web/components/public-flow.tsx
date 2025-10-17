@@ -63,26 +63,6 @@ export const PublicFlowView = ({
         }
     }, [urlMilestone])
 
-    console.log(`nodes`, (
-        roadmap?.nodes.map((node: any) => ({
-            ...node,
-            position: {
-                x: node.positionX,
-                y: node.positionY
-            },
-            type: "PROJECT",
-            measured: {width: 350, height: 140},
-            data: {
-                // ...node.data,
-                ...roadmap.milestones.find((milestone: any) => milestone.nodeId === node.id),
-                subdomain: subdomain,
-                focused: urlMilestone === node?.data?.id,
-                externalLink: externalLinks,
-                setUrlMilestone: setUrlMilestone
-            }
-        })) || []
-    ))
-
     const onNodesChange = (changes: NodeChange<Node>[]) => {
         const newNodes = applyNodeChanges(changes, localNodes)
         setLocalNodes(newNodes)

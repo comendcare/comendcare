@@ -311,8 +311,6 @@ export const PrivateFlowView = ({
         }
     }, [localNodes, pathname, setSelectedNodeIds, startOnborda])
 
-    console.log(`nodes`, updatedNodes)
-
     return (
         <div className="h-full w-full pb-6" onMouseMove={handleMouseMove}>
         <ReactFlow

@@ -241,7 +241,10 @@ export function EditMilestoneForm({
             nodeType: milestoneData?.nodeType || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            types: ((milestoneData?.types || []).map((type: any) => type.milestoneType) || []),
+            types: ((milestoneData?.types || []).map((type: any) => ({
+                ...type.milestoneType,
+                value: type.milestoneTypeId
+            })) || []),
             otherTypeDetails: typeof milestoneData?.metadata === 'object' ? (milestoneData.metadata as {
                 [key: string]: any
             })?.otherTypeDetails : undefined,
@@ -452,7 +455,6 @@ export function EditMilestoneForm({
 
     const init = async () => {
         if (session?.user.organizationId) {
-            console.log(`biosample options`, biosampleOptions)
             const formattedBiosamples: Option[] = (biosampleOptions || []).map((biosample: Partial<Biosample>,) => {
                 return (
                     {
@@ -465,7 +467,6 @@ export function EditMilestoneForm({
                     }
                 )
             })
-            console.log(`disease model options`, diseaseModelOptions)
             const formattedDiseaseModels: Option[] = (diseaseModelOptions || []).map((diseaseModel: Partial<DiseaseModel>) => {
                 return (
                     {
@@ -477,7 +478,6 @@ export function EditMilestoneForm({
                     }
                 )
             })
-            console.log(`clinical dataset options`, clinicalDatasetOptions)
             const formattedDatasamples: Option[] = (clinicalDatasetOptions || []).map((datasample: Partial<Tool>) => {
                 return (
                     {
@@ -1368,8 +1368,8 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
             {types?.map((type: any) => type?.value).includes("OTHER") && (
                 <>
                     <div>
-                        <FormLabel className="text-md">{`Type Description`}</FormLabel>
-                        <FormDescription>{`This will be used to improve the platform.`}</FormDescription>
+                        <FormLabel className="text-sm">{`Type Description`}</FormLabel>
+                        <FormDescription className="text-xs">{`This will be used to improve the platform.`}</FormDescription>
                     </div>
                     <FormField
                         control={form.control}
