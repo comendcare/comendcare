@@ -26,7 +26,7 @@ export default function PublicPageFooter() {
                 <div
                     className="flex flex-col items-center space-y-8 sm:grid sm:grid-cols-2 sm:space-y-0">
                     <p className="inline-flex items-center self-start place-self-start justify-start">
-                        Made with ❤️ by
+                        Built with ❤️ on 
                         <LinkPreview url={"https://www.comendcare.com/"} target="_blank">
                             <Image className="w-24 inline" src={logo} alt={"Comend Logo"}/>
                         </LinkPreview>
