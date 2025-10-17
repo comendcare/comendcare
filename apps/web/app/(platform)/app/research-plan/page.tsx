@@ -2,6 +2,7 @@ import {getSession} from "@/packages/lib/auth"
 import NoOrganization from "~web/components/no-organization";
 import RoadmapsPage from "~web/components/roadmaps-page";
 import prisma from "@/packages/lib/prisma";
+import { getPublicRoadmapsForOrganization } from "@/packages/lib/fetchers";
 
 export default async function RoadmapPage() {
     const session = await getSession();
@@ -9,41 +10,30 @@ export default async function RoadmapPage() {
 
     if (!orgId) return <NoOrganization/>
 
-    const [organization, roadmaps] = await Promise.all([
-        prisma.organization.findUnique({
-            where: {id: orgId},
-            select: {
-                id: true,
-                name: true,
-                subdomain: true,
-                customDomain: true,
-            },
-        }),
-        prisma.roadmap.findMany({
-            where: {organizationId: orgId},
-            orderBy: {createdAt: "desc"},
-            select: {
+    const organization = await prisma.organization.findUnique({
+        where: {id: orgId},
+        select: {
+            id: true,
+            name: true,
+            subdomain: true,
+            customDomain: true,
+        },
+    })
+
+    const roadmaps = organization?.subdomain 
+        ? ([
+            await getPublicRoadmapsForOrganization(organization.subdomain, {
                 id: true,
                 title: true,
                 description: true,
-                content: true,
                 slug: true,
-                image: true,
-                createdAt: true,
-                updatedAt: true,
-                published: true,
-                organizationId: true,
-                userId: true,
                 edges: true,
                 milestones: true,
                 nodes: true,
-                organization: true,
-                user: true,
                 modalities: true,
-                metadata: true,
-            },
-        }),
-    ]);
+            }),
+        ]) 
+        : ([[]])
 
     if (!organization) return <NoOrganization />
 
