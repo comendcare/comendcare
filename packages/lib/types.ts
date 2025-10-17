@@ -1261,7 +1261,7 @@ export const milestoneCategories = {
         types: ['GENETHERAPYPRODUCTION', 'GPMANUFACTURING']
     },
     'PRECLINICAL': {
-        option: {value: 'PRECLINICA', label: 'Preclinical', variant: 'indigo'},
+        option: {value: 'PRECLINICAL', label: 'Preclinical', variant: 'indigo'},
         types: ['ASSAYDEVELOPMENT', 'EFFICASYSTUDY', 'DOSEFINDINGSTUDY', 'TOXICOLOGYSTUDY', 'BIODISTRIBUTIONSTUDY']
     },
     'CLINICAL_TRIAL': {

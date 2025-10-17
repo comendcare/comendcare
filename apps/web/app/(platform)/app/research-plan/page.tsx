@@ -2,7 +2,6 @@ import {getSession} from "@/packages/lib/auth"
 import NoOrganization from "~web/components/no-organization";
 import RoadmapsPage from "~web/components/roadmaps-page";
 import prisma from "@/packages/lib/prisma";
-import { getPublicRoadmapsForOrganization } from "@/packages/lib/fetchers";
 
 export default async function RoadmapPage() {
     const session = await getSession();
@@ -20,20 +19,36 @@ export default async function RoadmapPage() {
         },
     })
 
-    const roadmaps = organization?.subdomain 
-        ? ([
-            await getPublicRoadmapsForOrganization(organization.subdomain, {
-                id: true,
-                title: true,
-                description: true,
-                slug: true,
-                edges: true,
-                milestones: true,
-                nodes: true,
-                modalities: true,
-            }),
-        ]) 
-        : ([[]])
+    const roadmaps = await prisma.roadmap.findMany({
+        where: {organizationId: orgId},
+        orderBy: {createdAt: "desc"},
+        select: {
+            id: true,
+            title: true,
+            description: true,
+            content: true,
+            slug: true,
+            image: true,
+            createdAt: true,
+            updatedAt: true,
+            published: true,
+            organizationId: true,
+            userId: true,
+            edges: true,
+            milestones: {
+                where: {private: false},
+                include: {
+                    types: {include: {milestoneType: true}},
+                },
+                orderBy: [{createdAt: "desc"}]
+            },
+            nodes: true,
+            organization: true,
+            user: true,
+            modalities: true,
+            metadata: true,
+        },
+    })
 
     if (!organization) return <NoOrganization />
 
