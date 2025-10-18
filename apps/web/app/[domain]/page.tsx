@@ -1,4 +1,3 @@
-"use server"
 import prisma from "@comend/lib/prisma"
 import {notFound} from "next/navigation"
 import {
@@ -27,6 +26,8 @@ import { PAGProfileToolsCard } from "~web/components/pag-profile-tools-card";
 import { SearchParams } from "@/packages/components/types";
 import { biosampleSearchParamsCache } from "@/packages/lib/validations";
 import { getValidFilters } from "@/packages/lib/data-table";
+
+export const dynamic = 'force-dynamic'
 
 interface IndexPageProps {
     params: {domain: string},
@@ -57,6 +58,8 @@ export async function generateStaticParams() {
         .filter(Boolean)
     return allPaths
 }
+
+export const dynamicParams = true
 
 export default async function OrganizationHomePage(props: IndexPageProps) {
     const searchParams = await props.searchParams

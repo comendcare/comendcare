@@ -4,13 +4,28 @@ import {getOrganizationData} from "@comend/lib/fetchers"
 import {Metadata} from "next"
 import PublicPageFooter from "~web/components/public-page-footer"
 import {TooltipProvider} from "@radix-ui/react-tooltip"
-import {PublicPageNavbar} from "~web/components/public-page-navbar";
+import {headers} from "next/headers";
+
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+
+function getOrigin() {
+    const h = headers();
+    const host = h.get('x-forwarded-host') ?? h.get('host')!;
+    const proto = h.get('x-forwarded-proto') ?? 'https';
+    return `${proto}://${host}`;
+}
+
+const toAbs = (u?: string | null, origin?: string) =>
+    u ? (u.startsWith('http') ? u : new URL(u, origin!).toString()) : undefined;
+
 
 export async function generateMetadata({
                                            params
                                        }: {
     params: { domain: string }
 }): Promise<Metadata | null> {
+    const origin = getOrigin()
     const domain = decodeURIComponent(params.domain)
     const data = await getOrganizationData(domain, {
             id: true,
@@ -66,53 +81,49 @@ export async function generateMetadata({
     if (!data) {
         return null
     }
-    const {
-        name: title,
-        description,
-        image,
-        logo
-    } = data as {
-        name: string
-        description: string
-        image: string
-        logo: string
-    }
 
-    const baseUrl = `https://${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+    const title = data.name ?? 'Comend';
+    const description = data.description ?? '';
+
+    // absolute assets
+    const ogImage = toAbs(data.image, origin);
+    const iconUrl = toAbs(data.logo, origin);
+
+    // canonical: prefer custom domain if you’re on a subdomain
+    const isOnSubdomain =
+        domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? ''}`);
+    const canonical =
+        isOnSubdomain && data.customDomain
+            ? `https://${data.customDomain}`
+            : origin;
 
     return {
         title,
         description,
+        metadataBase: new URL(origin),
+
+        alternates: { canonical },
+
         openGraph: {
+            type: 'website',
             title,
             description,
-            url: baseUrl,
-            images: image ? [image] : [],
+            url: canonical,
+            images: ogImage ? [{ url: ogImage }] : undefined,
         },
         twitter: {
-            card: "summary_large_image",
+            card: 'summary_large_image',
             title,
             description,
-            images: [image],
-            creator: "@comendcare"
+            images: ogImage ? [ogImage] : undefined,
+            creator: '@comendcare',
         },
-        icons: {
-            icon: logo ? [logo] : undefined,
-        },
-        metadataBase: new URL(`https://${domain}`),
-        // Optional: Set canonical URL to custom domain if it exists
-        // ...(params.domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) &&
-        //   data.customDomain && {
-        //     alternates: {
-        //       canonical: `https://${data.customDomain}`,
-        //     },
-        //   }),
-        alternates: `https://${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+        icons: iconUrl
             ? {
-                canonical: baseUrl,
+                icon: [{ url: iconUrl }],
             }
             : undefined,
-    }
+    };
 }
 
 export default async function SiteLayout({
