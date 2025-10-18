@@ -22,7 +22,6 @@ import {
 import { NavProjects } from "~web/components/nav-projects"
 import { NavMain } from "~web/components/nav-main"
 import { NavSecondary } from "~web/components/nav-secondary"
-import { NavUser } from "~web/components/nav-user"
 import {
     Sidebar,
     SidebarContent,

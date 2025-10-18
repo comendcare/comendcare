@@ -1,10 +1,28 @@
 import { RFPCard } from "./rfp-card"
-import { EditRFPDialog, NewRFPDialog } from "./edit-rfp-dialog"
+import { EditRFPDialog } from "./edit-rfp-dialog"
 import Image from "next/image"
+import dynamic from "next/dynamic";
+import {Button} from "@/packages/components/ui/button";
+import LoadingDots from "@/packages/components/icons/loading-dots";
 
 type Props = {
     initialRFPs: any[] // or RFP[] if you have the type locally
 }
+
+const NewRFPDialog = dynamic(
+    () =>
+        import("~web/components/edit-rfp-dialog").then(
+            (m) => m.NewRFPDialog
+        ),
+    {
+        ssr: false,
+        loading: () => (
+            <Button variant="cta">
+                <LoadingDots color="#808080" />
+            </Button>
+        ),
+    }
+);
 
 export function PrivateRFPsPage({ initialRFPs }: Props) {
 
