@@ -7,7 +7,7 @@ import { biosampleSearchParamsCache } from "@/packages/lib/validations"
 import { getValidFilters } from "@/packages/lib/data-table"
 import { PrivateDatasampleToolsPage } from "~web/components/private-datasample-tools-page"
 import { NewToolDialog } from "~web/components/edit-tool-dialog"
-import { getDatasamples } from "@/packages/lib/fetchers"
+import { getClinicalDatasets } from "@/packages/lib/fetchers"
 
 export const dynamic = "force-dynamic";
 
@@ -23,8 +23,32 @@ export default async function DataToolsPage(props: IndexPageProps) {
     const validFilters = getValidFilters(search.filters);
     const globalFilter = search.q ?? "";
 
-    const {data, pageCount} = await getDatasamples(
+    const {data, pageCount} = await getClinicalDatasets(
         session?.user.organizationId,
+        {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+
+            title: true,
+            cohortSize: true,
+            description: true,
+            contacts: true,
+            attachments: true,
+            private: true,
+            // pinned: true,
+            // metadata: true,
+            types: true,
+            notes: true,
+
+            institutionId: true,
+            institution: true,
+            geneId: true,
+            gene: true,
+            organizationId: true,
+            organization: {include: {conditions: {include: {condition: true}}}},
+            milestones: {include: {milestone: true}},
+        },
         {...search, q: globalFilter, filters: validFilters}
     )
 

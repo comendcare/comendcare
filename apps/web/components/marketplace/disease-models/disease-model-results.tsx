@@ -7,27 +7,22 @@ import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
 import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table";
-import { SearchParams } from "@/packages/components/types";
 
 const selector = (state: DiseaseModelSearchState) => ({
     searchResults: state.searchResults,
-    setSortBy: state.setSortBy
 })
 
 export function DiseaseModelSearchResults({
-    searchParams
+    isInitialized,
 }: {
-    searchParams?: SearchParams | undefined
+    isInitialized: boolean
 }) {
     const { 
         searchResults,
-        setSortBy
     } = useDiseaseModelSearchStore(useShallow(selector))
     const columns = useDiseaseModelsTableColumns()
 
-    setSortBy(searchParams?.sort)
-
-    if (!searchResults) {
+    if (!isInitialized || !searchResults) {
         return (
             <div className="h-full w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                 <Skeleton className="h-[286px] w-full"/>

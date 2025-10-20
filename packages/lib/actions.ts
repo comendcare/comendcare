@@ -1,16 +1,16 @@
 "use server"
 
 import prisma from "./prisma"
-import {
+import type {
     Roadmap,
     Organization,
-    Prisma,
     User,
     Invitation,
     PlatformNotification,
     Review,
     Institution, Condition,
 } from "@prisma/client"
+import {Prisma} from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {authOptions, withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "./auth"
 import {getSession} from "./auth"
@@ -4943,6 +4943,7 @@ export const updateMilestones = withOrganizationAuth(
                                         connect: {id: type.milestoneTypeId || type.milestoneType.id},
                                     },
                                 })),
+
                             },
                             biosamples: {
                                 deleteMany: {},

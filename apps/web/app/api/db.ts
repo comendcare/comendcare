@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import {PrismaClient} from "@prisma/client"
 import { fieldEncryptionExtension } from 'prisma-field-encryption'
 import { tmpdir } from "os"
 import fs from "fs"

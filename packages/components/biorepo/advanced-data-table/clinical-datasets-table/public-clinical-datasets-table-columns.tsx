@@ -22,7 +22,7 @@ function useColumnsPreset(explicit?: Preset) {
     return "default";
 }
 
-export function useClinicalDatasetsTableColumns(presetName?: Preset): ColumnDef<any>[] {
+export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, enableHiding: boolean = true, presetName?: Preset): ColumnDef<any>[] {
     const preset = useColumnsPreset(presetName);
 
     const comendColumns: ColumnDef<any>[] = [
@@ -51,8 +51,8 @@ export function useClinicalDatasetsTableColumns(presetName?: Preset): ColumnDef<
                 </Link>
             </div>
         ),
-        enableHiding: preset !== 'profile',
-        enableSorting: preset !== 'profile',
+        enableHiding,
+        enableSorting,
     },
     {
         id: "sortId.id", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -65,8 +65,8 @@ export function useClinicalDatasetsTableColumns(presetName?: Preset): ColumnDef<
                 <p>{row.original.id || 'No Dataset ID'}</p>
             </div>
         ),
-        enableHiding: preset !== 'profile',
-        enableSorting: preset !== 'profile',
+        enableHiding,
+        enableSorting,
         meta: { label: "Dataset ID" }
     },
     {
@@ -77,13 +77,13 @@ export function useClinicalDatasetsTableColumns(presetName?: Preset): ColumnDef<
       ),
       meta: {
         label: "Title",
-        placeholder: "Search titles...",
-        variant: "text",
-        icon: Text,
+        // placeholder: "Search titles...",
+        // variant: "text",
+        // icon: Text,
       },
       enableColumnFilter: true,
-        enableHiding: preset !== 'profile',
-        enableSorting: preset !== 'profile',
+        enableHiding,
+        enableSorting,
     },
     {
         id: "type.label", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -101,8 +101,8 @@ export function useClinicalDatasetsTableColumns(presetName?: Preset): ColumnDef<
             })}
           </>
         ),
-        enableHiding: preset !== 'profile',
-        enableSorting: preset !== 'profile',
+        enableHiding,
+        enableSorting,
         enableColumnFilter: true,
         meta: {
           label: "Type",
@@ -124,8 +124,8 @@ export function useClinicalDatasetsTableColumns(presetName?: Preset): ColumnDef<
                     : ''
             }</>
         ),
-        enableHiding: preset !== 'profile',
-        enableSorting: preset !== 'profile',
+        enableHiding,
+        enableSorting,
         meta: {
             label: "Cohort Size"
         }
@@ -141,8 +141,8 @@ export function useClinicalDatasetsTableColumns(presetName?: Preset): ColumnDef<
                 <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
             </div>
         ),
-        enableHiding: preset !== 'profile',
-        enableSorting: preset !== 'profile',
+        enableHiding,
+        enableSorting,
         meta: {
             label: "Condition"
         }
@@ -156,8 +156,8 @@ export function useClinicalDatasetsTableColumns(presetName?: Preset): ColumnDef<
         cell: ({row}) => (
             <>{row.original.gene?.symbol}</>
         ),
-        enableHiding: preset !== 'profile',
-        enableSorting: preset !== 'profile',
+        enableHiding,
+        enableSorting,
         meta: {
             label: "Gene"
         }
@@ -180,8 +180,8 @@ export function useClinicalDatasetsTableColumns(presetName?: Preset): ColumnDef<
             // return <></>
             return <>{row.original.institution?.name}</>
         },
-        enableHiding: preset !== 'profile',
-        enableSorting: preset !== 'profile',
+        enableHiding,
+        enableSorting,
         meta: {
             label: "Storage Facility"
         }
@@ -202,7 +202,7 @@ export function useClinicalDatasetsTableColumns(presetName?: Preset): ColumnDef<
             </ul>
         ),
         enableSorting: false,
-        enableHiding: preset !== 'profile',
+        enableHiding,
     },
     {
         id: "links",
@@ -227,7 +227,7 @@ export function useClinicalDatasetsTableColumns(presetName?: Preset): ColumnDef<
             </ul>
         ),
         enableSorting: false,
-        enableHiding: preset !== 'profile',
+        enableHiding,
     },
     {
         id: "description",
@@ -241,7 +241,7 @@ export function useClinicalDatasetsTableColumns(presetName?: Preset): ColumnDef<
             </div>
         ),
         enableSorting: false,
-        enableHiding: preset !== 'profile',
+        enableHiding,
     },
   ]
 

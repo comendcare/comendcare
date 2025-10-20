@@ -1,7 +1,7 @@
 "use client";
 
 import {useSession} from "next-auth/react";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {DeleteOrganizationAlertDialog} from "@comend/components/delete-organization-alert-dialog";
 import {
     DropdownMenu,

@@ -49,7 +49,7 @@ import {Table as TanstackTable} from "@tanstack/react-table"
 import {DotsHorizontalIcon} from "@radix-ui/react-icons";
 import {removeEmailFromWhitelist, removeProviderContactRequest} from "~admin/lib/actions"
 import {getCompanyContactRequests, getUserWhitelist} from "~admin/lib/fetchers"
-import {Company, Organization, Service, RFP} from "@prisma/client";
+import type {Company, Organization, Service, RFP} from "@prisma/client";
 import {
     Dialog,
     DialogContent,

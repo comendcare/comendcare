@@ -11,7 +11,7 @@ import {ChevronsUpDown, Pencil, Plus, Variable} from "lucide-react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@comend/components/ui/table";
 import {Milestone, milestoneCategories, MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap} from "@comend/lib/types";
 import {Badge} from "@comend/components/ui/badge";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {PrivateNoResearchPlansColumn, PrivateNoResearchPlansRow, PublicNoResearchPlans} from "./no-research-plans";
 import {NoProjects} from "./no-projects";
 import {FunctionComponent, ReactElement, useState} from "react";
@@ -31,7 +31,7 @@ export const RoadmapsCard = ({
         <Card className="organization-profile-tour-step4" data-testid="roadmaps-card">
             <CardHeader className="w-full pt-6 pb-2 space-y-4">
                 <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight" data-testid="roadmaps-heading">
+                    <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="roadmaps-heading">
                         Research plans
                     </CardTitle>
                     {pathname === "/app/profile" &&
@@ -73,6 +73,7 @@ export const RoadmapCard = ({
                                 setUrlView,
                                 subdomain,
                                 isPublic,
+                                organization,
                                 externalLinks
                             }: {
     roadmap: any,
@@ -82,6 +83,7 @@ export const RoadmapCard = ({
     setUrlView?: (view: string | undefined) => void,
     subdomain: string | undefined,
     isPublic: boolean,
+    organization?: Partial<Organization>,
     externalLinks: boolean
 }) => {
     const params = useSearchParams()
@@ -104,14 +106,14 @@ export const RoadmapCard = ({
         >
             <Card className="organization-profile-tour-step4 flex flex-col gap-0">
                 <CardHeader className="w-full pt-6 pb-0 space-y-4">
-                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
+                    <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight">
                         {roadmap.title || 'Untitled Research Plan'}
                     </CardTitle>
                     <CardDescription>
                         {roadmap.description}
                     </CardDescription>
                     <div className="flex gap-2">
-                        {RESEARCH_PLAN_TYPES.filter(typeOption => roadmap.modalities.includes(typeOption.value)).map((type: Option, index) =>
+                        {RESEARCH_PLAN_TYPES.filter(typeOption => (roadmap.modalities || []).includes(typeOption.value)).map((type: Option, index) =>
                             <ResearchPlanTypeBadge key={index} label={type.label}/>)}
                         <StageOfActivityBadge milestones={roadmap.milestones}/>
                     </div>
@@ -144,6 +146,7 @@ export const RoadmapCard = ({
                             subdomain={subdomain}
                             externalLinks={externalLinks}
                             urlMilestone={urlMilestone}
+                            organization={organization}
                             setUrlMilestone={setUrlMilestone}
                         />
                     </TabsContent>
@@ -171,6 +174,8 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
 }) => {
     const router = useRouter()
 
+    console.log(`roadmaps`, roadmaps)
+
     return (
         <Table>
             <TableHeader>
@@ -181,7 +186,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
             </TableHeader>
             <TableBody>
                 {RESEARCH_PLAN_TYPES.map((type, index) => {
-                    const roadmapsForModality = roadmaps.filter(roadmap => roadmap.modalities.includes(type.value) && type.value !== "OTHER")
+                    const roadmapsForModality = roadmaps.filter(roadmap => (roadmap.modalities || []).includes(type.value) && type.value !== "OTHER")
                     if (roadmapsForModality.length <= 0) return <></>
 
                     return (
@@ -208,13 +213,13 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
                         </CollapsibleTableGroup>
                     )
                 })}
-                {roadmaps.filter(roadmap => roadmap.modalities.length === 0 || roadmap.modalities.includes("OTHER")).length > 0 && (
+                {roadmaps.filter(roadmap => (roadmap.modalities || []).length === 0 || roadmap.modalities.includes("OTHER")).length > 0 && (
                     // group research plans with no type or 'other' type together in the table
                     <CollapsibleTableGroup
                         label={'Other'}
                         colSpan={2}
                     >
-                        {roadmaps.filter(roadmap => roadmap.modalities.length === 0 || roadmap.modalities.includes("OTHER")).map(roadmap => (
+                        {roadmaps.filter(roadmap => (roadmap.modalities || []).length === 0 || roadmap.modalities.includes("OTHER")).map(roadmap => (
                             <TableRow key={roadmap.id} className="cursor-pointer"
                                       onClick={() => rowClickCallback(roadmap)}>
                                 <TableCell>

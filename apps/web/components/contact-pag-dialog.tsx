@@ -17,7 +17,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import { mixpanelTrack, useMixpanelContext } from "@comend/lib/mixpanel";
 import { customerIOTrack, sendCustomerIOContactEmail } from "@comend/lib/customer-io";
 

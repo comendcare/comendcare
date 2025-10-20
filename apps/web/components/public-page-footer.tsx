@@ -1,10 +1,21 @@
 import logo from "@/public/logos/comend-full-logo.png"
-import {Facebook, Instagram, Linkedin, Twitter} from "lucide-react"
+import {createLucideIcon, Facebook, Instagram, Linkedin, Twitter} from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import {LinkPreview} from "~web/components/link-preview";
 import {Separator} from "@/packages/components/ui/separator";
 import React from "react";
+
+export const XIcon = createLucideIcon("X", [
+    [
+        "path",
+        {
+        d: "M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z",
+        stroke: "none",
+        fill: "currentColor",
+        },
+    ],
+]);
 
 export default function PublicPageFooter() {
     return (
@@ -15,7 +26,7 @@ export default function PublicPageFooter() {
                 <div
                     className="flex flex-col items-center space-y-8 sm:grid sm:grid-cols-2 sm:space-y-0">
                     <p className="inline-flex items-center self-start place-self-start justify-start">
-                        Made with ❤️ by
+                        Built with ❤️ on 
                         <LinkPreview url={"https://www.comendcare.com/"} target="_blank">
                             <Image className="w-24 inline" src={logo} alt={"Comend Logo"}/>
                         </LinkPreview>
@@ -55,19 +66,19 @@ export default function PublicPageFooter() {
                                 className="text-gray-700 transition hover:opacity-75"
                             >
                                 <span className="sr-only">LinkedIn</span>
-                                <Linkedin className="size-8"/>
+                                <Linkedin className="size-[33px] -mb-[1.25px]"/>
                             </a>
                         </li>
 
-                        <li>
+                        <li className="flex justify-center items-center">
                             <a
                                 href="https://twitter.com/comendcare"
                                 rel="noreferrer"
                                 target="_blank"
-                                className="text-gray-700 transition hover:opacity-75"
+                                className="text-gray-700 transition hover:opacity-75 mb-0 -ml-1"
                             >
-                                <span className="sr-only">Twitter</span>
-                                <Twitter className="size-8"/>
+                                <span className="sr-only">X</span>
+                                <XIcon className="size-8" />
                             </a>
                         </li>
                     </ul>

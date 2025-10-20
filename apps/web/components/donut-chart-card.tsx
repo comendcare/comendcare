@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { buttonVariants } from "@comend/components/ui/button";
-import { Organization } from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import { getMilestones } from "@/packages/lib/fetchers";
 import { StatusType } from "@comend/lib/types";
 

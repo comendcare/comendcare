@@ -39,7 +39,7 @@ import {
 import {Input} from "@comend/components/ui/input";
 import {Textarea} from "@comend/components/ui/textarea";
 import {createReview} from "@comend/lib/actions";
-import {Company, Milestone} from "@prisma/client";
+import type {Company, Milestone} from "@prisma/client";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";

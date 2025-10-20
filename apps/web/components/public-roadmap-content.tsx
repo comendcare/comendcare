@@ -8,7 +8,7 @@ import { cn } from "@comend/lib/utils"
 import { FloatingDock } from "./floating-dock"
 import { Mail, Share } from "lucide-react"
 import ShareDialog from "./share-dialog"
-import { Organization } from "@prisma/client"
+import type {Organization} from "@prisma/client"
 
 export function PublicRoadmapContent({organization, roadmap, subdomain, milestoneChangedCallback}: {organization: Partial<Organization>, roadmap: any, subdomain: string | undefined, milestoneChangedCallback?: (milestoneId: string | undefined) => void}) {
     const searchParams = useSearchParams()
@@ -45,6 +45,7 @@ export function PublicRoadmapContent({organization, roadmap, subdomain, mileston
                     setUrlMilestone={setMilestone}
                     urlView={view}
                     setUrlView={setView}
+                    organization={organization}
                 />
             </div>
             {roadmap.milestones && roadmap.milestones.length > 0 && (

@@ -5,9 +5,24 @@ import {nameToInitials} from "@comend/lib/utils";
 import {Member, Organization, User} from "@prisma/client";
 import Link from "next/link";
 import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
-import EditPagProfileAboutCardDialog from "~web/components/edit-pag-profile-about-card-dialog";
 import {Badge} from "@comend/components/ui/badge";
 import {mixpanelTrack} from "@comend/lib/mixpanel";
+import dynamic from "next/dynamic";
+import {Button} from "@/packages/components/ui/button";
+import LoadingDots from "@/packages/components/icons/loading-dots";
+import React from "react";
+
+const EditPagProfileAboutCardDialog = dynamic(
+    () => import("~web/components/edit-pag-profile-about-card-dialog"),
+    {
+        ssr: false,
+        loading: () =>
+            <Button variant="ghost" size="icon" aria-label="Owners only" disabled>
+                <LoadingDots color="#808080" />
+            </Button>
+    }
+);
+
 
 type OrgWithMembers = Partial<Organization> & { members: (Member & { user: User })[] };
 
@@ -30,7 +45,7 @@ export const PagProfileAboutCard = ({
     return (
         <Card className="organization-profile-tour-step1" data-testid="about-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight" data-testid="about-title">
+                <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="about-title">
                     About us
                 </CardTitle>
                 {organization && editable && <EditPagProfileAboutCardDialog organization={organization} />}

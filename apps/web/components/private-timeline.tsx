@@ -37,6 +37,7 @@ import { Badge } from "@/packages/components/ui/badge";
 import { DateView } from "./miletone-date-view";
 import { Separator } from "@/packages/components/ui/separator";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/packages/components/ui/card";
+import { Organization } from "@prisma/client";
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV !== "production"
 
@@ -47,75 +48,83 @@ const selector = (state: RoadmapState) => ({
     setMilestones: state.setMilestones,
 })
 
-export const TimelineView = ({sortBy, contextMenuRef}: {sortBy: string, contextMenuRef: React.RefObject<HTMLDivElement>}) => {
+export const TimelineView = ({
+    sortBy, 
+    organization, 
+    contextMenuRef
+}: {
+    sortBy: string, 
+    organization?: Organization,
+    contextMenuRef: React.RefObject<HTMLDivElement>
+}) => {
     const {
         selectedNodeIds,
         milestones,
         setMilestones
     } = useRoadmapStore(useShallow(selector))
 
-    const sensors = useSensors(
-        useSensor(MouseSensor),
-        useSensor(TouchSensor),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates
-        })
-    )
+    // const sensors = useSensors(
+    //     useSensor(MouseSensor),
+    //     useSensor(TouchSensor),
+    //     useSensor(KeyboardSensor, {
+    //         coordinateGetter: sortableKeyboardCoordinates
+    //     })
+    // )
 
-    function getDraggedData(id: string) {
-        const name = milestones?.find(item => item.id === id)?.title
-        const position = (milestones?.findIndex(item => item.id === id) || 0) + 1
-        const length = milestones?.length || 0
+    // function getDraggedData(id: string) {
+    //     const name = milestones?.find(item => item.id === id)?.title
+    //     const position = (milestones?.findIndex(item => item.id === id) || 0) + 1
+    //     const length = milestones?.length || 0
 
-        return {name, position, length}
-    }
+    //     return {name, position, length}
+    // }
 
-    const announcements: Announcements = {
-        onDragStart({active}) {
-            const data = getDraggedData(active?.id.toString())
-            const message = `Picked up milestone ${data.name} at position ${data.position} of ${data.length}`
-            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-            return message
-        },
-        onDragOver({active, over}) {
-            const activeData = getDraggedData(active?.id.toString())
+    // const announcements: Announcements = {
+    //     onDragStart({active}) {
+    //         const data = getDraggedData(active?.id.toString())
+    //         const message = `Picked up milestone ${data.name} at position ${data.position} of ${data.length}`
+    //         if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+    //         return message
+    //     },
+    //     onDragOver({active, over}) {
+    //         const activeData = getDraggedData(active?.id.toString())
 
-            if (over) {
-                const overData = getDraggedData(over?.id.toString())
-                const message = `Milestone ${activeData.name} was moved over position ${overData.position} of ${activeData.length}.`
-                if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-                return message
-            }
+    //         if (over) {
+    //             const overData = getDraggedData(over?.id.toString())
+    //             const message = `Milestone ${activeData.name} was moved over position ${overData.position} of ${activeData.length}.`
+    //             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+    //             return message
+    //         }
 
-            const message = `Milestone ${activeData.name} is no longer over a droppable position.`
-            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-            return message
-        },
-        onDragEnd({active, over}) {
-            const activeData = getDraggedData(active?.id.toString())
+    //         const message = `Milestone ${activeData.name} is no longer over a droppable position.`
+    //         if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+    //         return message
+    //     },
+    //     onDragEnd({active, over}) {
+    //         const activeData = getDraggedData(active?.id.toString())
 
-            if (over) {
-                const overData = getDraggedData(over?.id.toString())
-                const message = `Milestone ${activeData.name} was dropped into position ${overData.position} of ${activeData.length}`
-                if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-                return message
-            }
+    //         if (over) {
+    //             const overData = getDraggedData(over?.id.toString())
+    //             const message = `Milestone ${activeData.name} was dropped into position ${overData.position} of ${activeData.length}`
+    //             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+    //             return message
+    //         }
 
-            const message = `Milestone ${activeData} was dropped.`
-            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-            return message
-        },
-        onDragCancel({active}) {
-            const activeData = getDraggedData(active?.id.toString())
-            const message = `Dragging was cancelled. Milestone ${activeData.name} was dropped.`
-            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-            return message
-        },
-    }
+    //         const message = `Milestone ${activeData} was dropped.`
+    //         if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+    //         return message
+    //     },
+    //     onDragCancel({active}) {
+    //         const activeData = getDraggedData(active?.id.toString())
+    //         const message = `Dragging was cancelled. Milestone ${activeData.name} was dropped.`
+    //         if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+    //         return message
+    //     },
+    // }
 
     return (
         <ScrollArea className="w-full h-full px-10 pt-0">
-            <DndContext
+            {/* <DndContext
                 accessibility={{
                     announcements
                 }}
@@ -135,7 +144,7 @@ export const TimelineView = ({sortBy, contextMenuRef}: {sortBy: string, contextM
                         timelineOrder: index
                     })))
                 }}
-            >
+            > */}
                 <ol className="ml-2 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
                     <SortableContext 
                         disabled={sortBy !== "custom"}
@@ -190,11 +199,12 @@ export const TimelineView = ({sortBy, contextMenuRef}: {sortBy: string, contextM
                                 contextMenuRef={contextMenuRef}
                                 isPrivate={true}
                                 isDraggable={true}
+                                organization={organization}
                             />
                         ))}
                     </SortableContext>
                 </ol>
-            </DndContext>
+            {/* </DndContext> */}
         </ScrollArea>
     )
 }
@@ -207,6 +217,7 @@ export const DraggableTimelineItem = ({
     contextMenuRef,
     isPrivate = false,
     isDraggable = false,
+    organization,
 }: {
     milestone: Milestone, 
     index: number, 
@@ -214,7 +225,8 @@ export const DraggableTimelineItem = ({
     disabled: boolean,
     contextMenuRef?: React.RefObject<HTMLDivElement>,
     isPrivate?: boolean,
-    isDraggable?: boolean
+    isDraggable?: boolean,
+    organization?: Partial<Organization>,
 }) => {
     const {
         attributes,
@@ -321,7 +333,15 @@ export const DraggableTimelineItem = ({
                     milestone.nodeId && selectedNodeIds.includes(milestone.nodeId) ? "border-primary border-2" : ""
                 )}
             >
-                <TimelineItemContent isPrivate={true} milestone={milestone} isDraggable={isDraggable} disabled={disabled} attributes={attributes} listeners={listeners} />
+                <TimelineItemContent 
+                    isPrivate={true} 
+                    milestone={milestone} 
+                    isDraggable={isDraggable} 
+                    disabled={disabled} 
+                    attributes={attributes} 
+                    listeners={listeners} 
+                    organization={organization}
+                />
             </div>
         </li>
     )
@@ -332,6 +352,7 @@ export const TimelineItemContent = ({
     disabled = true,
     isDraggable = false,
     isPrivate = false,
+    organization,
     attributes,
     listeners
 }: {
@@ -339,6 +360,7 @@ export const TimelineItemContent = ({
     disabled?: boolean,
     isDraggable?: boolean,
     isPrivate?: boolean,
+    organization?: Partial<Organization>,
     attributes?: any,
     listeners?: any
 }) => {
@@ -402,7 +424,7 @@ export const TimelineItemContent = ({
             </time>
             {isPrivate && (
                 <div className="absolute top-[12px] right-0 p-2">
-                    <ProjectActionsMenu milestone={milestone as Milestone}/>
+                    <ProjectActionsMenu milestone={milestone as Milestone} organization={organization}/>
                 </div>
             )}
         </div>
@@ -439,25 +461,25 @@ export const TimelineItemContent = ({
             {(milestone?.biosamples?.length > 0 || milestone?.diseaseModels?.length > 0 || milestone?.tools?.length > 0) && (
                 <>
                     {(milestone.biosamples || []).map(({biosample}, index) => {
-                        const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
+                        const type = BIOSAMPLE_TYPE_OPTIONS.find((option, index) => option.value === biosample.types[0])
                         return (
-                            <Badge variant="green">
+                            <Badge key={index} variant="green">
                                 <TestTubeDiagonal className="h-4 w-4" />
                                 {`${biosample.id}`}
                             </Badge>
                         )
                     })}
                     {(milestone.diseaseModels || []).map(({diseaseModel}, index) => {
-                        const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
+                        const type = DISEASE_MODEL_TYPE_OPTIONS.find((option, index) => option.value === diseaseModel.types[0])
                         return (
-                            <Badge variant="green">
+                            <Badge key={index} variant="green">
                                 <Rat className="h-4 w-4" />
                                 {`${diseaseModel.id}`}
                             </Badge>
                         )
                     })}
                     {(milestone.tools || []).map(({tool}, index) => (
-                        <Badge variant="green">
+                        <Badge key={index} variant="green">
                             <Database className="h-4 w-4" />
                             {`${tool?.id}`}
                         </Badge>

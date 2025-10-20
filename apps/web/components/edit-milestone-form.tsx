@@ -12,7 +12,7 @@ import {
     FormItem,
     FormMessage,
     FormDescription,
-} from "@comend/components/ui/form" 
+} from "@comend/components/ui/form"
 import {Input} from "@comend/components/ui/input"
 import {AutosizeTextarea, Textarea} from "@comend/components/ui/textarea"
 import {Button} from "@comend/components/ui/button"
@@ -39,7 +39,17 @@ import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@comend/lib/data";
-import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option, BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS} from "@comend/lib/types"
+import {
+    Asset,
+    Milestone,
+    NODE_TYPE_OPTIONS,
+    RFP,
+    RFP_OPEN_TO_TYPE_OPTIONS,
+    StatusType,
+    Option,
+    BIOSAMPLE_TYPE_OPTIONS,
+    DISEASE_MODEL_TYPE_OPTIONS
+} from "@comend/lib/types"
 import {
     Biosample,
     DiseaseModel,
@@ -50,14 +60,6 @@ import {
     SavedCompany,
     Tool
 } from "@prisma/client"
-import {
-    getAssets,
-    getBiosamples,
-    getDatasamples,
-    getDiseaseModels,
-    getRFPs,
-    getSavedCompaniesFromOrganizationId
-} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group"
 import {ExternalContactField} from "./external-contact-field"
@@ -70,7 +72,6 @@ import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/too
 import MoneyInput from "@comend/components/money-input";
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group"
-import {PlateEditor} from "@comend/components/editor/plate-editor"
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs"
 import {CROSearchState, Recommendation, useCROSearchStore} from "@/state/search/croSearchStore"
 import {Card, CardContent} from "@comend/components/ui/card"
@@ -87,20 +88,49 @@ import {mixpanelTrack} from "@comend/lib/mixpanel"
 import ShareDialog from "./share-dialog"
 import {JsonObject} from "@prisma/client/runtime/library"
 import EditMilestoneDetailsPublicationsTab from "~web/components/edit-milestone-details-publications-tab";
-import { Skeleton } from "@comend/components/ui/skeleton"
-import EditMilestoneDetailsProjectsTab from "./edit-milestone-details-projects-tab"
-import { useOnborda } from "./onborda/OnbordaContext"
-import { EditRFPForm } from "./edit-rfp-form"
-import { CommandItem } from "@/packages/components/ui/command"
-import { usePathname } from "next/navigation"
-import { nanoid } from "nanoid"
-import { EditBiosampleToolForm } from "./edit-biosample-tool-form"
-import { EditDiseaseModelToolForm } from "./edit-disease-model-tool-form"
-import { EditDataToolForm } from "./edit-data-tool-form"
-import { MilestoneTypeBadge } from "@/packages/components/milestone-type-badge"
-import { Separator } from "@/packages/components/ui/separator"
-import { updateMilestones } from "@/packages/lib/actions"
-import { revalidate } from "@/packages/lib/revalidate"
+import {Skeleton} from "@comend/components/ui/skeleton"
+import {useOnborda} from "./onborda/OnbordaContext"
+import {EditRFPForm} from "./edit-rfp-form"
+import {CommandItem} from "@/packages/components/ui/command"
+import {usePathname} from "next/navigation"
+import {nanoid} from "nanoid"
+import {EditBiosampleToolForm} from "./edit-biosample-tool-form"
+import {EditDiseaseModelToolForm} from "./edit-disease-model-tool-form"
+import {EditDataToolForm} from "./edit-data-tool-form"
+import {MilestoneTypeBadge} from "@/packages/components/milestone-type-badge"
+import {Separator} from "@/packages/components/ui/separator"
+import dynamic from "next/dynamic";
+
+type PlateEditorProps = {
+    value: any[];
+    onChange: (v: any[]) => void;
+};
+
+const PlateEditor = dynamic<PlateEditorProps>(
+    () =>
+        import("@comend/components/editor/plate-editor").then(
+            (m) => m.PlateEditor   // ← pick the named export
+        ),
+    {
+        ssr: false, loading: () =>
+            <Skeleton className="w-full h-[200px]"/>
+    }
+);
+
+const EditMilestoneDetailsProjectsTab = dynamic(
+    () =>
+        import("./edit-milestone-details-projects-tab").then(
+            (m) => m.default   // ← pick the named export
+        ),
+    {
+        ssr: false, loading: () =>
+            <div className="flex flex-col gap-4">
+                <Skeleton className="w-full h-[230px]"/>
+                <Skeleton className="w-full h-[230px]"/>
+                <Skeleton className="w-full h-[230px]"/>
+            </div>
+    }
+);
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -180,14 +210,24 @@ export function EditMilestoneForm({
                                       organization,
                                       milestoneData,
                                       orgIsPublished,
+                                      biosampleOptions,
+                                      diseaseModelOptions,
+                                      clinicalDatasetOptions,
+                                      rfpOptions,
+                                      milestoneTypeOptions,
                                       onClose
                                   }: {
     organization: Organization | undefined
     milestoneData: Milestone
     orgIsPublished: boolean
+    biosampleOptions: Partial<Biosample>[],
+    diseaseModelOptions: Partial<DiseaseModel>[],
+    clinicalDatasetOptions: Partial<Tool>[],
+    rfpOptions: Partial<RFP>[],
+    milestoneTypeOptions: Partial<MilestoneType>[],
     onClose: () => void
 }) {
-    const {setMilestone, selectedNodeIds} = useRoadmapStore(useShallow(selector))
+    const {setMilestone} = useRoadmapStore(useShallow(selector))
     // const {recommendations, setRecommendations} = useCROSearchStore(useShallow(recommendationsSelector))
     // const {
     //     initialized: notificationsInitialized,
@@ -200,9 +240,7 @@ export function EditMilestoneForm({
     const pathname = usePathname()
     // const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
-    const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const [fetchedTools, setFetchedTools] = useState<Option[]>([])
-    const [fetchedRFPs, setFetchedRFPs] = useState<RFP[]>([])
     const [tab, setTab] = useState<string>("edit")
     // const {step} = useOnbordaStore(useShallow(onbordaSelector))
     // const {isOnbordaVisible} = useOnborda()
@@ -211,24 +249,23 @@ export function EditMilestoneForm({
     const [createBiosampleIsOpen, setCreateBiosampleIsOpen] = useState(false)
     const [createDiseaseModelIsOpen, setCreateDiseaseModelIsOpen] = useState(false)
     const [createClincalDatasetIsOpen, setCreateClinicalDatasetIsOpen] = useState(false)
-    const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
-    const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
+    // const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
+    // const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
 
-    useEffect(() => {
-        async function fetchSavedCompanies() {
-            const res = await getSavedCompaniesFromOrganizationId(
-                session?.user?.organizationId,
-                { companyId: true }
-            );
+    // useEffect(() => {
+    //     async function fetchSavedCompanies() {
+    //         const res = await getSavedCompaniesFromOrganizationId(
+    //             session?.user?.organizationId,
+    //             { companyId: true }
+    //         );
 
-            if (res.success && res.data) {
-                setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
-            }
-        }
+    //         if (res.success && res.data) {
+    //             setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
+    //         }
+    //     }
 
-        fetchSavedCompanies();
-    }, [session, status]);
-
+    //     fetchSavedCompanies();
+    // }, [session, status]);
 
     // state for adding fields
     const [hasBudget, setHasBudget] = useState(milestoneData?.budget || false)
@@ -242,7 +279,10 @@ export function EditMilestoneForm({
             nodeType: milestoneData?.nodeType || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            types: ((milestoneData?.types || []).map((type: any) => type.milestoneType) || []),
+            types: ((milestoneData?.types || []).map((type: any) => ({
+                ...type.milestoneType,
+                value: type.milestoneTypeId
+            })) || []),
             otherTypeDetails: typeof milestoneData?.metadata === 'object' ? (milestoneData.metadata as {
                 [key: string]: any
             })?.otherTypeDetails : undefined,
@@ -256,11 +296,10 @@ export function EditMilestoneForm({
             openTo: milestoneData?.openTo || [],
             tools: [
                 ...(milestoneData?.biosamples || []).map(({biosample}) => {
-                    const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
                     return (
                         {
-                            value: biosample.id, 
-                            type: 'Biosamples', 
+                            value: biosample.id,
+                            type: 'Biosamples',
                             icon: 'test-tube-diagonal',
                             // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
                             label: `${biosample.id}`,
@@ -269,10 +308,9 @@ export function EditMilestoneForm({
                     )
                 }),
                 ...(milestoneData?.diseaseModels || []).map(({diseaseModel}) => {
-                    const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
                     return (
                         {
-                            value: diseaseModel.id, 
+                            value: diseaseModel.id,
                             label: `${diseaseModel.id}`,
                             icon: 'rat',
                             type: 'Disease Models',
@@ -283,8 +321,8 @@ export function EditMilestoneForm({
                 ...(milestoneData?.tools || []).map(({tool}) => {
                     return (
                         {
-                            value: tool?.id, 
-                            label: `${tool?.id}`, 
+                            value: tool?.id,
+                            label: `${tool?.id}`,
                             icon: 'database',
                             type: 'Clinical Datasets',
                             datasample: tool,
@@ -416,10 +454,6 @@ export function EditMilestoneForm({
         //     } as Milestone], {limit: 3})
         // }
 
-        // toast('Success!', {
-        //     position: "bottom-left",
-        //     description: 'The changes to your milestone have been successfully saved.'
-        // })
         setIsMigrating(false)
     }
 
@@ -432,7 +466,7 @@ export function EditMilestoneForm({
 
     const handleMilestoneFormSubmitCallback = useCallback(
         handleMilestoneFormSubmit,
-        [milestoneData, session?.user.organizationId, setMilestone, milestoneTypes]
+        [milestoneData, setMilestone, milestoneTypeOptions]
     )
 
     const handleShare = async () => {
@@ -459,13 +493,11 @@ export function EditMilestoneForm({
 
     const init = async () => {
         if (session?.user.organizationId) {
-            const biosamples = await getBiosamples(session.user.organizationId)
-            const formattedBiosamples: Option[] = biosamples.data.map((biosample: Biosample, index: number) => {
-                const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === biosample.types[0])
+            const formattedBiosamples: Option[] = (biosampleOptions || []).map((biosample: Partial<Biosample>,) => {
                 return (
                     {
-                        value: biosample.id, 
-                        type: 'Biosamples', 
+                        value: biosample.id || '',
+                        type: 'Biosamples',
                         icon: "test-tube-diagonal",
                         // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
                         label: `${biosample.id}`,
@@ -473,12 +505,10 @@ export function EditMilestoneForm({
                     }
                 )
             })
-            const diseaseModels = await getDiseaseModels(session.user.organizationId)
-            const formattedDiseaseModels: Option[] = diseaseModels.data.map((diseaseModel: DiseaseModel) => {
-                const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === diseaseModel.types[0])
+            const formattedDiseaseModels: Option[] = (diseaseModelOptions || []).map((diseaseModel: Partial<DiseaseModel>) => {
                 return (
                     {
-                        value: diseaseModel.id, 
+                        value: diseaseModel.id || '',
                         label: `${diseaseModel.id}`,
                         icon: 'rat',
                         type: 'Disease Models',
@@ -486,12 +516,11 @@ export function EditMilestoneForm({
                     }
                 )
             })
-            const datasamples = await getDatasamples(session.user.organizationId)
-            const formattedDatasamples: Option[] = datasamples.data.map((datasample: Tool) => {
+            const formattedDatasamples: Option[] = (clinicalDatasetOptions || []).map((datasample: Partial<Tool>) => {
                 return (
                     {
-                        value: datasample.id, 
-                        label: datasample.id, 
+                        value: datasample.id || '',
+                        label: `${datasample.id}`,
                         icon: 'database',
                         type: 'Clinical Datasets',
                         datasample
@@ -499,36 +528,6 @@ export function EditMilestoneForm({
                 )
             })
             setFetchedTools([...formattedBiosamples, ...formattedDiseaseModels, ...formattedDatasamples])
-
-            const rfpsResponse = await getRFPs(session.user.organizationId, {
-                id: true,
-                title: true,
-                description: true,
-                openTo: true,
-                startDate: true,
-                endDate: true,
-                contacts: true,
-                attachments: true,
-                budget: true,
-                private: true,
-                headerImage: true,
-                milestones: true
-            })
-            if (rfpsResponse.success && rfpsResponse.data) {
-                setFetchedRFPs(rfpsResponse.data || [])
-            }
-        }
-
-        // get milestone types from database
-        const response = await getMilestoneTypes({
-            id: true,
-            label: true,
-            services: true,
-            categories: true,
-            description: true
-        })
-        if (response.success && response.data) {
-            setMilestoneTypes(response.data || [])
         }
 
         // if (milestoneData) {
@@ -621,7 +620,7 @@ export function EditMilestoneForm({
                                 <Loading/>
                             ) : (
                                 <>
-                                    <Separator />
+                                    <Separator/>
                                     <TabsContent value="edit" className="space-y-6 w-full h-full">
                                         <div className="w-full grid grid-cols-[100px_auto] gap-2 items-center">
                                             <FormLabel>Visibility</FormLabel>
@@ -688,7 +687,7 @@ export function EditMilestoneForm({
                                                 {formData?.types?.length === 3 &&
                                                     <FormDescription>{`Maximum selection is 3 types.`}</FormDescription>}
                                             </div>
-                                            <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypes}/>
+                                            <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypeOptions}/>
 
                                             <FormLabel>{`Project Status`}</FormLabel>
                                             <StatusFormField
@@ -726,8 +725,9 @@ export function EditMilestoneForm({
                                                                 groupBy={'type'}
                                                                 creatable={true}
                                                                 creatableItemOverride={() => (
-                                                                    <div className="w-full p-1 bg-white flex flex-col gap-1">
-                                                                        <Separator />
+                                                                    <div
+                                                                        className="w-full p-1 bg-white flex flex-col gap-1">
+                                                                        <Separator/>
                                                                         <Button
                                                                             value={undefined}
                                                                             variant={'ghost'}
@@ -788,12 +788,12 @@ export function EditMilestoneForm({
                                                                     icon: 'megaphone'
                                                                 } as Option))}
                                                                 onChange={field.onChange}
-                                                                defaultOptions={fetchedRFPs.map(rfp => ({
+                                                                defaultOptions={rfpOptions?.map(rfp => ({
                                                                     ...rfp,
                                                                     value: rfp.id,
                                                                     label: rfp.title,
                                                                 } as Option))}
-                                                                options={fetchedRFPs.map(rfp => ({
+                                                                options={rfpOptions?.map(rfp => ({
                                                                     ...rfp,
                                                                     value: rfp.id,
                                                                     label: rfp.title
@@ -809,8 +809,9 @@ export function EditMilestoneForm({
                                                                 }
                                                                 creatable={true}
                                                                 creatableItemOverride={() => (
-                                                                    <div className="w-full px-1 pb-1 flex flex-col gap-1">
-                                                                        <Separator />
+                                                                    <div
+                                                                        className="w-full px-1 pb-1 flex flex-col gap-1">
+                                                                        <Separator/>
                                                                         <Button
                                                                             value={undefined}
                                                                             variant={'ghost'}
@@ -853,7 +854,7 @@ export function EditMilestoneForm({
                                                                 setHasBudget(false)
                                                             }}
                                                         >
-                                                            <Trash />
+                                                            <Trash/>
                                                         </Button>
                                                     </span>
                                                 </>
@@ -918,7 +919,7 @@ export function EditMilestoneForm({
                                                                         setHasStartDate(false)
                                                                     }}
                                                                 >
-                                                                    <Trash />
+                                                                    <Trash/>
                                                                 </Button>
                                                             </div>
                                                         </>
@@ -986,7 +987,7 @@ export function EditMilestoneForm({
                                                                             setHasEndDate(false)
                                                                         }}
                                                                     >
-                                                                        <Trash />
+                                                                        <Trash/>
                                                                     </Button>
                                                                 </div>
                                                                 <FormMessage/>
@@ -1005,17 +1006,17 @@ export function EditMilestoneForm({
                                         )}
 
                                         {(
-                                            !hasBudget || 
-                                            !hasStartDate || 
-                                            !hasEndDate || 
-                                            !(formData?.contacts && formData?.contacts.length > 0) || 
+                                            !hasBudget ||
+                                            !hasStartDate ||
+                                            !hasEndDate ||
+                                            !(formData?.contacts && formData?.contacts.length > 0) ||
                                             !(formData?.attachments && formData?.attachments.length > 0)
                                         ) && (
                                             <>
                                                 {/* <FormLabel>Additional Properties</FormLabel> */}
                                                 <span className="flex flex-wrap gap-2">
                                                     {(!hasBudget) && (
-                                                        <Button 
+                                                        <Button
                                                             onClick={() => setHasBudget(true)}
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
@@ -1024,7 +1025,7 @@ export function EditMilestoneForm({
                                                         </Button>
                                                     )}
                                                     {(!hasStartDate) && (
-                                                        <Button 
+                                                        <Button
                                                             onClick={() => setHasStartDate(true)}
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
@@ -1033,7 +1034,7 @@ export function EditMilestoneForm({
                                                         </Button>
                                                     )}
                                                     {(!hasEndDate) && (
-                                                        <Button 
+                                                        <Button
                                                             onClick={() => setHasEndDate(true)}
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
@@ -1042,7 +1043,7 @@ export function EditMilestoneForm({
                                                         </Button>
                                                     )}
                                                     {(!formData?.contacts || formData?.contacts.length <= 0) && (
-                                                        <Button 
+                                                        <Button
                                                             onClick={() => {
                                                                 form.setValue("contacts", [
                                                                     {name: "", email: "", role: null}
@@ -1055,7 +1056,7 @@ export function EditMilestoneForm({
                                                         </Button>
                                                     )}
                                                     {(!formData?.attachments || formData?.attachments.length <= 0) && (
-                                                        <Button 
+                                                        <Button
                                                             onClick={() => {
                                                                 form.setValue("attachments", [
                                                                     {name: '', link: ''} as any
@@ -1204,8 +1205,8 @@ export function EditMilestoneForm({
             </Form>
 
             <Dialog open={createBiosampleIsOpen} onOpenChange={setCreateBiosampleIsOpen}>
-                <DialogContent>
-                    <DialogHeader>
+                <DialogContent className="gap-0">
+                    <DialogHeader className="pb-4">
                         <DialogTitle>
                             Create Biosample Tool
                         </DialogTitle>
@@ -1213,32 +1214,31 @@ export function EditMilestoneForm({
                             {`Create your Tool here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditBiosampleToolForm 
-                        toolData={{}} 
+                    <EditBiosampleToolForm
+                        toolData={{}}
                         closeDialog={(newBiosample) => {
                             setCreateBiosampleIsOpen(false)
 
                             if (newBiosample) {
-                                const type = BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === newBiosample.types[0])
                                 form.setValue("tools", [
                                     ...(form.getValues("tools") || []),
                                     {
-                                        value: newBiosample.id, 
-                                        type: 'Biosamples', 
+                                        value: newBiosample.id,
+                                        type: 'Biosamples',
                                         // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
                                         label: `${newBiosample.id}`,
                                         biosample: newBiosample
                                     }
                                 ])
                             }
-                        }} 
+                        }}
                     />
                 </DialogContent>
             </Dialog>
 
             <Dialog open={createDiseaseModelIsOpen} onOpenChange={setCreateDiseaseModelIsOpen}>
-                <DialogContent>
-                    <DialogHeader>
+                <DialogContent className="gap-0">
+                    <DialogHeader className="pb-4">
                         <DialogTitle>
                             Create Disease Model Tool
                         </DialogTitle>
@@ -1246,31 +1246,30 @@ export function EditMilestoneForm({
                             {`Create your Tool here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditDiseaseModelToolForm 
-                        toolData={{}} 
+                    <EditDiseaseModelToolForm
+                        toolData={{}}
                         closeDialog={(newDiseaseModel) => {
                             setCreateDiseaseModelIsOpen(false)
 
                             if (newDiseaseModel) {
-                                const type = DISEASE_MODEL_TYPE_OPTIONS.find(option => option.value === newDiseaseModel.types[0])
                                 form.setValue("tools", [
                                     ...(form.getValues("tools") || []),
                                     {
-                                        value: newDiseaseModel.id, 
+                                        value: newDiseaseModel.id,
                                         label: `${newDiseaseModel.id}`,
                                         type: 'Disease Models',
                                         diseaseModel: newDiseaseModel
                                     }
                                 ])
                             }
-                        }} 
+                        }}
                     />
                 </DialogContent>
             </Dialog>
 
             <Dialog open={createClincalDatasetIsOpen} onOpenChange={setCreateClinicalDatasetIsOpen}>
-                <DialogContent>
-                    <DialogHeader>
+                <DialogContent className="gap-0">
+                    <DialogHeader className="pb-4">
                         <DialogTitle>
                             Create Data Tool
                         </DialogTitle>
@@ -1278,8 +1277,8 @@ export function EditMilestoneForm({
                             {`Create your Tool here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditDataToolForm 
-                        toolData={{}} 
+                    <EditDataToolForm
+                        toolData={{}}
                         closeDialog={(newDatasample) => {
                             setCreateClinicalDatasetIsOpen(false)
 
@@ -1287,21 +1286,21 @@ export function EditMilestoneForm({
                                 form.setValue("tools", [
                                     ...(form.getValues("tools") || []),
                                     {
-                                        value: newDatasample.id, 
-                                        label: newDatasample.id, 
+                                        value: newDatasample.id,
+                                        label: newDatasample.id,
                                         type: 'Clinical Datasets',
                                         datasample: newDatasample
                                     }
                                 ])
                             }
-                        }} 
+                        }}
                     />
                 </DialogContent>
             </Dialog>
 
             <Dialog open={createRFPIsOpen} onOpenChange={setCreateRFPIsOpen}>
-                <DialogContent>
-                    <DialogHeader>
+                <DialogContent className="gap-0">
+                    <DialogHeader className="pb-4">
                         <DialogTitle>
                             Create an RFP
                         </DialogTitle>
@@ -1309,16 +1308,16 @@ export function EditMilestoneForm({
                             {`Create your RFP here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditRFPForm 
+                    <EditRFPForm
                         rfpData={{
                             milestones: [
                                 {
-                                    milestoneId: milestoneData.id, 
-                                    rfpId: nanoid(), 
+                                    milestoneId: milestoneData.id,
+                                    rfpId: nanoid(),
                                     milestone: milestoneData
                                 } as any
                             ]
-                        }} 
+                        }}
                         closeDialog={(newRFP) => {
                             setCreateRFPIsOpen(false)
 
@@ -1328,7 +1327,7 @@ export function EditMilestoneForm({
                                     newRFP as any
                                 ])
                             }
-                        }} 
+                        }}
                     />
                 </DialogContent>
             </Dialog>
@@ -1389,8 +1388,8 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                                 {...field}
                                 maxSelected={3}
                                 badgeClassName={badgeVariants({variant: "lightBlue"})}
-                                defaultOptions={milestoneTypes.map(type => ({...type, value: type.id}))}
-                                options={milestoneTypes.map(type => ({...type, value: type.id}))}
+                                defaultOptions={milestoneTypes?.map(type => ({...type, value: type.id}))}
+                                options={milestoneTypes?.map(type => ({...type, value: type.id}))}
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
                                 placeholder="Project type"
@@ -1406,11 +1405,11 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                 )}
             />
 
-            {types.map((type: any) => type?.value).includes("OTHER") && (
+            {types?.map((type: any) => type?.value).includes("OTHER") && (
                 <>
                     <div>
-                        <FormLabel className="text-md">{`Type Description`}</FormLabel>
-                        <FormDescription>{`This will be used to improve the platform.`}</FormDescription>
+                        <FormLabel className="text-sm">{`Type Description`}</FormLabel>
+                        <FormDescription className="text-xs">{`This will be used to improve the platform.`}</FormDescription>
                     </div>
                     <FormField
                         control={form.control}
@@ -1438,7 +1437,7 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
 export const PrivatePublicFormField = ({
                                            form,
                                            formData,
-                                        //    disabled = false,
+                                           //    disabled = false,
                                            mixpanelTrackCallback
                                        }: {
     form: any,
@@ -1524,10 +1523,10 @@ export const PrivatePublicFormField = ({
                                 <FormControl>
                                     <span className="flex gap-2">
                                         <RadioGroupItem value="PRIVATE"/>
-                                        <Tooltip 
+                                        <Tooltip
                                             // disableHoverableContent={disabled}
                                         >
-                                            <TooltipTrigger 
+                                            <TooltipTrigger
                                                 // disabled={disabled} 
                                                 asChild
                                             >
@@ -1549,10 +1548,10 @@ export const PrivatePublicFormField = ({
                                 <FormControl>
                                     <span className="flex gap-2">
                                         <RadioGroupItem value="PUBLIC"/>
-                                        <Tooltip 
+                                        <Tooltip
                                             // disableHoverableContent={disabled}
                                         >
-                                        <TooltipTrigger 
+                                        <TooltipTrigger
                                             // disabled={disabled} 
                                             asChild
                                         >

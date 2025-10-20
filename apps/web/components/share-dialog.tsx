@@ -6,7 +6,7 @@ import {
     DialogTitle,
 } from "@comend/components/ui/dialog"
 import {toast} from "sonner";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {Button} from "@comend/components/ui/button";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@comend/components/ui/accordion";
@@ -151,17 +151,21 @@ export default function ShareDialog({
                             {/*    </svg>*/}
                             {/*</a>*/}
                             <a
-                                className="border hover:bg-[#1d9bf0] w-12 h-12 fill-[#1d9bf0] hover:fill-white border-blue-200 rounded-full flex items-center justify-center shadow-md hover:shadow-sky-500/50 cursor-pointer"
+                                className="border hover:bg-black w-12 h-12 fill-black hover:fill-white border-black-200 rounded-full flex items-center justify-center shadow-md hover:shadow-gray-500/50 cursor-pointer"
                                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("Discover powerful research tools on Comend! 🚀")}&url=${encodeURIComponent(url)}&hashtags=research,healthtech,Comend`}
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 onClick={() => {
-                                    if (trackShareEvent) trackMixpanelShareEvent("Twitter")
+                                    if (trackShareEvent) trackMixpanelShareEvent("X")
                                 }}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24">
                                     <path
-                                        d="M19.633 7.997c.013.175.013.349.013.523 0 5.325-4.053 11.461-11.46 11.461-2.282 0-4.402-.661-6.186-1.809.324.037.636.05.973.05a8.07 8.07 0 0 0 5.001-1.721 4.036 4.036 0 0 1-3.767-2.793c.249.037.499.062.761.062.361 0 .724-.05 1.061-.137a4.027 4.027 0 0 1-3.23-3.953v-.05c.537.299 1.16.486 1.82.511a4.022 4.022 0 0 1-1.796-3.354c0-.748.199-1.434.548-2.032a11.457 11.457 0 0 0 8.306 4.215c-.062-.3-.1-.611-.1-.923a4.026 4.026 0 0 1 4.028-4.028c1.16 0 2.207.486 2.943 1.272a7.957 7.957 0 0 0 2.556-.973 4.02 4.02 0 0 1-1.771 2.22 8.073 8.073 0 0 0 2.319-.624 8.645 8.645 0 0 1-2.019 2.083z"></path>
+                                        // d="M19.633 7.997c.013.175.013.349.013.523 0 5.325-4.053 11.461-11.46 11.461-2.282 0-4.402-.661-6.186-1.809.324.037.636.05.973.05a8.07 8.07 0 0 0 5.001-1.721 4.036 4.036 0 0 1-3.767-2.793c.249.037.499.062.761.062.361 0 .724-.05 1.061-.137a4.027 4.027 0 0 1-3.23-3.953v-.05c.537.299 1.16.486 1.82.511a4.022 4.022 0 0 1-1.796-3.354c0-.748.199-1.434.548-2.032a11.457 11.457 0 0 0 8.306 4.215c-.062-.3-.1-.611-.1-.923a4.026 4.026 0 0 1 4.028-4.028c1.16 0 2.207.486 2.943 1.272a7.957 7.957 0 0 0 2.556-.973 4.02 4.02 0 0 1-1.771 2.22 8.073 8.073 0 0 0 2.319-.624 8.645 8.645 0 0 1-2.019 2.083z"
+                                        d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"
+                                        stroke="none"
+                                        // fill="currentColor"
+                                    ></path>
                                 </svg>
                             </a>
                             {/*<a*/}
@@ -204,7 +208,7 @@ export default function ShareDialog({
                                     if (trackShareEvent) trackMixpanelShareEvent("Email")
                                 }}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24">
                                     <path
                                         d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6zm3.519 0L12 11.671 18.481 6H5.52zM20 7.329l-7.341 6.424a1 1 0 0 1-1.318 0L4 7.329V18h16V7.329z"
                                         fill="0D0D0D"
@@ -237,7 +241,7 @@ export default function ShareDialog({
                                     if (trackShareEvent) trackMixpanelShareEvent("Linkedin")
                                 }}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24">
                                     <path
                                         d="M20.47,2H3.53A1.45,1.45,0,0,0,2.06,3.43V20.57A1.45,1.45,0,0,0,3.53,22H20.47a1.45,1.45,0,0,0,1.47-1.43V3.43A1.45,1.45,0,0,0,20.47,2ZM8.09,18.74h-3v-9h3ZM6.59,8.48h0a1.56,1.56,0,1,1,0-3.12,1.57,1.57,0,1,1,0,3.12ZM18.91,18.74h-3V13.91c0-1.21-.43-2-1.52-2A1.65,1.65,0,0,0,12.85,13a2,2,0,0,0-.1.73v5h-3s0-8.18,0-9h3V11A3,3,0,0,1,15.46,9.5c2,0,3.45,1.29,3.45,4.06Z"/>
                                 </svg>

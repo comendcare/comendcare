@@ -25,7 +25,33 @@ export default async function DiseaseModelToolsPage(props: IndexPageProps) {
 
     const {data, pageCount} = await getDiseaseModels(
         session?.user.organizationId,
-        {...search, q: globalFilter, filters: validFilters}
+        {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+
+            description: true,
+            contacts: true,
+            attachments: true,
+            private: true,
+            // pinned: true,
+            // metadata: true,
+            types: true,
+            genotype: true,
+            strain: true,
+            notes: true,
+
+            institutionId: true,
+            institution: true,
+            geneId: true,
+            gene: true,
+            conditionId: true,
+            condition: true,
+            organizationId: true,
+            organization: {include: {conditions: {include: {condition: true}}}},
+            milestones: {include: {milestone: true}},
+        },
+        {...search, q: globalFilter, filters: validFilters},
     )
 
     // not part of an org

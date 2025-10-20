@@ -4,12 +4,22 @@ import {authOptions} from "@/packages/lib/auth";
 import prisma from "@/packages/lib/prisma";
 import AppClientShell from "./_client-shell";
 import InvitationGate from "~web/components/invitation-gate";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import {Button} from "@/packages/components/ui/button";
 import Link from "next/link";
 import {SidebarTrigger} from "@/packages/components/ui/sidebar";
-import {NavUser} from "~web/components/nav-user";
 import * as React from "react";
+import dynamic from "next/dynamic";
+
+const NavUser = dynamic(
+    () => import("~web/components/nav-user").then(m => m.NavUser),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="h-8 w-8 rounded-lg bg-gray-200 animate-pulse" aria-label="Loading user menu" />
+        ),
+    }
+);
 
 export default async function AppLayoutServer({children}: { children: React.ReactNode }) {
     const session = await getServerSession(authOptions);

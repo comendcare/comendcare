@@ -6,7 +6,6 @@ import {PAGProfileRFPsHoverableCard} from "~web/components/pag-profile-rfps-card
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
-import EditPAGProfileHeaderDialog from "~web/components/edit-pag-profile-header-dialog";
 import {Building2, Calendar, CircleDollarSign, ExternalLink, HandCoins} from "lucide-react";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {Dialog, DialogContent, DialogTrigger} from "@comend/components/ui/dialog";
@@ -17,8 +16,11 @@ import {EditablePAGBannerPhoto} from "./editable-pag-banner-photo";
 import {PAGProfileToolsCard} from "./pag-profile-tools-card";
 import Link from "next/link";
 import { SearchParams } from "@/packages/components/types";
+import dynamic from "next/dynamic";
+import LoadingDots from "@/packages/components/icons/loading-dots";
+import type { Biosample, DiseaseModel, Tool } from "@prisma/client";
 
-type ToolCounts = {
+export type ToolCounts = {
     biosampleCount: number;
     diseaseModelCount: number;
     clinicalDatasetCount: number;
@@ -29,17 +31,47 @@ type PAGProfilePageProps = {
     conditions: any[];
     roadmaps: any[];
     toolCounts: ToolCounts;
+    biosamples: Biosample[];
+    biosamplesPageCount: number;
+    diseaseModels: DiseaseModel[];
+    diseaseModelsPageCount: number;
+    clinicalDatasets: Tool[];
+    clinicalDatasetsPageCount: number;
     rfps: any[];
     isOwner: boolean;
     rootDomain: string;
     searchParams: SearchParams
 };
 
+
+const EditPAGProfileHeaderDialog = dynamic(
+    () =>
+        import("~web/components/edit-pag-profile-header-dialog").then(
+            (m) => m.default
+        ),
+    {
+        ssr: false,
+        loading: () => (
+            <Button
+                variant="ghost"
+            >
+                <LoadingDots color="#808080" />
+            </Button>
+        ),
+    }
+);
+
 export default function PAGProfilePage({
                                            organization,
                                            conditions,
                                            roadmaps,
                                            toolCounts,
+                                           biosamples,
+                                           biosamplesPageCount,
+                                           diseaseModels,
+                                           diseaseModelsPageCount,
+                                           clinicalDatasets,
+                                           clinicalDatasetsPageCount,
                                            rfps,
                                            isOwner,
                                            rootDomain,
@@ -189,7 +221,17 @@ export default function PAGProfilePage({
                                     />
                                     <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
                                     {/* tools card handles it's own data state via zustand - necessary for pagination to work properly */}
-                                    <PAGProfileToolsCard organizationId={organization.id} toolCounts={toolCounts} searchParams={searchParams}/>
+                                    <PAGProfileToolsCard 
+                                        organization={organization}
+                                        searchParams={searchParams}
+                                        toolCounts={toolCounts}
+                                        biosamples={biosamples}
+                                        biosamplesPageCount={biosamplesPageCount}
+                                        diseaseModels={diseaseModels}
+                                        diseaseModelsPageCount={diseaseModelsPageCount}
+                                        clinicalDatasets={clinicalDatasets}
+                                        clinicalDatasetsPageCount={clinicalDatasetsPageCount}
+                                    />
                                 </div>
                             </div>
                         </div>

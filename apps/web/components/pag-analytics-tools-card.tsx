@@ -16,7 +16,6 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
         <Card className="col-span-4 flex flex-col">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <Microscope className="h-5 w-5"/>
                     Toolkit overview
                 </CardTitle>
             </CardHeader>
@@ -40,7 +39,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                                 <ExternalLink className="h-4 w-4 text-muted-foreground"/>
                             </Link>
                         </div>
-                        <div className="text-lg font-bold">
+                        <div className="text-lg font-semibold">
                             {organization.biosamples.length}
                         </div>
                     </div>
@@ -63,7 +62,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                                 <ExternalLink className="h-4 w-4 text-muted-foreground"/>
                             </Link>
                         </div>
-                        <div className="text-lg font-bold">
+                        <div className="text-lg font-semibold">
                             {organization.diseaseModel.length}
                         </div>
                     </div>
@@ -86,14 +85,14 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                                 <ExternalLink className="h-4 w-4 text-muted-foreground"/>
                             </Link>
                         </div>
-                        <div className="text-lg font-bold">
+                        <div className="text-lg font-semibold">
                             {organization.tools.length}
                         </div>
                     </div>
                 </div>
 
                 {/* Open Access Requests */}
-                <div className="pt-4 border-t">
+                {/* <div className="pt-4 border-t">
                     <div className="flex items-center justify-between">
                         <span className="flex flex-row items-center justify-center gap-x-2 text-sm font-medium">
                             Open access requests
@@ -123,11 +122,11 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                                 </Link>
                             </TooltipProvider>
                         </span>
-                        <div className="text-2xl font-bold">
+                        <div className="text-2xl font-semibold">
                             {organization.materialAndDataAccessRequests.length}
                         </div>
                     </div>
-                </div>
+                </div> */}
             </CardContent>
         </Card>
     );

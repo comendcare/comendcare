@@ -3,7 +3,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/ca
 import {cn} from "@comend/lib/utils";
 import {faker} from "@faker-js/faker";
 import {Badge} from "@comend/components/ui/badge";
-import {Organization} from "@prisma/client";
+import type {Organization} from "@prisma/client";
 import Link from "next/link";
 
 const pag = {

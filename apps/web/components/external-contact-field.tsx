@@ -1,6 +1,6 @@
 import { Button } from "@comend/components/ui/button"
 import { Input } from "@comend/components/ui/input"
-import { Prisma } from "@prisma/client"
+import type {Prisma} from "@prisma/client"
 import { Trash, User } from "lucide-react"
 
 type ContactType = Prisma.ExternalContactGetPayload<{

@@ -22,6 +22,7 @@ import {
 } from "@comend/lib/types"
 import {debounce} from "lodash";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/packages/components/ui/dialog";
+import { initializeCROSearch } from "@/packages/lib/initialize-client-state"
 
 export function ProviderMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, sortBy, setSortBy, setSearchTerm, filters, setFilters, totalResults} = useCROSearchStore(
@@ -52,9 +53,18 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
     // keep searchTerm input in sync if the store changes elsewhere
     useEffect(() => setQuery(searchTerm), [searchTerm])
 
-    useEffect(() => {
-        setSearchTerm("") // initial fetch on page load
-    }, [])
+    // useEffect(() => {
+    //     const parsedCROFilters = {
+    //         categories: [] as any[],
+    //         milestoneTypes: [] as any[],
+    //         types: [] as any[],
+    //         certifications: [] as any[],
+    //         tags: [] as any[],
+    //     }
+    //     initializeCROSearch(parsedCROFilters)
+    //     console.log(`CRO search initialized...`)
+    //     setSearchTerm("") // initial fetch on page load
+    // }, [])
 
     const handleInputChangeCallback = useCallback(
         (search: string) => {

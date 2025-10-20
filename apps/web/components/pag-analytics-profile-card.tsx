@@ -1,6 +1,5 @@
 import {Users, UserCircle, CircleDollarSign, Earth, ExternalLink} from "lucide-react"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/packages/components/ui/card";
-import { Prisma } from "@prisma/client";
 import {formatMoney, formatNumberWithCommas} from "@/packages/lib/utils";
 import {Button, buttonVariants} from "@comend/components/ui/button";
 import {OrganizationForAnalytics} from "@/packages/lib/types";
@@ -13,7 +12,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <UserCircle className="h-5 w-5" />
-                    Profile
+                    Organization profile
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -37,7 +36,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                                 <ExternalLink className="h-4 w-4 text-muted-foreground" />
                             </Link>
                         </div>
-                        <div className="text-lg font-bold">
+                        <div className="text-lg font-semibold">
                             {organization.members.length}
                         </div>
                     </div>
@@ -60,7 +59,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                                 <ExternalLink className="h-4 w-4 text-muted-foreground" />
                             </Link>
                         </div>
-                        <div className="text-lg font-bold">
+                        <div className="text-lg font-semibold">
                             {organization.conditions?.[0]?.condition?.numberOfPatientsEngaged
                                 ? formatNumberWithCommas(organization.conditions[0].condition.numberOfPatientsEngaged.toString())
                                 : "--"}
@@ -85,7 +84,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                                 <ExternalLink className="h-4 w-4 text-muted-foreground" />
                             </Link>
                         </div>
-                        <div className="text-lg font-bold">
+                        <div className="text-lg font-semibold">
                             {`$${formatMoney(organization.researchBudget)}`}
                         </div>
                     </div>

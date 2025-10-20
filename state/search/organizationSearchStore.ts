@@ -231,7 +231,27 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                 console.log(`featured orgs`, prismaResults)
                 const featuredOrgs = ids.map(id => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
 
-                set({initialized: true, filters, featuredOrgs})
+                set({
+                    featuredOrgs,
+                    searchTerm: "",
+                    sortBy: "alphabetical",
+                    lastFetchedPage: 1,
+                    filters,
+                })
+
+                const {results: newSearchResults, total} = await getUpdatedSearchResults({
+                    ...get(),
+                    searchTerm: "",
+                    lastFetchedPage: 1,
+                }, true)
+
+                set({
+                    searchTerm: "",
+                    searchResults: newSearchResults,
+                    lastFetchedPage: 1,
+                    totalResults: total,
+                    initialized: true,
+                })
             },
             featuredOrgs: [],
             searchTerm: '',

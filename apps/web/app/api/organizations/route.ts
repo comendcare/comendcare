@@ -21,6 +21,15 @@ export async function POST(req: Request) {
                 roadmaps: {
                     where: {
                         milestones: {some: {private: false}} // Only include roadmaps with at least one public milestone
+                    },
+                    include: {
+                        milestones: {
+                            where: {private: false},
+                            include: {
+                                types: {include: {milestoneType: true}},
+                            },
+                            orderBy: [{createdAt: "desc"}]
+                        },
                     }
                 },
                 biosamples: {where: {private: false}},

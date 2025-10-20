@@ -1,7 +1,7 @@
 "use client"
 
 import {useEffect, useState} from "react";
-import {Company, Prisma, SavedCompany} from "@prisma/client";
+import type {Company, Prisma, SavedCompany} from "@prisma/client";
 import {Button} from "@comend/components/ui/button";
 import {toast} from "sonner";
 import {getSavedCompaniesFromOrganizationId} from "@comend/lib/fetchers";

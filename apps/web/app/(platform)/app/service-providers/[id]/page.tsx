@@ -10,11 +10,11 @@ import CROPageTabs from "~web/components/marketplace/cro-page-tabs";
 import CROPageHeader from "~web/components/marketplace/cro-page-header";
 import {notFound} from "next/navigation";
 import prisma from "@/packages/lib/prisma";
-import {CompanyWithReviewsAndServices} from "@/packages/lib/types";
+import type {CompanyWithReviewsAndServices} from "@/packages/lib/types";
 import {getSavedCompaniesFromOrganizationId} from "@/packages/lib/fetchers";
 import {getSession} from "@/packages/lib/auth";
 import NoOrganization from "~web/components/no-organization";
-import {SavedCompany} from "@prisma/client";
+import type {SavedCompany} from "@prisma/client";
 
 export default async function CompanyHomePage({
                                                   params
