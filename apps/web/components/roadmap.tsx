@@ -759,7 +759,7 @@ const RoadmapHeader = ({
                                 </TooltipTrigger>
                             </div>
                             <TooltipContent className="max-w-80">
-                                {`All projects in this plan are private and cannot be shared. Make at least one project published to enable sharing. Click to toggle all projects published.`}
+                                {`All projects in this plan are private and cannot be shared. Make at least one project published to enable sharing. Click to publish all projects.`}
                             </TooltipContent>
                         </Tooltip>
                     )
@@ -783,7 +783,7 @@ const RoadmapHeader = ({
                                 </TooltipTrigger>
                             </div>
                             <TooltipContent className="max-w-80">
-                                {`This research plan is public and can be shared externally. Make all project private to hide this research plan and disable sharing. Click to toggle all projects private.`}
+                                {`This research plan is public and can be shared externally. Make all project private to hide this research plan and disable sharing. Click to make all projects private.`}
                             </TooltipContent>
                         </Tooltip>
                     )
