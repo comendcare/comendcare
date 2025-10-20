@@ -11,7 +11,7 @@ import {
     BackgroundVariant,
     Background,
 } from "@xyflow/react"
-import type { Edge, Node, NodeChange } from "@xyflow/react"
+import type { Edge, MiniMapNodeProps, Node, NodeChange } from "@xyflow/react"
 import { useShallow } from "zustand/react/shallow"
 import MilestoneNode from "~web/components/milestone-node"
 import { Button } from "@comend/components/ui/button"
@@ -41,6 +41,21 @@ const selector = (state: RoadmapState) => ({
     addNodes: state.addNodes,
     addMilestones: state.addMilestones
 })
+
+const gridSize = 15
+
+function snapToGridCenter(x: number, y: number, width: number, height: number) {
+  const centerX = x + width / 2
+  const centerY = y + height / 2
+
+  const snappedCenterX = Math.round(centerX / gridSize) * gridSize
+  const snappedCenterY = Math.round(centerY / gridSize) * gridSize
+
+  return {
+    x: snappedCenterX - width / 2,
+    y: snappedCenterY - height / 2
+  }
+}
 
 export const PrivateFlowView = ({
     width,
@@ -165,12 +180,31 @@ export const PrivateFlowView = ({
         }
     }
 
-    const onNodesChange = (changes: NodeChange<Node>[]) => {
-        const newNodes = applyNodeChanges(changes, localNodes)
-        setLocalNodes(newNodes)
+    // const onNodesChange = (changes: NodeChange<Node>[]) => {
+    //     const newNodes = applyNodeChanges(changes, localNodes)
+    //     setLocalNodes(newNodes)
 
-        const validChanges = changes.filter(change => change.type === "position")
-        if (validChanges.length > 0) debounceUpdateStore(newNodes) // only change zustand state if the user is updating the node position
+    //     const validChanges = changes.filter(change => change.type === "position")
+    //     if (validChanges.length > 0) debounceUpdateStore(newNodes) // only change zustand state if the user is updating the node position
+    // }
+
+    const onNodesChange = (changes: NodeChange<Node>[]) => {
+        const newNodes = applyNodeChanges(changes, localNodes).map(node => {
+            if (node.position) {
+                const nodeElement = document.getElementById(`react-flow__node-${node.id}`)
+                if (!nodeElement) return node
+                const { offsetWidth, offsetHeight } = nodeElement
+
+                return {
+                    ...node,
+                    position: snapToGridCenter(node.position.x, node.position.y, offsetWidth, offsetHeight)
+                }
+            }
+            return node
+        })
+
+        setLocalNodes(newNodes)
+        debounceUpdateStore(newNodes)
     }
 
     const debounceUpdateStore = useCallback(
@@ -204,6 +238,17 @@ export const PrivateFlowView = ({
                     },
                     origin: connectionState.fromHandle?.position === 'left' ? [1.0, 0.5] : [0.0, 0.5],
                 }
+
+                // const newNode: Node = {
+                //     id,
+                //     type: "PROJECT",
+                //     position: snapToGridCenter(pos.x, pos.y, PREVIEW_NODE_WIDTH, PREVIEW_NODE_HEIGHT),
+                //     data: {
+                //         ...previewNodeRef.current.data,
+                //         id: nanoid(),
+                //         nodeId: id,
+                //     },
+                // }
 
                 addNodes([newNode], "Flow Connection")
 

@@ -62,19 +62,8 @@ const selector = (state: RoadmapState) => ({
     setSelectedNodeIds: state.setSelectedNodeIds,
 })
 
-// snap grid is 15, and the handles are positioned in the center of the node
-// we want to make sure the handles match the 15x15 grid so edges can always be
-// straight when desired
-const GRID = 30
-
-function snapToGrid(value: number) {
-  return Math.round(value / GRID) * GRID
-}
-
 export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
     const {selectedNodeIds, setSelectedNodeIds} = useRoadmapStore(useShallow(selector))
-    const cardRef = useRef<HTMLDivElement>(null)
-    const [height, setHeight] = useState<number | undefined>(undefined)
 
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
         const target = event.target as any;
@@ -109,17 +98,6 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
         };
     }, [selectedNodeIds])
 
-    useEffect(() => {
-        if (!cardRef.current) return
-
-        const measure = () => {
-            const measuredHeight = cardRef.current!.scrollHeight
-            setHeight(snapToGrid(measuredHeight))
-        }
-
-        requestAnimationFrame(measure)
-    }, [props])
-
     return (
         <Card 
             className={cn(
@@ -127,8 +105,11 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                 props?.id && selectedNodeIds.includes(props?.id) ? "border-gray-900 border-2 click-project-step" : "",
                 props.id === "preview" ? "opacity-50" : "",
             )}
-            ref={cardRef}
-            style={{ height: height ?? "auto" }}
+            style={{
+                // transform the node so the 'snap to grid' point is centered in the node
+                // this allows edges to be straight, and perfectly align handles no matter the node's card height
+                transform: 'translate(-50%, -50%)',
+            }}
         >
             <CardHeader className="py-4">
                 {props.data?.contextMenuRef && (
