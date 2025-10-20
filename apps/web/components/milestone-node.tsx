@@ -28,7 +28,7 @@ import {RoadmapState, useRoadmapStore} from "~web/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 // import {PublicMilestoneNode} from "./public-milestone-node"
 import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge"
-import { Box, Calendar, ExternalLink, Megaphone, Microscope, Plus, Trash, User, Lock, BadgeAlert, DollarSign, TestTubeDiagonal, Rat, Database } from "lucide-react"
+import { Box, Calendar, ExternalLink, Megaphone, Microscope, Plus, Trash, User, Lock, BadgeAlert, DollarSign, TestTubeDiagonal, Rat, Database, Globe } from "lucide-react"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu"
 import { Separator } from "@/packages/components/ui/separator"
@@ -60,10 +60,11 @@ const selector = (state: RoadmapState) => ({
     edges: state.edges,
     onEdgesChange: state.onEdgesChange,
     setSelectedNodeIds: state.setSelectedNodeIds,
+    setMilestone: state.setMilestone
 })
 
 export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
-    const {selectedNodeIds, setSelectedNodeIds} = useRoadmapStore(useShallow(selector))
+    const {selectedNodeIds, setSelectedNodeIds, setMilestone} = useRoadmapStore(useShallow(selector))
 
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
         const target = event.target as any;
@@ -118,17 +119,42 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                     </div>
                 )}
                 <CardTitle className="text-gray-900">
-                    {props.data?.title || "New Milestone"}
-                    {props.data?.private && (
+                    {props.data?.private ? (
                         <Tooltip>
-                            <TooltipTrigger>
-                                <Lock size={20} className="inline-block align-middle ml-2 mb-1"/>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-red-100 hover:bg-red-300"
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: false})
+                                    }}
+                                >
+                                    <Lock size={20} className="text-red-800"/>
+                                </Button>
                             </TooltipTrigger>
                             <TooltipContent className="font-normal">
-                                {`Only visible to your team`}
+                                {`Only visible to your team. Click to publish this project.`}
+                            </TooltipContent>
+                        </Tooltip>
+                    ) : (
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Button
+                                    className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-green-100 hover:bg-green-300"
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: true})
+                                    }}
+                                >
+                                    <Globe size={20} className="text-green-800"/>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="font-normal">
+                                {`This project is published. Click to make it private.`}
                             </TooltipContent>
                         </Tooltip>
                     )}
+                    {props.data?.title || "New Milestone"}
                 </CardTitle>
                 {/* <CardDescription className="line-clamp-2">
                     {truncate(props.data?.description || "", 200)}
