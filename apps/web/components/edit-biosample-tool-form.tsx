@@ -597,7 +597,7 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                                     placeholder="Search for institutions..."
                                     hidePlaceholderWhenSelected={true}
                                     loadingIndicator={<p>Loading institutions...</p>}
-                                    emptyIndicator={<p>No institutions found.</p>}
+                                    emptyIndicator={<p>No institutions found. Try a different search.</p>}
                                     showHoverCard={false}
                                     className="-mt-2 w-full min-h-[40px]"
                                 />
