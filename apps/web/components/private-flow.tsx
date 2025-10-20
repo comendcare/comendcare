@@ -311,6 +311,8 @@ export const PrivateFlowView = ({
         }
     }, [localNodes, pathname, setSelectedNodeIds, startOnborda])
 
+    const gridSize = 15
+
     return (
         <div className="h-full w-full pb-6" onMouseMove={handleMouseMove}>
         <ReactFlow
@@ -333,6 +335,7 @@ export const PrivateFlowView = ({
             fitView
             fitViewOptions={{ padding: 0.2, duration: 500 }}
             snapToGrid={true}
+            snapGrid={[gridSize, gridSize]}
             style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
             minZoom={0.1}
