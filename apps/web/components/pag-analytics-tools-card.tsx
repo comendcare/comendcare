@@ -40,7 +40,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                                 <ExternalLink className="h-4 w-4 text-muted-foreground"/>
                             </Link>
                         </div>
-                        <div className="text-lg font-bold">
+                        <div className="text-lg font-semibold">
                             {organization.biosamples.length}
                         </div>
                     </div>
@@ -63,7 +63,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                                 <ExternalLink className="h-4 w-4 text-muted-foreground"/>
                             </Link>
                         </div>
-                        <div className="text-lg font-bold">
+                        <div className="text-lg font-semibold">
                             {organization.diseaseModel.length}
                         </div>
                     </div>
@@ -86,7 +86,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                                 <ExternalLink className="h-4 w-4 text-muted-foreground"/>
                             </Link>
                         </div>
-                        <div className="text-lg font-bold">
+                        <div className="text-lg font-semibold">
                             {organization.tools.length}
                         </div>
                     </div>
@@ -123,7 +123,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                                 </Link>
                             </TooltipProvider>
                         </span>
-                        <div className="text-2xl font-bold">
+                        <div className="text-2xl font-semibold">
                             {organization.materialAndDataAccessRequests.length}
                         </div>
                     </div>

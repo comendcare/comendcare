@@ -36,7 +36,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                                 <ExternalLink className="h-4 w-4 text-muted-foreground" />
                             </Link>
                         </div>
-                        <div className="text-lg font-bold">
+                        <div className="text-lg font-semibold">
                             {organization.members.length}
                         </div>
                     </div>
@@ -59,7 +59,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                                 <ExternalLink className="h-4 w-4 text-muted-foreground" />
                             </Link>
                         </div>
-                        <div className="text-lg font-bold">
+                        <div className="text-lg font-semibold">
                             {organization.conditions?.[0]?.condition?.numberOfPatientsEngaged
                                 ? formatNumberWithCommas(organization.conditions[0].condition.numberOfPatientsEngaged.toString())
                                 : "--"}
@@ -84,7 +84,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                                 <ExternalLink className="h-4 w-4 text-muted-foreground" />
                             </Link>
                         </div>
-                        <div className="text-lg font-bold">
+                        <div className="text-lg font-semibold">
                             {`$${formatMoney(organization.researchBudget)}`}
                         </div>
                     </div>
