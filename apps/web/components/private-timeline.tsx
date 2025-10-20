@@ -28,7 +28,7 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {GripVertical, Megaphone, Microscope, User, Lock, Calendar, DollarSign, Database, Rat, TestTubeDiagonal} from "lucide-react"
+import {GripVertical, Megaphone, Microscope, User, Lock, Calendar, DollarSign, Database, Rat, TestTubeDiagonal, Globe} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu";
@@ -46,6 +46,7 @@ const selector = (state: RoadmapState) => ({
     setSelectedNodeIds: state.setSelectedNodeIds,
     milestones: state.milestones,
     setMilestones: state.setMilestones,
+    setMilestone: state.setMilestone
 })
 
 export const TimelineView = ({
@@ -365,6 +366,8 @@ export const TimelineItemContent = ({
     listeners?: any
 }) => {
 
+    const {setMilestone} = useRoadmapStore(useShallow(selector))
+
     return (
         <>
         <div className="flex flex-row items-start justify-start gap-4 mr-8">
@@ -405,17 +408,42 @@ export const TimelineItemContent = ({
                         </Button>
                     )
                 )} */}
-                <p className="inline mr-2 font-semibold text-lg group-hover:underline">{milestone.title}</p>
-                {milestone.private && (
+                {milestone.private ? (
                     <Tooltip>
-                        <TooltipTrigger>
-                            <Lock size={20} className="inline m-1 mb-2"/>
+                        <TooltipTrigger asChild>
+                            <Button
+                                className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-red-100 hover:bg-red-300"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    if (milestone.nodeId) setMilestone(milestone.nodeId, {private: false})
+                                }}
+                            >
+                                <Lock size={20} className="text-red-800"/>
+                            </Button>
                         </TooltipTrigger>
                         <TooltipContent className="font-normal">
-                            {`Only visible to your team`}
+                            {`Only visible to your team. Click to publish this project.`}
+                        </TooltipContent>
+                    </Tooltip>
+                ) : (
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <Button
+                                className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-green-100 hover:bg-green-300"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    if (milestone.nodeId) setMilestone(milestone.nodeId, {private: true})
+                                }}
+                            >
+                                <Globe size={20} className="text-green-800"/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="font-normal">
+                            {`This project is published. Click to make it private.`}
                         </TooltipContent>
                     </Tooltip>
                 )}
+                <p className="inline mr-2 font-semibold text-lg group-hover:underline">{milestone.title}</p>
             </span>
             {/* {milestone.private && <PrivateBadge iconOnly/>} */}
             <time
