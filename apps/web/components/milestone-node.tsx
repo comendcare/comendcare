@@ -108,7 +108,7 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
             style={{
                 // transform the node so the 'snap to grid' point is centered in the node
                 // this allows edges to be straight, and perfectly align handles no matter the node's card height
-                transform: 'translate(-50%, -50%)',
+                transform: 'translate(0%, -50%)',
             }}
         >
             <CardHeader className="py-4">
