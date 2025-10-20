@@ -16,7 +16,6 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
         <Card className="col-span-4 flex flex-col">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <Microscope className="h-5 w-5"/>
                     Toolkit overview
                 </CardTitle>
             </CardHeader>
