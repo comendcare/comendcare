@@ -103,9 +103,9 @@ export default function PAGAnalyticsLineChartCard({organization}: { organization
                     </Button>
                 </CardTitle>
                 <div className="text-muted-foreground">
-                    <div className="text-2xl font-bold inline-flex items-baseline">
+                    <div className="text-2xl font-semibold inline-flex items-baseline">
                         {total}
-                        <span className="text-sm font-bold">&nbsp;this week</span>
+                        <span className="text-sm font-semibold">&nbsp;this week</span>
                     </div>
                     {percentChange !== null && (
                         <div

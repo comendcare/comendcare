@@ -5,9 +5,24 @@ import {nameToInitials} from "@comend/lib/utils";
 import {Member, Organization, User} from "@prisma/client";
 import Link from "next/link";
 import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
-import EditPagProfileAboutCardDialog from "~web/components/edit-pag-profile-about-card-dialog";
 import {Badge} from "@comend/components/ui/badge";
 import {mixpanelTrack} from "@comend/lib/mixpanel";
+import dynamic from "next/dynamic";
+import {Button} from "@/packages/components/ui/button";
+import LoadingDots from "@/packages/components/icons/loading-dots";
+import React from "react";
+
+const EditPagProfileAboutCardDialog = dynamic(
+    () => import("~web/components/edit-pag-profile-about-card-dialog"),
+    {
+        ssr: false,
+        loading: () =>
+            <Button variant="ghost" size="icon" aria-label="Owners only" disabled>
+                <LoadingDots color="#808080" />
+            </Button>
+    }
+);
+
 
 type OrgWithMembers = Partial<Organization> & { members: (Member & { user: User })[] };
 

@@ -77,9 +77,9 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
       ),
       meta: {
         label: "Title",
-        placeholder: "Search titles...",
-        variant: "text",
-        icon: Text,
+        // placeholder: "Search titles...",
+        // variant: "text",
+        // icon: Text,
       },
       enableColumnFilter: true,
         enableHiding,

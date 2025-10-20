@@ -58,7 +58,7 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                         {/* <Workflow className="h-4 w-4 text-muted-foreground"/> */}
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-semibold">{organization.roadmaps.length}</div>
+                        <div className="text-xl font-semibold">{organization.roadmaps.length}</div>
                         {/*<p className="text-xs text-muted-foreground">*/}
                         {/*    +20.1% from last month*/}
                         {/*</p>*/}
@@ -83,7 +83,7 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                         {/* <Microscope className="h-4 w-4 text-muted-foreground"/> */}
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-semibold">
+                        <div className="text-xl font-semibold">
                             {organization.tools.length + organization.biosamples.length + organization.diseaseModel.length}
                         </div>
                         {/*<p className="text-xs text-muted-foreground">*/}
@@ -110,7 +110,7 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                         {/* <Megaphone className="h-4 w-4 text-muted-foreground"/> */}
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-semibold">{organization.rfps.length}</div>
+                        <div className="text-xl font-semibold">{organization.rfps.length}</div>
                         {/*<p className="text-xs text-muted-foreground">*/}
                         {/*    +180.1% from last month*/}
                         {/*</p>*/}

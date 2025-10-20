@@ -11,12 +11,11 @@ import { Button } from "@comend/components/ui/button";
 import { Share } from "lucide-react";
 import { Dialog, DialogContent } from "@comend/components/ui/dialog";
 import ShareDialog from "./share-dialog";
-import { useSession } from "next-auth/react";
 
 type Props = {
     orgId: string;
     organization: Pick<Organization, "id" | "name" | "subdomain" | "customDomain">;
-    roadmaps: Array<Pick<Roadmap, "id" | "title" | "description" | "slug" | "image" | "createdAt" | "updatedAt" | "published" | "organizationId" | "userId">>;
+    roadmaps: any[];
 };
 
 export default function RoadmapsPage({ orgId, organization, roadmaps }: Props) {
