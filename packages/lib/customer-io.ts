@@ -40,6 +40,12 @@ class CustomerIO {
         if (!CustomerIO.instance) CustomerIO.instance = new CustomerIO()
         return CustomerIO.instance
     }
+
+    async flush() {
+        if (this.analytics instanceof Analytics && typeof (this.analytics as any).closeAndFlush === "function") {
+            await (this.analytics as any).closeAndFlush()
+        }
+    }
 }
 
 export async function customerIOIdentify(distinctId: string, session: Session) {
@@ -102,18 +108,26 @@ export async function sendCustomerIOContactEmail(emailPayload: any) {
     }
 }
 
-export async function customerIOOnResearchPlanCreated(userId: string, props: Record<string, any> = {}) {
+export async function customerIOOnResearchPlanCreated(
+    userId: string,
+    props: Record<string, any> = {}
+) {
     const instance = await getCustomerIOInstance()
 
-    // 2a) Track the event (good for campaigns & analytics)
-    instance.analytics.track({
-        userId,
-        event: "created_research_plan",
-        properties: props
-    })
+    try {
+        // Send the event
+        instance.analytics.track({
+            userId,
+            event: "created_research_plan",
+            properties: props,
+        })
 
-    instance.analytics.identify({
-        userId,
-        traits: { "has_research_plan": true, ...props }
-    })
+        // Set/update traits
+        instance.analytics.identify({
+            userId,
+            traits: { has_research_plan: true, ...props },
+        })
+    } finally {
+        if (IS_PROD) await instance.flush()
+    }
 }

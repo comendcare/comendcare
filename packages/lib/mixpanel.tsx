@@ -4,7 +4,6 @@ import { createContext, useContext, useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
 import mixpanel, { Config } from "mixpanel-browser"
 import { useSession } from "next-auth/react"
-import { customerIOIdentify } from "./customer-io"
 import { getOrganizationFromOrganizationId, getUser } from "./fetchers"
 import { getCookie } from "./utils"
 
@@ -169,7 +168,7 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                         console.log(`mixpanel identify user`, userData)
                         if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") mixpanel.identify(session.user.email) // development & preview use email as distinct id
                         else mixpanel.identify(session.user.id) // production uses userID from DB (fetched from session)
-            
+
                         let currentOrg = undefined
                         if (session?.user?.organizationId) currentOrg = await getOrganizationFromOrganizationId(session?.user?.organizationId, {
                             id: true,
@@ -222,27 +221,37 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                             rfps: true,
                             metadata: true
                         })
-            
+
                         // add super properties that will apply to all tracked events
                         mixpanel.register({
                             "Environment": process.env.NEXT_PUBLIC_NODE_ENV,
-                            ...(currentOrg?.success && currentOrg?.data 
+                            ...(currentOrg?.success && currentOrg?.data
                                 ? {
                                     "Organization ID": currentOrg.data.id,
                                     "Organization Name": currentOrg.data.name
-                                } 
+                                }
                                 : undefined)
                         })
-            
+
                         mixpanel.people.set({
                             $name: session.user.name,
                             $email: session.user.email,
                         })
-            
+
                         const distinctId = mixpanel.get_distinct_id()
                         setMixpanelContext({ distinctId })
 
-                        if (session.user.email) customerIOIdentify(distinctId, session)
+                        if (session.user.email) {
+                            await fetch('/api/analytics/cio/identify', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    userId: distinctId,
+                                    name: session.user.name,
+                                    email: session.user.email,
+                                }),
+                            })
+                        }
                     } else {
                         // if the user has not consented, make sure they are opted out of mixpanel tracking
                         console.log(`mixpanel opt-out`)
