@@ -279,6 +279,7 @@ export const PrivateFlowView = ({
             contextMenuRef,
             organization: organization
         },
+        isPublic: false
     }))
 
     const updatedEdges = localEdges.map((edge: Edge) => ({

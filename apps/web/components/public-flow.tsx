@@ -13,7 +13,7 @@ import {
     Controls,
 } from "@xyflow/react"
 import "@xyflow/react/dist/base.css"
-import { MemoPublicMilestoneNodeButton, MemoPublicMilestoneNodeLink, MilestoneNode } from "./milestone-node"
+import { MemoPublicMilestoneNodeButton, MemoPublicMilestoneNodeLink } from "./milestone-node"
 import { Milestone } from "@prisma/client"
 
 export const PublicFlowView = ({ 
@@ -138,6 +138,7 @@ export const PublicFlowView = ({
             subdomain: subdomain,
             focused: urlMilestone === node?.data?.id,
             externalLink: externalLinks,
+            isPublic: true,
             setUrlMilestone: setUrlMilestone
         },
     }))
