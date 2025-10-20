@@ -180,14 +180,6 @@ export const PrivateFlowView = ({
         }
     }
 
-    // const onNodesChange = (changes: NodeChange<Node>[]) => {
-    //     const newNodes = applyNodeChanges(changes, localNodes)
-    //     setLocalNodes(newNodes)
-
-    //     const validChanges = changes.filter(change => change.type === "position")
-    //     if (validChanges.length > 0) debounceUpdateStore(newNodes) // only change zustand state if the user is updating the node position
-    // }
-
     const onNodesChange = (changes: NodeChange<Node>[]) => {
         const newNodes = applyNodeChanges(changes, localNodes).map(node => {
             if (node.position) {
@@ -238,17 +230,6 @@ export const PrivateFlowView = ({
                     },
                     origin: connectionState.fromHandle?.position === 'left' ? [1.0, 0.5] : [0.0, 0.5],
                 }
-
-                // const newNode: Node = {
-                //     id,
-                //     type: "PROJECT",
-                //     position: snapToGridCenter(pos.x, pos.y, PREVIEW_NODE_WIDTH, PREVIEW_NODE_HEIGHT),
-                //     data: {
-                //         ...previewNodeRef.current.data,
-                //         id: nanoid(),
-                //         nodeId: id,
-                //     },
-                // }
 
                 addNodes([newNode], "Flow Connection")
 
