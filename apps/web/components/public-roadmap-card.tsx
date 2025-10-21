@@ -113,7 +113,7 @@ export const RoadmapCard = ({
                         {roadmap.description}
                     </CardDescription>
                     <div className="flex gap-2">
-                        {RESEARCH_PLAN_TYPES.filter(typeOption => roadmap.modalities.includes(typeOption.value)).map((type: Option, index) =>
+                        {RESEARCH_PLAN_TYPES.filter(typeOption => (roadmap.modalities || []).includes(typeOption.value)).map((type: Option, index) =>
                             <ResearchPlanTypeBadge key={index} label={type.label}/>)}
                         <StageOfActivityBadge milestones={roadmap.milestones}/>
                     </div>
@@ -174,6 +174,8 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
 }) => {
     const router = useRouter()
 
+    console.log(`roadmaps`, roadmaps)
+
     return (
         <Table>
             <TableHeader>
@@ -184,7 +186,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
             </TableHeader>
             <TableBody>
                 {RESEARCH_PLAN_TYPES.map((type, index) => {
-                    const roadmapsForModality = roadmaps.filter(roadmap => roadmap.modalities.includes(type.value) && type.value !== "OTHER")
+                    const roadmapsForModality = roadmaps.filter(roadmap => (roadmap.modalities || []).includes(type.value) && type.value !== "OTHER")
                     if (roadmapsForModality.length <= 0) return <></>
 
                     return (
@@ -211,13 +213,13 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
                         </CollapsibleTableGroup>
                     )
                 })}
-                {roadmaps.filter(roadmap => roadmap.modalities.length === 0 || roadmap.modalities.includes("OTHER")).length > 0 && (
+                {roadmaps.filter(roadmap => (roadmap.modalities || []).length === 0 || roadmap.modalities.includes("OTHER")).length > 0 && (
                     // group research plans with no type or 'other' type together in the table
                     <CollapsibleTableGroup
                         label={'Other'}
                         colSpan={2}
                     >
-                        {roadmaps.filter(roadmap => roadmap.modalities.length === 0 || roadmap.modalities.includes("OTHER")).map(roadmap => (
+                        {roadmaps.filter(roadmap => (roadmap.modalities || []).length === 0 || roadmap.modalities.includes("OTHER")).map(roadmap => (
                             <TableRow key={roadmap.id} className="cursor-pointer"
                                       onClick={() => rowClickCallback(roadmap)}>
                                 <TableCell>

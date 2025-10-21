@@ -7,8 +7,7 @@ import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/a
 import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table"
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
 import { Button } from "@/packages/components/ui/button"
-import { Card, CardContent, CardDescription, CardTitle } from "@/packages/components/ui/card"
-import { PulsatingButton } from "@/packages/components/ui/pulsating-button"
+import { Card, CardContent, CardTitle } from "@/packages/components/ui/card"
 import { Skeleton } from "@/packages/components/ui/skeleton"
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
@@ -21,10 +20,12 @@ import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
 import { CROMarketplaceCard } from "~web/components/marketplace/marketplace-cro-card"
 import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card"
-import { OrganizationMarketplaceListElement } from "~web/components/marketplace/marketplace-pag-list-element"
-import {getSavedCompaniesFromOrganizationId, getSavedOrganizationsFromOrganizationId} from "@/packages/lib/fetchers";
-import {SavedCompany, SavedOrganization} from "@prisma/client";
-import {useSession} from "next-auth/react";
+// import { OrganizationMarketplaceListElement } from "~web/components/marketplace/marketplace-pag-list-element"
+// import {getSavedCompaniesFromOrganizationId, getSavedOrganizationsFromOrganizationId} from "@/packages/lib/fetchers";
+// import {SavedCompany, SavedOrganization} from "@prisma/client";
+// import {useSession} from "next-auth/react";
+import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@/packages/lib/initialize-client-state"
+import { truncate } from "@/packages/lib/utils"
 
 const croSelector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -56,64 +57,130 @@ const clinicalDatsetSelector = (state: ClinicalDatasetSearchState) => ({
 })
 
 export default function MarketplacePage() {
-    const {data: session, status} = useSession()
+    // const {data: session, status} = useSession()
     const croStore = useCROSearchStore(useShallow(croSelector))
     const organizationStore = useOrganizationSearchStore(useShallow(organizationSelector))
     const biosampleStore = useBiosampleSearchStore(useShallow(biosampleSelector))
     const diseaseModelStore = useDiseaseModelSearchStore(useShallow(diseaseModelSelector))
     const clinicalDatasetStore = useClinicalDatasetSearchStore(useShallow(clinicalDatsetSelector))
-    const biosampleColumns = useBiosamplesTableColumns()
-    const diseaseModelColumns = useDiseaseModelsTableColumns()
-    const clinicalDatasetColumns = useClinicalDatasetsTableColumns()
-    const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
-    const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
+    const biosampleColumns = useBiosamplesTableColumns(
+        false, // disable sorting
+        false, // disable hiding
+    )
+    const diseaseModelColumns = useDiseaseModelsTableColumns(
+        false, // disable sorting,
+        false, // disable hiding
+    )
+    const clinicalDatasetColumns = useClinicalDatasetsTableColumns(
+        false, // disable sorting,
+        false, // disable hiding
+    )
+    const [crosInitialized, setCROsInitialized] = useState(false)
+    const [pagsInitialized, setPagsInitialized] = useState(false)
+    const [biosamplesInitialized, setBiosamplesInitialized] = useState(false)
+    const [diseaseModelsInitialized, setDiseaseModelsInitialized] = useState(false)
+    const [clinicalDatasetsInitialized, setClinicalDatasetsInitialized] = useState(false)
+    // const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
+    // const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
+
+    // useEffect(() => {
+    //     async function fetchData() {
+    //         const savedOrganizationsResponse = await getSavedOrganizationsFromOrganizationId(session?.user?.organizationId || undefined, {
+    //             id: true,
+    //             organizationId: true,
+    //             organization: true,
+    //             savedOrganizationId: true,
+    //             savedOrganization: true,
+    //             updatedAt: true,
+    //             createdAt: true,
+    //             metadata: true
+    //         });
+    //         if (savedOrganizationsResponse.success) {
+    //             const savedOrganizationData = savedOrganizationsResponse.data as SavedOrganization[];
+    //             setSavedOrganizationIds(new Set(savedOrganizationData.map((c: SavedOrganization) => c.savedOrganizationId)));
+    //         } else {
+    //             console.error(savedOrganizationsResponse.error);
+    //         }
+    //     }
+
+    //     fetchData();
+    // }, [session, status])
+
+    // useEffect(() => {
+    //     async function fetchSavedCompanies() {
+    //         const res = await getSavedCompaniesFromOrganizationId(
+    //             session?.user?.organizationId,
+    //             { companyId: true }
+    //         );
+
+    //         if (res.success && res.data) {
+    //             setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
+    //         }
+    //     }
+
+    //     fetchSavedCompanies();
+    // }, [session, status]);
 
     useEffect(() => {
-        async function fetchData() {
-            const savedOrganizationsResponse = await getSavedOrganizationsFromOrganizationId(session?.user?.organizationId || undefined, {
-                id: true,
-                organizationId: true,
-                organization: true,
-                savedOrganizationId: true,
-                savedOrganization: true,
-                updatedAt: true,
-                createdAt: true,
-                metadata: true
-            });
-            if (savedOrganizationsResponse.success) {
-                const savedOrganizationData = savedOrganizationsResponse.data as SavedOrganization[];
-                setSavedOrganizationIds(new Set(savedOrganizationData.map((c: SavedOrganization) => c.savedOrganizationId)));
-            } else {
-                console.error(savedOrganizationsResponse.error);
+        const init = async () => {
+            console.log(`start init...`)
+            const parsedCROFilters = {
+                categories: [] as any[],
+                milestoneTypes: [] as any[],
+                types: [] as any[],
+                certifications: [] as any[],
+                tags: [] as any[],
             }
+            await initializeCROSearch(parsedCROFilters)
+            setCROsInitialized(true)
+            console.log(`CRO search initialized...`)
+
+            const parsedPAGFilters = {
+                genes: [] as any[],
+                conditions: [] as any[],
+                systems: [] as any[],
+                mechanisms: [] as any[],
+                modalities: [] as any[],
+            }
+            await initializeOrganizationSearch(parsedPAGFilters)
+            setPagsInitialized(true)
+            console.log(`Organization search initialized...`)
+
+            const parsedBiosampleFilters = {
+                types: [] as any[],
+                genes: [] as any[],
+                conditions: [] as any[],
+                organizations: [] as any[],
+            }
+            await initializeBiosampleSearch(parsedBiosampleFilters)
+            setBiosamplesInitialized(true)
+            console.log(`Biosample search initialized...`)
+
+            const parsedDiseaseModelFilters = {
+                types: [] as any[],
+                genes: [] as any[],
+                conditions: [] as any[],
+                organizations: [] as any[],
+            }
+            await initializeDiseaseModelSearch(parsedDiseaseModelFilters)
+            setDiseaseModelsInitialized(true)
+            console.log(`Disease Model search initialized...`)
+
+            const parsedClinicalDatasetFilters = {
+                types: [] as any[],
+                genes: [] as any[],
+                conditions: [] as any[],
+                organizations: [] as any[]
+            }
+            await initializeClinicalDatasetSearch(parsedClinicalDatasetFilters)
+            setClinicalDatasetsInitialized(true)
+            console.log(`Clinical Dataset search initialized...`)
         }
 
-        fetchData();
-    }, [session, status])
+        init()
 
-    useEffect(() => {
-        croStore.setSearchTerm("")
-        organizationStore.setSearchTerm("")
-        biosampleStore.setSearchTerm("")
-        diseaseModelStore.setSearchTerm("")
-        clinicalDatasetStore.setSearchTerm("")
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    useEffect(() => {
-        async function fetchSavedCompanies() {
-            const res = await getSavedCompaniesFromOrganizationId(
-                session?.user?.organizationId,
-                { companyId: true }
-            );
-
-            if (res.success && res.data) {
-                setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
-            }
-        }
-
-        fetchSavedCompanies();
-    }, [session, status]);
 
     return (
         <div className="flex flex-col w-full h-full mx-auto gap-8">
@@ -131,7 +198,7 @@ export default function MarketplacePage() {
                         </Button>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        {(croStore.searchResults && croStore.searchResults.length > 0 )
+                        {(crosInitialized && croStore.searchResults && croStore.searchResults.length > 0 )
                             ? (
                                 <>
                                     {croStore.searchResults?.slice(0, 3).map((cro, index) => (
@@ -139,7 +206,8 @@ export default function MarketplacePage() {
                                             cro={cro}
                                             key={index}
                                             location={"Marketplace"}
-                                            savedCompanyIds={savedCompanyIds}
+                                            // savedCompanyIds={savedCompanyIds}
+                                            savedCompanyIds={new Set()}
                                         />
                                     ))}
                                 </>
@@ -168,7 +236,7 @@ export default function MarketplacePage() {
                         </Button>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        {([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0 )
+                        {(pagsInitialized && ([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0))
                             ? (
                                 <>
                                     {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].slice(0, 3).map((organization, index) => (
@@ -176,7 +244,8 @@ export default function MarketplacePage() {
                                             organization={organization}
                                             key={index}
                                             isPublic={false}
-                                            savedOrganizationIds={savedOrganizationIds}
+                                            // savedOrganizationIds={savedOrganizationIds}
+                                            savedOrganizationIds={new Set()}
                                         />
                                     ))}
                                 </>
@@ -191,11 +260,6 @@ export default function MarketplacePage() {
                         }
                     </ol>
                 </div>
-
-                {/* <div className="p-10 flex flex-col gap-2 bg-blue-light rounded-lg mb-6">
-                    <h2 className="text-2xl font-semibold">Toolkit</h2>
-                    <p>Find tools that belong to patient groups on the Comend platform. Sign up with a researcher profile to request access to public tools, like biosamples, disease models, and clinical datasets.</p>
-                </div> */}
         
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
@@ -210,16 +274,22 @@ export default function MarketplacePage() {
                         </Button>
                     </div>
                     <ol className="w-full">
-                        {(biosampleStore.searchResults && biosampleStore.searchResults.length > 0 )
+                        {(biosamplesInitialized && biosampleStore.searchResults && biosampleStore.searchResults.length > 0 )
                             ? (
                                 <>
                                     <div className="max-w-7xl w-full overflow-auto">
-                                        <BiosamplesTable showPagination={false} data={biosampleStore.searchResults?.slice(0, 3)} pageCount={1} columns={biosampleColumns} searchParams={{}}/>
+                                        <BiosamplesTable 
+                                            showPagination={false} 
+                                            data={biosampleStore.searchResults?.slice(0, 3)} 
+                                            pageCount={1} 
+                                            columns={biosampleColumns} 
+                                            searchParams={{}}
+                                        />
                                     </div>
                                 </>
                             )
                             : (
-                                biosampleStore.initialized 
+                                (biosamplesInitialized && biosampleStore.initialized )
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
@@ -261,7 +331,7 @@ export default function MarketplacePage() {
                         </Button>
                     </div>
                     <ol className="w-full">
-                        {(diseaseModelStore.searchResults && diseaseModelStore.searchResults.length > 0 )
+                        {(diseaseModelsInitialized && diseaseModelStore.searchResults && diseaseModelStore.searchResults.length > 0 )
                             ? (
                                 <>
                                     <div className="max-w-7xl w-full overflow-auto">
@@ -270,7 +340,7 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                diseaseModelStore.initialized 
+                                (diseaseModelsInitialized && diseaseModelStore.initialized) 
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
@@ -312,7 +382,7 @@ export default function MarketplacePage() {
                         </Button>
                     </div>
                     <ol className="w-full">
-                        {(clinicalDatasetStore.searchResults && clinicalDatasetStore.searchResults.length > 0 )
+                        {(clinicalDatasetsInitialized && clinicalDatasetStore.searchResults && clinicalDatasetStore.searchResults.length > 0 )
                             ? (
                                 <>
                                     <div className="max-w-7xl w-full overflow-auto">
@@ -321,7 +391,7 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                clinicalDatasetStore.initialized 
+                                (clinicalDatasetsInitialized && clinicalDatasetStore.initialized)
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">

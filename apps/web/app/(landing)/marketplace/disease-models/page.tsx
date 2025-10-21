@@ -9,7 +9,7 @@ export default function DiseaseModelsPage() {
         <main className="flex flex-col w-full items-center h-full mx-auto">
             <div className="flex flex-col gap-4 p-2 w-full">
                 <DiseaseModelMarketplaceIntegratedSearchAndFilter />
-                <DiseaseModelSearchResults />
+                <DiseaseModelSearchResults isInitialized={true}/>
             </div>
         </main>
     )

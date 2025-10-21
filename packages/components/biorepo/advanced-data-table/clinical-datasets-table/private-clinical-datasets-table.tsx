@@ -16,12 +16,24 @@ import { SearchParams } from "typesense/lib/Typesense/Documents";
 import { useState } from "react";
 import { Dialog, DialogPortal } from "./../../../ui/dialog";
 
-export function ClinicalDatasetsTable({data, pageCount, columns, onSelectionChange, searchParams}: {
+export function ClinicalDatasetsTable({
+  data, 
+  pageCount, 
+  columns, 
+  onSelectionChange, 
+  searchParams,
+  showFilters = true,
+  showPagination = true,
+  interactive = true
+}: {
   data: Tool[], 
   pageCount: number, 
   columns: ColumnDef<any>[], 
   onSelectionChange?: (selectedRows: Tool[]) => void, 
-  searchParams: SearchParams
+  searchParams: SearchParams,
+  showFilters?: boolean,
+  showPagination?: boolean,
+  interactive?: boolean
 }) {
   const [editingTool, setEditingTool] = useState<any | undefined>(undefined)
   const { enableAdvancedFilter, filterFlag } = useFeatureFlags();
@@ -29,10 +41,10 @@ export function ClinicalDatasetsTable({data, pageCount, columns, onSelectionChan
     data,
     columns,
     pageCount,
-    enableAdvancedFilter,
+    enableAdvancedFilter: showFilters && enableAdvancedFilter,
     initialState: {
       sorting: [],
-      columnPinning: { right: ["actions"] },
+      columnPinning: { right: ["actions"], left: ["select"] },
     },
     getRowId: (originalRow) => originalRow.id,
     shallow: false,
@@ -50,6 +62,7 @@ export function ClinicalDatasetsTable({data, pageCount, columns, onSelectionChan
     <>
       <DataTable
         table={table}
+        showPagination={showPagination}
         noResults={
             (data.length === 0 && Object.keys(searchParams).length === 0) 
             ? (
@@ -75,36 +88,40 @@ export function ClinicalDatasetsTable({data, pageCount, columns, onSelectionChan
             setEditingTool(row?.original)
         }
       >
-        {enableAdvancedFilter ? (
-          <DataTableAdvancedToolbar table={table}>
-              <DataTableFilterList
-                table={table}
-                shallow={shallow}
-                debounceMs={debounceMs}
-                throttleMs={throttleMs}
-                align="start"
-              />
-          </DataTableAdvancedToolbar>
-        ) : (
-          <DataTableToolbar table={table} enableSearch={true}/>
+        {showFilters && (
+          enableAdvancedFilter ? (
+            <DataTableAdvancedToolbar table={table}>
+                <DataTableFilterList
+                  table={table}
+                  shallow={shallow}
+                  debounceMs={debounceMs}
+                  throttleMs={throttleMs}
+                  align="start"
+                />
+            </DataTableAdvancedToolbar>
+          ) : (
+            <DataTableToolbar table={table} enableSearch={true}/>
+          )
         )}
       </DataTable>
 
-      <Dialog 
-          open={!!editingTool}
-          onOpenChange={(open) => !open && setEditingTool(undefined)}
-      >
-          <DialogPortal>
-              <div onClick={(e) => e.stopPropagation()}>
-                  <EditAssetDialog
-                      key={editingTool?.id}
-                      data={editingTool} 
-                      type={'data'}
-                      closeDialog={() => {setEditingTool(undefined)}}
-                  />
-              </div>
-          </DialogPortal>
-      </Dialog>
+      {interactive && (
+        <Dialog 
+            open={!!editingTool}
+            onOpenChange={(open) => !open && setEditingTool(undefined)}
+        >
+            <DialogPortal>
+                <div onClick={(e) => e.stopPropagation()}>
+                    <EditAssetDialog
+                        key={editingTool?.id}
+                        data={editingTool} 
+                        type={'data'}
+                        closeDialog={() => {setEditingTool(undefined)}}
+                    />
+                </div>
+            </DialogPortal>
+        </Dialog>
+      )}
     </>
   );
 }

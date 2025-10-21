@@ -15,12 +15,12 @@ import { Asset, RFP, Roadmap } from './types';
 import { useToolStore } from "../../state/tool/toolStore";
 import { useRFPStore } from "../../state/rfp/rfpStore";
 
-export function initializeCROSearch(filters: CROMarketplaceFiltersType) {
+export async function initializeCROSearch(filters: CROMarketplaceFiltersType) {
     if (typeof window !== "undefined") {
         const initCROSearchState = useCROSearchStore.getState().initState;
 
         // Call Zustand's initState directly
-        initCROSearchState(filters)
+        await initCROSearchState(filters)
     }
 }
 
@@ -33,39 +33,39 @@ export function initializeMilestoneSearch() {
     }
 }
 
-export function initializeOrganizationSearch(filters: PAGMarketplaceFiltersType) {
+export async function initializeOrganizationSearch(filters: PAGMarketplaceFiltersType) {
     if (typeof window !== "undefined") {
         const initOrganizationSearchState = useOrganizationSearchStore.getState().initState;
 
         // Call Zustand's initState directly
-        initOrganizationSearchState(filters)
+        await initOrganizationSearchState(filters)
     }
 }
 
-export function initializeBiosampleSearch(filters: BiosampleMarketplaceFiltersType) {
+export async function initializeBiosampleSearch(filters: BiosampleMarketplaceFiltersType, sortBy?: string | string[] | undefined) {
     if (typeof window !== "undefined") {
         const initBiosampleSearchState = useBiosampleSearchStore.getState().initState;
 
         // Call Zustand's initState directly
-        initBiosampleSearchState(filters)
+        await initBiosampleSearchState(filters, sortBy)
     }
 }
 
-export function initializeDiseaseModelSearch(filters: DiseaseModelMarketplaceFiltersType) {
+export async function initializeDiseaseModelSearch(filters: DiseaseModelMarketplaceFiltersType, sortBy?: string | string[] | undefined) {
     if (typeof window !== "undefined") {
         const initDiseaseModelSearchState = useDiseaseModelSearchStore.getState().initState;
 
         // Call Zustand's initState directly
-        initDiseaseModelSearchState(filters)
+        await initDiseaseModelSearchState(filters, sortBy)
     }
 }
 
-export function initializeClinicalDatasetSearch(filters: ClinicalDatasetMarketplaceFiltersType) {
+export async function initializeClinicalDatasetSearch(filters: ClinicalDatasetMarketplaceFiltersType, sortBy?: string | string[] | undefined) {
     if (typeof window !== "undefined") {
         const initClinicalDatasetSearchState = useClinicalDatasetSearchStore.getState().initState;
 
         // Call Zustand's initState directly
-        initClinicalDatasetSearchState(filters)
+        await initClinicalDatasetSearchState(filters, sortBy)
     }
 }
 

@@ -12,7 +12,7 @@ import {
     FormItem,
     FormMessage,
     FormDescription,
-} from "@comend/components/ui/form" 
+} from "@comend/components/ui/form"
 import {Input} from "@comend/components/ui/input"
 import {AutosizeTextarea, Textarea} from "@comend/components/ui/textarea"
 import {Button} from "@comend/components/ui/button"
@@ -39,7 +39,17 @@ import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@comend/lib/data";
-import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option, BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS} from "@comend/lib/types"
+import {
+    Asset,
+    Milestone,
+    NODE_TYPE_OPTIONS,
+    RFP,
+    RFP_OPEN_TO_TYPE_OPTIONS,
+    StatusType,
+    Option,
+    BIOSAMPLE_TYPE_OPTIONS,
+    DISEASE_MODEL_TYPE_OPTIONS
+} from "@comend/lib/types"
 import {
     Biosample,
     DiseaseModel,
@@ -50,14 +60,6 @@ import {
     SavedCompany,
     Tool
 } from "@prisma/client"
-import {
-    getAssets,
-    getBiosamples,
-    getDatasamples,
-    getDiseaseModels,
-    getRFPs,
-    getSavedCompaniesFromOrganizationId
-} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group"
 import {ExternalContactField} from "./external-contact-field"
@@ -70,7 +72,6 @@ import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/too
 import MoneyInput from "@comend/components/money-input";
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group"
-import {PlateEditor} from "@comend/components/editor/plate-editor"
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs"
 import {CROSearchState, Recommendation, useCROSearchStore} from "@/state/search/croSearchStore"
 import {Card, CardContent} from "@comend/components/ui/card"
@@ -87,20 +88,49 @@ import {mixpanelTrack} from "@comend/lib/mixpanel"
 import ShareDialog from "./share-dialog"
 import {JsonObject} from "@prisma/client/runtime/library"
 import EditMilestoneDetailsPublicationsTab from "~web/components/edit-milestone-details-publications-tab";
-import { Skeleton } from "@comend/components/ui/skeleton"
-import EditMilestoneDetailsProjectsTab from "./edit-milestone-details-projects-tab"
-import { useOnborda } from "./onborda/OnbordaContext"
-import { EditRFPForm } from "./edit-rfp-form"
-import { CommandItem } from "@/packages/components/ui/command"
-import { usePathname } from "next/navigation"
-import { nanoid } from "nanoid"
-import { EditBiosampleToolForm } from "./edit-biosample-tool-form"
-import { EditDiseaseModelToolForm } from "./edit-disease-model-tool-form"
-import { EditDataToolForm } from "./edit-data-tool-form"
-import { MilestoneTypeBadge } from "@/packages/components/milestone-type-badge"
-import { Separator } from "@/packages/components/ui/separator"
-import { updateMilestones } from "@/packages/lib/actions"
-import { revalidate } from "@/packages/lib/revalidate"
+import {Skeleton} from "@comend/components/ui/skeleton"
+import {useOnborda} from "./onborda/OnbordaContext"
+import {EditRFPForm} from "./edit-rfp-form"
+import {CommandItem} from "@/packages/components/ui/command"
+import {usePathname} from "next/navigation"
+import {nanoid} from "nanoid"
+import {EditBiosampleToolForm} from "./edit-biosample-tool-form"
+import {EditDiseaseModelToolForm} from "./edit-disease-model-tool-form"
+import {EditDataToolForm} from "./edit-data-tool-form"
+import {MilestoneTypeBadge} from "@/packages/components/milestone-type-badge"
+import {Separator} from "@/packages/components/ui/separator"
+import dynamic from "next/dynamic";
+
+type PlateEditorProps = {
+    value: any[];
+    onChange: (v: any[]) => void;
+};
+
+const PlateEditor = dynamic<PlateEditorProps>(
+    () =>
+        import("@comend/components/editor/plate-editor").then(
+            (m) => m.PlateEditor   // ← pick the named export
+        ),
+    {
+        ssr: false, loading: () =>
+            <Skeleton className="w-full h-[200px]"/>
+    }
+);
+
+const EditMilestoneDetailsProjectsTab = dynamic(
+    () =>
+        import("./edit-milestone-details-projects-tab").then(
+            (m) => m.default   // ← pick the named export
+        ),
+    {
+        ssr: false, loading: () =>
+            <div className="flex flex-col gap-4">
+                <Skeleton className="w-full h-[230px]"/>
+                <Skeleton className="w-full h-[230px]"/>
+                <Skeleton className="w-full h-[230px]"/>
+            </div>
+    }
+);
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -177,16 +207,16 @@ type SimpleAttachment = { name: string; link: string };
 // }
 
 export function EditMilestoneForm({
-    organization,
-    milestoneData,
-    orgIsPublished,
-    biosampleOptions,
-    diseaseModelOptions,
-    clinicalDatasetOptions,
-    rfpOptions,
-    milestoneTypeOptions,
-    onClose
-}: {
+                                      organization,
+                                      milestoneData,
+                                      orgIsPublished,
+                                      biosampleOptions,
+                                      diseaseModelOptions,
+                                      clinicalDatasetOptions,
+                                      rfpOptions,
+                                      milestoneTypeOptions,
+                                      onClose
+                                  }: {
     organization: Organization | undefined
     milestoneData: Milestone
     orgIsPublished: boolean
@@ -249,7 +279,10 @@ export function EditMilestoneForm({
             nodeType: milestoneData?.nodeType || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            types: ((milestoneData?.types || []).map((type: any) => type.milestoneType) || []),
+            types: ((milestoneData?.types || []).map((type: any) => ({
+                ...type.milestoneType,
+                value: type.milestoneTypeId
+            })) || []),
             otherTypeDetails: typeof milestoneData?.metadata === 'object' ? (milestoneData.metadata as {
                 [key: string]: any
             })?.otherTypeDetails : undefined,
@@ -265,8 +298,8 @@ export function EditMilestoneForm({
                 ...(milestoneData?.biosamples || []).map(({biosample}) => {
                     return (
                         {
-                            value: biosample.id, 
-                            type: 'Biosamples', 
+                            value: biosample.id,
+                            type: 'Biosamples',
                             icon: 'test-tube-diagonal',
                             // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
                             label: `${biosample.id}`,
@@ -277,7 +310,7 @@ export function EditMilestoneForm({
                 ...(milestoneData?.diseaseModels || []).map(({diseaseModel}) => {
                     return (
                         {
-                            value: diseaseModel.id, 
+                            value: diseaseModel.id,
                             label: `${diseaseModel.id}`,
                             icon: 'rat',
                             type: 'Disease Models',
@@ -288,8 +321,8 @@ export function EditMilestoneForm({
                 ...(milestoneData?.tools || []).map(({tool}) => {
                     return (
                         {
-                            value: tool?.id, 
-                            label: `${tool?.id}`, 
+                            value: tool?.id,
+                            label: `${tool?.id}`,
                             icon: 'database',
                             type: 'Clinical Datasets',
                             datasample: tool,
@@ -460,13 +493,11 @@ export function EditMilestoneForm({
 
     const init = async () => {
         if (session?.user.organizationId) {
-            console.log(`start init`)
-            console.log(`biosample options`, biosampleOptions)
             const formattedBiosamples: Option[] = (biosampleOptions || []).map((biosample: Partial<Biosample>,) => {
                 return (
                     {
-                        value: biosample.id || '', 
-                        type: 'Biosamples', 
+                        value: biosample.id || '',
+                        type: 'Biosamples',
                         icon: "test-tube-diagonal",
                         // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
                         label: `${biosample.id}`,
@@ -474,11 +505,10 @@ export function EditMilestoneForm({
                     }
                 )
             })
-            console.log(`disease model options`, diseaseModelOptions)
             const formattedDiseaseModels: Option[] = (diseaseModelOptions || []).map((diseaseModel: Partial<DiseaseModel>) => {
                 return (
                     {
-                        value: diseaseModel.id || '', 
+                        value: diseaseModel.id || '',
                         label: `${diseaseModel.id}`,
                         icon: 'rat',
                         type: 'Disease Models',
@@ -486,12 +516,11 @@ export function EditMilestoneForm({
                     }
                 )
             })
-            console.log(`clinical dataset options`, clinicalDatasetOptions)
             const formattedDatasamples: Option[] = (clinicalDatasetOptions || []).map((datasample: Partial<Tool>) => {
                 return (
                     {
-                        value: datasample.id || '', 
-                        label: `${datasample.id}`, 
+                        value: datasample.id || '',
+                        label: `${datasample.id}`,
                         icon: 'database',
                         type: 'Clinical Datasets',
                         datasample
@@ -499,8 +528,6 @@ export function EditMilestoneForm({
                 )
             })
             setFetchedTools([...formattedBiosamples, ...formattedDiseaseModels, ...formattedDatasamples])
-
-            console.log(`end init`)
         }
 
         // if (milestoneData) {
@@ -593,7 +620,7 @@ export function EditMilestoneForm({
                                 <Loading/>
                             ) : (
                                 <>
-                                    <Separator />
+                                    <Separator/>
                                     <TabsContent value="edit" className="space-y-6 w-full h-full">
                                         <div className="w-full grid grid-cols-[100px_auto] gap-2 items-center">
                                             <FormLabel>Visibility</FormLabel>
@@ -698,8 +725,9 @@ export function EditMilestoneForm({
                                                                 groupBy={'type'}
                                                                 creatable={true}
                                                                 creatableItemOverride={() => (
-                                                                    <div className="w-full p-1 bg-white flex flex-col gap-1">
-                                                                        <Separator />
+                                                                    <div
+                                                                        className="w-full p-1 bg-white flex flex-col gap-1">
+                                                                        <Separator/>
                                                                         <Button
                                                                             value={undefined}
                                                                             variant={'ghost'}
@@ -781,8 +809,9 @@ export function EditMilestoneForm({
                                                                 }
                                                                 creatable={true}
                                                                 creatableItemOverride={() => (
-                                                                    <div className="w-full px-1 pb-1 flex flex-col gap-1">
-                                                                        <Separator />
+                                                                    <div
+                                                                        className="w-full px-1 pb-1 flex flex-col gap-1">
+                                                                        <Separator/>
                                                                         <Button
                                                                             value={undefined}
                                                                             variant={'ghost'}
@@ -825,7 +854,7 @@ export function EditMilestoneForm({
                                                                 setHasBudget(false)
                                                             }}
                                                         >
-                                                            <Trash />
+                                                            <Trash/>
                                                         </Button>
                                                     </span>
                                                 </>
@@ -890,7 +919,7 @@ export function EditMilestoneForm({
                                                                         setHasStartDate(false)
                                                                     }}
                                                                 >
-                                                                    <Trash />
+                                                                    <Trash/>
                                                                 </Button>
                                                             </div>
                                                         </>
@@ -958,7 +987,7 @@ export function EditMilestoneForm({
                                                                             setHasEndDate(false)
                                                                         }}
                                                                     >
-                                                                        <Trash />
+                                                                        <Trash/>
                                                                     </Button>
                                                                 </div>
                                                                 <FormMessage/>
@@ -977,17 +1006,17 @@ export function EditMilestoneForm({
                                         )}
 
                                         {(
-                                            !hasBudget || 
-                                            !hasStartDate || 
-                                            !hasEndDate || 
-                                            !(formData?.contacts && formData?.contacts.length > 0) || 
+                                            !hasBudget ||
+                                            !hasStartDate ||
+                                            !hasEndDate ||
+                                            !(formData?.contacts && formData?.contacts.length > 0) ||
                                             !(formData?.attachments && formData?.attachments.length > 0)
                                         ) && (
                                             <>
                                                 {/* <FormLabel>Additional Properties</FormLabel> */}
                                                 <span className="flex flex-wrap gap-2">
                                                     {(!hasBudget) && (
-                                                        <Button 
+                                                        <Button
                                                             onClick={() => setHasBudget(true)}
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
@@ -996,7 +1025,7 @@ export function EditMilestoneForm({
                                                         </Button>
                                                     )}
                                                     {(!hasStartDate) && (
-                                                        <Button 
+                                                        <Button
                                                             onClick={() => setHasStartDate(true)}
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
@@ -1005,7 +1034,7 @@ export function EditMilestoneForm({
                                                         </Button>
                                                     )}
                                                     {(!hasEndDate) && (
-                                                        <Button 
+                                                        <Button
                                                             onClick={() => setHasEndDate(true)}
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
@@ -1014,7 +1043,7 @@ export function EditMilestoneForm({
                                                         </Button>
                                                     )}
                                                     {(!formData?.contacts || formData?.contacts.length <= 0) && (
-                                                        <Button 
+                                                        <Button
                                                             onClick={() => {
                                                                 form.setValue("contacts", [
                                                                     {name: "", email: "", role: null}
@@ -1027,7 +1056,7 @@ export function EditMilestoneForm({
                                                         </Button>
                                                     )}
                                                     {(!formData?.attachments || formData?.attachments.length <= 0) && (
-                                                        <Button 
+                                                        <Button
                                                             onClick={() => {
                                                                 form.setValue("attachments", [
                                                                     {name: '', link: ''} as any
@@ -1185,8 +1214,8 @@ export function EditMilestoneForm({
                             {`Create your Tool here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditBiosampleToolForm 
-                        toolData={{}} 
+                    <EditBiosampleToolForm
+                        toolData={{}}
                         closeDialog={(newBiosample) => {
                             setCreateBiosampleIsOpen(false)
 
@@ -1194,15 +1223,15 @@ export function EditMilestoneForm({
                                 form.setValue("tools", [
                                     ...(form.getValues("tools") || []),
                                     {
-                                        value: newBiosample.id, 
-                                        type: 'Biosamples', 
+                                        value: newBiosample.id,
+                                        type: 'Biosamples',
                                         // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
                                         label: `${newBiosample.id}`,
                                         biosample: newBiosample
                                     }
                                 ])
                             }
-                        }} 
+                        }}
                     />
                 </DialogContent>
             </Dialog>
@@ -1217,8 +1246,8 @@ export function EditMilestoneForm({
                             {`Create your Tool here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditDiseaseModelToolForm 
-                        toolData={{}} 
+                    <EditDiseaseModelToolForm
+                        toolData={{}}
                         closeDialog={(newDiseaseModel) => {
                             setCreateDiseaseModelIsOpen(false)
 
@@ -1226,14 +1255,14 @@ export function EditMilestoneForm({
                                 form.setValue("tools", [
                                     ...(form.getValues("tools") || []),
                                     {
-                                        value: newDiseaseModel.id, 
+                                        value: newDiseaseModel.id,
                                         label: `${newDiseaseModel.id}`,
                                         type: 'Disease Models',
                                         diseaseModel: newDiseaseModel
                                     }
                                 ])
                             }
-                        }} 
+                        }}
                     />
                 </DialogContent>
             </Dialog>
@@ -1248,8 +1277,8 @@ export function EditMilestoneForm({
                             {`Create your Tool here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditDataToolForm 
-                        toolData={{}} 
+                    <EditDataToolForm
+                        toolData={{}}
                         closeDialog={(newDatasample) => {
                             setCreateClinicalDatasetIsOpen(false)
 
@@ -1257,14 +1286,14 @@ export function EditMilestoneForm({
                                 form.setValue("tools", [
                                     ...(form.getValues("tools") || []),
                                     {
-                                        value: newDatasample.id, 
-                                        label: newDatasample.id, 
+                                        value: newDatasample.id,
+                                        label: newDatasample.id,
                                         type: 'Clinical Datasets',
                                         datasample: newDatasample
                                     }
                                 ])
                             }
-                        }} 
+                        }}
                     />
                 </DialogContent>
             </Dialog>
@@ -1279,16 +1308,16 @@ export function EditMilestoneForm({
                             {`Create your RFP here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditRFPForm 
+                    <EditRFPForm
                         rfpData={{
                             milestones: [
                                 {
-                                    milestoneId: milestoneData.id, 
-                                    rfpId: nanoid(), 
+                                    milestoneId: milestoneData.id,
+                                    rfpId: nanoid(),
                                     milestone: milestoneData
                                 } as any
                             ]
-                        }} 
+                        }}
                         closeDialog={(newRFP) => {
                             setCreateRFPIsOpen(false)
 
@@ -1298,7 +1327,7 @@ export function EditMilestoneForm({
                                     newRFP as any
                                 ])
                             }
-                        }} 
+                        }}
                     />
                 </DialogContent>
             </Dialog>
@@ -1379,8 +1408,8 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
             {types?.map((type: any) => type?.value).includes("OTHER") && (
                 <>
                     <div>
-                        <FormLabel className="text-md">{`Type Description`}</FormLabel>
-                        <FormDescription>{`This will be used to improve the platform.`}</FormDescription>
+                        <FormLabel className="text-sm">{`Type Description`}</FormLabel>
+                        <FormDescription className="text-xs">{`This will be used to improve the platform.`}</FormDescription>
                     </div>
                     <FormField
                         control={form.control}
@@ -1408,7 +1437,7 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
 export const PrivatePublicFormField = ({
                                            form,
                                            formData,
-                                        //    disabled = false,
+                                           //    disabled = false,
                                            mixpanelTrackCallback
                                        }: {
     form: any,
@@ -1494,10 +1523,10 @@ export const PrivatePublicFormField = ({
                                 <FormControl>
                                     <span className="flex gap-2">
                                         <RadioGroupItem value="PRIVATE"/>
-                                        <Tooltip 
+                                        <Tooltip
                                             // disableHoverableContent={disabled}
                                         >
-                                            <TooltipTrigger 
+                                            <TooltipTrigger
                                                 // disabled={disabled} 
                                                 asChild
                                             >
@@ -1519,10 +1548,10 @@ export const PrivatePublicFormField = ({
                                 <FormControl>
                                     <span className="flex gap-2">
                                         <RadioGroupItem value="PUBLIC"/>
-                                        <Tooltip 
+                                        <Tooltip
                                             // disableHoverableContent={disabled}
                                         >
-                                        <TooltipTrigger 
+                                        <TooltipTrigger
                                             // disabled={disabled} 
                                             asChild
                                         >

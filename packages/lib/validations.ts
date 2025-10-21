@@ -104,6 +104,29 @@ export const biosampleSearchParamsCache = createSearchParamsCache({
   joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and"),
 });
 
+export const clinicalDatasetSearchParamsCache = createSearchParamsCache({
+  q: parseAsString.withDefault(""),
+  filterFlag: parseAsStringEnum(
+      flagConfig.featureFlags.map((flag) => flag.value),
+  ),
+  page: parseAsInteger.withDefault(1),
+  perPage: parseAsInteger.withDefault(10),
+  sort: getSortingStateParser<Tool>().withDefault([
+    { id: "createdAt", desc: true },
+  ]),
+  title: parseAsString.withDefault(""),
+  types: parseAsArrayOf(z.string()).withDefault([]),
+  availability: parseAsArrayOf(z.string()).withDefault([]),
+  currentCountry: parseAsString.withDefault(""),
+  countryOfCollection: parseAsString.withDefault(""),
+  quantity: parseAsArrayOf(z.coerce.number()).withDefault([]),
+  private: parseAsArrayOf(z.string().toLowerCase().transform((x) => x === 'true').pipe(z.boolean())).withDefault([]),
+  createdAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
+  // advanced filter
+  filters: getFiltersStateParser().withDefault([]),
+  joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and"),
+});
+
 export const createTaskSchema = z.object({
   title: z.string(),
   label: labelEnum,
@@ -129,6 +152,9 @@ export type GetDiseaseModelSchema = Awaited<
 >
 export type GetBiosamplesSchema = Awaited<
     ReturnType<typeof biosampleSearchParamsCache.parse>
+>
+export type GetClinicalDatasetsSchema = Awaited<
+    ReturnType<typeof clinicalDatasetSearchParamsCache.parse>
 >
 export type GetBiosampleRequestsSchema = Awaited<
     ReturnType<typeof biosampleRequestsSearchParamsCache.parse>

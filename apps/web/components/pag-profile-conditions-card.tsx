@@ -3,10 +3,23 @@ import {Condition, Organization} from "@prisma/client";
 import {Badge} from "@comend/components/ui/badge";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import React from "react";
-import EditPAGProfileConditionCardDialog from "~web/components/edit-pag-profile-condition-card-dialog";
-import {Info} from "lucide-react";
+import {Info, Pencil} from "lucide-react";
 import {formatNumberWithCommas} from "@/packages/lib/utils";
-import type {Prisma} from "@prisma/client"; // type-only; erased at build
+import type {Prisma} from "@prisma/client";
+import dynamic from "next/dynamic";
+import {Button} from "@/packages/components/ui/button"; // type-only; erased at build
+import LoadingDots from "@comend/components/icons/loading-dots"
+
+const EditPAGProfileConditionCardDialog = dynamic(
+    () => import("~web/components/edit-pag-profile-condition-card-dialog"),
+    {
+        ssr: false,
+        loading: () =>
+            <Button variant="ghost" size="icon" aria-label="Owners only" disabled>
+                <LoadingDots color="#808080" />
+            </Button>
+    }
+);
 
 type AssocMini = { id: string; name: string; slug: string };
 

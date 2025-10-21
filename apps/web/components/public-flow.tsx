@@ -1,15 +1,18 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import {
     ReactFlow,
     MiniMap,
     useReactFlow,
     Background,
     BackgroundVariant,
+    applyNodeChanges,
+    NodeChange,
+    Node,
 } from "@xyflow/react"
 import "@xyflow/react/dist/base.css"
-import { MemoPublicMilestoneNodeButton, MemoPublicMilestoneNodeLink } from "./milestone-node"
+import { MemoPublicMilestoneNodeButton, MemoPublicMilestoneNodeLink, MilestoneNode } from "./milestone-node"
 
 export const PublicFlowView = ({ 
     roadmap, 
@@ -30,6 +33,21 @@ export const PublicFlowView = ({
         RFP: externalLinks ? MemoPublicMilestoneNodeLink: MemoPublicMilestoneNodeButton
     }
     const { fitView } = useReactFlow()
+    const [localNodes, setLocalNodes] = useState(roadmap.nodes)
+
+    useEffect(() => {
+        setLocalNodes(roadmap.nodes
+            .sort((a: any, b: any) => b.createdAt - a.createdAt)
+            .map((node: any) => {
+                const milestone = roadmap.milestones.find((m: any) => m.nodeId == node.id)
+                return {
+                    ...node, 
+                    type: milestone?.nodeType || "PROJECT",
+                    data: milestone || node.data
+                } as Node
+            }))
+        // setLocalEdges(edges)
+    }, [roadmap.nodes])
 
     useEffect(() => {
         if (urlMilestone && roadmap?.nodes) {
@@ -45,23 +63,37 @@ export const PublicFlowView = ({
         }
     }, [urlMilestone])
 
+    const onNodesChange = (changes: NodeChange<Node>[]) => {
+        const newNodes = applyNodeChanges(changes, localNodes)
+        setLocalNodes(newNodes)
+    }
+
+    const updatedNodes = localNodes.map((node: any, index: number) => ({
+        ...node,
+        position: {
+            x: node.positionX,
+            y: node.positionY
+        },
+        type: "PROJECT",
+        data: {
+            ...roadmap.milestones.find((milestone: any) => milestone.nodeId === node.id),
+            subdomain: subdomain,
+            focused: urlMilestone === node?.data?.id,
+            externalLink: externalLinks,
+            setUrlMilestone: setUrlMilestone
+        },
+    }))
+
     return (
     <ReactFlow
         width={80}
-        nodes={roadmap?.nodes.map((node: any) => ({
-            ...node, 
-            position: {x: node.positionX, y: node.positionY}, 
-            type: node.data.nodeType,
-            data: {
-                ...node.data,
-                subdomain: subdomain,
-                focused: urlMilestone === node?.data?.id,
-                externalLink: externalLinks,
-                setUrlMilestone: setUrlMilestone
-            }
+        nodes={updatedNodes}
+        edges={roadmap?.edges.map((edge: any) => ({
+            ...edge,
+            type: 'DEFAULT'
         })) || []}
-        edges={roadmap?.edges || []}
         nodeTypes={nodeTypes}
+        onNodesChange={onNodesChange}
         proOptions={{ hideAttribution: true }}
         edgesReconnectable={false}
         edgesFocusable={false}
@@ -73,10 +105,10 @@ export const PublicFlowView = ({
         minZoom={0.1}
     >
         <Background variant={BackgroundVariant.Dots} />
-        {/* <MiniMap
+        <MiniMap
             nodeColor='#757575'
             maskColor='rgb(200, 200, 200, 0.8)' 
-        /> */}
+        />
     </ReactFlow>
     )
 }

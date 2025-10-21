@@ -3,7 +3,7 @@ import { Roadmap } from "~web/components/roadmap"
 import NoOrganization from "~web/components/no-organization"
 import {
     getBiosamples, 
-    getDatasamples, 
+    getClinicalDatasets, 
     getDiseaseModels, 
     getMilestoneTypes, 
     getOrganizationFromOrganizationId, 
@@ -108,7 +108,7 @@ export default async function RoadmapPage({
         }),
         getBiosamples(orgId, { id: true }),
         getDiseaseModels(orgId, { id: true }),
-        getDatasamples(orgId, { id: true }),
+        getClinicalDatasets(orgId, { id: true }),
         getRFPs(orgId, {id: true, title: true})
     ])
 

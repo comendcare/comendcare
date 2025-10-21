@@ -4,18 +4,25 @@ import * as React from "react";
 import {DataTable} from "./../data-table/data-table";
 import {useDataTable} from "./../../../../../packages/lib/hooks/use-data-table";
 import {ColumnDef, Row} from "@tanstack/react-table";
-import {Tool} from "@prisma/client";
+import type {Biosample, Tool} from "@prisma/client";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 import { useBiosampleSearchStore } from "../../../../../state/search/biosampleSearchStore";
 import {DataTableToolbar} from "./../data-table/data-table-toolbar";
 
-export function BiosamplesTable({data, pageCount, columns, onSelectionChange, searchParams, showPagination = true}: {
-    data: Tool[],
+export function BiosamplesTable({
+    data, 
+    pageCount, 
+    columns, 
+    onSelectionChange, 
+    searchParams, 
+    showPagination = true,
+}: {
+    data: Biosample[],
     pageCount: number,
     columns: ColumnDef<any>[],
     onSelectionChange?: (selectedRows: Tool[]) => void,
     searchParams: SearchParams,
-    showPagination?: boolean
+    showPagination?: boolean,
 }) {
     const {table, shallow, debounceMs, throttleMs} = useDataTable({
         data,

@@ -7,27 +7,22 @@ import { NoResultsView } from "../no-results";
 import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns";
 import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table";
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
-import { SearchParams } from "@/packages/components/types";
 
 const selector = (state: ClinicalDatasetSearchState) => ({
     searchResults: state.searchResults,
-    setSortBy: state.setSortBy
 })
 
 export function ClinicalDatasetSearchResults({
-    searchParams
+    isInitialized
 }: {
-    searchParams?: SearchParams | undefined
+    isInitialized: boolean
 }) {
     const { 
         searchResults,
-        setSortBy
     } = useClinicalDatasetSearchStore(useShallow(selector))
     const columns = useClinicalDatasetsTableColumns()
 
-    setSortBy(searchParams?.sort)
-
-    if (!searchResults) {
+    if (!isInitialized || !searchResults) {
         return (
             <div className="h-full w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                 <Skeleton className="h-[286px] w-full"/>
