@@ -163,22 +163,22 @@ export const PrivateFlowView = ({
         }
       }, [startConnectNode, screenToFlowPosition, getIntersectingNodes]);
 
-    const handleEditClick = (event: React.MouseEvent, node: Node) => {
-        if (event.ctrlKey || event.altKey) return
-        if (event.metaKey) {
-            // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
-            if (node.id && !selectedNodeIds.includes(node.id)) {
-                setSelectedNodeIds([...selectedNodeIds, node.id])
-            }
-        } else {
-            // regular click, set selected node id
-            if (node.id) {
-                setSelectedNodeIds([node.id])
-            } else {
-                setSelectedNodeIds([])
-            }
-        }
-    }
+    // const handleEditClick = (event: React.MouseEvent, node: Node) => {
+    //     if (event.ctrlKey || event.altKey) return
+    //     if (event.metaKey) {
+    //         // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
+    //         if (node.id && !selectedNodeIds.includes(node.id)) {
+    //             setSelectedNodeIds([...selectedNodeIds, node.id])
+    //         }
+    //     } else {
+    //         // regular click, set selected node id
+    //         if (node.id) {
+    //             setSelectedNodeIds([node.id])
+    //         } else {
+    //             setSelectedNodeIds([])
+    //         }
+    //     }
+    // }
 
     const onNodesChange = (changes: NodeChange<Node>[]) => {
         const newNodes = applyNodeChanges(changes, localNodes).map(node => {
@@ -210,8 +210,7 @@ export const PrivateFlowView = ({
 
     const onConnectEnd = useCallback(
         (event: any, connectionState: any) => {
-            // when a connection is dropped on the pane it's not valid
-            if (!connectionState.isValid && previewNodeRef.current) {
+            if (connectionState.isValid && previewNodeRef.current) {
                 // we need to remove the wrapper bounds, in order to get the correct position
                 const id = nanoid();
                 const { clientX, clientY } =
@@ -228,7 +227,7 @@ export const PrivateFlowView = ({
                         id: nanoid(),
                         nodeId: id,
                     },
-                    origin: connectionState.fromHandle?.position === 'left' ? [1.0, 0.5] : [0.0, 0.5],
+                    origin: connectionState.fromHandle?.position === 'left' ? [1.0, 0.0] : [0.0, 0.0],
                 }
 
                 addNodes([newNode], "Flow Connection")
@@ -279,6 +278,9 @@ export const PrivateFlowView = ({
             contextMenuRef,
             organization: organization
         },
+        draggable: true,
+        dragHandle: '.drag-handle', // class on the element that should start drag
+        isSelectable: false,
         isPublic: false
     }))
 
@@ -350,7 +352,7 @@ export const PrivateFlowView = ({
             }}
             nodes={previewNode ? [...updatedNodes, previewNode] : updatedNodes}
             edges={updatedEdges}
-            onNodeClick={handleEditClick}
+            // onNodeClick={handleEditClick}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}

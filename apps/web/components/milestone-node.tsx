@@ -100,17 +100,37 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
         };
     }, [selectedNodeIds])
 
+    const handleEditClick = (event: React.MouseEvent, nodeId: string) => {
+        if (event.ctrlKey || event.altKey) return
+        if (event.metaKey) {
+            // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
+            if (nodeId && !selectedNodeIds.includes(nodeId)) {
+                setSelectedNodeIds([...selectedNodeIds, nodeId])
+            }
+        } else {
+            // regular click, set selected node id
+            if (nodeId) {
+                setSelectedNodeIds([nodeId])
+            } else {
+                setSelectedNodeIds([])
+            }
+        }
+    }
+
     return (
         <Card 
             className={cn(
-                "border-2 border-gray-300 w-[350px] text-wrap",
+                "drag-handle border-2 border-gray-300 w-[350px] text-wrap",
                 props?.id && selectedNodeIds.includes(props?.id) ? "border-gray-900 border-2 click-project-step" : "",
                 props.id === "preview" ? "opacity-50" : "",
             )}
             style={{
                 // transform the node so the 'snap to grid' point is centered in the node
                 // this allows edges to be straight, and perfectly align handles no matter the node's card height
-                transform: 'translate(0%, -50%)',
+                transform: props.id === 'preview' ? 'translate(0%, 50%)' : 'translate(0%, -50%)',
+            }}
+            onClick={(e) => {
+                handleEditClick(e, props.id)
             }}
         >
             <CardHeader className="py-4">
@@ -268,23 +288,29 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
 
             {props.data?.contextMenuRef && props.id !== "preview" ? (
                 <>
-                    <NodeHandle type="target" position={Position.Left} node={props as NodeProps<MilestoneNodeType>}/>
                     <NodeHandle 
-                        type="source" position={Position.Right}
-                        node={props as NodeProps<MilestoneNodeType>}/>
+                        type="target" 
+                        position={Position.Left} 
+                        node={props as NodeProps<MilestoneNodeType>}
+                    />
+                    <NodeHandle 
+                        type="source" 
+                        position={Position.Right}
+                        node={props as NodeProps<MilestoneNodeType>}
+                    />
                 </>
             ): (
                 <>
-                <Handle
-                    type="target"
-                    position={Position.Left}
-                    className="z-10 bg-black p-1 rounded-full border-solid border-black border-2"
-                />
-                <Handle
-                    type="source"
-                    position={Position.Right}
-                    className="z-10 bg-black p-1 rounded-full border-solid border-black border-2"
-                />
+                    <Handle
+                        type="target"
+                        position={Position.Left}
+                        className="z-10 bg-black p-1 rounded-full border-solid border-black border-2"
+                    />
+                    <Handle
+                        type="source"
+                        position={Position.Right}
+                        className="z-10 bg-black p-1 rounded-full border-solid border-black border-2"
+                    />
                 </>
             )}
         </Card>
