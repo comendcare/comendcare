@@ -7,7 +7,6 @@ import { SearchParams } from "@/packages/components/types";
 import { initializeBiosampleSearch } from "@/packages/lib/initialize-client-state";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
 import { useShallow } from "zustand/react/shallow";
-import { PrivateBiosampleToolsPage } from "~web/components/private-biosample-tools-page";
 
 interface IndexPageProps {
     searchParams: Promise<SearchParams>
