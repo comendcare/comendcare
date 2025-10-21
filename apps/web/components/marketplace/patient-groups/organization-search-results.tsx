@@ -12,17 +12,20 @@ import {getSavedCompaniesFromOrganizationId, getSavedOrganizationsFromOrganizati
 import {SavedCompany, SavedOrganization} from "@prisma/client";
 import {useSession} from "next-auth/react";
 import {SavedOrganizationData} from "@/packages/lib/types";
+import { LoaderCircle } from "lucide-react";
+import { cn } from "@/packages/lib/utils";
 
 const selector = (state: OrganizationSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
     setLastFetchedPage: state.setLastFetchedPage,
     view: state.view,
-    searchResults: state.searchResults
+    searchResults: state.searchResults,
+    totalResults: state.totalResults,
 })
 
 export function OrganizationSearchResults({isPublic}: {isPublic: boolean}) {
     const {data: session, status} = useSession()
-    const { lastFetchedPage, setLastFetchedPage, view, searchResults } = useOrganizationSearchStore(useShallow(selector))
+    const { lastFetchedPage, setLastFetchedPage, view, searchResults, totalResults } = useOrganizationSearchStore(useShallow(selector))
     const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
 
     useEffect(() => {
@@ -98,6 +101,9 @@ export function OrganizationSearchResults({isPublic}: {isPublic: boolean}) {
     return (
         <>
             <ResultsView />
+            <LoaderCircle 
+                className={cn("h-[40px] w-[40px] animate-spin", (searchResults.length === totalResults) && "opacity-0")}
+            />
             <InfiniteScroll 
                 lastFetchedPage={lastFetchedPage} 
                 setLastFetchedPage={setLastFetchedPage}

@@ -34,7 +34,7 @@ export default function PatientGroupsPage() {
 
     return (
         <main className="flex flex-col w-full px-4 pb-20 items-center h-full">
-            <div className="flex flex-col gap-4 p-2 w-full">
+            <div className="flex flex-col gap-4 p-2 w-full items-center align-center">
                 <PAGMarketplaceIntegratedSearchAndFilter />
                 <OrganizationSearchResults isPublic={false} />
             </div>
