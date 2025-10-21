@@ -920,6 +920,7 @@ export const BIOSAMPLE_TYPE_OPTIONS: Option[] = [
     { value: 'RNA', label: 'RNA' },
     { value: 'SALIVA', label: 'Saliva' },
     { value: 'STOOL', label: 'Stool' },
+    { value: 'OTHER', label: 'Other' }
 ]
 
 export const TOOL_TYPE_OPTIONS: Option[] = [
@@ -933,6 +934,7 @@ export const TOOL_TYPE_OPTIONS: Option[] = [
     { value: 'TOXICOLOGYSTUDY', label: 'Toxicology study' },
     { value: 'EEG', label: 'EEG' },
     { value: 'STRUCTURALMRI', label: 'Structural MRI' },
+    { value: 'OTHER', label: 'Other' }
 ]
 
 export const REQUEST_STATUS_OPTIONS: any[] = [
