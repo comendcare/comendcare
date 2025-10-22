@@ -3,7 +3,7 @@ import NoOrganization from "~web/components/no-organization"
 import {getSession} from "@/packages/lib/auth"
 import { PrivateRFPsPage } from "~web/components/private-rfps-page"
 import prisma from "@comend/lib/prisma"
-
+import { RFPSort } from "@/packages/lib/utils"
 
 export default async function RFPsPage() {
     const session = await getSession()
@@ -13,7 +13,9 @@ export default async function RFPsPage() {
 
     const rfps = await prisma.rFP.findMany({
         where: { organizationId: orgId },
-        orderBy: { createdAt: "desc" },
+        orderBy: { 
+            createdAt: "desc" 
+        },
         include: {
             contacts: true,
             attachments: true,
@@ -25,5 +27,5 @@ export default async function RFPsPage() {
         },
     })
 
-    return <PrivateRFPsPage initialRFPs={rfps}/>
+    return <PrivateRFPsPage initialRFPs={RFPSort(rfps)}/>
 }

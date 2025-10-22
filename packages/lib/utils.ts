@@ -17,6 +17,40 @@ import {
     Task
 } from "./types";
 import Papa from "papaparse";
+import type { RFP } from "@prisma/client";
+
+export const RFPSort = (rfps: RFP[]) => {
+    const now = new Date();
+
+    // sort RFPs - 
+    //      open (due earliest -> due latest, undefined at end) > 
+    //      upcoming (starting earliest -> starting latest) > 
+    //      closed (due latest -> due earliest)
+    const isOpen = (rfp: RFP) => rfp.startDate && rfp.startDate <= now && (rfp.endDate ? rfp.endDate >= now : true)
+    const isUpcoming = (rfp: RFP) => rfp.startDate && rfp.startDate > now
+    const isClosed = (rfp: RFP) => rfp.endDate && rfp.endDate < now
+
+    const openRFPs = rfps.filter(rfp => isOpen(rfp)).sort((a: RFP, b: RFP) => {
+        if (a.endDate && b.endDate) return a.endDate.getTime() - b.endDate.getTime()
+        return 1
+    })
+    const upcomingRFPs = rfps.filter(rfp => isUpcoming(rfp)).sort((a: RFP, b: RFP) => {
+        if (a.startDate && b.startDate) return a.startDate.getTime() - b.startDate.getTime()
+        return 1
+    })
+    const closedRFPs = rfps.filter(rfp => isClosed(rfp)).sort((a: RFP, b: RFP) => {
+        if (a.endDate && b.endDate) return a.endDate.getTime() - b.endDate.getTime()
+        return 1
+    })
+    const otherRFPs = rfps.filter(rfp => !isOpen(rfp) && !isUpcoming(rfp) && !isClosed(rfp))
+
+    return ([
+        ...openRFPs,
+        ...upcomingRFPs,
+        ...closedRFPs,
+        ...otherRFPs
+    ])
+}
 
 const dateFmtUTC = new Intl.DateTimeFormat("en-US", {
     timeZone: "UTC",

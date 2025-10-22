@@ -27,6 +27,7 @@ import { PAGProfileToolsCard } from "~web/components/pag-profile-tools-card";
 import { SearchParams } from "@/packages/components/types";
 import { biosampleSearchParamsCache } from "@/packages/lib/validations";
 import { getValidFilters } from "@/packages/lib/data-table";
+import { RFPSort } from "@/packages/lib/utils";
 
 interface IndexPageProps {
     params: {domain: string},
@@ -316,7 +317,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                             {(rfps.length > 0) && (
                                 <PAGProfileRFPsHoverableCard
                                     isPrivate={false}
-                                    rfps={rfps}
+                                    rfps={RFPSort(rfps)}
                                 />
                             )}
                             <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
