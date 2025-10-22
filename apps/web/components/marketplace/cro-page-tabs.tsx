@@ -81,17 +81,17 @@ export default function CROPageTabs({company}: {company: CompanyWithReviewsAndSe
                 {/*        </div>*/}
                 {/*    )}*/}
                 {/*</TabsTrigger>*/}
-                <TabsTrigger value="reviews" variant="outline" className="px-8">
-                    <Users className="mr-1.5 h-4 w-4 flex-shrink-0"/>
-                    Reviews
-                    {company?.reviews?.length !== undefined && (
-                        <div
-                            className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
-                        >
-                            {company.reviews.length}
-                        </div>
-                    )}
-                </TabsTrigger>
+                {/*<TabsTrigger value="reviews" variant="outline" className="px-8">*/}
+                {/*    <Users className="mr-1.5 h-4 w-4 flex-shrink-0"/>*/}
+                {/*    Reviews*/}
+                {/*    {company?.reviews?.length !== undefined && (*/}
+                {/*        <div*/}
+                {/*            className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'*/}
+                {/*        >*/}
+                {/*            {company.reviews.length}*/}
+                {/*        </div>*/}
+                {/*    )}*/}
+                {/*</TabsTrigger>*/}
             </TabsList>
             <TabsContent value="services" className="space-y-4 w-full">
                 {(!company) ? (
@@ -115,9 +115,9 @@ export default function CROPageTabs({company}: {company: CompanyWithReviewsAndSe
             {/*<TabsContent value="certifications" className="space-y-4 w-full">*/}
             {/*    <CROMarketplaceProfileCertificationsTab croCertifications={company.certifications}/>*/}
             {/*</TabsContent>*/}
-            <TabsContent value="reviews" className="space-y-4 w-full">
-                <CROMarketplaceProfileReviewsTab cro={company as CompanyWithReviewsAndServices}/>
-            </TabsContent>
+            {/*<TabsContent value="reviews" className="space-y-4 w-full">*/}
+            {/*    <CROMarketplaceProfileReviewsTab cro={company as CompanyWithReviewsAndServices}/>*/}
+            {/*</TabsContent>*/}
         </Tabs>
     )
 }
