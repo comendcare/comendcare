@@ -35,7 +35,7 @@ import {Popover, PopoverContent, PopoverTrigger} from "@comend/components/ui/pop
 import {cn} from "@comend/lib/utils"
 import {format} from "date-fns"
 import {Calendar} from "@comend/components/ui/calendar"
-import { Calendar as CalendarIcon, Pencil, Pin } from "lucide-react"
+import { Calendar as CalendarIcon, Lock, Pencil, Pin } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { AttachmentsFormField, BudgetFormField, ContactsFormField, OpenToFormField, PrivatePublicFormField } from "./edit-milestone-form"
@@ -52,6 +52,7 @@ import { useShallow } from "zustand/react/shallow"
 import MoneyInput from "@comend/components/money-input"
 import ProjectMultipleSelector from "./project-multiple-selector"
 import { revalidate } from "@/packages/lib/revalidate"
+import { Separator } from "@/packages/components/ui/separator"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -99,10 +100,10 @@ const editRFPForm = z.object({
         })
         .min(1, "Title is required")
         .max(200, "Title must be less than 200 characters"),
-    description: z
-        .string()
-        .max(1000, "Description must be less than 1000 characters")
-        .optional(),
+    description: z.string().optional(),
+    eligibility: z.string().optional(),
+    instructions: z.string().optional(),
+    evaluationProcess: z.string().optional(),
     attachments: z.array(z.custom<AttachmentType>()).optional(),
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
@@ -111,6 +112,7 @@ const editRFPForm = z.object({
     endDate: z.date().optional(),
     milestones: z.array(z.custom<Milestone>()).optional(),
     budget: z.number().max(2147483647).min(0).optional(),
+    notes: z.string().optional(),
 }).refine(
     (rfp) => rfp.startDate && rfp.endDate ? rfp.startDate?.getTime() <= rfp.endDate?.getTime() : true, 
     {
@@ -156,6 +158,9 @@ export function EditRFPForm({
             // headerImage: rfpData?.headerImage || undefined,
             title: rfpData?.title || "",
             description: rfpData?.description || "",
+            eligibility: rfpData?.eligibility || "",
+            instructions: rfpData?.instructions || "",
+            evaluationProcess: rfpData?.evaluationProcess || "",
             attachments: rfpData?.attachments || undefined,
             isPrivate: rfpData?.private !== undefined ? rfpData?.private : true,
             contacts: rfpData?.contacts || undefined,
@@ -164,6 +169,7 @@ export function EditRFPForm({
             endDate: rfpData?.endDate || undefined,
             milestones: (rfpData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
             budget: rfpData?.budget || undefined,
+            notes: rfpData?.notes || "",
         }
     })
 
@@ -187,6 +193,9 @@ export function EditRFPForm({
             headerImage,
             title,
             description,
+            eligibility,
+            instructions,
+            evaluationProcess,
             attachments,
             isPrivate,
             contacts,
@@ -194,7 +203,8 @@ export function EditRFPForm({
             startDate,
             endDate,
             milestones,
-            budget
+            budget,
+            notes
         } = values;
 
         const updateData: Partial<RFP> = {
@@ -209,12 +219,16 @@ export function EditRFPForm({
                 })
             }),
             ...(description !== undefined && description !== null ? {description} : undefined),
+            ...(eligibility !== undefined && eligibility !== null ? {eligibility} : undefined),
+            ...(instructions !== undefined && instructions !== null ? {instructions} : undefined),
+            ...(evaluationProcess !== undefined && evaluationProcess !== null ? {evaluationProcess} : undefined),
             ...(attachments ? {attachments} : undefined),
             ...(contacts ? {contacts} : undefined),
             ...(openTo ? {openTo} : undefined),
             ...(startDate ? {startDate} : undefined),
             ...(endDate ? {endDate} : undefined),
             ...(budget ? {budget} : undefined),
+            ...(notes !== undefined && notes !== null ? {notes} : undefined),
         }
 
         if (!session?.user?.organizationId) {
@@ -449,11 +463,65 @@ export function EditRFPForm({
                         name="description"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel >{`Description`}</FormLabel>
+                                <FormLabel >{`Scope`}</FormLabel>
                                 <FormControl>
                                     <Textarea
-                                        id="description"
-                                        placeholder={`Enter a description...`}
+                                        id="scope"
+                                        placeholder={`Enter scope...`}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="eligibility"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel >{`Eligibility`}</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        id="eligibility"
+                                        placeholder={`Enter eligibility...`}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="instructions"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel >{`Instructions`}</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        id="instructions"
+                                        placeholder={`Enter instructions...`}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="evaluationProcess"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel >{`Evaluation Process`}</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        id="evaluationProcess"
+                                        placeholder={`Enter evaluation process...`}
                                         {...field}
                                     />
                                 </FormControl>
@@ -505,6 +573,38 @@ export function EditRFPForm({
 
                     <ContactsFormField form={form} />
                     <AttachmentsFormField form={form} />
+
+                    <Separator />
+        
+                    <FormField
+                        control={form.control}
+                        name="notes"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px] flex items-center">
+                                <span>Internal Notes</span>
+                                <Tooltip>
+                                    <TooltipTrigger className="pl-2">
+                                    <Lock className="h-4 w-4" />
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left">
+                                    <p className="text-normal">
+                                        Only visible to your team
+                                    </p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                </FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        id="notes"
+                                        placeholder={`Enter internal notes...`}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
                 </div>
             </ScrollArea>
 
