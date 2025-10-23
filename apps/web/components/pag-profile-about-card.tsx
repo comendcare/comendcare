@@ -130,7 +130,9 @@ export const PagProfileAboutCard = ({
                         </div>
 
                         {organization?.members && organization.members.length > 0 ? (
-                            organization.members.map((member, index) => (
+                            organization.members
+                                .filter(member => !member.user.email?.toLowerCase().endsWith("@comendcare.com"))
+                                .map((member, index) => (
                                 <div key={index} className="flex items-center space-x-4" data-testid="member-item">
                                     <Avatar>
                                         <AvatarImage src={member.user.image || ""} />
