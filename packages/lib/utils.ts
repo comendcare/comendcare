@@ -19,6 +19,38 @@ import {
 import Papa from "papaparse";
 import type { RFP } from "@prisma/client";
 
+type DateStatus =
+    | { status: "Not Open"; daysRemaining: number | undefined; variant: "yellow" }
+    | { status: "Open"; daysRemaining: number | undefined; variant: "green" }
+    | { status: "Closed"; daysRemaining: number | undefined; variant: "red" }
+    | undefined;
+
+function toUTCDateOnly(d: Date) {
+    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+}
+
+export function checkDateRangeUTC(startDateStr?: string | Date, endDateStr?: string | Date): DateStatus {
+    if (!startDateStr && !endDateStr) return undefined;
+
+    const todayUTC = toUTCDateOnly(new Date());
+    const startRaw = startDateStr ? new Date(startDateStr) : undefined;
+    const endRaw = endDateStr ? new Date(endDateStr) : undefined;
+
+    if ((startRaw && isNaN(startRaw.getTime())) || (endRaw && isNaN(endRaw.getTime()))) return undefined;
+
+    const start = startRaw ? toUTCDateOnly(startRaw) : undefined;
+    const end = endRaw ? toUTCDateOnly(endRaw) : undefined;
+
+    if (start && todayUTC < start) return {status: "Not Open", daysRemaining: undefined, variant: "yellow"};
+    if (end && todayUTC > end) return {status: "Closed", daysRemaining: undefined, variant: "red"};
+
+    if ((!start || todayUTC >= start) && (!end || todayUTC <= end)) {
+        const daysRemaining = end ? Math.ceil((end.getTime() - todayUTC.getTime()) / 86400000) : 0;
+        return {status: "Open", daysRemaining, variant: "green"};
+    }
+    return undefined;
+}
+
 export const RFPSort = (rfps: RFP[]) => {
     const now = new Date();
 
