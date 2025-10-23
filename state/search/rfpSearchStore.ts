@@ -9,39 +9,39 @@ import { mixpanelTrack } from "@comend/lib/mixpanel";
 export type ViewType = 'grid' | 'list'
 
 export type FiltersType = {
-    // categories: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
-    // milestoneTypes: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
-    // types: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
-    // certifications: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
-    // tags: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
+    conditions: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    genes: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    openTo: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    status: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    organizations: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[]
 }
 
 export const defaultFilters = {
-    // categories: [],
-    // milestoneTypes: [],
-    // types: [],
-    // certifications: [],
-    // tags: [],
+    conditions: [],
+    genes: [],
+    openTo: [],
+    status: [],
+    organizations: []
 }
 
 function generateFiltersString(filters: FiltersType): string {
@@ -49,45 +49,45 @@ function generateFiltersString(filters: FiltersType): string {
 
     const escapeValue = (value: string) => `\`${value}\``;
 
-    // Categories (Array Field)
-    // if (filters?.categories && filters.categories.length > 0) {
-    //     const categoryFilter = filters.categories
-    //         .map(category => `categories:=[${escapeValue(category.value)}]`)
-    //         .join(" && ");
-    //     filtersList.push(`(${categoryFilter})`);
-    // }
+    // conditions
+    if (filters?.conditions && filters.conditions.length > 0) {
+        const conditionFilter = filters.conditions
+            .map(condition => `organization.conditions.condition.name:=[${escapeValue(condition.value)}]`)
+            .join(" || ");
+        filtersList.push(`(${conditionFilter})`);
+    }
 
-    // Milestone Types (Array Field)
-    // if (filters?.milestoneTypes && filters.milestoneTypes.length > 0) {
-    //     const milestoneTypeFilter = filters.milestoneTypes
-    //         .map(milestoneType => `milestoneTypes:=[${escapeValue(milestoneType.value)}]`)
-    //         .join(" && ");
-    //     filtersList.push(`(${milestoneTypeFilter})`);
-    // }
+    // genes
+    if (filters?.genes && filters.genes.length > 0) {
+        const geneFilter = filters.genes
+            .map(gene => `gene.symbol:=[${escapeValue(gene.value)}]`)
+            .join(" || ");
+        filtersList.push(`(${geneFilter})`);
+    }
 
-    // Company Types (Single String Field)
-    // if (filters?.types && filters.types.length > 0) {
-    //     const typeFilter = filters.types
-    //         .map(type => `companyType:=${escapeValue(type.value)}`)
-    //         .join(" || ");
-    //     filtersList.push(`(${typeFilter})`);
-    // }
+    // open to 
+    if (filters?.openTo && filters.openTo.length > 0) {
+        const openToFilter = filters.openTo
+            .map(openTo => `openTo:=[${escapeValue(openTo.value)}]`)
+            .join(" || ");
+        filtersList.push(`(${openToFilter})`);
+    }
 
-    // Certifications (Array Field)
-    // if (filters?.certifications && filters.certifications.length > 0) {
-    //     const certificationFilter = filters.certifications
-    //         .map(cert => `simplifiedCertifications:=[${escapeValue(cert.value)}]`)
-    //         .join(" && ");
-    //     filtersList.push(`(${certificationFilter})`);
-    // }
+    // status
+    if (filters?.status && filters.status.length > 0) {
+        const statusFilter = filters.status
+            .map(status => `status:=[${escapeValue(status.value)}]`)
+            .join(" || ");
+        filtersList.push(`(${statusFilter})`);
+    }
 
-    // Tags (Array Field)
-    // if (filters?.tags && filters.tags.length > 0) {
-    //     const tagsFilter = filters.tags
-    //         .map(tag => `tags:=[${escapeValue(tag.value)}]`)
-    //         .join(" && ");
-    //     filtersList.push(`(${tagsFilter})`);
-    // }
+    // Organizations
+    if (filters?.organizations && filters.organizations.length > 0) {
+        const organizationFilter = filters.organizations
+            .map(organization => `organization.id:=[${escapeValue(organization.value)}]`)
+            .join(" || ");
+        filtersList.push(`(${organizationFilter})`);
+    }
 
     // Combine all filters with `&&`
     const typesenseFilters = filtersList.length > 0 ? filtersList.join(" && ") : "";
@@ -97,8 +97,8 @@ function generateFiltersString(filters: FiltersType): string {
 }
 
 const sortByFilters: { [key: string]: string } = {
-    "alphabetical": "title:asc",
-    "highest-rated": "avgRating:desc",
+    // "alphabetical": "title:asc",
+    // "highest-rated": "avgRating:desc",
 }
 
 const getUpdatedSearchResults = async (
@@ -112,9 +112,9 @@ const getUpdatedSearchResults = async (
 
         // Merge tag-priority sort with user-chosen sort
         let sortBy = TAG_PRIORITY_SORT;
-        if (state.sortBy && sortByFilters[state.sortBy]) {
-            sortBy += `,${sortByFilters[state.sortBy]}`;
-        }
+        // if (state.sortBy && sortByFilters[state.sortBy]) {
+        //     sortBy += `,${sortByFilters[state.sortBy]}`;
+        // }
 
         const searchParameters = {
             q: state.searchTerm,

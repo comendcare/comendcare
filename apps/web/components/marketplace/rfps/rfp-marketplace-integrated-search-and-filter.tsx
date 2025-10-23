@@ -28,15 +28,16 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
 
     const [query, setQuery] = useState(searchTerm)
 
-    const clearAllFilters = () =>
-        setFilters({...filters, milestoneTypes: [], types: [], certifications: [], tags: [], categories: []})
+    const clearAll = () => {
+        setFilters({ ...filters, conditions: [], genes: [], openTo: [], status: [], organizations: [] });
+    }
 
     // helper to update a single filter key from MultipleSelector
     const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) =>
         setFilters({...filters, [key]: value})
 
-    // const removeFilterItem = (key: keyof typeof filters, value: string) =>
-    //     setFilters({...filters, [key]: (filters[key] || []).filter((i) => i.value !== value)})
+    const removeFilterItem = (key: keyof typeof filters, value: string) =>
+        setFilters({...filters, [key]: (filters[key] || []).filter((i) => i.value !== value)})
 
     // keep searchTerm input in sync if the store changes elsewhere
     useEffect(() => setQuery(searchTerm), [searchTerm])
@@ -61,7 +62,7 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
                     <Label className="text-base font-semibold text-gray-900">Search</Label>
                     <Input
                         type="text"
-                        // placeholder="Titles..."
+                        placeholder="Title, scope, eligibility, evaluation process..."
                         value={query}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             const search: string = e.target.value
@@ -130,7 +131,7 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
                                         {options.find((opt) => opt.value === item.value)?.label || item.value}
                                         <button
                                             onClick={() => removeFilterItem(key as any, item.value)}
-                                            className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                       s     className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
                                         >
                                             <X className="h-3 w-3"/>
                                         </button>
@@ -149,32 +150,6 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
                 <div className="mt-2 text-sm text-muted-foreground">
                     {typeof totalResults === "number" ? `${totalResults} results` : "Loading results..."}
                 </div>
-                <Select
-                    value={sortBy}
-                    onValueChange={(value: string) => {
-                        setSortBy(value)
-                    }}
-                >
-                    <SelectTrigger className="w-[200px] h-full text-xs">
-                        <SelectValue placeholder="Sort by" className="text-xs"/>
-                    </SelectTrigger>
-                    <SelectContent className="text-xs">
-                        <SelectGroup className="text-xs">
-                            <SelectItem
-                                value="alphabetical"
-                                className="text-xs"
-                            >
-                                Alphabetical (A-Z)
-                            </SelectItem>
-                            <SelectItem
-                                value="highest-rated"
-                                className="text-xs"
-                            >
-                                Highest rated
-                            </SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
             </div>
         </div>
     )

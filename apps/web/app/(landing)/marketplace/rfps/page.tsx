@@ -18,11 +18,11 @@ export default function RFPPage() {
     useEffect(() => {
         if (!initialized) {
             const parsedRFPFilters = {
-                // categories: [] as any[],
-                // milestoneTypes: [] as any[],
-                // types: [] as any[],
-                // certifications: [] as any[],
-                // tags: [] as any[],
+                conditions: [],
+                genes: [],
+                openTo: [],
+                status: [],
+                organizations: []
             }
             initializeRFPSearch(parsedRFPFilters)
             console.log(`RFP search initialized...`)
