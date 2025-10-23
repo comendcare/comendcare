@@ -224,7 +224,9 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // });
             },
             onConnect: async (connection: Connection) => {
-                console.log(`on connect`)
+                // don't add edges from preview node
+                if (connection.source === 'preview' || connection.target === 'preview') return
+
                 const edges = addEdge(
                     {...connection, style: {stroke: 'black'}},
                     get().edges
@@ -350,7 +352,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                 return nodes
             },
             addNodes: async (nodes: Node[], creationMethod?: string) => {
-                console.log(`add nodes`)
                 set({
                     nodes: [...get().nodes, ...nodes],
                     milestones: [...get().milestones, ...nodes.map(node => node.data as Milestone)]

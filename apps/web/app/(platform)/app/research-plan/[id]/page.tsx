@@ -86,6 +86,8 @@ export default async function RoadmapPage({
             contacts: true,
             attachments: true,
             types: { include: { milestoneType: true } },
+            biosamples: { include: { biosample: true} },
+            diseaseModels: { include: { diseaseModel: true } },
             tools: { include: { tool: true } },
             rfps: { include: { rfp: true } },
         }),

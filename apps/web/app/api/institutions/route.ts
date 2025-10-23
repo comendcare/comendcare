@@ -7,6 +7,8 @@ export async function GET(req: Request) {
         const url = new URL(req.url);
         const searchQuery = url.searchParams.get("search")?.toLowerCase() || "";
 
+        if (searchQuery === "") return NextResponse.json([])
+
         // Query the Institution model with a case-insensitive search
         const institutions = await prisma.institution.findMany({
             where: {

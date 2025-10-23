@@ -10,9 +10,11 @@ import {
     applyNodeChanges,
     NodeChange,
     Node,
+    Controls,
 } from "@xyflow/react"
 import "@xyflow/react/dist/base.css"
-import { MemoPublicMilestoneNodeButton, MemoPublicMilestoneNodeLink, MilestoneNode } from "./milestone-node"
+import { MemoPublicMilestoneNodeButton, MemoPublicMilestoneNodeLink } from "./milestone-node"
+import { Milestone } from "@prisma/client"
 
 export const PublicFlowView = ({ 
     roadmap, 
@@ -63,6 +65,62 @@ export const PublicFlowView = ({
         }
     }, [urlMilestone])
 
+    useEffect(() => {
+        // if there is no milestone selected use the following logic for default zoom
+        // 1. zoom to left most in-progress project
+        // 2. if nothing is in progress, try to left-most project in planning
+        // 3. if nothing is in progress or planning, use the right-most project completed
+        if (!urlMilestone) {
+            const inProgressProjects = roadmap.milestones
+                .filter((milestone: Milestone) => milestone.status === 'INPROGRESS')
+                .map((milestone: Milestone) => milestone.id)
+            const planningProjects = roadmap.milestones
+                .filter((milestone: Milestone) => milestone.status === 'PLANNED')
+                .map((milestone: Milestone) => milestone.id)
+            const completedProjects = roadmap.milestones
+                .filter((milestone: Milestone) => milestone.status === 'COMPLETED')
+                .map((milestone: Milestone) => milestone.id)
+
+            if (inProgressProjects.length > 0) {
+                const timer = setTimeout(() => {
+                    fitView({
+                        nodes: [(roadmap?.nodes || [])
+                            .filter((node: any) => inProgressProjects.includes(node.data.id))
+                            .sort((a: any, b: any) => (a.positionX) - (b.positionX))[0]],
+                        padding: 4,
+                        duration: 500
+                    })
+                }, 1) // Delay by a short time to allow landing adjustment
+        
+                return () => clearTimeout(timer)
+            } else if (planningProjects.length > 0) {
+                const timer = setTimeout(() => {
+                    fitView({
+                        nodes: [(roadmap?.nodes || [])
+                            .filter((node: any) => planningProjects.includes(node.data.id))
+                            .sort((a: any, b: any) => (a.positionX) - (b.positionX))[0]],
+                        padding: 4,
+                        duration: 500
+                    })
+                }, 1) // Delay by a short time to allow landing adjustment
+        
+                return () => clearTimeout(timer)
+            } else if (completedProjects.length > 0) {
+                const timer = setTimeout(() => {
+                    fitView({
+                        nodes: [(roadmap?.nodes || [])
+                            .filter((node: any) => completedProjects.includes(node.data.id))
+                            .sort((a: any, b: any) => (b.positionX) - (a.positionX))[0]],
+                        padding: 4,
+                        duration: 500
+                    })
+                }, 1) // Delay by a short time to allow landing adjustment
+        
+                return () => clearTimeout(timer)
+            }
+        }
+    }, [])
+
     const onNodesChange = (changes: NodeChange<Node>[]) => {
         const newNodes = applyNodeChanges(changes, localNodes)
         setLocalNodes(newNodes)
@@ -80,36 +138,45 @@ export const PublicFlowView = ({
             subdomain: subdomain,
             focused: urlMilestone === node?.data?.id,
             externalLink: externalLinks,
+            isPublic: true,
             setUrlMilestone: setUrlMilestone
         },
     }))
 
+    const gridSize = 15
+
     return (
-    <ReactFlow
-        width={80}
-        nodes={updatedNodes}
-        edges={roadmap?.edges.map((edge: any) => ({
-            ...edge,
-            type: 'DEFAULT'
-        })) || []}
-        nodeTypes={nodeTypes}
-        onNodesChange={onNodesChange}
-        proOptions={{ hideAttribution: true }}
-        edgesReconnectable={false}
-        edgesFocusable={false}
-        nodesDraggable={false}
-        nodesConnectable={false}
-        draggable={false}
-        fitView
-        fitViewOptions={{ padding: 0.2 }}
-        minZoom={0.1}
-    >
-        <Background variant={BackgroundVariant.Dots} />
-        <MiniMap
-            nodeColor='#757575'
-            maskColor='rgb(200, 200, 200, 0.8)' 
-        />
-    </ReactFlow>
+        <ReactFlow
+            width={80}
+            nodes={updatedNodes}
+            edges={roadmap?.edges.map((edge: any) => ({
+                ...edge,
+                type: 'DEFAULT'
+            })) || []}
+            nodeTypes={nodeTypes}
+            onNodesChange={onNodesChange}
+            proOptions={{ hideAttribution: true }}
+            edgesReconnectable={false}
+            edgesFocusable={false}
+            nodesDraggable={false}
+            nodesConnectable={false}
+            draggable={false}
+            fitView
+            fitViewOptions={{ padding: 0.2 }}
+            minZoom={0.1}
+
+            paneClickDistance={1}
+            snapToGrid={true}
+            snapGrid={[gridSize, gridSize]}
+            style={{ width: '100%', height: '100%' }}
+        >
+            <Background variant={BackgroundVariant.Dots} />
+            <Controls className="flex flex-col gap-2" />
+            <MiniMap
+                nodeColor='#757575'
+                maskColor='rgb(200, 200, 200, 0.8)' 
+            />
+        </ReactFlow>
     )
 }
 
