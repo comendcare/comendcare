@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/packages/components/ui/button";
 import { TabNav } from "@comend/components/tab-nav";
-import { ArrowLeft, Building2, Database, Rat, Search, SearchIcon, TestTubeDiagonal, Users } from "lucide-react";
+import { ArrowLeft, Building2, Database, Megaphone, Rat, Search, SearchIcon, TestTubeDiagonal, Users } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
@@ -42,6 +42,13 @@ const links = [
         icon: Database,
         comingSoon: false
     },
+    {
+        // name: "Requests for Proposals",
+        name: "RFPs",
+        href: "/marketplace/rfps",
+        icon: Megaphone,
+        comingSoon: false
+    },
 ]
 
 const publicLinks = [
@@ -73,6 +80,12 @@ const publicLinks = [
         name: "Clinical Datasets",
         href: "/marketplace/clinical-datasets",
         icon: Database,
+        comingSoon: false
+    },
+    {
+        name: "RFPs",
+        href: "/marketplace/rfps",
+        icon: Megaphone,
         comingSoon: false
     },
     // {
