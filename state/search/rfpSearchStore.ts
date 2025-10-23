@@ -97,8 +97,7 @@ function generateFiltersString(filters: FiltersType): string {
 }
 
 const sortByFilters: { [key: string]: string } = {
-    // "alphabetical": "title:asc",
-    // "highest-rated": "avgRating:desc",
+    "default": "sort_rank:asc",
 }
 
 const getUpdatedSearchResults = async (
@@ -106,23 +105,14 @@ const getUpdatedSearchResults = async (
     isNewSearch: boolean = true
 ): Promise<{results: any[], total: number}> => {
     try {
-        // const TAG_PRIORITY_SORT = "_eval([ (tags:=[`Experienced in rare disease`]):2, (tags:=[`PAG friendly`]):1 ]):desc,avgRating:desc";
-        const TAG_PRIORITY_SORT = ""
         const filtersString = generateFiltersString(state.filters)
-
-        // Merge tag-priority sort with user-chosen sort
-        let sortBy = TAG_PRIORITY_SORT;
-        // if (state.sortBy && sortByFilters[state.sortBy]) {
-        //     sortBy += `,${sortByFilters[state.sortBy]}`;
-        // }
-
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "title,description",
+            query_by: "title,description,eligibility,evaluationProcess",
             per_page: 10,
             page: state.lastFetchedPage,
             ...(filtersString ? { filter_by: filtersString } : undefined),
-            sort_by: sortBy,
+            sort_by: sortByFilters[state.sortBy],
         };
 
         const results = await typesense
@@ -130,21 +120,18 @@ const getUpdatedSearchResults = async (
             .documents()
             .search(searchParameters);
 
-        // return isNewSearch ? results.hits : state.searchResults
-
         const typeSenseHits = results.hits || [];
         // @ts-ignore
         const ids = typeSenseHits.map(hit => hit.document.id);
 
         if (ids.length === 0) {
-            // return isNewSearch ? [] : state.searchResults;
             return {
                 results: isNewSearch ? [] : state.searchResults,
                 total: results.found || 0
             }
         }
 
-        const prismaResponse = await fetch('/api/companies', {
+        const prismaResponse = await fetch('/api/rfps', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ids }),
@@ -152,7 +139,7 @@ const getUpdatedSearchResults = async (
 
         if (!prismaResponse.ok) {
             const text = await prismaResponse.text() // may be empty or HTML on 405
-            throw new Error(`POST /api/companies failed: ${prismaResponse.status} ${text}`)
+            throw new Error(`POST /api/rfps failed: ${prismaResponse.status} ${text}`)
         }
 
         const prismaResults = await prismaResponse.json();
@@ -202,18 +189,18 @@ export const useRFPSearchStore = create<RFPSearchState>()(
                     filters, 
                     searchTerm: '', 
                     lastFetchedPage: 1, 
-                    sortBy: "alphabetical" ,
+                    sortBy: "default" ,
                 })
 
                 const { results, total } = await getUpdatedSearchResults({
                     ...get(),
-                    sortBy: "alphabetical",
+                    sortBy: "default",
                     lastFetchedPage: 1,
                 }, true)
 
                 set({ 
                     initialized: true, 
-                    sortBy: "alphabetical", 
+                    sortBy: "default", 
                     searchResults: results, 
                     lastFetchedPage: 1, 
                     totalResults: total 
@@ -250,7 +237,7 @@ export const useRFPSearchStore = create<RFPSearchState>()(
                     totalResults: total,
                 })
             },
-            sortBy: "alphabetical",
+            sortBy: "default",
             setSortBy: async (sortBy: string | undefined) => {
                 const { results, total } = await getUpdatedSearchResults({
                     ...get(),
