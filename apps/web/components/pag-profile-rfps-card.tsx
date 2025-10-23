@@ -230,6 +230,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                             <div className="w-full flex gap-2 flex-wrap">
                                 {rfp.milestones.map((project: any) => (
                                     <Badge className="font-normal" variant={"purple"}>
+                                        <FileText className="h-4 w-4"/>
                                         {project.milestone.title}
                                     </Badge>
                                 ))}

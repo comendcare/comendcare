@@ -3,7 +3,7 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {PrivateBadge} from "~web/components/private-badge";
-import {Calendar, Clock, DollarSign, School} from "lucide-react";
+import {Calendar, Clock, DollarSign, FileText, School} from "lucide-react";
 import {PropertyBadge} from "./property-badge";
 import {checkDateRangeUTC, formatDateUTC, formatMoney} from "@comend/lib/utils";
 import {RFPActionsMenu} from "./rfp-actions-menu";
@@ -120,6 +120,7 @@ export const RFPCard = ({rfp, isPrivate = false}: { rfp: any; isPrivate?: boolea
                     <div className="w-full flex gap-2 flex-wrap">
                         {rfp.milestones.map((project: any) => (
                             <Badge className="font-normal" variant={"purple"}>
+                                <FileText className="h-4 w-4"/>
                                 {project.milestone.title}
                             </Badge>
                         ))}
