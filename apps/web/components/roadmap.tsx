@@ -698,7 +698,7 @@ const RoadmapHeader = ({
     orgSubdomain: string | undefined
 }) => {
     const {data: session, status} = useSession()
-    const { milestones, setSelectedNodeIds, addMilestones } = useRoadmapStore(useShallow(selector))
+    const { milestones, setSelectedNodeIds, addMilestones, setMilestone } = useRoadmapStore(useShallow(selector))
     const parentRef = useRef<HTMLDivElement>(null)
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1024)
@@ -742,24 +742,48 @@ const RoadmapHeader = ({
                     ? (
                         <Tooltip>
                             <div className="p-[6px] h-[40px] w-[40px] min-w-[40px]">
-                                <TooltipTrigger className="h-full w-full rounded-md flex justify-center items-center">
-                                    <Lock className="text-red-600 h-4 w-4"/>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        className="h-full w-full rounded-md flex justify-center items-center bg-red-100 hover:bg-red-300"
+                                        onClick={() => {
+                                            console.log(`make all projects published`)
+                                            milestones
+                                                .map(milestone => milestone.nodeId)
+                                                .forEach((nodeId: string | null) => {
+                                                    if (nodeId) setMilestone(nodeId, {private: false})
+                                                })
+                                        }}
+                                    >
+                                        <Lock className="text-red-600 h-4 w-4"/>
+                                    </Button>
                                 </TooltipTrigger>
                             </div>
                             <TooltipContent className="max-w-80">
-                                {`All projects in this plan are private and cannot be shared. Make at least one project public to enable sharing.`}
+                                {`All projects in this plan are private and cannot be shared. Make at least one project published to enable sharing. Click to publish all projects.`}
                             </TooltipContent>
                         </Tooltip>
                     )
                     : (
                         <Tooltip>
                             <div className="p-[6px] h-[40px] w-[40px] min-w-[40px]">
-                                <TooltipTrigger className="h-full w-full rounded-md flex justify-center items-center">
-                                    <Globe className="text-green-600 h-4 w-4"/>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        className="h-full w-full rounded-md flex justify-center items-center bg-green-100 hover:bg-green-300"
+                                        onClick={() => {
+                                            console.log(`make all projects private`)
+                                            milestones
+                                                .map(milestone => milestone.nodeId)
+                                                .forEach((nodeId: string | null) => {
+                                                    if (nodeId) setMilestone(nodeId, {private: true})
+                                                })
+                                        }}
+                                    >
+                                        <Globe className="text-green-600 h-4 w-4"/>
+                                    </Button>
                                 </TooltipTrigger>
                             </div>
                             <TooltipContent className="max-w-80">
-                                {`This research plan is public and can be shared externally. Make all project private to hide this research plan and disable sharing.`}
+                                {`This research plan is public and can be shared externally. Make all project private to hide this research plan and disable sharing. Click to make all projects private.`}
                             </TooltipContent>
                         </Tooltip>
                     )
