@@ -28,7 +28,7 @@ export const RoadmapsCard = ({
     const pathname = usePathname()
 
     return (
-        <Card className="organization-profile-tour-step4" data-testid="roadmaps-card">
+        <Card className="organization-profile-tour-step4 w-full" data-testid="roadmaps-card">
             <CardHeader className="w-full pt-6 pb-2 space-y-4">
                 <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
                     <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="roadmaps-heading">
