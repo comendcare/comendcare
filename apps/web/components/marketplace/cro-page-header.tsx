@@ -23,6 +23,8 @@ import {ServiceProviderWebsiteButton} from "../service-provider-website-button";
 import {companyTypeMap, CompanyWithReviewsAndServices} from "@comend/lib/types";
 import ContactCroDialog from "~web/components/contact-cro-dialog";
 import SaveCROButton from "~web/components/save-cro-button";
+import {Avatar, AvatarFallback, AvatarImage} from "@/packages/components/ui/avatar";
+import {HoverableAvatar} from "~web/components/hoverable-avatar";
 
 
 const companyTypeIcons: Record<string, React.ReactElement | null> = {
@@ -92,6 +94,7 @@ export default async function CROPageHeader({
                 {/*            : "No reviews yet"}*/}
                 {/*    </p>*/}
                 {/*</Link>*/}
+
                 <div
                     className="flex flex-col sm:flex-row sm:flex-wrap items-baseline sm:space-x-6">
                     {company.headquarters &&
@@ -137,14 +140,15 @@ export default async function CROPageHeader({
                         </div>
                     </Link>
                 </div>
-                <div className="flex flex-wrap gap-2 w-5/6">
-                    {filteredCertifications.map((certification, index) => (
-                        <CertificationBadge
-                            key={index}
-                            certificationName={certification}
-                        />
-                    ))}
-                    {company.tags && company.tags.length > 0 && (
+
+                {company.tags && company.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 w-5/6">
+                        {filteredCertifications.map((certification, index) => (
+                            <CertificationBadge
+                                key={index}
+                                certificationName={certification}
+                            />
+                        ))}
                         <div className="flex flex-wrap gap-2 w-5/6">
                             {company.tags.map((tag, index) => (
                                 <span
@@ -163,8 +167,34 @@ export default async function CROPageHeader({
                                     </span>
                             ))}
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
+
+                {/*<div className="flex flex-row space-x-4 justify-start items-center">*/}
+                {/*    <div className="font-bold text-lg">*/}
+                {/*        Worked with:*/}
+                {/*    </div>*/}
+                {/*    <div*/}
+                {/*        className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale"*/}
+                {/*    >*/}
+                {/*        <HoverableAvatar*/}
+                {/*            src="https://github.com/shadcn.png"*/}
+                {/*            alt="@shadcn"*/}
+                {/*            fallback="CN"*/}
+                {/*        />*/}
+                {/*        <HoverableAvatar*/}
+                {/*            src="https://github.com/maxleiter.png"*/}
+                {/*            alt="@maxleiter"*/}
+                {/*            fallback="LR"*/}
+                {/*        />*/}
+                {/*        <HoverableAvatar*/}
+                {/*            src="https://github.com/evilrabbit.png"*/}
+                {/*            alt="@evilrabbit"*/}
+                {/*            fallback="ER"*/}
+                {/*        />*/}
+                {/*    </div>*/}
+                {/*</div>*/}
+
                 {company.description && company.description.trim() && (
                     <div className="w-5/6">
                         {/*<CRODescription text={company.description}/>*/}
