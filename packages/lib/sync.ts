@@ -57,21 +57,21 @@ const manageCollection = async (
 };
 
 const STATUS_PRIORITY = {
-  'Open': 0,
-  'Not Open': 1,
-  'Closed': 2,
+  'Open': 1,
+  'Not Open': 2,
+  'Closed': 3,
 }
 
 function getSortRank(rfp: RFP) {
     const status = checkDateRangeUTC(rfp?.startDate || undefined, rfp?.endDate || undefined)
     if (!status) return 0
 
-    const base = STATUS_PRIORITY[status.status] * 1_000_000_000_000 // status weighting
+    const base = STATUS_PRIORITY[status.status] * 1_000_000_000_000_000 // status weighting
     const now = new Date()
 
     if (status.status === 'Open') {
         // ascending by due_date → smaller date = higher rank
-        if (rfp.endDate) return base + rfp.endDate.getTime()
+        if (rfp.endDate) return rfp.endDate.getTime()
 
         // if end date does not exist on this RFP put it at the end of the Open section
         return base
@@ -84,7 +84,7 @@ function getSortRank(rfp: RFP) {
 
     if (status.status === 'Closed' && rfp.endDate) {
         // descending by due_date → larger date = higher rank
-        return base + rfp.endDate.getTime()
+        return base + base - rfp.endDate.getTime()
     }
 
     return 0
