@@ -28,6 +28,9 @@ class CustomerIO {
     analytics: Analytics | NoopAnalytics
 
     private constructor() {
+        const envMsg = IS_PROD ? "production" : "non-production"
+        console.log(`[CustomerIO] Initializing analytics in ${envMsg} mode`)
+
         this.analytics = IS_PROD
             ? new Analytics({
                 writeKey: process.env.CUSTOMER_IO_WRITE_KEY || "",
@@ -40,10 +43,21 @@ class CustomerIO {
         if (!CustomerIO.instance) CustomerIO.instance = new CustomerIO()
         return CustomerIO.instance
     }
+
+    async flush() {
+        if (this.analytics instanceof Analytics && typeof (this.analytics as any).closeAndFlush === "function") {
+            console.log("[CustomerIO] Flushing queued events...")
+            await (this.analytics as any).closeAndFlush()
+            console.log("[CustomerIO] Flush complete")
+        } else {
+            console.log("[CustomerIO] Flush skipped (Noop or unsupported analytics instance)")
+        }
+    }
 }
 
 export async function customerIOIdentify(distinctId: string, session: Session) {
     const instance = CustomerIO.getInstance()
+    console.log(`[CustomerIO] Identify called for userId=${distinctId}`)
 
     instance.analytics.identify({
         userId: distinctId,
@@ -60,19 +74,18 @@ export async function getCustomerIOInstance(): Promise<CustomerIO> {
 
 export async function customerIOTrack(data: { userId: string | undefined, event: string, properties: any}) {
     const instance = await getCustomerIOInstance()
+    const resolvedUserId = data.userId || data.properties.email || nanoid()
+    console.log(`[CustomerIO] Track event=${data.event} userId=${resolvedUserId}`)
 
-    if (data.userId) {
+    try {
         instance.analytics.track({
-            userId: data.userId,
+            userId: resolvedUserId,
             event: data.event,
-            properties: data.properties
+            properties: data.properties,
         })
-    } else {
-        instance.analytics.track({
-            userId: data.properties.email || nanoid(),
-            event: data.event,
-            properties: data.properties
-        })
+        console.log(`[CustomerIO] Track event '${data.event}' queued successfully`)
+    } catch (err) {
+        console.error(`[CustomerIO] Track event '${data.event}' failed:`, err)
     }
 }
 
@@ -102,18 +115,33 @@ export async function sendCustomerIOContactEmail(emailPayload: any) {
     }
 }
 
-export async function customerIOOnResearchPlanCreated(userId: string, props: Record<string, any> = {}) {
+export async function customerIOOnResearchPlanCreated(
+    userId: string,
+    props: Record<string, any> = {}
+) {
     const instance = await getCustomerIOInstance()
+    console.log(`[CustomerIO] Research plan created for userId=${userId}`)
 
-    // 2a) Track the event (good for campaigns & analytics)
-    instance.analytics.track({
-        userId,
-        event: "created_research_plan",
-        properties: props
-    })
+    try {
+        instance.analytics.track({
+            userId,
+            event: "created_research_plan",
+            properties: props,
+        })
+        console.log("[CustomerIO] 'created_research_plan' event queued")
 
-    instance.analytics.identify({
-        userId,
-        traits: { "has_research_plan": true, ...props }
-    })
+        instance.analytics.identify({
+            userId,
+            traits: { has_research_plan: true, ...props },
+        })
+        console.log("[CustomerIO] has_research_plan trait queued")
+    } catch (err) {
+        console.error("[CustomerIO] Error during research plan event/identify:", err)
+    } finally {
+        if (IS_PROD) {
+            await instance.flush()
+        } else {
+            console.log("[CustomerIO] Skipped flush (non-prod environment)")
+        }
+    }
 }
