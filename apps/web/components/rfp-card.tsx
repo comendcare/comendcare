@@ -57,7 +57,7 @@ export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rf
                             {rfp.private && <PrivateBadge iconOnly/>}
                             {status && (
                                 <Badge variant={status.variant as any} className="text-sm">
-                                    {status.status}
+                                    {status.label}
                                 </Badge>
                             )}
                         </div>

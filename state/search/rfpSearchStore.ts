@@ -52,7 +52,7 @@ function generateFiltersString(filters: FiltersType): string {
     // conditions
     if (filters?.conditions && filters.conditions.length > 0) {
         const conditionFilter = filters.conditions
-            .map(condition => `organization.conditions.condition.name:=[${escapeValue(condition.value)}]`)
+            .map(condition => `condition.name:=[${escapeValue(condition.value)}]`)
             .join(" || ");
         filtersList.push(`(${conditionFilter})`);
     }
@@ -60,7 +60,7 @@ function generateFiltersString(filters: FiltersType): string {
     // genes
     if (filters?.genes && filters.genes.length > 0) {
         const geneFilter = filters.genes
-            .map(gene => `gene.symbol:=[${escapeValue(gene.value)}]`)
+            .map(gene => `condition.causalGenes:=${escapeValue(gene.value)} || condition.associatedGenes:=${escapeValue(gene.value)}`)
             .join(" || ");
         filtersList.push(`(${geneFilter})`);
     }
@@ -82,12 +82,12 @@ function generateFiltersString(filters: FiltersType): string {
     }
 
     // Organizations
-    if (filters?.organizations && filters.organizations.length > 0) {
-        const organizationFilter = filters.organizations
-            .map(organization => `organization.id:=[${escapeValue(organization.value)}]`)
-            .join(" || ");
-        filtersList.push(`(${organizationFilter})`);
-    }
+    // if (filters?.organizations && filters.organizations.length > 0) {
+    //     const organizationFilter = filters.organizations
+    //         .map(organization => `organization.id:=[${escapeValue(organization.value)}]`)
+    //         .join(" || ");
+    //     filtersList.push(`(${organizationFilter})`);
+    // }
 
     // Combine all filters with `&&`
     const typesenseFilters = filtersList.length > 0 ? filtersList.join(" && ") : "";

@@ -265,7 +265,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                     <CaretAccordion 
                         title={'Eligibility'}
                         content={
-                            <p className="text-sm text-secondary-foreground">{rfp.eligibility}</p>
+                            <p className="text-sm">{rfp.eligibility}</p>
                         }
                     />
                 )}
@@ -274,7 +274,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                     <CaretAccordion 
                         title={'Instructions'}
                         content={
-                            <p className="text-sm text-secondary-foreground">{rfp.instructions}</p>
+                            <p className="text-sm">{rfp.instructions}</p>
                         }
                     />
                 )}
@@ -283,7 +283,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                     <CaretAccordion 
                         title={'Evaluation Process'}
                         content={
-                            <p className="text-sm text-secondary-foreground">{rfp.evaluationProcess}</p>
+                            <p className="text-sm">{rfp.evaluationProcess}</p>
                         }
                     />
                 )}
@@ -294,7 +294,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                     <div className="flex flex-col gap-2 w-full">
                         <h3 className="text-lg font-semibold">Primary Contacts</h3>
                         {rfp?.contacts?.map((contact: ExternalContact) => (
-                            <span className="flex items-center gap-2 text-wrap w-full">
+                            <span className="flex items-center gap-2 text-wrap w-full text-sm">
                                 <Mail className="mt-1 h-4 w-4 min-h-4 min-w-4"/>
                                 <a
                                     className={cn(contact?.email && "underline")}
@@ -316,7 +316,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                     <div className="flex flex-col gap-2 w-full">
                         <h3 className="text-lg font-semibold">Primary Attachments</h3>
                         {rfp?.attachments?.map((attachment: ExternalAttachment) => (
-                            <span className="flex items-start gap-2 text-wrap w-full">
+                            <span className="flex items-start gap-2 text-wrap w-full text-sm">
                                 <LinkIcon className="mt-1 h-4 w-4 min-h-4 min-w-4"/>
                                 <a
                                     className={cn(

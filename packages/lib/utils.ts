@@ -19,10 +19,44 @@ import {
 import Papa from "papaparse";
 import type { RFP } from "@prisma/client";
 
+const STATUS_PRIORITY = {
+  'OPEN': 1,
+  'NOTOPEN': 2,
+  'CLOSED': 3,
+}
+
+export function getSortRank(rfp: RFP) {
+    const status = checkDateRangeUTC(rfp?.startDate || undefined, rfp?.endDate || undefined)
+    if (!status) return 0
+
+    const base = STATUS_PRIORITY[status.status] * 1_000_000_000_000_000 // status weighting
+    const now = new Date()
+
+    if (status.status === 'OPEN') {
+        // ascending by due_date → smaller date = higher rank
+        if (rfp.endDate) return rfp.endDate.getTime()
+
+        // if end date does not exist on this RFP put it at the end of the Open section
+        return base
+    }
+
+    if (status.status === 'NOTOPEN' && rfp.startDate) {
+        // ascending by start_date
+        return base + rfp.startDate.getTime()
+    }
+
+    if (status.status === 'CLOSED' && rfp.endDate) {
+        // descending by due_date → larger date = higher rank
+        return base + base - rfp.endDate.getTime()
+    }
+
+    return 0
+}
+
 type DateStatus =
-    | { status: "Not Open"; daysRemaining: number | undefined; variant: "yellow" }
-    | { status: "Open"; daysRemaining: number | undefined; variant: "green" }
-    | { status: "Closed"; daysRemaining: number | undefined; variant: "red" }
+    | { status: "NOTOPEN"; label: "Not Open"; daysRemaining: number | undefined; variant: "yellow" }
+    | { status: "OPEN"; label: "Open"; daysRemaining: number | undefined; variant: "green" }
+    | { status: "CLOSED"; label: "Closed"; daysRemaining: number | undefined; variant: "red" }
     | undefined;
 
 function toUTCDateOnly(d: Date) {
@@ -41,12 +75,12 @@ export function checkDateRangeUTC(startDateStr?: string | Date, endDateStr?: str
     const start = startRaw ? toUTCDateOnly(startRaw) : undefined;
     const end = endRaw ? toUTCDateOnly(endRaw) : undefined;
 
-    if (start && todayUTC < start) return {status: "Not Open", daysRemaining: undefined, variant: "yellow"};
-    if (end && todayUTC > end) return {status: "Closed", daysRemaining: undefined, variant: "red"};
+    if (start && todayUTC < start) return {status: "NOTOPEN", label: "Not Open", daysRemaining: undefined, variant: "yellow"};
+    if (end && todayUTC > end) return {status: "CLOSED", label: "Closed", daysRemaining: undefined, variant: "red"};
 
     if ((!start || todayUTC >= start) && (!end || todayUTC <= end)) {
         const daysRemaining = end ? Math.ceil((end.getTime() - todayUTC.getTime()) / 86400000) : 0;
-        return {status: "Open", daysRemaining, variant: "green"};
+        return {status: "OPEN", label: "Open", daysRemaining, variant: "green"};
     }
     return undefined;
 }

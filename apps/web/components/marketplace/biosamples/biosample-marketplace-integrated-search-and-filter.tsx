@@ -413,32 +413,6 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                 <div className="mt-2 text-sm text-muted-foreground">
                     {typeof totalResults === "number" ? `${totalResults} results` : "Loading results..."}
                 </div>
-                {/* <Select
-                    value={sortBy}
-                    onValueChange={(value: string) => {
-                        setSortBy(value)
-                    }}
-                >
-                    <SelectTrigger className="w-[200px] h-full text-xs">
-                        <SelectValue placeholder="Sort by" className="text-xs"/>
-                    </SelectTrigger>
-                    <SelectContent className="text-xs">
-                        <SelectGroup className="text-xs">
-                            <SelectItem
-                                value="alphabetical"
-                                className="text-xs"
-                            >
-                                Alphabetical (A-Z)
-                            </SelectItem>
-                            <SelectItem
-                                value="highest-rated"
-                                className="text-xs"
-                            >
-                                Highest rated
-                            </SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select> */}
             </div>
         </div>
     )

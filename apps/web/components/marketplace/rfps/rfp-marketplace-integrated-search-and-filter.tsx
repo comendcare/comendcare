@@ -1,16 +1,18 @@
 "use client"
 
 import {useCallback, useEffect, useMemo, useRef, useState} from "react"
-import {Funnel} from "lucide-react"
+import {Funnel, X} from "lucide-react"
 import {useShallow} from "zustand/react/shallow"
 import {Button} from "@comend/components/ui/button"
 import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"
 import {Separator} from "@comend/components/ui/separator"
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
 import {debounce} from "lodash";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/packages/components/ui/dialog";
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
+import MultipleSelector from "@/packages/components/ui/multiple-selector"
+import { RFP_OPEN_TO_TYPE_OPTIONS, Option, RFP_STATUS_TYPE_OPTIONS } from "@comend/lib/types"
+import { Badge } from "@/packages/components/ui/badge"
 
 export function RFPMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, sortBy, setSortBy, setSearchTerm, filters, setFilters, totalResults} = useRFPSearchStore(
@@ -54,6 +56,58 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
         []
     )
 
+    const activeCount =
+        (filters.conditions?.length || 0) +
+        (filters.genes?.length || 0) + 
+        (filters.organizations?.length || 0)
+
+    const handleAsyncGeneSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+        
+        try {
+            const response = await fetch(`/api/genes?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        }
+    };
+
+    const handleAsyncConditionSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+        
+        try {
+            const response = await fetch(`/api/conditions?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        }
+    };
+
+    const handleAsyncOrganizationSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+        
+        try {
+            const response = await fetch(`/api/organizations?search=${query}`, {
+                method: 'GET'
+            });
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        }
+    };
+
     return (
         <div className="w-full mx-auto flex flex-col gap-y-2">
             <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm">
@@ -90,60 +144,131 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
                             dialogRef.current?.focus() // focus the dialog content instead
                         }}
                     >
-                        <DialogTitle>Service Provider Filters</DialogTitle>
-                            {/* Project Types */}
-                            {/* <div>
-                                <Label>Project Types</Label>
+                        <DialogTitle>RFP Filters</DialogTitle>
+                            {/* Conditions */}
+                            <div>
+                                <Label>Condition</Label>
                                 <MultipleSelector
-                                    value={filters.milestoneTypes}
-                                    onChange={(vals) => setFilterKey("milestoneTypes", vals)}
-                                    defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
-                                    placeholder="Select project types..."
+                                    value={filters.conditions ?? []}
+                                    onChange={(vals) => setFilterKey("conditions", vals)}
+                                    onSearch={handleAsyncConditionSearch}
+                                    placeholder="Select conditions..."
+                                    hidePlaceholderWhenSelected
+                                    commandProps={{className: "bg-transparent"}}
+                                    loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading conditions...</p>}
+                                    emptyIndicator={
+                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                    }
+                                    showHoverCard={false}
+                                />
+                            </div>
+
+                            {/* Genes */}
+                            <div>
+                                <Label>Gene</Label>
+                                <MultipleSelector
+                                    value={filters.genes ?? []}
+                                    onChange={(vals) => setFilterKey("genes", vals)}
+                                    onSearch={handleAsyncGeneSearch}
+                                    placeholder="Select genes..."
+                                    hidePlaceholderWhenSelected
+                                    commandProps={{className: "bg-transparent"}}
+                                    loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading genes...</p>}
+                                    emptyIndicator={
+                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                    }
+                                    showHoverCard={false}
+                                />
+                            </div>
+
+                            {/* Open to */}
+                            <div>
+                                <Label>Open to</Label>
+                                <MultipleSelector
+                                    value={filters.genes ?? []}
+                                    onChange={(vals) => setFilterKey("openTo", vals)}
+                                    defaultOptions={RFP_OPEN_TO_TYPE_OPTIONS}
+                                    placeholder="Select option..."
                                     hidePlaceholderWhenSelected
                                     commandProps={{className: "bg-transparent"}}
                                     emptyIndicator={
                                         <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
                                     }
+                                    showHoverCard={false}
                                 />
-                            </div> */}
+                            </div>
+
+                            {/* Status */}
+                            <div>
+                                <Label>Status</Label>
+                                <MultipleSelector
+                                    value={filters.genes ?? []}
+                                    onChange={(vals) => setFilterKey("status", vals)}
+                                    defaultOptions={RFP_STATUS_TYPE_OPTIONS}
+                                    placeholder="Select status..."
+                                    hidePlaceholderWhenSelected
+                                    commandProps={{className: "bg-transparent"}}
+                                    emptyIndicator={
+                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                    }
+                                    showHoverCard={false}
+                                />
+                            </div>
                     </DialogContent>
                 </Dialog>
             </div>
 
-            {/* <div className="flex flex-row gap-2 items-center">
-                {true &&
-                    // filters.milestoneTypes.length ||
-                    // filters.types.length ||
-                    // filters.certifications.length ||
-                    // filters.tags.length) > 0 && 
-                    (
+            {/* Active filter badges */}
+            <div className="flex flex-row gap-2 items-center">
+                {activeCount > 0 && (
                     <div className="flex flex-wrap gap-2 items-center">
-                        {[
-                            // {key: "milestoneTypes", options: MILESTONE_TYPE_OPTIONS_WITH_VALUE},
-                            // {key: "types", options: BUSINESS_TYPES},
-                            // {key: "certifications", options: CRO_CERTIFICATIONS},
-                            // {key: "tags", options: CRO_TAGS},
-                        ]
-                            .flatMap(({key, options}) =>
-                                // @ts-ignore — keys align with FiltersType
-                                (filters[key] || []).map((item: { value: string }) => (
-                                    <Badge key={`${key}-${item.value}`} variant="secondary" className="text-xs">
-                                        {options.find((opt) => opt.value === item.value)?.label || item.value}
-                                        <button
-                                            onClick={() => removeFilterItem(key as any, item.value)}
-                                       s     className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
-                                        >
-                                            <X className="h-3 w-3"/>
-                                        </button>
-                                    </Badge>
-                                ))
-                            )}
-                        <Button variant="ghost" size="sm" onClick={clearAllFilters} className="text-xs">
+                        {/* conditions */}
+                        {(filters.conditions || []).map((item) => (
+                            <Badge key={`conditions-${item.value}`} variant="secondary" className="text-xs">
+                                {/* {MECHANISM_OPTIONS.find((o) => o.value === item.value)?.label ||
+                                    item.value} */}
+                                {item.value}
+                                <button
+                                    onClick={() => removeFilterItem("conditions", item.value)}
+                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+
+                        {/* genes */}
+                        {(filters.genes || []).map((item) => (
+                            <Badge key={`genes-${item.value}`} variant="secondary" className="text-xs">
+                                {item.value}
+                                <button
+                                    onClick={() => removeFilterItem("genes", item.value)}
+                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+
+                        {/* organizations */}
+                        {(filters.organizations || []).map((item) => (
+                            <Badge key={`organizations-${item.value}`} variant="secondary" className="text-xs">
+                                {item.label}
+                                <button
+                                    onClick={() => removeFilterItem("organizations", item.value)}
+                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+
+                        <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs">
                             Clear all
                         </Button>
                     </div>
                 )}
-            </div> */}
+            </div>
 
             <div className="w-full flex flex-row justify-between items-center">
                 {/* Result Count */}

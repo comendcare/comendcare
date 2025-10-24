@@ -57,9 +57,9 @@ const manageCollection = async (
 };
 
 const STATUS_PRIORITY = {
-  'Open': 1,
-  'Not Open': 2,
-  'Closed': 3,
+  'OPEN': 1,
+  'NOTOPEN': 2,
+  'CLOSED': 3,
 }
 
 function getSortRank(rfp: RFP) {
@@ -69,7 +69,7 @@ function getSortRank(rfp: RFP) {
     const base = STATUS_PRIORITY[status.status] * 1_000_000_000_000_000 // status weighting
     const now = new Date()
 
-    if (status.status === 'Open') {
+    if (status.status === 'OPEN') {
         // ascending by due_date → smaller date = higher rank
         if (rfp.endDate) return rfp.endDate.getTime()
 
@@ -77,12 +77,12 @@ function getSortRank(rfp: RFP) {
         return base
     }
 
-    if (status.status === 'Not Open' && rfp.startDate) {
+    if (status.status === 'NOTOPEN' && rfp.startDate) {
         // ascending by start_date
         return base + rfp.startDate.getTime()
     }
 
-    if (status.status === 'Closed' && rfp.endDate) {
+    if (status.status === 'CLOSED' && rfp.endDate) {
         // descending by due_date → larger date = higher rank
         return base + base - rfp.endDate.getTime()
     }
@@ -171,13 +171,13 @@ export const syncToTypesense = async (env: {
                     type: "int64",
                     sort: true,
                     optional: false,
-                }
+                },
                 // {
-                //     name: "gene.symbol",
+                //     name: "status",
                 //     type: "string",
-                //     sort: true,
-                //     optional: true,
-                // },
+                //     sort: false,
+                //     optional: true
+                // }
             ]
         }
         
@@ -200,7 +200,9 @@ export const syncToTypesense = async (env: {
                             select: {
                                 condition: {
                                     select: {
-                                        name: true
+                                        name: true,
+                                        causalGenes: true,
+                                        associatedGenes: true,
                                     }
                                 }
                             }
@@ -225,7 +227,8 @@ export const syncToTypesense = async (env: {
                 ...rfp,
                 createdAt: rfp.createdAt.getTime(), // special case for created at to enable sorting
                 condition: rfp.organization?.conditions && rfp.organization.conditions.length > 0 && rfp.organization.conditions[0].condition,
-                sort_rank: getSortRank(rfp as any)
+                sort_rank: getSortRank(rfp as any),
+                status: checkDateRangeUTC(rfp.startDate || undefined, rfp.endDate || undefined)?.status || 'Open'
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'rfps', uploadRFPs);
         } else {

@@ -165,7 +165,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
 
         const prismaResults = await prismaResponse.json();
 
-        const enrichedResults = ids.map(id => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
+        const enrichedResults = ids.map((id: string) => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
 
         return {
             results: isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults],
