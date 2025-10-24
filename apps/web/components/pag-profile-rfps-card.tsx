@@ -9,7 +9,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog";
-import {Calendar, DollarSign, FileText, Link as LinkIcon, School, User, Clock, ChevronDown, ChevronRight, Mail} from "lucide-react";
+import {Calendar, DollarSign, FileText, Link as LinkIcon, School, User, Clock, ChevronDown, ChevronRight, Mail, Workflow} from "lucide-react";
 import Link from "next/link";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {PropertyBadge} from "./property-badge";
@@ -228,13 +228,19 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                 )}
 
                 {(rfp.milestones && rfp.milestones.length > 0) && (
-                    <div className="w-full flex gap-2 flex-wrap">
-                        {rfp.milestones.map((project: any) => (
-                            <Badge className="font-normal" variant={"purple"}>
-                                <FileText className="h-4 w-4 min-h-4 min-w-4"/>
-                                {project.milestone.title}
-                            </Badge>
-                        ))}
+                    <div className="border-l-4 border-purple-200 pl-4 space-y-2">
+                        <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
+                            <Workflow className="h-4 w-4 min-w-4 text-purple-900" />
+                            <span className="text-purple-900 text-nowrap">Linked Projects</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            {rfp.milestones.map((project: any) => (
+                                <Badge className="font-normal" variant={"purple"}>
+                                    <FileText className="h-4 w-4 min-h-4 min-w-4"/>
+                                    {project.milestone.title}
+                                </Badge>
+                            ))}
+                        </div>
                     </div>
                 )}
 
