@@ -9,6 +9,9 @@ import {checkDateRangeUTC, formatDateUTC, formatMoney} from "@comend/lib/utils";
 import {RFPActionsMenu} from "./rfp-actions-menu";
 import {Badge} from "@/packages/components/ui/badge";
 import {Skeleton} from "@comend/components/ui/skeleton";
+import { Separator } from "@/packages/components/ui/separator";
+import { ProfilePhoto } from "@/packages/components/profile-photo";
+import { Organization } from "@prisma/client";
 
 /** Header skeleton that matches the header’s layout/height to prevent reflow */
 function HeaderSkeleton() {
@@ -24,7 +27,7 @@ function HeaderSkeleton() {
     );
 }
 
-export const RFPCard = ({rfp, isPrivate = false}: { rfp: any; isPrivate?: boolean }) => {
+export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rfp: any; showOrganization?: boolean; isPrivate?: boolean }) => {
     // Gate the header (and actions menu) until after hydration
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
@@ -120,11 +123,27 @@ export const RFPCard = ({rfp, isPrivate = false}: { rfp: any; isPrivate?: boolea
                     <div className="w-full flex gap-2 flex-wrap">
                         {rfp.milestones.map((project: any) => (
                             <Badge className="font-normal" variant={"purple"}>
-                                <FileText className="h-4 w-4"/>
+                                <FileText className="h-4 w-4 min-h-4 min-w-4"/>
                                 {project.milestone.title}
                             </Badge>
                         ))}
                     </div>
+                )}
+
+                {showOrganization && rfp.organization && (
+                    <>
+                        <Separator />
+                        <a
+                            href={`http://${rfp.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                            onClick={(e) => e.stopPropagation()}
+                            target="_blank"
+                        >
+                            <div className="flex flex-row gap-2 items-center">
+                                <ProfilePhoto img={rfp.organization.image} name={rfp.organization.name} className="h-9 w-9 -mt-1"/>
+                                <p className="text-lg font-semibold underline">{rfp.organization.name}</p>
+                            </div>
+                        </a>
+                    </>
                 )}
 
             </CardContent>
