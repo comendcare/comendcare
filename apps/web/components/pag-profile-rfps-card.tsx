@@ -9,7 +9,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog";
-import {Calendar, DollarSign, FileText, Link as LinkIcon, School, User, Clock, ChevronDown, ChevronRight} from "lucide-react";
+import {Calendar, DollarSign, FileText, Link as LinkIcon, School, User, Clock, ChevronDown, ChevronRight, Mail} from "lucide-react";
 import Link from "next/link";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {PropertyBadge} from "./property-badge";
@@ -30,6 +30,9 @@ import {Badge} from "@/packages/components/ui/badge";
 import { ExternalAttachment, ExternalContact, Milestone } from "@prisma/client";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import { Button } from "@/packages/components/ui/button";
+import { DialogDescription } from "@radix-ui/react-dialog";
+import { ProfilePhoto } from "@/packages/components/profile-photo";
+import { Separator } from "@/packages/components/ui/separator";
 
 export const PAGProfileRFPsHoverableCard = ({rfps, isPrivate}: { rfps: any[], isPrivate: boolean }) => {
     const searchParams = useSearchParams()
@@ -172,8 +175,9 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                         </Badge>
                     )}
                 </DialogTitle>
+                <DialogDescription className="text-sm text-muted-foreground">{rfp.description}</DialogDescription>
             </DialogHeader>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-4">
                 <ul className="pt-4 w-full flex flex-col gap-2 text-sm text-wrap break-words">
                     {rfp.budget && (
                         <li>
@@ -224,31 +228,32 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                 )}
 
                 {(rfp.milestones && rfp.milestones.length > 0) && (
-                    <CaretAccordion 
-                        title={'Linked Projects'}
-                        content={
-                            <div className="w-full flex gap-2 flex-wrap">
-                                {rfp.milestones.map((project: any) => (
-                                    <Badge className="font-normal" variant={"purple"}>
-                                        <FileText className="h-4 w-4 min-h-4 min-w-4"/>
-                                        {project.milestone.title}
-                                    </Badge>
-                                ))}
-                            </div>
-                        }
-                        className="mt-2"
-                    />
+                    <div className="w-full flex gap-2 flex-wrap">
+                        {rfp.milestones.map((project: any) => (
+                            <Badge className="font-normal" variant={"purple"}>
+                                <FileText className="h-4 w-4 min-h-4 min-w-4"/>
+                                {project.milestone.title}
+                            </Badge>
+                        ))}
+                    </div>
                 )}
 
-                {rfp.description && (
-                    <CaretAccordion 
-                        title={'Scope'}
-                        content={
-                            <p className="text-sm text-secondary-foreground">{rfp.description}</p>
-                        }
-                        className="mt-2"
-                    />
+                <Separator />
+
+                {rfp.organization && (
+                    <a
+                        href={`http://${rfp.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                        onClick={(e) => e.stopPropagation()}
+                        target="_blank"
+                    >
+                        <div className="flex flex-row gap-2 items-center">
+                            <ProfilePhoto img={rfp.organization.image} name={rfp.organization.name} className="h-9 w-9 -mt-1"/>
+                            <p className="text-lg font-semibold underline">{rfp.organization.name}</p>
+                        </div>
+                    </a>
                 )}
+
+                <Separator />
 
                 {rfp.eligibility && (
                     <CaretAccordion 
@@ -256,7 +261,6 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                         content={
                             <p className="text-sm text-secondary-foreground">{rfp.eligibility}</p>
                         }
-                        className="mt-2"
                     />
                 )}
 
@@ -266,7 +270,6 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                         content={
                             <p className="text-sm text-secondary-foreground">{rfp.instructions}</p>
                         }
-                        className="mt-2"
                     />
                 )}
 
@@ -276,47 +279,17 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                         content={
                             <p className="text-sm text-secondary-foreground">{rfp.evaluationProcess}</p>
                         }
-                        className="mt-2"
                     />
                 )}
 
-                <div className="pt-4 flex flex-col w-full gap-4">
-                    <Badge variant={"secondary"} className="p-2 flex flex-col items-start justify-start w-full text-sm">
-                        <p className="font-semibold">Organization: </p>
-                        <p className="font-normal">{rfp?.organization?.name || "No organization"}</p>
-                    </Badge>
+                {((rfp.contacts && rfp.contacts.length > 0) || (rfp.attachments && rfp.attachments.length > 0)) && <Separator />}
 
-                    <Badge variant={"secondary"} className="p-2 flex flex-col items-start justify-start w-full text-sm">
-                        <p className="font-semibold">Primary Attachments: </p>
-                        <ol className="font-normal flex flex-col gap-2 w-full max-w-full">
-                            {rfp?.attachments?.map((attachment: ExternalAttachment) => (
-                                <li className="flex items-start gap-2 text-wrap w-full">
-                                    <LinkIcon className="mt-[2px] h-4 w-4 min-h-4 min-w-4"/>
-                                    <a
-                                        className={cn(
-                                            attachment?.link && "underline", 
-                                            "text-wrap w-full",
-                                            // allow text break in middle of word for long links
-                                            !attachment.name && attachment.link && "break-all"
-                                        )}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                        }}
-                                        href={attachment?.link}
-                                    >
-                                        {attachment?.name || attachment?.link || "No attachments"}
-                                    </a>
-                                </li>
-                            ))}
-                        </ol>
-                    </Badge>
-
-                    <Badge variant={"secondary"} className="p-2 flex flex-col items-start justify-start w-full text-sm">
-                        <p className="font-semibold">Primary Contacts: </p>
-                        <ol className="font-normal flex flex-col gap-2">
+                {rfp.contacts && rfp.contacts.length > 0 && (
+                    <div className="flex flex-col gap-2 w-full">
+                        <h3 className="text-lg font-semibold">Primary Contacts</h3>
                         {rfp?.contacts?.map((contact: ExternalContact) => (
-                            <li className="flex items-start gap-2 text-wrap w-full">
-                                <User className="mt-[2px] h-4 w-4 min-h-4 min-w-4"/>
+                            <span className="flex items-center gap-2 text-wrap w-full">
+                                <Mail className="mt-1 h-4 w-4 min-h-4 min-w-4"/>
                                 <a
                                     className={cn(contact?.email && "underline")}
                                     onClick={(e) => {
@@ -328,11 +301,35 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                                         contact?.email ||
                                         contact?.affiliation || "No primary contacts"}
                                 </a>
-                            </li>
+                            </span>
                         ))}
-                        </ol>
-                    </Badge>
-                </div>
+                    </div>
+                )}
+
+                {rfp.attachments && rfp.attachments.length > 0 && (
+                    <div className="flex flex-col gap-2 w-full">
+                        <h3 className="text-lg font-semibold">Primary Attachments</h3>
+                        {rfp?.attachments?.map((attachment: ExternalAttachment) => (
+                            <span className="flex items-start gap-2 text-wrap w-full">
+                                <LinkIcon className="mt-1 h-4 w-4 min-h-4 min-w-4"/>
+                                <a
+                                    className={cn(
+                                        attachment?.link && "underline", 
+                                        "text-wrap w-full",
+                                        // allow text break in middle of word for long links
+                                        !attachment.name && attachment.link && "break-all"
+                                    )}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                    }}
+                                    href={attachment?.link}
+                                >
+                                    {attachment?.name || attachment?.link || "No attachments"}
+                                </a>
+                            </span>
+                        ))}
+                    </div>
+                )}
             </div>
         </ScrollArea>
     )
@@ -358,7 +355,7 @@ const CaretAccordion = ({title, content, className}: {title: string, content: Re
                 <p className="text-xl font-semibold">{title}</p>
             </span>
             {isOpen && (
-                <div className="ml-8">
+                <div>
                     {content}
                 </div>
             )}
