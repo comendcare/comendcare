@@ -120,14 +120,10 @@ export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rf
                 )}
 
                 {(rfp.milestones && rfp.milestones.length > 0) && (
-                    <div className="w-full flex gap-2 flex-wrap">
-                        {rfp.milestones.map((project: any) => (
-                            <Badge className="font-normal" variant={"purple"}>
-                                <FileText className="h-4 w-4 min-h-4 min-w-4"/>
-                                {project.milestone.title}
-                            </Badge>
-                        ))}
-                    </div>
+                    <Badge className="font-normal w-fit" variant={"purple"}>
+                        <FileText className="h-4 w-4 min-h-4 min-w-4"/>
+                        {rfp.milestones.length <= 1 ? `${rfp.milestones.length} Linked project` : `${rfp.milestones.length} Linked projects`}
+                    </Badge>
                 )}
 
                 {showOrganization && rfp.organization && (
