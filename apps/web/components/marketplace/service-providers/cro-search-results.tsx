@@ -13,12 +13,15 @@ import { NoResultsView } from "../no-results";
 import {useSession} from "next-auth/react";
 import {getSavedCompaniesFromOrganizationId} from "@/packages/lib/fetchers";
 import {SavedCompany} from "@prisma/client";
+import { LoaderCircle } from "lucide-react";
+import { cn } from "@/packages/lib/utils";
 
 const selector = (state: CROSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
     setLastFetchedPage: state.setLastFetchedPage,
     view: state.view,
-    searchResults: state.searchResults
+    searchResults: state.searchResults,
+    totalResults: state.totalResults
 })
 
 export function CROSearchResults() {
@@ -28,7 +31,8 @@ export function CROSearchResults() {
         lastFetchedPage, 
         setLastFetchedPage, 
         view, 
-        searchResults 
+        searchResults,
+        totalResults
     } = useCROSearchStore(useShallow(selector))
 
     useEffect(() => {
@@ -97,6 +101,9 @@ export function CROSearchResults() {
     return (
         <>
             <ResultsView />
+            <LoaderCircle 
+                className={cn("h-[40px] w-[40px] animate-spin", (searchResults.length === totalResults) && "opacity-0")}
+            />
             <InfiniteScroll 
                 lastFetchedPage={lastFetchedPage} 
                 setLastFetchedPage={setLastFetchedPage}

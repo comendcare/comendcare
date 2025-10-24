@@ -4949,7 +4949,7 @@ export const updateMilestones = withOrganizationAuth(
                                 deleteMany: {},
                                 create: (milestone.biosamples || []).map((tool: any) => ({
                                     biosample: {
-                                        connect: {id: tool.toolId || tool.biosample.id},
+                                        connect: {id: tool.biosampleId || tool.biosample.id},
                                     },
                                 })),
                             },
@@ -4957,7 +4957,7 @@ export const updateMilestones = withOrganizationAuth(
                                 deleteMany: {},
                                 create: (milestone.diseaseModels || []).map((tool: any) => ({
                                     diseaseModel: {
-                                        connect: {id: tool.toolId || tool.diseaseModel.id},
+                                        connect: {id: tool.diseaseModelId || tool.diseaseModel.id},
                                     },
                                 })),
                             },

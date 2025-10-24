@@ -1409,7 +1409,6 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                 <>
                     <div>
                         <FormLabel className="text-sm">{`Type Description`}</FormLabel>
-                        <FormDescription className="text-xs">{`This will be used to improve the platform.`}</FormDescription>
                     </div>
                     <FormField
                         control={form.control}
@@ -1419,7 +1418,7 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                                 <FormControl>
                                     <Textarea
                                         id="otherTypeDetails"
-                                        placeholder={`Please enter a short description of your project type.`}
+                                        placeholder={`Please add a short note about your project type — it helps us make the platform better.`}
                                         // defaultValue={field.value}
                                         {...field}
                                     />

@@ -28,7 +28,7 @@ export const RoadmapsCard = ({
     const pathname = usePathname()
 
     return (
-        <Card className="organization-profile-tour-step4" data-testid="roadmaps-card">
+        <Card className="organization-profile-tour-step4 w-full" data-testid="roadmaps-card">
             <CardHeader className="w-full pt-6 pb-2 space-y-4">
                 <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
                     <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="roadmaps-heading">
@@ -195,6 +195,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
                             key={index}
                             label={type.label}
                             colSpan={2}
+                            disabled={true}
                         >
                             {roadmapsForModality.map(roadmap => (
                                 <TableRow key={roadmap.id} className="cursor-pointer"
@@ -218,6 +219,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
                     <CollapsibleTableGroup
                         label={'Other'}
                         colSpan={2}
+                        disabled={true}
                     >
                         {roadmaps.filter(roadmap => (roadmap.modalities || []).length === 0 || roadmap.modalities.includes("OTHER")).map(roadmap => (
                             <TableRow key={roadmap.id} className="cursor-pointer"
@@ -245,9 +247,10 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
     )
 }
 
-export const CollapsibleTableGroup = ({label, colSpan, children}: {
+export const CollapsibleTableGroup = ({label, colSpan, disabled = false, children}: {
     label: string,
     colSpan: number,
+    disabled?: boolean
     children?: React.ReactNode
 }) => {
     const [isOpen, setIsOpen] = useState(true)
@@ -256,13 +259,18 @@ export const CollapsibleTableGroup = ({label, colSpan, children}: {
         <>
             <TableRow
                 data-state={undefined}
-                className="!appearance-none cursor-pointer bg-gray-50"
-                onClick={() => setIsOpen(prev => !prev)}
+                className={cn(
+                    "!appearance-none bg-gray-50",
+                    (!disabled && "cursor-pointer")
+                )}
+                onClick={() => {
+                    if (!disabled) setIsOpen(prev => !prev)
+                }}
             >
                 <TableCell colSpan={colSpan} className="p-2">
                     <div className="flex gap-2 justify-between items-center">
                         {label}
-                        <ChevronsUpDown className="h-4 w-4"/>
+                        {!disabled && <ChevronsUpDown className="h-4 w-4"/>}
                     </div>
                 </TableCell>
             </TableRow>

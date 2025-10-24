@@ -451,28 +451,23 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
             />
 
             {formData?.types?.map((type: any) => type?.value).includes("OTHER") && (
-                <>
-                    <div>
-                        <FormLabel className="text-md">{`Type Description`}</FormLabel>
-                        <FormDescription>{`This will be used to improve the platform.`}</FormDescription>
-                    </div>
-                    <FormField
-                        control={form.control}
-                        name="otherTypeDetails"
-                        render={({field}) => (
-                            <FormItem className="flex flex-col grow">
+                <FormField
+                    control={form.control}
+                    name="otherTypeDetails"
+                    render={({field}) => (
+                        <FormItem className="w-full flex gap-4 items-center">
+                            <FormLabel className="w-[100px]">{`Type Description`}</FormLabel>
                                 <FormControl>
                                     <Textarea
                                         id="otherTypeDetails"
-                                        placeholder={`Please enter a short description of your project type.`}
+                                        placeholder={`Please add a short note about your biosample type — it helps us make the platform better.`}
                                         {...field}
                                     />
                                 </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-                </>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
             )}
 
             <FormField
@@ -597,7 +592,7 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                                     placeholder="Search for institutions..."
                                     hidePlaceholderWhenSelected={true}
                                     loadingIndicator={<p>Loading institutions...</p>}
-                                    emptyIndicator={<p>No institutions found.</p>}
+                                    emptyIndicator={<p>No institutions found. Try a different search.</p>}
                                     showHoverCard={false}
                                     className="-mt-2 w-full min-h-[40px]"
                                 />

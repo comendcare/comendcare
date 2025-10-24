@@ -272,8 +272,14 @@ export default async function OrganizationRoadmapPage({
                                 organization={organization}
                                 roadmap={undefined}
                             />
-                            <PAGRoadmapHeader organization={organization} editable={false} />
-                            <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
+                            <PAGRoadmapHeader
+                                organization={organization}
+                                editable={false}
+                            />
+                            <RoadmapsCard
+                                roadmaps={roadmaps}
+                                organization={organization}
+                            />
                         </div>
 
                         <FloatingDock

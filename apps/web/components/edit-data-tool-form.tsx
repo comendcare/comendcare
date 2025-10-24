@@ -328,28 +328,23 @@ export function EditDataToolForm({
                     />
         
                     {formData.types.map((type: any) => type?.value).includes("OTHER") && (
-                        <>
-                            <div>
-                                <FormLabel className="text-md">{`Type Description`}</FormLabel>
-                                <FormDescription>{`This will be used to improve the platform.`}</FormDescription>
-                            </div>
-                            <FormField
-                                control={form.control}
-                                name="otherTypeDetails"
-                                render={({field}) => (
-                                    <FormItem className="flex flex-col grow">
+                        <FormField
+                            control={form.control}
+                            name="otherTypeDetails"
+                            render={({field}) => (
+                                <FormItem className="w-full flex gap-4 items-center">
+                                    <FormLabel className="w-[100px]">{`Type Description`}</FormLabel>
                                         <FormControl>
                                             <Textarea
                                                 id="otherTypeDetails"
-                                                placeholder={`Please enter a short description of your project type.`}
+                                                placeholder={`Please add a short note about your clinical dataset type — it helps us make the platform better.`}
                                                 {...field}
                                             />
                                         </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-                        </>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
                     )}
 
                     <FormField

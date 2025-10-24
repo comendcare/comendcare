@@ -11,7 +11,7 @@ import {
     BackgroundVariant,
     Background,
 } from "@xyflow/react"
-import type { Edge, Node, NodeChange } from "@xyflow/react"
+import type { Edge, MiniMapNodeProps, Node, NodeChange } from "@xyflow/react"
 import { useShallow } from "zustand/react/shallow"
 import MilestoneNode from "~web/components/milestone-node"
 import { Button } from "@comend/components/ui/button"
@@ -41,6 +41,21 @@ const selector = (state: RoadmapState) => ({
     addNodes: state.addNodes,
     addMilestones: state.addMilestones
 })
+
+const gridSize = 15
+
+function snapToGridCenter(x: number, y: number, width: number, height: number) {
+  const centerX = x + width / 2
+  const centerY = y + height / 2
+
+  const snappedCenterX = Math.round(centerX / gridSize) * gridSize
+  const snappedCenterY = Math.round(centerY / gridSize) * gridSize
+
+  return {
+    x: snappedCenterX - width / 2,
+    y: snappedCenterY - height / 2
+  }
+}
 
 export const PrivateFlowView = ({
     width,
@@ -148,29 +163,40 @@ export const PrivateFlowView = ({
         }
       }, [startConnectNode, screenToFlowPosition, getIntersectingNodes]);
 
-    const handleEditClick = (event: React.MouseEvent, node: Node) => {
-        if (event.ctrlKey || event.altKey) return
-        if (event.metaKey) {
-            // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
-            if (node.id && !selectedNodeIds.includes(node.id)) {
-                setSelectedNodeIds([...selectedNodeIds, node.id])
-            }
-        } else {
-            // regular click, set selected node id
-            if (node.id) {
-                setSelectedNodeIds([node.id])
-            } else {
-                setSelectedNodeIds([])
-            }
-        }
-    }
+    // const handleEditClick = (event: React.MouseEvent, node: Node) => {
+    //     if (event.ctrlKey || event.altKey) return
+    //     if (event.metaKey) {
+    //         // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
+    //         if (node.id && !selectedNodeIds.includes(node.id)) {
+    //             setSelectedNodeIds([...selectedNodeIds, node.id])
+    //         }
+    //     } else {
+    //         // regular click, set selected node id
+    //         if (node.id) {
+    //             setSelectedNodeIds([node.id])
+    //         } else {
+    //             setSelectedNodeIds([])
+    //         }
+    //     }
+    // }
 
     const onNodesChange = (changes: NodeChange<Node>[]) => {
-        const newNodes = applyNodeChanges(changes, localNodes)
-        setLocalNodes(newNodes)
+        const newNodes = applyNodeChanges(changes, localNodes).map(node => {
+            if (node.position) {
+                const nodeElement = document.getElementById(`react-flow__node-${node.id}`)
+                if (!nodeElement) return node
+                const { offsetWidth, offsetHeight } = nodeElement
 
-        const validChanges = changes.filter(change => change.type === "position")
-        if (validChanges.length > 0) debounceUpdateStore(newNodes) // only change zustand state if the user is updating the node position
+                return {
+                    ...node,
+                    position: snapToGridCenter(node.position.x, node.position.y, offsetWidth, offsetHeight)
+                }
+            }
+            return node
+        })
+
+        setLocalNodes(newNodes)
+        debounceUpdateStore(newNodes)
     }
 
     const debounceUpdateStore = useCallback(
@@ -184,8 +210,7 @@ export const PrivateFlowView = ({
 
     const onConnectEnd = useCallback(
         (event: any, connectionState: any) => {
-            // when a connection is dropped on the pane it's not valid
-            if (!connectionState.isValid && previewNodeRef.current) {
+            if (connectionState.isValid && previewNodeRef.current) {
                 // we need to remove the wrapper bounds, in order to get the correct position
                 const id = nanoid();
                 const { clientX, clientY } =
@@ -202,7 +227,7 @@ export const PrivateFlowView = ({
                         id: nanoid(),
                         nodeId: id,
                     },
-                    origin: connectionState.fromHandle?.position === 'left' ? [1.0, 0.5] : [0.0, 0.5],
+                    origin: connectionState.fromHandle?.position === 'left' ? [1.0, 0.0] : [0.0, 0.0],
                 }
 
                 addNodes([newNode], "Flow Connection")
@@ -253,6 +278,10 @@ export const PrivateFlowView = ({
             contextMenuRef,
             organization: organization
         },
+        draggable: true,
+        dragHandle: '.drag-handle', // class on the element that should start drag
+        isSelectable: false,
+        isPublic: false
     }))
 
     const updatedEdges = localEdges.map((edge: Edge) => ({
@@ -311,6 +340,8 @@ export const PrivateFlowView = ({
         }
     }, [localNodes, pathname, setSelectedNodeIds, startOnborda])
 
+    const gridSize = 15
+
     return (
         <div className="h-full w-full pb-6" onMouseMove={handleMouseMove}>
         <ReactFlow
@@ -321,7 +352,7 @@ export const PrivateFlowView = ({
             }}
             nodes={previewNode ? [...updatedNodes, previewNode] : updatedNodes}
             edges={updatedEdges}
-            onNodeClick={handleEditClick}
+            // onNodeClick={handleEditClick}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
@@ -333,6 +364,7 @@ export const PrivateFlowView = ({
             fitView
             fitViewOptions={{ padding: 0.2, duration: 500 }}
             snapToGrid={true}
+            snapGrid={[gridSize, gridSize]}
             style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
             minZoom={0.1}
