@@ -67,57 +67,22 @@ export const PublicFlowView = ({
 
     useEffect(() => {
         // if there is no milestone selected use the following logic for default zoom
-        // 1. zoom to left most in-progress project
-        // 2. if nothing is in progress, try to left-most project in planning
-        // 3. if nothing is in progress or planning, use the right-most project completed
-        if (!urlMilestone) {
-            const inProgressProjects = roadmap.milestones
-                .filter((milestone: Milestone) => milestone.status === 'INPROGRESS')
-                .map((milestone: Milestone) => milestone.id)
-            const planningProjects = roadmap.milestones
-                .filter((milestone: Milestone) => milestone.status === 'PLANNED')
-                .map((milestone: Milestone) => milestone.id)
-            const completedProjects = roadmap.milestones
-                .filter((milestone: Milestone) => milestone.status === 'COMPLETED')
-                .map((milestone: Milestone) => milestone.id)
-
-            if (inProgressProjects.length > 0) {
-                const timer = setTimeout(() => {
-                    fitView({
-                        nodes: [(roadmap?.nodes || [])
-                            .filter((node: any) => inProgressProjects.includes(node.data.id))
-                            .sort((a: any, b: any) => (a.positionX) - (b.positionX))[0]],
-                        padding: 4,
-                        duration: 500
-                    })
-                }, 1) // Delay by a short time to allow landing adjustment
-        
-                return () => clearTimeout(timer)
-            } else if (planningProjects.length > 0) {
-                const timer = setTimeout(() => {
-                    fitView({
-                        nodes: [(roadmap?.nodes || [])
-                            .filter((node: any) => planningProjects.includes(node.data.id))
-                            .sort((a: any, b: any) => (a.positionX) - (b.positionX))[0]],
-                        padding: 4,
-                        duration: 500
-                    })
-                }, 1) // Delay by a short time to allow landing adjustment
-        
-                return () => clearTimeout(timer)
-            } else if (completedProjects.length > 0) {
-                const timer = setTimeout(() => {
-                    fitView({
-                        nodes: [(roadmap?.nodes || [])
-                            .filter((node: any) => completedProjects.includes(node.data.id))
-                            .sort((a: any, b: any) => (b.positionX) - (a.positionX))[0]],
-                        padding: 4,
-                        duration: 500
-                    })
-                }, 1) // Delay by a short time to allow landing adjustment
-        
-                return () => clearTimeout(timer)
-            }
+        // zoom to furthest left project
+        if (!urlMilestone && roadmap.nodes && roadmap.nodes.length > 0) {
+            const timer = setTimeout(() => {
+                fitView({
+                    nodes: [roadmap?.nodes
+                        .sort((a: any, b: any) => (a.positionX) - (b.positionX))[0]],
+                    padding: {
+                        left: 1,
+                        right: 6,
+                        y: 6,
+                    },
+                    duration: 500
+                })
+            }, 1) // Delay by a short time to allow landing adjustment
+    
+            return () => clearTimeout(timer)
         }
     }, [])
 

@@ -1222,8 +1222,8 @@ model InstitutionRelationship {
   institutionId String
   relatedId     String
 
-  institution Institution @relation("InstitutionRelationships", fields: [institutionId], references: [id])
-  related     Institution @relation("InstitutionRelatedTo", fields: [relatedId], references: [id])
+  institution Institution @relation("InstitutionRelationships", fields: [institutionId], references: [id], onDelete: Cascade)
+  related     Institution @relation("InstitutionRelatedTo", fields: [relatedId], references: [id], onDelete: Cascade)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   metadata    Json?
@@ -1237,7 +1237,7 @@ model Affiliation {
   endDate       DateTime?
 
   researcher  Researcher  @relation(fields: [researcherId], references: [id])
-  institution Institution @relation(fields: [institutionId], references: [id])
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
