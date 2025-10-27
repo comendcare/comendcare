@@ -149,7 +149,8 @@ export default function MarketplacePage() {
                             ? (
                                 <>
                                     {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])]
-                                        .slice(0, width < 1280 ? 2 : 3).map((organization, index) => (
+                                        .slice(0, width < 1280 ? 2 : 3)
+                                        .map((organization, index) => (
                                             <OrganizationMarketplaceCard
                                                 organization={organization}
                                                 key={index}
