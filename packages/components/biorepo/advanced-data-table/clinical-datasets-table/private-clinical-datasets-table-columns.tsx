@@ -260,7 +260,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             <DataTableColumnHeader column={column} title="Links" />
         ),
         cell: ({ row }) => (
-            <ul className="flex flex-col gap-2 min-w-[120px]">
+            <ul className="flex flex-col gap-2">
                 {row.original.attachments?.map((attachment: any, index: number) => (
                     <li key={index}>
                         <Link 

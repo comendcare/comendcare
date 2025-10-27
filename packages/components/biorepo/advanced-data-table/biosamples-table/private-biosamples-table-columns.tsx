@@ -132,7 +132,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader 
                     column={column} 
                     className="min-w-fit text-nowrap"
-                    title="Public Donor ID"
+                    title="Public donor ID"
                     tooltip="This is a unique de-identified ID assigned to the donor of this sample. This ID is public, and will appear in the marketplace."
                 />
             ),
@@ -143,7 +143,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </div>
             ),
             enableHiding: true,
-            meta: { label: "Public Donor ID" }
+            meta: { label: "Public donor ID" }
         },
         {
             id: "donor.internalId",
@@ -152,12 +152,12 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader 
                     column={column} 
                     className="min-w-fit text-nowrap"
-                    title="Internal Donor ID" 
+                    title="Internal donor ID" 
                     tooltip="This ID is optional, and can be used to track donor IDs from any previously used donor identification system outside the Comend platform. This ID cannot be guaranteed to be unique across our platform, and will only be visible to members of your organization."
                 />
             ),
             enableHiding: true,
-            meta: { label: "Internal Donor ID" }
+            meta: { label: "Internal donor ID" }
         },
         {
             id: "id",
@@ -386,7 +386,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Total Available Quantity"
+                    title="Total available quantity"
                 />
             ),
             cell: ({row}) => (
@@ -406,7 +406,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
-                label: "Total Available Quantity",
+                label: "Total available quantity",
                 variant: "range",
                 range: [0, 1000],
                 unit: 'ml',
@@ -419,7 +419,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Stored With"
+                    title="Stored with"
                 />
             ),
             cell: ({row}) => {
@@ -428,7 +428,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
-                label: "Stored With",
+                label: "Stored with",
                 variant: "select",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
@@ -442,7 +442,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Point of Contact"
+                    title="Point of contact"
                 />
             ),
             cell: ({row}) => (
@@ -456,7 +456,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableSorting: false,
             enableHiding: true,
-            meta: { label: "Point of Contact" }
+            meta: { label: "Point of contact" }
         },
         {
             id: "links",
@@ -469,7 +469,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({row}) => (
-                <ul className="flex flex-col gap-2 min-w-[120px]">
+                <ul className="flex flex-col gap-2">
                     {row.original.attachments?.map((attachment: any, index: number) => (
                         <li key={index}>
                             <Link 
@@ -747,7 +747,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Linked Projects"
+                    title="Linked projects"
                 />
             ),
             cell: ({row}) => (
@@ -763,7 +763,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
-                label: "Linked Projects",
+                label: "Linked projects",
                 variant: "multiSelect",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
@@ -795,7 +795,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Internal Notes"
+                    title="Internal notes"
                 />
             ),
             cell: ({row}) => (
@@ -803,7 +803,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     {row.original.notes}
                 </div>
             ),
-            meta: { label: "Internal Notes" },
+            meta: { label: "Internal notes" },
             enableHiding: true,
         },
         // {

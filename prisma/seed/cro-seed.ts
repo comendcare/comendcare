@@ -1,11 +1,13 @@
 import prisma from "@comend/lib/prisma"
 import * as fs from "fs/promises";
+import path from "path";
 
 async function main() {
     console.log('Starting seed script...');
 
     // Load the JSON data
-    const companies = JSON.parse(await fs.readFile('../../packages/data/new_dataset.json', 'utf-8'));
+    const filePath = path.resolve(__dirname, "../../packages/data/new_dataset.json");
+    const companies = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     console.log(`Total records to process: ${companies.length}`);
 

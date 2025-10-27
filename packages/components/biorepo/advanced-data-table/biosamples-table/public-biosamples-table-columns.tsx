@@ -144,7 +144,7 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Associated Patient Group"
+                    title="Associated patient group"
                 />
             ),
             cell: ({row}) => (
@@ -176,7 +176,7 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Total Available Quantity"
+                    title="Total available quantity"
                 />
             ),
             cell: ({row}) => (
@@ -221,7 +221,7 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Point of Contact"
+                    title="Point of contact"
                 />
             ),
             cell: ({row}) => (
@@ -235,7 +235,7 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
             ),
             enableHiding,
             enableSorting: false,
-            meta: { label: "Point of Contact" }
+            meta: { label: "Point of contact" }
         },
         {
             id: "links",
@@ -248,7 +248,7 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
                 />
             ),
             cell: ({row}) => (
-                <ul className="flex flex-col gap-2 min-w-[120px]">
+                <ul className="flex flex-col gap-2">
                     {row.original.attachments?.map((attachment: any, index: number) => (
                         <li key={index}>
                             <Link 
