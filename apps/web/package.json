@@ -11,7 +11,7 @@
         "prebuild": "node ../../write-certificates.js",
         "dev": "next dev",
         "test": "playwright test",
-        "build": "prisma generate && prisma migrate deploy && next build",
+        "build": "prisma generate && prisma db push && next build",
         "start": "next start",
         "lint": "next lint"
     },
