@@ -464,11 +464,11 @@ export function EditDiseaseModelToolForm({
                         name="description"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">{`Description`}</FormLabel>
+                                <FormLabel className="w-[100px]">{`Notes`}</FormLabel>
                                 <FormControl>
                                     <Textarea
                                         id="description"
-                                        placeholder={`Enter a description...`}
+                                        placeholder={`Enter notes...`}
                                         {...field}
                                     />
                                 </FormControl>
