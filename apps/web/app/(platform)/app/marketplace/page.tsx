@@ -80,6 +80,8 @@ export default function MarketplacePage() {
     const [biosamplesInitialized, setBiosamplesInitialized] = useState(false)
     const [diseaseModelsInitialized, setDiseaseModelsInitialized] = useState(false)
     const [clinicalDatasetsInitialized, setClinicalDatasetsInitialized] = useState(false)
+    const [width, setWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 0)
+
     // const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
     // const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
 
@@ -120,6 +122,17 @@ export default function MarketplacePage() {
 
     //     fetchSavedCompanies();
     // }, [session, status]);
+
+    useEffect(() => {
+        function handleResize() {
+            setWidth(window.innerWidth)
+        }
+
+        window.addEventListener('resize', handleResize)
+        handleResize() // Set initial width on mount
+
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
     useEffect(() => {
         const init = async () => {
@@ -201,14 +214,15 @@ export default function MarketplacePage() {
                         {(crosInitialized && croStore.searchResults && croStore.searchResults.length > 0 )
                             ? (
                                 <>
-                                    {croStore.searchResults?.slice(0, 3).map((cro, index) => (
-                                        <CROMarketplaceCard
-                                            cro={cro}
-                                            key={index}
-                                            location={"Marketplace"}
-                                            // savedCompanyIds={savedCompanyIds}
-                                            savedCompanyIds={new Set()}
-                                        />
+                                    {croStore.searchResults?.slice(0, width < 1280 ? 2 : 3)
+                                        .map((cro, index) => (
+                                            <CROMarketplaceCard
+                                                cro={cro}
+                                                key={index}
+                                                location={"Marketplace"}
+                                                // savedCompanyIds={savedCompanyIds}
+                                                savedCompanyIds={new Set()}
+                                            />
                                     ))}
                                 </>
                             )
@@ -216,7 +230,7 @@ export default function MarketplacePage() {
                                 <>
                                     <Skeleton className="h-[286px] w-full"/>
                                     <Skeleton className="h-[286px] w-full"/>
-                                    <Skeleton className="h-[286px] w-full"/>
+                                    {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
                                 </>
                             )
                         }
@@ -239,14 +253,16 @@ export default function MarketplacePage() {
                         {(pagsInitialized && ([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0))
                             ? (
                                 <>
-                                    {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].slice(0, 3).map((organization, index) => (
-                                        <OrganizationMarketplaceCard
-                                            organization={organization}
-                                            key={index}
-                                            isPublic={false}
-                                            // savedOrganizationIds={savedOrganizationIds}
-                                            savedOrganizationIds={new Set()}
-                                        />
+                                    {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])]
+                                        .slice(0, width < 1280 ? 2 : 3)
+                                        .map((organization, index) => (
+                                            <OrganizationMarketplaceCard
+                                                organization={organization}
+                                                key={index}
+                                                isPublic={false}
+                                                // savedOrganizationIds={savedOrganizationIds}
+                                                savedOrganizationIds={new Set()}
+                                            />
                                     ))}
                                 </>
                             )
@@ -254,7 +270,7 @@ export default function MarketplacePage() {
                                 <>
                                     <Skeleton className="h-[286px] w-full"/>
                                     <Skeleton className="h-[286px] w-full"/>
-                                    <Skeleton className="h-[286px] w-full"/>
+                                    {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
                                 </>
                             )
                         }
