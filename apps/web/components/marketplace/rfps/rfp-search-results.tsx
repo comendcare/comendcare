@@ -11,19 +11,23 @@ import { Dialog, DialogTrigger } from "@/packages/components/plate-ui/dialog";
 import { mixpanelTrack } from "@/packages/lib/mixpanel";
 import { DialogContent } from "@/packages/components/ui/dialog";
 import { RFPDetails } from "~web/components/pag-profile-rfps-card";
+import { LoaderCircle } from "lucide-react";
+import { cn } from "@udecode/cn";
 
 const selector = (state: RFPSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
     setLastFetchedPage: state.setLastFetchedPage,
     view: state.view,
-    searchResults: state.searchResults
+    searchResults: state.searchResults,
+    totalResults: state.totalResults
 })
 
 export function RFPSearchResults() {
     const {
         lastFetchedPage, 
         setLastFetchedPage, 
-        searchResults 
+        searchResults,
+        totalResults
     } = useRFPSearchStore(useShallow(selector))
 
     if (!searchResults) {
@@ -41,8 +45,8 @@ export function RFPSearchResults() {
         )
     }
 
-    return (
-        <>
+    const ResultsView = () => {
+        return (
             <div className="w-full flex flex-col gap-4">
                 {(!searchResults || searchResults.length === 0) ? (
                     <NoResultsView />
@@ -78,6 +82,15 @@ export function RFPSearchResults() {
                     </div>
                 )}
             </div>
+        )
+    }
+
+    return (
+        <>
+            <ResultsView />
+            <LoaderCircle 
+                className={cn("h-[40px] w-[40px] animate-spin", (searchResults.length === totalResults) && "opacity-0")}
+            />
             <InfiniteScroll 
                 lastFetchedPage={lastFetchedPage} 
                 setLastFetchedPage={setLastFetchedPage}
