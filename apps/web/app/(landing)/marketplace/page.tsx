@@ -18,7 +18,9 @@ import Link from "next/link"
 import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
 import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card"
-import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@/packages/lib/initialize-client-state"
+import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeRFPSearch } from "@/packages/lib/initialize-client-state"
+import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
+import { RFPCard } from "~web/components/rfp-card"
 
 const organizationSelector = (state: OrganizationSearchState) => ({
     featuredOrgs: state.featuredOrgs,
@@ -44,12 +46,20 @@ const clinicalDatsetSelector = (state: ClinicalDatasetSearchState) => ({
     searchResults: state.searchResults,
 })
 
+const rfpSelector = (state: RFPSearchState) => ({
+    initialized: state.initialized,
+    setSearchTerm: state.setSearchTerm,
+    searchResults: state.searchResults,
+})
+
 export default function MarketplacePage() {
     // const {data: session, status} = useSession()
     const organizationStore = useOrganizationSearchStore(useShallow(organizationSelector))
     const biosampleStore = useBiosampleSearchStore(useShallow(biosampleSelector))
     const diseaseModelStore = useDiseaseModelSearchStore(useShallow(diseaseModelSelector))
     const clinicalDatasetStore = useClinicalDatasetSearchStore(useShallow(clinicalDatsetSelector))
+    const rfpStore = useRFPSearchStore(useShallow(rfpSelector))
+
     const biosampleColumns = useBiosamplesTableColumns(
         false, // disable sorting
         false, // disable hiding
@@ -66,6 +76,7 @@ export default function MarketplacePage() {
     const [biosamplesInitialized, setBiosamplesInitialized] = useState(false)
     const [diseaseModelsInitialized, setDiseaseModelsInitialized] = useState(false)
     const [clinicalDatasetsInitialized, setClinicalDatasetsInitialized] = useState(false)
+    const [rfpsInitialized, setRfpsInitialized] = useState(false)
 
     useEffect(() => {
         const init = async () => {
@@ -110,6 +121,17 @@ export default function MarketplacePage() {
             await initializeClinicalDatasetSearch(parsedClinicalDatasetFilters)
             setClinicalDatasetsInitialized(true)
             console.log(`Clinical Dataset search initialized...`)
+
+            const parsedRFPFilters = {
+                conditions: [],
+                genes: [],
+                openTo: [],
+                status: [],
+                organizations: []
+            }
+            initializeRFPSearch(parsedRFPFilters)
+            setRfpsInitialized(true)
+            console.log(`RFP search initialized...`)
         }
 
         init()
@@ -312,6 +334,41 @@ export default function MarketplacePage() {
                                             <Skeleton className="h-[286px] w-full"/>
                                         </>
                                     )
+                            )
+                        }
+                    </ol>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center gap-4">
+                        <h2 className="text-2xl semibold">Requests for Proposals</h2>
+                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                            <Link
+                                href={"/app/marketplace/rfps"}
+                            >
+                                Browse all requests for proposals
+                                <ArrowRight />
+                            </Link>
+                        </Button>
+                    </div>
+                    <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {(rfpsInitialized && rfpStore.searchResults && rfpStore.searchResults.length > 0 )
+                            ? (
+                                <>
+                                    {rfpStore.searchResults?.slice(0, 3).map((rfp, index) => (
+                                        <RFPCard
+                                            rfp={rfp}
+                                            key={index}
+                                        />
+                                    ))}
+                                </>
+                            )
+                            : (
+                                <>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                </>
                             )
                         }
                     </ol>
