@@ -304,7 +304,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                             dialogRef.current?.focus() // focus the dialog content instead
                         }}
                     >
-                        <DialogTitle>Patient Group Filters</DialogTitle>
+                        <DialogTitle>Patient group filters</DialogTitle>
                             {/* Conditions */}
                             <div>
                                 <Label>Condition</Label>
@@ -344,7 +344,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                             {/* Mechanisms of action */}
                             <div>
                                 <Label>
-                                    Mechanisms of Action
+                                    Mechanisms of action
                                 </Label>
                                 <MultipleSelector
                                     value={filters.mechanisms ?? []}
@@ -365,7 +365,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                             {/* Associated systems */}
                             <div>
                                 <Label>
-                                    Associated Systems
+                                    Associated systems
                                 </Label>
                                 <MultipleSelector
                                     value={filters.systems ?? []}
@@ -385,7 +385,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                             {/* Modalities */}
                             <div>
                                 <Label>
-                                    Modalities of Interest
+                                    Modalities of interest
                                 </Label>
                                 <MultipleSelector
                                     value={filters.modalities ?? []}

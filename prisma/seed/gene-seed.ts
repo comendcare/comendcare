@@ -1,11 +1,13 @@
 import prisma from "@comend/lib/prisma"
 import * as fs from 'fs/promises'
+import path from "path";
 
 async function main() {
     console.log('Starting seed script...');
 
     // Load the JSON data
-    const data = JSON.parse(await fs.readFile('data/non_alt_loci_set.json', 'utf-8'));
+    const filePath = path.resolve(__dirname, "../../packages/data/non_alt_loci_set.json");
+    const data = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     // Extract the `docs` array from the response
     const genes = data.response.docs;

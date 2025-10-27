@@ -74,7 +74,11 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "private",
             accessorKey: "private",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Visibility"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Visibility"
+                />
             ),
             cell: ({row}) => (
                 <div>
@@ -116,6 +120,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             accessorKey: "id",
             header: ({column}) => (
                 <DataTableColumnHeader
+                    className="min-w-fit text-nowrap"
                     column={column} 
                     title="Model ID"
                     tooltip="This is a unique ID assigned to this model. This ID is public, and will appear in the marketplace."
@@ -135,7 +140,11 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "types",
             accessorKey: "types",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Type"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Type"
+                />
             ),
             cell: ({row}) => (
                 <>
@@ -160,7 +169,11 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "strain",
             accessorKey: "strain",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Strain"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Strain"
+                />
             ),
             enableHiding: true,
             meta: {
@@ -171,7 +184,11 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "gene.symbol",
             accessorKey: "gene.symbol",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Gene"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Gene"
+                />
             ),
             cell: ({row}) => (
                 <>{row.original.gene?.symbol}</>
@@ -190,7 +207,11 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "genotype",
             accessorKey: "genotype",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Genotype"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Genotype"
+                />
             ),
             enableHiding: true,
             meta: {
@@ -235,7 +256,11 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "institution.name",
             accessorKey: "institution.name",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Storage Facility"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Stored with"
+                />
             ),
             cell: ({row}) => {
                 // if (row.original.institution?.website && row.original.institution?.name) {
@@ -252,7 +277,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
-                label: "Storage Facility",
+                label: "Stored with",
                 variant: "select",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
@@ -263,7 +288,11 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "contacts",
             accessorKey: "contacts",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Point of Contact"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Point of contact"
+                />
             ),
             cell: ({row}) => (
                 <ul className="flex flex-col gap-2">
@@ -277,17 +306,21 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             enableSorting: false,
             enableHiding: true,
             meta: {
-                label: "Point of Contact"
+                label: "Point of contact"
             }
         },
         {
             id: "links",
             accessorKey: "links",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Links"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Links"
+                />
             ),
             cell: ({row}) => (
-                <ul className="flex flex-col gap-2 min-w-[120px]">
+                <ul className="flex flex-col gap-2">
                     {row.original.attachments?.map((attachment: any, index: number) => (
                         <li key={index}>
                             <Link 
@@ -329,7 +362,11 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "milestones",
             accessorKey: "milestones",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Linked Projects"/>
+                <DataTableColumnHeader
+                    className="min-w-fit text-nowrap" 
+                    column={column} 
+                    title="Linked projects"
+                />
             ),
             cell: ({row}) => (
                 <ul className="flex flex-col gap-2">
@@ -344,7 +381,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
-                label: "Linked Projects",
+                label: "Linked projects",
                 variant: "multiSelect",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
@@ -355,7 +392,11 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "description",
             accessorKey: "description",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Description"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Notes"
+                />
             ),
             cell: ({row}) => (
                 <div className="line-clamp-3">
@@ -363,7 +404,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 </div>
             ),
             meta: {
-                label: "Description"
+                label: "Notes"
             },
             enableHiding: true,
         },
@@ -371,14 +412,18 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             id: "notes",
             accessorKey: "notes",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Internal Notes"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Internal notes"
+                />
             ),
             cell: ({row}) => (
                 <div className="line-clamp-3">
                     {row.original.notes}
                 </div>
             ),
-            meta: { label: "Internal Notes" },
+            meta: { label: "Internal notes" },
             enableHiding: true,
         },
         // {

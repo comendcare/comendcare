@@ -267,7 +267,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                             dialogRef.current?.focus() // focus the dialog content instead
                         }}
                     >
-                        <DialogTitle>Biosample Filters</DialogTitle>
+                        <DialogTitle>Biosample filters</DialogTitle>
                         {/* Conditions */}
                         <div>
                             <Label>Condition</Label>
@@ -306,7 +306,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                         
                         {/* Biosample Types */}
                         <div>
-                            <Label>Biosample Types</Label>
+                            <Label>Biosample types</Label>
                             <MultipleSelector
                                 value={filters.types ?? []}
                                 onChange={(vals) => setFilterKey("types", vals)}

@@ -174,12 +174,12 @@ export default function MarketplacePage() {
         
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Biosamples</h2>
+                        <h2 className="text-2xl semibold">Patient biosamples</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/marketplace/biosamples"}
                             >
-                                Browse all biosamples
+                                Browse all patient biosamples
                                 <ArrowRight />
                             </Link>
                         </Button>
@@ -204,7 +204,7 @@ export default function MarketplacePage() {
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
-                                                <CardTitle>Add biosamples in the toolkit!</CardTitle>
+                                                <CardTitle>Add patient biosamples in the toolkit!</CardTitle>
                                                 {/* <CardDescription>Add biosamples in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription> */}
                                                 <Button
                                                     className="w-fit"
