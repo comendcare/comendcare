@@ -89,7 +89,11 @@ export function RFPSearchResults() {
         <>
             <ResultsView />
             <LoaderCircle 
-                className={cn("h-[40px] w-[40px] animate-spin", (searchResults.length === totalResults) && "opacity-0")}
+                className={cn("h-[40px] w-[40px] animate-spin", (
+                    !searchResults ||
+                    searchResults.length === totalResults || 
+                    searchResults.length === 0
+                ) && "opacity-0")}
             />
             <InfiniteScroll 
                 lastFetchedPage={lastFetchedPage} 
