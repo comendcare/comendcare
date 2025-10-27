@@ -27,38 +27,14 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
 
     const comendColumns: ColumnDef<any>[] = [
     {
-        id: "organization.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
-        accessorKey: "organization",
-        header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Organization"/>
-        ),
-        cell: ({row}) => (
-            <div className="flex gap-2 items-center w-[150px]">
-                <ProfilePhoto
-                    img={row.original?.organization?.image}
-                    name={row.original?.organization?.name}
-                    className="size-8"
-                />
-                <Link
-                    href={
-                        process.env.NEXT_PUBLIC_VERCEL_ENV
-                            ? `https://${row.original?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-                            : `http://${row.original?.organization?.subdomain}.localhost:3000`
-                    }
-                    className="underline"
-                >
-                    {row.original.organization?.name}
-                </Link>
-            </div>
-        ),
-        enableHiding,
-        enableSorting,
-    },
-    {
         id: "sortId.id", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "id",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Dataset ID"/>
+            <DataTableColumnHeader 
+                className="min-w-fit text-nowrap"
+                column={column} 
+                title="Dataset ID"
+            />
         ),
         cell: ({row}) => (
             <div className="flex gap-2 items-center">
@@ -70,26 +46,34 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
         meta: { label: "Dataset ID" }
     },
     {
-      id: "title.title", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
-      accessorKey: "title",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Title" />
-      ),
-      meta: {
-        label: "Title",
-        // placeholder: "Search titles...",
-        // variant: "text",
-        // icon: Text,
-      },
-      enableColumnFilter: true,
-        enableHiding,
-        enableSorting,
+        id: "title.title", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+        accessorKey: "title",
+        header: ({ column }) => (
+            <DataTableColumnHeader 
+                className="min-w-fit text-nowrap"
+                column={column} 
+                title="Title" 
+            />
+        ),
+        meta: {
+            label: "Title",
+            // placeholder: "Search titles...",
+            // variant: "text",
+            // icon: Text,
+        },
+        enableColumnFilter: true,
+            enableHiding,
+            enableSorting,
     },
     {
         id: "type.label", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "types",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Type" />
+            <DataTableColumnHeader 
+                className="min-w-fit text-nowrap"
+                column={column} 
+                title="Type"
+            />
         ),
         cell: ({ row }) => (
           <>
@@ -115,7 +99,11 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
         id: "cohortSize", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "cohortSize",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Cohort Size"/>
+            <DataTableColumnHeader 
+                className="min-w-fit text-nowrap"
+                column={column} 
+                title="Cohort size"
+            />
         ),
         cell: ({row}) => (
             <>{
@@ -134,7 +122,11 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
         id: "condition.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "condition",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Condition"/>
+            <DataTableColumnHeader 
+                className="min-w-fit text-nowrap"
+                column={column} 
+                title="Condition"
+            />
         ),
         cell: ({row}) => (
             <div className="flex gap-2 items-center">
@@ -151,7 +143,11 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
         id: "gene.symbol", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "gene",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Gene"/>
+            <DataTableColumnHeader 
+                className="min-w-fit text-nowrap"
+                column={column} 
+                title="Gene"
+            />
         ),
         cell: ({row}) => (
             <>{row.original.gene?.symbol}</>
@@ -163,10 +159,46 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
         }
     },
     {
+        id: "organization.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+        accessorKey: "organization",
+        header: ({column}) => (
+            <DataTableColumnHeader 
+                className="min-w-fit text-nowrap"
+                column={column} 
+                title="Associated patient group"
+            />
+        ),
+        cell: ({row}) => (
+            <div className="flex gap-2 items-center w-[150px]">
+                <ProfilePhoto
+                    img={row.original?.organization?.image}
+                    name={row.original?.organization?.name}
+                    className="size-8"
+                />
+                <Link
+                    href={
+                        process.env.NEXT_PUBLIC_VERCEL_ENV
+                            ? `https://${row.original?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                            : `http://${row.original?.organization?.subdomain}.localhost:3000`
+                    }
+                    className="underline"
+                >
+                    {row.original.organization?.name}
+                </Link>
+            </div>
+        ),
+        enableHiding,
+        enableSorting,
+    },
+    {
         id: "institution.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "institution",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Storage Facility"/>
+            <DataTableColumnHeader 
+                className="min-w-fit text-nowrap"
+                column={column} 
+                title="Stored with"
+            />
         ),
         cell: ({row}) => {
             // if (row.original.institution?.website && row.original.institution?.name) {
@@ -183,14 +215,18 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
         enableHiding,
         enableSorting,
         meta: {
-            label: "Storage Facility"
+            label: "Stored with"
         }
     },
     {
         id: "contacts",
         accessorKey: "contacts",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Point of Contact" />
+            <DataTableColumnHeader 
+                className="min-w-fit text-nowrap"
+                column={column} 
+                title="Point of contact" 
+            />
         ),
         cell: ({ row }) => (
             <ul className="flex flex-col gap-2">
@@ -208,10 +244,14 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
         id: "links",
         accessorKey: "links",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Links" />
+            <DataTableColumnHeader 
+                className="min-w-fit text-nowrap"
+                column={column} 
+                title="Links"
+            />
         ),
         cell: ({ row }) => (
-            <ul className="flex flex-col gap-2 min-w-[120px]">
+            <ul className="flex flex-col gap-2">
                 {row.original.attachments?.map((attachment: any, index: number) => (
                     <li key={index}>
                         <Link 
@@ -233,7 +273,11 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
         id: "description",
         accessorKey: "description",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Description" />
+            <DataTableColumnHeader 
+                className="min-w-fit text-nowrap"
+                column={column} 
+                title="Notes" 
+            />
         ),
         cell: ({ row }) => (
             <div className="line-clamp-3">

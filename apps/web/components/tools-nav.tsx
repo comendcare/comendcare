@@ -4,19 +4,19 @@ import { Database, Rat, TestTubeDiagonal } from "lucide-react";
 
 const links = [
     {
-        name: "Patient Biosamples",
+        name: "Patient biosamples",
         href: "/biosample",
         icon: TestTubeDiagonal,
         comingSoon: false,
     },
     {
-        name: "Disease Models",
+        name: "Disease models",
         href: "/disease-models",
         icon: Rat,
         comingSoon: false,
     },
     {
-        name: "Clinical Datasets",
+        name: "Clinical datasets",
         href: "/data",
         icon: Database,
         comingSoon: false,

@@ -518,7 +518,7 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
             />
 
             <FormItem className={cn("w-full flex gap-4 items-center")}>
-                <FormLabel className="w-[100px]">{'Available Quantity'}</FormLabel>
+                <FormLabel className="w-[100px]">{'Total Available Quantity'}</FormLabel>
                 <div className="w-full gap-2 flex">
                     <FormField
                         control={form.control}
@@ -555,7 +555,7 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                         name="quantityUnit"
                         render={({ field }) => (
                             <FormControl>
-                                <Select
+                                {/* <Select
                                     value={field.value} 
                                     onValueChange={(newVal) => form.setValue("quantityUnit", newVal)}
                                 >
@@ -567,7 +567,8 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                                             <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
                                         ))}
                                     </SelectContent>
-                                </Select>
+                                </Select> */}
+                                <p className="tex-sm pl-2 h-full">ml</p>
                             </FormControl>
                         )}
                     />

@@ -94,6 +94,8 @@ export default function MarketplacePage() {
     const [diseaseModelsInitialized, setDiseaseModelsInitialized] = useState(false)
     const [clinicalDatasetsInitialized, setClinicalDatasetsInitialized] = useState(false)
     const [rfpsInitialized, setRfpsInitialized] = useState(false)
+    const [width, setWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 0)
+    
     // const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
     // const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
 
@@ -134,6 +136,17 @@ export default function MarketplacePage() {
 
     //     fetchSavedCompanies();
     // }, [session, status]);
+
+    useEffect(() => {
+        function handleResize() {
+            setWidth(window.innerWidth)
+        }
+
+        window.addEventListener('resize', handleResize)
+        handleResize() // Set initial width on mount
+
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
     useEffect(() => {
         const init = async () => {
@@ -212,7 +225,7 @@ export default function MarketplacePage() {
             <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Service Providers</h2>
+                        <h2 className="text-2xl semibold">Service providers</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/service-providers"}
@@ -226,14 +239,15 @@ export default function MarketplacePage() {
                         {(crosInitialized && croStore.searchResults && croStore.searchResults.length > 0 )
                             ? (
                                 <>
-                                    {croStore.searchResults?.slice(0, 3).map((cro, index) => (
-                                        <CROMarketplaceCard
-                                            cro={cro}
-                                            key={index}
-                                            location={"Marketplace"}
-                                            // savedCompanyIds={savedCompanyIds}
-                                            savedCompanyIds={new Set()}
-                                        />
+                                    {croStore.searchResults?.slice(0, width < 1280 ? 2 : 3)
+                                        .map((cro, index) => (
+                                            <CROMarketplaceCard
+                                                cro={cro}
+                                                key={index}
+                                                location={"Marketplace"}
+                                                // savedCompanyIds={savedCompanyIds}
+                                                savedCompanyIds={new Set()}
+                                            />
                                     ))}
                                 </>
                             )
@@ -241,7 +255,7 @@ export default function MarketplacePage() {
                                 <>
                                     <Skeleton className="h-[286px] w-full"/>
                                     <Skeleton className="h-[286px] w-full"/>
-                                    <Skeleton className="h-[286px] w-full"/>
+                                    {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
                                 </>
                             )
                         }
@@ -250,7 +264,7 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Patient Groups</h2>
+                        <h2 className="text-2xl semibold">Patient groups</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/patient-groups"}
@@ -264,14 +278,16 @@ export default function MarketplacePage() {
                         {(pagsInitialized && ([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0))
                             ? (
                                 <>
-                                    {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].slice(0, 3).map((organization, index) => (
-                                        <OrganizationMarketplaceCard
-                                            organization={organization}
-                                            key={index}
-                                            isPublic={false}
-                                            // savedOrganizationIds={savedOrganizationIds}
-                                            savedOrganizationIds={new Set()}
-                                        />
+                                    {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])]
+                                        .slice(0, width < 1280 ? 2 : 3)
+                                        .map((organization, index) => (
+                                            <OrganizationMarketplaceCard
+                                                organization={organization}
+                                                key={index}
+                                                isPublic={false}
+                                                // savedOrganizationIds={savedOrganizationIds}
+                                                savedOrganizationIds={new Set()}
+                                            />
                                     ))}
                                 </>
                             )
@@ -279,7 +295,7 @@ export default function MarketplacePage() {
                                 <>
                                     <Skeleton className="h-[286px] w-full"/>
                                     <Skeleton className="h-[286px] w-full"/>
-                                    <Skeleton className="h-[286px] w-full"/>
+                                    {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
                                 </>
                             )
                         }
@@ -288,12 +304,12 @@ export default function MarketplacePage() {
         
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Biosamples</h2>
+                        <h2 className="text-2xl semibold">Patient biosamples</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/biosamples"}
                             >
-                                Browse all biosamples
+                                Browse all patient biosamples
                                 <ArrowRight />
                             </Link>
                         </Button>
@@ -318,7 +334,7 @@ export default function MarketplacePage() {
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
-                                                <CardTitle>Add biosamples in the toolkit!</CardTitle>
+                                                <CardTitle>Add patient biosamples in the toolkit!</CardTitle>
                                                 {/* <CardDescription>Add biosamples in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription> */}
                                                 <Button
                                                     className="w-fit"
@@ -327,7 +343,7 @@ export default function MarketplacePage() {
                                                 >
                                                     {/* <Link href={"/#contact"}> */}
                                                     <Link href={"/app/tools/biosample"}>
-                                                        Biosamples Toolkit
+                                                        Patient biosamples toolkit
                                                     </Link>
                                                 </Button>
                                             </CardContent>
@@ -345,7 +361,7 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Disease Models</h2>
+                        <h2 className="text-2xl semibold">Disease models</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/disease-models"}
@@ -378,7 +394,7 @@ export default function MarketplacePage() {
                                                 >
                                                     {/* <Link href={"/#contact"}> */}
                                                     <Link href={"/app/tools/disease-models"}>
-                                                        Disease Models Toolkit
+                                                        Disease models toolkit
                                                     </Link>
                                                 </Button>
                                             </CardContent>
@@ -396,7 +412,7 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Clinical Datasets</h2>
+                        <h2 className="text-2xl semibold">Clinical datasets</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/clinical-datasets"}
@@ -429,7 +445,7 @@ export default function MarketplacePage() {
                                                 >
                                                     {/* <Link href={"/#contact"}> */}
                                                     <Link href={"/app/tools/data"}>
-                                                        Clinical Datasets Toolkit
+                                                        Clinical datasets toolkit
                                                     </Link>
                                                 </Button>
                                             </CardContent>
