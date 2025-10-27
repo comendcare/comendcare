@@ -1,23 +1,12 @@
 "use client";
 
 import type {ColumnDef} from "@tanstack/react-table";
-import {
-    CircleDashed,
-} from "lucide-react";
 import * as React from "react";
-import {
-    DataTableColumnHeader
-} from "./../data-table/data-table-column-header";
-import {
-    BIOSAMPLE_TYPE_OPTIONS,
-    AVAILABILITY_OPTIONS
-} from "./../../../../../packages/lib/types";
+import {DataTableColumnHeader} from "./../data-table/data-table-column-header";
+import {BIOSAMPLE_TYPE_OPTIONS} from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
-import { Badge } from "./../../../ui/badge";
-import { Option } from "./../../../../../packages/lib/types";
 import Link from "next/link";
-import { handleGetAvailability } from "./../../../../../packages/lib/utils";
 import {usePathname} from "next/navigation";
 
 type Preset = "default" | "profile";
@@ -34,10 +23,129 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
 
     const columns: ColumnDef<any>[] = [
         {
+            id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "id",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Sample ID"
+                />
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center min-w-fit text-nowrap">
+                    <p>{row.original.id || 'No Sample ID'}</p>
+                </div>
+            ),
+            enableHiding,
+            enableSorting,
+            meta: { label: "Sample ID" }
+        },
+        {
+            id: "donor.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "donor.id",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="text-nowrap"
+                    column={column} 
+                    title="Donor ID"
+                />
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center min-w-[110px] text-nowrap">
+                    <img className="size-8 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${row.original.donorId}`} alt="User Avatar" />
+                    <p>{row.original.donorId}</p>
+                </div>
+            ),
+            enableHiding,
+            enableSorting,
+            meta: { label: "Donor ID" },
+        },
+        {
+            id: "type.label", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "types",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Type"
+                />
+            ),
+            cell: ({row}) => (
+                <>
+                    {(row.original.types || []).map((type: string, index: number) => {
+                        const typeOption = BIOSAMPLE_TYPE_OPTIONS.find(t => t.value === type)
+                        return (
+                            <MilestoneTypeBadge label={typeOption?.label} key={index}/>
+                        )
+                    })}
+                </>
+            ),
+            enableHiding,
+            enableSorting,
+            meta: { label: "Type" }
+        },
+        {
+            id: "condition.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "condition",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Condition"
+                />
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
+                </div>
+            ),
+            enableHiding,
+            enableSorting,
+            meta: { label: "Condition" }
+        },
+        {
+            id: "gene.symbol", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "gene.symbol",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Gene"
+                />
+            ),
+            cell: ({row}) => (
+                <>{row.original.gene?.symbol}</>
+            ),
+            enableHiding,
+            enableSorting,
+            meta: { label: "Gene" }
+        },
+        {
+            id: "genotype.genotype", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            accessorKey: "genotype",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Genotype"
+                />
+            ),
+            enableHiding,
+            enableSorting,
+            meta: {
+                label: "Genotype"
+            }
+        },
+        {
             id: "organization.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "organization.name",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Organization"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Associated Patient Group"
+                />
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 items-center w-[150px]">
@@ -62,117 +170,14 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
             enableSorting,
         },
         {
-            id: "donor.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-            accessorKey: "donor.id",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Public Donor ID"/>
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 min-w-[200px] items-center">
-                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${row.original.donorId}`} alt="User Avatar" />
-                    <p>{row.original.donorId}</p>
-                </div>
-            ),
-            enableHiding,
-            enableSorting,
-            meta: { label: "Public Donor ID" },
-        },
-        {
-            id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-            accessorKey: "id",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Sample ID"/>
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 items-center">
-                    <p>{row.original.id || 'No Sample ID'}</p>
-                </div>
-            ),
-            enableHiding,
-            enableSorting,
-            meta: { label: "Sample ID" }
-        },
-        {
-            id: "type.label", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-            accessorKey: "types",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Type"/>
-            ),
-            cell: ({row}) => (
-                <>
-                    {(row.original.types || []).map((type: string, index: number) => {
-                        const typeOption = BIOSAMPLE_TYPE_OPTIONS.find(t => t.value === type)
-                        return (
-                            <MilestoneTypeBadge label={typeOption?.label} key={index}/>
-                        )
-                    })}
-                </>
-            ),
-            enableHiding,
-            enableSorting,
-            meta: { label: "Type" }
-        },
-        {
-            id: "condition.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-            accessorKey: "condition",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Condition"/>
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 items-center">
-                    <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
-                </div>
-            ),
-            enableHiding,
-            enableSorting,
-            meta: { label: "Condition" }
-        },
-        {
-            id: "gene.symbol", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-            accessorKey: "gene.symbol",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Gene"/>
-            ),
-            cell: ({row}) => (
-                <>{row.original.gene?.symbol}</>
-            ),
-            enableHiding,
-            enableSorting,
-            meta: { label: "Gene" }
-        },
-        {
-            id: "genotype.genotype", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
-            accessorKey: "genotype",
-            header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Genotype"/>
-            ),
-            enableHiding,
-            enableSorting,
-            meta: {
-                label: "Genotype"
-            }
-        },
-        // {
-        //     id: "availability.value", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-        //     accessorKey: "availability",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Availability Status"/>
-        //     ),
-        //     cell: ({row}) => {
-        //         const availability = handleGetAvailability(row.original)
-        //         if (availability !== undefined) {
-        //             return <Badge variant={availability.variant}>{availability.value}</Badge>
-        //         }
-        //         return <></>
-        //     },
-        //     enableHiding: true,
-        //     meta: { label: "Availability Status" }
-        // },
-        {
             id: "quantity", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "quantity",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Available Quantity"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Total Available Quantity"
+                />
             ),
             cell: ({row}) => (
                 <>
@@ -190,26 +195,34 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
             ),
             enableHiding,
             enableSorting,
-            meta: { label: "Available Quantity" }
+            meta: { label: "Inventory" }
         },
         {
             id: "institution.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "institution.name",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Storage Facility"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Stored with"
+                />
             ),
             cell: ({row}) => {
                 return <>{row.original.institution?.name}</>
             },
             enableHiding,
             enableSorting,
-            meta: { label: "Storage Facility" }
+            meta: { label: "Stored with" }
         },
         {
             id: "contacts",
             accessorKey: "contacts",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Point of Contact"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Point of Contact"
+                />
             ),
             cell: ({row}) => (
                 <ul className="flex flex-col gap-2">
@@ -228,7 +241,11 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
             id: "links",
             accessorKey: "links",
             header: ({column}) => (
-                <DataTableColumnHeader column={column} title="Links"/>
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Links"
+                />
             ),
             cell: ({row}) => (
                 <ul className="flex flex-col gap-2 min-w-[120px]">
@@ -250,22 +267,6 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
             enableHiding,
             meta: { label: "Links" }
         },
-        // {
-        //     id: "description",
-        //     accessorKey: "description",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Other Notes"/>
-        //     ),
-        //     cell: ({row}) => (
-        //         <div className="line-clamp-3">
-        //             {row.original.description}
-        //         </div>
-        //     ),
-        //     meta: {
-        //         label: "Other Notes"
-        //     },
-        //     enableHiding: true,
-        // },
     ]
 
     const presets: Record<Preset, string[]> = {
