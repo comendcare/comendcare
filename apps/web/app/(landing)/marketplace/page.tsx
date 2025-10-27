@@ -66,6 +66,7 @@ export default function MarketplacePage() {
     const [biosamplesInitialized, setBiosamplesInitialized] = useState(false)
     const [diseaseModelsInitialized, setDiseaseModelsInitialized] = useState(false)
     const [clinicalDatasetsInitialized, setClinicalDatasetsInitialized] = useState(false)
+    const [width, setWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 0)
 
     useEffect(() => {
         const init = async () => {
@@ -117,6 +118,17 @@ export default function MarketplacePage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    useEffect(() => {
+        function handleResize() {
+            setWidth(window.innerWidth)
+        }
+
+        window.addEventListener('resize', handleResize)
+        handleResize() // Set initial width on mount
+
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
+
     return (
         <div className="flex flex-col w-full h-full mx-auto gap-8">
             <div className="flex flex-col gap-8">
@@ -136,14 +148,16 @@ export default function MarketplacePage() {
                         {(pagsInitialized && ([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0))
                             ? (
                                 <>
-                                    {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].slice(0, 3).map((organization, index) => (
-                                        <OrganizationMarketplaceCard
-                                            organization={organization}
-                                            key={index}
-                                            isPublic={false}
-                                            // savedOrganizationIds={savedOrganizationIds}
-                                            savedOrganizationIds={new Set()}
-                                        />
+                                    {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])]
+                                        .slice(0, width < 1280 ? 2 : 3)
+                                        .map((organization, index) => (
+                                            <OrganizationMarketplaceCard
+                                                organization={organization}
+                                                key={index}
+                                                isPublic={false}
+                                                // savedOrganizationIds={savedOrganizationIds}
+                                                savedOrganizationIds={new Set()}
+                                            />
                                     ))}
                                 </>
                             )
@@ -151,7 +165,7 @@ export default function MarketplacePage() {
                                 <>
                                     <Skeleton className="h-[286px] w-full"/>
                                     <Skeleton className="h-[286px] w-full"/>
-                                    <Skeleton className="h-[286px] w-full"/>
+                                    {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
                                 </>
                             )
                         }
