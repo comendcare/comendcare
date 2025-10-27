@@ -169,7 +169,7 @@ const getUpdatedSearchResults = async (
         const searchParameters = {
             q: state.searchTerm,
             query_by: "title,description",
-            per_page: 10,
+            per_page: 12,
             page: state.lastFetchedPage,
             ...(filtersString ? { filter_by: filtersString } : undefined),
             sort_by: sortBy,

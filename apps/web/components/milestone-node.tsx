@@ -142,39 +142,25 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                 <CardTitle className="text-gray-900">
                     {!props?.data?.isPublic && (
                         props.data?.private ? (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-red-100 hover:bg-red-300"
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: false})
-                                        }}
-                                    >
-                                        <Lock size={20} className="text-red-800"/>
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent className="font-normal">
-                                    {`Only visible to your team. Click to publish this project.`}
-                                </TooltipContent>
-                            </Tooltip>
+                            <Button
+                                className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-red-100 hover:bg-red-300"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: false})
+                                }}
+                            >
+                                <Lock size={20} className="text-red-800"/>
+                            </Button>
                         ) : (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-green-100 hover:bg-green-300"
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: true})
-                                        }}
-                                    >
-                                        <Globe size={20} className="text-green-800"/>
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent className="font-normal">
-                                    {`This project is published. Click to make it private.`}
-                                </TooltipContent>
-                            </Tooltip>
+                            <Button
+                                className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-green-100 hover:bg-green-300"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: true})
+                                }}
+                            >
+                                <Globe size={20} className="text-green-800"/>
+                            </Button>
                         )
                     )}
                     {props.data?.title || "New Milestone"}
