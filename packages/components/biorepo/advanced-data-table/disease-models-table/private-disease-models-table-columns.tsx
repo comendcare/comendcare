@@ -291,7 +291,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Point of Contact"
+                    title="Point of contact"
                 />
             ),
             cell: ({row}) => (
@@ -306,7 +306,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             enableSorting: false,
             enableHiding: true,
             meta: {
-                label: "Point of Contact"
+                label: "Point of contact"
             }
         },
         {
@@ -365,7 +365,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader
                     className="min-w-fit text-nowrap" 
                     column={column} 
-                    title="Linked Projects"
+                    title="Linked projects"
                 />
             ),
             cell: ({row}) => (
@@ -381,7 +381,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
-                label: "Linked Projects",
+                label: "Linked projects",
                 variant: "multiSelect",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
@@ -415,7 +415,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Internal Notes"
+                    title="Internal notes"
                 />
             ),
             cell: ({row}) => (
@@ -423,7 +423,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     {row.original.notes}
                 </div>
             ),
-            meta: { label: "Internal Notes" },
+            meta: { label: "Internal notes" },
             enableHiding: true,
         },
         // {

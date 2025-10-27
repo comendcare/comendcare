@@ -137,8 +137,8 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({row}) => (
-                <div className="flex gap-2 min-w-[200px] items-center">
-                    <img className="h-12 w-12 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${row.original.donorId}`} alt="User Avatar" />
+                <div className="flex gap-2 items-center">
+                    <img className="size-8 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${row.original.donorId}`} alt="User Avatar" />
                     <p>{row.original.donorId}</p>
                 </div>
             ),

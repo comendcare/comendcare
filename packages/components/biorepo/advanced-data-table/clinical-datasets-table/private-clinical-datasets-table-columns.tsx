@@ -151,7 +151,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         id: "cohortSize",
         accessorKey: "cohortSize",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Cohort Size"/>
+            <DataTableColumnHeader column={column} title="Cohort size"/>
         ),
         cell: ({row}) => (
             <>{
@@ -162,7 +162,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         ),
         enableHiding: true,
         meta: {
-            label: "Cohort Size"
+            label: "Cohort size"
         }
     },
     {
@@ -211,7 +211,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         id: "institution.name",
         accessorKey: "institution.name",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Storage Facility"/>
+            <DataTableColumnHeader column={column} title="Stored with"/>
         ),
         cell: ({row}) => {
             // if (row.original.institution?.website && row.original.institution?.name) {
@@ -228,7 +228,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         enableHiding: true,
         enableColumnFilter: true,
         meta: {
-            label: "Storage Facility",
+            label: "Stored with",
             variant: "select",
             icon: CircleDashed,
             showInAdvancedOnly: true,
@@ -239,7 +239,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         id: "contacts",
         accessorKey: "contacts",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Point of Contact" />
+            <DataTableColumnHeader column={column} title="Point of contact" />
         ),
         cell: ({ row }) => (
             <ul className="flex flex-col gap-2">

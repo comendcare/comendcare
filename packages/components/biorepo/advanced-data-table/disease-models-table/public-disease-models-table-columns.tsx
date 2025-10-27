@@ -196,7 +196,7 @@ export function useDiseaseModelsTableColumns(enableSorting: boolean = true, enab
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Point of Contact"
+                    title="Point of contact"
                 />
             ),
             cell: ({row}) => (
@@ -211,7 +211,7 @@ export function useDiseaseModelsTableColumns(enableSorting: boolean = true, enab
             enableSorting: false,
             enableHiding,
             meta: {
-                label: "Point of Contact"
+                label: "Point of contact"
             }
         },
         {

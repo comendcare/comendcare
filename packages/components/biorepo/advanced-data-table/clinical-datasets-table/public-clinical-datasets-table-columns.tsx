@@ -99,7 +99,11 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
         id: "cohortSize", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "cohortSize",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Cohort Size"/>
+            <DataTableColumnHeader 
+                className="min-w-fit text-nowrap"
+                column={column} 
+                title="Cohort size"
+            />
         ),
         cell: ({row}) => (
             <>{
@@ -221,7 +225,7 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
             <DataTableColumnHeader 
                 className="min-w-fit text-nowrap"
                 column={column} 
-                title="Point of Contact" 
+                title="Point of contact" 
             />
         ),
         cell: ({ row }) => (
