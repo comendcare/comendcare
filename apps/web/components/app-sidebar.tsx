@@ -148,7 +148,7 @@ const data = {
             icon: Store,
             variant: "ghost",
             url: "/app/marketplace",
-            match: (path: string) => path.startsWith('/app/marketplace'),
+            match: (path: string) => path.includes('/app/marketplace'),
             // subPages: [{
             //     title: "Saved",
             //     icon: Bookmark,

@@ -5,7 +5,7 @@ import {debounce} from 'lodash'
 
 interface InfiniteScrollParamsType {
     lastFetchedPage: number,
-    setLastFetchedPage: (page: number) => void
+    setLastFetchedPage: (page: number) => void,
 }
 
 export default function InfiniteScroll({lastFetchedPage, setLastFetchedPage}: InfiniteScrollParamsType) {
@@ -52,8 +52,6 @@ export default function InfiniteScroll({lastFetchedPage, setLastFetchedPage}: In
                 if (ref) ref(node)
             }}
             className="w-full flex justify-center"
-        >
-            {isLoading && <LoaderCircle className="h-[40px] w-[40px] animate-spin"/>}
-        </div>
+        />
     )
 }

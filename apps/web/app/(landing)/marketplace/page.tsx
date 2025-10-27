@@ -7,9 +7,7 @@ import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/a
 import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table"
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
 import { Button } from "@/packages/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/packages/components/ui/card"
-import { PulsatingButton } from "@/packages/components/ui/pulsating-button"
-import { Separator } from "@/packages/components/ui/separator"
+import { Card, CardContent, CardTitle } from "@/packages/components/ui/card"
 import { Skeleton } from "@/packages/components/ui/skeleton"
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
@@ -20,9 +18,7 @@ import Link from "next/link"
 import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
 import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card"
-import {getSavedOrganizationsFromOrganizationId} from "@/packages/lib/fetchers";
-import {SavedOrganization} from "@prisma/client";
-import {useSession} from "next-auth/react";
+import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@/packages/lib/initialize-client-state"
 
 const organizationSelector = (state: OrganizationSearchState) => ({
     featuredOrgs: state.featuredOrgs,
@@ -49,7 +45,7 @@ const clinicalDatsetSelector = (state: ClinicalDatasetSearchState) => ({
 })
 
 export default function MarketplacePage() {
-    const {data: session, status} = useSession()
+    // const {data: session, status} = useSession()
     const organizationStore = useOrganizationSearchStore(useShallow(organizationSelector))
     const biosampleStore = useBiosampleSearchStore(useShallow(biosampleSelector))
     const diseaseModelStore = useDiseaseModelSearchStore(useShallow(diseaseModelSelector))
@@ -59,234 +55,268 @@ export default function MarketplacePage() {
         false, // disable hiding
     )
     const diseaseModelColumns = useDiseaseModelsTableColumns(
-        false, // disable sorting
+        false, // disable sorting,
         false, // disable hiding
     )
     const clinicalDatasetColumns = useClinicalDatasetsTableColumns(
-        false, // disable sorting
+        false, // disable sorting,
         false, // disable hiding
     )
-    const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
+    const [pagsInitialized, setPagsInitialized] = useState(false)
+    const [biosamplesInitialized, setBiosamplesInitialized] = useState(false)
+    const [diseaseModelsInitialized, setDiseaseModelsInitialized] = useState(false)
+    const [clinicalDatasetsInitialized, setClinicalDatasetsInitialized] = useState(false)
 
     useEffect(() => {
-        async function fetchData() {
-            const savedOrganizationsResponse = await getSavedOrganizationsFromOrganizationId(session?.user?.organizationId || undefined, {
-                id: true,
-                organizationId: true,
-                organization: true,
-                savedOrganizationId: true,
-                savedOrganization: true,
-                updatedAt: true,
-                createdAt: true,
-                metadata: true
-            });
-            if (savedOrganizationsResponse.success) {
-                const savedOrganizationData = savedOrganizationsResponse.data as SavedOrganization[];
-                setSavedOrganizationIds(new Set(savedOrganizationData.map((c: SavedOrganization) => c.savedOrganizationId)));
-            } else {
-                console.error(savedOrganizationsResponse.error);
+        const init = async () => {
+            console.log(`start init...`)
+            const parsedPAGFilters = {
+                genes: [] as any[],
+                conditions: [] as any[],
+                systems: [] as any[],
+                mechanisms: [] as any[],
+                modalities: [] as any[],
             }
+            await initializeOrganizationSearch(parsedPAGFilters)
+            setPagsInitialized(true)
+            console.log(`Organization search initialized...`)
+
+            const parsedBiosampleFilters = {
+                types: [] as any[],
+                genes: [] as any[],
+                conditions: [] as any[],
+                organizations: [] as any[],
+            }
+            await initializeBiosampleSearch(parsedBiosampleFilters)
+            setBiosamplesInitialized(true)
+            console.log(`Biosample search initialized...`)
+
+            const parsedDiseaseModelFilters = {
+                types: [] as any[],
+                genes: [] as any[],
+                conditions: [] as any[],
+                organizations: [] as any[],
+            }
+            await initializeDiseaseModelSearch(parsedDiseaseModelFilters)
+            setDiseaseModelsInitialized(true)
+            console.log(`Disease Model search initialized...`)
+
+            const parsedClinicalDatasetFilters = {
+                types: [] as any[],
+                genes: [] as any[],
+                conditions: [] as any[],
+                organizations: [] as any[]
+            }
+            await initializeClinicalDatasetSearch(parsedClinicalDatasetFilters)
+            setClinicalDatasetsInitialized(true)
+            console.log(`Clinical Dataset search initialized...`)
         }
 
-        fetchData();
-    }, [session, status])
+        init()
 
-    useEffect(() => {
-        organizationStore.setSearchTerm("")
-        biosampleStore.setSearchTerm("")
-        diseaseModelStore.setSearchTerm("")
-        clinicalDatasetStore.setSearchTerm("")
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    
+
     return (
-        <main className="w-full h-full flex flex-col gap-10">
-            <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center gap-4">
-                    <h2 className="text-xl md:text-2xl font-semibold">Patient Groups</h2>
-                    <Button asChild variant={"secondary"} className="justify-self-end self-end">
-                        <Link
-                            href={"/marketplace/patient-groups"}
-                        >
-                            Browse all patient groups
-                            <ArrowRight />
-                        </Link>
-                    </Button>
+        <div className="flex flex-col w-full h-full mx-auto gap-8">
+            <div className="flex flex-col gap-8">
+                <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center gap-4">
+                        <h2 className="text-2xl semibold">Patient Groups</h2>
+                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                            <Link
+                                href={"/marketplace/patient-groups"}
+                            >
+                                Browse all patient groups
+                                <ArrowRight />
+                            </Link>
+                        </Button>
+                    </div>
+                    <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {(pagsInitialized && ([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0))
+                            ? (
+                                <>
+                                    {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].slice(0, 3).map((organization, index) => (
+                                        <OrganizationMarketplaceCard
+                                            organization={organization}
+                                            key={index}
+                                            isPublic={false}
+                                            // savedOrganizationIds={savedOrganizationIds}
+                                            savedOrganizationIds={new Set()}
+                                        />
+                                    ))}
+                                </>
+                            )
+                            : (
+                                <>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                </>
+                            )
+                        }
+                    </ol>
                 </div>
-                <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    {([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0 )
-                        ? (
-                            <>
-                                {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].slice(0, 3).map((organization, index) => (
-                                    <OrganizationMarketplaceCard
-                                        organization={organization}
-                                        key={index}
-                                        isPublic={true}
-                                        savedOrganizationIds={savedOrganizationIds}
-                                    />
-                                ))}
-                            </>
-                        )
-                        : (
-                            <>
-                                <Skeleton className="h-[286px] w-full"/>
-                                <Skeleton className="h-[286px] w-full"/>
-                                <Skeleton className="h-[286px] w-full"/>
-                            </>
-                        )
-                    }
-                </ol>
-            </div>
-    
-            <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center gap-4">
-                    <h2 className="text-xl md:text-2xl font-semibold">Biosamples</h2>
-                    <Button asChild variant={"secondary"} className="justify-self-end self-end">
-                        <Link
-                            href={"/marketplace/biosamples"}
-                        >
-                            Browse all biosamples
-                            <ArrowRight />
-                        </Link>
-                    </Button>
+        
+                <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center gap-4">
+                        <h2 className="text-2xl semibold">Biosamples</h2>
+                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                            <Link
+                                href={"/marketplace/biosamples"}
+                            >
+                                Browse all biosamples
+                                <ArrowRight />
+                            </Link>
+                        </Button>
+                    </div>
+                    <ol className="w-full">
+                        {(biosamplesInitialized && biosampleStore.searchResults && biosampleStore.searchResults.length > 0 )
+                            ? (
+                                <>
+                                    <div className="max-w-7xl w-full overflow-auto">
+                                        <BiosamplesTable 
+                                            showPagination={false} 
+                                            data={biosampleStore.searchResults?.slice(0, 3)} 
+                                            pageCount={1} 
+                                            columns={biosampleColumns} 
+                                            searchParams={{}}
+                                        />
+                                    </div>
+                                </>
+                            )
+                            : (
+                                (biosamplesInitialized && biosampleStore.initialized )
+                                    ? (
+                                        <Card className="h-[286px] w-full">
+                                            <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
+                                                <CardTitle>Add biosamples in the toolkit!</CardTitle>
+                                                {/* <CardDescription>Add biosamples in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription> */}
+                                                <Button
+                                                    className="w-fit"
+                                                    variant={'secondary'}
+                                                    asChild
+                                                >
+                                                    {/* <Link href={"/#contact"}> */}
+                                                    <Link href={"/app/tools/biosample"}>
+                                                        Biosamples Toolkit
+                                                    </Link>
+                                                </Button>
+                                            </CardContent>
+                                        </Card>
+                                    )
+                                    : (
+                                        <>
+                                            <Skeleton className="h-[286px] w-full"/>
+                                        </>
+                                    )
+                            )
+                        }
+                    </ol>
                 </div>
-                <ol className="w-full">
-                    {(biosampleStore.searchResults && biosampleStore.searchResults.length > 0 )
-                        ? (
-                            <>
-                                <div className="max-w-7xl w-full overflow-auto">
-                                    <BiosamplesTable showPagination={false} data={biosampleStore.searchResults?.slice(0, 3)} pageCount={1} columns={biosampleColumns} searchParams={{}}/>
-                                </div>
-                            </>
-                        )
-                        : (
-                            biosampleStore.initialized 
-                                ? (
-                                    <Card className="h-[286px] w-full">
-                                        <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
-                                            <CardTitle>Sign up to upload biosamples!</CardTitle>
-                                            {/* <CardDescription>Want to add biosamples? Please sign up to add biosamples to the marketplace.</CardDescription> */}
-                                            <Button
-                                                className="w-fit"
-                                                asChild
-                                            >
-                                                {/* <Link href={"/#contact"}> */}
-                                                <Link href={"https://calendly.com/albertatcomend/onboarding"}>
-                                                    Sign up
-                                                </Link>
-                                            </Button>
-                                        </CardContent>
-                                    </Card>
-                                )
-                                : (
-                                    <>
-                                        <Skeleton className="h-[286px] w-full"/>
-                                    </>
-                                )
-                        )
-                    }
-                </ol>
-            </div>
 
-            <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center gap-4">
-                    <h2 className="text-xl md:text-2xl font-semibold">Disease Models</h2>
-                    <Button asChild variant={"secondary"} className="justify-self-end self-end">
-                        <Link
-                            href={"/marketplace/disease-models"}
-                        >
-                            Browse all disease models
-                            <ArrowRight />
-                        </Link>
-                    </Button>
+                <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center gap-4">
+                        <h2 className="text-2xl semibold">Disease Models</h2>
+                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                            <Link
+                                href={"/marketplace/disease-models"}
+                            >
+                                Browse all disease models
+                                <ArrowRight />
+                            </Link>
+                        </Button>
+                    </div>
+                    <ol className="w-full">
+                        {(diseaseModelsInitialized && diseaseModelStore.searchResults && diseaseModelStore.searchResults.length > 0 )
+                            ? (
+                                <>
+                                    <div className="max-w-7xl w-full overflow-auto">
+                                        <DiseaseModelsTable showPagination={false} data={diseaseModelStore.searchResults?.slice(0, 3)} pageCount={1} columns={diseaseModelColumns} searchParams={{}}/>
+                                    </div>
+                                </>
+                            )
+                            : (
+                                (diseaseModelsInitialized && diseaseModelStore.initialized) 
+                                    ? (
+                                        <Card className="h-[286px] w-full">
+                                            <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
+                                                <CardTitle>Add disease models in the toolkit!</CardTitle>
+                                                {/* <CardDescription>Add disease models in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription> */}
+                                                <Button
+                                                    className="w-fit"
+                                                    variant={'secondary'}
+                                                    asChild
+                                                >
+                                                    {/* <Link href={"/#contact"}> */}
+                                                    <Link href={"/app/tools/disease-models"}>
+                                                        Disease Models Toolkit
+                                                    </Link>
+                                                </Button>
+                                            </CardContent>
+                                        </Card>
+                                    )
+                                    : (
+                                        <>
+                                            <Skeleton className="h-[286px] w-full"/>
+                                        </>
+                                    )
+                            )
+                        }
+                    </ol>
                 </div>
-                <ol className="w-full">
-                    {(diseaseModelStore.searchResults && diseaseModelStore.searchResults.length > 0 )
-                        ? (
-                            <>
-                                <div className="max-w-7xl w-full overflow-auto">
-                                    <DiseaseModelsTable showPagination={false} data={diseaseModelStore.searchResults?.slice(0, 3)} pageCount={1} columns={diseaseModelColumns} searchParams={{}}/>
-                                </div>
-                            </>
-                        )
-                        : (
-                            diseaseModelStore.initialized 
-                                ? (
-                                    <Card className="h-[286px] w-full">
-                                        <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
-                                            <CardTitle>Sign up to upload disease models!</CardTitle>
-                                            {/* <CardDescription>Want to add disease models? Please sign up to add disease models to the marketplace.</CardDescription> */}
-                                            <Button
-                                                className="w-fit"
-                                                asChild
-                                            >
-                                                {/* <Link href={"/#contact"}> */}
-                                                <Link href={"https://calendly.com/albertatcomend/onboarding"}>
-                                                    Sign up
-                                                </Link>
-                                            </Button>
-                                        </CardContent>
-                                    </Card>
-                                )
-                                : (
-                                    <>
-                                        <Skeleton className="h-[286px] w-full"/>
-                                    </>
-                                )
-                        )
-                    }
-                </ol>
-            </div>
 
-            <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center gap-4">
-                    <h2 className="text-xl md:text-2xl font-semibold">Clinical Datasets</h2>
-                    <Button asChild variant={"secondary"} className="justify-self-end self-end">
-                        <Link
-                            href={"/marketplace/clinical-datasets"}
-                        >
-                            Browse all clinical datasets
-                            <ArrowRight />
-                        </Link>
-                    </Button>
+                <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center gap-4">
+                        <h2 className="text-2xl semibold">Clinical Datasets</h2>
+                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                            <Link
+                                href={"/marketplace/clinical-datasets"}
+                            >
+                                Browse all clinical datasets
+                                <ArrowRight />
+                            </Link>
+                        </Button>
+                    </div>
+                    <ol className="w-full">
+                        {(clinicalDatasetsInitialized && clinicalDatasetStore.searchResults && clinicalDatasetStore.searchResults.length > 0 )
+                            ? (
+                                <>
+                                    <div className="max-w-7xl w-full overflow-auto">
+                                        <ClinicalDatasetsTable showPagination={false} data={clinicalDatasetStore.searchResults?.slice(0, 3)} pageCount={1} columns={clinicalDatasetColumns} searchParams={{}}/>
+                                    </div>
+                                </>
+                            )
+                            : (
+                                (clinicalDatasetsInitialized && clinicalDatasetStore.initialized)
+                                    ? (
+                                        <Card className="h-[286px] w-full">
+                                            <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
+                                                <CardTitle>Add clinical dataset in the toolkit!</CardTitle>
+                                                {/* <CardDescription>Add clinical datasets in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription> */}
+                                                <Button
+                                                    className="w-fit"
+                                                    variant={'secondary'}
+                                                    asChild
+                                                >
+                                                    {/* <Link href={"/#contact"}> */}
+                                                    <Link href={"/app/tools/data"}>
+                                                        Clinical Datasets Toolkit
+                                                    </Link>
+                                                </Button>
+                                            </CardContent>
+                                        </Card>
+                                    )
+                                    : (
+                                        <>
+                                            <Skeleton className="h-[286px] w-full"/>
+                                        </>
+                                    )
+                            )
+                        }
+                    </ol>
                 </div>
-                <ol className="w-full">
-                    {(clinicalDatasetStore.searchResults && clinicalDatasetStore.searchResults.length > 0 )
-                        ? (
-                            <>
-                                <div className="max-w-7xl w-full overflow-auto">
-                                    <ClinicalDatasetsTable showPagination={false} data={clinicalDatasetStore.searchResults?.slice(0, 3)} pageCount={1} columns={clinicalDatasetColumns} searchParams={{}}/>
-                                </div>
-                            </>
-                        )
-                        : (
-                            clinicalDatasetStore.initialized 
-                                ? (
-                                    <Card className="h-[286px] w-full">
-                                        <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
-                                            <CardTitle>Sign up to upload clinical datasets!</CardTitle>
-                                            {/* <CardDescription>Want to add clinical datasets? Please sign up to add clinical datasets to the marketplace.</CardDescription> */}
-                                            <Button
-                                                className="w-fit"
-                                                asChild
-                                            >
-                                                {/* <Link href={"/#contact"}> */}
-                                                <Link href={"https://calendly.com/albertatcomend/onboarding"}>
-                                                    Sign up
-                                                </Link>
-                                            </Button>
-                                        </CardContent>
-                                    </Card>
-                                )
-                                : (
-                                    <>
-                                        <Skeleton className="h-[286px] w-full"/>
-                                    </>
-                                )
-                        )
-                    }
-                </ol>
             </div>
-        </main>
+        </div>
     )
 }
