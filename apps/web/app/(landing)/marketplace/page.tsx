@@ -21,6 +21,9 @@ import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketp
 import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeRFPSearch } from "@/packages/lib/initialize-client-state"
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
 import { RFPCard } from "~web/components/rfp-card"
+import { mixpanelTrack } from "@/packages/lib/mixpanel"
+import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/dialog"
+import { RFPDetails } from "~web/components/pag-profile-rfps-card"
 
 const organizationSelector = (state: OrganizationSearchState) => ({
     featuredOrgs: state.featuredOrgs,
@@ -356,10 +359,31 @@ export default function MarketplacePage() {
                             ? (
                                 <>
                                     {rfpStore.searchResults?.slice(0, 3).map((rfp, index) => (
-                                        <RFPCard
-                                            rfp={rfp}
-                                            key={index}
-                                        />
+                                        <Dialog>
+                                            <DialogTrigger
+                                                className="w-full max-w-full h-full"
+                                                onClick={() => {
+                                                    mixpanelTrack("RFP Details Viewed", {
+                                                        "ID": rfp.id,
+                                                        "Name": rfp.title,
+                                                        "Budget": rfp.budget,
+                                                        "Linked Projects": rfp.milestones.map(({milestone}: any) => milestone),
+                                                        // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                                                        // we flatten them into a single list that can be parsed
+                                                        "Linked Project Types": rfp.milestones.flatMap(({milestone}: any) =>
+                                                            (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                                                        ),
+                                                        "Location": "marketplace explore"
+                                                    })
+                                                }}
+                                                data-testid="rfp-card-trigger"
+                                            >
+                                                <RFPCard rfp={rfp} showOrganization={true}/>
+                                            </DialogTrigger>
+                                            <DialogContent className="overflow-hidden" data-testid="dialog">
+                                                <RFPDetails rfp={rfp}/>
+                                            </DialogContent>
+                                        </Dialog>
                                     ))}
                                 </>
                             )
