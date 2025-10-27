@@ -49,16 +49,16 @@ export default function Loading() {
                             {/* Left side: conditions + about */}
                             <div className="relative col-span-2 space-y-4">
                                 <div className="sticky top-4 space-y-4">
-                                    <Skeleton className="h-80 w-full rounded-md" />
-                                    <Skeleton className="h-96 w-full rounded-md" />
+                                    <Skeleton className="h-80 w-full rounded-md border" />
+                                    <Skeleton className="h-96 w-full rounded-md border" />
                                 </div>
                             </div>
 
                             {/* Right side: rfps, tools, roadmaps */}
                             <div className="col-span-4 space-y-4">
-                                <Skeleton className="h-40 w-full rounded-md" />
-                                <Skeleton className="h-56 w-full rounded-md" />
-                                <Skeleton className="h-64 w-full rounded-md" />
+                                <Skeleton className="h-40 w-full rounded-md border" />
+                                <Skeleton className="h-56 w-full rounded-md border" />
+                                <Skeleton className="h-64 w-full rounded-md border" />
                             </div>
                         </div>
                     </div>
