@@ -14,7 +14,6 @@ import { Input } from "@comend/components/ui/input"
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
-import { DialogClose } from "@comend/components/ui/dialog"
 
 const formSchema = z.object({
     file: z
@@ -47,10 +46,6 @@ export function FileUploadForm({accept, onSubmit}: {accept: string, onSubmit: (f
         onSubmit(selectedFile)
     }
 
-    useEffect(() => {
-        console.log(`form is valid`, form.formState)
-    }, [form.formState])
-
     return (
         <Form {...form}>
             <form
@@ -77,7 +72,6 @@ export function FileUploadForm({accept, onSubmit}: {accept: string, onSubmit: (f
                     )}
                 />
 
-                <DialogClose className="w-fit self-end">
                     <Button
                         variant={"cta"}
                         className="w-fit"
@@ -86,7 +80,6 @@ export function FileUploadForm({accept, onSubmit}: {accept: string, onSubmit: (f
                     >
                         Upload
                     </Button>
-                </DialogClose>
             </form>
         </Form>
     )

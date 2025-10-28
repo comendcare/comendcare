@@ -3,14 +3,14 @@
 import React, { useState } from "react";
 import { Button } from "@comend/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
-import { Import } from "lucide-react";
+import { Import, LoaderCircle } from "lucide-react";
 import { FileUploadForm } from "~web/components/file-upload-form";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createDiseaseModel } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
-import { parseCSV } from "@comend/lib/utils";
+import { cn, parseCSV } from "@comend/lib/utils";
 import { DISEASE_MODEL_TYPE_OPTIONS, editDiseaseModelForm } from "@/packages/lib/types";
 import { revalidate } from "@/packages/lib/revalidate";
 import z from "zod";
@@ -107,8 +107,12 @@ export function DiseaseModelBulkImportDialog() {
     const pathname = usePathname()
     const {data: session} = useSession()
     const [isOpen, setIsOpen] = useState(false)
+    const [isImporting, setIsImporting] = useState(false)
+    const [importCount, setImportCount] = useState(0)
+    const [totalItems, setTotalItems] = useState(0)
 
     const handleImport = async (file: File | undefined) => {
+        setIsImporting(true)
         if (file && file.name.endsWith(".csv")) {
             // parse CSV file
             try {
@@ -128,6 +132,9 @@ export function DiseaseModelBulkImportDialog() {
                         {key: 'Visibility', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                     ]
                 )
+
+                setTotalItems(result.values.length)
+                setImportCount(0)
     
                 if (result.errors.length > 0) {
                     toast('Warning!', {
@@ -151,7 +158,7 @@ export function DiseaseModelBulkImportDialog() {
                     console.log(`create disease model with data`, formattedDiseaseModel)
 
                     const newDiseaseModel = await createDiseaseModel(session?.user.organizationId, formattedDiseaseModel)
-                    await revalidate(pathname)
+                    setImportCount((prev) => prev + 1)
                 }
             } catch (e) {
                 toast('Error!', {
@@ -164,6 +171,12 @@ export function DiseaseModelBulkImportDialog() {
         } else {
             console.error("Please upload a valid CSV file.");
         }
+
+        await revalidate(pathname)
+        setIsOpen(false)
+        setIsImporting(false)
+        setImportCount(0)
+        setTotalItems(0)
 
         router.refresh()
     }
@@ -180,19 +193,38 @@ export function DiseaseModelBulkImportDialog() {
                 </Button>
             </DialogTrigger>
             <DialogContent className="flex flex-col justify-start">
-        <DialogHeader>
-            <DialogTitle className="text-2xl">
-                Import Disease Models
-            </DialogTitle>
-            <DialogDescription>
-                Import multiple disease models at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1Hwdh6LOwWhiK3lEt3gLnURLmQgfsy59CXbxYCqm5uxs/edit?usp=sharing">Disease model input template</Link>, filling it out, downloading it as a CSV, and uploading it.
-            </DialogDescription>
+            {isImporting ? (
+                <>
+                <DialogHeader>
+                    <DialogTitle className="text-2xl">
+                        Importing... please keep this tab open
+                    </DialogTitle>
+                    <DialogDescription>
+                        We’re processing your file. This can take a few minutes.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="h-[180px] w-full flex gap-4 justify-center items-center">
+                    <LoaderCircle className={cn("h-[40px] w-[40px] animate-spin")}/>
+                    <p>{importCount > 0 ? `${importCount} of ${totalItems} models imported` : `Processing file...`}</p>
+                </div>
+                </>
+            ) : (
+                <>
+                <DialogHeader>
+                    <DialogTitle className="text-2xl">
+                        Import Disease Models
+                    </DialogTitle>
+                    <DialogDescription>
+                        Import multiple disease models at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1Hwdh6LOwWhiK3lEt3gLnURLmQgfsy59CXbxYCqm5uxs/edit?usp=sharing">Disease model input template</Link>, filling it out, downloading it as a CSV, and uploading it.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <FileUploadForm 
                     accept=".csv" 
                     onSubmit={handleImport}
                 />
+                </>
+            )}
             </DialogContent>
         </Dialog>
     )
