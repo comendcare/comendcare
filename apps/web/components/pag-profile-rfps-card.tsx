@@ -1,21 +1,19 @@
 "use client"
 
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog";
-import {Building, Calendar, DollarSign, FileText, GraduationCap, Link as LinkIcon, Pin, School, User} from "lucide-react";
-import {DateView} from "./miletone-date-view";
+import {Calendar, DollarSign, FileText, Link as LinkIcon, School, User, Clock, ChevronDown, ChevronRight, Mail, Workflow} from "lucide-react";
 import Link from "next/link";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {PropertyBadge} from "./property-badge";
-import {cn, formatDateUTC, formatMoney} from "@comend/lib/utils";
+import {checkDateRangeUTC, cn, formatDateUTC, formatMoney, RFPSort} from "@comend/lib/utils";
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {useSearchParams} from "next/navigation";
 import {NoRFPs} from "./no-rfps";
@@ -29,6 +27,12 @@ import {
     CarouselApi
 } from "@/packages/components/ui/carousel";
 import {Badge} from "@/packages/components/ui/badge";
+import { ExternalAttachment, ExternalContact, Milestone } from "@prisma/client";
+import { Scrollbar } from "@radix-ui/react-scroll-area";
+import { Button } from "@/packages/components/ui/button";
+import { DialogDescription } from "@radix-ui/react-dialog";
+import { ProfilePhoto } from "@/packages/components/profile-photo";
+import { Separator } from "@/packages/components/ui/separator";
 
 export const PAGProfileRFPsHoverableCard = ({rfps, isPrivate}: { rfps: any[], isPrivate: boolean }) => {
     const searchParams = useSearchParams()
@@ -63,7 +67,7 @@ export const PAGProfileRFPsHoverableCard = ({rfps, isPrivate}: { rfps: any[], is
                         ? (
                             <Carousel opts={{loop: true}} setApi={setApi} className="w-full">
                                 <CarouselContent>
-                                    {rfps.map((rfp, index) => (
+                                    {rfps.map((rfp: any, index: number) => (
                                         <CarouselItem key={index}>
                                             <div className="h-full p-1">
                                                 <Dialog defaultOpen={searchParams.get("rfp") == rfp.id}>
@@ -111,7 +115,6 @@ export const AssetDetails = ({tool}: { tool: any }) => {
         <ScrollArea className={"max-h-[600px] -mr-2 pr-3"}>
             <DialogHeader>
                 <DialogTitle>{tool.title}</DialogTitle>
-                <DialogDescription>{tool.description}</DialogDescription>
             </DialogHeader>
 
             <ul className="pt-2 w-full flex flex-col gap-2 text-sm text-wrap break-words">
@@ -158,26 +161,23 @@ export const AssetDetails = ({tool}: { tool: any }) => {
 }
 
 export const RFPDetails = ({rfp}: { rfp: any }) => {
+    const status = useMemo(() => checkDateRangeUTC(rfp.startDate, rfp.endDate), [rfp.startDate, rfp.endDate]);
+
     return (
-        <>
-            {/*<div*/}
-            {/*    className="absolute top-0 w-full h-[80px] left-0 flex justify-end items-end absolute -top-px -left-px w-[calc(100%+4px)] bg-blue-light">*/}
-            {/*    <img*/}
-            {/*        src={rfp.headerImage}*/}
-            {/*        style={{*/}
-            {/*            width: "100%",*/}
-            {/*            height: "100%",*/}
-            {/*            objectFit: "cover",*/}
-            {/*            objectPosition: "center"*/}
-            {/*        }}*/}
-            {/*        className="absolute w-full"*/}
-            {/*    />*/}
-            {/*</div>*/}
-            <ScrollArea className="max-h-[600px] -mr-2 pr-3">
-                <DialogHeader>
-                    <DialogTitle>{rfp.title}</DialogTitle>
-                    <DialogDescription>{rfp.description}</DialogDescription>
-                </DialogHeader>
+        <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
+            <Scrollbar />
+            <DialogHeader>
+                <DialogTitle className="text-2xl font-semibold flex gap-2 items-center">
+                    {rfp.title}
+                    {status && (
+                        <Badge variant={status.variant as any} className="text-sm">
+                            {status.status}
+                        </Badge>
+                    )}
+                </DialogTitle>
+                <DialogDescription className="text-sm text-muted-foreground">{rfp.description}</DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col gap-4">
                 <ul className="pt-4 w-full flex flex-col gap-2 text-sm text-wrap break-words">
                     {rfp.budget && (
                         <li>
@@ -220,41 +220,152 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                     )}
                 </ul>
 
-                <div className="pt-4 flex flex-row w-full gap-4">
-                    <Badge variant={"secondary"} className="p-2 flex flex-col items-start justify-start w-full text-sm">
-                        <p className="font-normal">Organization: </p>
-                        <p>{rfp?.organization?.name || "No organization"}</p>
+                {status?.daysRemaining !== undefined && (
+                    <Badge variant={"green"} className="w-full font-normal flex gap-2">
+                        <Clock size={18}/>
+                        {`${status.daysRemaining} days remaining to submit proposals`}
                     </Badge>
+                )}
 
-                    <Badge variant={"secondary"} className="p-2 flex flex-col items-start justify-start w-full text-sm">
-                        <p className="font-normal">Primary Attachment: </p>
-                        <a
-                            className={cn(rfp?.attachments?.[0]?.link && "underline")}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }}
-                            href={rfp?.attachments?.[0]?.link}
-                        >
-                            {rfp?.attachments?.[0]?.name || rfp?.attachments?.[0]?.link || "No attachments"}
-                        </a>
-                    </Badge>
+                {(rfp.milestones && rfp.milestones.length > 0) && (
+                    <div className="border-l-4 border-purple-200 pl-4 space-y-2">
+                        <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
+                            <Workflow className="h-4 w-4 min-w-4 text-purple-900" />
+                            <span className="text-purple-900 text-nowrap">Linked Projects</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            {rfp.milestones.map((project: any) => (
+                                <Badge className="font-normal" variant={"purple"}>
+                                    <FileText className="h-4 w-4 min-h-4 min-w-4"/>
+                                    {project.milestone.title}
+                                </Badge>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
-                    <Badge variant={"secondary"} className="p-2 flex flex-col items-start justify-start w-full text-sm">
-                        <p className="font-normal">Primary Contact: </p>
-                        <a
-                            className={cn(rfp?.contacts?.[0]?.email && "underline")}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }}
-                            href={rfp?.contacts?.[0]?.email ? `mailto:${rfp?.contacts[0]?.email}` : undefined}
-                        >
-                            {rfp?.contacts?.[0]?.name ||
-                                rfp?.contacts?.[0]?.email ||
-                                rfp?.contacts?.[0]?.affiliation || "No primary contacts"}
-                        </a>
-                    </Badge>
-                </div>
-            </ScrollArea>
-        </>
+                <Separator />
+
+                {rfp.organization && (
+                    <a
+                        href={`http://${rfp.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                        onClick={(e) => e.stopPropagation()}
+                        target="_blank"
+                    >
+                        <div className="flex flex-row gap-2 items-center">
+                            <ProfilePhoto img={rfp.organization.image} name={rfp.organization.name} className="h-9 w-9 -mt-1"/>
+                            <p className="text-lg font-semibold underline">{rfp.organization.name}</p>
+                        </div>
+                    </a>
+                )}
+
+                <Separator />
+
+                {rfp.eligibility && (
+                    <CaretAccordion 
+                        title={'Eligibility'}
+                        content={
+                            <p className="text-sm">{rfp.eligibility}</p>
+                        }
+                    />
+                )}
+
+                {rfp.instructions && (
+                    <CaretAccordion 
+                        title={'Instructions'}
+                        content={
+                            <p className="text-sm">{rfp.instructions}</p>
+                        }
+                    />
+                )}
+
+                {rfp.evaluationProcess && (
+                    <CaretAccordion 
+                        title={'Evaluation Process'}
+                        content={
+                            <p className="text-sm">{rfp.evaluationProcess}</p>
+                        }
+                    />
+                )}
+
+                {((rfp.contacts && rfp.contacts.length > 0) || (rfp.attachments && rfp.attachments.length > 0)) && <Separator />}
+
+                {rfp.contacts && rfp.contacts.length > 0 && (
+                    <div className="flex flex-col gap-2 w-full">
+                        <h3 className="text-lg font-semibold">Primary Contacts</h3>
+                        {rfp?.contacts?.map((contact: ExternalContact) => (
+                            <span className="flex items-center gap-2 text-wrap w-full text-sm">
+                                <Mail className="mt-1 h-4 w-4 min-h-4 min-w-4"/>
+                                <a
+                                    className={cn(contact?.email && "underline")}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                    }}
+                                    href={contact?.email ? `mailto:${contact?.email}` : undefined}
+                                >
+                                    {contact?.name ||
+                                        contact?.email ||
+                                        contact?.affiliation || "No primary contacts"}
+                                </a>
+                            </span>
+                        ))}
+                    </div>
+                )}
+
+                {rfp.attachments && rfp.attachments.length > 0 && (
+                    <div className="flex flex-col gap-2 w-full">
+                        <h3 className="text-lg font-semibold">Primary Attachments</h3>
+                        {rfp?.attachments?.map((attachment: ExternalAttachment) => (
+                            <span className="flex items-start gap-2 text-wrap w-full text-sm">
+                                <LinkIcon className="mt-1 h-4 w-4 min-h-4 min-w-4"/>
+                                <a
+                                    className={cn(
+                                        attachment?.link && "underline", 
+                                        "text-wrap w-full",
+                                        // allow text break in middle of word for long links
+                                        !attachment.name && attachment.link && "break-all"
+                                    )}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                    }}
+                                    href={attachment?.link}
+                                >
+                                    {attachment?.name || attachment?.link || "No attachments"}
+                                </a>
+                            </span>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </ScrollArea>
     )
 }
+
+const CaretAccordion = ({title, content, className}: {title: string, content: React.ReactNode, className?: string}) => {
+    const [isOpen, setIsOpen] = useState(false)
+
+    return (
+        <div className={cn("flex flex-col gap-2", className)} >
+            <span className="flex gap-2 items-center">
+                <Button 
+                    variant={'ghost'} 
+                    className="p-0 h-6 w-6"
+                    onClick={() => setIsOpen((prev) => !prev)}
+                >
+                    {isOpen ? (
+                        <ChevronDown />
+                    ) : (
+                        <ChevronRight />
+                    )}
+                </Button>
+                <p className="text-xl font-semibold">{title}</p>
+            </span>
+            {isOpen && (
+                <div>
+                    {content}
+                </div>
+            )}
+        </div>
+    )
+}
+
