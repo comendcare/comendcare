@@ -171,7 +171,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                     {rfp.title}
                     {status && (
                         <Badge variant={status.variant as any} className="text-sm">
-                            {status.status}
+                            {status.label}
                         </Badge>
                     )}
                 </DialogTitle>
