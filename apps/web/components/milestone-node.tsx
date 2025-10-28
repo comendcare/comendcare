@@ -144,7 +144,7 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                     {!props?.data?.isPublic && (
                         <PublicPrivateButton 
                             isPrivate={props.data?.private}
-                            updateCallback={(isPrivate) => {
+                            updateCallback={async (isPrivate) => {
                                 if (props.data?.nodeId) {
                                     setMilestone(props.data.nodeId, {private: isPrivate})
                                 }

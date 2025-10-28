@@ -412,7 +412,7 @@ export const TimelineItemContent = ({
                 {isPrivate && (
                     <PublicPrivateButton 
                         isPrivate={milestone.private}
-                        updateCallback={(isPrivate) => {
+                        updateCallback={async (isPrivate) => {
                             if (milestone.nodeId) {
                                 setMilestone(milestone.nodeId, {private: isPrivate})
                             }
