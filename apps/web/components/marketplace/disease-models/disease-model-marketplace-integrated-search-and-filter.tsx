@@ -267,7 +267,7 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
                             dialogRef.current?.focus() // focus the dialog content instead
                         }}
                     >
-                        <DialogTitle>Disease Model Filters</DialogTitle>
+                        <DialogTitle>Disease model filters</DialogTitle>
                         {/* Conditions */}
                         <div>
                             <Label>Condition</Label>
@@ -306,7 +306,7 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
 
                         {/* Disease Model Types */}
                         <div>
-                            <Label>Disease Model Types</Label>
+                            <Label>Disease model types</Label>
                             <MultipleSelector
                                 value={filters.types ?? []}
                                 onChange={(vals) => setFilterKey("types", vals)}

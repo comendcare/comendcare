@@ -108,7 +108,7 @@ const data = {
             subPages: []
         },
         {
-            title: "RFPs",
+            title: "Requests for Proposals",
             icon: Megaphone,
             variant: "ghost",
             url: `/app/rfps`,

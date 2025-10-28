@@ -38,6 +38,7 @@ import { DateView } from "./miletone-date-view";
 import { Separator } from "@/packages/components/ui/separator";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/packages/components/ui/card";
 import { Organization } from "@prisma/client";
+import { PublicPrivateButton } from "./public-private-button";
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV !== "production"
 
@@ -409,27 +410,14 @@ export const TimelineItemContent = ({
                     )
                 )} */}
                 {isPrivate && (
-                    milestone.private ? (
-                        <Button
-                            className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-red-100 hover:bg-red-300"
-                            onClick={(e) => {
-                                e.stopPropagation()
-                                if (milestone.nodeId) setMilestone(milestone.nodeId, {private: false})
-                            }}
-                        >
-                            <Lock size={20} className="text-red-800"/>
-                        </Button>
-                    ) : (
-                        <Button
-                            className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-green-100 hover:bg-green-300"
-                            onClick={(e) => {
-                                e.stopPropagation()
-                                if (milestone.nodeId) setMilestone(milestone.nodeId, {private: true})
-                            }}
-                        >
-                            <Globe size={20} className="text-green-800"/>
-                        </Button>
-                    )
+                    <PublicPrivateButton 
+                        isPrivate={milestone.private}
+                        updateCallback={(isPrivate) => {
+                            if (milestone.nodeId) {
+                                setMilestone(milestone.nodeId, {private: isPrivate})
+                            }
+                        }}
+                    />
                 )}
                 <p className="inline mr-2 font-semibold text-lg group-hover:underline">{milestone.title}</p>
             </span>

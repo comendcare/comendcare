@@ -17,6 +17,106 @@ import {
     Task
 } from "./types";
 import Papa from "papaparse";
+import type { RFP } from "@prisma/client";
+
+const STATUS_PRIORITY = {
+  'OPEN': 1,
+  'NOTOPEN': 2,
+  'CLOSED': 3,
+}
+
+export function getSortRank(rfp: RFP) {
+    const status = checkDateRangeUTC(rfp?.startDate || undefined, rfp?.endDate || undefined)
+    if (!status) return 0
+
+    const base = STATUS_PRIORITY[status.status] * 1_000_000_000_000_000 // status weighting
+    const now = new Date()
+
+    if (status.status === 'OPEN') {
+        // ascending by due_date → smaller date = higher rank
+        if (rfp.endDate) return rfp.endDate.getTime()
+
+        // if end date does not exist on this RFP put it at the end of the Open section
+        return base
+    }
+
+    if (status.status === 'NOTOPEN' && rfp.startDate) {
+        // ascending by start_date
+        return base + rfp.startDate.getTime()
+    }
+
+    if (status.status === 'CLOSED' && rfp.endDate) {
+        // descending by due_date → larger date = higher rank
+        return base + base - rfp.endDate.getTime()
+    }
+
+    return 0
+}
+
+type DateStatus =
+    | { status: "NOTOPEN"; label: "Not Open"; daysRemaining: number | undefined; variant: "yellow" }
+    | { status: "OPEN"; label: "Open"; daysRemaining: number | undefined; variant: "green" }
+    | { status: "CLOSED"; label: "Closed"; daysRemaining: number | undefined; variant: "red" }
+    | undefined;
+
+function toUTCDateOnly(d: Date) {
+    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+}
+
+export function checkDateRangeUTC(startDateStr?: string | Date, endDateStr?: string | Date): DateStatus {
+    if (!startDateStr && !endDateStr) return undefined;
+
+    const todayUTC = toUTCDateOnly(new Date());
+    const startRaw = startDateStr ? new Date(startDateStr) : undefined;
+    const endRaw = endDateStr ? new Date(endDateStr) : undefined;
+
+    if ((startRaw && isNaN(startRaw.getTime())) || (endRaw && isNaN(endRaw.getTime()))) return undefined;
+
+    const start = startRaw ? toUTCDateOnly(startRaw) : undefined;
+    const end = endRaw ? toUTCDateOnly(endRaw) : undefined;
+
+    if (start && todayUTC < start) return {status: "NOTOPEN", label: "Not Open", daysRemaining: undefined, variant: "yellow"};
+    if (end && todayUTC > end) return {status: "CLOSED", label: "Closed", daysRemaining: undefined, variant: "red"};
+
+    if ((!start || todayUTC >= start) && (!end || todayUTC <= end)) {
+        const daysRemaining = end ? Math.ceil((end.getTime() - todayUTC.getTime()) / 86400000) : 0;
+        return {status: "OPEN", label: "Open", daysRemaining, variant: "green"};
+    }
+    return undefined;
+}
+
+export const RFPSort = (rfps: RFP[]) => {
+    const now = new Date();
+
+    // sort RFPs - 
+    //      open (due earliest -> due latest, undefined at end) > 
+    //      upcoming (starting earliest -> starting latest) > 
+    //      closed (due latest -> due earliest)
+    const isOpen = (rfp: RFP) => rfp.startDate && rfp.startDate <= now && (rfp.endDate ? rfp.endDate >= now : true)
+    const isUpcoming = (rfp: RFP) => rfp.startDate && rfp.startDate > now
+    const isClosed = (rfp: RFP) => rfp.endDate && rfp.endDate < now
+
+    const openRFPs = rfps.filter(rfp => isOpen(rfp)).sort((a: RFP, b: RFP) => {
+        if (a.endDate && b.endDate) return a.endDate.getTime() - b.endDate.getTime()
+        return 1
+    })
+    const upcomingRFPs = rfps.filter(rfp => isUpcoming(rfp)).sort((a: RFP, b: RFP) => {
+        if (a.startDate && b.startDate) return a.startDate.getTime() - b.startDate.getTime()
+        return 1
+    })
+    const closedRFPs = rfps.filter(rfp => isClosed(rfp)).sort((a: RFP, b: RFP) => {
+        if (a.endDate && b.endDate) return a.endDate.getTime() - b.endDate.getTime()
+        return 1
+    })
+    const otherRFPs = rfps.filter(rfp => !isOpen(rfp) && !isUpcoming(rfp) && !isClosed(rfp))
+
+    return ([
+        ...openRFPs,
+        ...upcomingRFPs,
+        ...closedRFPs,
+        ...otherRFPs
+    ])
+}
 
 const dateFmtUTC = new Intl.DateTimeFormat("en-US", {
     timeZone: "UTC",
