@@ -185,7 +185,7 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
                             <div>
                                 <Label>Open to</Label>
                                 <MultipleSelector
-                                    value={filters.genes ?? []}
+                                    value={filters.openTo ?? []}
                                     onChange={(vals) => setFilterKey("openTo", vals)}
                                     defaultOptions={RFP_OPEN_TO_TYPE_OPTIONS}
                                     placeholder="Select option..."
@@ -202,7 +202,7 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
                             <div>
                                 <Label>Status</Label>
                                 <MultipleSelector
-                                    value={filters.genes ?? []}
+                                    value={filters.status ?? []}
                                     onChange={(vals) => setFilterKey("status", vals)}
                                     defaultOptions={RFP_STATUS_TYPE_OPTIONS}
                                     placeholder="Select status..."
