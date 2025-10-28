@@ -15,6 +15,7 @@ import {getSavedCompaniesFromOrganizationId} from "@/packages/lib/fetchers";
 import {SavedCompany} from "@prisma/client";
 import { LoaderCircle } from "lucide-react";
 import { cn } from "@/packages/lib/utils";
+import { search } from "@notionhq/client/build/src/api-endpoints";
 
 const selector = (state: CROSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -102,7 +103,11 @@ export function CROSearchResults() {
         <>
             <ResultsView />
             <LoaderCircle 
-                className={cn("h-[40px] w-[40px] animate-spin", (searchResults.length === totalResults) && "opacity-0")}
+                className={cn("h-[40px] w-[40px] animate-spin", (
+                    !searchResults ||
+                    searchResults.length === totalResults || 
+                    searchResults.length === 0
+                ) && "opacity-0")}
             />
             <InfiniteScroll 
                 lastFetchedPage={lastFetchedPage} 

@@ -1,8 +1,7 @@
 export const dynamic = 'force-dynamic'; // Prevent caching
-import { handleGetAvailability, stringToSortableInt } from "./utils";
+import { checkDateRangeUTC, getSortRank, handleGetAvailability, stringToSortableInt } from "./utils";
 import prisma from "./prisma"
-import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, TOOL_TYPE_OPTIONS } from "./types";
-
+import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, RFP, TOOL_TYPE_OPTIONS } from "./types";
 
 const sendTypeSenseRequest = async (
     url: string,
@@ -111,7 +110,6 @@ export const syncToTypesense = async (env: {
     console.log('Environment variables:', env);
 
     try {
-
         // Define schemas
         const organizationSchema = {
             name: 'organizations',
@@ -615,6 +613,40 @@ export const syncToTypesense = async (env: {
                 }
             ]
         }
+        const rfpSchema = {
+            name: 'rfps',
+            enable_nested_fields: true,
+            fields: [
+                {
+                    name: ".*",
+                    type: "auto",
+                },
+                {
+                    name: "condition.name",
+                    type: "string",
+                    sort: true,
+                    optional: true
+                },
+                {
+                    name: "organization.name",
+                    type: "string",
+                    sort: true,
+                    optional: true,
+                },
+                {
+                    name: "sort_rank",
+                    type: "int64",
+                    sort: true,
+                    optional: false,
+                },
+                // {
+                //     name: "status",
+                //     type: "string",
+                //     sort: false,
+                //     optional: true
+                // }
+            ]
+        }
 
         console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
         console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
@@ -622,6 +654,7 @@ export const syncToTypesense = async (env: {
         console.log('Biosample Schema:', JSON.stringify(biosampleSchema, null, 2));
         console.log('Disease Model:', JSON.stringify(diseaseModelSchema, null, 2));
         console.log('Clinical Dataset:', JSON.stringify(clinicalDatasetSchema, null, 2));
+        console.log(`RFPs`, JSON.stringify(rfpSchema, null, 2))
 
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizationSchema);
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
@@ -629,6 +662,7 @@ export const syncToTypesense = async (env: {
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', biosampleSchema);
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', diseaseModelSchema);
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', clinicalDatasetSchema);
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'rfps', rfpSchema);
 
         const organizations = await prisma.organization.findMany({
             where: {
@@ -712,7 +746,9 @@ export const syncToTypesense = async (env: {
                             select: {
                                 condition: {
                                     select: {
-                                        name: true
+                                        name: true,
+                                        causalGenes: true,
+                                        associatedGenes: true,
                                     }
                                 }
                             }
@@ -760,6 +796,41 @@ export const syncToTypesense = async (env: {
                 cohortSize: true,
             }
         })
+        const rfps = await prisma.rFP.findMany({
+            where: {
+                private: false // only sync public biosamples
+            },
+            select: {
+                createdAt: true,
+                // this list must include ALL items that allow sorting in the table
+                // otherwise the sorting will not function
+                organization: {
+                    select: {
+                        id: true,
+                        name: true,
+                        conditions: {
+                            select: {
+                                condition: {
+                                    select: {
+                                        name: true,
+                                        causalGenes: true,
+                                        associatedGenes: true,
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                id: true,
+                title: true,
+                description: true,
+                eligibility: true,
+                evaluationProcess: true,
+                openTo: true,
+                startDate: true,
+                endDate: true
+            }
+        })
 
         console.log('Raw organizations data:', organizations);
         console.log('Raw milestones data:', milestones);
@@ -767,6 +838,7 @@ export const syncToTypesense = async (env: {
         console.log('Raw biosamples data:', biosamples)
         console.log('Raw disease models data:', diseaseModels)
         console.log('Raw clinical datasets data:', clinicalDatasets)
+        console.log('Raw rfp data:', rfps)
 
         if (organizations.length > 0) {
             console.log('Validating organization data...');
@@ -916,6 +988,19 @@ export const syncToTypesense = async (env: {
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', uploadClinicalDatasets);
         } else {
             console.log('No clinical datasets to import.');
+        }
+
+        if (rfps.length > 0) {
+            const uploadRFPs = rfps.map(rfp => ({
+                ...rfp,
+                createdAt: rfp.createdAt.getTime(), // special case for created at to enable sorting
+                condition: rfp.organization?.conditions && rfp.organization.conditions.length > 0 && rfp.organization.conditions[0].condition,
+                sort_rank: getSortRank(rfp as any),
+                status: checkDateRangeUTC(rfp.startDate || undefined, rfp.endDate || undefined)?.status || 'Open'
+            }))
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'rfps', uploadRFPs);
+        } else {
+            console.log('No rfps to import.');
         }
 
         console.log('Sync job completed successfully.');

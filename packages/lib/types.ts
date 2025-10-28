@@ -903,6 +903,12 @@ export const DISEASE_MODEL_TYPE_OPTIONS: Option[] = [
   { value: 'OTHER', label: 'Other', group: 'Other' },
 ]
 
+export const RFP_STATUS_TYPE_OPTIONS: Option[] = [
+    {value: 'OPEN', label: 'Open'},
+    {value: 'NOTOPEN', label: 'Not Open'},
+    {value: 'CLOSED', label: 'Closed'}
+]
+
 export const BIOSAMPLE_TYPE_OPTIONS: Option[] = [
     { value: 'IPSCS', label: 'Induced pluripotent stem cells (iPSCs)' },
     { value: 'FIBROBLAST', label: 'Fibroblast' },

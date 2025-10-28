@@ -3,14 +3,13 @@
 import { useRoadmapStore } from "../../apps/web/state/roadmap/roadmapStore";
 import { PlatformNotification, Prisma } from "@prisma/client";
 import { useNotificationsStore } from "../../state/notifications/notificationsStore";
-import { useCROSearchStore } from "../../state/search/croSearchStore";
 import { useMilestoneSearchStore } from "../../state/search/milestoneSearchStore";
-import { useOrganizationSearchStore } from "../../state/search/organizationSearchStore";
-import { FiltersType as CROMarketplaceFiltersType } from "../../state/search/croSearchStore";
-import { FiltersType as PAGMarketplaceFiltersType} from "../../state/search/organizationSearchStore";
+import { FiltersType as CROMarketplaceFiltersType, useCROSearchStore} from "../../state/search/croSearchStore";
+import { FiltersType as PAGMarketplaceFiltersType, useOrganizationSearchStore} from "../../state/search/organizationSearchStore";
 import { FiltersType as BiosampleMarketplaceFiltersType, useBiosampleSearchStore} from "../../state/search/biosampleSearchStore";
 import { FiltersType as DiseaseModelMarketplaceFiltersType, useDiseaseModelSearchStore} from "../../state/search/diseaseModelSearchStore";
 import { FiltersType as ClinicalDatasetMarketplaceFiltersType, useClinicalDatasetSearchStore} from "../../state/search/clinicalDatasetSearchStore";
+import { FiltersType as RFPMarketplaceFiltersType, useRFPSearchStore} from "../../state/search/rfpSearchStore";
 import { Asset, RFP, Roadmap } from './types';
 import { useToolStore } from "../../state/tool/toolStore";
 import { useRFPStore } from "../../state/rfp/rfpStore";
@@ -21,6 +20,15 @@ export async function initializeCROSearch(filters: CROMarketplaceFiltersType) {
 
         // Call Zustand's initState directly
         await initCROSearchState(filters)
+    }
+}
+
+export async function initializeRFPSearch(filters: RFPMarketplaceFiltersType) {
+    if (typeof window !== "undefined") {
+        const initRFPSearchState = useRFPSearchStore.getState().initState;
+
+        // Call Zustand's initState directly
+        await initRFPSearchState(filters)
     }
 }
 

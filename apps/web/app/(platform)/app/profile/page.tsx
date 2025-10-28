@@ -14,6 +14,7 @@ import {
 } from "@comend/lib/fetchers";
 import { biosampleSearchParamsCache } from "@/packages/lib/validations"
 import { getValidFilters } from "@/packages/lib/data-table";
+import { RFPSort } from "@/packages/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -117,6 +118,9 @@ export default async function ProfilePage(props: IndexPageProps) {
                 id: true,
                 title: true,
                 description: true,
+                eligibility: true,
+                instructions: true,
+                evaluationProcess: true,
                 openTo: true,
                 startDate: true,
                 endDate: true,
@@ -263,7 +267,7 @@ export default async function ProfilePage(props: IndexPageProps) {
             diseaseModelsPageCount={diseaseModelsPageCount}
             clinicalDatasets={clinicalDatasets}
             clinicalDatasetsPageCount={clinicalDatasetsPageCount}
-            rfps={rfps}
+            rfps={RFPSort(rfps)}
             isOwner={!!isOwner}
             rootDomain={process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? "comend.io"}
             searchParams={searchParams}
