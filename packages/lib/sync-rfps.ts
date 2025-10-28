@@ -58,7 +58,7 @@ const manageCollection = async (
 
 const STATUS_PRIORITY = {
   'OPEN': 1,
-  'NOTOPEN': 2,
+  'COMINGSOON': 2,
   'CLOSED': 3,
 }
 
@@ -77,7 +77,7 @@ function getSortRank(rfp: RFP) {
         return base
     }
 
-    if (status.status === 'NOTOPEN' && rfp.startDate) {
+    if (status.status === 'COMINGSOON' && rfp.startDate) {
         // ascending by start_date
         return base + rfp.startDate.getTime()
     }

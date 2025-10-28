@@ -21,7 +21,7 @@ import type { RFP } from "@prisma/client";
 
 const STATUS_PRIORITY = {
   'OPEN': 1,
-  'NOTOPEN': 2,
+  'COMINGSOON': 2,
   'CLOSED': 3,
 }
 
