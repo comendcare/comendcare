@@ -314,6 +314,8 @@ model Tool {
   types       String[] // values (ToolType ids)
   notes       String?
 
+  companyId                     String?
+  company                       Company?                             @relation(fields: [companyId], references: [id], onDelete: SetNull)
   institutionId                 String?
   institution                   Institution?                         @relation(fields: [institutionId], references: [id], onDelete: SetNull)
   geneId                        Int?
@@ -340,6 +342,8 @@ model DiseaseModel {
   strain      String?
   notes       String?
 
+  companyId                     String?
+  company                       Company?                                     @relation(fields: [companyId], references: [id], onDelete: SetNull)
   institutionId                 String?
   institution                   Institution?                                 @relation(fields: [institutionId], references: [id], onDelete: SetNull)
   geneId                        Int?
@@ -382,6 +386,8 @@ model Biosample {
   priceUnit           String?
   notes               String?
 
+  companyId                     String?
+  company                       Company?                                  @relation(fields: [companyId], references: [id], onDelete: SetNull)
   institutionId                 String?
   institution                   Institution?                              @relation(fields: [institutionId], references: [id], onDelete: SetNull)
   donor                         Donor?                                    @relation(fields: [donorId], references: [id])
@@ -961,9 +967,13 @@ model Company {
   milestoneTypes                  String[]
   savedByOrganizations            SavedCompany[]          @relation("cro_save_savedCompany")
   contactRequestedByOrganizations CompanyContactRequest[] @relation("cro_contact_request_company")
-  createdAt                       DateTime                @default(now())
-  updatedAt                       DateTime                @default(now()) @updatedAt
-  metadata                        Json?
+  biosamples                      Biosample[]
+  diseaseModel                    DiseaseModel[]
+  tool                            Tool[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  metadata  Json?
 }
 
 model SavedCompany {

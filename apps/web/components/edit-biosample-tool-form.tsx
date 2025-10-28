@@ -91,6 +91,7 @@ export function EditBiosampleToolForm({
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
+    const [storageFacilityOptions, setStorageFacilityOptions] = useState<Option[]>([])
 
     const form = useForm<z.infer<typeof editBiosampleForm>>({
         mode: "onChange",
@@ -110,7 +111,20 @@ export function EditBiosampleToolForm({
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
 
             // biosample properties
-            institutions: toolData?.institution ? [{label: toolData.institution.name, value: toolData.institution.id}] : [],
+            storageFacility: [
+                ...([
+                    toolData?.company ? ({
+                        value: toolData.company.id,
+                        label: `${toolData.company.name}`
+                    }) : undefined
+                ]),
+                ...([
+                    toolData?.institution ? ({
+                        value: toolData.institution.id,
+                        label: `${toolData.institution.name}`
+                    }) : undefined
+                ])
+            ],
             genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
             variant: toolData?.variant || undefined, 
             anatomicalSite: toolData?.anatomicalSite || undefined,
@@ -322,6 +336,46 @@ export function EditBiosampleToolForm({
                 if (response.success && response.data) {
                     setOrgIsPublished(response.data.published)
                 }
+
+                // const formattedCompanies: Option[] = (await prisma.company.findMany({})).map((company) => (
+                    
+                // ))
+
+                // const formattedBiosamples: Option[] = (biosampleOptions || []).map((biosample: Partial<Biosample>,) => {
+                //     return (
+                //         {
+                //             value: biosample.id || '',
+                //             type: 'Biosamples',
+                //             icon: "test-tube-diagonal",
+                //             // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
+                //             label: `${biosample.id}`,
+                //             biosample
+                //         }
+                //     )
+                // })
+                // const formattedDiseaseModels: Option[] = (diseaseModelOptions || []).map((diseaseModel: Partial<DiseaseModel>) => {
+                //     return (
+                //         {
+                //             value: diseaseModel.id || '',
+                //             label: `${diseaseModel.id}`,
+                //             icon: 'rat',
+                //             type: 'Disease Models',
+                //             diseaseModel
+                //         }
+                //     )
+                // })
+                // const formattedDatasamples: Option[] = (clinicalDatasetOptions || []).map((datasample: Partial<Tool>) => {
+                //     return (
+                //         {
+                //             value: datasample.id || '',
+                //             label: `${datasample.id}`,
+                //             icon: 'database',
+                //             type: 'Clinical Datasets',
+                //             datasample
+                //         }
+                //     )
+                // })
+                // setFetchedTools([...formattedBiosamples, ...formattedDiseaseModels, ...formattedDatasamples])
             }
 
             // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away
@@ -398,11 +452,21 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
         return genes; // should be [{ label: "TP53", value: "TP53" }, ...]
     };
 
-    const handleInstitutionAsyncSearch = async (query: string): Promise<Option[]> => {
-        const response = await fetch(`/api/institutions?search=${query}`);
-        const data = await response.json();
-        return data;
-    };
+    const handleStorageFacilityAsyncSearch = async (query: string): Promise<Option[]> => {
+        const institutionsResponse = await fetch(`/api/institutions?search=${query}`)
+        const institutionsData = await institutionsResponse.json()
+
+        const companiesResponse = await fetch(`/api/companies?search=${query}`)
+        const companiesData = await companiesResponse.json()
+
+        return companiesData.concat(institutionsData)
+    }
+
+    // const handleInstitutionAsyncSearch = async (query: string): Promise<Option[]> => {
+    //     const response = await fetch(`/api/institutions?search=${query}`);
+    //     const data = await response.json();
+    //     return data;
+    // };
 
     return (
         <>
@@ -589,7 +653,7 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                                     creatable={true}
                                     maxSelected={1}
                                     triggerSearchOnFocus={true}
-                                    onSearch={handleInstitutionAsyncSearch}
+                                    onSearch={handleStorageFacilityAsyncSearch}
                                     placeholder="Search for institutions..."
                                     hidePlaceholderWhenSelected={true}
                                     loadingIndicator={<p>Loading institutions...</p>}
