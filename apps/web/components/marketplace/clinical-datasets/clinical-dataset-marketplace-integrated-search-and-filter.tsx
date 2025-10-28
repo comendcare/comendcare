@@ -267,7 +267,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
                             dialogRef.current?.focus() // focus the dialog content instead
                         }}
                     >
-                        <DialogTitle>Clinical Dataset Filters</DialogTitle>
+                        <DialogTitle>Clinical dataset filters</DialogTitle>
                         {/* Conditions */}
                         <div>
                             <Label>Condition</Label>
@@ -306,7 +306,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
 
                         {/* Clinical Dataset Types */}
                         <div>
-                            <Label>Clinical Dataset Types</Label>
+                            <Label>Clinical dataset types</Label>
                             <MultipleSelector
                                 value={filters.types ?? []}
                                 onChange={(vals) => setFilterKey("types", vals)}

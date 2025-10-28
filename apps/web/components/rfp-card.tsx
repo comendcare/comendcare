@@ -9,6 +9,10 @@ import {cn, formatDateUTC, formatMoney} from "@comend/lib/utils";
 import {RFPActionsMenu} from "./rfp-actions-menu";
 import {Badge} from "@/packages/components/ui/badge";
 import {Skeleton} from "@comend/components/ui/skeleton";
+import { PublicPrivateButton } from "./public-private-button";
+import { RFPState, useRFPStore } from "@/state/rfp/rfpStore";
+import { useShallow } from "zustand/react/shallow";
+import { revalidate } from "@/packages/lib/revalidate";
 
 
 type DateStatus =
@@ -57,9 +61,14 @@ function HeaderSkeleton() {
     );
 }
 
+const rfpSelector = (state: RFPState) => ({
+    updateRFP: state.updateRFP,
+})
+
 export const RFPCard = ({rfp, isPrivate = false}: { rfp: any; isPrivate?: boolean }) => {
     // Gate the header (and actions menu) until after hydration
     const [mounted, setMounted] = useState(false);
+    const { updateRFP } = useRFPStore(useShallow(rfpSelector))
     useEffect(() => setMounted(true), []);
 
     const status = useMemo(() => checkDateRangeUTC(rfp.startDate, rfp.endDate), [rfp.startDate, rfp.endDate]);
@@ -82,9 +91,22 @@ export const RFPCard = ({rfp, isPrivate = false}: { rfp: any; isPrivate?: boolea
                     <>
                         <div className="flex gap-2 items-center">
                             <CardTitle className="text-lg max-w-full truncate leading-normal">
+                                {isPrivate && (
+                                    <PublicPrivateButton 
+                                        isPrivate={rfp.private}
+                                        updateCallback={(isPrivate) => {
+                                            if (rfp.id) {
+                                                updateRFP(
+                                                    {...rfp, private: isPrivate},
+                                                    rfp.organizationId
+                                                )
+                                                revalidate('/app/rfps')
+                                            }
+                                        }}
+                                    />
+                                )}
                                 {rfp.title}
                             </CardTitle>
-                            {rfp.private && <PrivateBadge iconOnly/>}
                             {status && (
                                 <Badge variant={status.variant as any} className="text-sm">
                                     {status.status}

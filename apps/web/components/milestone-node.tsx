@@ -35,6 +35,7 @@ import { Separator } from "@/packages/components/ui/separator"
 import { Tooltip, TooltipContent } from "@/packages/components/ui/tooltip"
 import { TooltipTrigger } from "@/packages/components/plate-ui/tooltip"
 import { Organization } from "@prisma/client"
+import { PublicPrivateButton } from "./public-private-button"
 
 export type MilestoneNodeType = Node<
     Milestone & {
@@ -141,27 +142,35 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                 )}
                 <CardTitle className="text-gray-900">
                     {!props?.data?.isPublic && (
-                        props.data?.private ? (
-                            <Button
-                                className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-red-100 hover:bg-red-300"
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: false})
-                                }}
-                            >
-                                <Lock size={20} className="text-red-800"/>
-                            </Button>
-                        ) : (
-                            <Button
-                                className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-green-100 hover:bg-green-300"
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: true})
-                                }}
-                            >
-                                <Globe size={20} className="text-green-800"/>
-                            </Button>
-                        )
+                        <PublicPrivateButton 
+                            isPrivate={props.data?.private}
+                            updateCallback={(isPrivate) => {
+                                if (props.data?.nodeId) {
+                                    setMilestone(props.data.nodeId, {private: isPrivate})
+                                }
+                            }}
+                        />
+                        // props.data?.private ? (
+                        //     <Button
+                        //         className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-red-100 hover:bg-red-300"
+                        //         onClick={(e) => {
+                        //             e.stopPropagation()
+                        //             if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: false})
+                        //         }}
+                        //     >
+                        //         <Lock size={20} className="text-red-800"/>
+                        //     </Button>
+                        // ) : (
+                        //     <Button
+                        //         className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-green-100 hover:bg-green-300"
+                        //         onClick={(e) => {
+                        //             e.stopPropagation()
+                        //             if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: true})
+                        //         }}
+                        //     >
+                        //         <Globe size={20} className="text-green-800"/>
+                        //     </Button>
+                        // )
                     )}
                     {props.data?.title || "New Milestone"}
                 </CardTitle>

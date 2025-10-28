@@ -43,6 +43,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@comend/components/ui/alert-dialog"
+import { revalidate } from "@/packages/lib/revalidate"
 
 const editResearchPlanForm = z.object({
     title: z
@@ -282,6 +283,8 @@ export function EditResearchPlanForm({
                                                         if (researchPlanData?.id) {
                                                             setIsLoading(true)
                                                             await deleteRoadmap(session?.user.organizationId, researchPlanData)
+                                                            revalidate('/app/research-plan')
+                                                            revalidate('/app/dashboard')
                                                             // After deletion, navigate away
                                                             router.push("/app/research-plan")
                                                         }

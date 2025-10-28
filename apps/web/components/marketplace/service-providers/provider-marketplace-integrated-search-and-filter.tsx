@@ -180,10 +180,10 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                             dialogRef.current?.focus() // focus the dialog content instead
                         }}
                     >
-                        <DialogTitle>Service Provider Filters</DialogTitle>
+                        <DialogTitle>Service provider filters</DialogTitle>
                             {/* Project Types */}
                             <div>
-                                <Label>Project Types</Label>
+                                <Label>Project types</Label>
                                 <MultipleSelector
                                     value={filters.milestoneTypes}
                                     onChange={(vals) => setFilterKey("milestoneTypes", vals)}
@@ -199,7 +199,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
 
                             {/* Business Types */}
                             <div>
-                                <Label>Business Types</Label>
+                                <Label>Business types</Label>
                                 <MultipleSelector
                                     value={filters.types}
                                     onChange={(vals) => setFilterKey("types", vals)}
