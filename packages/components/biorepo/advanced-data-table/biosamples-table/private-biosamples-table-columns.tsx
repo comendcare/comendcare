@@ -423,7 +423,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({row}) => {
-                return <>{row.original.institution?.name}</>
+                return <>{row.original.institution?.name || row.original.company?.title}</>
             },
             enableHiding: true,
             enableColumnFilter: true,

@@ -2941,6 +2941,20 @@ export const createBiosample = withOrganizationAuth(
             }
 
             // console.log(`incoming data`, data)
+            const foundInstitution = data?.storageFacility?.[0].value ? (
+                await prisma.institution.findUnique({
+                    where: {
+                        id: data?.storageFacility?.[0].value
+                    }
+                })
+            ) : undefined
+            const foundCompany = data?.storageFacility?.[0].value ? (
+                await prisma.company.findUnique({
+                    where: {
+                        id: data?.storageFacility?.[0].value
+                    }
+                })
+            ) : undefined
 
             const biosampleData: any = {
                 id: data.id,
@@ -2972,7 +2986,9 @@ export const createBiosample = withOrganizationAuth(
                 priceUnit: data.priceUnit,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 variant: data.variant,
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                // institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                institution: foundInstitution || undefined,
+                company: foundCompany || undefined,
                 genotype: data.genotype,
                 notes: data.notes,
                 // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
@@ -2994,6 +3010,7 @@ export const createBiosample = withOrganizationAuth(
                     },
                     donor: true,
                     institution: true,
+                    company: true
                 },
                 data: {
                     ...biosampleData,
@@ -3032,17 +3049,25 @@ export const createBiosample = withOrganizationAuth(
                         // transform symbol to uppercase because all genes are uppercase in our database
                         ? ({gene: {connect: {symbol: biosampleData.gene.value.toUpperCase() }}})
                         : undefined),
-                    ...(biosampleData.institution
-                        ? ({
-                            institution: {
-                                connectOrCreate: {
-                                    where: {id: biosampleData.institution.value},
-                                    create: {
-                                        name: biosampleData.institution.value,
-                                    }
-                                }
-                            }
-                        })
+                    // ...(biosampleData.institution
+                    //     ? ({
+                    //         institution: {
+                    //             connectOrCreate: {
+                    //                 where: {id: biosampleData.institution.value},
+                    //                 create: {
+                    //                     name: biosampleData.institution.value,
+                    //                 }
+                    //             }
+                    //         }
+                    //     })
+                    //     : undefined),
+                    ...(biosampleData.institution 
+                        ? ({institution: {connect: {id: biosampleData.institution.id}}})
+                        // ? ({institutionId: biosampleData.institution.id})
+                        : undefined),
+                    ...(biosampleData.company 
+                        ? ({company: {connect: {id: biosampleData.company.id}}})
+                        // ? ({companyId: biosampleData.company.id})
                         : undefined),
                     donor: {
                         connectOrCreate: {
@@ -3157,6 +3182,20 @@ export const updateBiosample = withOrganizationAuth(
             });
             if (!existing) throw new Error("Biosample not found.");
 
+            const foundInstitution = await prisma.institution.findUnique({
+                where: {
+                    id: data?.storageFacility?.[0].value
+                }
+            })
+            const foundCompany = await prisma.company.findUnique({
+                where: {
+                    id: data?.storageFacility?.[0].value
+                }
+            })
+
+            console.log(`found institution`, foundInstitution)
+            console.log(`found company`, foundCompany)
+
             const biosampleData: any = {
                 id: data.id,
                 types: data.types ? data.types.map((t) => t.value) : undefined,
@@ -3187,10 +3226,12 @@ export const updateBiosample = withOrganizationAuth(
                 priceUnit: data.priceUnit,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 variant: data.variant,
-                institution:
-                    data.institutions && data.institutions.length > 0
-                        ? data.institutions[0]
-                        : undefined,
+                // institution:
+                //     data.institutions && data.institutions.length > 0
+                //         ? data.institutions[0]
+                //         : undefined,
+                institution: foundInstitution,
+                company: foundCompany,
                 genotype: data.genotype,
                 notes: data.notes,
             };
@@ -3207,6 +3248,7 @@ export const updateBiosample = withOrganizationAuth(
                     },
                     donor: true,
                     institution: true,
+                    company: true,
                 },
                 data: {
                     ...biosampleData,
@@ -3256,18 +3298,40 @@ export const updateBiosample = withOrganizationAuth(
                     ...(biosampleData.gene
                         ? {gene: {connect: {symbol: biosampleData.gene.value.toUpperCase()}}}
                         : {gene: {disconnect: true}}),
-                    ...(biosampleData.institution
+                    ...(biosampleData.institution 
                         ? {
-                            institution: {
-                                connectOrCreate: {
-                                    where: {id: biosampleData.institution.value},
-                                    create: {
-                                        name: biosampleData.institution.value
-                                    }
-                                }
-                            }
+                            institution: {connect: {id: biosampleData.institution.id}}
                         }
                         : {institution: {disconnect: true}}),
+                    ...(biosampleData.company 
+                        ? {
+                            company: {connect: {id: biosampleData.company.id}}
+                        }
+                        : {company: {disconnect: true}}),
+                    // ...(biosampleData.institution
+                    //     ? {
+                    //         institution: {
+                    //             connectOrCreate: {
+                    //                 where: {id: biosampleData.institution.value},
+                    //                 create: {
+                    //                     name: biosampleData.institution.value
+                    //                 }
+                    //             }
+                    //         }
+                    //     }
+                    //     : {institution: {disconnect: true}}),
+                    // ...(biosampleData.company
+                    //     ? {
+                    //         company: {
+                    //             connectOrCreate: {
+                    //                 where: {id: biosampleData.company.value},
+                    //                 create: {
+                    //                     name: biosampleData.company.value
+                    //                 }
+                    //             }
+                    //         }
+                    //     }
+                    //     : {company: {disconnect: true}}),
                     ...(data.donorId
                         ? {donor: {connect: {id: data.donorId}}}
                         : {donor: {disconnect: true}}),
@@ -3372,7 +3436,8 @@ export const createOrUpdateBiosample = withOrganizationAuth(
             const {
                 description,
                 types,
-                institutions,
+                // institutions,
+                storageFacility,
                 otherTypeDetails,
                 attachments,
                 isPrivate,
@@ -3409,6 +3474,17 @@ export const createOrUpdateBiosample = withOrganizationAuth(
 
             console.log(`incoming data`, data)
 
+            const foundInstitution = await prisma.institution.findUnique({
+                where: {
+                    id: data?.storageFacility?.[0].value
+                }
+            })
+            const foundCompany = await prisma.company.findUnique({
+                where: {
+                    id: data?.storageFacility?.[0].value
+                }
+            })
+
             const biosampleData: any = {
                 id: data.id,
                 types: (types || []).map(type => type.value),
@@ -3439,7 +3515,9 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                 priceUnit,
                 gene: genes && genes.length > 0 ? genes[0] : undefined,
                 variant,
-                institution: institutions && institutions.length > 0 ? institutions[0] : undefined
+                // institution: institutions && institutions.length > 0 ? institutions[0] : undefined
+                institution: foundInstitution,
+                company: foundCompany,
                 // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
                 // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
             }
@@ -3525,9 +3603,19 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                             connect: {symbol: biosampleData.gene.value.toUpperCase()}
                         }
                     }) : {gene: {disconnect: true}}),
-                    ...(biosampleData.institution ? ({
-                        institution: {connect: {id: biosampleData.institution.value}}
-                    }) : {institution: {disconnect: true}}),
+                    // ...(biosampleData.institution ? ({
+                    //     institution: {connect: {id: biosampleData.institution.value}}
+                    // }) : {institution: {disconnect: true}}),
+                    ...(biosampleData.institution 
+                        ? {
+                            institution: {connect: {id: biosampleData.institution.id}}
+                        }
+                        : {institution: {disconnect: true}}),
+                    ...(biosampleData.company 
+                        ? {
+                            company: {connect: {id: biosampleData.company.id}}
+                        }
+                        : {company: {disconnect: true}}),
                     donor: {
                         upsert: {
                             update: {
@@ -3614,9 +3702,15 @@ export const createOrUpdateBiosample = withOrganizationAuth(
                             connect: {symbol: biosampleData.gene.value.toUpperCase()}
                         }
                     }) : undefined),
+                    // ...(biosampleData.institution ? ({
+                    //     institution: {connect: {id: biosampleData.institution.value}}
+                    // }) : undefined),
                     ...(biosampleData.institution ? ({
-                        institution: {connect: {id: biosampleData.institution.value}}
-                    }) : undefined),
+                            institution: {connect: {id: biosampleData.institution.id}}
+                        }) : undefined),
+                    ...(biosampleData.company ? ({
+                            company: {connect: {id: biosampleData.company.id}}
+                        }) : undefined),
                     donor: {
                         create: {
                             ...donorData,

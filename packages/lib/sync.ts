@@ -726,6 +726,7 @@ export const syncToTypesense = async (env: {
                 availability: true,
                 quantity: true,
                 institution: true,
+                company: true,
                 description: true,
                 genotype: true,
             }

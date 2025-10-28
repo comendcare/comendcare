@@ -2733,6 +2733,7 @@ const fetchBiosamples = async (
                         include: {diagnoses: {include: {type: true}}}
                     },
                     institution: true,
+                    company: true,
                     materialAndDataAccessRequests: true
                 },
                 orderBy,
@@ -2869,6 +2870,7 @@ export const getAllBiosamples = withResearcherAuth(
                         attachments: true,
                         donor: true,
                         institution: true,
+                        company: true,
                         materialAndDataAccessRequests: true
                     },
                     orderBy,

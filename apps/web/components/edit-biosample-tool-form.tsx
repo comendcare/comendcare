@@ -93,6 +93,8 @@ export function EditBiosampleToolForm({
     const [isSaving, setIsSaving] = useState(false)
     const [storageFacilityOptions, setStorageFacilityOptions] = useState<Option[]>([])
 
+    console.log(`tool data`, toolData)
+
     const form = useForm<z.infer<typeof editBiosampleForm>>({
         mode: "onChange",
         resolver: zodResolver(editBiosampleForm),
@@ -111,20 +113,31 @@ export function EditBiosampleToolForm({
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
 
             // biosample properties
-            storageFacility: [
-                ...([
-                    toolData?.company ? ({
-                        value: toolData.company.id,
-                        label: `${toolData.company.name}`
-                    }) : undefined
-                ]),
-                ...([
-                    toolData?.institution ? ({
+            // storageFacility: [
+            //     ...([
+            //         toolData?.company ? ({
+            //             value: toolData.company.id,
+            //             label: `${toolData.company.name}`
+            //         }) : undefined
+            //     ]),
+            //     ...([
+            //         toolData?.institution ? ({
+            //             value: toolData.institution.id,
+            //             label: `${toolData.institution.name}`
+            //         }) : undefined
+            //     ])
+            // ],
+            storageFacility: (toolData?.company || toolData?.institution) ? (
+                (toolData?.company ? ([{
+                    value: toolData.company.id,
+                    label: `${toolData.company.title}`
+                } as Option]) : []).concat(
+                    toolData?.institution ? ([{
                         value: toolData.institution.id,
                         label: `${toolData.institution.name}`
-                    }) : undefined
-                ])
-            ],
+                    } as Option]) : []
+                )
+            ) : undefined,
             genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
             variant: toolData?.variant || undefined, 
             anatomicalSite: toolData?.anatomicalSite || undefined,
@@ -462,12 +475,6 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
         return companiesData.concat(institutionsData)
     }
 
-    // const handleInstitutionAsyncSearch = async (query: string): Promise<Option[]> => {
-    //     const response = await fetch(`/api/institutions?search=${query}`);
-    //     const data = await response.json();
-    //     return data;
-    // };
-
     return (
         <>
         <div className="flex-col space-y-4">
@@ -642,7 +649,7 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
 
             <FormField
                 control={form.control}
-                name="institutions"
+                name="storageFacility"
                 render={({field}) => (
                     <FormItem className={cn("w-full flex gap-4 items-center")}>
                         <FormLabel className="w-[100px]">Storage Facility</FormLabel>
@@ -654,10 +661,10 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                                     maxSelected={1}
                                     triggerSearchOnFocus={true}
                                     onSearch={handleStorageFacilityAsyncSearch}
-                                    placeholder="Search for institutions..."
+                                    placeholder="Search..."
                                     hidePlaceholderWhenSelected={true}
-                                    loadingIndicator={<p>Loading institutions...</p>}
-                                    emptyIndicator={<p>No institutions found. Try a different search.</p>}
+                                    loadingIndicator={<p>Loading results...</p>}
+                                    emptyIndicator={<p>No results found. Try a different search.</p>}
                                     showHoverCard={false}
                                     className="-mt-2 w-full min-h-[40px]"
                                 />
