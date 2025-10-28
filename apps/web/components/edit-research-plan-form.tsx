@@ -27,7 +27,6 @@ import { JsonObject } from "@prisma/client/runtime/library"
 import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import {
-    ADDITIONAL_RESEARCH_PLAN_TYPES,
     MODALITIES,
     optionSchema,
     RESEARCH_PLAN_TYPES,
@@ -199,11 +198,7 @@ export function EditResearchPlanForm({
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
-                                    defaultOptions={
-                                        MODALITIES.map((o) => ({ ...o, type: "Therapeutic approach" })).concat(
-                                            ADDITIONAL_RESEARCH_PLAN_TYPES.map((o) => ({ ...o, type: "Therapeutic agnostic" }))
-                                        )
-                                    }
+                                    defaultOptions={RESEARCH_PLAN_TYPES}
                                     placeholder="Select a type..."
                                     hidePlaceholderWhenSelected={true}
                                     emptyIndicator={
