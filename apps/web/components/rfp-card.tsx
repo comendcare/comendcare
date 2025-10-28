@@ -3,45 +3,19 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {PrivateBadge} from "~web/components/private-badge";
-import {Calendar, Clock, DollarSign, Megaphone, School, User} from "lucide-react";
+import {Calendar, Clock, DollarSign, FileText, School} from "lucide-react";
 import {PropertyBadge} from "./property-badge";
-import {cn, formatDateUTC, formatMoney} from "@comend/lib/utils";
+import {checkDateRangeUTC, formatDateUTC, formatMoney} from "@comend/lib/utils";
 import {RFPActionsMenu} from "./rfp-actions-menu";
 import {Badge} from "@/packages/components/ui/badge";
 import {Skeleton} from "@comend/components/ui/skeleton";
-
-
-type DateStatus =
-    | { status: "Not Open"; daysRemaining: number | undefined; variant: "yellow" }
-    | { status: "Open"; daysRemaining: number | undefined; variant: "green" }
-    | { status: "Closed"; daysRemaining: number | undefined; variant: "red" }
-    | undefined;
-
-function toUTCDateOnly(d: Date) {
-    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-}
-
-function checkDateRangeUTC(startDateStr?: string | Date, endDateStr?: string | Date): DateStatus {
-    if (!startDateStr && !endDateStr) return undefined;
-
-    const todayUTC = toUTCDateOnly(new Date());
-    const startRaw = startDateStr ? new Date(startDateStr) : undefined;
-    const endRaw = endDateStr ? new Date(endDateStr) : undefined;
-
-    if ((startRaw && isNaN(startRaw.getTime())) || (endRaw && isNaN(endRaw.getTime()))) return undefined;
-
-    const start = startRaw ? toUTCDateOnly(startRaw) : undefined;
-    const end = endRaw ? toUTCDateOnly(endRaw) : undefined;
-
-    if (start && todayUTC < start) return {status: "Not Open", daysRemaining: undefined, variant: "yellow"};
-    if (end && todayUTC > end) return {status: "Closed", daysRemaining: undefined, variant: "red"};
-
-    if ((!start || todayUTC >= start) && (!end || todayUTC <= end)) {
-        const daysRemaining = end ? Math.ceil((end.getTime() - todayUTC.getTime()) / 86400000) : 0;
-        return {status: "Open", daysRemaining, variant: "green"};
-    }
-    return undefined;
-}
+import { Separator } from "@/packages/components/ui/separator";
+import { ProfilePhoto } from "@/packages/components/profile-photo";
+import { Organization } from "@prisma/client";
+import { PublicPrivateButton } from "./public-private-button";
+import { RFPState, useRFPStore } from "@/state/rfp/rfpStore";
+import { useShallow } from "zustand/react/shallow";
+import { revalidate } from "@/packages/lib/revalidate";
 
 /** Header skeleton that matches the header’s layout/height to prevent reflow */
 function HeaderSkeleton() {
@@ -57,9 +31,14 @@ function HeaderSkeleton() {
     );
 }
 
-export const RFPCard = ({rfp, isPrivate = false}: { rfp: any; isPrivate?: boolean }) => {
+const rfpSelector = (state: RFPState) => ({
+    updateRFP: state.updateRFP,
+})
+
+export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rfp: any; showOrganization?: boolean; isPrivate?: boolean }) => {
     // Gate the header (and actions menu) until after hydration
     const [mounted, setMounted] = useState(false);
+    const { updateRFP } = useRFPStore(useShallow(rfpSelector))
     useEffect(() => setMounted(true), []);
 
     const status = useMemo(() => checkDateRangeUTC(rfp.startDate, rfp.endDate), [rfp.startDate, rfp.endDate]);
@@ -82,12 +61,25 @@ export const RFPCard = ({rfp, isPrivate = false}: { rfp: any; isPrivate?: boolea
                     <>
                         <div className="flex gap-2 items-center">
                             <CardTitle className="text-lg max-w-full truncate leading-normal">
+                                {isPrivate && (
+                                    <PublicPrivateButton 
+                                        isPrivate={rfp.private}
+                                        updateCallback={async (isPrivate: boolean) => {
+                                            if (rfp.id) {
+                                                await updateRFP(
+                                                    {...rfp, private: isPrivate},
+                                                    rfp.organizationId
+                                                )
+                                                await revalidate('/app/rfps')
+                                            }
+                                        }}
+                                    />
+                                )}
                                 {rfp.title}
                             </CardTitle>
-                            {rfp.private && <PrivateBadge iconOnly/>}
                             {status && (
                                 <Badge variant={status.variant as any} className="text-sm">
-                                    {status.status}
+                                    {status.label}
                                 </Badge>
                             )}
                         </div>
@@ -140,14 +132,6 @@ export const RFPCard = ({rfp, isPrivate = false}: { rfp: any; isPrivate?: boolea
                             <PropertyBadge icon={Calendar}><b>Due: </b>{formatDateUTC(rfp.endDate)}</PropertyBadge>
                         </li>
                     )}
-
-                    {/* {(rfp.contacts || []).map((contact: any, index: number) => (
-                        <li key={index}>
-                            <PropertyBadge icon={User}>
-                                <p>{contact?.name || contact?.email || contact?.affiliation}</p>
-                            </PropertyBadge>
-                        </li>
-                    ))} */}
                 </ul>
 
                 {status?.daysRemaining !== undefined && (
@@ -155,6 +139,29 @@ export const RFPCard = ({rfp, isPrivate = false}: { rfp: any; isPrivate?: boolea
                         <Clock size={18}/>
                         {`${status.daysRemaining} days remaining to submit proposals`}
                     </Badge>
+                )}
+
+                {(rfp.milestones && rfp.milestones.length > 0) && (
+                    <Badge className="font-normal w-fit" variant={"purple"}>
+                        <FileText className="h-4 w-4 min-h-4 min-w-4"/>
+                        {rfp.milestones.length <= 1 ? `${rfp.milestones.length} Linked project` : `${rfp.milestones.length} Linked projects`}
+                    </Badge>
+                )}
+
+                {showOrganization && rfp.organization && (
+                    <>
+                        <Separator />
+                        <a
+                            href={`http://${rfp.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                            onClick={(e) => e.stopPropagation()}
+                            target="_blank"
+                        >
+                            <div className="flex flex-row gap-2 items-center">
+                                <ProfilePhoto img={rfp.organization.image} name={rfp.organization.name} className="h-9 w-9 -mt-1"/>
+                                <p className="text-lg font-semibold underline">{rfp.organization.name}</p>
+                            </div>
+                        </a>
+                    </>
                 )}
 
             </CardContent>

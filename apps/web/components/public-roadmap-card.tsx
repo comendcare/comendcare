@@ -172,9 +172,11 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
     roadmaps: any[],
     rowClickCallback: (roadmap: any) => void
 }) => {
-    const router = useRouter()
-
-    console.log(`roadmaps`, roadmaps)
+    const MODALITY_OPTIONS = RESEARCH_PLAN_TYPES.map(type => type.value)
+    const otherRoadmaps = roadmaps.filter(roadmap => (
+        roadmap.modalities.filter((modality: string) => MODALITY_OPTIONS.includes(modality)).length <= 0 ||
+        roadmap.modalities.includes("OTHER").length > 0
+    ))
 
     return (
         <Table>
@@ -214,21 +216,18 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
                         </CollapsibleTableGroup>
                     )
                 })}
-                {roadmaps.filter(roadmap => (roadmap.modalities || []).length === 0 || roadmap.modalities.includes("OTHER")).length > 0 && (
+                {otherRoadmaps && otherRoadmaps.length > 0 && (
                     // group research plans with no type or 'other' type together in the table
                     <CollapsibleTableGroup
                         label={'Other'}
                         colSpan={2}
                         disabled={true}
                     >
-                        {roadmaps.filter(roadmap => (roadmap.modalities || []).length === 0 || roadmap.modalities.includes("OTHER")).map(roadmap => (
+                        {otherRoadmaps.map(roadmap => (
                             <TableRow key={roadmap.id} className="cursor-pointer"
                                       onClick={() => rowClickCallback(roadmap)}>
                                 <TableCell>
                                     <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
-                                    {/* {roadmap.description && (
-                                        <p className="line-clamp-2 text-muted-foreground">{roadmap.description}</p>
-                                    )} */}
                                 </TableCell>
                                 <TableCell className="flex justify-end items-center">
                                     <StageOfActivityBadge milestones={roadmap.milestones}/>

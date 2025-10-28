@@ -178,6 +178,7 @@ export async function getPublicRFPsForOrganization(
             },
             private: {equals: false}
         },
+        orderBy: {createdAt: 'desc'},
         select: {
             ...select,
             // filter out any private milestones if the user has requested to access milestones

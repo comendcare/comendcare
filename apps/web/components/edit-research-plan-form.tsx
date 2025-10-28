@@ -27,7 +27,6 @@ import { JsonObject } from "@prisma/client/runtime/library"
 import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import {
-    ADDITIONAL_RESEARCH_PLAN_TYPES,
     MODALITIES,
     optionSchema,
     RESEARCH_PLAN_TYPES,
@@ -43,6 +42,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@comend/components/ui/alert-dialog"
+import { revalidate } from "@/packages/lib/revalidate"
 
 const editResearchPlanForm = z.object({
     title: z
@@ -198,11 +198,7 @@ export function EditResearchPlanForm({
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
-                                    defaultOptions={
-                                        MODALITIES.map((o) => ({ ...o, type: "Therapeutic approach" })).concat(
-                                            ADDITIONAL_RESEARCH_PLAN_TYPES.map((o) => ({ ...o, type: "Therapeutic agnostic" }))
-                                        )
-                                    }
+                                    defaultOptions={RESEARCH_PLAN_TYPES}
                                     placeholder="Select a type..."
                                     hidePlaceholderWhenSelected={true}
                                     emptyIndicator={
@@ -282,6 +278,8 @@ export function EditResearchPlanForm({
                                                         if (researchPlanData?.id) {
                                                             setIsLoading(true)
                                                             await deleteRoadmap(session?.user.organizationId, researchPlanData)
+                                                            revalidate('/app/research-plan')
+                                                            revalidate('/app/dashboard')
                                                             // After deletion, navigate away
                                                             router.push("/app/research-plan")
                                                         }

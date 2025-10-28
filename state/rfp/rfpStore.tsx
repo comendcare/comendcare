@@ -39,6 +39,7 @@ export const useRFPStore = create<RFPState>()(
                 
                 // new RFP first, because RFPs are displayed in decending order by creation date
                 set({ rfps: [newRfp, ...get().rfps]})
+                console.log(`successfully created RFP`)
                 return newRfp
             },
             updateRFP: async (rfp: Partial<RFP>, orgId: string) => {
@@ -58,6 +59,7 @@ export const useRFPStore = create<RFPState>()(
                 })
 
                 set({ rfps: get().rfps.map(rfp => rfp.id === updatedRfp.id ? updatedRfp : rfp) })
+                console.log(`successfully updated RFP`)
                 return updatedRfp
             },
             deleteRFP: async (rfpId: string, orgId: string) => {
@@ -77,17 +79,18 @@ export const useRFPStore = create<RFPState>()(
                 })
 
                 set({ rfps: get().rfps.filter(rfp => rfp.id !== deletedRfp.id) })
+                console.log(`successfully deleted RFP`)
             },
             saveState: (orgId: string | null | undefined) => {
-                console.log(`save state`)
+                // console.log(`save state`)
                 syncDBRFPs(orgId, { rfps: get().rfps })
             }
         }),
         {
             limit: 1, // limit the stored history states to 1 since we're only using this for the undo button right now
-            onSave: (pastState, currentState) => {
-                console.log(`Saved rfps state: `, currentState)
-                return
-            },
+            // onSave: (pastState, currentState) => {
+            //     console.log(`Saved rfps state: `, currentState)
+            //     return
+            // },
         })
     )

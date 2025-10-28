@@ -18,7 +18,12 @@ import Link from "next/link"
 import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
 import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card"
-import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeDiseaseModelSearch, initializeOrganizationSearch } from "@/packages/lib/initialize-client-state"
+import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeRFPSearch } from "@/packages/lib/initialize-client-state"
+import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
+import { RFPCard } from "~web/components/rfp-card"
+import { mixpanelTrack } from "@/packages/lib/mixpanel"
+import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/dialog"
+import { RFPDetails } from "~web/components/pag-profile-rfps-card"
 
 const organizationSelector = (state: OrganizationSearchState) => ({
     featuredOrgs: state.featuredOrgs,
@@ -44,12 +49,20 @@ const clinicalDatsetSelector = (state: ClinicalDatasetSearchState) => ({
     searchResults: state.searchResults,
 })
 
+const rfpSelector = (state: RFPSearchState) => ({
+    initialized: state.initialized,
+    setSearchTerm: state.setSearchTerm,
+    searchResults: state.searchResults,
+})
+
 export default function MarketplacePage() {
     // const {data: session, status} = useSession()
     const organizationStore = useOrganizationSearchStore(useShallow(organizationSelector))
     const biosampleStore = useBiosampleSearchStore(useShallow(biosampleSelector))
     const diseaseModelStore = useDiseaseModelSearchStore(useShallow(diseaseModelSelector))
     const clinicalDatasetStore = useClinicalDatasetSearchStore(useShallow(clinicalDatsetSelector))
+    const rfpStore = useRFPSearchStore(useShallow(rfpSelector))
+
     const biosampleColumns = useBiosamplesTableColumns(
         false, // disable sorting
         false, // disable hiding
@@ -66,6 +79,8 @@ export default function MarketplacePage() {
     const [biosamplesInitialized, setBiosamplesInitialized] = useState(false)
     const [diseaseModelsInitialized, setDiseaseModelsInitialized] = useState(false)
     const [clinicalDatasetsInitialized, setClinicalDatasetsInitialized] = useState(false)
+    const [rfpsInitialized, setRfpsInitialized] = useState(false)
+    const [width, setWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 0)
 
     useEffect(() => {
         const init = async () => {
@@ -110,6 +125,17 @@ export default function MarketplacePage() {
             await initializeClinicalDatasetSearch(parsedClinicalDatasetFilters)
             setClinicalDatasetsInitialized(true)
             console.log(`Clinical Dataset search initialized...`)
+
+            const parsedRFPFilters = {
+                conditions: [],
+                genes: [],
+                openTo: [],
+                status: [],
+                organizations: []
+            }
+            initializeRFPSearch(parsedRFPFilters)
+            setRfpsInitialized(true)
+            console.log(`RFP search initialized...`)
         }
 
         init()
@@ -117,12 +143,23 @@ export default function MarketplacePage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    useEffect(() => {
+        function handleResize() {
+            setWidth(window.innerWidth)
+        }
+
+        window.addEventListener('resize', handleResize)
+        handleResize() // Set initial width on mount
+
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
+
     return (
         <div className="flex flex-col w-full h-full mx-auto gap-8">
             <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Patient Groups</h2>
+                        <h2 className="text-2xl semibold">Patient groups</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/marketplace/patient-groups"}
@@ -136,14 +173,16 @@ export default function MarketplacePage() {
                         {(pagsInitialized && ([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0))
                             ? (
                                 <>
-                                    {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].slice(0, 3).map((organization, index) => (
-                                        <OrganizationMarketplaceCard
-                                            organization={organization}
-                                            key={index}
-                                            isPublic={false}
-                                            // savedOrganizationIds={savedOrganizationIds}
-                                            savedOrganizationIds={new Set()}
-                                        />
+                                    {[...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])]
+                                        .slice(0, width < 1280 ? 2 : 3)
+                                        .map((organization, index) => (
+                                            <OrganizationMarketplaceCard
+                                                organization={organization}
+                                                key={index}
+                                                isPublic={false}
+                                                // savedOrganizationIds={savedOrganizationIds}
+                                                savedOrganizationIds={new Set()}
+                                            />
                                     ))}
                                 </>
                             )
@@ -151,7 +190,7 @@ export default function MarketplacePage() {
                                 <>
                                     <Skeleton className="h-[286px] w-full"/>
                                     <Skeleton className="h-[286px] w-full"/>
-                                    <Skeleton className="h-[286px] w-full"/>
+                                    {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
                                 </>
                             )
                         }
@@ -160,12 +199,12 @@ export default function MarketplacePage() {
         
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Biosamples</h2>
+                        <h2 className="text-2xl semibold">Patient biosamples</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/marketplace/biosamples"}
                             >
-                                Browse all biosamples
+                                Browse all patient biosamples
                                 <ArrowRight />
                             </Link>
                         </Button>
@@ -190,7 +229,7 @@ export default function MarketplacePage() {
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
-                                                <CardTitle>Add biosamples in the toolkit!</CardTitle>
+                                                <CardTitle>Add patient biosamples in the toolkit!</CardTitle>
                                                 {/* <CardDescription>Add biosamples in the toolkit tab, and mark them as published to view them in the marketplace.</CardDescription> */}
                                                 <Button
                                                     className="w-fit"
@@ -217,7 +256,7 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Disease Models</h2>
+                        <h2 className="text-2xl semibold">Disease models</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/marketplace/disease-models"}
@@ -268,7 +307,7 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Clinical Datasets</h2>
+                        <h2 className="text-2xl semibold">Clinical datasets</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/marketplace/clinical-datasets"}
@@ -312,6 +351,62 @@ export default function MarketplacePage() {
                                             <Skeleton className="h-[286px] w-full"/>
                                         </>
                                     )
+                            )
+                        }
+                    </ol>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center gap-4">
+                        <h2 className="text-2xl semibold">Requests for proposals</h2>
+                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                            <Link
+                                href={"/app/marketplace/rfps"}
+                            >
+                                Browse all requests for proposals
+                                <ArrowRight />
+                            </Link>
+                        </Button>
+                    </div>
+                    <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {(rfpsInitialized && rfpStore.searchResults && rfpStore.searchResults.length > 0 )
+                            ? (
+                                <>
+                                    {rfpStore.searchResults?.slice(0, 3).map((rfp, index) => (
+                                        <Dialog>
+                                            <DialogTrigger
+                                                className="w-full max-w-full h-full"
+                                                onClick={() => {
+                                                    mixpanelTrack("RFP Details Viewed", {
+                                                        "ID": rfp.id,
+                                                        "Name": rfp.title,
+                                                        "Budget": rfp.budget,
+                                                        "Linked Projects": rfp.milestones.map(({milestone}: any) => milestone),
+                                                        // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                                                        // we flatten them into a single list that can be parsed
+                                                        "Linked Project Types": rfp.milestones.flatMap(({milestone}: any) =>
+                                                            (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                                                        ),
+                                                        "Location": "marketplace explore"
+                                                    })
+                                                }}
+                                                data-testid="rfp-card-trigger"
+                                            >
+                                                <RFPCard rfp={rfp} showOrganization={true}/>
+                                            </DialogTrigger>
+                                            <DialogContent className="overflow-hidden" data-testid="dialog">
+                                                <RFPDetails rfp={rfp}/>
+                                            </DialogContent>
+                                        </Dialog>
+                                    ))}
+                                </>
+                            )
+                            : (
+                                <>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                </>
                             )
                         }
                     </ol>

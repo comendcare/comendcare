@@ -28,7 +28,7 @@ import {AssetDetails, RFPDetails} from "./pag-profile-rfps-card"
 import {TypeBadge} from "./type-badge"
 import {Separator} from "@comend/components/ui/separator"
 import {Badge, badgeVariants} from "@comend/components/ui/badge"
-import {cn, formatMoney, truncate} from "@comend/lib/utils"
+import {cn, formatMoney, RFPSort, truncate} from "@comend/lib/utils"
 
 export function MilestoneDetails({milestone}: { milestone: any }) {
     const nodeType =

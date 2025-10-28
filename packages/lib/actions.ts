@@ -3819,6 +3819,8 @@ export const createOrUpdateRFP = withOrganizationAuth(
             const wasPrivate = existing?.private ?? undefined;
             const wasEndDate = existing?.endDate ?? undefined;
 
+            console.log(`rfp data`, rfpData)
+
             const response = await prisma.rFP.upsert({
                 where: {
                     id: rfpData.id || nanoid(),
@@ -3839,6 +3841,9 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     headerImage: rfpData.headerImage,
                     title: rfpData.title,
                     description: rfpData.description,
+                    eligibility: rfpData.eligibility,
+                    instructions: rfpData.instructions,
+                    evaluationProcess: rfpData.evaluationProcess,
                     attachments: {
                         deleteMany: {}, // clear all existing attachments
                         createMany: {
@@ -3870,12 +3875,16 @@ export const createOrUpdateRFP = withOrganizationAuth(
                         })),
                     },
                     budget: rfpData.budget,
+                    notes: rfpData.notes,
                 },
                 create: {
                     ...(rfpData.id ? {id: rfpData.id} : undefined),
                     headerImage: rfpData.headerImage,
                     title: rfpData.title || "",
                     description: rfpData.description,
+                    eligibility: rfpData.eligibility,
+                    instructions: rfpData.instructions,
+                    evaluationProcess: rfpData.evaluationProcess,
                     attachments: {
                         createMany: {
                             data: (rfpData?.attachments || []).map((attachment: any) => ({
@@ -3905,6 +3914,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     },
                     organization: {connect: {id: organization.id}},
                     budget: rfpData.budget,
+                    notes: rfpData.notes,
                 },
             });
 
