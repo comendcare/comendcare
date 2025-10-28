@@ -67,7 +67,7 @@ export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rf
                                         updateCallback={async (isPrivate: boolean) => {
                                             if (rfp.id) {
                                                 await updateRFP(
-                                                    {id: rfp.id, private: isPrivate},
+                                                    {...rfp, private: isPrivate},
                                                     rfp.organizationId
                                                 )
                                                 await revalidate('/app/rfps')
