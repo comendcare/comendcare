@@ -76,9 +76,9 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: CompanyWithRevi
                 label: tag,
                 value: tag
             })) || [],
-            services: cro.services.map((tag: any) => ({
-                label: tag,
-                value: tag
+            services: (cro.services ?? []).map((s: { id: string; name: string }) => ({
+                label: s.name,
+                value: s.id,
             })) || [],
         },
     });
@@ -111,23 +111,17 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: CompanyWithRevi
         formData.set("type", values.type || "");
 
         const mappedData: Record<string, any> = {
-            certifications: values.certifications?.map((item) => item.label) || [],
-            tags: values.tags?.map((item) => item.label) || [],
+            certifications: values.certifications?.map(i => i.label) || [],
+            tags: values.tags?.map(i => i.label) || [],
+            // ✅ send the selected service IDs (or names, depending on your API)
+            services: values.services?.map(i => i.value) || [],
         };
 
-        // Add mapped data to FormData
         Object.entries(mappedData).forEach(([key, value]) => {
-            if (value !== undefined && value !== null) {
-                if (Array.isArray(value)) {
-                    formData.append(key, JSON.stringify(value));
-                } else {
-                    formData.append(key, value.toString());
-                }
-            }
+            formData.append(key, Array.isArray(value) ? JSON.stringify(value) : String(value));
         });
 
         const response = await updateCompany(cro.id, formData);
-
         if (response.success) {
             toast.success("Company updated successfully");
             router.refresh();
@@ -198,6 +192,7 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: CompanyWithRevi
                                 </FormItem>
                             )}
                         />
+
                         <FormField
                             control={form.control}
                             name="website"
