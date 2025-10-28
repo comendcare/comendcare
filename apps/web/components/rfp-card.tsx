@@ -64,13 +64,13 @@ export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rf
                                 {isPrivate && (
                                     <PublicPrivateButton 
                                         isPrivate={rfp.private}
-                                        updateCallback={(isPrivate) => {
+                                        updateCallback={async (isPrivate: boolean) => {
                                             if (rfp.id) {
-                                                updateRFP(
-                                                    {...rfp, private: isPrivate},
+                                                await updateRFP(
+                                                    {id: rfp.id, private: isPrivate},
                                                     rfp.organizationId
                                                 )
-                                                revalidate('/app/rfps')
+                                                await revalidate('/app/rfps')
                                             }
                                         }}
                                     />
