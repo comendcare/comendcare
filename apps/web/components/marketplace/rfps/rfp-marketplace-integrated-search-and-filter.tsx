@@ -7,7 +7,7 @@ import {Button} from "@comend/components/ui/button"
 import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"
 import {Separator} from "@comend/components/ui/separator"
-import {debounce} from "lodash";
+import {debounce, filter} from "lodash";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/packages/components/ui/dialog";
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
 import MultipleSelector from "@/packages/components/ui/multiple-selector"
@@ -59,7 +59,8 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
     const activeCount =
         (filters.conditions?.length || 0) +
         (filters.genes?.length || 0) + 
-        (filters.organizations?.length || 0)
+        (filters.openTo?.length || 0) +
+        (filters.status?.length || 0)
 
     const handleAsyncGeneSearch = async (query: string): Promise<Option[]> => {
         if (!query) return []; // Return empty if no input
@@ -185,7 +186,7 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
                             <div>
                                 <Label>Open to</Label>
                                 <MultipleSelector
-                                    value={filters.genes ?? []}
+                                    value={filters.openTo ?? []}
                                     onChange={(vals) => setFilterKey("openTo", vals)}
                                     defaultOptions={RFP_OPEN_TO_TYPE_OPTIONS}
                                     placeholder="Select option..."
@@ -202,7 +203,7 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
                             <div>
                                 <Label>Status</Label>
                                 <MultipleSelector
-                                    value={filters.genes ?? []}
+                                    value={filters.status ?? []}
                                     onChange={(vals) => setFilterKey("status", vals)}
                                     defaultOptions={RFP_STATUS_TYPE_OPTIONS}
                                     placeholder="Select status..."
@@ -250,12 +251,23 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
                             </Badge>
                         ))}
 
-                        {/* organizations */}
-                        {(filters.organizations || []).map((item) => (
-                            <Badge key={`organizations-${item.value}`} variant="secondary" className="text-xs">
+                        {(filters.openTo || []).map((item) => (
+                            <Badge key={`openTo-${item.value}`} variant="secondary" className="text-xs">
                                 {item.label}
                                 <button
-                                    onClick={() => removeFilterItem("organizations", item.value)}
+                                    onClick={() => removeFilterItem("openTo", item.value)}
+                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+
+                        {(filters.status || []).map((item) => (
+                            <Badge key={`status-${item.value}`} variant="secondary" className="text-xs">
+                                {item.label}
+                                <button
+                                    onClick={() => removeFilterItem("status", item.value)}
                                     className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
                                 >
                                     <X className="h-3 w-3" />

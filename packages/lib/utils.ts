@@ -21,7 +21,7 @@ import type { RFP } from "@prisma/client";
 
 const STATUS_PRIORITY = {
   'OPEN': 1,
-  'NOTOPEN': 2,
+  'COMINGSOON': 2,
   'CLOSED': 3,
 }
 
@@ -40,7 +40,7 @@ export function getSortRank(rfp: RFP) {
         return base
     }
 
-    if (status.status === 'NOTOPEN' && rfp.startDate) {
+    if (status.status === 'COMINGSOON' && rfp.startDate) {
         // ascending by start_date
         return base + rfp.startDate.getTime()
     }
@@ -54,7 +54,7 @@ export function getSortRank(rfp: RFP) {
 }
 
 type DateStatus =
-    | { status: "NOTOPEN"; label: "Not Open"; daysRemaining: number | undefined; variant: "yellow" }
+    | { status: "COMINGSOON"; label: "Coming soon"; daysRemaining: number | undefined; variant: "yellow" }
     | { status: "OPEN"; label: "Open"; daysRemaining: number | undefined; variant: "green" }
     | { status: "CLOSED"; label: "Closed"; daysRemaining: number | undefined; variant: "red" }
     | undefined;
@@ -75,7 +75,7 @@ export function checkDateRangeUTC(startDateStr?: string | Date, endDateStr?: str
     const start = startRaw ? toUTCDateOnly(startRaw) : undefined;
     const end = endRaw ? toUTCDateOnly(endRaw) : undefined;
 
-    if (start && todayUTC < start) return {status: "NOTOPEN", label: "Not Open", daysRemaining: undefined, variant: "yellow"};
+    if (start && todayUTC < start) return {status: "COMINGSOON", label: "Coming soon", daysRemaining: undefined, variant: "yellow"};
     if (end && todayUTC > end) return {status: "CLOSED", label: "Closed", daysRemaining: undefined, variant: "red"};
 
     if ((!start || todayUTC >= start) && (!end || todayUTC <= end)) {

@@ -159,7 +159,7 @@ export default function MarketplacePage() {
             <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Patient Groups</h2>
+                        <h2 className="text-2xl semibold">Patient groups</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/marketplace/patient-groups"}
@@ -256,7 +256,7 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Disease Models</h2>
+                        <h2 className="text-2xl semibold">Disease models</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/marketplace/disease-models"}
@@ -307,7 +307,7 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Clinical Datasets</h2>
+                        <h2 className="text-2xl semibold">Clinical datasets</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/marketplace/clinical-datasets"}
@@ -358,7 +358,7 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Requests for Proposals</h2>
+                        <h2 className="text-2xl semibold">Requests for proposals</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/rfps"}
