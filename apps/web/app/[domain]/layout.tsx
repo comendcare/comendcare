@@ -4,7 +4,7 @@ import {getOrganizationData} from "@comend/lib/fetchers"
 import {Metadata} from "next"
 import PublicPageFooter from "~web/components/public-page-footer"
 import {TooltipProvider} from "@radix-ui/react-tooltip"
-import {PublicPageNavbar} from "~web/components/public-page-navbar";
+import {PublicPageNavbarLoginOnly} from "~web/components/public-page-navbar-login-only";
 
 export async function generateMetadata({
                                            params
@@ -191,6 +191,7 @@ export default async function SiteLayout({
     return (
         <div>
             <TooltipProvider>
+                <PublicPageNavbarLoginOnly/>
                 <div>
                     {children}
                 </div>
