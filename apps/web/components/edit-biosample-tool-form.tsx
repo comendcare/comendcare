@@ -20,7 +20,10 @@ import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
     DialogClose,
+    DialogContent,
     DialogFooter,
+    DialogHeader,
+    DialogTrigger,
 } from "@comend/components/ui/dialog"
 import { BIOSAMPLE_TYPE_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS } from "@comend/lib/types"
 import type {Prisma} from "@prisma/client"
@@ -32,7 +35,7 @@ import { Plus, Trash, Info, Lock } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import ProjectMultipleSelector from "./project-multiple-selector"
 // import { DeleteAssetDialog } from "./delete-tool-dialog"
-import MultipleSelector from "@comend/components/ui/multiple-selector"
+import MultipleSelector, { GroupOption, isOptionsExist } from "@comend/components/ui/multiple-selector"
 import { editBiosampleForm, Option } from "@comend/lib/types"
 import { useRouter } from "next/navigation"
 import { revalidate } from "@comend/lib/revalidate"
@@ -45,6 +48,9 @@ import { cn } from "@/packages/lib/utils"
 import { Label } from "@/packages/components/ui/label"
 import { Switch } from "@/packages/components/ui/switch"
 import LoadingDots from "@/packages/components/icons/loading-dots"
+import { CommandItem } from "@/packages/components/ui/command"
+import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog"
+import { Badge } from "@/packages/components/ui/badge"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -78,6 +84,78 @@ const PRICE_OPTIONS: Option[] = [
     }
 ]
 
+const CreateBiosampleDialog = ({
+    options, 
+    selected, 
+    inputValue,
+    onSearch,
+    debouncedSearchTerm,
+    isLoading,
+    maxSelected,
+    onMaxSelected,
+    setInputValue,
+    onClickCallback
+} : {
+    options: GroupOption, 
+    selected: Option[], 
+    inputValue: string,
+    onSearch?: (value: string) => Promise<Option[]>,
+    debouncedSearchTerm: string,
+    isLoading: boolean,
+    maxSelected: number,
+    onMaxSelected: ((maxLimit: number) => void) | undefined,
+    setInputValue: (value: React.SetStateAction<string>) => void,
+    onClickCallback?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => any
+}) => {
+    if (
+        isOptionsExist(options, [{value: inputValue, label: inputValue}]) ||
+        selected.find((s) => s.value === inputValue)
+    ) {
+        return undefined;
+    }
+
+    const Item = (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button
+                    value={undefined}
+                    variant={'ghost'}
+                    className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                    onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }}
+                    onClick={(e) => {
+                        setInputValue("")
+                        onClickCallback && onClickCallback(e)
+                    }}
+                >
+                    {`Submit creation request for "${inputValue}"`}
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Submit creation request</DialogTitle>
+                    <DialogDescription>This request will be sent to the Comend team. We will review it and link the storage facility to your biosample when we've created it in our database.</DialogDescription>
+                </DialogHeader>
+                <Button variant={'secondary'}>Create</Button>
+            </DialogContent>
+        </Dialog>
+    );
+
+    // For normal creatable
+    if (!onSearch && inputValue.length > 0) {
+        return Item;
+    }
+
+    // For async search creatable. avoid showing creatable item before loading at first.
+    if (onSearch && debouncedSearchTerm.length > 0 && !isLoading) {
+        return Item;
+    }
+
+    return undefined;
+}
+
 export function EditBiosampleToolForm({
     toolData,
     closeDialog
@@ -91,9 +169,6 @@ export function EditBiosampleToolForm({
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
-    const [storageFacilityOptions, setStorageFacilityOptions] = useState<Option[]>([])
-
-    console.log(`tool data`, toolData)
 
     const form = useForm<z.infer<typeof editBiosampleForm>>({
         mode: "onChange",
@@ -405,6 +480,8 @@ export function EditBiosampleToolForm({
 }
 
 export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData: any}) => {
+    const [createRequests, setCreateRequests] = useState<string[]>([])
+
     const handleGeneAsyncSearch = async (query: string) => {
         const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
         const genes = await res.json();
@@ -604,6 +681,17 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                                 <MultipleSelector
                                     {...field}
                                     creatable={true}
+                                    createOnBlur={false}
+                                    creatableItemOverride={(props) => (
+                                        <CreateBiosampleDialog 
+                                            {...props}
+                                            onClickCallback={(e) => {
+                                                e.preventDefault()
+                                                e.stopPropagation()
+                                                setCreateRequests(prev => [...prev, props.inputValue])
+                                            }}
+                                        />
+                                    )}
                                     maxSelected={1}
                                     triggerSearchOnFocus={true}
                                     onSearch={handleStorageFacilityAsyncSearch}
@@ -620,6 +708,12 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                     </FormItem>
                 )}
             />
+
+            <div className="flex flex-col gap-2">
+                {createRequests.map((request, index) => (
+                    <Badge className="w-full text-sm font-normal" key={index}>{`Creation request for "${request}" submitted.`}</Badge>
+                ))}
+            </div>
 
             <ContactsFormField form={form} />
             <AttachmentsFormField form={form} />
