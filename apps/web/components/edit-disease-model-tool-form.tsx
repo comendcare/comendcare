@@ -23,24 +23,26 @@ import {
     DialogFooter,
 } from "@comend/components/ui/dialog"
 import { DISEASE_MODEL_TYPE_OPTIONS, editDiseaseModelForm } from "@comend/lib/types"
-import type {Prisma} from "@prisma/client"
+import type {CreateFacilityRequest, Prisma} from "@prisma/client"
 import { getDonorData, getOrganizationFromOrganizationId } from "@comend/lib/fetchers"
 import { useSession } from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
 import { Info, Lock } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
-import MultipleSelector from "@comend/components/ui/multiple-selector"
+import MultipleSelector, { MultipleSelectorRef } from "@comend/components/ui/multiple-selector"
 import { Option } from "@comend/lib/types"
 import { useRouter } from "next/navigation"
 import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@/packages/components/ui/separator"
 import { mixpanelTrack } from "@/packages/lib/mixpanel"
-import { createDiseaseModel, updateDiseaseModel } from "@/packages/lib/actions"
+import { createCreateFacilityRequest, createDiseaseModel, updateCreateFacilityRequest, updateDiseaseModel } from "@/packages/lib/actions"
 import { cn } from "@/packages/lib/utils"
 import LoadingDots from "@/packages/components/icons/loading-dots"
 import ProjectMultipleSelector from "./project-multiple-selector"
 import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog"
+import { SubmitCreateRequest } from "./create-facility-request-button"
+import { Badge } from "@/packages/components/ui/badge"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -57,6 +59,8 @@ export function EditDiseaseModelToolForm({
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
+    const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(toolData.createFacilityRequests || [])
+    const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
 
     const form = useForm<z.infer<typeof editDiseaseModelForm>>({
         mode: "onChange",
@@ -103,7 +107,7 @@ export function EditDiseaseModelToolForm({
         milestones: form.watch("milestones"),
     }
 
-    const handleFormSubmit = async (values: z.infer<typeof editDiseaseModelForm>) => {
+    const handleFormSubmit = async (values: z.infer<typeof editDiseaseModelForm>, createFacilityRequests: CreateFacilityRequest[]) => {
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(
@@ -136,6 +140,22 @@ export function EditDiseaseModelToolForm({
                 )
             } else {
                 const newAsset = await createDiseaseModel(session.user.organizationId, values)
+                for (let i = 0; i < createFacilityRequests.length; i++) {
+                    console.log(`update`,                         {
+                            id: createFacilityRequests[i].id,
+                            name: createFacilityRequests[i].name,
+                            biosampleId: newAsset.id
+                        })
+                    const updatedRequest = await updateCreateFacilityRequest(
+                        session?.user?.organizationId,
+                        {
+                            id: createFacilityRequests[i].id,
+                            name: createFacilityRequests[i].name,
+                            biosampleId: newAsset.id
+                        }
+                    )
+                    console.log(`updated request`, updatedRequest)
+                }
                 await revalidate("/app/tools/disease-model")
                 router.refresh()
 
@@ -249,7 +269,7 @@ export function EditDiseaseModelToolForm({
             <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
                 <ScrollBar />
                 <form
-                    onSubmit={form.handleSubmit(handleFormSubmit)}
+                    // onSubmit={form.handleSubmit(handleFormSubmit)}
                     className="space-y-6 m-1 pb-12"
                 >
                     <FormItem className="flex gap-2 items-center">
@@ -467,7 +487,27 @@ export function EditDiseaseModelToolForm({
                                     <FormControl className="w-full">
                                         <MultipleSelector
                                             {...field}
+                                            ref={storageFacilityRef}
                                             creatable={true}
+                                            createOnBlur={false}
+                                            creatableItemOverride={(props) => (
+                                                <SubmitCreateRequest
+                                                    {...props}
+                                                    parentRef={storageFacilityRef}
+                                                    onClickCallback={async (e) => {
+                                                        e.preventDefault()
+                                                        e.stopPropagation()
+                                                        const newRequest = await createCreateFacilityRequest(
+                                                            session?.user.organizationId,
+                                                            {
+                                                                name: props.inputValue,
+                                                                diseaseModelId: toolData.id
+                                                            }
+                                                        )
+                                                        setCreateRequests(prev => [...prev, newRequest])
+                                                    }}
+                                                />
+                                            )}
                                             maxSelected={1}
                                             triggerSearchOnFocus={true}
                                             onSearch={handleStorageFacilityAsyncSearch}
@@ -484,6 +524,12 @@ export function EditDiseaseModelToolForm({
                             </FormItem>
                         )}
                     />
+
+                    <div className="flex flex-col gap-2">
+                        {createRequests.map((request, index) => (
+                            <Badge className="w-full text-sm font-normal" key={index}>{`Creation request for "${request?.name}" submitted.`}</Badge>
+                        ))}
+                    </div>
 
                     <ContactsFormField form={form} />
                     <AttachmentsFormField form={form} />
@@ -576,7 +622,7 @@ export function EditDiseaseModelToolForm({
                         variant={"cta"}
                         onClick={(e) => {
                             e.preventDefault()
-                            handleFormSubmit(form.getValues())
+                            handleFormSubmit(form.getValues(), createRequests)
                         }}
                     >
                         {isSaving 

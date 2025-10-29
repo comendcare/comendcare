@@ -2503,6 +2503,7 @@ const fetchDiseaseModels = async (
                     institution: true,
                     company: true,
                     milestones: {include: {milestone: true}},
+                    createFacilityRequests: true,
                 },
                 orderBy,
             }),
