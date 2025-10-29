@@ -781,6 +781,7 @@ const syncToTypesense = async (env: {
                 gene: true,
                 types: true,
                 cohortSize: true,
+                createFacilityRequests: true,
             }
         })
         const rfps = await prisma.rFP.findMany({

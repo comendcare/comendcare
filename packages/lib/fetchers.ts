@@ -3088,6 +3088,7 @@ const fetchClinicalDatsets = async (
                     institution: true,
                     company: true,
                     gene: true,
+                    createFacilityRequests: true,
                 },
                 orderBy,
             }),
