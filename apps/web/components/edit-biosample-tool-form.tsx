@@ -238,12 +238,7 @@ export function EditBiosampleToolForm({
             } else {
                 const newAsset = await createBiosample(session.user.organizationId, values)
                 for (let i = 0; i < createFacilityRequests.length; i++) {
-                    console.log(`update`,                         {
-                            id: createFacilityRequests[i].id,
-                            name: createFacilityRequests[i].name,
-                            biosampleId: newAsset.id
-                        })
-                    const updatedRequest = await updateCreateFacilityRequest(
+                    await updateCreateFacilityRequest(
                         session?.user?.organizationId,
                         {
                             id: createFacilityRequests[i].id,
@@ -251,7 +246,6 @@ export function EditBiosampleToolForm({
                             biosampleId: newAsset.id
                         }
                     )
-                    console.log(`updated request`, updatedRequest)
                 }
                 await revalidate("/app/tools/biosample")
                 router.refresh()

@@ -28,7 +28,7 @@ import {
     DialogTrigger
 } from "@comend/components/ui/dialog"
 import {Asset, optionSchema, TOOL_TYPE_OPTIONS} from "@comend/lib/types"
-import {MilestoneType, Prisma} from "@prisma/client"
+import {CreateFacilityRequest, MilestoneType, Prisma} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
@@ -39,17 +39,18 @@ import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useShallow } from "zustand/react/shallow"
 import ProjectMultipleSelector from "./project-multiple-selector"
 import { DeleteAssetDialog } from "./delete-asset-dialog"
-import { badgeVariants } from "@comend/components/ui/badge"
-import MultipleSelector from "@comend/components/ui/multiple-selector"
+import { Badge, badgeVariants } from "@comend/components/ui/badge"
+import MultipleSelector, { MultipleSelectorRef } from "@comend/components/ui/multiple-selector"
 import { JsonObject } from "@prisma/client/runtime/library"
 import { editDataToolForm, Option } from "@comend/lib/types"
 import { revalidate } from "@/packages/lib/revalidate"
 import { useRouter } from "next/navigation"
-import { createClinicalDataset, updateClinicalDataset } from "@/packages/lib/actions"
+import { createClinicalDataset, createCreateFacilityRequest, updateClinicalDataset, updateCreateFacilityRequest } from "@/packages/lib/actions"
 import { Separator } from "@/packages/components/ui/separator"
 import { cn } from "@/packages/lib/utils"
 import LoadingDots from "@/packages/components/icons/loading-dots"
 import { mixpanelTrack } from "@/packages/lib/mixpanel"
+import { SubmitCreateRequest } from "./create-facility-request-button"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -66,6 +67,8 @@ export function EditClincalDatasetForm({
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
+    const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(toolData.createFacilityRequests || [])
+    const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
 
     const form = useForm<z.infer<typeof editDataToolForm>>({
         mode: "onChange",
@@ -113,7 +116,7 @@ export function EditClincalDatasetForm({
         milestones: form.watch("milestones")
     }
 
-    const handleFormSubmit = async (values: z.infer<typeof editDataToolForm>) => {
+    const handleFormSubmit = async (values: z.infer<typeof editDataToolForm>, createFacilityRequests: CreateFacilityRequest[]) => {
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(
@@ -149,6 +152,16 @@ export function EditClincalDatasetForm({
             } else {
                 // const newTool = await createTool(updateData, session.user.organizationId)
                 const newTool = await createClinicalDataset(session.user.organizationId, values)
+                for (let i = 0; i < createFacilityRequests.length; i++) {
+                    await updateCreateFacilityRequest(
+                        session?.user?.organizationId,
+                        {
+                            id: createFacilityRequests[i].id,
+                            name: createFacilityRequests[i].name,
+                            clinicalDatasetId: newTool.id
+                        }
+                    )
+                }
                 await revalidate('/app/tools/data')
                 router.refresh() // call refresh to update UI after revalidatePath() call marks cache as stale
                 
@@ -272,7 +285,7 @@ export function EditClincalDatasetForm({
             <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
                 <ScrollBar />
                 <form
-                    onSubmit={form.handleSubmit(handleFormSubmit)}
+                    // onSubmit={form.handleSubmit(handleFormSubmit)}
                     className="space-y-6 m-1 pb-12"
                 >
                     <FormItem className="flex gap-2 items-center">
@@ -441,7 +454,27 @@ export function EditClincalDatasetForm({
                                     <FormControl className="w-full">
                                         <MultipleSelector
                                             {...field}
+                                            ref={storageFacilityRef}
                                             creatable={true}
+                                            createOnBlur={false}
+                                            creatableItemOverride={(props) => (
+                                                <SubmitCreateRequest
+                                                    {...props}
+                                                    parentRef={storageFacilityRef}
+                                                    onClickCallback={async (e) => {
+                                                        e.preventDefault()
+                                                        e.stopPropagation()
+                                                        const newRequest = await createCreateFacilityRequest(
+                                                            session?.user.organizationId,
+                                                            {
+                                                                name: props.inputValue,
+                                                                clinicalDatasetId: toolData.id
+                                                            }
+                                                        )
+                                                        setCreateRequests(prev => [...prev, newRequest])
+                                                    }}
+                                                />
+                                            )}
                                             maxSelected={1}
                                             triggerSearchOnFocus={true}
                                             onSearch={handleStorageFacilityAsyncSearch}
@@ -458,6 +491,12 @@ export function EditClincalDatasetForm({
                             </FormItem>
                         )}
                     />
+
+                    <div className="flex flex-col gap-2">
+                        {createRequests.map((request, index) => (
+                            <Badge className="w-full text-sm font-normal" key={index}>{`Creation request for "${request?.name}" submitted.`}</Badge>
+                        ))}
+                    </div>
 
                     {/* <FormField
                         control={form.control}
@@ -571,7 +610,7 @@ export function EditClincalDatasetForm({
                         variant={"cta"}
                         onClick={(e) => {
                             e.preventDefault()
-                            handleFormSubmit(form.getValues())
+                            handleFormSubmit(form.getValues(), createRequests)
                         }}
                     >
                         {isSaving 

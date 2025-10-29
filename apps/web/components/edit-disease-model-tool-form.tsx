@@ -141,20 +141,14 @@ export function EditDiseaseModelToolForm({
             } else {
                 const newAsset = await createDiseaseModel(session.user.organizationId, values)
                 for (let i = 0; i < createFacilityRequests.length; i++) {
-                    console.log(`update`,                         {
-                            id: createFacilityRequests[i].id,
-                            name: createFacilityRequests[i].name,
-                            biosampleId: newAsset.id
-                        })
-                    const updatedRequest = await updateCreateFacilityRequest(
+                    await updateCreateFacilityRequest(
                         session?.user?.organizationId,
                         {
                             id: createFacilityRequests[i].id,
                             name: createFacilityRequests[i].name,
-                            biosampleId: newAsset.id
+                            diseaseModelId: newAsset.id
                         }
                     )
-                    console.log(`updated request`, updatedRequest)
                 }
                 await revalidate("/app/tools/disease-model")
                 router.refresh()
