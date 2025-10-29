@@ -14,7 +14,7 @@ import OnboardingCard from "~web/components/onboarding-card";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/packages/lib/auth";
 import CustomerIOSnippet from "@/packages/components/customerio";
-
+import { headers } from 'next/headers';
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -77,11 +77,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({
-                                             children
+                                             children,
                                          }: {
-    children: React.ReactNode
+    children: React.ReactNode,
 }) {
     const session = await getServerSession(authOptions);
+    const headersList = headers();
+    const pathname = headersList.get('x-current-path') || '';
+    const hideCookieBanner = pathname.includes('embed');
 
     return (
         <html
@@ -91,36 +94,40 @@ export default async function RootLayout({
         >
         <head>
             {/* consent scripts added so cookieyes can block cookies & localStorage where necessary, if the user has not consented */}
-            {process.env.NODE_ENV !== "production" ? (
+            {!hideCookieBanner && (
                 <>
-                    <script
-                        data-cookieyes='cookieyes-functional'
-                        src={`/functional-localstorage-manager.js`}
-                    />
-                    <script
-                        data-cookieyes='cookieyes-analytics'
-                        src={`/analytics-localstorage-manager.js`}
-                    />
-                </>
-            ) : (
-                <>
-                    <script
-                        id="cookieyes"
-                        type="text/javascript"
-                        src={`https://cdn-cookieyes.com/client_data/${process.env.COOKIE_YES_WEBSITE_KEY}/script.js`}
-                        data-cookiescript-domain=".comend.io"
-                    ></script>
-                    <script
-                        data-cookieyes='cookieyes-functional'
-                        src={`/functional-localstorage-manager.js`}
-                    />
-                    <script
-                        data-cookieyes='cookieyes-analytics'
-                        src={`/analytics-localstorage-manager.js`}
-                    />
+                {process.env.NODE_ENV !== "production" ? (
+                    <>
+                        <script
+                            data-cookieyes='cookieyes-functional'
+                            src={`/functional-localstorage-manager.js`}
+                        />
+                        <script
+                            data-cookieyes='cookieyes-analytics'
+                            src={`/analytics-localstorage-manager.js`}
+                        />
+                    </>
+                ) : (
+                    <>
+                        <script
+                            id="cookieyes"
+                            type="text/javascript"
+                            src={`https://cdn-cookieyes.com/client_data/${process.env.COOKIE_YES_WEBSITE_KEY}/script.js`}
+                            data-cookiescript-domain=".comend.io"
+                        ></script>
+                        <script
+                            data-cookieyes='cookieyes-functional'
+                            src={`/functional-localstorage-manager.js`}
+                        />
+                        <script
+                            data-cookieyes='cookieyes-analytics'
+                            src={`/analytics-localstorage-manager.js`}
+                        />
+                    </>
+                )}
+                <CustomerIOSnippet />
                 </>
             )}
-            <CustomerIOSnippet />
         </head>
         <body>
         <Suspense fallback={<Loading/>}>
