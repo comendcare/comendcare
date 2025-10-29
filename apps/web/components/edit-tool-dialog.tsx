@@ -104,7 +104,7 @@ const DiseaseModelForm = dynamic(
     }
 );
 const DataForm = dynamic(
-    () => import("./edit-data-tool-form").then(m => m.EditDataToolForm),
+    () => import("./edit-clinical-dataset-form").then(m => m.EditClincalDatasetForm),
     {ssr: false, loading: () => <div className="overflow-hidden max-h-[80vh] -mr-2 pr-3 space-y-8">
             <div className="space-y-2">
                 <Skeleton className="h-4 w-[200px]"/>

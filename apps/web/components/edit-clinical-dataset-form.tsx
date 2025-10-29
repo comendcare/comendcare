@@ -45,7 +45,7 @@ import { JsonObject } from "@prisma/client/runtime/library"
 import { editDataToolForm, Option } from "@comend/lib/types"
 import { revalidate } from "@/packages/lib/revalidate"
 import { useRouter } from "next/navigation"
-import { createDataTool, updateDataTool } from "@/packages/lib/actions"
+import { createClinicalDataset, updateClinicalDataset } from "@/packages/lib/actions"
 import { Separator } from "@/packages/components/ui/separator"
 import { cn } from "@/packages/lib/utils"
 import LoadingDots from "@/packages/components/icons/loading-dots"
@@ -53,7 +53,7 @@ import { mixpanelTrack } from "@/packages/lib/mixpanel"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
-export function EditDataToolForm({
+export function EditClincalDatasetForm({
     toolData,
     closeDialog
 }: {
@@ -87,7 +87,17 @@ export function EditDataToolForm({
 
             genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
             cohortSize: toolData?.cohortSize?.toString() || undefined,
-            institutions: toolData?.institution ? [{label: toolData.institution.name, value: toolData.institution.id}] : [],
+            storageFacility: (toolData?.company || toolData?.institution) ? (
+                (toolData?.company ? ([{
+                    value: toolData.company.id,
+                    label: `${toolData.company.title}`
+                } as Option]) : []).concat(
+                    toolData?.institution ? ([{
+                        value: toolData.institution.id,
+                        label: `${toolData.institution.name}`
+                    } as Option]) : []
+                )
+            ) : undefined,
             notes: toolData?.notes || undefined,
         }
     })
@@ -116,7 +126,7 @@ export function EditDataToolForm({
         try {
             if (toolData.id) {
                 // const updatedTool = await updateTool(updateData, session.user.organizationId)
-                const updatedTool = await updateDataTool(session.user.organizationId, values, toolData.id)
+                const updatedTool = await updateClinicalDataset(session.user.organizationId, values, toolData.id)
                 await revalidate('/app/tools/data')
                 router.refresh() // call refresh to update UI after revalidatePath() call marks cache as stale
 
@@ -138,7 +148,7 @@ export function EditDataToolForm({
                 )
             } else {
                 // const newTool = await createTool(updateData, session.user.organizationId)
-                const newTool = await createDataTool(session.user.organizationId, values)
+                const newTool = await createClinicalDataset(session.user.organizationId, values)
                 await revalidate('/app/tools/data')
                 router.refresh() // call refresh to update UI after revalidatePath() call marks cache as stale
                 
@@ -175,11 +185,15 @@ export function EditDataToolForm({
         return genes; // should be [{ label: "TP53", value: "TP53" }, ...]
     };
 
-    const handleInstitutionAsyncSearch = async (query: string): Promise<Option[]> => {
-        const response = await fetch(`/api/institutions?search=${query}`);
-        const data = await response.json();
-        return data;
-    };
+    const handleStorageFacilityAsyncSearch = async (query: string): Promise<Option[]> => {
+        const institutionsResponse = await fetch(`/api/institutions?search=${query}`)
+        const institutionsData = await institutionsResponse.json()
+
+        const companiesResponse = await fetch(`/api/companies?search=${query}`)
+        const companiesData = await companiesResponse.json()
+
+        return companiesData.concat(institutionsData)
+    }
 
     // Initialization - Allow update once form is initialized
     useEffect(() => {
@@ -419,7 +433,7 @@ export function EditDataToolForm({
 
                     <FormField
                         control={form.control}
-                        name="institutions"
+                        name="storageFacility"
                         render={({field}) => (
                             <FormItem className={cn("w-full flex gap-4 items-center")}>
                                 <FormLabel className="w-[100px]">Storage Facility</FormLabel>
@@ -430,11 +444,11 @@ export function EditDataToolForm({
                                             creatable={true}
                                             maxSelected={1}
                                             triggerSearchOnFocus={true}
-                                            onSearch={handleInstitutionAsyncSearch}
-                                            placeholder="Search for institutions..."
+                                            onSearch={handleStorageFacilityAsyncSearch}
+                                            placeholder="Search..."
                                             hidePlaceholderWhenSelected={true}
-                                            loadingIndicator={<p>Loading institutions...</p>}
-                                            emptyIndicator={<p>No institutions found.</p>}
+                                            loadingIndicator={<p>Loading results...</p>}
+                                            emptyIndicator={<p>No results found. Try a different search.</p>}
                                             showHoverCard={false}
                                             className="-mt-2 w-full min-h-[40px]"
                                         />

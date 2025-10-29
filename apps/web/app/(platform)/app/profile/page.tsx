@@ -169,6 +169,7 @@ export default async function ProfilePage(props: IndexPageProps) {
             },
             institutionId: true,
             institution: true,
+            company: true,
             geneId: true,
             gene: true,
             organizationId: true,
@@ -199,6 +200,7 @@ export default async function ProfilePage(props: IndexPageProps) {
 
             institutionId: true,
             institution: true,
+            company: true,
             geneId: true,
             gene: true,
             conditionId: true,
@@ -231,6 +233,7 @@ export default async function ProfilePage(props: IndexPageProps) {
 
             institutionId: true,
             institution: true,
+            company: true,
             geneId: true,
             gene: true,
             organizationId: true,

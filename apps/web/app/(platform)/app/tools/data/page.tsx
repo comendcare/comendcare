@@ -43,6 +43,7 @@ export default async function DataToolsPage(props: IndexPageProps) {
 
             institutionId: true,
             institution: true,
+            company: true,
             geneId: true,
             gene: true,
             organizationId: true,

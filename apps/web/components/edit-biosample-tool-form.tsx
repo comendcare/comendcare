@@ -113,20 +113,6 @@ export function EditBiosampleToolForm({
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
 
             // biosample properties
-            // storageFacility: [
-            //     ...([
-            //         toolData?.company ? ({
-            //             value: toolData.company.id,
-            //             label: `${toolData.company.name}`
-            //         }) : undefined
-            //     ]),
-            //     ...([
-            //         toolData?.institution ? ({
-            //             value: toolData.institution.id,
-            //             label: `${toolData.institution.name}`
-            //         }) : undefined
-            //     ])
-            // ],
             storageFacility: (toolData?.company || toolData?.institution) ? (
                 (toolData?.company ? ([{
                     value: toolData.company.id,
@@ -349,46 +335,6 @@ export function EditBiosampleToolForm({
                 if (response.success && response.data) {
                     setOrgIsPublished(response.data.published)
                 }
-
-                // const formattedCompanies: Option[] = (await prisma.company.findMany({})).map((company) => (
-                    
-                // ))
-
-                // const formattedBiosamples: Option[] = (biosampleOptions || []).map((biosample: Partial<Biosample>,) => {
-                //     return (
-                //         {
-                //             value: biosample.id || '',
-                //             type: 'Biosamples',
-                //             icon: "test-tube-diagonal",
-                //             // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
-                //             label: `${biosample.id}`,
-                //             biosample
-                //         }
-                //     )
-                // })
-                // const formattedDiseaseModels: Option[] = (diseaseModelOptions || []).map((diseaseModel: Partial<DiseaseModel>) => {
-                //     return (
-                //         {
-                //             value: diseaseModel.id || '',
-                //             label: `${diseaseModel.id}`,
-                //             icon: 'rat',
-                //             type: 'Disease Models',
-                //             diseaseModel
-                //         }
-                //     )
-                // })
-                // const formattedDatasamples: Option[] = (clinicalDatasetOptions || []).map((datasample: Partial<Tool>) => {
-                //     return (
-                //         {
-                //             value: datasample.id || '',
-                //             label: `${datasample.id}`,
-                //             icon: 'database',
-                //             type: 'Clinical Datasets',
-                //             datasample
-                //         }
-                //     )
-                // })
-                // setFetchedTools([...formattedBiosamples, ...formattedDiseaseModels, ...formattedDatasamples])
             }
 
             // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away

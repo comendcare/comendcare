@@ -2121,7 +2121,8 @@ export const editDiseaseModelForm = z.object({
 
     // disease model properties
     genes: z.array(optionSchema).optional(),
-    institutions: z.array(optionSchema).optional(),
+    // institutions: z.array(optionSchema).optional(),
+    storageFacility: z.array(optionSchema).optional(),
 })
 
 export const editDataToolForm = z.object({
@@ -2148,5 +2149,6 @@ export const editDataToolForm = z.object({
 
     genes: z.array(optionSchema).optional(),
     cohortSize: z.string().optional(),
-    institutions: z.array(optionSchema).optional(),
+    // institutions: z.array(optionSchema).optional(),
+    storageFacility: z.array(optionSchema).optional(),
 })
