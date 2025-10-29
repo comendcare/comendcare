@@ -9,6 +9,9 @@ import type {
     PlatformNotification,
     Review,
     Institution, Condition,
+    Biosample,
+    DiseaseModel,
+    Tool,
 } from "@prisma/client"
 import {Prisma} from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
@@ -2972,6 +2975,74 @@ export const updateClinicalDataset = withOrganizationAuth(
             console.error("Error creating clinical dataset:", error.message);
             throw new Error(error.message || "Failed to create clinical dataset.");
         }
+    }
+)
+
+export const updateCreateFacilityRequest = withOrganizationAuth(
+    async (organization: Organization, data: {
+        id: string,
+        name: string,
+        biosampleId?: string,
+        diseaseModelId?: string,
+        clinicalDatasetId?: string
+    }) => {
+        console.log(`create data`, data)
+        const newRequest = await prisma.createFacilityRequest.update({
+            where: {
+                id: data.id
+            },
+            include: {
+                biosample: true,
+                diseaseModel: true,
+                clinicalDataset: true,
+            },
+            data: {
+                name: data.name,
+                ...(data.biosampleId
+                    ? ({biosample: {connect: {id: data.biosampleId}}}) 
+                    : undefined),
+                ...(data.diseaseModelId
+                    ? ({diseaseModel: {connect: {id: data.diseaseModelId}}}) 
+                    : undefined),
+                ...(data.clinicalDatasetId
+                    ? ({clinicalDataset: {connect: {id: data.clinicalDatasetId}}}) 
+                    : undefined)
+            }
+        })
+
+        return newRequest
+    }
+)
+
+export const createCreateFacilityRequest = withOrganizationAuth(
+    async (organization: Organization, data: {
+        name: string,
+        biosampleId?: string,
+        diseaseModelId?: string,
+        clinicalDatasetId?: string
+    }) => {
+        console.log(`create data`, data)
+        const newRequest = await prisma.createFacilityRequest.create({
+            include: {
+                biosample: true,
+                diseaseModel: true,
+                clinicalDataset: true,
+            },
+            data: {
+                name: data.name,
+                ...(data.biosampleId
+                    ? ({biosample: {connect: {id: data.biosampleId}}}) 
+                    : undefined),
+                ...(data.diseaseModelId
+                    ? ({diseaseModel: {connect: {id: data.diseaseModelId}}}) 
+                    : undefined),
+                ...(data.clinicalDatasetId
+                    ? ({clinicalDataset: {connect: {id: data.clinicalDatasetId}}}) 
+                    : undefined)
+            }
+        })
+
+        return newRequest
     }
 )
 

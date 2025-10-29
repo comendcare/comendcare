@@ -2735,7 +2735,8 @@ const fetchBiosamples = async (
                     },
                     institution: true,
                     company: true,
-                    materialAndDataAccessRequests: true
+                    materialAndDataAccessRequests: true,
+                    createFacilityRequests: true,
                 },
                 orderBy,
             }),
@@ -2872,7 +2873,8 @@ export const getAllBiosamples = withResearcherAuth(
                         donor: true,
                         institution: true,
                         company: true,
-                        materialAndDataAccessRequests: true
+                        materialAndDataAccessRequests: true,
+                        createFacilityRequests: true,
                     },
                     orderBy,
                 }),

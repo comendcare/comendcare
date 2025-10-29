@@ -729,6 +729,7 @@ export const syncToTypesense = async (env: {
                 company: true,
                 description: true,
                 genotype: true,
+                createFacilityRequests: true,
             }
         })
         const diseaseModels = await prisma.diseaseModel.findMany({

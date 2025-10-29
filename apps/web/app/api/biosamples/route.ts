@@ -20,7 +20,8 @@ export async function POST(req: Request) {
                     include: {milestone: true}
                 },
                 attachments: true,
-                contacts: true
+                contacts: true,
+                createFacilityRequests: true,
             },
         });
 

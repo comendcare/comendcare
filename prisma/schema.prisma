@@ -324,6 +324,7 @@ model Tool {
   organization                  Organization?                        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   milestones                    ToolToMilestone[]
   materialAndDataAccessRequests MaterialAndDataAccessRequestToTool[]
+  createFacilityRequests        CreateFacilityRequest[]
 }
 
 model DiseaseModel {
@@ -354,6 +355,7 @@ model DiseaseModel {
   organization                  Organization?                                @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   milestones                    DiseaseModelToMilestone[]
   materialAndDataAccessRequests MaterialAndDataAccessRequestToDiseaseModel[]
+  createFacilityRequests        CreateFacilityRequest[]
 }
 
 model Biosample {
@@ -397,6 +399,7 @@ model Biosample {
   organization                  Organization?                             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   milestones                    BiosampleToMilestone[]
   materialAndDataAccessRequests MaterialAndDataAccessRequestToBiosample[]
+  createFacilityRequests        CreateFacilityRequest[]
 }
 
 model DonorDiagnosis {
@@ -1293,6 +1296,21 @@ enum Priority {
   low
   medium
   high
+}
+
+model CreateFacilityRequest {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+
+  biosampleId       String?
+  biosample         Biosample?    @relation(fields: [biosampleId], references: [id], onDelete: SetNull)
+  diseaseModelId    String?
+  diseaseModel      DiseaseModel? @relation(fields: [diseaseModelId], references: [id], onDelete: SetNull)
+  clinicalDatasetId String?
+  clinicalDataset   Tool?         @relation(fields: [clinicalDatasetId], references: [id], onDelete: SetNull)
 }
 
 model MaterialAndDataAccessRequest {

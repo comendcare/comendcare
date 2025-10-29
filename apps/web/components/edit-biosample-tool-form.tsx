@@ -26,7 +26,7 @@ import {
     DialogTrigger,
 } from "@comend/components/ui/dialog"
 import { BIOSAMPLE_TYPE_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS } from "@comend/lib/types"
-import type {Prisma} from "@prisma/client"
+import type {CreateFacilityRequest, Prisma} from "@prisma/client"
 import {getDonorData, getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
@@ -41,7 +41,7 @@ import { useRouter } from "next/navigation"
 import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@/packages/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/packages/components/ui/select"
-import { createBiosample, updateBiosample } from "@/packages/lib/actions"
+import { createBiosample, createCreateFacilityRequest, updateBiosample, updateCreateFacilityRequest } from "@/packages/lib/actions"
 import { mixpanelTrack } from "@/packages/lib/mixpanel"
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog"
 import { cn } from "@/packages/lib/utils"
@@ -127,7 +127,6 @@ const SubmitCreateRequest = ({
             }}
             onClick={(e) => {
                 setInputValue("")
-                // inputRef.current.blur()
                 parentRef?.current?.blur()
                 onClickCallback && onClickCallback(e)
             }}
@@ -162,6 +161,26 @@ export function EditBiosampleToolForm({
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
+    const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(toolData.createFacilityRequests || [])
+    const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
+
+    const handleGeneAsyncSearch = async (query: string) => {
+        const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
+        const genes = await res.json();
+        return genes; // should be [{ label: "TP53", value: "TP53" }, ...]
+    };
+
+    const handleStorageFacilityAsyncSearch = async (query: string): Promise<Option[]> => {
+        const institutionsResponse = await fetch(`/api/institutions?search=${query}`)
+        const institutionsData = await institutionsResponse.json()
+
+        const companiesResponse = await fetch(`/api/companies?search=${query}`)
+        const companiesData = await companiesResponse.json()
+
+        return companiesData.concat(institutionsData)
+    }
+
+    console.log(`tool data`, toolData)
 
     const form = useForm<z.infer<typeof editBiosampleForm>>({
         mode: "onChange",
@@ -249,7 +268,7 @@ export function EditBiosampleToolForm({
         donor: form.watch("donor"),
     }
 
-    const handleFormSubmit = async (values: z.infer<typeof editBiosampleForm>) => {
+    const handleFormSubmit = async (values: z.infer<typeof editBiosampleForm>, createFacilityRequests: CreateFacilityRequest[]) => {
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(
@@ -260,6 +279,7 @@ export function EditBiosampleToolForm({
         }
 
         console.log(`form submit values`, values)
+        console.log(`create requests`, createFacilityRequests)
 
         try {
             if (toolData.id) {
@@ -285,6 +305,22 @@ export function EditBiosampleToolForm({
                 )
             } else {
                 const newAsset = await createBiosample(session.user.organizationId, values)
+                for (let i = 0; i < createFacilityRequests.length; i++) {
+                    console.log(`update`,                         {
+                            id: createFacilityRequests[i].id,
+                            name: createFacilityRequests[i].name,
+                            biosampleId: newAsset.id
+                        })
+                    const updatedRequest = await updateCreateFacilityRequest(
+                        session?.user?.organizationId,
+                        {
+                            id: createFacilityRequests[i].id,
+                            name: createFacilityRequests[i].name,
+                            biosampleId: newAsset.id
+                        }
+                    )
+                    console.log(`updated request`, updatedRequest)
+                }
                 await revalidate("/app/tools/biosample")
                 router.refresh()
                 
@@ -372,15 +408,6 @@ export function EditBiosampleToolForm({
                     moneyRaised: true,
                     moneyDeployed: true,
                     researchBudget: true,
-                    // address1                  String?
-                    // address2                  String?
-                    // formattedAddress          String?
-                    // city                      String?
-                    // region                    String?
-                    // postalCode                String?
-                    // country                   String?
-                    // lat                       String?
-                    // lng                       String?
                     createdAt: true,
                     updatedAt: true,
                     user: true,
@@ -422,10 +449,300 @@ export function EditBiosampleToolForm({
             <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
                 <ScrollBar />
                 <form
-                    onSubmit={form.handleSubmit(handleFormSubmit)}
+                    // onSubmit={form.handleSubmit(handleFormSubmit)}
                     className="space-y-6 m-1 pb-12"
                 >
-                    <AdditionalBiosampleFields form={form} formData={formData}/>
+                <div className="flex-col space-y-4">
+                    {/* <h1 className="font-semibold text-md py-0 my-0">Biosample Information</h1> */}
+                    <FormItem className="flex gap-2 items-center">
+                        <FormLabel className="flex items-center gap-1 grow">
+                            Visibility
+                            <Tooltip delayDuration={0}>
+                                <TooltipTrigger asChild>
+                                    <Info className="h-4 w-4"/>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80 text-wrap text-left">
+                                    {`Private tools will not be shown to people outside of your organization.`}
+                                </TooltipContent>
+                            </Tooltip>
+                        </FormLabel>
+                        <PrivatePublicFormField form={form} formData={formData}/>
+                    </FormItem>
+
+                    <FormField
+                        control={form.control}
+                        name="types"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px]">{`Biosample Type`}</FormLabel>
+                                <FormControl>
+                                    <MultipleSelector
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        options={BIOSAMPLE_TYPE_OPTIONS}
+                                        hidePlaceholderWhenSelected={true}
+                                        showHoverCard={false}
+                                        placeholder="Select a type..."
+                                        emptyIndicator={
+                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                no results found.
+                                            </p>
+                                        }
+                                        groupBy="roadmapTitle"
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    {formData?.types?.map((type: any) => type?.value).includes("OTHER") && (
+                        <FormField
+                            control={form.control}
+                            name="otherTypeDetails"
+                            render={({field}) => (
+                                <FormItem className="w-full flex gap-4 items-center">
+                                    <FormLabel className="w-[100px]">{`Type Description`}</FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                id="otherTypeDetails"
+                                                placeholder={`Please add a short note about your biosample type — it helps us make the platform better.`}
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                    )}
+
+                    <FormField
+                        control={form.control}
+                        name="genes"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px]">Related Gene</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <MultipleSelector
+                                            {...field}
+                                            onSearch={handleGeneAsyncSearch}
+                                            placeholder="Search for genes..."
+                                            triggerSearchOnFocus={true}
+                                            hidePlaceholderWhenSelected={true}
+                                            loadingIndicator={<p>Loading genes...</p>}
+                                            emptyIndicator={<p>No genes found.</p>}
+                                            showHoverCard={false}
+                                            className="-mt-2 w-full min-h-[40px]"
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="genotype"
+                        render={({field}) => (
+                            <FormItem className={cn("w-full flex gap-4 items-center")}>
+                                <FormLabel className="w-[100px]">{`Genotype`}</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <Input
+                                            id="genotype"
+                                            className="-mt-2 w-full min-h-[40px]"
+                                            placeholder={`Enter a genotype`}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormItem className={cn("w-full flex gap-4 items-center")}>
+                        <FormLabel className="w-[100px]">{'Total Available Quantity'}</FormLabel>
+                        <div className="w-full gap-2 flex">
+                            <FormField
+                                control={form.control}
+                                name="quantity"
+                                render={({field}) => (
+                                    <FormControl className="-mt-2 w-full">
+                                        <div className="w-full"> 
+                                        <Input
+                                            id="quantity"
+                                            className="w-full min-h-[40px]"
+                                            placeholder={`Enter a number`}
+                                            type="number"
+                                            min="0"
+                                            onInput={(e) => {
+                                                const target = e.currentTarget;
+                                                if (Number(target.value) < 0) {
+                                                target.value = "0"; // reset to 0 if negative
+                                                }
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (e.key === "-" || e.key === "e") {
+                                                e.preventDefault(); // block typing "-" and "e" for exponent notation
+                                                }
+                                            }}
+                                            {...field}
+                                        />
+                                        </div>
+                                    </FormControl>
+                                )}
+                            />
+
+                            <FormField 
+                                control={form.control}
+                                name="quantityUnit"
+                                render={({ field }) => (
+                                    <FormControl>
+                                        {/* <Select
+                                            value={field.value} 
+                                            onValueChange={(newVal) => form.setValue("quantityUnit", newVal)}
+                                        >
+                                            <SelectTrigger className="-mt-2 w-[100px] min-h-[40px]">
+                                                <SelectValue placeholder="Select a value" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {QUANTITY_OPTIONS.map((option, index) => (
+                                                    <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select> */}
+                                        <p className="tex-sm pl-2 h-full">ml</p>
+                                    </FormControl>
+                                )}
+                            />
+                        </div>
+                        <FormMessage />
+                    </FormItem>
+
+                    <FormField
+                        control={form.control}
+                        name="storageFacility"
+                        render={({field}) => (
+                            <FormItem className={cn("w-full flex gap-4 items-center")}>
+                                <FormLabel className="w-[100px]">Storage Facility</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <MultipleSelector
+                                            {...field}
+                                            ref={storageFacilityRef}
+                                            creatable={true}
+                                            createOnBlur={false}
+                                            creatableItemOverride={(props) => (
+                                                <SubmitCreateRequest
+                                                    {...props}
+                                                    parentRef={storageFacilityRef}
+                                                    onClickCallback={async (e) => {
+                                                        e.preventDefault()
+                                                        e.stopPropagation()
+                                                        const newRequest = await createCreateFacilityRequest(
+                                                            session?.user.organizationId,
+                                                            {
+                                                                name: props.inputValue,
+                                                                biosampleId: toolData.id
+                                                            }
+                                                        )
+                                                        setCreateRequests(prev => [...prev, newRequest])
+                                                    }}
+                                                />
+                                            )}
+                                            maxSelected={1}
+                                            triggerSearchOnFocus={true}
+                                            onSearch={handleStorageFacilityAsyncSearch}
+                                            placeholder="Search..."
+                                            hidePlaceholderWhenSelected={true}
+                                            loadingIndicator={<p>Loading results...</p>}
+                                            emptyIndicator={<p>No results found. Try a different search.</p>}
+                                            showHoverCard={false}
+                                            className="-mt-2 w-full min-h-[40px]"
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+
+                    <div className="flex flex-col gap-2">
+                        {createRequests.map((request, index) => (
+                            <Badge className="w-full text-sm font-normal" key={index}>{`Creation request for "${request?.name}" submitted.`}</Badge>
+                        ))}
+                    </div>
+
+                    <ContactsFormField form={form} />
+                    <AttachmentsFormField form={form} />
+
+                    <FormField
+                        control={form.control}
+                        name="milestones"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px]">{`Linked Projects`}</FormLabel>
+                                <FormControl>
+                                    <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
+                                </FormControl>
+                                <FormMessage className="text-primary"/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="description"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px]">{`Description`}</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        id="description"
+                                        placeholder={`Enter description...`}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <Separator />
+
+                    <FormField
+                        control={form.control}
+                        name="notes"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center">
+                                <FormLabel className="w-[100px] flex items-center">
+                                <span>Internal Notes</span>
+                                <Tooltip>
+                                    <TooltipTrigger className="pl-2">
+                                    <Lock className="h-4 w-4" />
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left">
+                                    <p className="text-normal">
+                                        Only visible to your team
+                                    </p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                </FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        id="notes"
+                                        placeholder={`Enter internal notes...`}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+                </div>
 
                     <Separator className="w-full"/>
                     <DonorFormFields form={form} />
@@ -454,7 +771,7 @@ export function EditBiosampleToolForm({
                         variant={"cta"}
                         onClick={(e) => {
                             e.preventDefault()
-                            handleFormSubmit(form.getValues())
+                            handleFormSubmit(form.getValues(), createRequests)
                         }}
                     >
                         {isSaving 
@@ -472,7 +789,7 @@ export function EditBiosampleToolForm({
     )
 }
 
-export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData: any}) => {
+export const AdditionalBiosampleFields = ({organizationId, biosampleId, form, formData}: {organizationId: string, biosampleId: string, form: any, formData: any}) => {
     const [createRequests, setCreateRequests] = useState<string[]>([])
     const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
 
@@ -681,7 +998,7 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                                         <SubmitCreateRequest
                                             {...props}
                                             parentRef={storageFacilityRef}
-                                            onClickCallback={(e) => {
+                                            onClickCallback={async (e) => {
                                                 e.preventDefault()
                                                 e.stopPropagation()
                                                 setCreateRequests(prev => [...prev, props.inputValue])
