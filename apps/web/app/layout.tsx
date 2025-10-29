@@ -15,6 +15,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/packages/lib/auth";
 import CustomerIOSnippet from "@/packages/components/customerio";
 import { headers } from 'next/headers';
+import { CookieyesScripts } from "./cookie-yes-scripts";
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -96,35 +97,7 @@ export default async function RootLayout({
             {/* consent scripts added so cookieyes can block cookies & localStorage where necessary, if the user has not consented */}
             {!hideCookieBanner && (
                 <>
-                {process.env.NODE_ENV !== "production" ? (
-                    <>
-                        <script
-                            data-cookieyes='cookieyes-functional'
-                            src={`/functional-localstorage-manager.js`}
-                        />
-                        <script
-                            data-cookieyes='cookieyes-analytics'
-                            src={`/analytics-localstorage-manager.js`}
-                        />
-                    </>
-                ) : (
-                    <>
-                        <script
-                            id="cookieyes"
-                            type="text/javascript"
-                            src={`https://cdn-cookieyes.com/client_data/${process.env.COOKIE_YES_WEBSITE_KEY}/script.js`}
-                            data-cookiescript-domain=".comend.io"
-                        ></script>
-                        <script
-                            data-cookieyes='cookieyes-functional'
-                            src={`/functional-localstorage-manager.js`}
-                        />
-                        <script
-                            data-cookieyes='cookieyes-analytics'
-                            src={`/analytics-localstorage-manager.js`}
-                        />
-                    </>
-                )}
+                <CookieyesScripts />
                 <CustomerIOSnippet />
                 </>
             )}
