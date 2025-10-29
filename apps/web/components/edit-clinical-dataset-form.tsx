@@ -422,28 +422,6 @@ export function EditClincalDatasetForm({
                         )}
                     />
 
-                    {/* <FormField
-                        control={form.control}
-                        name="variant"
-                        render={({field}) => (
-                            // <FormItem className="w-full flex gap-4 items-center">
-                            <FormItem className={cn("w-full flex gap-4 items-center")}>
-                                <FormLabel className="w-[100px]">{`Variant`}</FormLabel>
-                                <div className="w-full">
-                                    <FormControl className="w-full">
-                                        <Input
-                                            id="variant"
-                                            className="-mt-2 w-full min-h-[40px]"
-                                            placeholder={`Enter a variant`}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    /> */}
-
                     <FormField
                         control={form.control}
                         name="storageFacility"
@@ -497,27 +475,6 @@ export function EditClincalDatasetForm({
                             <Badge className="w-full text-sm font-normal" key={index}>{`Creation request for "${request?.name}" submitted.`}</Badge>
                         ))}
                     </div>
-
-                    {/* <FormField
-                        control={form.control}
-                        name="patientId"
-                        render={({field}) => (
-                            <FormItem className={cn("w-full flex gap-4 items-center")}>
-                                <FormLabel className="w-[100px]">{`Linked Patient ID`}</FormLabel>
-                                <div className="w-full">
-                                    <FormControl className="w-full">
-                                        <Input
-                                            id="patientId"
-                                            className="-mt-2 w-full min-h-[40px]"
-                                            placeholder={`Enter a phenotype`}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    /> */}
 
                     <ContactsFormField form={form} />
                     <AttachmentsFormField form={form} />
