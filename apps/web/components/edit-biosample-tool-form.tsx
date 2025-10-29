@@ -35,7 +35,7 @@ import { Plus, Trash, Info, Lock } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import ProjectMultipleSelector from "./project-multiple-selector"
 // import { DeleteAssetDialog } from "./delete-tool-dialog"
-import MultipleSelector, { GroupOption, isOptionsExist } from "@comend/components/ui/multiple-selector"
+import MultipleSelector, { GroupOption, isOptionsExist, MultipleSelectorRef } from "@comend/components/ui/multiple-selector"
 import { editBiosampleForm, Option } from "@comend/lib/types"
 import { useRouter } from "next/navigation"
 import { revalidate } from "@comend/lib/revalidate"
@@ -84,7 +84,7 @@ const PRICE_OPTIONS: Option[] = [
     }
 ]
 
-const CreateBiosampleDialog = ({
+const SubmitCreateRequest = ({
     options, 
     selected, 
     inputValue,
@@ -94,7 +94,8 @@ const CreateBiosampleDialog = ({
     maxSelected,
     onMaxSelected,
     setInputValue,
-    onClickCallback
+    onClickCallback,
+    parentRef
 } : {
     options: GroupOption, 
     selected: Option[], 
@@ -106,6 +107,7 @@ const CreateBiosampleDialog = ({
     onMaxSelected: ((maxLimit: number) => void) | undefined,
     setInputValue: (value: React.SetStateAction<string>) => void,
     onClickCallback?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => any
+    parentRef: React.RefObject<MultipleSelectorRef>
 }) => {
     if (
         isOptionsExist(options, [{value: inputValue, label: inputValue}]) ||
@@ -115,32 +117,23 @@ const CreateBiosampleDialog = ({
     }
 
     const Item = (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button
-                    value={undefined}
-                    variant={'ghost'}
-                    className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
-                    onMouseDown={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }}
-                    onClick={(e) => {
-                        setInputValue("")
-                        onClickCallback && onClickCallback(e)
-                    }}
-                >
-                    {`Submit creation request for "${inputValue}"`}
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Submit creation request</DialogTitle>
-                    <DialogDescription>This request will be sent to the Comend team. We will review it and link the storage facility to your biosample when we've created it in our database.</DialogDescription>
-                </DialogHeader>
-                <Button variant={'secondary'}>Create</Button>
-            </DialogContent>
-        </Dialog>
+        <Button
+            value={undefined}
+            variant={'ghost'}
+            className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+            onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }}
+            onClick={(e) => {
+                setInputValue("")
+                // inputRef.current.blur()
+                parentRef?.current?.blur()
+                onClickCallback && onClickCallback(e)
+            }}
+        >
+            {`Submit creation request for "${inputValue}"`}
+        </Button>
     );
 
     // For normal creatable
@@ -481,6 +474,7 @@ export function EditBiosampleToolForm({
 
 export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData: any}) => {
     const [createRequests, setCreateRequests] = useState<string[]>([])
+    const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
 
     const handleGeneAsyncSearch = async (query: string) => {
         const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
@@ -680,11 +674,13 @@ export const AdditionalBiosampleFields = ({form, formData}: {form: any, formData
                             <FormControl className="w-full">
                                 <MultipleSelector
                                     {...field}
+                                    ref={storageFacilityRef}
                                     creatable={true}
                                     createOnBlur={false}
                                     creatableItemOverride={(props) => (
-                                        <CreateBiosampleDialog 
+                                        <SubmitCreateRequest
                                             {...props}
+                                            parentRef={storageFacilityRef}
                                             onClickCallback={(e) => {
                                                 e.preventDefault()
                                                 e.stopPropagation()
