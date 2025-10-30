@@ -100,20 +100,8 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
 
                     <Tabs value={tab} onValueChange={(newTab => setTab(newTab as TabType))} className="flex h-full flex-col">
                         <TabsList className="w-fit">
-                            <TabsTrigger value="projects">Project Templates</TabsTrigger>
-                            <TabsTrigger value="research-plans" className="flex gap-2">
-                                Research plan templates
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <div className="ml-auto">
-                                        <Info className="h-4 w-4"/>
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-80 text-wrap text-left">
-                                        {"Selected Projects from the template card will be added to your current research plan."}
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TabsTrigger>
+                            <TabsTrigger value="projects">Project templates</TabsTrigger>
+                            <TabsTrigger value="research-plans" className="flex gap-2">Research plan templates</TabsTrigger>
                         </TabsList>
 
                         <div className="flex-1 min-h-0">

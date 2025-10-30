@@ -1496,19 +1496,19 @@ export const ASSOCIATED_CATEGORIES: { id: string; label: string; value: string; 
     },
     {
         id: '3',
-        label: 'Clinical Study',
+        label: 'Clinical study',
         value: 'clinical study',
         description: 'Involves human trials to evaluate the safety, efficacy, and outcomes of new medical interventions.',
     },
     {
         id: '4',
-        label: 'Disease Models',
+        label: 'Disease models',
         value: 'disease models',
         description: 'Utilizes experimental models to study disease mechanisms and test potential treatments.',
     },
     {
         id: '5',
-        label: 'Design & Manufacturing',
+        label: 'Design & manufacturing',
         value: 'design & manufacturing',
         description: 'Focuses on the engineering, production, and optimization of medical products and therapeutics.',
     },
