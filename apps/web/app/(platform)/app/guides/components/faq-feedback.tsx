@@ -9,7 +9,7 @@ import FAQFeedbackRadioButtons, {
 import FAQFeedbackThumbs from "./faq-feedback-thumbs"
 import FAQFeedbackForm from "./faq-feedback-form"
 import { toast } from "sonner"
-import { customerIOTrack } from "@comend/lib/customer-io"
+import {customerIOTrack} from "@/packages/lib/customer-io-track";
 import { mixpanelTrack, useMixpanelContext } from "@comend/lib/mixpanel"
 import { createGuidesFeedbackTicket } from "@comend/lib/notion"
 
@@ -53,19 +53,21 @@ export default function FAQFeedback({title, description}: {title: string, descri
             })
 
             await customerIOTrack({
-                userId: mixpanelContext?.distinctId,
-                event: "guides_feedback_sent",
+                userId: mixpanelContext?.distinctId,     // keep IDs aligned with Mixpanel
+                event: 'guides_feedback_sent',
                 properties: {
-                    helpful: feedback.helpful ? "true" : "false",
+                    helpful: feedback.helpful ? 'true' : 'false',
                     name: feedback.name,
                     email: feedback.email,
                     issue_type: feedback.issueType,
                     issue_description: feedback.issueDescription,
                     article_prompt: title,
                     article_description: description,
-                    article_path: path
-                }
-            })
+                    article_path: path,
+                },
+                // optional:
+                traits: { email: feedback.email, name: feedback.name }, // will upsert on profile
+            });
 
             if (feedback.issueDescription) {
                 await createGuidesFeedbackTicket({

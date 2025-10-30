@@ -14,7 +14,7 @@ import {
 } from "@comend/components/ui/form"
 import { useForm } from "react-hook-form"
 import { sendBetaSignupEmail } from "@comend/lib/emails"
-import { customerIOTrack } from "@comend/lib/customer-io"
+import {customerIOTrack} from "@/packages/lib/customer-io-track";
 import { mixpanelTrack } from "@comend/lib/mixpanel"
 
 const betaSignupFormSchema = z.object({

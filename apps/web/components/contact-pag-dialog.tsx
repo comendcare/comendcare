@@ -19,7 +19,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
 import type {Organization} from "@prisma/client";
 import { mixpanelTrack, useMixpanelContext } from "@comend/lib/mixpanel";
-import { customerIOTrack, sendCustomerIOContactEmail } from "@comend/lib/customer-io";
+import {customerIOTrack} from "@/packages/lib/customer-io-track";
 
 // Validation schema
 const contactSchema = z.object({
@@ -59,20 +59,20 @@ export default function ContactPAGDialog({organization}: { organization: Organiz
                 "Contacter Name": values.name,
                 "Contacter Email": values.email
             })
-            // await customerIOTrack({
-            //     userId: mixpanelContext?.distinctId,
-            //     event: "pag_contacted",
-            //     properties: {
-            //         org_id: organization.id,
-            //         org_name: organization.name,
-            //         org_contact_email: organization.contactEmail,
-            //         message: values.message,
-            //         contacter_name: values.name,
-            //         contacter_email: values.email,
-            //         name: organization.name,
-            //         email: organization.contactEmail
-            //     }
-            // })
+            await customerIOTrack({
+                userId: mixpanelContext?.distinctId,
+                event: "pag_contacted",
+                properties: {
+                    org_id: organization.id,
+                    org_name: organization.name,
+                    org_contact_email: organization.contactEmail,
+                    message: values.message,
+                    contacter_name: values.name,
+                    contacter_email: values.email,
+                    name: organization.name,
+                    email: organization.contactEmail
+                }
+            })
             const emailPayload = {
                 transactional_message_id: "3",
                 message_data: {
@@ -89,7 +89,7 @@ export default function ContactPAGDialog({organization}: { organization: Organiz
                 },
                 to: organization.contactEmail,
             }
-            sendCustomerIOContactEmail(emailPayload)
+            // sendCustomerIOContactEmail(emailPayload)
             // await sendPAGContactEmail({
             //     name: values.name,
             //     email: values.email,

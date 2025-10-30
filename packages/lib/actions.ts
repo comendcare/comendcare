@@ -57,7 +57,7 @@ import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/lib
 import z from "zod"
 import {writeRawEvent} from "./raw-events";
 import crypto from "node:crypto";
-import {customerIOOnResearchPlanCreated} from "./customer-io";
+import {customerIOTrack} from "./customer-io-track";
 
 const PATHS = [
     "/app",
@@ -3954,31 +3954,34 @@ export const createRoadmap = withOrganizationAuth(
             });
 
             try {
-                if (actor?.userId) {
-                    const baseUrl =
-                        process.env.NEXT_PUBLIC_APP_URL ||
-                        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
-
-                    await fetch(`${baseUrl}/api/customerio/research-plan-created`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            userId: actor.userId,
-                            props: {
-                                roadmapId: roadmap.id,
-                                orgId: organization.id,
-                                orgSubdomain: organization.subdomain,
-                                templateId: roadmapTemplate?.id,
-                                title: finalRoadmap?.title ?? roadmapTemplate?.title,
-                                numMilestones: finalRoadmap?.milestones.length ?? 0,
-                            },
-                        }),
-                    }).catch((err) => {
-                        console.warn("Failed to call CustomerIO API route:", err);
-                    });
-                }
+                await customerIOTrack({
+                    userId: actor?.userId,                 // required to attribute to a person; helper no-ops if missing
+                    event: 'org_research_plan_created',    // keep aligned with your writeRawEvent type
+                    timestamp: new Date(),                 // or finalRoadmap?.createdAt if you select it
+                    traits: {
+                        // optional profile upserts (handy for segmentation):
+                        userName: actor?.userName,
+                        organization_id: organization.id,
+                        organization_name: organization.name ?? finalRoadmap?.organization?.name,
+                        organization_subdomain: organization.subdomain,
+                    },
+                    properties: {
+                        orgId: organization.id,
+                        orgName: organization.name ?? finalRoadmap?.organization?.name,
+                        orgSubdomain: organization.subdomain,
+                        roadmapId: finalRoadmap?.id,
+                        title: finalRoadmap?.title ?? roadmapTemplate?.title,
+                        published: true, // your default
+                        template_title: roadmapTemplate?.title,
+                        modalities: roadmapTemplate?.modalities,
+                        milestone_count: finalRoadmap?.milestones?.length ?? 0,
+                        node_count: finalRoadmap?.nodes?.length ?? 0,
+                        edge_count: finalRoadmap?.edges?.length ?? 0,
+                    },
+                });
             } catch (e) {
-                console.error("customerIOOnResearchPlanCreated POST failed:", e);
+                // don’t ever block the user flow on analytics
+                console.error('[CIO] track org_research_plan_created failed:', e);
             }
 
             // This is to make it so that saving shows the newly created projects from the roadmap
