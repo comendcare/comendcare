@@ -3855,6 +3855,8 @@ export const createRoadmap = withOrganizationAuth(
         roadmapTemplate?: (typeof templateResearchPlans)[0] & { metadata: JsonObject },
         actor?: Actor
     ) => {
+        const session = await getSession()
+
         try {
             if (!organization.id) {
                 throw new Error("No organization id provided.");
@@ -3955,7 +3957,7 @@ export const createRoadmap = withOrganizationAuth(
 
             try {
                 await customerIOTrack({
-                    userId: actor?.userId,                 // required to attribute to a person; helper no-ops if missing
+                    userId: session?.user.id,                 // required to attribute to a person; helper no-ops if missing
                     event: 'org_research_plan_created',    // keep aligned with your writeRawEvent type
                     timestamp: new Date(),                 // or finalRoadmap?.createdAt if you select it
                     traits: {

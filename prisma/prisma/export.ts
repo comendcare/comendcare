@@ -315,6 +315,141 @@ async function exportMilestones(outDir: string) {
     await fs.writeFile(path.join(outDir, 'milestones.csv'), csv, 'utf8');
 }
 
+async function exportServices(outDir: string) {
+    const services = await prisma.service.findMany({
+        include: {
+            _count: {
+                select: {
+                    company: true,
+                    companyContactRequestToService: true,
+                },
+            },
+        },
+        orderBy: { name: 'asc' },
+    });
+
+    const headers = [
+        'id',
+        'name',
+        'description',
+        'metadata',
+        // relation counts
+        'companiesCount',
+        'contactRequestsCount',
+    ];
+
+    const rows = services.map((s) => ({
+        id: s.id,
+        name: s.name ?? '',
+        description: s.description ?? '',
+        metadata: safeStr(s.metadata),
+        companiesCount: String(s._count.company ?? 0),
+        contactRequestsCount: String(s._count.companyContactRequestToService ?? 0),
+    }));
+
+    const csv = toCSV(rows, headers);
+    await fs.writeFile(path.join(outDir, 'services.csv'), csv, 'utf8');
+}
+
+async function exportCompanies(outDir: string) {
+    const companies = await prisma.company.findMany({
+        include: {
+            _count: {
+                select: {
+                    sites: true,
+                    services: true,
+                    certifications: true,
+                    rfis: true,
+                    reviews: true,
+                    savedByOrganizations: true,
+                    contactRequestedByOrganizations: true,
+                    biosamples: true,
+                    diseaseModel: true,
+                    tool: true,
+                },
+            },
+            services: { select: { id: true, name: true } },
+        },
+        orderBy: { createdAt: 'asc' },
+    });
+
+    const headers = [
+        'id',
+        'url',
+        'scientistDotComURL',
+        'title',
+        'description',
+        'yearEstablished',
+        'website',
+        'headquarters',
+        'companyType',
+        'simplifiedCertifications',
+        'tags',
+        'avgRating',
+        'categories',
+        'milestoneTypes',
+        'metadata',
+        'createdAt',
+        'updatedAt',
+        // service list (helpful in CSVs)
+        'serviceIds',
+        'serviceNames',
+        // relation counts
+        'sitesCount',
+        'servicesCount',
+        'certificationsCount',
+        'rfisCount',
+        'reviewsCount',
+        'savedByOrgsCount',
+        'contactRequestsByOrgsCount',
+        'biosamplesCount',
+        'diseaseModelsCount',
+        'toolsCount',
+    ];
+
+    const rows = companies.map((c) => {
+        const svcIds = c.services?.map((s) => s.id) ?? [];
+        const svcNames = c.services?.map((s) => s.name ?? '').filter(Boolean) ?? [];
+
+        return {
+            id: c.id,
+            url: c.url ?? '',
+            scientistDotComURL: c.scientistDotComURL ?? '',
+            title: c.title ?? '',
+            description: c.description ?? '',
+            yearEstablished: c.yearEstablished != null ? String(c.yearEstablished) : '',
+            website: c.website ?? '',
+            headquarters: c.headquarters ?? '',
+            companyType: c.companyType ?? '',
+            simplifiedCertifications: joinArr(c.simplifiedCertifications),
+            tags: joinArr(c.tags),
+            avgRating: c.avgRating != null ? String(c.avgRating) : '',
+            categories: joinArr(c.categories),
+            milestoneTypes: joinArr(c.milestoneTypes),
+            metadata: safeStr(c.metadata),
+            createdAt: toISO(c.createdAt),
+            updatedAt: toISO(c.updatedAt),
+
+            serviceIds: joinArr(svcIds),
+            serviceNames: joinArr(svcNames),
+
+            sitesCount: String(c._count.sites ?? 0),
+            servicesCount: String(c._count.services ?? 0),
+            certificationsCount: String(c._count.certifications ?? 0),
+            rfisCount: String(c._count.rfis ?? 0),
+            reviewsCount: String(c._count.reviews ?? 0),
+            savedByOrgsCount: String(c._count.savedByOrganizations ?? 0),
+            contactRequestsByOrgsCount: String(c._count.contactRequestedByOrganizations ?? 0),
+            biosamplesCount: String(c._count.biosamples ?? 0),
+            diseaseModelsCount: String(c._count.diseaseModel ?? 0),
+            toolsCount: String(c._count.tool ?? 0),
+        };
+    });
+
+    const csv = toCSV(rows, headers);
+    await fs.writeFile(path.join(outDir, 'companies.csv'), csv, 'utf8');
+}
+
 /** ======== Main ======== */
 
 async function main() {
@@ -327,6 +462,10 @@ async function main() {
     await exportRoadmaps(outDir);
     console.log('Exporting Milestones...');
     await exportMilestones(outDir);
+    console.log('Exporting Services...');
+    await exportServices(outDir);
+    console.log('Exporting Companies...');
+    await exportCompanies(outDir);
 
     console.log('Done. Files written to ./exports');
 }
