@@ -463,6 +463,28 @@ export const TimelineItemContent = ({
             )}
 
             {(milestone?.biosamples?.length > 0 || milestone?.diseaseModels?.length > 0 || milestone?.tools?.length > 0) && (
+                <li>
+                    <Badge variant={'green'}>
+                        <Microscope size={16} />
+                        {(milestone?.biosamples?.length + milestone?.diseaseModels?.length + milestone?.tools?.length) <= 1 
+                            ? `1 Linked tool` 
+                            : `${(milestone?.biosamples?.length + milestone?.diseaseModels?.length + milestone?.tools?.length)} Linked tools`}
+                    </Badge>
+                </li>
+            )}
+
+            {(milestone?.rfps?.length > 0) && (
+                <li>
+                    <Badge variant={'orange'}>
+                        <Microscope size={16} />
+                        {(milestone?.rfps?.length) <= 1 
+                            ? `1 Linked RFP` 
+                            : `${(milestone?.rfps?.length)} Linked RFPs`}
+                    </Badge>
+                </li>
+            )}
+
+            {/* {(milestone?.biosamples?.length > 0 || milestone?.diseaseModels?.length > 0 || milestone?.tools?.length > 0) && (
                 <>
                     {(milestone.biosamples || []).map(({biosample}, index) => {
                         const type = BIOSAMPLE_TYPE_OPTIONS.find((option, index) => option.value === biosample.types?.[0])
@@ -499,7 +521,7 @@ export const TimelineItemContent = ({
                         </Badge>
                     ))}
                 </>
-            )}
+            )} */}
         </span>
 
         <li className="mt-4">
