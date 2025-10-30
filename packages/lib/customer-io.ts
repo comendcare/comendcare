@@ -3,8 +3,8 @@ const isProd =
     process.env.NEXT_PUBLIC_APP_ENV === 'production';
 
 const CIO = {
-    siteId: process.env.CUSTOMER_IO_WRITE_KEY ?? '',
-    apiKey: process.env.CUSTOMER_IO_API_KEY ?? '',
+    siteId: process.env.CIO_TRACK_SITE_ID ?? '',   // <-- change this
+    apiKey: process.env.CIO_TRACK_API_KEY ?? '',   // <-- and this
     region: (process.env.CIO_REGION ?? 'us') as 'us' | 'eu',
 };
 
