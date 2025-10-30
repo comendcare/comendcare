@@ -80,7 +80,7 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                         {tab === 'projects' ? (
                             <>
                                 <DialogTitle className="text-2xl">
-                                    Project Templates
+                                    Project templates
                                 </DialogTitle>
                                 <DialogDescription>
                                     Select the individual project templates you would like to add to your research plan.
@@ -89,7 +89,7 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                         ): (
                             <>
                                 <DialogTitle className="text-2xl">
-                                    Research Plan Templates
+                                    Research plan templates
                                 </DialogTitle>
                                 <DialogDescription>
                                     Select a research plan template to add a curated set of projects to your existing resarch plan.
@@ -102,7 +102,7 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                         <TabsList className="w-fit">
                             <TabsTrigger value="projects">Project Templates</TabsTrigger>
                             <TabsTrigger value="research-plans" className="flex gap-2">
-                                Research Plan Templates
+                                Research plan templates
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <div className="ml-auto">

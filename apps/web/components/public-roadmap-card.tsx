@@ -115,7 +115,7 @@ export const RoadmapCard = ({
                     <div className="flex gap-2">
                         {RESEARCH_PLAN_TYPES.filter(typeOption => (roadmap.modalities || []).includes(typeOption.value)).map((type: Option, index) =>
                             <ResearchPlanTypeBadge key={index} label={type.label}/>)}
-                        <StageOfActivityBadge milestones={roadmap.milestones}/>
+                        <StageOfActivityBadge showTooltip={false} milestones={roadmap.milestones}/>
                     </div>
 
                     <TabsList className="w-min rounded-t-md rounded-b-none z-10 -py-2">
@@ -180,10 +180,10 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
 
     return (
         <Table>
-            <TableHeader>
-                <TableRow className="pointer-events-none">
-                    <TableHead className="w-full">Therapeutic strategy</TableHead>
-                    <TableHead className="self-end text-right w-fit text-nowrap">Stage</TableHead>
+            <TableHeader className="px-0">
+                <TableRow className="pointer-events-none px-0">
+                    <TableHead className="w-full px-0">Therapeutic strategy</TableHead>
+                    <TableHead className="self-end text-right w-fit text-nowrap px-0">Stage</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -200,16 +200,16 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
                             disabled={true}
                         >
                             {roadmapsForModality.map(roadmap => (
-                                <TableRow key={roadmap.id} className="cursor-pointer"
+                                <TableRow key={roadmap.id} className="cursor-pointer px-0"
                                           onClick={() => rowClickCallback(roadmap)}>
-                                    <TableCell>
+                                    <TableCell className="px-0">
                                         <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
                                         {/* {roadmap.description && (
                                             <p className="line-clamp-2 text-muted-foreground">{roadmap.description}</p>
                                         )} */}
                                     </TableCell>
-                                    <TableCell className="flex justify-end items-center">
-                                        <StageOfActivityBadge milestones={roadmap.milestones}/>
+                                    <TableCell className="flex justify-end items-center px-0">
+                                        <StageOfActivityBadge showTooltip={false} milestones={roadmap.milestones}/>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -230,7 +230,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
                                     <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
                                 </TableCell>
                                 <TableCell className="flex justify-end items-center">
-                                    <StageOfActivityBadge milestones={roadmap.milestones}/>
+                                    <StageOfActivityBadge showTooltip={false} milestones={roadmap.milestones}/>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -278,9 +278,10 @@ export const CollapsibleTableGroup = ({label, colSpan, disabled = false, childre
     )
 }
 
-export const StageOfActivityBadge = ({milestones}: { milestones: Milestone[] }) => {
+export const StageOfActivityBadge = ({milestones, showTooltip = true}: { milestones: Milestone[], showTooltip?: boolean }) => {
     const stage = getStage(milestones)
-    return (
+
+    return (showTooltip ? (
         <TooltipProvider delayDuration={0}>
             <Tooltip>
                 <TooltipTrigger>
@@ -292,7 +293,22 @@ export const StageOfActivityBadge = ({milestones}: { milestones: Milestone[] }) 
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>
-    )
+    ) : (
+        <Badge variant={stage.variant as any} className="text-sm">{stage.label}</Badge> 
+    ))
+    // return (
+    //     <TooltipProvider delayDuration={0}>
+    //         <Tooltip>
+    //             <TooltipTrigger disabled={!showTooltip}>
+    //                 <Badge variant={stage.variant as any} className="text-sm">{stage.label}</Badge>
+    //             </TooltipTrigger>
+
+    //             <TooltipContent className="max-w-80">
+    //                 Stage
+    //             </TooltipContent>
+    //         </Tooltip>
+    //     </TooltipProvider>
+    // )
 }
 
 export const ResearchPlanTypeBadge = ({label}: { label: string }) => {
