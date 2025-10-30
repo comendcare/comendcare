@@ -337,6 +337,7 @@ export function EditClincalDatasetForm({
                                     <MultipleSelector
                                         value={field.value}
                                         onChange={field.onChange}
+                                        badgeClassName={badgeVariants({variant: "lightBlue"})}
                                         options={TOOL_TYPE_OPTIONS}
                                         hidePlaceholderWhenSelected={true}
                                         showHoverCard={false}

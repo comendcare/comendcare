@@ -43,6 +43,7 @@ import ProjectMultipleSelector from "./project-multiple-selector"
 import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog"
 import { SubmitCreateRequest } from "./create-facility-request-button"
 import { Badge } from "@/packages/components/ui/badge"
+import { badgeVariants } from "@/packages/components/ui/badge"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -295,6 +296,7 @@ export function EditDiseaseModelToolForm({
                                     <MultipleSelector
                                         value={field.value}
                                         onChange={field.onChange}
+                                        badgeClassName={badgeVariants({variant: "lightBlue"})}
                                         options={DISEASE_MODEL_TYPE_OPTIONS}
                                         hidePlaceholderWhenSelected={true}
                                         showHoverCard={false}

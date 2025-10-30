@@ -52,6 +52,7 @@ import { CommandItem } from "@/packages/components/ui/command"
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog"
 import { Badge } from "@/packages/components/ui/badge"
 import { SubmitCreateRequest } from "./create-facility-request-button"
+import { badgeVariants } from "@/packages/components/ui/badge"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -405,6 +406,7 @@ export function EditBiosampleToolForm({
                                     <MultipleSelector
                                         value={field.value}
                                         onChange={field.onChange}
+                                        badgeClassName={badgeVariants({variant: "lightBlue"})}
                                         options={BIOSAMPLE_TYPE_OPTIONS}
                                         hidePlaceholderWhenSelected={true}
                                         showHoverCard={false}

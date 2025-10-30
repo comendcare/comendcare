@@ -3,6 +3,7 @@
 import type {ColumnDef} from "@tanstack/react-table";
 import {
     CircleDashed,
+    FileText,
     Globe,
     Info,
     Lock,
@@ -754,7 +755,10 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 <ul className="flex flex-col gap-2">
                     {row.original.milestones?.map((milestone: any, index: number) => (
                         <li key={index} className="line-clamp-2">
-                            {milestone.milestone?.title || undefined}
+                            <Badge className="font-normal" variant={"purple"}>
+                                <FileText className="h-4 w-4 min-h-4 min-w-4"/>
+                                {milestone.milestone?.title || undefined}
+                            </Badge>
                         </li>
                     ))}
                 </ul>
