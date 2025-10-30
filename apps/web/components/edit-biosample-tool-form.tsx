@@ -455,6 +455,7 @@ export function EditBiosampleToolForm({
                                         <MultipleSelector
                                             {...field}
                                             onSearch={handleGeneAsyncSearch}
+                                            badgeClassName={badgeVariants({variant: "teal"})}
                                             placeholder="Search for genes..."
                                             triggerSearchOnFocus={true}
                                             hidePlaceholderWhenSelected={true}

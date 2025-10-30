@@ -547,10 +547,14 @@ export const SAMPLE_TRANSPORT_METHOD_OPTIONS: Option[] = [
 
 export const DIAGNOSIS_SEVERITY_OPTIONS: Option[] = [
     {label: 'Mild', value: 'MILD', badgeVariant: 'cyan'},
-    {label: 'Moderate', value: 'MODERATE', badgeVariant: 'emerald'},
-    {label: 'Severe', value: 'SEVERE', badgeVariant: 'lime'},
-    {label: 'Life-threatening/Critical', value: 'CRITICAL', badgeVariant: 'yellow'},
-    {label: 'Terminal', value: 'TERMINAL', badgeVariant: 'orange'},
+    // {label: 'Moderate', value: 'MODERATE', badgeVariant: 'emerald'},
+    // {label: 'Severe', value: 'SEVERE', badgeVariant: 'lime'},
+    // {label: 'Life-threatening/Critical', value: 'CRITICAL', badgeVariant: 'yellow'},
+    // {label: 'Terminal', value: 'TERMINAL', badgeVariant: 'orange'},
+    {label: 'Moderate', value: 'MODERATE', badgeVariant: 'cyan'},
+    {label: 'Severe', value: 'SEVERE', badgeVariant: 'cyan'},
+    {label: 'Life-threatening/Critical', value: 'CRITICAL', badgeVariant: 'cyan'},
+    {label: 'Terminal', value: 'TERMINAL', badgeVariant: 'cyan'},
 ]
 
 export const AVAILABILITY_OPTIONS: Option[] = [

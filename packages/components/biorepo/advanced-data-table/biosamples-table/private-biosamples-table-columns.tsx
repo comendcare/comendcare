@@ -219,7 +219,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({row}) => (
-                <>{row.original.gene?.symbol}</>
+                <>
+                    {row.original.gene?.symbol && (
+                        <Badge variant={"teal"}>
+                            {row.original.gene.symbol}
+                        </Badge>
+                    )}
+                </>
             ),
             enableHiding: true,
             enableColumnFilter: true,
@@ -269,7 +275,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             cell: ({row}) => (
                 <>
-                    {DONOR_SEX_OPTIONS.find(t => t.value === row.original.donor?.sex)?.label}
+                    {DONOR_SEX_OPTIONS.find(t => t.value === row.original.donor?.sex)?.label && (
+                        <Badge>
+                            {DONOR_SEX_OPTIONS.find(t => t.value === row.original.donor?.sex)?.label}
+                        </Badge>
+                    )}
                 </>
             ),
             enableHiding: true,
@@ -294,7 +304,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             cell: ({row}) => (
                 <>
-                    {DONOR_RACE_OPTIONS.find(t => t.value === row.original.donor?.race)?.label}
+                    {DONOR_RACE_OPTIONS.find(t => t.value === row.original.donor?.race)?.label && (
+                        <Badge>
+                            {DONOR_RACE_OPTIONS.find(t => t.value === row.original.donor?.race)?.label}
+                        </Badge>
+                    )}
                 </>
             ),
             enableHiding: true,
@@ -336,9 +350,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     {row.original.donor?.diagnoses?.map((diagnosis: any, index: number) => {
                         const severityOption = DIAGNOSIS_SEVERITY_OPTIONS.find(option => option.value === diagnosis.severity)
                         return (
-                            <li key={index} className="grid grid-cols-[minmax(100px,_1fr)_150px] gap-4 items-center">
-                                {diagnosis?.type?.label} 
-                                {severityOption && <Badge className="w-fit" variant={severityOption.badgeVariant}>{severityOption.label}</Badge>}
+                            <li key={index} className="flex gap-2 items-center">
+                                <Badge>
+                                    {diagnosis?.type?.label} 
+                                </Badge>
+                                {severityOption && <Badge>{severityOption.label}</Badge>}
                             </li>
                         )
                     })}
@@ -424,7 +440,15 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({row}) => {
-                return <>{row.original.institution?.name || row.original.company?.title}</>
+                return (
+                    <>
+                    {(row.original.institution?.name || row.original.company?.title) && (
+                        <Badge>
+                            {row.original.institution?.name || row.original.company?.title}
+                        </Badge>
+                    )}
+                    </>
+                )
             },
             enableHiding: true,
             enableColumnFilter: true,
