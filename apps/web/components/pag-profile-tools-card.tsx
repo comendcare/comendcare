@@ -126,7 +126,7 @@ export const PAGProfileToolsCard = ({
                             )}
                         >
                             {<Rat className="mr-2 h-6 w-6"/>}
-                            Disease Models ({toolCounts.diseaseModelCount})
+                            Disease models ({toolCounts.diseaseModelCount})
                         </div>
                     )}
                     {(toolCounts.clinicalDatasetCount > 0) && (
@@ -147,7 +147,7 @@ export const PAGProfileToolsCard = ({
                             )}
                         >
                             {<Database className="mr-2 h-6 w-6"/>}
-                            Clinical Datasets ({toolCounts.clinicalDatasetCount})
+                            Clinical datasets ({toolCounts.clinicalDatasetCount})
                         </div>
                     )}
                 </div>
