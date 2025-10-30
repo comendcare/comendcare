@@ -683,13 +683,13 @@ export function EditMilestoneForm({
                                             />
 
                                             <div>
-                                                <FormLabel>{`Project Type`}</FormLabel>
+                                                <FormLabel>{`Project type`}</FormLabel>
                                                 {formData?.types?.length === 3 &&
                                                     <FormDescription>{`Maximum selection is 3 types.`}</FormDescription>}
                                             </div>
                                             <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypeOptions}/>
 
-                                            <FormLabel>{`Project Status`}</FormLabel>
+                                            <FormLabel>{`Project status`}</FormLabel>
                                             <StatusFormField
                                                 form={form}
                                                 mixpanelTrackCallback={(updatedStatus) => {
@@ -701,7 +701,7 @@ export function EditMilestoneForm({
                                                 }}
                                             />
 
-                                            <FormLabel>Linked Tools</FormLabel>
+                                            <FormLabel>Linked tools</FormLabel>
                                             <FormField
                                                 control={form.control}
                                                 name="tools"
@@ -866,7 +866,7 @@ export function EditMilestoneForm({
                                                     name="startDate"
                                                     render={({field}) => (
                                                         <>
-                                                            <FormLabel>{'Start Date'}</FormLabel>
+                                                            <FormLabel>{'Start date'}</FormLabel>
                                                             <div className="flex gap-2">
                                                                 <Select
                                                                     defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
@@ -933,7 +933,7 @@ export function EditMilestoneForm({
                                                     name="endDate"
                                                     render={({field}) => (
                                                         <>
-                                                            <FormLabel>{'End Date'}</FormLabel>
+                                                            <FormLabel>{'End date'}</FormLabel>
                                                             <div className="flex flex-col gap-2">
                                                                 <div className="flex gap-2">
                                                                     <Select
@@ -1021,7 +1021,7 @@ export function EditMilestoneForm({
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
                                                         >
-                                                            {'+ Add Budget'}
+                                                            {'+ Add budget'}
                                                         </Button>
                                                     )}
                                                     {(!hasStartDate) && (
@@ -1030,7 +1030,7 @@ export function EditMilestoneForm({
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
                                                         >
-                                                            {'+ Add Start Date'}
+                                                            {'+ Add start date'}
                                                         </Button>
                                                     )}
                                                     {(!hasEndDate) && (
@@ -1039,7 +1039,7 @@ export function EditMilestoneForm({
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
                                                         >
-                                                            {'+ Add End Date'}
+                                                            {'+ Add end date'}
                                                         </Button>
                                                     )}
                                                     {(!formData?.contacts || formData?.contacts.length <= 0) && (
@@ -1052,7 +1052,7 @@ export function EditMilestoneForm({
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
                                                         >
-                                                            {'+ Add Contacts'}
+                                                            {'+ Add contacts'}
                                                         </Button>
                                                     )}
                                                     {(!formData?.attachments || formData?.attachments.length <= 0) && (
@@ -1065,7 +1065,7 @@ export function EditMilestoneForm({
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
                                                         >
-                                                            {'+ Add Links'}
+                                                            {'+ Add links'}
                                                         </Button>
                                                     )}
                                                 </span>
@@ -1079,7 +1079,7 @@ export function EditMilestoneForm({
                                             <Dialog>
                                                 <DialogTrigger asChild>
                                                     <Button type="button" variant="destructive">
-                                                        Delete Project
+                                                        Delete project
                                                     </Button>
                                                 </DialogTrigger>
                                                 <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
@@ -1094,7 +1094,7 @@ export function EditMilestoneForm({
                                                     onClose()
                                                 }}
                                             >
-                                                Save Changes
+                                                Save changes
                                             </Button>
                                         </span>
                                     </TabsContent>
@@ -1838,26 +1838,19 @@ export function AttachmentsFormField({form}: { form: UseFormReturn<any> }) {
                                     <FormLabel>{`Links`}</FormLabel>
                                     <FormDescription>{`Add any links that are not on the Comend platform.`}</FormDescription>
                                 </div>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Button
-                                            size={"icon"}
-                                            variant="secondary"
-                                            onClick={(e: any) => {
-                                                e.preventDefault()
-                                                form.setValue("attachments", [
-                                                    ...(field?.value || []),
-                                                    {name: '', link: ''}
-                                                ])
-                                            }}
-                                        >
-                                            <Plus/>
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
-                                        {`Add a link`}
-                                    </TooltipContent>
-                                </Tooltip>
+                                <Button
+                                    size={"icon"}
+                                    variant="secondary"
+                                    onClick={(e: any) => {
+                                        e.preventDefault()
+                                        form.setValue("attachments", [
+                                            ...(field?.value || []),
+                                            {name: '', link: ''}
+                                        ])
+                                    }}
+                                >
+                                    <Plus/>
+                                </Button>
                             </div>
 
                             {field.value && field.value.length > 0 && (
@@ -1904,26 +1897,19 @@ export const ContactsFormField = ({form}: { form: any }) => {
                             <FormLabel>{`Contacts`}</FormLabel>
                             <FormDescription>{`Add any external contacts that are not on the Comend platform.`}</FormDescription>
                         </div>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <Button
-                                    variant="secondary"
-                                    size={"icon"}
-                                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                        e.preventDefault()
-                                        form.setValue("contacts", [
-                                            ...(field.value || []),
-                                            {name: "", email: "", role: null}
-                                        ])
-                                    }}
-                                >
-                                    <Plus/>
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-80 text-wrap text-left font-normal">
-                                {`Add a contact`}
-                            </TooltipContent>
-                        </Tooltip>
+                        <Button
+                            variant="secondary"
+                            size={"icon"}
+                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                e.preventDefault()
+                                form.setValue("contacts", [
+                                    ...(field.value || []),
+                                    {name: "", email: "", role: null}
+                                ])
+                            }}
+                        >
+                            <Plus/>
+                        </Button>
                     </div>
 
                     {field?.value && field.value.length > 0 && (

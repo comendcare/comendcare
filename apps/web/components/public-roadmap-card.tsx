@@ -120,10 +120,10 @@ export const RoadmapCard = ({
 
                     <TabsList className="w-min rounded-t-md rounded-b-none z-10 -py-2">
                         <TabsTrigger value="flow" className="data-[state=active]:shadow-none rounded-b-none -mb-2 py-2.5">
-                            Flow View
+                            Flow view
                         </TabsTrigger>
                         <TabsTrigger value="list" className="data-[state=active]:shadow-none rounded-b-none -mb-2 py-2.5">
-                            List View
+                            List view
                         </TabsTrigger>
                     </TabsList>
                 </CardHeader>

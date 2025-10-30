@@ -686,7 +686,7 @@ export function EditBiosampleToolForm({
                 </DialogClose>
 
                 <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
-                    Delete Tool
+                    Delete tool
                 </Button>
                 <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                     <DeleteBiosampleDialog toolId={toolData.id} closeDialog={closeDialog}/>
@@ -706,7 +706,7 @@ export function EditBiosampleToolForm({
                                     <LoadingDots/>
                                 </div>
                             ) 
-                            : ("Save Changes")
+                            : ("Save changes")
                         }
                     </Button>
                 </div>

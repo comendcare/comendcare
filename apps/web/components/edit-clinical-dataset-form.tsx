@@ -556,7 +556,7 @@ export function EditClincalDatasetForm({
                 </DialogClose>
 
                 <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
-                    Delete Tool
+                    Delete tool
                 </Button>
                 <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                     <DeleteAssetDialog toolId={toolData.id} closeDialog={closeDialog}/>
@@ -576,7 +576,7 @@ export function EditClincalDatasetForm({
                                     <LoadingDots/>
                                 </div>
                             ) 
-                            : ("Save Changes")
+                            : ("Save changes")
                         }
                     </Button>
                 </div>

@@ -253,7 +253,7 @@ export function Roadmap({
                             <div className="flex flex-row items-center gap-x-1 justify-start">
                                 <TabsList className="mr-auto">
                                     <TabsTrigger value="flow" className="relative">
-                                        Flow View
+                                        Flow view
                                         <Tooltip>
                                             <TooltipTrigger asChild>
                                                 <div className="ml-2">
@@ -265,7 +265,7 @@ export function Roadmap({
                                             </TooltipContent>
                                         </Tooltip>
                                     </TabsTrigger>
-                                    <TabsTrigger value="list">List View</TabsTrigger>
+                                    <TabsTrigger value="list">List view</TabsTrigger>
                                 </TabsList>
 
                                 {selectedView === "list" && (
@@ -346,7 +346,7 @@ export function Roadmap({
                                 </Tooltip>
                             </div>
 
-                            {/* Flow View */}
+                            {/* Flow view */}
                             <TabsContent
                                 value="flow"
                                 className="m-0 h-[calc(100vh-10rem)]"

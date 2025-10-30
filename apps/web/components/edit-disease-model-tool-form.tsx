@@ -534,7 +534,7 @@ export function EditDiseaseModelToolForm({
                 </DialogClose>
 
                 <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
-                    Delete Tool
+                    Delete tool
                 </Button>
                 <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                     <DeleteDiseaseModelDialog toolId={toolData.id} closeDialog={closeDialog}/>
@@ -554,7 +554,7 @@ export function EditDiseaseModelToolForm({
                                     <LoadingDots/>
                                 </div>
                             ) 
-                            : ("Save Changes")
+                            : ("Save changes")
                         }
                     </Button>
                 </div>

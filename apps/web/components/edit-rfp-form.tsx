@@ -661,7 +661,7 @@ export function EditRFPForm({
                                 if (closeDialog) closeDialog()
                             }}
                         >
-                            Save Changes
+                            Save changes
                         </Button>
                     </div>
                 </DialogClose>
