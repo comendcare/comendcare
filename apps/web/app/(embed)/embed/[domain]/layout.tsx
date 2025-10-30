@@ -2,7 +2,6 @@ import {ReactNode} from "react"
 import {notFound} from "next/navigation"
 import {getOrganizationData} from "@comend/lib/fetchers"
 import {TooltipProvider} from "@radix-ui/react-tooltip"
-import {PublicPageNavbar} from "~web/components/public-page-navbar";
 import { ComendEmbedBanner } from "~web/components/comend-embed-banner"
 
 export default async function EmbedLayout({
@@ -68,11 +67,11 @@ export default async function EmbedLayout({
     if (!data) {
         notFound()
     }
+    console.log(data)
 
     return (
         <div>
             <TooltipProvider>
-                <PublicPageNavbar/>
                 <div>
                     {children}
                 </div>
