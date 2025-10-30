@@ -48,7 +48,7 @@ import {
     StatusType,
     Option,
     BIOSAMPLE_TYPE_OPTIONS,
-    DISEASE_MODEL_TYPE_OPTIONS
+    DISEASE_MODEL_TYPE_OPTIONS,
 } from "@comend/lib/types"
 import {
     Biosample,
@@ -302,7 +302,7 @@ export function EditMilestoneForm({
                             type: 'Biosamples',
                             icon: 'test-tube-diagonal',
                             // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
-                            label: `${biosample.id}`,
+                            label: `${biosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
                             biosample
                         }
                     )
@@ -311,7 +311,7 @@ export function EditMilestoneForm({
                     return (
                         {
                             value: diseaseModel.id,
-                            label: `${diseaseModel.id}`,
+                            label: `${diseaseModel.id} - ${(DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
                             icon: 'rat',
                             type: 'Disease Models',
                             diseaseModel
@@ -322,7 +322,7 @@ export function EditMilestoneForm({
                     return (
                         {
                             value: tool?.id,
-                            label: `${tool?.id}`,
+                            label: `${tool?.id} - ${tool?.title}`,
                             icon: 'database',
                             type: 'Clinical Datasets',
                             datasample: tool,
@@ -500,7 +500,7 @@ export function EditMilestoneForm({
                         type: 'Biosamples',
                         icon: "test-tube-diagonal",
                         // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
-                        label: `${biosample.id}`,
+                        label: `${biosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
                         biosample
                     }
                 )
@@ -509,7 +509,7 @@ export function EditMilestoneForm({
                 return (
                     {
                         value: diseaseModel.id || '',
-                        label: `${diseaseModel.id}`,
+                        label: `${diseaseModel.id} - ${(DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
                         icon: 'rat',
                         type: 'Disease Models',
                         diseaseModel
@@ -520,7 +520,7 @@ export function EditMilestoneForm({
                 return (
                     {
                         value: datasample.id || '',
-                        label: `${datasample.id}`,
+                        label: `${datasample?.id} - ${datasample?.title}`,
                         icon: 'database',
                         type: 'Clinical Datasets',
                         datasample
@@ -1226,7 +1226,7 @@ export function EditMilestoneForm({
                                         value: newBiosample.id,
                                         type: 'Biosamples',
                                         // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
-                                        label: `${newBiosample.id}`,
+                                        label: `${newBiosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => newBiosample?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
                                         biosample: newBiosample,
                                         icon: 'test-tube-diagonal',
                                     }
@@ -1257,7 +1257,7 @@ export function EditMilestoneForm({
                                     ...(form.getValues("tools") || []),
                                     {
                                         value: newDiseaseModel.id,
-                                        label: `${newDiseaseModel.id}`,
+                                        label: `${newDiseaseModel.id} - ${(DISEASE_MODEL_TYPE_OPTIONS.filter(option => newDiseaseModel?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
                                         type: 'Disease Models',
                                         diseaseModel: newDiseaseModel,
                                         icon: 'rat',
@@ -1289,7 +1289,7 @@ export function EditMilestoneForm({
                                     ...(form.getValues("tools") || []),
                                     {
                                         value: newDatasample.id,
-                                        label: newDatasample.id,
+                                        label: `${newDatasample.id} - ${newDatasample.title}`,
                                         type: 'Clinical Datasets',
                                         datasample: newDatasample,
                                         icon: 'database',
