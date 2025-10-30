@@ -13,13 +13,15 @@ export async function POST(req: Request) {
             include: {
                 gene: true,
                 institution: true,
+                company: true,
                 organization: {include: {conditions: {include: {condition: true}}}},
                 milestones: {
                     where: {milestone: {private: false}},
                     include: {milestone: true}
                 },
                 attachments: true,
-                contacts: true
+                contacts: true,
+                createFacilityRequests: true,
             },
         });
 

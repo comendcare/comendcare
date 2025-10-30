@@ -73,11 +73,7 @@ export const PublicFlowView = ({
                 fitView({
                     nodes: [roadmap?.nodes
                         .sort((a: any, b: any) => (a.positionX) - (b.positionX))[0]],
-                    padding: {
-                        left: 1,
-                        right: 6,
-                        y: 6,
-                    },
+                    padding: 2,
                     duration: 500
                 })
             }, 1) // Delay by a short time to allow landing adjustment

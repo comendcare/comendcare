@@ -101,6 +101,7 @@ const orgDeepInclude = {
             attachments: true,
             milestones: { include: { milestone: true } },
             institution: true,
+            company: true,
             gene: true,
         },
     },
@@ -110,6 +111,7 @@ const orgDeepInclude = {
             attachments: true,
             milestones: { include: { milestone: true } },
             institution: true,
+            company: true,
             donor: {
                 include: {
                     diagnoses: { include: { type: true } },
@@ -130,6 +132,7 @@ const orgDeepInclude = {
             attachments: true,
             milestones: { include: { milestone: true } },
             institution: true,
+            company: true,
             gene: true,
             condition: true,
         },

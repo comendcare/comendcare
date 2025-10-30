@@ -105,6 +105,8 @@ export default async function middleware(req: NextRequest) {
             })
         }
 
+        res.headers.set("x-current-path", path);
+
         return res
     }
 
@@ -112,20 +114,28 @@ export default async function middleware(req: NextRequest) {
     if (hostname == `app.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) {
         const session = await getToken({ req })
         if (!session && path !== "/login") {
-            return NextResponse.redirect(new URL("/login", req.url))
+            const res = NextResponse.redirect(new URL("/login", req.url))
+            res.headers.set("x-current-path", path);
+            return res
         } else if (session && path == "/login") {
-            return NextResponse.redirect(new URL("/", req.url))
+            const res = NextResponse.redirect(new URL("/", req.url))
+            res.headers.set("x-current-path", path);
+            return res
         }
-        return NextResponse.rewrite(
+        const res = NextResponse.rewrite(
             new URL(`${path === "/" ? "" : path}`, req.url)
         )
+        res.headers.set("x-current-path", path);
+        return res
     }
 
     // special case for `vercel.pub` domain
     if (hostname === "vercel.pub") {
-        return NextResponse.redirect(
+        const res = NextResponse.redirect(
             "https://vercel.com/blog/platforms-starter-kit"
         )
+        res.headers.set("x-current-path", path);
+        return res
     }
 
     // DON'T rewrite root application to `/home` folder
@@ -134,11 +144,15 @@ export default async function middleware(req: NextRequest) {
         hostname === process.env.NEXT_PUBLIC_ROOT_DOMAIN ||
         hostname === "comendcare.com"
     ) {
-        return NextResponse.rewrite(
+        const res = NextResponse.rewrite(
             new URL(`${path === "/" ? "/" : path}`, req.url)
         )
+        res.headers.set("x-current-path", path);
+        return res
     }
 
     // rewrite everything else to `/[domain]/[slug] dynamic route
-    return NextResponse.rewrite(new URL(`/${hostname}${path}`, req.url))
+    const res = NextResponse.rewrite(new URL(`/${hostname}${path}`, req.url))
+    res.headers.set("x-current-path", path);
+    return res
 }

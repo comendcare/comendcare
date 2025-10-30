@@ -20,7 +20,7 @@ import { revalidate } from "@/packages/lib/revalidate"
 import { usePathname } from "next/navigation"
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog"
 import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog"
-import { createBiosample, createDiseaseModel, createOrUpdateAsset } from "@/packages/lib/actions"
+import { createBiosample, createClinicalDataset, createDiseaseModel } from "@/packages/lib/actions"
 
 export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' | 'data' | 'diseaseModel'}) => {
     const {data: session} = useSession()
@@ -30,15 +30,15 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
     const [editIsOpen, setEditIsOpen] = useState(false)
     const popoverRef = useRef<HTMLInputElement>(null)
 
-    const handleDuplicate = async () => {
-        if (session?.user?.organizationId) {
-            if (type === 'biosample') await createBiosample(session.user.organizationId, {...tool, id: undefined})
-            if (type === 'diseaseModel') await createDiseaseModel(session.user.organizationId, {...tool, id: undefined})
-            if (type === 'data') await createOrUpdateAsset(session.user.organizationId, {...tool, id: undefined})
-            // await createTool({...tool, id: undefined}, session.user.organizationId)
-            await revalidate(pathname)
-        }
-    }
+    // const handleDuplicate = async () => {
+    //     if (session?.user?.organizationId) {
+    //         if (type === 'biosample') await createBiosample(session.user.organizationId, {...tool, id: undefined})
+    //         if (type === 'diseaseModel') await createDiseaseModel(session.user.organizationId, {...tool, id: undefined})
+    //         if (type === 'data') await createClinicalDataset(session.user.organizationId, {...tool, id: undefined})
+    //         // await createTool({...tool, id: undefined}, session.user.organizationId)
+    //         await revalidate(pathname)
+    //     }
+    // }
 
     const handleEdit = () => {
         setEditIsOpen(true)

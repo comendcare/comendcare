@@ -183,7 +183,7 @@ export function useDiseaseModelsTableColumns(enableSorting: boolean = true, enab
                 />
             ),
             cell: ({row}) => {
-                return <>{row.original.institution?.name}</>
+                return <>{row.original.institution?.name || row.original.company?.title}</>
             },
             enableHiding,
             enableSorting,

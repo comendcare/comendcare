@@ -1,8 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { Button } from "@comend/components/ui/button"
 import { X } from "lucide-react"
+import {LinkPreview} from "~web/components/link-preview";
+import Image from "next/image";
+import logo from "@/public/logos/comend-full-logo-white-text.png";
 
 export function ComendEmbedBanner() {
     const [isVisible, setIsVisible] = useState(true)
@@ -16,10 +19,11 @@ export function ComendEmbedBanner() {
     return (
         <div className="pointer-events-none fixed inset-x-0 bottom-0 sm:px-6 sm:pb-5 lg:px-8">
             <div className="pointer-events-auto flex items-center justify-between gap-x-6 bg-gray-900 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
-                <p className="text-sm leading-6 text-white">
-                    <a href={`http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`} target="_blank">
-                        Check out Comend for more information &nbsp;<span aria-hidden="true">&rarr;</span>
-                    </a>
+                <p className="text-sm leading-6 text-white inline-flex items-center self-start place-self-start justify-start">
+                    Built with ❤️ on
+                    <LinkPreview url={`http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`} target="_blank">
+                        <Image className="w-24 inline" src={logo} alt={"Comend Logo"}/>
+                    </LinkPreview>
                 </p>
                 <Button
                     variant="ghost"

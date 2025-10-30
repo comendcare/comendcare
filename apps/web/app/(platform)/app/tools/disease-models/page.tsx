@@ -43,6 +43,7 @@ export default async function DiseaseModelToolsPage(props: IndexPageProps) {
 
             institutionId: true,
             institution: true,
+            company: true,
             geneId: true,
             gene: true,
             conditionId: true,

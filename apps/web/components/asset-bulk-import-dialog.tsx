@@ -8,7 +8,7 @@ import { FileUploadForm } from "~web/components/file-upload-form";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { createOrUpdateAsset } from "@comend/lib/actions";
+import { createClinicalDataset } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
 import { cn, parseCSV } from "@comend/lib/utils";
 import { revalidate } from "@/packages/lib/revalidate";
@@ -48,7 +48,7 @@ export function AssetBulkImportDialog() {
                 }
     
                 await Promise.all(result.values.map(async (tool) => {
-                    await createOrUpdateAsset(session?.user.organizationId, tool)
+                    await createClinicalDataset(session?.user.organizationId, tool)
                     setImportCount((prev) => prev + 1)
                 }))
             } catch (e) {

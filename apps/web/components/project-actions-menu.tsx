@@ -180,8 +180,10 @@ export const ProjectActionsMenu = ({
                 <DialogContent className="min-w-fit">
                     { organization && "subdomain" in organization && typeof organization.subdomain === "string" ? (
                         <ShareDialog
-                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
-                            organization={organization}
+                            url={`${process.env.NEXT_PUBLIC_VERCEL_ENV
+                                ? `https://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                : `http://${organization.subdomain}.localhost:3000`
+                            }/research-plan/${milestone.roadmapId}?project=${milestone.id}`}                            organization={organization}
                             postMessage={`A new project ${milestone.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
                             postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
                             embeddedProjectData={{

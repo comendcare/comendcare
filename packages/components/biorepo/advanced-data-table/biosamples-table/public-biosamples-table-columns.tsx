@@ -208,7 +208,7 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
                 />
             ),
             cell: ({row}) => {
-                return <>{row.original.institution?.name}</>
+                return <>{row.original.institution?.name || row.original.company?.title}</>
             },
             enableHiding,
             enableSorting,
