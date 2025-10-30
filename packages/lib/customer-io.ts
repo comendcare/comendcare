@@ -21,7 +21,6 @@ export function getCio() {
         });
         return null;
     }
-
     if (!cioConfigured) {
         console.error('[CIO] getCio: missing config', {
             haveSiteId: Boolean(CIO.siteId),
@@ -29,31 +28,24 @@ export function getCio() {
         });
         return null;
     }
-
     if (_cio) return _cio;
 
     try {
-        // Support multiple export styles after bundling
+        // customerio-node >= v5 style exports
         const mod = require('customerio-node');
-        const Ctor =
-            (mod && mod.CustomerIO) ||
-            (mod && mod.default) ||
-            mod; // fallback
+        const { TrackClient, RegionUS, RegionEU } = mod;
 
-        if (typeof Ctor !== 'function') {
-            throw new Error(
-                'CustomerIO class not found in customerio-node exports (got: ' +
-                Object.keys(mod || {}).join(', ') +
-                ')'
-            );
+        if (typeof TrackClient !== 'function') {
+            console.error('[CIO] customerio-node exports', Object.keys(mod || {}));
+            throw new Error('TrackClient not found in customerio-node exports');
         }
 
-        const region = CIO.region === 'eu' ? 'EU' : 'US';
+        const region = CIO.region === 'eu' ? RegionEU : RegionUS;
 
-        _cio = new Ctor(CIO.siteId, CIO.apiKey, { region });
+        _cio = new TrackClient(CIO.siteId, CIO.apiKey, { region });
 
-        console.log('[CIO] initialized', {
-            region,
+        console.log('[CIO] initialized (TrackClient)', {
+            region: CIO.region,
             siteIdPreview: String(CIO.siteId).slice(0, 4) + '***',
             apiKeyPreview: String(CIO.apiKey).slice(0, 4) + '***',
         });

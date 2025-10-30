@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 // app/api/cio/track/route.ts
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
