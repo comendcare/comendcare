@@ -746,7 +746,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             accessorKey: "milestones",
             header: ({column}) => (
                 <DataTableColumnHeader 
-                    className="min-w-fit text-nowrap"
+                    className="text-nowrap"
                     column={column} 
                     title="Linked projects"
                 />
@@ -754,8 +754,8 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             cell: ({row}) => (
                 <ul className="flex flex-col gap-2">
                     {row.original.milestones?.map((milestone: any, index: number) => (
-                        <li key={index} className="line-clamp-2">
-                            <Badge className="font-normal" variant={"purple"}>
+                        <li key={index}>
+                            <Badge variant={"purple"}>
                                 <FileText className="h-4 w-4 min-h-4 min-w-4"/>
                                 {milestone.milestone?.title || undefined}
                             </Badge>

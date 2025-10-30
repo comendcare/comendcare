@@ -3,6 +3,7 @@
 import type {ColumnDef} from "@tanstack/react-table";
 import {
     CircleDashed,
+    FileText,
     Globe,
     Lock,
 } from "lucide-react";
@@ -20,6 +21,7 @@ import {useSession} from "next-auth/react";
 import { Checkbox } from "./../../../ui/checkbox";
 import { handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch } from "./../../../../../packages/lib/utils";
 import Link from "next/link";
+import { Badge } from "./../../../ui/badge";
 
 export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
     const {data: session} = useSession()
@@ -362,8 +364,11 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             cell: ({row}) => (
                 <ul className="flex flex-col gap-2">
                     {row.original.milestones?.map((milestone: any, index: number) => (
-                        <li key={index} className="line-clamp-2">
-                            {milestone.milestone?.title || undefined}
+                        <li key={index}>
+                            <Badge variant={"purple"}>
+                                <FileText className="h-4 w-4 min-h-4 min-w-4"/>
+                                {milestone.milestone?.title || undefined}
+                            </Badge>
                         </li>
                     ))}
                 </ul>

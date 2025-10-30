@@ -6,6 +6,7 @@ import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { useEffect, useState } from "react"
 import { getMilestones } from "@comend/lib/fetchers"
 import { useSession } from "next-auth/react"
+import { badgeVariants } from "@/packages/components/ui/badge"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -43,9 +44,10 @@ export default function ProjectMultipleSelector({
 
     return (
         <MultipleSelector
-            value={value.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title})) as Option[]}
+            badgeClassName={badgeVariants({variant: "purple"})}
+            value={value.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title, icon: 'file-text'})) as Option[]}
             onChange={onChange}
-            options={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title} as Option))}
+            options={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title, roadmapTitle: milestone.roadmap?.title, icon: 'file-text'} as Option))}
             hidePlaceholderWhenSelected={true}
             showHoverCard={false}
             placeholder="Link projects"
