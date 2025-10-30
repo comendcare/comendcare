@@ -1336,12 +1336,18 @@ export function EditMilestoneForm({
                 <DialogContent className="min-w-fit">
                     {organization && "subdomain" in organization && typeof organization.subdomain === "string" ? (
                         <ShareDialog
-                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
+                            url={`${process.env.NEXT_PUBLIC_VERCEL_ENV
+                                ? `https://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                : `http://${organization.subdomain}.localhost:3000`
+                            }/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
                             organization={organization}
                             postMessage={`A new project ${formData.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
                             postSubject={`A new project ${formData.title} has been added to ${organization.name}`}
                             embeddedProjectData={{
-                                embeddedProjectLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestoneData.roadmapId}/project/${milestoneData.id}`,
+                                embeddedProjectLink: `${process.env.NEXT_PUBLIC_VERCEL_ENV
+                                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                    : `http://localhost:3000`
+                                }/embed/${organization.subdomain}/research-plan/${milestoneData.roadmapId}/project/${milestoneData.id}`,
                                 projectId: milestoneData.id,
                                 projectTitle: milestoneData.title
                             }}

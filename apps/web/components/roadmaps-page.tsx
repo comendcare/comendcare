@@ -79,13 +79,18 @@ export default function RoadmapsPage({ orgId, organization, roadmaps }: Props) {
                 <DialogContent className="min-w-fit">
                     { "subdomain" in organization && typeof organization.subdomain === "string" ? (
                         <ShareDialog
-                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`}
+                            url={`${process.env.NEXT_PUBLIC_VERCEL_ENV
+                                ? `https://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                : `http://${organization.subdomain}.localhost:3000`
+                            }/research-plan`}
                             organization={organization}
                             // postMessage={`A new project ${milestone.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestone.roadmapId}?project=${milestone.id}`}
                             // postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
                             embeddedResearchPlansData={{
-                                embeddedResearchPlansLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plans`,
-                            }}
+                                embeddedResearchPlansLink: `${process.env.NEXT_PUBLIC_VERCEL_ENV
+                                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                    : `http://localhost:3000`
+                                }/embed/${organization.subdomain}/research-plans`,                            }}
                             // trackShareEvent={(socialOption: string) => {
                             //     mixpanelTrack(`Research Plans Table Shared`, {
                             //         "Platform": socialOption,

@@ -942,7 +942,10 @@ const RoadmapHeader = ({
                 <DialogContent className="min-w-fit">
                     {typeof orgSubdomain === "string" ? (
                         <ShareDialog
-                            url={`${orgSubdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlanId}`}
+                            url={`${process.env.NEXT_PUBLIC_VERCEL_ENV
+                                ? `https://${orgSubdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                : `http://${orgSubdomain}.localhost:3000`
+                            }/research-plan/${researchPlanId}`}
                             organization={{
                                 id: session?.user.organizationId || undefined,
                                 subdomain: orgSubdomain
@@ -951,7 +954,10 @@ const RoadmapHeader = ({
                             // postSubject={`A new project ${milestone.title} has been added to ${organization.name}`}
                             // embeddedResearchPlanLink={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${researchPlanId}`}
                             embeddedResearchPlanData={{
-                                embeddedResearchPlanLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${orgSubdomain}/research-plan/${researchPlanId}`,
+                                embeddedResearchPlanLink: `${process.env.NEXT_PUBLIC_VERCEL_ENV
+                                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                    : `http://localhost:3000`
+                                }/embed/${orgSubdomain}/research-plan/${researchPlanId}`,
                                 resarchPlanId: researchPlanId,
                                 researchPlanTitle: researchPlanDetails.title || ''
                             }}

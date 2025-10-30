@@ -160,9 +160,15 @@ export const RFPActionsMenu = ({rfp}: {rfp: RFP}) => {
                 <div onClick={(e) => e.stopPropagation()}>
                     <DialogContent className="min-w-fit">
                         <ShareDialog
-                            url={`${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}?rfp=${rfp.id}`}
+                            url={`${process.env.NEXT_PUBLIC_VERCEL_ENV
+                                ? `https://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                : `http://${organization?.subdomain}.localhost:3000`
+                            }?rfp=${rfp.id}`}
                             embeddedRFPData={{
-                                embeddedRFPLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization?.subdomain}/rfp/${rfp.id}`,
+                                embeddedRFPLink: `${process.env.NEXT_PUBLIC_VERCEL_ENV
+                                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                    : `http://localhost:3000`
+                                }/embed/${organization?.subdomain}/rfp/${rfp.id}`,
                                 rfpId: rfp.id,
                                 rfpTitle: rfp.title
                             }}  
