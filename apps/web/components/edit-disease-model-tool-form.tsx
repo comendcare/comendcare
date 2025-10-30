@@ -23,24 +23,26 @@ import {
     DialogFooter,
 } from "@comend/components/ui/dialog"
 import { DISEASE_MODEL_TYPE_OPTIONS, editDiseaseModelForm } from "@comend/lib/types"
-import type {Prisma} from "@prisma/client"
+import type {CreateFacilityRequest, Prisma} from "@prisma/client"
 import { getDonorData, getOrganizationFromOrganizationId } from "@comend/lib/fetchers"
 import { useSession } from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
 import { Info, Lock } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
-import MultipleSelector from "@comend/components/ui/multiple-selector"
+import MultipleSelector, { MultipleSelectorRef } from "@comend/components/ui/multiple-selector"
 import { Option } from "@comend/lib/types"
 import { useRouter } from "next/navigation"
 import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@/packages/components/ui/separator"
 import { mixpanelTrack } from "@/packages/lib/mixpanel"
-import { createDiseaseModel, updateDiseaseModel } from "@/packages/lib/actions"
+import { createCreateFacilityRequest, createDiseaseModel, updateCreateFacilityRequest, updateDiseaseModel } from "@/packages/lib/actions"
 import { cn } from "@/packages/lib/utils"
 import LoadingDots from "@/packages/components/icons/loading-dots"
 import ProjectMultipleSelector from "./project-multiple-selector"
 import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog"
+import { SubmitCreateRequest } from "./create-facility-request-button"
+import { Badge } from "@/packages/components/ui/badge"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -57,6 +59,8 @@ export function EditDiseaseModelToolForm({
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
+    const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(toolData.createFacilityRequests || [])
+    const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
 
     const form = useForm<z.infer<typeof editDiseaseModelForm>>({
         mode: "onChange",
@@ -73,7 +77,18 @@ export function EditDiseaseModelToolForm({
             attachments: toolData?.attachments || undefined,
             isPrivate: toolData?.private !== undefined ? toolData?.private : true,
             contacts: toolData?.contacts || undefined,
-            institutions: toolData?.institution ? [{label: toolData.institution.name, value: toolData.institution.id}] : [],
+            // institutions: toolData?.institution ? [{label: toolData.institution.name, value: toolData.institution.id}] : [],
+            storageFacility: (toolData?.company || toolData?.institution) ? (
+                (toolData?.company ? ([{
+                    value: toolData.company.id,
+                    label: `${toolData.company.title}`
+                } as Option]) : []).concat(
+                    toolData?.institution ? ([{
+                        value: toolData.institution.id,
+                        label: `${toolData.institution.name}`
+                    } as Option]) : []
+                )
+            ) : undefined,
             genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
             genotype: toolData?.genotype || undefined,
@@ -92,7 +107,7 @@ export function EditDiseaseModelToolForm({
         milestones: form.watch("milestones"),
     }
 
-    const handleFormSubmit = async (values: z.infer<typeof editDiseaseModelForm>) => {
+    const handleFormSubmit = async (values: z.infer<typeof editDiseaseModelForm>, createFacilityRequests: CreateFacilityRequest[]) => {
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(
@@ -125,6 +140,16 @@ export function EditDiseaseModelToolForm({
                 )
             } else {
                 const newAsset = await createDiseaseModel(session.user.organizationId, values)
+                for (let i = 0; i < createFacilityRequests.length; i++) {
+                    await updateCreateFacilityRequest(
+                        session?.user?.organizationId,
+                        {
+                            id: createFacilityRequests[i].id,
+                            name: createFacilityRequests[i].name,
+                            diseaseModelId: newAsset.id
+                        }
+                    )
+                }
                 await revalidate("/app/tools/disease-model")
                 router.refresh()
 
@@ -160,11 +185,15 @@ export function EditDiseaseModelToolForm({
         return genes; // should be [{ label: "TP53", value: "TP53" }, ...]
     };
 
-    const handleInstitutionAsyncSearch = async (query: string): Promise<Option[]> => {
-        const response = await fetch(`/api/institutions?search=${query}`);
-        const data = await response.json();
-        return data;
-    };
+    const handleStorageFacilityAsyncSearch = async (query: string): Promise<Option[]> => {
+        const institutionsResponse = await fetch(`/api/institutions?search=${query}`)
+        const institutionsData = await institutionsResponse.json()
+
+        const companiesResponse = await fetch(`/api/companies?search=${query}`)
+        const companiesData = await companiesResponse.json()
+
+        return companiesData.concat(institutionsData)
+    }
 
     // Initialization - Allow update once form is initialized
     useEffect(() => {
@@ -234,7 +263,7 @@ export function EditDiseaseModelToolForm({
             <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
                 <ScrollBar />
                 <form
-                    onSubmit={form.handleSubmit(handleFormSubmit)}
+                    // onSubmit={form.handleSubmit(handleFormSubmit)}
                     className="space-y-6 m-1 pb-12"
                 >
                     <FormItem className="flex gap-2 items-center">
@@ -371,67 +400,44 @@ export function EditDiseaseModelToolForm({
                         )}
                     />
 
-                    {/* <FormField
-                        control={form.control}
-                        name="phenotype"
-                        render={({field}) => (
-                            <FormItem className={cn("w-full flex gap-4 items-center")}>
-                                <FormLabel className="w-[100px]">{`Phenotype`}</FormLabel>
-                                <div className="w-full">
-                                    <FormControl className="w-full">
-                                        <Input
-                                            id="phenotype"
-                                            className="-mt-2 w-full min-h-[40px]"
-                                            placeholder={`Enter a phenotype`}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    /> */}
-
-                    {/* <FormField
-                        control={form.control}
-                        name="patientId"
-                        render={({field}) => (
-                            <FormItem className={cn("w-full flex gap-4 items-center")}>
-                                <FormLabel className="w-[100px]">{`Linked Patient ID`}</FormLabel>
-                                <div className="w-full">
-                                    <FormControl className="w-full">
-                                        <Input
-                                            id="patientId"
-                                            className="-mt-2 w-full min-h-[40px]"
-                                            placeholder={`Enter a phenotype`}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    /> */}
-
                     <FormField
                         control={form.control}
-                        name="institutions"
+                        name="storageFacility"
                         render={({field}) => (
-                            // <FormItem className="w-full flex gap-4 items-center">
                             <FormItem className={cn("w-full flex gap-4 items-center")}>
                                 <FormLabel className="w-[100px]">Storage Facility</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
                                             {...field}
+                                            ref={storageFacilityRef}
                                             creatable={true}
+                                            createOnBlur={false}
+                                            creatableItemOverride={(props) => (
+                                                <SubmitCreateRequest
+                                                    {...props}
+                                                    parentRef={storageFacilityRef}
+                                                    onClickCallback={async (e) => {
+                                                        e.preventDefault()
+                                                        e.stopPropagation()
+                                                        const newRequest = await createCreateFacilityRequest(
+                                                            session?.user.organizationId,
+                                                            {
+                                                                name: props.inputValue,
+                                                                diseaseModelId: toolData.id
+                                                            }
+                                                        )
+                                                        setCreateRequests(prev => [...prev, newRequest])
+                                                    }}
+                                                />
+                                            )}
                                             maxSelected={1}
                                             triggerSearchOnFocus={true}
-                                            onSearch={handleInstitutionAsyncSearch}
-                                            placeholder="Search for institutions..."
+                                            onSearch={handleStorageFacilityAsyncSearch}
+                                            placeholder="Search..."
                                             hidePlaceholderWhenSelected={true}
-                                            loadingIndicator={<p>Loading institutions...</p>}
-                                            emptyIndicator={<p>No institutions found.</p>}
+                                            loadingIndicator={<p>Loading results...</p>}
+                                            emptyIndicator={<p>No results found. Try a different search.</p>}
                                             showHoverCard={false}
                                             className="-mt-2 w-full min-h-[40px]"
                                         />
@@ -441,6 +447,12 @@ export function EditDiseaseModelToolForm({
                             </FormItem>
                         )}
                     />
+
+                    <div className="flex flex-col gap-2">
+                        {createRequests.map((request, index) => (
+                            <Badge className="w-full text-sm font-normal" key={index}>{`Creation request for "${request?.name}" submitted.`}</Badge>
+                        ))}
+                    </div>
 
                     <ContactsFormField form={form} />
                     <AttachmentsFormField form={form} />
@@ -533,7 +545,7 @@ export function EditDiseaseModelToolForm({
                         variant={"cta"}
                         onClick={(e) => {
                             e.preventDefault()
-                            handleFormSubmit(form.getValues())
+                            handleFormSubmit(form.getValues(), createRequests)
                         }}
                     >
                         {isSaving 

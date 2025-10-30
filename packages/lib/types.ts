@@ -2016,7 +2016,8 @@ export const editBiosampleForm = z.object({
     // biosmaple properties
     genes: z.array(optionSchema).optional(),
     variant: z.string().optional(),
-    institutions: z.array(optionSchema).optional(),
+    // institutions: z.array(optionSchema).optional(),
+    storageFacility: z.array(optionSchema).optional(),
     anatomicalSite: z.string().optional(),
     preservationMethod: z.string().optional(),
     preservation: z.string().optional(),
@@ -2120,7 +2121,8 @@ export const editDiseaseModelForm = z.object({
 
     // disease model properties
     genes: z.array(optionSchema).optional(),
-    institutions: z.array(optionSchema).optional(),
+    // institutions: z.array(optionSchema).optional(),
+    storageFacility: z.array(optionSchema).optional(),
 })
 
 export const editDataToolForm = z.object({
@@ -2147,5 +2149,6 @@ export const editDataToolForm = z.object({
 
     genes: z.array(optionSchema).optional(),
     cohortSize: z.string().optional(),
-    institutions: z.array(optionSchema).optional(),
+    // institutions: z.array(optionSchema).optional(),
+    storageFacility: z.array(optionSchema).optional(),
 })

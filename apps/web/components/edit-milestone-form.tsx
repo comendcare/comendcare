@@ -96,7 +96,7 @@ import {usePathname} from "next/navigation"
 import {nanoid} from "nanoid"
 import {EditBiosampleToolForm} from "./edit-biosample-tool-form"
 import {EditDiseaseModelToolForm} from "./edit-disease-model-tool-form"
-import {EditDataToolForm} from "./edit-data-tool-form"
+import {EditClincalDatasetForm} from "./edit-clinical-dataset-form"
 import {MilestoneTypeBadge} from "@/packages/components/milestone-type-badge"
 import {Separator} from "@/packages/components/ui/separator"
 import dynamic from "next/dynamic";
@@ -1277,7 +1277,7 @@ export function EditMilestoneForm({
                             {`Create your Tool here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditDataToolForm
+                    <EditClincalDatasetForm
                         toolData={{}}
                         closeDialog={(newDatasample) => {
                             setCreateClinicalDatasetIsOpen(false)

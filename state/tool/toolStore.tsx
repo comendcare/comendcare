@@ -1,9 +1,8 @@
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { Asset } from '@comend/lib/types';
-import { createOrUpdateAsset, deleteAsset, syncDBAssets } from '@comend/lib/actions';
+import { createClinicalDataset, deleteAsset, updateClinicalDataset } from '@comend/lib/actions';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
-import type { Option } from '@comend/lib/types';
 
 export interface ToolState {
     tools: Asset[],
@@ -12,7 +11,7 @@ export interface ToolState {
     createTool: (tool: Partial<Asset>, orgId: string) => Promise<void>,
     updateTool: (tool: Partial<Asset>, orgId: string) => Promise<void>,
     deleteTool: (toolId: string, orgId: string) => Promise<void>,
-    saveState: (orgId: string | null | undefined) => void,
+    // saveState: (orgId: string | null | undefined) => void,
 }
 
 export const useToolStore = create<ToolState>()(
@@ -25,7 +24,7 @@ export const useToolStore = create<ToolState>()(
             },
             createTool: async (tool: Partial<Asset>, orgId: string) => {
                 console.log(`create tool`, tool)
-                const newAsset = await createOrUpdateAsset(orgId, tool)
+                const newAsset = await createClinicalDataset(orgId, tool)
 
                 mixpanelTrack("Tool Created", {
                     "ID": newAsset.id,
@@ -42,7 +41,7 @@ export const useToolStore = create<ToolState>()(
                 set({ tools: [newAsset, ...get().tools]})
             },
             updateTool: async (tool: Partial<Asset>, orgId: string) => {
-                const updatedAsset = await createOrUpdateAsset(orgId, tool)
+                const updatedAsset = await updateClinicalDataset(orgId, tool)
                 console.log(`updated tool`, updatedAsset)
 
                 mixpanelTrack("Tool Updated", {
@@ -72,9 +71,9 @@ export const useToolStore = create<ToolState>()(
                 })
                 set({ tools: get().tools.filter(tool => tool.id !== deletedAsset.id) })
             },
-            saveState: (orgId: string | null | undefined) => {
-                syncDBAssets(orgId, { tools: get().tools })
-            }
+            // saveState: (orgId: string | null | undefined) => {
+            //     syncDBAssets(orgId, { tools: get().tools })
+            // }
         }),
         {
             limit: 1, // limit the stored history states to 1 since we're only using this for the undo button right now

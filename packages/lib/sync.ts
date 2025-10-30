@@ -726,8 +726,10 @@ export const syncToTypesense = async (env: {
                 availability: true,
                 quantity: true,
                 institution: true,
+                company: true,
                 description: true,
                 genotype: true,
+                createFacilityRequests: true,
             }
         })
         const diseaseModels = await prisma.diseaseModel.findMany({
@@ -758,10 +760,12 @@ export const syncToTypesense = async (env: {
                 id: true,
                 description: true,
                 institution: true,
+                company: true,
                 gene: true,
                 types: true,
                 genotype: true,
                 strain: true,
+                createFacilityRequests: true,
             }
         })
         const clinicalDatasets = await prisma.tool.findMany({
@@ -791,9 +795,11 @@ export const syncToTypesense = async (env: {
                 title: true,
                 description: true,
                 institution: true,
+                company: true,
                 gene: true,
                 types: true,
                 cohortSize: true,
+                createFacilityRequests: true,
             }
         })
         const rfps = await prisma.rFP.findMany({

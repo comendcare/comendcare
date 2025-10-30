@@ -13,21 +13,12 @@ const toolSelector = (state: ToolState) => ({
     createTool: state.createTool,
     updateTool: state.updateTool,
     deleteTool: state.deleteTool,
-    saveState: state.saveState
 })
 
 export const DeleteAssetDialog = ({toolId, closeDialog}: {toolId: string | undefined, closeDialog?: () => void}) => {
     const {data: session} = useSession()
     const pathname = usePathname()
-    const { deleteTool, saveState } = useToolStore(useShallow(toolSelector))
-    const { undo } = useToolStore.temporal.getState()
-
-    const handleUndo = async () => {
-        undo()
-        await saveState(session?.user?.organizationId)
-        await revalidate(pathname)
-        toast.dismiss("undo-toast")
-    }
+    const { deleteTool } = useToolStore(useShallow(toolSelector))
 
     const handleDeleteAsset = async () => {
         if (!session?.user?.organizationId) {
@@ -50,17 +41,6 @@ export const DeleteAssetDialog = ({toolId, closeDialog}: {toolId: string | undef
             await deleteTool(toolId, session.user.organizationId)
             await revalidate(pathname)
             if (closeDialog) closeDialog()
-            toast(
-                <div className="flex flex-col gap-2 w-full">
-                    <span className="flex justify-between items-center">
-                        <p className="font-semibold text-gray-900">
-                            {`Tool Deleted`}
-                        </p>
-                        <Button className="self-end" onClick={handleUndo}>Undo Delete</Button>
-                    </span>
-                </div>,
-                {position: "bottom-left", duration: 20000, id: "undo-toast"}
-            )
         } catch (error) {
             console.error("Error deleting tool:", error);
             toast.error(

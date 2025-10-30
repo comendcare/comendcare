@@ -201,16 +201,7 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
             />
         ),
         cell: ({row}) => {
-            // if (row.original.institution?.website && row.original.institution?.name) {
-            //     return (
-            //         <Link className="underline" href={row.original.institution?.website}>
-            //             {row.original.institution?.name}
-            //         </Link>
-            //     )
-            // }
-            // if (row.original.institution?.name) return (<>{row.original.institution?.name}</>)
-            // return <></>
-            return <>{row.original.institution?.name}</>
+            return <>{row.original.institution?.name || row.original.company?.title}</>
         },
         enableHiding,
         enableSorting,

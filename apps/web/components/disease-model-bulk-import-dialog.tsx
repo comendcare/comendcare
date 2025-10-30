@@ -85,7 +85,7 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<z.infer
             return []
         })(),
         // storage facility
-        institutions: (() => {
+        storageFacility: (() => {
             if (foundInstitutions && foundInstitutions.length > 0 && diseaseModel['Storage Facility']) {
                 return foundInstitutions
             }
