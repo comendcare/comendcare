@@ -3955,17 +3955,30 @@ export const createRoadmap = withOrganizationAuth(
 
             try {
                 if (actor?.userId) {
-                    await customerIOOnResearchPlanCreated(actor.userId, {
-                        roadmapId: roadmap.id,
-                        orgId: organization.id,
-                        orgSubdomain: organization.subdomain,
-                        templateId: roadmapTemplate?.id,
-                        title: finalRoadmap?.title ?? roadmapTemplate?.title,
-                        numMilestones: finalRoadmap?.milestones.length ?? 0,
+                    const baseUrl =
+                        process.env.NEXT_PUBLIC_APP_URL ||
+                        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
+                    await fetch(`${baseUrl}/api/customerio/research-plan-created`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            userId: actor.userId,
+                            props: {
+                                roadmapId: roadmap.id,
+                                orgId: organization.id,
+                                orgSubdomain: organization.subdomain,
+                                templateId: roadmapTemplate?.id,
+                                title: finalRoadmap?.title ?? roadmapTemplate?.title,
+                                numMilestones: finalRoadmap?.milestones.length ?? 0,
+                            },
+                        }),
+                    }).catch((err) => {
+                        console.warn("Failed to call CustomerIO API route:", err);
                     });
                 }
             } catch (e) {
-                console.error("customerIOOnResearchPlanCreated failed:", e);
+                console.error("customerIOOnResearchPlanCreated POST failed:", e);
             }
 
             // This is to make it so that saving shows the newly created projects from the roadmap
