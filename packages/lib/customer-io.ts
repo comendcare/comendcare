@@ -1,5 +1,5 @@
 'use server'
-import Analytics from "@customerio/cdp-analytics-node"
+import { Analytics } from "@customerio/cdp-analytics-node"
 import { nanoid } from "@reduxjs/toolkit";
 import { APIClient, SendEmailRequest } from "customerio-node"
 import { Session } from "next-auth";
@@ -45,13 +45,7 @@ class CustomerIO {
     }
 
     async flush() {
-        if (this.analytics instanceof Analytics && typeof (this.analytics as any).closeAndFlush === "function") {
-            console.log("[CustomerIO] Flushing queued events...")
-            await (this.analytics as any).closeAndFlush()
-            console.log("[CustomerIO] Flush complete")
-        } else {
-            console.log("[CustomerIO] Flush skipped (Noop or unsupported analytics instance)")
-        }
+        await (this.analytics as any).closeAndFlush()
     }
 }
 
@@ -119,29 +113,32 @@ export async function customerIOOnResearchPlanCreated(
     userId: string,
     props: Record<string, any> = {}
 ) {
-    const instance = await getCustomerIOInstance()
-    console.log(`[CustomerIO] Research plan created for userId=${userId}`)
+    const instance = await getCustomerIOInstance();
+    console.log(`[CustomerIO] Research plan created for userId=${userId}`);
 
     try {
-        instance.analytics.track({
+        // ✅ await these so failures throw here (not after the function returns)
+        await instance.analytics.track({
             userId,
             event: "created_research_plan",
             properties: props,
-        })
-        console.log("[CustomerIO] 'created_research_plan' event queued")
+        });
+        console.log("[CustomerIO] 'created_research_plan' event queued");
 
-        instance.analytics.identify({
+        await instance.analytics.identify({
             userId,
             traits: { has_research_plan: true, ...props },
-        })
-        console.log("[CustomerIO] has_research_plan trait queued")
+        });
+        console.log("[CustomerIO] has_research_plan trait queued");
     } catch (err) {
-        console.error("[CustomerIO] Error during research plan event/identify:", err)
+        console.error("[CustomerIO] Error during research plan event/identify:", err);
     } finally {
-        if (IS_PROD) {
-            await instance.flush()
-        } else {
-            console.log("[CustomerIO] Skipped flush (non-prod environment)")
-        }
+        // ✅ In serverless, flush before returning so events aren't dropped
+        // Use a short timeout so you never hang the request
+        const FLUSH_TIMEOUT_MS = 1500;
+        await Promise.race([
+            instance.flush(),            // calls closeAndFlush under the hood
+            new Promise((r) => setTimeout(r, FLUSH_TIMEOUT_MS)),
+        ]);
     }
 }

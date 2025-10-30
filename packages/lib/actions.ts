@@ -9,6 +9,9 @@ import type {
     PlatformNotification,
     Review,
     Institution, Condition,
+    Biosample,
+    DiseaseModel,
+    Tool,
 } from "@prisma/client"
 import {Prisma} from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
@@ -2455,6 +2458,22 @@ export const updateDiseaseModel = withOrganizationAuth(
             if (!organization.id) throw new Error("No organization id provided.")
             if (!data.id) throw new Error("No biosample id provided.")
 
+            let foundInstitution = undefined
+            let foundCompany = undefined
+
+            if (data.storageFacility && data.storageFacility.length > 0) {
+                foundInstitution = await prisma.institution.findUnique({
+                    where: {
+                        id: data?.storageFacility?.[0]?.value
+                    }
+                })
+                foundCompany = await prisma.company.findUnique({
+                    where: {
+                        id: data?.storageFacility?.[0]?.value
+                    }
+                })
+            }
+
             const diseaseModelData: any = {
                 id: data.id,
                 types: data.types ? data.types.map(type => type.value) : undefined,
@@ -2464,7 +2483,8 @@ export const updateDiseaseModel = withOrganizationAuth(
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 description: data.description,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                institution: foundInstitution,
+                company: foundCompany,
                 milestones: (data.milestones || []).map((m) => ({
                     milestoneId: m.id,
                     biosampleId: data.id || "",
@@ -2484,6 +2504,7 @@ export const updateDiseaseModel = withOrganizationAuth(
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
                     institution: true,
+                    company: true,
                 },
                 data: {
                     ...diseaseModelData,
@@ -2493,18 +2514,6 @@ export const updateDiseaseModel = withOrganizationAuth(
                     ...(diseaseModelData.gene
                         ? ({gene: {connect: {symbol: diseaseModelData.gene.value.toUpperCase()}}})
                         : {gene: {disconnect: true}}),
-                    ...(diseaseModelData.institution
-                        ? {
-                            institution: {
-                                connectOrCreate: {
-                                    where: {id: diseaseModelData.institution.value},
-                                    create: {
-                                        name: diseaseModelData.institution.value
-                                    }
-                                }
-                            }
-                        }
-                        : {institution: {disconnect: true}}),
                     ...(diseaseModelData.attachments ? (
                         {
                             attachments: {
@@ -2545,12 +2554,16 @@ export const updateDiseaseModel = withOrganizationAuth(
                             },
                         }
                     ) : undefined),
+                    ...(diseaseModelData.institution 
+                        ? {institution: {connect: {id: diseaseModelData.institution.id}}} // if institution exists in database, connect
+                        : {institution: {disconnect: true}}), // if institution does not exist in database, disconnect
+                    ...(diseaseModelData.company 
+                        ? {company: {connect: {id: diseaseModelData.company.id}}} // if company exists in database, connect
+                        : {company: {disconnect: true}}), // if company does not exist in database, disconnect
                 },
             })
 
-            const response = await prisma.diseaseModel.findUnique({
-                where: {id: data.id}
-            })
+            const response = await prisma.diseaseModel.findUnique({where: {id: data.id}})
 
             revalidatePath("/app/tools/disease-models")
 
@@ -2567,6 +2580,22 @@ export const createDiseaseModel = withOrganizationAuth(
         try {
             if (!organization.id) throw new Error("No organization id provided.")
 
+            let foundInstitution = undefined
+            let foundCompany = undefined
+
+            if (data.storageFacility && data.storageFacility.length > 0) {
+                foundInstitution = await prisma.institution.findUnique({
+                    where: {
+                        id: data?.storageFacility?.[0].value
+                    }
+                })
+                foundCompany = await prisma.company.findUnique({
+                    where: {
+                        id: data?.storageFacility?.[0].value
+                    }
+                })
+            }
+
             const diseaseModelData: any = {
                 id: data.id,
                 types: (data.types || []).map(type => type.value),
@@ -2576,7 +2605,8 @@ export const createDiseaseModel = withOrganizationAuth(
                 private: data.isPrivate !== undefined && data.isPrivate !== null ? data.isPrivate : true,
                 description: data.description,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                institution: foundInstitution,
+                company: foundCompany,
                 milestones: (data.milestones || []).map((milestone) => {
                     return ({
                         milestoneId: milestone.id,
@@ -2597,6 +2627,7 @@ export const createDiseaseModel = withOrganizationAuth(
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
                     institution: true,
+                    company: true,
                 },
                 data: {
                     ...diseaseModelData,
@@ -2609,18 +2640,12 @@ export const createDiseaseModel = withOrganizationAuth(
                     ...(diseaseModelData.gene
                         ? ({gene: {connect: {symbol: diseaseModelData.gene.value.toUpperCase()}}})
                         : undefined),
-                    ...(diseaseModelData.institution
-                        ? ({
-                            institution: {
-                                connectOrCreate: {
-                                    where: {id: diseaseModelData.institution.value},
-                                    create: {
-                                        name: diseaseModelData.institution.value,
-                                    }
-                                }
-                            }
-                        })
-                        : undefined),
+                    ...(diseaseModelData.institution 
+                        ? ({institution: {connect: {id: diseaseModelData.institution.id}}}) // if institution exists in database, connect
+                        : ({institution: undefined})), // if institution does not exist in database, don't connect
+                    ...(diseaseModelData.company 
+                        ? ({company: {connect: {id: diseaseModelData.company.id}}}) // if company exists in database, connect
+                        : ({institution: undefined})), // if company does not exist in database, don't connect
                     attachments: {
                         createMany: {
                             data: (diseaseModelData?.attachments || []).map((attachment: any) => ({
@@ -2671,14 +2696,28 @@ function generateDonorNanoid() {
     return (id.slice(0, 4) + '-' + id.slice(4))
 }
 
-export const createDataTool = withOrganizationAuth(
+export const createClinicalDataset = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editDataToolForm>) => {
         try {
             if (!organization.id) {
                 throw new Error("No organization id provided.")
             }
 
-            console.log(`incoming data`, data)
+            let foundInstitution = undefined
+            let foundCompany = undefined
+
+            if (data.storageFacility && data.storageFacility.length > 0) {
+                foundInstitution = await prisma.institution.findUnique({
+                    where: {
+                        id: data?.storageFacility?.[0].value
+                    }
+                })
+                foundCompany = await prisma.company.findUnique({
+                    where: {
+                        id: data?.storageFacility?.[0].value
+                    }
+                })
+            }
 
             const dataToolData: any = {
                 id: data.id,
@@ -2697,7 +2736,8 @@ export const createDataTool = withOrganizationAuth(
                 contacts: data.contacts,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                institution: foundInstitution,
+                company: foundCompany,
                 notes: data.notes,
             }
 
@@ -2713,6 +2753,7 @@ export const createDataTool = withOrganizationAuth(
                         }
                     },
                     institution: true,
+                    company: true,
                 },
                 data: {
                     ...dataToolData,
@@ -2756,18 +2797,12 @@ export const createDataTool = withOrganizationAuth(
                     )
                         ? {cohortSize: data.cohortSize !== '' ? JSON.parse(data.cohortSize) : null}
                         : undefined),
-                    ...(dataToolData.institution
-                        ? ({
-                            institution: {
-                                connectOrCreate: {
-                                    where: {id: dataToolData.institution.value},
-                                    create: {
-                                        name: dataToolData.institution.value,
-                                    }
-                                }
-                            }
-                        })
-                        : undefined),
+                    ...(dataToolData.institution 
+                        ? ({institution: {connect: {id: dataToolData.institution.id}}}) // if institution exists in database, connect
+                        : ({institution: undefined})), // if institution does not exist in database, don't connect
+                    ...(dataToolData.company 
+                        ? ({company: {connect: {id: dataToolData.company.id}}}) // if company exists in database, connect
+                        : ({institution: undefined})), // if company does not exist in database, don't connect
                 }
             })
 
@@ -2805,7 +2840,7 @@ export const setDataToolsVisibility = withOrganizationAuth(
     }
 )
 
-export const updateDataTool = withOrganizationAuth(
+export const updateClinicalDataset = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editDataToolForm>) => {
         try {
             if (!organization.id) {
@@ -2814,6 +2849,22 @@ export const updateDataTool = withOrganizationAuth(
 
             if (!data.id) {
                 throw new Error("No data tool id provided.")
+            }
+
+            let foundInstitution = undefined
+            let foundCompany = undefined
+
+            if (data.storageFacility && data.storageFacility.length > 0) {
+                foundInstitution = await prisma.institution.findUnique({
+                    where: {
+                        id: data?.storageFacility?.[0]?.value
+                    }
+                })
+                foundCompany = await prisma.company.findUnique({
+                    where: {
+                        id: data?.storageFacility?.[0]?.value
+                    }
+                })
             }
 
             const dataToolData: any = {
@@ -2833,7 +2884,8 @@ export const updateDataTool = withOrganizationAuth(
                 contacts: data.contacts,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                institution: foundInstitution,
+                company: foundCompany,
                 notes: data.notes,
             }
 
@@ -2850,6 +2902,7 @@ export const updateDataTool = withOrganizationAuth(
                         }
                     },
                     institution: true,
+                    company: true,
                 },
                 data: {
                     ...dataToolData,
@@ -2900,18 +2953,12 @@ export const updateDataTool = withOrganizationAuth(
                             connect: {symbol: dataToolData.gene.value.toUpperCase()}
                         }
                     }) : {gene: {disconnect: true}}),
-                    ...(dataToolData.institution
-                        ? {
-                            institution: {
-                                connectOrCreate: {
-                                    where: {id: dataToolData.institution.value},
-                                    create: {
-                                        name: dataToolData.institution.value
-                                    }
-                                }
-                            }
-                        }
-                        : {institution: {disconnect: true}}),
+                    ...(dataToolData.institution 
+                        ? {institution: {connect: {id: dataToolData.institution.id}}} // if institution exists in database, connect
+                        : {institution: {disconnect: true}}), // if institution does not exist in database, disconnect
+                    ...(dataToolData.company 
+                        ? {company: {connect: {id: dataToolData.company.id}}} // if company exists in database, connect
+                        : {company: {disconnect: true}}), // if company does not exist in database, disconnect
                 },
             })
 
@@ -2931,6 +2978,74 @@ export const updateDataTool = withOrganizationAuth(
     }
 )
 
+export const updateCreateFacilityRequest = withOrganizationAuth(
+    async (organization: Organization, data: {
+        id: string,
+        name: string,
+        biosampleId?: string,
+        diseaseModelId?: string,
+        clinicalDatasetId?: string
+    }) => {
+        console.log(`create data`, data)
+        const newRequest = await prisma.createFacilityRequest.update({
+            where: {
+                id: data.id
+            },
+            include: {
+                biosample: true,
+                diseaseModel: true,
+                clinicalDataset: true,
+            },
+            data: {
+                name: data.name,
+                ...(data.biosampleId
+                    ? ({biosample: {connect: {id: data.biosampleId}}}) 
+                    : undefined),
+                ...(data.diseaseModelId
+                    ? ({diseaseModel: {connect: {id: data.diseaseModelId}}}) 
+                    : undefined),
+                ...(data.clinicalDatasetId
+                    ? ({clinicalDataset: {connect: {id: data.clinicalDatasetId}}}) 
+                    : undefined)
+            }
+        })
+
+        return newRequest
+    }
+)
+
+export const createCreateFacilityRequest = withOrganizationAuth(
+    async (organization: Organization, data: {
+        name: string,
+        biosampleId?: string,
+        diseaseModelId?: string,
+        clinicalDatasetId?: string
+    }) => {
+        console.log(`create data`, data)
+        const newRequest = await prisma.createFacilityRequest.create({
+            include: {
+                biosample: true,
+                diseaseModel: true,
+                clinicalDataset: true,
+            },
+            data: {
+                name: data.name,
+                ...(data.biosampleId
+                    ? ({biosample: {connect: {id: data.biosampleId}}}) 
+                    : undefined),
+                ...(data.diseaseModelId
+                    ? ({diseaseModel: {connect: {id: data.diseaseModelId}}}) 
+                    : undefined),
+                ...(data.clinicalDatasetId
+                    ? ({clinicalDataset: {connect: {id: data.clinicalDatasetId}}}) 
+                    : undefined)
+            }
+        })
+
+        return newRequest
+    }
+)
+
 export const createBiosample = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
         try {
@@ -2940,7 +3055,21 @@ export const createBiosample = withOrganizationAuth(
                 throw new Error("No organization id provided.")
             }
 
-            // console.log(`incoming data`, data)
+            let foundInstitution = undefined
+            let foundCompany = undefined
+
+            if (data.storageFacility && data.storageFacility.length > 0) {
+                foundInstitution = await prisma.institution.findUnique({
+                    where: {
+                        id: data?.storageFacility?.[0].value
+                    }
+                })
+                foundCompany = await prisma.company.findUnique({
+                    where: {
+                        id: data?.storageFacility?.[0].value
+                    }
+                })
+            }
 
             const biosampleData: any = {
                 id: data.id,
@@ -2972,14 +3101,13 @@ export const createBiosample = withOrganizationAuth(
                 priceUnit: data.priceUnit,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 variant: data.variant,
-                institution: data.institutions && data.institutions.length > 0 ? data.institutions[0] : undefined,
+                institution: foundInstitution,
+                company: foundCompany,
                 genotype: data.genotype,
                 notes: data.notes,
                 // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
                 // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
             }
-
-            // console.log(`biosample data`, biosampleData)
 
             const response = await prisma.biosample.create({
                 include: {
@@ -2994,6 +3122,7 @@ export const createBiosample = withOrganizationAuth(
                     },
                     donor: true,
                     institution: true,
+                    company: true
                 },
                 data: {
                     ...biosampleData,
@@ -3032,18 +3161,12 @@ export const createBiosample = withOrganizationAuth(
                         // transform symbol to uppercase because all genes are uppercase in our database
                         ? ({gene: {connect: {symbol: biosampleData.gene.value.toUpperCase() }}})
                         : undefined),
-                    ...(biosampleData.institution
-                        ? ({
-                            institution: {
-                                connectOrCreate: {
-                                    where: {id: biosampleData.institution.value},
-                                    create: {
-                                        name: biosampleData.institution.value,
-                                    }
-                                }
-                            }
-                        })
-                        : undefined),
+                    ...(biosampleData.institution 
+                        ? ({institution: {connect: {id: biosampleData.institution.id}}}) // if institution exists in database, connect
+                        : ({institution: undefined})), // if institution does not exist in database, don't connect
+                    ...(biosampleData.company 
+                        ? ({company: {connect: {id: biosampleData.company.id}}}) // if company exists in database, connect
+                        : ({institution: undefined})), // if company does not exist in database, don't connect
                     donor: {
                         connectOrCreate: {
                             where: {id: data.donorId || nanoid()},
@@ -3157,6 +3280,22 @@ export const updateBiosample = withOrganizationAuth(
             });
             if (!existing) throw new Error("Biosample not found.");
 
+            let foundInstitution = undefined
+            let foundCompany = undefined
+
+            if (data.storageFacility && data.storageFacility.length > 0) {
+                foundInstitution = await prisma.institution.findUnique({
+                    where: {
+                        id: data?.storageFacility?.[0]?.value
+                    }
+                })
+                foundCompany = await prisma.company.findUnique({
+                    where: {
+                        id: data?.storageFacility?.[0]?.value
+                    }
+                })
+            }
+
             const biosampleData: any = {
                 id: data.id,
                 types: data.types ? data.types.map((t) => t.value) : undefined,
@@ -3187,10 +3326,8 @@ export const updateBiosample = withOrganizationAuth(
                 priceUnit: data.priceUnit,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 variant: data.variant,
-                institution:
-                    data.institutions && data.institutions.length > 0
-                        ? data.institutions[0]
-                        : undefined,
+                institution: foundInstitution,
+                company: foundCompany,
                 genotype: data.genotype,
                 notes: data.notes,
             };
@@ -3207,6 +3344,7 @@ export const updateBiosample = withOrganizationAuth(
                     },
                     donor: true,
                     institution: true,
+                    company: true,
                 },
                 data: {
                     ...biosampleData,
@@ -3256,18 +3394,12 @@ export const updateBiosample = withOrganizationAuth(
                     ...(biosampleData.gene
                         ? {gene: {connect: {symbol: biosampleData.gene.value.toUpperCase()}}}
                         : {gene: {disconnect: true}}),
-                    ...(biosampleData.institution
-                        ? {
-                            institution: {
-                                connectOrCreate: {
-                                    where: {id: biosampleData.institution.value},
-                                    create: {
-                                        name: biosampleData.institution.value
-                                    }
-                                }
-                            }
-                        }
-                        : {institution: {disconnect: true}}),
+                    ...(biosampleData.institution 
+                        ? {institution: {connect: {id: biosampleData.institution.id}}} // if institution exists in database, connect
+                        : {institution: {disconnect: true}}), // if institution does not exist in database, disconnect
+                    ...(biosampleData.company 
+                        ? {company: {connect: {id: biosampleData.company.id}}} // if company exists in database, connect
+                        : {company: {disconnect: true}}), // if company does not exist in database, disconnect
                     ...(data.donorId
                         ? {donor: {connect: {id: data.donorId}}}
                         : {donor: {disconnect: true}}),
@@ -3350,423 +3482,122 @@ export const updateBiosample = withOrganizationAuth(
     }
 );
 
-export const createOrUpdateBiosample = withOrganizationAuth(
-    async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {
-        try {
-            if (!organization.id) {
-                throw new Error("No organization id provided.")
-            }
+// export const createOrUpdateAsset = withOrganizationAuth(
+//     async (organization: Organization, toolData: any) => {
+//         try {
+//             console.log(`tool data`, toolData)
+//             if (!organization.id) {
+//                 throw new Error("No organization id provided.")
+//             }
 
-            // import
-            // for import will have to keep track of created donors and map their PAG id to their unique DB id
-            // pass in donor id
-            // if donor id exists, connect to existing donor
+//             const response = await prisma.tool.upsert({
+//                 where: {
+//                     id: toolData.id || nanoid()
+//                 },
+//                 include: {
+//                     organization: {include: {conditions: {include: {condition: true}}}},
+//                     contacts: true,
+//                     attachments: true,
+//                     milestones: {
+//                         include: {
+//                             milestone: {
+//                                 include: {types: {include: {milestoneType: true}}}
+//                             }
+//                         }
+//                     },
+//                 },
+//                 update: {
+//                     title: toolData.title,
+//                     description: toolData.description,
+//                     types: toolData.types,
+//                     ...(toolData.attachments ? (
+//                         {
+//                             attachments: {
+//                                 deleteMany: {}, // clear all existing attachments
+//                                 createMany: {
+//                                     data: (toolData?.attachments || []).map((attachment: any) => ({
+//                                         link: attachment.link,
+//                                         ...(attachment.name ? {name: attachment.name} : undefined)
+//                                     }))
+//                                 }
+//                             }
+//                         }
+//                     ) : undefined),
+//                     ...(toolData.contacts ? (
+//                         {
+//                             contacts: {
+//                                 deleteMany: {},
+//                                 createMany: {
+//                                     data: (toolData?.contacts || []).map((contact: any) => ({
+//                                         name: contact.name,
+//                                         email: contact.email,
+//                                         ...(contact.role ? {role: contact.role} : undefined),
+//                                         ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+//                                     }))
+//                                 }
+//                             }
+//                         }
+//                     ) : undefined),
+//                     ...(toolData.milestones ? (
+//                         {
+//                             milestones: {
+//                                 deleteMany: {},
+//                                 create: (toolData.milestones || []).map((milestone: any) => ({
+//                                     milestone: {
+//                                         connect: {id: milestone.milestoneId}
+//                                     }
+//                                 }))
+//                             },
+//                         }
+//                     ) : undefined),
+//                     private: toolData.private || false,
+//                     metadata: toolData.metadata as InputJsonObject,
+//                 },
+//                 create: {
+//                     // create with the given id if it's available. This is useful for situations like 'undo'
+//                     // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
+//                     ...(toolData.id ? {id: toolData.id} : undefined),
+//                     title: toolData.title || "",
+//                     description: toolData.description,
+//                     types: toolData.types,
+//                     attachments: {
+//                         createMany: {
+//                             data: (toolData?.attachments || []).map((attachment: any) => ({
+//                                 link: attachment.link,
+//                                 ...(attachment.name ? {name: attachment.name} : undefined)
+//                             }))
+//                         }
+//                     },
+//                     contacts: {
+//                         createMany: {
+//                             data: (toolData?.contacts || []).map((contact: any) => ({
+//                                 name: contact.name,
+//                                 email: contact.email,
+//                                 ...(contact.role ? {role: contact.role} : undefined),
+//                                 ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+//                             }))
+//                         }
+//                     },
+//                     milestones: {
+//                         create: (toolData.milestones || []).map((milestone: any) => ({
+//                             milestone: {
+//                                 connect: {id: milestone.milestoneId}
+//                             }
+//                         }))
+//                     },
+//                     private: toolData.private || false,
+//                     organization: {connect: {id: organization.id}},
+//                     metadata: toolData.metadata as InputJsonObject,
+//                 },
+//             })
 
-            // create & update
-            // separate create & update
-            // create - if donor id exists, create with existing donor
-            // update - if donor id !== biosample.donorId, connect to new donor, then update newly connected donor
-
-            // might have to separate donor and biosample forms
-
-            const {
-                description,
-                types,
-                institutions,
-                otherTypeDetails,
-                attachments,
-                isPrivate,
-                contacts,
-                milestones,
-                anatomicalSite,
-                preservationMethod,
-                methodOfTransport,
-                currentCountry,
-                countryOfCollection,
-                collectionDate,
-                biosampleDiagnosis,
-                yearOfExcision,
-                ageAtExcision,
-                genes,
-                variant,
-                age,
-                sex,
-                gender,
-                race,
-                ethnicity,
-                treatments,
-                diagnoses,
-                height,
-                weight,
-                bmi,
-                medications,
-                availability,
-                quantity,
-                quantityUnit,
-                price,
-                priceUnit,
-            } = data;
-
-            console.log(`incoming data`, data)
-
-            const biosampleData: any = {
-                id: data.id,
-                types: (types || []).map(type => type.value),
-                metadata: {
-                    // ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
-                    otherTypeDetails: otherTypeDetails
-                } as JsonObject,
-                private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
-                milestones: (milestones || []).map((milestone) => {
-                    return ({
-                        milestoneId: milestone.id,
-                        biosampleId: data.id || '',
-                    })
-                }),
-                ...(description !== undefined && description !== null ? {description} : undefined),
-                ...(attachments ? {attachments} : undefined),
-                ...(contacts ? {contacts} : undefined),
-                anatomicalSite,
-                preservationMethod,
-                methodOfTransport,
-                currentCountry,
-                countryOfCollection,
-                collectionDate,
-                availability,
-                ...(quantity !== undefined && quantity !== null ? {quantity: JSON.parse(quantity)} : undefined),
-                quantityUnit,
-                ...(price !== undefined && price !== null ? {price: JSON.parse(price)} : undefined),
-                priceUnit,
-                gene: genes && genes.length > 0 ? genes[0] : undefined,
-                variant,
-                institution: institutions && institutions.length > 0 ? institutions[0] : undefined
-                // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
-                // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
-            }
-
-            const donorData: any = {
-                age: typeof age === 'string' ? parseInt(age, 10) : age,
-                sex,
-                gender,
-                race,
-                ethnicity,
-                treatments,
-                diagnoses,
-                height: typeof height === 'string' ? parseInt(height, 10) : height,
-                weight: typeof weight === 'string' ? parseInt(weight, 10) : weight,
-                bmi: typeof bmi === 'string' ? parseInt(bmi, 10) : bmi,
-                medications,
-            }
-
-            console.log(`biosample data`, biosampleData)
-            console.log(`donor data`, donorData)
-
-            const response = await prisma.biosample.upsert({
-                where: {id: biosampleData.id || nanoid()},
-                include: {
-                    contacts: true,
-                    attachments: true,
-                    milestones: {
-                        include: {
-                            milestone: {
-                                include: {types: {include: {milestoneType: true}}}
-                            }
-                        }
-                    },
-                    donor: true,
-                    institution: true,
-                },
-                update: {
-                    ...biosampleData,
-                    ...(biosampleData.attachments ? (
-                        {
-                            attachments: {
-                                deleteMany: {}, // clear all existing attachments
-                                createMany: {
-                                    data: (biosampleData?.attachments || []).map((attachment: any) => ({
-                                        link: attachment.link,
-                                        ...(attachment.name ? {name: attachment.name} : undefined)
-                                    }))
-                                }
-                            }
-                        }
-                    ) : undefined),
-                    ...(biosampleData.contacts ? (
-                        {
-                            contacts: {
-                                deleteMany: {},
-                                createMany: {
-                                    data: (biosampleData?.contacts || []).map((contact: any) => ({
-                                        name: contact.name,
-                                        email: contact.email,
-                                        ...(contact.role ? {role: contact.role} : undefined),
-                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                                    }))
-                                }
-                            }
-                        }
-                    ) : undefined),
-                    ...(biosampleData.milestones ? (
-                        {
-                            milestones: {
-                                deleteMany: {},
-                                create: (biosampleData.milestones || []).map((milestone: any) => ({
-                                    milestone: {
-                                        connect: {id: milestone.milestoneId}
-                                    }
-                                }))
-                            },
-                        }
-                    ) : undefined),
-                    private: biosampleData.private || false,
-                    metadata: biosampleData.metadata as InputJsonObject,
-                    ...(biosampleData.gene ? ({
-                        gene: {
-                            connect: {symbol: biosampleData.gene.value.toUpperCase()}
-                        }
-                    }) : {gene: {disconnect: true}}),
-                    ...(biosampleData.institution ? ({
-                        institution: {connect: {id: biosampleData.institution.value}}
-                    }) : {institution: {disconnect: true}}),
-                    donor: {
-                        upsert: {
-                            update: {
-                                ...donorData,
-                                organization: {connect: {id: organization.id}},
-                                diagnoses: {
-                                    deleteMany: {},
-                                    create: donorData?.diagnoses?.map((diagnosis: {
-                                        diagnosis: Option[],
-                                        severity: string | undefined
-                                    }) => ({
-                                        severity: diagnosis.severity,
-                                        type: {
-                                            connectOrCreate: {
-                                                where: {id: diagnosis.diagnosis[0].value},
-                                                create: {
-                                                    id: diagnosis.diagnosis[0].value,
-                                                    label: diagnosis.diagnosis[0].label
-                                                }
-                                            }
-                                        }
-                                    }))
-                                }
-                            },
-                            create: {
-                                ...donorData,
-                                organization: {connect: {id: organization.id}},
-                                diagnoses: {
-                                    create: donorData?.diagnoses?.map((diagnosis: {
-                                        diagnosis: Option[],
-                                        severity: string | undefined
-                                    }) => ({
-                                        severity: diagnosis.severity,
-                                        type: {
-                                            connectOrCreate: {
-                                                where: {id: diagnosis.diagnosis[0].value},
-                                                create: {
-                                                    id: diagnosis.diagnosis[0].value,
-                                                    label: diagnosis.diagnosis[0].label
-                                                }
-                                            }
-                                        }
-                                    }))
-                                }
-                            }
-                        }
-                    }
-                },
-                create: {
-                    ...biosampleData,
-                    // create with the given id if it's available. This is useful for situations like 'undo'
-                    // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
-                    ...(biosampleData.id ? {id: biosampleData.id} : undefined),
-                    attachments: {
-                        createMany: {
-                            data: (biosampleData?.attachments || []).map((attachment: any) => ({
-                                link: attachment.link,
-                                ...(attachment.name ? {name: attachment.name} : undefined)
-                            }))
-                        }
-                    },
-                    contacts: {
-                        createMany: {
-                            data: (biosampleData?.contacts || []).map((contact: any) => ({
-                                name: contact.name,
-                                email: contact.email,
-                                ...(contact.role ? {role: contact.role} : undefined),
-                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                            }))
-                        }
-                    },
-                    milestones: {
-                        create: (biosampleData.milestones || []).map((milestone: any) => ({
-                            milestone: {
-                                connect: {id: milestone.milestoneId}
-                            }
-                        }))
-                    },
-                    private: biosampleData.private || false,
-                    organization: {connect: {id: organization.id}},
-                    metadata: biosampleData.metadata as InputJsonObject,
-                    ...(biosampleData.gene ? ({
-                        gene: {
-                            connect: {symbol: biosampleData.gene.value.toUpperCase()}
-                        }
-                    }) : undefined),
-                    ...(biosampleData.institution ? ({
-                        institution: {connect: {id: biosampleData.institution.value}}
-                    }) : undefined),
-                    donor: {
-                        create: {
-                            ...donorData,
-                            organization: {connect: {id: organization.id}},
-                            diagnoses: {
-                                create: donorData?.diagnoses?.map((diagnosis: {
-                                    diagnosis: Option[],
-                                    severity: string | undefined
-                                }) => ({
-                                    severity: diagnosis.severity,
-                                    type: {
-                                        connectOrCreate: {
-                                            where: {id: diagnosis.diagnosis[0].value},
-                                            create: {
-                                                id: diagnosis.diagnosis[0].value,
-                                                label: diagnosis.diagnosis[0].label
-                                            }
-                                        }
-                                    }
-                                }))
-                            }
-                        }
-                    }
-                }
-            })
-
-            return response
-        } catch (error: any) {
-            console.error("Error creating or updating biosample:", error.message);
-            throw new Error(error.message || "Failed to create or update biosample.");
-        }
-    }
-)
-
-export const createOrUpdateAsset = withOrganizationAuth(
-    async (organization: Organization, toolData: any) => {
-        try {
-            console.log(`tool data`, toolData)
-            if (!organization.id) {
-                throw new Error("No organization id provided.")
-            }
-
-            const response = await prisma.tool.upsert({
-                where: {
-                    id: toolData.id || nanoid()
-                },
-                include: {
-                    organization: {include: {conditions: {include: {condition: true}}}},
-                    contacts: true,
-                    attachments: true,
-                    milestones: {
-                        include: {
-                            milestone: {
-                                include: {types: {include: {milestoneType: true}}}
-                            }
-                        }
-                    },
-                },
-                update: {
-                    title: toolData.title,
-                    description: toolData.description,
-                    types: toolData.types,
-                    ...(toolData.attachments ? (
-                        {
-                            attachments: {
-                                deleteMany: {}, // clear all existing attachments
-                                createMany: {
-                                    data: (toolData?.attachments || []).map((attachment: any) => ({
-                                        link: attachment.link,
-                                        ...(attachment.name ? {name: attachment.name} : undefined)
-                                    }))
-                                }
-                            }
-                        }
-                    ) : undefined),
-                    ...(toolData.contacts ? (
-                        {
-                            contacts: {
-                                deleteMany: {},
-                                createMany: {
-                                    data: (toolData?.contacts || []).map((contact: any) => ({
-                                        name: contact.name,
-                                        email: contact.email,
-                                        ...(contact.role ? {role: contact.role} : undefined),
-                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                                    }))
-                                }
-                            }
-                        }
-                    ) : undefined),
-                    ...(toolData.milestones ? (
-                        {
-                            milestones: {
-                                deleteMany: {},
-                                create: (toolData.milestones || []).map((milestone: any) => ({
-                                    milestone: {
-                                        connect: {id: milestone.milestoneId}
-                                    }
-                                }))
-                            },
-                        }
-                    ) : undefined),
-                    private: toolData.private || false,
-                    metadata: toolData.metadata as InputJsonObject,
-                },
-                create: {
-                    // create with the given id if it's available. This is useful for situations like 'undo'
-                    // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
-                    ...(toolData.id ? {id: toolData.id} : undefined),
-                    title: toolData.title || "",
-                    description: toolData.description,
-                    types: toolData.types,
-                    attachments: {
-                        createMany: {
-                            data: (toolData?.attachments || []).map((attachment: any) => ({
-                                link: attachment.link,
-                                ...(attachment.name ? {name: attachment.name} : undefined)
-                            }))
-                        }
-                    },
-                    contacts: {
-                        createMany: {
-                            data: (toolData?.contacts || []).map((contact: any) => ({
-                                name: contact.name,
-                                email: contact.email,
-                                ...(contact.role ? {role: contact.role} : undefined),
-                                ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-                            }))
-                        }
-                    },
-                    milestones: {
-                        create: (toolData.milestones || []).map((milestone: any) => ({
-                            milestone: {
-                                connect: {id: milestone.milestoneId}
-                            }
-                        }))
-                    },
-                    private: toolData.private || false,
-                    organization: {connect: {id: organization.id}},
-                    metadata: toolData.metadata as InputJsonObject,
-                },
-            })
-
-            return response
-        } catch (error: any) {
-            console.error("Error creating or updating tool:", error.message);
-            throw new Error(error.message || "Failed to create or update tool.");
-        }
-    }
-)
+//             return response
+//         } catch (error: any) {
+//             console.error("Error creating or updating tool:", error.message);
+//             throw new Error(error.message || "Failed to create or update tool.");
+//         }
+//     }
+// )
 
 export const deleteRFP = withOrganizationAuth(
     async (_: Organization, rfpId: string) => {
@@ -4124,17 +3955,30 @@ export const createRoadmap = withOrganizationAuth(
 
             try {
                 if (actor?.userId) {
-                    await customerIOOnResearchPlanCreated(actor.userId, {
-                        roadmapId: roadmap.id,
-                        orgId: organization.id,
-                        orgSubdomain: organization.subdomain,
-                        templateId: roadmapTemplate?.id,
-                        title: finalRoadmap?.title ?? roadmapTemplate?.title,
-                        numMilestones: finalRoadmap?.milestones.length ?? 0,
+                    const baseUrl =
+                        process.env.NEXT_PUBLIC_APP_URL ||
+                        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
+                    await fetch(`${baseUrl}/api/customerio/research-plan-created`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            userId: actor.userId,
+                            props: {
+                                roadmapId: roadmap.id,
+                                orgId: organization.id,
+                                orgSubdomain: organization.subdomain,
+                                templateId: roadmapTemplate?.id,
+                                title: finalRoadmap?.title ?? roadmapTemplate?.title,
+                                numMilestones: finalRoadmap?.milestones.length ?? 0,
+                            },
+                        }),
+                    }).catch((err) => {
+                        console.warn("Failed to call CustomerIO API route:", err);
                     });
                 }
             } catch (e) {
-                console.error("customerIOOnResearchPlanCreated failed:", e);
+                console.error("customerIOOnResearchPlanCreated POST failed:", e);
             }
 
             // This is to make it so that saving shows the newly created projects from the roadmap
@@ -4793,54 +4637,55 @@ export const updateEdges = withOrganizationAuth(
 )
 
 /* HANDLE MILESTONES, ASSETS & RFPS - create, update, delete ------------------------------------------------------------- */
-export const syncDBAssets = withOrganizationAuth(
-    async (_: Organization, {tools}: { tools: Asset[] }) => {
-        try {
-            let updateAssets: Asset[] = []
-            const session = await getSession()
+// export const syncDBAssets = withOrganizationAuth(
+//     async (_: Organization, {tools}: { tools: Asset[] }) => {
+//         try {
+//             let updateAssets: Asset[] = []
+//             const session = await getSession()
 
-            if (!session?.user.organizationId) throw new Error("No session available")
+//             if (!session?.user.organizationId) throw new Error("No session available")
 
-            await Promise.all(
-                tools.map(async (tool: Asset) => {
-                    const previousAsset: Asset | null = await prisma.tool.findUnique({
-                        where: {id: tool.id},
-                        include: {
-                            organization: {include: {conditions: {include: {condition: true}}}},
-                            contacts: true,
-                            attachments: true,
-                            milestones: {
-                                include: {
-                                    milestone: true
-                                }
-                            },
-                            institution: true,
-                            gene: true,
-                        }
-                    })
+//             await Promise.all(
+//                 tools.map(async (tool: Asset) => {
+//                     const previousAsset: Asset | null = await prisma.tool.findUnique({
+//                         where: {id: tool.id},
+//                         include: {
+//                             organization: {include: {conditions: {include: {condition: true}}}},
+//                             contacts: true,
+//                             attachments: true,
+//                             milestones: {
+//                                 include: {
+//                                     milestone: true
+//                                 }
+//                             },
+//                             institution: true,
+//                             gene: true,
+//                         }
+//                     })
 
-                    if (!previousAsset) {
-                        // if the tool does not exist, re-create it
-                        const a = await createOrUpdateAsset(session.user.organizationId, tool)
-                        updateAssets = [...updateAssets, a]
-                    } else {
-                        // if the tool does exist, update it's properties
-                        updateAssets = [...updateAssets, previousAsset]
-                    }
-                })
-            )
+//                     if (!previousAsset) {
+//                         // if the tool does not exist, re-create it
+//                         const a = await createClinicalDataset(session.user.organizationId, tool)
+//                         updateAssets = [...updateAssets, a]
+//                     } else {
+//                         // if the tool does exist, update it's properties
+//                         const a = await updateClinicalDataset(session.user.organizationId, tool)
+//                         updateAssets = [...updateAssets, a]
+//                     }
+//                 })
+//             )
 
-            // delete any tools that no longer exist
-            // const dbAssetIds = await prisma.tool.findMany({
-            //     where: {organizationId: session.user.organizationId}
-            // }).map(tool => )
+//             // delete any tools that no longer exist
+//             // const dbAssetIds = await prisma.tool.findMany({
+//             //     where: {organizationId: session.user.organizationId}
+//             // }).map(tool => )
 
-            return {success: true, data: updateAssets}
-        } catch (e) {
-            return {success: false, error: e}
-        }
-    }
-)
+//             return {success: true, data: updateAssets}
+//         } catch (e) {
+//             return {success: false, error: e}
+//         }
+//     }
+// )
 
 export const syncDBRFPs = withOrganizationAuth(
     async (_: Organization, {rfps}: { rfps: RFP[] }) => {

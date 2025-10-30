@@ -96,7 +96,7 @@ import {usePathname} from "next/navigation"
 import {nanoid} from "nanoid"
 import {EditBiosampleToolForm} from "./edit-biosample-tool-form"
 import {EditDiseaseModelToolForm} from "./edit-disease-model-tool-form"
-import {EditDataToolForm} from "./edit-data-tool-form"
+import {EditClincalDatasetForm} from "./edit-clinical-dataset-form"
 import {MilestoneTypeBadge} from "@/packages/components/milestone-type-badge"
 import {Separator} from "@/packages/components/ui/separator"
 import dynamic from "next/dynamic";
@@ -1277,7 +1277,7 @@ export function EditMilestoneForm({
                             {`Create your Tool here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditDataToolForm
+                    <EditClincalDatasetForm
                         toolData={{}}
                         closeDialog={(newDatasample) => {
                             setCreateClinicalDatasetIsOpen(false)
@@ -1336,12 +1336,18 @@ export function EditMilestoneForm({
                 <DialogContent className="min-w-fit">
                     {organization && "subdomain" in organization && typeof organization.subdomain === "string" ? (
                         <ShareDialog
-                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
+                            url={`${process.env.NEXT_PUBLIC_VERCEL_ENV
+                                ? `https://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                : `http://${organization.subdomain}.localhost:3000`
+                            }/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
                             organization={organization}
                             postMessage={`A new project ${formData.title} has been added to ${organization.name} ${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${milestoneData.roadmapId}?project=${milestoneData.id}`}
                             postSubject={`A new project ${formData.title} has been added to ${organization.name}`}
                             embeddedProjectData={{
-                                embeddedProjectLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/embed/${organization.subdomain}/research-plan/${milestoneData.roadmapId}/project/${milestoneData.id}`,
+                                embeddedProjectLink: `${process.env.NEXT_PUBLIC_VERCEL_ENV
+                                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                                    : `http://localhost:3000`
+                                }/embed/${organization.subdomain}/research-plan/${milestoneData.roadmapId}/project/${milestoneData.id}`,
                                 projectId: milestoneData.id,
                                 projectTitle: milestoneData.title
                             }}

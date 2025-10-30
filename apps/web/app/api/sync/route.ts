@@ -710,8 +710,10 @@ const syncToTypesense = async (env: {
                 availability: true,
                 quantity: true,
                 institution: true,
+                company: true,
                 description: true,
                 genotype: true,
+                createFacilityRequests: true,
             }
         })
         const diseaseModels = await prisma.diseaseModel.findMany({
@@ -740,10 +742,12 @@ const syncToTypesense = async (env: {
                 id: true,
                 description: true,
                 institution: true,
+                company: true,
                 gene: true,
                 types: true,
                 genotype: true,
                 strain: true,
+                createFacilityRequests: true,
             }
         })
         const clinicalDatasets = await prisma.tool.findMany({
@@ -773,9 +777,46 @@ const syncToTypesense = async (env: {
                 title: true,
                 description: true,
                 institution: true,
+                company: true,
                 gene: true,
                 types: true,
                 cohortSize: true,
+                createFacilityRequests: true,
+            }
+        })
+        const rfps = await prisma.rFP.findMany({
+            where: {
+                private: false // only sync public biosamples
+            },
+            select: {
+                createdAt: true,
+                // this list must include ALL items that allow sorting in the table
+                // otherwise the sorting will not function
+                organization: {
+                    select: {
+                        id: true,
+                        name: true,
+                        conditions: {
+                            select: {
+                                condition: {
+                                    select: {
+                                        name: true,
+                                        causalGenes: true,
+                                        associatedGenes: true,
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                id: true,
+                title: true,
+                description: true,
+                eligibility: true,
+                evaluationProcess: true,
+                openTo: true,
+                startDate: true,
+                endDate: true
             }
         })
         const rfps = await prisma.rFP.findMany({

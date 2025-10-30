@@ -29,7 +29,7 @@ export interface Option {
     [key: string]: string | boolean | undefined | null;
 }
 
-interface GroupOption {
+export interface GroupOption {
     [key: string]: Option[];
 }
 
@@ -81,6 +81,7 @@ interface MultipleSelectorProps {
     selectFirstItem?: boolean;
     /** Allow user to create option when there is no option matched. */
     creatable?: boolean;
+    createOnBlur?: boolean;
     /** Props of `Command` */
     commandProps?: React.ComponentPropsWithoutRef<typeof Command>;
     /** Props of `CommandInput` */
@@ -91,7 +92,27 @@ interface MultipleSelectorProps {
     /** hide the clear all button. */
     hideClearAllButton?: boolean;
     showHoverCard?: boolean;
-    creatableItemOverride?: () => React.JSX.Element
+    creatableItemOverride?: ({
+        options, 
+        selected, 
+        inputValue,
+        onSearch,
+        debouncedSearchTerm,
+        isLoading,
+        maxSelected,
+        onMaxSelected,
+        setInputValue,
+    } : {
+        options: GroupOption, 
+        selected: Option[], 
+        inputValue: string,
+        onSearch?: (value: string) => Promise<Option[]>,
+        debouncedSearchTerm: string,
+        isLoading: boolean,
+        maxSelected: number,
+        onMaxSelected: ((maxLimit: number) => void) | undefined,
+        setInputValue: (value: React.SetStateAction<string>) => void
+    }) => React.JSX.Element | undefined
     showCountInsteadOfSelected?: boolean
     showBadgesInDropdown?: boolean
 }
@@ -101,6 +122,7 @@ export interface MultipleSelectorRef {
     input: HTMLInputElement;
     focus: () => void;
     reset: () => void;
+    blur: () => void;
 }
 
 export function useDebounce<T>(value: T, delay?: number): T {
@@ -147,7 +169,7 @@ function removePickedOption(groupOption: GroupOption, picked: Option[]) {
     return cloneOption;
 }
 
-function isOptionsExist(groupOption: GroupOption, targetOption: Option[]) {
+export function isOptionsExist(groupOption: GroupOption, targetOption: Option[]) {
     for (const [, value] of Object.entries(groupOption)) {
         if (value.some((option) => targetOption.find((p) => p.value === option.value))) {
             return true;
@@ -205,6 +227,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
             badgeClassName,
             selectFirstItem = true,
             creatable = false,
+            createOnBlur = true,
             triggerSearchOnFocus = false,
             commandProps,
             inputProps,
@@ -236,6 +259,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                 input: inputRef.current as HTMLInputElement,
                 focus: () => inputRef?.current?.focus(),
                 reset: () => setSelected([]),
+                blur: () => inputRef?.current?.blur(),
             }),
             [selected],
         );
@@ -388,7 +412,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                             return;
                         }
                         setInputValue('');
-                        const newOptions = [...selected, {value, label: value}];
+                        const newOptions = [...selected, {value, label: value, new: true}];
                         setSelected(newOptions);
                         onChange?.(newOptions);
                     }}
@@ -557,6 +581,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
 
                                 if (
                                     creatable &&
+                                    createOnBlur &&
                                     trimmedValue.length > 0 &&
                                     !selected.find((s) => s.value === trimmedValue) &&
                                     !Object.values(options).flat().some((opt) => opt.value === trimmedValue)
@@ -706,7 +731,19 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                             </CommandGroup>
                                         )}
                                     </ScrollArea>
-                                    {creatableItemOverride ? creatableItemOverride() : CreatableItem()}
+                                    {creatableItemOverride 
+                                        ? creatableItemOverride({
+                                            options, 
+                                            selected, 
+                                            inputValue,
+                                            onSearch,
+                                            debouncedSearchTerm,
+                                            isLoading,
+                                            maxSelected,
+                                            onMaxSelected,
+                                            setInputValue
+                                        }) 
+                                        : CreatableItem()}
                                 </div>
                             )}
                         </CommandList>

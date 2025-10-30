@@ -263,16 +263,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({row}) => {
-                // if (row.original.institution?.website && row.original.institution?.name) {
-                //     return (
-                //         <Link className="underline" href={row.original.institution?.website}>
-                //             {row.original.institution?.name}
-                //         </Link>
-                //     )
-                // }
-                // if (row.original.institution?.name) return (<>{row.original.institution?.name}</>)
-                // return <></>
-                return <>{row.original.institution?.name}</>
+                return <>{row.original.institution?.name || row.original.company?.title}</>
             },
             enableHiding: true,
             enableColumnFilter: true,
