@@ -33,20 +33,36 @@ export function getCio() {
     if (_cio) return _cio;
 
     try {
-        // @ts-ignore
-        const { CustomerIO } = require('customerio-node');
+        // Support multiple export styles after bundling
+        const mod = require('customerio-node');
+        const Ctor =
+            (mod && mod.CustomerIO) ||
+            (mod && mod.default) ||
+            mod; // fallback
 
-        _cio = new CustomerIO(CIO.siteId, CIO.apiKey, {
-            region: CIO.region === 'eu' ? 'EU' : 'US',
-        });
+        if (typeof Ctor !== 'function') {
+            throw new Error(
+                'CustomerIO class not found in customerio-node exports (got: ' +
+                Object.keys(mod || {}).join(', ') +
+                ')'
+            );
+        }
+
+        const region = CIO.region === 'eu' ? 'EU' : 'US';
+
+        _cio = new Ctor(CIO.siteId, CIO.apiKey, { region });
 
         console.log('[CIO] initialized', {
-            region: CIO.region,
-            siteIdPreview: CIO.siteId.slice(0, 4) + '***',
-            apiKeyPreview: CIO.apiKey.slice(0, 4) + '***',
+            region,
+            siteIdPreview: String(CIO.siteId).slice(0, 4) + '***',
+            apiKeyPreview: String(CIO.apiKey).slice(0, 4) + '***',
         });
     } catch (err: any) {
-        console.error('[CIO] failed to initialize SDK', err);
+        console.error('[CIO] failed to initialize SDK', {
+            error: String(err?.message || err),
+            stack: err?.stack,
+        });
+        return null;
     }
 
     return _cio;
