@@ -69,63 +69,61 @@ export default function EditPAGContactEmailDialog({ organization }: { organizati
     }
 
     return (
-        <TooltipProvider>
-            <Dialog
-                open={open}
-                onOpenChange={(state) => {
-                    if (!state) {
-                        editEmailForm.reset({
-                            contactEmail: organization.contactEmail || ""
-                        });
-                    }
-                    setOpen(state);
-                }}
-            >
-                <Tooltip>
-                    <TooltipTrigger onClick={(e) => e.preventDefault()}>
-                        <DialogTrigger asChild>
-                            <Button variant="ghost" disabled={session?.user?.membership?.role !== "owner"}>
-                                <Pencil />
-                            </Button>
-                        </DialogTrigger>
-                    </TooltipTrigger>
-                    {session?.user?.membership?.role !== "owner" && (
-                        <TooltipContent className="max-w-80">
-                            <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
-                        </TooltipContent>
-                    )}
-                </Tooltip>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Edit Contact Email</DialogTitle>
-                        <DialogDescription>
-                            Update the main email contact for your organization.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <Form {...editEmailForm}>
-                        <form onSubmit={editEmailForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
-                            <FormField
-                                control={editEmailForm.control}
-                                name="contactEmail"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Contact Email</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="email"
-                                                placeholder="name@example.com"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <Button type="submit">Save</Button>
-                        </form>
-                    </Form>
-                </DialogContent>
-            </Dialog>
-        </TooltipProvider>
+        <Dialog
+            open={open}
+            onOpenChange={(state) => {
+                if (!state) {
+                    editEmailForm.reset({
+                        contactEmail: organization.contactEmail || ""
+                    });
+                }
+                setOpen(state);
+            }}
+        >
+            <Tooltip>
+                <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" disabled={session?.user?.membership?.role !== "owner"}>
+                            <Pencil />
+                        </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                {session?.user?.membership?.role !== "owner" && (
+                    <TooltipContent className="max-w-80">
+                        <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                    </TooltipContent>
+                )}
+            </Tooltip>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Edit Contact Email</DialogTitle>
+                    <DialogDescription>
+                        Update the main email contact for your organization.
+                    </DialogDescription>
+                </DialogHeader>
+                <Form {...editEmailForm}>
+                    <form onSubmit={editEmailForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
+                        <FormField
+                            control={editEmailForm.control}
+                            name="contactEmail"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Contact Email</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="email"
+                                            placeholder="name@example.com"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <Button type="submit">Save</Button>
+                    </form>
+                </Form>
+            </DialogContent>
+        </Dialog>
     );
 }

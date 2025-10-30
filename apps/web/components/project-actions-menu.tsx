@@ -128,31 +128,29 @@ export const ProjectActionsMenu = ({
                         <Pencil/>
                         Edit
                     </DropdownMenuItem>
-                    <TooltipProvider>
-                        <Tooltip delayDuration={0}>
-                            <TooltipTrigger asChild>
-                                <div>
-                                    <DropdownMenuItem
-                                        disabled={milestone.private}
-                                        onClick={(e) => {
-                                            if (milestone.private) return
-                                            e.preventDefault()
-                                            handleShare()
-                                            setIsOpen(false)
-                                        }}
-                                    >
-                                        <Share />
-                                        Share
-                                    </DropdownMenuItem>
-                                </div>
-                            </TooltipTrigger>
-                            {milestone.private && (
-                                <TooltipContent side={"left"}>
-                                    <p>This project is private. Make it public to share.</p>
-                                </TooltipContent>
-                            )}
-                        </Tooltip>
-                    </TooltipProvider>
+                    <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                            <div>
+                                <DropdownMenuItem
+                                    disabled={milestone.private}
+                                    onClick={(e) => {
+                                        if (milestone.private) return
+                                        e.preventDefault()
+                                        handleShare()
+                                        setIsOpen(false)
+                                    }}
+                                >
+                                    <Share />
+                                    Share
+                                </DropdownMenuItem>
+                            </div>
+                        </TooltipTrigger>
+                        {milestone.private && (
+                            <TooltipContent side={"left"}>
+                                <p>Project is private. Publish it to share.</p>
+                            </TooltipContent>
+                        )}
+                    </Tooltip>
                     {/*<DropdownMenuItem*/}
                     {/*    onClick={(e) => {*/}
                     {/*        e.preventDefault()*/}

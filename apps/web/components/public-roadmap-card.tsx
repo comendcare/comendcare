@@ -282,7 +282,7 @@ export const StageOfActivityBadge = ({milestones, showTooltip = true}: { milesto
     const stage = getStage(milestones)
 
     return (showTooltip ? (
-        <TooltipProvider delayDuration={0}>
+        <TooltipProvider>
             <Tooltip>
                 <TooltipTrigger>
                     <Badge variant={stage.variant as any} className="text-sm">{stage.label}</Badge>
@@ -296,24 +296,11 @@ export const StageOfActivityBadge = ({milestones, showTooltip = true}: { milesto
     ) : (
         <Badge variant={stage.variant as any} className="text-sm">{stage.label}</Badge> 
     ))
-    // return (
-    //     <TooltipProvider delayDuration={0}>
-    //         <Tooltip>
-    //             <TooltipTrigger disabled={!showTooltip}>
-    //                 <Badge variant={stage.variant as any} className="text-sm">{stage.label}</Badge>
-    //             </TooltipTrigger>
-
-    //             <TooltipContent className="max-w-80">
-    //                 Stage
-    //             </TooltipContent>
-    //         </Tooltip>
-    //     </TooltipProvider>
-    // )
 }
 
 export const ResearchPlanTypeBadge = ({label}: { label: string }) => {
     return (
-        <TooltipProvider delayDuration={0}>
+        <TooltipProvider>
             <Tooltip>
                 <TooltipTrigger>
                     <Badge variant={'secondary'} className="text-sm">{label}</Badge>

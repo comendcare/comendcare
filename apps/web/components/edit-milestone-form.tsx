@@ -656,7 +656,7 @@ export function EditMilestoneForm({
                                                     </TooltipTrigger>
                                                     {formData.isPrivate && (
                                                         <TooltipContent side={"top"}>
-                                                            <p>This project is private. Make it public to share.</p>
+                                                            <p>Project is private. Publish it to share.</p>
                                                         </TooltipContent>
                                                     )}
                                                 </Tooltip>
