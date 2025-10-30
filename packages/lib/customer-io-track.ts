@@ -1,9 +1,8 @@
-// lib/customerIOTrack.ts
-import { isProd } from './env';
-
 // We’ll directly call the server function if we’re already on the server,
-// otherwise we POST to our API route which calls the Node SDK.
-// This lets you call customerIOTrack() from server or client components / hooks.
+
+const isProd =
+    process.env.NODE_ENV === 'production' ||
+    process.env.NEXT_PUBLIC_APP_ENV === 'production';
 
 type Input = {
     userId?: string | null;
@@ -19,7 +18,7 @@ export async function customerIOTrack(input: Input) {
 
     if (typeof window === 'undefined') {
         // SERVER: call server util directly
-        const { cioTrackServer } = await import('./cio.server');
+        const { cioTrackServer } = await import('./customer-io');
         return cioTrackServer({
             userId: input.userId!,
             event: input.event,
