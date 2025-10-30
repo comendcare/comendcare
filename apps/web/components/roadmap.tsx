@@ -294,8 +294,8 @@ export function Roadmap({
                                             <SelectContent>
                                                 {/* <SelectItem value="custom">{`Custom`}</SelectItem> */}
                                                 <SelectItem value="default">{`Default`}</SelectItem>
-                                                <SelectItem value="start">{`Start Date`}</SelectItem>
-                                                <SelectItem value="end">{`End Date`}</SelectItem>
+                                                <SelectItem value="start">{`Start date`}</SelectItem>
+                                                <SelectItem value="end">{`End date`}</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>
