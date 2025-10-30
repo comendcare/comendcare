@@ -280,13 +280,13 @@ export function Roadmap({
                                                     {(() => {
                                                         switch(sortBy) {
                                                             case "start":
-                                                                return "Sort by: Start Date"
+                                                                return "Sort by: start date"
                                                             case "end":
-                                                                return "Sort by: End Date"
+                                                                return "Sort by: end date"
                                                             // default:
-                                                            //     return "Sort by: Custom"
+                                                            //     return "Sort by: custom"
                                                             default:
-                                                                return "Sort by: Default"
+                                                                return "Sort by: default"
                                                         }
                                                     })()}
                                                 </SelectValue>
