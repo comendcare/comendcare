@@ -14,51 +14,124 @@ const cioConfigured = Boolean(CIO.siteId && CIO.apiKey);
 let _cio: any | null = null;
 
 export function getCio() {
-    if (!isProd || !cioConfigured) return null;
+    if (!isProd) {
+        console.log('[CIO] getCio: skipped (not production env)', {
+            NODE_ENV: process.env.NODE_ENV,
+            NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
+        });
+        return null;
+    }
+
+    if (!cioConfigured) {
+        console.error('[CIO] getCio: missing config', {
+            haveSiteId: Boolean(CIO.siteId),
+            haveApiKey: Boolean(CIO.apiKey),
+        });
+        return null;
+    }
+
     if (_cio) return _cio;
 
-    // customerio-node is ESM in some setups; do a dynamic require/import
-    // If your project is ESM, change this to: const { CustomerIO } = await import('customerio-node')
-    // @ts-ignore
-    const { CustomerIO } = require('customerio-node');
+    try {
+        // @ts-ignore
+        const { CustomerIO } = require('customerio-node');
 
-    _cio = new CustomerIO(CIO.siteId, CIO.apiKey, {
-        // region: 'US'|'EU' depending on the SDK—map our env to what the lib expects
-        region: CIO.region === 'eu' ? 'EU' : 'US',
-        // optional: timeout, retries, etc.
-    });
+        _cio = new CustomerIO(CIO.siteId, CIO.apiKey, {
+            region: CIO.region === 'eu' ? 'EU' : 'US',
+        });
+
+        console.log('[CIO] initialized', {
+            region: CIO.region,
+            siteIdPreview: CIO.siteId.slice(0, 4) + '***',
+            apiKeyPreview: CIO.apiKey.slice(0, 4) + '***',
+        });
+    } catch (err: any) {
+        console.error('[CIO] failed to initialize SDK', err);
+    }
+
     return _cio;
 }
 
-/** Server-side track with best-effort identify+track */
+/** Server-side track with best-effort identify+track + debug logs */
 export async function cioTrackServer(input: {
     userId: string;
     event: string;
     properties?: Record<string, any>;
     timestamp?: Date | number;
-    traits?: Record<string, any>; // optional: name/email, etc.
+    traits?: Record<string, any>;
 }) {
-    if (!isProd || !cioConfigured) return { ok: true, skipped: true };
+    console.log('[CIO] track called', {
+        event: input.event,
+        userId: input.userId,
+        hasProps: Boolean(input.properties && Object.keys(input.properties).length),
+        hasTraits: Boolean(input.traits && Object.keys(input.traits).length),
+        isProd,
+        cioConfigured,
+    });
+
+    if (!isProd) {
+        console.log('[CIO] skipped (not prod)');
+        return { ok: true, skipped: true, reason: 'not prod' };
+    }
+
+    if (!cioConfigured) {
+        console.error('[CIO] skipped (missing config)');
+        return { ok: false, skipped: true, reason: 'no config' };
+    }
 
     const cio = getCio();
-    if (!cio) return { ok: false, error: 'CIO not configured' };
+    if (!cio) {
+        console.error('[CIO] getCio returned null');
+        return { ok: false, error: 'CIO not configured' };
+    }
 
     const { userId, event, properties, timestamp, traits } = input;
 
-    // 1) Identify/update person (idempotent)
-    if (traits && Object.keys(traits).length) {
-        await cio.identify(userId, traits);
-    } else {
-        // At minimum, ensure the profile exists (optional but nice)
-        await cio.identify(userId, {});
+    if (!userId) {
+        console.error('[CIO] skipped (no userId provided)');
+        return { ok: false, skipped: true, reason: 'no userId' };
     }
 
-    // 2) Track event
-    await cio.track(userId, {
-        name: event,
-        data: properties ?? {},
-        timestamp: timestamp ? Math.floor(new Date(timestamp).getTime() / 1000) : undefined, // seconds
-    });
+    const start = Date.now();
 
-    return { ok: true };
+    try {
+        console.log('[CIO] identify start', { userId, traits });
+        await cio.identify(userId, traits && Object.keys(traits).length ? traits : {});
+        console.log('[CIO] identify success', { ms: Date.now() - start });
+    } catch (e: any) {
+        console.error('[CIO] identify failed', e);
+    }
+
+    try {
+        const ts =
+            timestamp != null
+                ? Math.floor(new Date(timestamp).getTime() / 1000)
+                : undefined;
+
+        console.log('[CIO] track start', {
+            event,
+            timestamp: ts,
+            dataPreview: properties ? JSON.stringify(properties).slice(0, 200) : '{}',
+        });
+
+        await cio.track(userId, {
+            name: event,
+            data: properties ?? {},
+            timestamp: ts,
+        });
+
+        console.log('[CIO] track success', {
+            event,
+            ms: Date.now() - start,
+        });
+
+        return { ok: true };
+    } catch (err: any) {
+        console.error('[CIO] track failed', {
+            event,
+            error: err?.message,
+            stack: err?.stack,
+        });
+        return { ok: false, error: err?.message };
+    }
 }

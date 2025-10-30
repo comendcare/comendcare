@@ -1,7 +1,7 @@
 // app/api/cio/track/route.ts
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import {cioTrackServer} from "@/packages/lib/customer-io";
+import { cioTrackServer } from '@/packages/lib/customer-io';
 
 const isProd =
     process.env.NODE_ENV === 'production' ||
@@ -16,23 +16,68 @@ const Body = z.object({
 });
 
 export async function POST(req: Request) {
-    try {
-        const json = await req.json();
-        const body = Body.parse(json);
+    const rid = Math.random().toString(36).slice(2, 10); // short request id for correlation
+    const start = Date.now();
 
-        // Optional: basic origin check / auth if you like
-        // const origin = req.headers.get('origin');
+    try {
+        // log inbound request basics
+        const headers = {
+            origin: req.headers.get('origin'),
+            'content-type': req.headers.get('content-type'),
+        };
+        console.log('[CIO API]', rid, 'incoming request', {
+            headers,
+            method: req.method,
+            url: req.url,
+        });
+
+        const json = await req.json().catch((e) => {
+            console.error('[CIO API]', rid, 'failed to parse JSON body', e);
+            return {};
+        });
+
+        console.log('[CIO API]', rid, 'raw body received', {
+            keys: Object.keys(json || {}),
+            size: JSON.stringify(json || {}).length,
+        });
+
+        const body = Body.parse(json);
+        console.log('[CIO API]', rid, 'validated body', {
+            userId: body.userId,
+            event: body.event,
+            hasProps: !!body.properties && Object.keys(body.properties).length > 0,
+            hasTraits: !!body.traits && Object.keys(body.traits).length > 0,
+            timestampType:
+                body.timestamp === undefined ? 'none' : typeof body.timestamp,
+        });
 
         const result = await cioTrackServer(body as any);
+        console.log('[CIO API]', rid, 'cioTrackServer result', {
+            result,
+            durationMs: Date.now() - start,
+        });
 
         // In non-prod we still return 200 so callers don’t branch everywhere
         return NextResponse.json(result);
     } catch (err: any) {
+        const duration = Date.now() - start;
         if (!isProd) {
-            console.error('CIO track error (dev)', err);
-            return NextResponse.json({ ok: true, skipped: true, devError: String(err) });
+            console.error('[CIO API]', 'error (dev)', err);
+            return NextResponse.json({
+                ok: true,
+                skipped: true,
+                devError: String(err),
+                durationMs: duration,
+            });
         }
-        console.error('CIO track error', err);
-        return NextResponse.json({ ok: false, error: 'Bad Request' }, { status: 400 });
+        console.error('[CIO API]', 'error', {
+            error: String(err?.message || err),
+            stack: err?.stack,
+            durationMs: duration,
+        });
+        return NextResponse.json(
+            { ok: false, error: 'Bad Request' },
+            { status: 400 },
+        );
     }
 }
