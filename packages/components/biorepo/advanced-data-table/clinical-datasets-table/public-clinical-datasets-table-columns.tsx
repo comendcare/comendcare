@@ -12,6 +12,7 @@ import { MilestoneTypeBadge } from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Badge } from "./../../../ui/badge";
 
 type Preset = "default" | "profile";
 
@@ -150,7 +151,13 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
             />
         ),
         cell: ({row}) => (
-            <>{row.original.gene?.symbol}</>
+            <>
+                {row.original.gene?.symbol && (
+                    <Badge variant={"teal"}>
+                        {row.original.gene.symbol}
+                    </Badge>
+                )}
+            </>
         ),
         enableHiding,
         enableSorting,
@@ -201,7 +208,15 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
             />
         ),
         cell: ({row}) => {
-            return <>{row.original.institution?.name || row.original.company?.title}</>
+            return (
+                <>
+                {(row.original.institution?.name || row.original.company?.title) && (
+                    <Badge>
+                        {row.original.institution?.name || row.original.company?.title}
+                    </Badge>
+                )}
+                </>
+            )
         },
         enableHiding,
         enableSorting,
