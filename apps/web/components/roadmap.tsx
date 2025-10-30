@@ -260,8 +260,8 @@ export function Roadmap({
                                                 <Info className="h-4 w-4"/>
                                                 </div>
                                             </TooltipTrigger>
-                                            <TooltipContent className="max-w-80 text-wrap text-left">
-                                                {"Interactive whiteboard to organize research plans. Project order changes in this view or the list stay separate."}
+                                            <TooltipContent className="max-w-80 text-wrap text-left" side="bottom">
+                                                {"Interactive whiteboard. Changes made here or in the list view update both."}
                                             </TooltipContent>
                                         </Tooltip>
                                     </TabsTrigger>
@@ -735,8 +735,16 @@ const RoadmapHeader = ({
         <div ref={parentRef} className="flex justify-between items-center">
             <span className="flex flex-row items-center">
                 <h1 className="h-full text-2xl font-semibold text-wrap line-clamp-2 pr-1">{researchPlanDetails.title || "Untitled Research Plan"}</h1>
+                <Button
+                    onClick={() => setEditResearchPlanIsOpen(true)} 
+                    variant="ghost"
+                    size={"icon"}
+                    className="min-w-[40px]"
+                >
+                    <Pencil />
+                </Button>
                 <div className="p-[6px] h-[40px]">
-                    <StageOfActivityBadge milestones={milestones} />
+                    <StageOfActivityBadge showTooltip={false} milestones={milestones} />
                 </div>
                 {milestones.filter(milestone => !milestone.private).length <= 0 
                     ? (
@@ -759,7 +767,7 @@ const RoadmapHeader = ({
                                 </TooltipTrigger>
                             </div>
                             <TooltipContent className="max-w-80">
-                                {`All projects in this plan are private and cannot be shared. Make at least one project published to enable sharing. Click to publish all projects.`}
+                                {`Private research plans cannot be shared externally. Click to publish all projects.`}
                             </TooltipContent>
                         </Tooltip>
                     )
@@ -783,26 +791,11 @@ const RoadmapHeader = ({
                                 </TooltipTrigger>
                             </div>
                             <TooltipContent className="max-w-80">
-                                {`This research plan is public and can be shared externally. Make all project private to hide this research plan and disable sharing. Click to make all projects private.`}
+                                {`Published research plans can be shared externally. Click to make all projects private.`}
                             </TooltipContent>
                         </Tooltip>
                     )
                 }
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            onClick={() => setEditResearchPlanIsOpen(true)} 
-                            variant="ghost"
-                            size={"icon"}
-                            className="min-w-[40px]"
-                        >
-                            <Pencil />
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-80">
-                        <p>{`Edit the details of your research plan, like the title and description.`}</p>
-                    </TooltipContent>
-                </Tooltip>
             </span>
 
             <span className="flex flex-row items-center justify-end">
@@ -825,17 +818,26 @@ const RoadmapHeader = ({
                     </TooltipContent>
                 </Tooltip> */}
 
-                <Button 
-                    variant={"ghost"}  
-                    onClick={() => {
-                        setTab('projects')
-                        setNewMilestoneIsOpen(true)
-                    }}
-                    size={isCollapsed ? "icon" : "default"}
-                >
-                    <LayoutTemplate />
-                    {!isCollapsed && <p>{`Templates`}</p>}
-                </Button>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button 
+                            variant={"ghost"}  
+                            onClick={() => {
+                                setTab('projects')
+                                setNewMilestoneIsOpen(true)
+                            }}
+                            size={isCollapsed ? "icon" : "default"}
+                        >
+                            <LayoutTemplate />
+                            {!isCollapsed && <p>{`Templates`}</p>}
+                        </Button>
+                    </TooltipTrigger>
+                    {isCollapsed && (
+                        <TooltipContent className="max-w-80">
+                            <p>{`Templates`}</p>
+                        </TooltipContent>
+                    )}
+                </Tooltip>
 
                 <Tooltip>
                     <TooltipTrigger asChild>
@@ -857,9 +859,11 @@ const RoadmapHeader = ({
                             {!isCollapsed && <p>{`Add an empty project`}</p>}
                         </Button>
                     </TooltipTrigger>
-                    <TooltipContent className="max-w-80">
-                        <p>{`Start from scratch. Add an empty project to your research plan.`}</p>
-                    </TooltipContent>
+                    {isCollapsed && (
+                        <TooltipContent className="max-w-80">
+                            <p>{`Add an empty project`}</p>
+                        </TooltipContent>
+                    )}
                 </Tooltip>
 
                 <DropdownMenu modal={false}>
