@@ -182,7 +182,7 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                 <ul className="w-full flex flex-row flex-wrap gap-2 text-sm text-wrap break-words">
                     {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label && b?.milestoneType?.label ? a?.milestoneType?.label.length - b?.milestoneType?.label.length : 0).map((milestoneType, index) => (
                         <li key={index}>
-                            <Badge className="w-fit">
+                            <Badge className="w-fit" variant={'lightBlue'}>
                                 {milestoneType?.milestoneType?.label || "No type"}
                             </Badge>
                         </li>
@@ -270,7 +270,7 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                                 <div className="flex flex-wrap gap-2">
                                     {props.data?.rfps.map(({rfp}, index) => (
                                         <Badge key={index} variant="orange">
-                                            <Megaphone className="h-4 w-4" />
+                                            <Megaphone className="h-4 w-4 min-w-4" />
                                             {`${rfp?.title}`}
                                         </Badge>
                                     ))}

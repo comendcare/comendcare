@@ -1227,7 +1227,8 @@ export function EditMilestoneForm({
                                         type: 'Biosamples',
                                         // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
                                         label: `${newBiosample.id}`,
-                                        biosample: newBiosample
+                                        biosample: newBiosample,
+                                        icon: 'test-tube-diagonal',
                                     }
                                 ])
                             }
@@ -1258,7 +1259,8 @@ export function EditMilestoneForm({
                                         value: newDiseaseModel.id,
                                         label: `${newDiseaseModel.id}`,
                                         type: 'Disease Models',
-                                        diseaseModel: newDiseaseModel
+                                        diseaseModel: newDiseaseModel,
+                                        icon: 'rat',
                                     }
                                 ])
                             }
@@ -1289,7 +1291,8 @@ export function EditMilestoneForm({
                                         value: newDatasample.id,
                                         label: newDatasample.id,
                                         type: 'Clinical Datasets',
-                                        datasample: newDatasample
+                                        datasample: newDatasample,
+                                        icon: 'database',
                                     }
                                 ])
                             }
