@@ -366,6 +366,7 @@ export function EditDiseaseModelToolForm({
                                         <MultipleSelector
                                             {...field}
                                             onSearch={handleGeneAsyncSearch}
+                                            badgeClassName={badgeVariants({variant: "teal"})}
                                             placeholder="Search for genes..."
                                             triggerSearchOnFocus={true}
                                             hidePlaceholderWhenSelected={true}

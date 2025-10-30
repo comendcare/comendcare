@@ -193,7 +193,13 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({row}) => (
-                <>{row.original.gene?.symbol}</>
+                <>
+                    {row.original.gene?.symbol && (
+                        <Badge variant={"teal"}>
+                            {row.original.gene.symbol}
+                        </Badge>
+                    )}
+                </>
             ),
             enableHiding: true,
             enableColumnFilter: true,
@@ -265,7 +271,15 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({row}) => {
-                return <>{row.original.institution?.name || row.original.company?.title}</>
+                return (
+                    <>
+                    {(row.original.institution?.name || row.original.company?.title) && (
+                        <Badge>
+                            {row.original.institution?.name || row.original.company?.title}
+                        </Badge>
+                    )}
+                    </>
+                )
             },
             enableHiding: true,
             enableColumnFilter: true,
