@@ -384,7 +384,7 @@ export function EditBiosampleToolForm({
                     <FormItem className="flex gap-2 items-center">
                         <FormLabel className="flex items-center gap-1 grow">
                             Visibility
-                            <Tooltip delayDuration={0}>
+                            <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Info className="h-4 w-4"/>
                                 </TooltipTrigger>
@@ -738,7 +738,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
         <>
         <div className="flex gap-1 items-center">
             <h1 className="font-semibold text-md py-0 my-0">Donor Information</h1>
-            <Tooltip delayDuration={0}>
+            <Tooltip>
                 <TooltipTrigger>
                     <Info className="h-4 w-4"/>
                 </TooltipTrigger>
@@ -757,7 +757,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                         {!createNewDonor && (
                             <FormLabel className="flex items-center gap-1 grow"> 
                                 Public Donor ID
-                                <Tooltip delayDuration={0}>
+                                <Tooltip>
                                     <TooltipTrigger>
                                         <Info className="h-4 w-4"/>
                                     </TooltipTrigger>
@@ -806,7 +806,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                 <FormItem>
                     <FormLabel className="flex items-center gap-1 grow pb-3">
                         {`Internal Donor ID`}
-                        <Tooltip delayDuration={0}>
+                        <Tooltip>
                             <TooltipTrigger asChild>
                                 <Info className="h-4 w-4"/>
                             </TooltipTrigger>

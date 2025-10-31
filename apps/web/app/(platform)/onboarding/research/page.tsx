@@ -27,7 +27,7 @@ export default function OrganizationOnboardingResearchPage() {
                         {/*    {`Hover over the `}*/}
                         {/*    <span className="inline-flex items-center">*/}
                         {/*        {" "}*/}
-                        {/*        <Tooltip delayDuration={0}>*/}
+                        {/*        <Tooltip>*/}
                         {/*            <TooltipTrigger>*/}
                         {/*                <Info className="h-4 inline-block align-baseline mx-1"/>*/}
                         {/*            </TooltipTrigger>*/}

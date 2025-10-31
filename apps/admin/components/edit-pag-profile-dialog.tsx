@@ -1317,7 +1317,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                 {/*        <FormItem className="space-y-3">*/}
                                 {/*            <FormLabel className="flex items-center">*/}
                                 {/*                {`Are you currently raising money?`}*/}
-                                {/*                <Tooltip delayDuration={0}>*/}
+                                {/*                <Tooltip>*/}
                                 {/*                    <TooltipTrigger>*/}
                                 {/*                        <FaQuestionCircle*/}
                                 {/*                            className="text-black h-4 inline-block align-baseline mx-1"/>*/}

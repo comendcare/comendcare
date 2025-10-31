@@ -50,7 +50,7 @@ export function EmojiPickerNavigation({
   // );
 
   return (
-    <TooltipProvider delayDuration={500}>
+    <TooltipProvider>
       <nav
         id="emoji-nav"
         className="mb-2.5 border-0 border-b border-solid border-b-border p-1.5"

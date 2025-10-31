@@ -128,7 +128,7 @@ export const ProjectActionsMenu = ({
                         <Pencil/>
                         Edit
                     </DropdownMenuItem>
-                    <Tooltip delayDuration={0}>
+                    <Tooltip>
                         <TooltipTrigger asChild>
                             <div>
                                 <DropdownMenuItem

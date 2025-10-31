@@ -71,7 +71,7 @@ export function BiopharmaConsentSwitch({organization}: { organization: Organizat
                                 <FormLabel htmlFor="biopharmaConsentSettings" className="inline-flex items-center gap-1">
                                     {field.value ? "Biopharma consented" : "Biopharma not consented"}
                                     {session?.user?.membership?.role === "owner" && (
-                                        <Tooltip delayDuration={0}>
+                                        <Tooltip>
                                             <TooltipTrigger>
                                                 <Info className="h-4 w-4"/>
                                             </TooltipTrigger>

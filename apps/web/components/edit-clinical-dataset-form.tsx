@@ -291,7 +291,7 @@ export function EditClincalDatasetForm({
                     <FormItem className="flex gap-2 items-center">
                         <FormLabel className="flex items-center gap-1 grow">
                             Visibility
-                            <Tooltip delayDuration={0}>
+                            <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Info className="h-4 w-4"/>
                                 </TooltipTrigger>

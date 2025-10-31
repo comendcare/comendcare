@@ -19,7 +19,7 @@ export function TabNav({
             <div className={cn("mx-auto flex items-center flex-wrap justify-center", className)} {...props}>
                 {links.map((link, index) => (
                     link.comingSoon ?
-                        <Tooltip key={link.href} delayDuration={0}>
+                        <Tooltip key={link.href}>
                             <TooltipTrigger asChild>
                                 <div
                                     className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm text-muted-foreground transition-colors"

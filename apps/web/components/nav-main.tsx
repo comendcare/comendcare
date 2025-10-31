@@ -13,7 +13,6 @@ import {usePathname} from "next/navigation"
 import {
     Tooltip,
     TooltipContent,
-    TooltipProvider,
     TooltipTrigger,
 } from "@comend/components/ui/tooltip"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
@@ -55,7 +54,7 @@ export function NavMain({items}: { items: Item[] }) {
                 return (
                     <SidebarMenuItem key={item.title}>
                         {isComingSoon ? (
-                            <Tooltip delayDuration={0}>
+                            <Tooltip>
                                 <TooltipTrigger asChild>
                                     <>
                                         <SidebarMenuButton

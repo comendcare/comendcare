@@ -58,7 +58,7 @@ export function Providers({children, session}: { children: React.ReactNode, sess
                         <MixpanelProvider>
                             <OnbordaProvider>
                                 <SettingsProvider>
-                                    <TooltipProvider delayDuration={1000}>
+                                    <TooltipProvider delayDuration={300}>
                                     {children}
                                     </TooltipProvider>
                                 </SettingsProvider>

@@ -637,7 +637,7 @@ export function EditMilestoneForm({
                                                         })
                                                     }}
                                                 />
-                                                <Tooltip delayDuration={0}>
+                                                <Tooltip>
                                                     <TooltipTrigger asChild>
                                                         <div>
                                                             <Button

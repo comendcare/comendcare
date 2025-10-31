@@ -216,7 +216,7 @@ export default function OnboardingSteps() {
                                     </a>
                                 </>
                             ) : (
-                                <Tooltip delayDuration={0}>
+                                <Tooltip>
                                     <TooltipTrigger className="text-left">
                                         <>
                                             {stepIdx !== updatedSteps.length - 1 && (
