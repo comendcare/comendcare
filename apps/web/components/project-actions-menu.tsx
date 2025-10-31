@@ -147,7 +147,7 @@ export const ProjectActionsMenu = ({
                         </TooltipTrigger>
                         {milestone.private && (
                             <TooltipContent side={"left"}>
-                                <p>Project is private. Publish it to share.</p>
+                                <p>Publish project to share.</p>
                             </TooltipContent>
                         )}
                     </Tooltip>
