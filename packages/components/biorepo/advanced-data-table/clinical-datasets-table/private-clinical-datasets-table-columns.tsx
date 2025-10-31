@@ -101,7 +101,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             <DataTableColumnHeader 
                 column={column} 
                 title="Dataset ID"
-                tooltip="This is a unique ID assigned to this dataset. This ID is public, and will appear in the marketplace."
+                tooltip="Unique ID assigned to this dataset. This ID is public and appears in the marketplace."
             />
         ),
         cell: ({row}) => (

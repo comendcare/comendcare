@@ -87,22 +87,24 @@ export function FeatureFlagsProvider({ additionalButtons, children, showFilters 
               {flagConfig.featureFlags.map((flag) => (
                 <Tooltip key={flag.value}>
                     <TooltipTrigger>
-                      <TabsTrigger value={flag.value} className="flex gap-2">
+                      <TabsTrigger value={flag.value} className="flex gap-2" disabled={flag.tooltipTitle}>
                           <flag.icon className="size-3.5 shrink-0" />
                           {flag.label}
                       </TabsTrigger>
                     </TooltipTrigger>
-                  <TooltipContent
-                    align="start"
-                    side="top"
-                    sideOffset={6}
-                    className="flex flex-col gap-1.5 border bg-background py-2 font-semibold text-foreground [&>span]:hidden"
-                  >
-                    <div>{flag.tooltipTitle}</div>
-                    <p className="text-balance text-muted-foreground text-xs">
-                      {flag.tooltipDescription}
-                    </p>
-                  </TooltipContent>
+                    {flag.tooltipDescription && (
+                      <TooltipContent
+                        align="start"
+                        side="top"
+                        sideOffset={6}
+                        className="flex flex-col gap-1.5 border bg-background py-2 font-semibold text-foreground [&>span]:hidden"
+                      >
+                        <div>{flag.tooltipTitle}</div>
+                        <p className="text-balance text-muted-foreground text-xs">
+                          {flag.tooltipDescription}
+                        </p>
+                      </TooltipContent>
+                    )}
                 </Tooltip>
               ))}
             </TabsList>

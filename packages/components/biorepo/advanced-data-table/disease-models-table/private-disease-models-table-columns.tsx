@@ -125,7 +125,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     className="min-w-fit text-nowrap"
                     column={column} 
                     title="Model ID"
-                    tooltip="This is a unique ID assigned to this model. This ID is public, and will appear in the marketplace."
+                    tooltip="Unique ID assigned to this model. This ID is public and appears in the marketplace."
                 />
             ),
             cell: ({row}) => (
