@@ -134,7 +134,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     column={column} 
                     className="min-w-fit text-nowrap"
                     title="Public donor ID"
-                    tooltip="This is a unique de-identified ID assigned to the donor of this sample. This ID is public, and will appear in the marketplace."
+                    tooltip="This is a unique, public de-identified ID. It will appear in the marketplace.."
                 />
             ),
             cell: ({row}) => (
@@ -154,7 +154,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     column={column} 
                     className="min-w-fit text-nowrap"
                     title="Internal donor ID" 
-                    tooltip="This ID is optional, and can be used to track donor IDs from any previously used donor identification system outside the Comend platform. This ID cannot be guaranteed to be unique across our platform, and will only be visible to members of your organization."
+                    tooltip="Optional internal ID for your organization’s tracking system. Not guaranteed to be unique or visible outside your organization."
                 />
             ),
             enableHiding: true,
