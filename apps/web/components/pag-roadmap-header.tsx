@@ -1,6 +1,6 @@
 import type {Organization} from "@prisma/client";
 import { ProfilePhoto } from "@comend/components/profile-photo";
-import { Building2, Calendar, HandCoins } from "lucide-react";
+import { Building2, Calendar, CircleDollarSign, HandCoins } from "lucide-react";
 import { formatMoney, standardizeYear } from "@comend/lib/utils";
 
 export function PAGRoadmapHeader({
@@ -31,7 +31,7 @@ export function PAGRoadmapHeader({
                     <div className="w-full flex flex-wrap gap-x-6">
                         {organization?.moneyRaised !== null && organization?.moneyRaised !== undefined && organization?.moneyRaised > 0 &&
                             <div className="mt-2 flex items-center text-gray-500">
-                                <HandCoins
+                                <CircleDollarSign
                                     className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                     aria-hidden="true"
                                 />
