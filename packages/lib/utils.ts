@@ -21,8 +21,9 @@ import type { RFP } from "@prisma/client";
 
 const STATUS_PRIORITY = {
   'OPEN': 1,
-  'COMINGSOON': 2,
-  'CLOSED': 3,
+  'ROLLING': 2,
+  'COMINGSOON': 3,
+  'CLOSED': 4,
 }
 
 export function getSortRank(rfp: RFP) {
@@ -37,6 +38,10 @@ export function getSortRank(rfp: RFP) {
         if (rfp.endDate) return rfp.endDate.getTime()
 
         // if end date does not exist on this RFP put it at the end of the Open section
+        return base
+    }
+
+    if (status.status === 'ROLLING') {
         return base
     }
 
@@ -55,6 +60,7 @@ export function getSortRank(rfp: RFP) {
 
 type DateStatus =
     | { status: "COMINGSOON"; label: "Coming soon"; daysRemaining: number | undefined; variant: "yellow" }
+    | { status: "ROLLING"; label: "Rolling"; daysRemaining: number | undefined; variant: "orange" }
     | { status: "OPEN"; label: "Open"; daysRemaining: number | undefined; variant: "green" }
     | { status: "CLOSED"; label: "Closed"; daysRemaining: number | undefined; variant: "red" }
     | undefined;
@@ -64,7 +70,7 @@ function toUTCDateOnly(d: Date) {
 }
 
 export function checkDateRangeUTC(startDateStr?: string | Date, endDateStr?: string | Date): DateStatus {
-    if (!startDateStr && !endDateStr) return undefined;
+    if (!startDateStr && !endDateStr) return { status: "ROLLING", label: "Rolling", daysRemaining: undefined, variant: "orange" }
 
     const todayUTC = toUTCDateOnly(new Date());
     const startRaw = startDateStr ? new Date(startDateStr) : undefined;
