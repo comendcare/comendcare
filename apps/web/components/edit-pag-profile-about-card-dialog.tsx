@@ -305,19 +305,7 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                                         Therapeutics of interest
                                     </FormLabel>
                                     <FormDescription className="flex items-center">
-                                        {`The treatment modalities your organization is interested in. Select all that apply.`}
-                                        <Tooltip delayDuration={0}>
-                                            {/*disabled to make the tooltip unclickable*/}
-                                            <TooltipTrigger disabled>
-                                                <Info
-                                                    className="text-black h-4 inline-block align-baseline mx-1 h-4 w-4"/>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>
-                                                    {`This will help us match you with the experts of your particular modality.`}
-                                                </p>
-                                            </TooltipContent>
-                                        </Tooltip>
+                                        {`Select all treatment modalities your organization is interested in. This helps us match you with experts in those specific areas.`}
                                     </FormDescription>
                                     <FormControl>
                                         <MultipleSelector

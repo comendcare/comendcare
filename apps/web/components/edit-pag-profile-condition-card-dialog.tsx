@@ -407,18 +407,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     <FormItem>
                                         <FormLabel>Causal genes</FormLabel>
                                         <FormDescription className="flex flex-row items-baseline">
-                                            {`Select all that apply.`}
-                                            <Tooltip delayDuration={0}>
-                                                <TooltipTrigger asChild>
-                                                    <div tabIndex={0} role="button"
-                                                            aria-label="What is a causal gene?">
-                                                        <Info className="mx-1 inline-block h-4 w-4"/>
-                                                    </div>
-                                                </TooltipTrigger>
-                                                <TooltipContent side="right" sideOffset={8} avoidCollisions={false}>
-                                                    <p>Causal genes are those that directly cause your disorder.</p>
-                                                </TooltipContent>
-                                            </Tooltip>
+                                            {`Causal genes are those that directly cause your disorder. Select all that apply.`}
                                         </FormDescription>
                                         <FormControl>
                                             <MultipleSelector
@@ -444,26 +433,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     <FormItem>
                                         <FormLabel>Associated genes</FormLabel>
                                         <FormDescription className="flex flex-row items-baseline">
-                                            {`Select all that apply.`}
-                                            <Tooltip delayDuration={0}>
-                                                {/*disabled to make the tooltip unclickable*/}
-                                                <TooltipTrigger asChild>
-                                                    <div tabIndex={0} role="button"
-                                                            aria-label="What is an associated gene?">
-                                                        <Info className="mx-1 inline-block h-4 w-4"/>
-                                                    </div>
-                                                </TooltipTrigger>
-                                                <TooltipContent
-                                                    side="right"
-                                                    sideOffset={8}
-                                                    avoidCollisions={false}
-                                                    className="z-[9999] max-w-xs overflow-visible"
-                                                >
-                                                    <p>
-                                                        {`Associated genes are those that may tangentially be related to your disorder.`}
-                                                    </p>
-                                                </TooltipContent>
-                                            </Tooltip>
+                                            {`Associated genes are those that may be indirectly related to your disorder. Select all that apply.`}
                                         </FormDescription>
                                         <FormControl>
                                             <MultipleSelector

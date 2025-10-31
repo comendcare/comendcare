@@ -930,18 +930,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                 Therapeutics of interest
                                             </FormLabel>
                                             <FormDescription className="flex items-center">
-                                                {`The treatment modalities of interest of your organization. Select all that apply.`}
-                                                <Tooltip delayDuration={0}>
-                                                    <TooltipTrigger>
-                                                        <MessageCircleQuestion
-                                                            className="text-black h-4 inline-block align-baseline mx-1"/>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p>
-                                                            {`This will help us match you with the experts of your particular modality.`}
-                                                        </p>
-                                                    </TooltipContent>
-                                                </Tooltip>
+                                                {`Select all treatment modalities your organization is interested in. This helps us match you with experts in those specific areas.`}
                                             </FormDescription>
                                             <FormControl>
                                                 <MultipleSelector
@@ -1055,7 +1044,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         <FormItem>
                                             <FormLabel>Causal genes</FormLabel>
                                             <FormDescription>
-                                                Select all that apply.
+                                                {`Causal genes are those that directly cause your disorder. Select all that apply.`}
                                             </FormDescription>
                                             <FormControl>
                                                 <MultipleSelector
@@ -1080,9 +1069,8 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         <FormItem>
                                             <FormLabel>Associated genes</FormLabel>
                                             <FormDescription>
-                                                Select all that apply.
+                                                {`Associated genes are those that may be indirectly related to your disorder. Select all that apply.`}
                                             </FormDescription>
-                                            {/*<FormDescription>{`The genes associated with your condition.`}</FormDescription>*/}
                                             <FormControl>
                                                 <MultipleSelector
                                                     {...field}
