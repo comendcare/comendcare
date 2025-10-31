@@ -1,10 +1,14 @@
 import LoadingDots from "@/packages/components/icons/loading-dots"
 import { Button } from "@/packages/components/ui/button"
 import { Globe, Lock } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export const PublicPrivateButton = ({isPrivate, updateCallback}: {isPrivate: boolean, updateCallback: (isPrivate: boolean) => Promise<void>}) => {
     const [localIsPrivate, setLocalIsPrivate] = useState(isPrivate)
+
+    useEffect(() => {
+        setLocalIsPrivate(isPrivate)
+    }, [isPrivate])
 
     return (localIsPrivate ? (
             <Button
