@@ -175,10 +175,15 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                         </Badge>
                     )}
                 </DialogTitle>
-                <DialogDescription className="text-sm text-muted-foreground">{rfp.description}</DialogDescription>
             </DialogHeader>
-            <div className="flex flex-col gap-4">
-                <ul className="pt-4 w-full flex flex-col gap-2 text-sm text-wrap break-words">
+            <div className="flex flex-col gap-4 pt-4 ">
+                {status?.daysRemaining !== undefined && (
+                    <Badge variant={"green"} className="w-full font-normal flex gap-2">
+                        <Clock size={18}/>
+                        {`${status.daysRemaining} days remaining to submit proposals`}
+                    </Badge>
+                )}
+                <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
                     {rfp.budget && (
                         <li>
                             <PropertyBadge icon={DollarSign}>
@@ -220,13 +225,6 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                     )}
                 </ul>
 
-                {status?.daysRemaining !== undefined && (
-                    <Badge variant={"green"} className="w-full font-normal flex gap-2">
-                        <Clock size={18}/>
-                        {`${status.daysRemaining} days remaining to submit proposals`}
-                    </Badge>
-                )}
-
                 {(rfp.milestones && rfp.milestones.length > 0) && (
                     <div className="border-l-4 border-purple-200 pl-4 space-y-2">
                         <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
@@ -243,6 +241,8 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                         </div>
                     </div>
                 )}
+
+                <DialogDescription className="text-sm text-muted-foreground">{rfp.description}</DialogDescription>
 
                 <Separator />
 
