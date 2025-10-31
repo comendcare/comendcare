@@ -401,7 +401,7 @@ export function EditBiosampleToolForm({
                         name="types"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">{`Biosample Type`}</FormLabel>
+                                <FormLabel className="w-[100px]">{`Biosample type`}</FormLabel>
                                 <FormControl>
                                     <MultipleSelector
                                         value={field.value}
@@ -449,7 +449,7 @@ export function EditBiosampleToolForm({
                         name="genes"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">Related Gene</FormLabel>
+                                <FormLabel className="w-[100px]">Related gene</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
@@ -493,7 +493,7 @@ export function EditBiosampleToolForm({
                     />
 
                     <FormItem className={cn("w-full flex gap-4 items-center")}>
-                        <FormLabel className="w-[100px]">{'Total Available Quantity'}</FormLabel>
+                        <FormLabel className="w-[100px]">{'Total available quantity'}</FormLabel>
                         <div className="w-full gap-2 flex">
                             <FormField
                                 control={form.control}
@@ -556,7 +556,7 @@ export function EditBiosampleToolForm({
                         name="storageFacility"
                         render={({field}) => (
                             <FormItem className={cn("w-full flex gap-4 items-center")}>
-                                <FormLabel className="w-[100px]">Storage Facility</FormLabel>
+                                <FormLabel className="w-[100px]">Stored with</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
@@ -613,7 +613,7 @@ export function EditBiosampleToolForm({
                         name="milestones"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">{`Linked Projects`}</FormLabel>
+                                <FormLabel className="w-[100px]">{`Linked projects`}</FormLabel>
                                 <FormControl>
                                     <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
                                 </FormControl>
@@ -648,7 +648,7 @@ export function EditBiosampleToolForm({
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
                                 <FormLabel className="w-[100px] flex items-center">
-                                <span>Internal Notes</span>
+                                <span>Internal notes</span>
                                 <Tooltip>
                                     <TooltipTrigger className="pl-2">
                                     <Lock className="h-4 w-4" />
@@ -756,7 +756,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                     <div className="w-full flex items-center justify-end">
                         {!createNewDonor && (
                             <FormLabel className="flex items-center gap-1 grow"> 
-                                Public Donor ID
+                                Public donor ID
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <Info className="h-4 w-4"/>
@@ -776,7 +776,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                     if (checked) form.setValue("donor", [])
                                 }}
                             />
-                            <Label htmlFor="create-new-donor">Create New Donor</Label>
+                            <Label htmlFor="create-new-donor">Create new donor</Label>
                         </div>
                     </div>
                     {!createNewDonor && (
@@ -805,7 +805,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
             render={({field}) => (
                 <FormItem>
                     <FormLabel className="flex items-center gap-1 grow pb-3">
-                        {`Internal Donor ID`}
+                        {`Internal donor ID`}
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Info className="h-4 w-4"/>

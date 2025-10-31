@@ -116,7 +116,7 @@ export function useClinicalDatasetsTableColumns(enableSorting: boolean = true, e
         enableHiding,
         enableSorting,
         meta: {
-            label: "Cohort Size"
+            label: "Cohort size"
         }
     },
     {

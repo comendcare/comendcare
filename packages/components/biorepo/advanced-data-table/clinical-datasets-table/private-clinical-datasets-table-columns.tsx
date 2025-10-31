@@ -257,6 +257,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 ))}
             </ul>
         ),
+        meta: { label: "Point of contact" },
         enableSorting: false,
         enableHiding: true,
     },
@@ -282,6 +283,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 ))}
             </ul>
         ),
+        meta: { label: "Links" },
         enableSorting: false,
         enableHiding: true,
     },
@@ -305,7 +307,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
     {
         accessorKey: "milestones",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Linked Projects" />
+            <DataTableColumnHeader column={column} title="Linked projects" />
         ),
         cell: ({row}) => (
             <ul className="flex flex-col gap-2">
@@ -319,6 +321,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 ))}
             </ul>
         ),
+        meta: { label: "Linked projects" },
         enableSorting: false,
         enableHiding: true,
     },
@@ -326,27 +329,28 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         id: "description",
         accessorKey: "description",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Description" />
+            <DataTableColumnHeader column={column} title="Notes" />
         ),
         cell: ({ row }) => (
             <div className="line-clamp-3">
                 {row.original.description}
             </div>
         ),
+        meta: { label: "Notes" },
         enableHiding: true,
     },
     {
         id: "notes",
         accessorKey: "notes",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Internal Notes"/>
+            <DataTableColumnHeader column={column} title="Internal notes"/>
         ),
         cell: ({row}) => (
             <div className="line-clamp-3">
                 {row.original.notes}
             </div>
         ),
-        meta: { label: "Internal Notes" },
+        meta: { label: "Internal notes" },
         enableHiding: true,
     },
     // {

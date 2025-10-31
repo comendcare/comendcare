@@ -186,7 +186,7 @@ export function BiosampleBulkImportDialog() {
                     onClick={() => setIsOpen(true)}
                 >
                     <Import />
-                    <p>{`Import Biosamples`}</p>
+                    <p>{`Import biosamples`}</p>
                 </Button>
             </DialogTrigger>
             <DialogContent className="flex flex-col justify-start">
@@ -209,7 +209,7 @@ export function BiosampleBulkImportDialog() {
                 <>
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
-                        Import Biosamples
+                        Import biosamples
                     </DialogTitle>
                     <DialogDescription>
                         Import multiple biosamples at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1O5NOlRhC-qagsIP_Zk_5_CEdMWAy5VEPoCCu3_2WJoE/edit?usp=sharing">Biosample input template</Link>, filling it out, downloading it as a CSV, and uploading it.

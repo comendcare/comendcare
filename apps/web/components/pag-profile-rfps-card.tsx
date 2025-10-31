@@ -229,7 +229,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                     <div className="border-l-4 border-purple-200 pl-4 space-y-2">
                         <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
                             <Workflow className="h-4 w-4 min-w-4 text-purple-900" />
-                            <span className="text-purple-900 text-nowrap">Linked Projects</span>
+                            <span className="text-purple-900 text-nowrap">Linked projects</span>
                         </div>
                         <div className="flex flex-wrap gap-2">
                             {rfp.milestones.map((project: any) => (
@@ -281,7 +281,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
 
                 {rfp.evaluationProcess && (
                     <CaretAccordion 
-                        title={'Evaluation Process'}
+                        title={'Evaluation process'}
                         content={
                             <p className="text-sm">{rfp.evaluationProcess}</p>
                         }

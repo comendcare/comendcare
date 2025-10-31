@@ -738,7 +738,7 @@ export function EditMilestoneForm({
                                                                             }}
                                                                             onClick={() => setCreateBiosampleIsOpen(true)}
                                                                         >
-                                                                            {`+ Create Biosample`}
+                                                                            {`+ Create biosample`}
                                                                         </Button>
                                                                         <Button
                                                                             value={undefined}
@@ -1208,7 +1208,7 @@ export function EditMilestoneForm({
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
-                            Create Biosample Tool
+                            Create biosample tool
                         </DialogTitle>
                         <DialogDescription>
                             {`Create your Tool here. Click save when you're done.`}

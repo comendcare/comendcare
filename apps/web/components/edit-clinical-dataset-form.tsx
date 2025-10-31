@@ -380,7 +380,7 @@ export function EditClincalDatasetForm({
                         name="cohortSize"
                         render={({field}) => (
                             <FormItem className={cn("w-full flex gap-4 items-center")}>
-                                <FormLabel className="w-[100px]">{`Cohort Size`}</FormLabel>
+                                <FormLabel className="w-[100px]">{`Cohort size`}</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="-mt-2 w-full">
                                         <Input
@@ -402,7 +402,7 @@ export function EditClincalDatasetForm({
                         name="genes"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">Related Gene</FormLabel>
+                                <FormLabel className="w-[100px]">Related gene</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
@@ -429,7 +429,7 @@ export function EditClincalDatasetForm({
                         name="storageFacility"
                         render={({field}) => (
                             <FormItem className={cn("w-full flex gap-4 items-center")}>
-                                <FormLabel className="w-[100px]">Storage Facility</FormLabel>
+                                <FormLabel className="w-[100px]">Stored with</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
@@ -486,7 +486,7 @@ export function EditClincalDatasetForm({
                         name="milestones"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">{`Linked Projects`}</FormLabel>
+                                <FormLabel className="w-[100px]">{`Linked projects`}</FormLabel>
                                 <FormControl>
                                     <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
                                 </FormControl>
@@ -500,11 +500,11 @@ export function EditClincalDatasetForm({
                         name="description"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">{`Description`}</FormLabel>
+                                <FormLabel className="w-[100px]">{`Notes`}</FormLabel>
                                 <FormControl>
                                     <Textarea
                                         id="description"
-                                        placeholder={`Enter a description...`}
+                                        placeholder={`Enter notes...`}
                                         {...field}
                                     />
                                 </FormControl>
@@ -521,7 +521,7 @@ export function EditClincalDatasetForm({
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
                                 <FormLabel className="w-[100px] flex items-center">
-                                <span>Internal Notes</span>
+                                <span>Internal notes</span>
                                 <Tooltip>
                                     <TooltipTrigger className="pl-2">
                                     <Lock className="h-4 w-4" />

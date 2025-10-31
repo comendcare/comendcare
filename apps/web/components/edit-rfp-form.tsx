@@ -517,7 +517,7 @@ export function EditRFPForm({
                         name="evaluationProcess"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel >{`Evaluation Process`}</FormLabel>
+                                <FormLabel >{`Evaluation process`}</FormLabel>
                                 <FormControl>
                                     <Textarea
                                         id="evaluationProcess"
@@ -551,7 +551,7 @@ export function EditRFPForm({
                         name="milestones"
                         render={({field}) => (
                             <FormItem className="w-full mt-2">
-                                <FormLabel >{`Linked Projects`}</FormLabel>
+                                <FormLabel >{`Linked projects`}</FormLabel>
                                 <FormControl>
                                     <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
                                 </FormControl>
@@ -562,7 +562,7 @@ export function EditRFPForm({
 
                     <OpenToFormField form={form}/>
                     <FormItem className="w-full mt-2">
-                        <FormLabel>{`Award Amount`}</FormLabel>
+                        <FormLabel>{`Award amount`}</FormLabel>
                         <FormDescription>{`The total funding amount available for this research project award.`}</FormDescription>
                         <MoneyInput 
                             form={form}
@@ -582,7 +582,7 @@ export function EditRFPForm({
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
                                 <FormLabel className="w-[100px] flex items-center">
-                                <span>Internal Notes</span>
+                                <span>Internal notes</span>
                                 <Tooltip>
                                     <TooltipTrigger className="pl-2">
                                     <Lock className="h-4 w-4" />
@@ -678,7 +678,7 @@ const ProposalTimelineInput = ({form}: {form: any}) => {
             name="startDate"
             render={({field}) => (
                 <FormItem>
-                    <FormLabel>{`Request Opens`}</FormLabel>
+                    <FormLabel>{`Request opens`}</FormLabel>
                     <FormDescription>{`The date you'll begin accepting proposals.`}</FormDescription>
                     <div>
                         <Popover >
@@ -713,7 +713,7 @@ const ProposalTimelineInput = ({form}: {form: any}) => {
             name="endDate"
             render={({field}) => (
                 <FormItem>
-                    <FormLabel>{`Deadline for Proposals`}</FormLabel>
+                    <FormLabel>{`Deadline for proposals`}</FormLabel>
                     <FormDescription>{`The last day you will be accepting proposals.`}</FormDescription>
                     <Popover >
                         <PopoverTrigger asChild>
