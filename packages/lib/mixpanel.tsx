@@ -222,6 +222,31 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                             metadata: true
                         })
 
+                        // keep your current logic that uses email in dev/preview and user.id in prod
+                        const canonicalId =
+                            process.env.NEXT_PUBLIC_NODE_ENV !== "production"
+                                ? session.user.email!               // you already identify Mixpanel with email in dev
+                                : session.user.id!;                 // and with user.id in prod
+
+                        // Identify in Customer.io Web SDK with the same id
+                        if (process.env.NEXT_PUBLIC_APP_ENV === 'production') {
+                            const cio = (window as any)._cio;
+                            if (cio && canonicalId) {
+                                cio.identify(canonicalId, {
+                                    email: session.user.email ?? undefined,
+                                    name: session.user.name ?? undefined,
+                                    // optional: mirror org traits so web-events have them, too
+                                    ...(currentOrg?.success && currentOrg?.data
+                                        ? {
+                                            organization_id: currentOrg.data.id,
+                                            organization_name: currentOrg.data.name,
+                                            organization_subdomain: currentOrg.data.subdomain,
+                                        }
+                                        : undefined),
+                                });
+                            }
+                        }
+
                         // add super properties that will apply to all tracked events
                         mixpanel.register({
                             "Environment": process.env.NEXT_PUBLIC_NODE_ENV,
@@ -240,18 +265,6 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
 
                         const distinctId = mixpanel.get_distinct_id()
                         setMixpanelContext({ distinctId })
-
-                        if (session.user.email) {
-                            await fetch('/api/analytics/cio/identify', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    userId: distinctId,
-                                    name: session.user.name,
-                                    email: session.user.email,
-                                }),
-                            })
-                        }
                     } else {
                         // if the user has not consented, make sure they are opted out of mixpanel tracking
                         console.log(`mixpanel opt-out`)
@@ -289,6 +302,17 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
     //         mixpanel.track(`User navigates to ${pathname}`)
     //     }
     // }, [isMixpanelInitialized, pathname])
+
+    // Track Customer.io pageviews on route change
+    useEffect(() => {
+        if (process.env.NEXT_PUBLIC_APP_ENV !== 'production') return;
+        const cio = (window as any)._cio;
+        if (!cio) return;
+        // respect your existing consent gate — only send when analytics allowed
+        if (getCookie('cookieyes-consent')?.includes('analytics:yes')) {
+            cio.page(); // auto-includes url, title, referrer
+        }
+    }, [pathname]);
 
     return (
         <MixpanelContext.Provider value={({ mixpanelContext })}>

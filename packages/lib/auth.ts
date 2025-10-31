@@ -8,6 +8,11 @@ import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "./prisma"
 import {Member, Organization, PrismaClient} from "@prisma/client";
 import sgMail from "@sendgrid/mail";
+import {cioIdentify} from "./customer-io-identify";
+
+const isProd =
+    process.env.NODE_ENV === 'production' ||
+    process.env.NEXT_PUBLIC_APP_ENV === 'production';
 
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
@@ -252,6 +257,34 @@ export const authOptions: NextAuthOptions = {
                 organizationId: activeOrgId,
                 membership,
             };
+
+            const dbOrganization = await prisma.organization.findUnique({
+                where: {id: token.sub!},
+                select: {
+                    name: true,
+                    subdomain: true,
+                }
+            });
+
+            try {
+                if (isProd) {
+                    const canonicalId =
+                        /* if you kept mixed IDs: */ (process.env.NEXT_PUBLIC_APP_ENV !== 'production'
+                        ? dbUser.email!
+                        : dbUser.id!);
+                    await cioIdentify(canonicalId, {
+                        email: dbUser.email,
+                        name: dbUser.name,
+                        created_at: dbUser.createdAt,
+                        organization_id: activeOrgId,
+                        organization_name: dbOrganization?.name,
+                        organization_subdomain: dbOrganization?.subdomain,
+                        role: membership?.role,
+                    });
+                }
+            } catch (err) {
+                console.warn("Failed to identify user in Customer.io:", err);
+            }
 
             return session;
         },
