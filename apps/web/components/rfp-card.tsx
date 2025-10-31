@@ -109,7 +109,7 @@ export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rf
                                     .map((option: string) => {
                                         switch (option) {
                                             case "CRO":
-                                                return "Service Providers";
+                                                return "Service providers";
                                             case "ACADEMIC":
                                                 return "Academics";
                                             default:
