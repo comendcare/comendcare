@@ -268,18 +268,14 @@ export const authOptions: NextAuthOptions = {
 
             try {
                 if (isProd) {
-                    const canonicalId =
-                        /* if you kept mixed IDs: */ (process.env.NEXT_PUBLIC_APP_ENV !== 'production'
-                        ? dbUser.email!
-                        : dbUser.id!);
-                    await cioIdentify(canonicalId, {
-                        email: dbUser.email,
-                        name: dbUser.name,
+                    await cioIdentify(dbUser.id!, {
+                        email: dbUser.email ?? undefined,
+                        name: dbUser.name ?? undefined,
                         created_at: dbUser.createdAt,
-                        organization_id: activeOrgId,
-                        organization_name: dbOrganization?.name,
-                        organization_subdomain: dbOrganization?.subdomain,
-                        role: membership?.role,
+                        organization_id: activeOrgId ?? undefined,
+                        organization_name: dbOrganization?.name ?? undefined,
+                        organization_subdomain: dbOrganization?.subdomain ?? undefined,
+                        role: membership?.role ?? undefined,
                     });
                 }
             } catch (err) {
