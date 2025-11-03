@@ -49,7 +49,7 @@ export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(opti
 
 const formSchema = z.object({
     name: z.string().min(2),
-    title: z.string().min(2),
+    title: z.string().min(2).optional(),
     affiliations: z.array(optionSchema).optional(),
     orcid: z.string().regex(/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/, {
         message: "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
@@ -450,7 +450,7 @@ export default function EditResearcherProfileDialog() {
                         </div>
 
                         <Button type="submit" disabled={loading}>
-                            {loading ? <LoadingDots color="#808080"/> : "Next"}
+                            {loading ? <LoadingDots color="#808080"/> : "Save"}
                         </Button>
                     </form>
                 </Form>
