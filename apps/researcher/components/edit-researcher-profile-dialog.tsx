@@ -47,9 +47,14 @@ export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(opti
     value: option.id,
 }));
 
+const TitleEnum = z.enum(["researcher","pm","pi","student","other"]);
+
 const formSchema = z.object({
     name: z.string().min(2),
-    title: z.string().min(2).optional(),
+    title: z.preprocess(
+        (v) => (v === "" ? undefined : v),
+        TitleEnum.optional()
+    ),
     affiliations: z.array(optionSchema).optional(),
     orcid: z.string().regex(/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/, {
         message: "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
