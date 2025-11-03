@@ -83,7 +83,7 @@ export function DeleteMilestoneDialogContent({
                             variant={"destructive"}
                             onClick={handleDeleteMilestone}
                         >
-                            Delete Project
+                            Delete project
                         </Button>
                     </DialogClose>
                 </DialogFooter>

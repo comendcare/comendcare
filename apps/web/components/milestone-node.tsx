@@ -182,7 +182,7 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                 <ul className="w-full flex flex-row flex-wrap gap-2 text-sm text-wrap break-words">
                     {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label && b?.milestoneType?.label ? a?.milestoneType?.label.length - b?.milestoneType?.label.length : 0).map((milestoneType, index) => (
                         <li key={index}>
-                            <Badge className="w-fit">
+                            <Badge className="w-fit" variant={'lightBlue'}>
                                 {milestoneType?.milestoneType?.label || "No type"}
                             </Badge>
                         </li>
@@ -217,6 +217,28 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                             </Badge>
                         </li>
                     )}
+
+                    {(props.data?.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0) && (
+                        <li>
+                            <Badge variant={'green'}>
+                                <Microscope size={16} />
+                                {(props.data?.biosamples?.length + props.data?.diseaseModels?.length + props.data?.tools?.length) <= 1 
+                                    ? `1 Linked tool` 
+                                    : `${(props.data?.biosamples?.length + props.data?.diseaseModels?.length + props.data?.tools?.length)} Linked tools`}
+                            </Badge>
+                        </li>
+                    )}
+
+                    {(props.data?.rfps?.length > 0) && (
+                        <li>
+                            <Badge variant={'orange'}>
+                                <Microscope size={16} />
+                                {(props.data?.rfps?.length) <= 1 
+                                    ? `1 Linked RFP` 
+                                    : `${(props.data?.rfps?.length)} Linked RFPs`}
+                            </Badge>
+                        </li>
+                    )}
                 </ul>
 
                 <StatusButton 
@@ -226,7 +248,7 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                     onStatusChange={() => {}}
                 />
 
-                {(props.data?.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0 || props.data?.rfps?.length > 0) && (
+                {/* {(props.data?.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0 || props.data?.rfps?.length > 0) && (
                     <>
                     <Separator className="bg-gray-300 h-[2px] rounded-full my-4"/>
                         {(props.data?.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0) && (
@@ -270,7 +292,7 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                                 <div className="flex flex-wrap gap-2">
                                     {props.data?.rfps.map(({rfp}, index) => (
                                         <Badge key={index} variant="orange">
-                                            <Megaphone className="h-4 w-4" />
+                                            <Megaphone className="h-4 w-4 min-w-4" />
                                             {`${rfp?.title}`}
                                         </Badge>
                                     ))}
@@ -278,7 +300,7 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                             </div>
                         )}
                     </>
-                )}
+                )} */}
             </CardContent>
 
             {props.data?.contextMenuRef && props.id !== "preview" ? (

@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@come
 import Link from "next/link";
 import { Badge } from "@comend/components/ui/badge";
 import { ProfilePhoto } from "@comend/components/profile-photo";
-import { Building2, HandCoins, Calendar } from "lucide-react";
+import { Building2, HandCoins, Calendar, CircleDollarSign } from "lucide-react";
 
 export function OrganizationMarketplaceListElement({ organization, isPublic = false }: { organization: any, isPublic?: boolean }) {
     return (
@@ -37,7 +37,7 @@ export function OrganizationMarketplaceListElement({ organization, isPublic = fa
                 )}
                 {organization?.moneyRaised !== null && organization?.moneyRaised > 0 &&
                     <div className="m-0 flex items-center text-gray-500">
-                        <HandCoins
+                        <CircleDollarSign
                             className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                             aria-hidden="true"
                         />

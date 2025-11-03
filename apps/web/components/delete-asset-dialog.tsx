@@ -71,7 +71,7 @@ export const DeleteAssetDialog = ({toolId, closeDialog}: {toolId: string | undef
                             variant={"destructive"}
                             onClick={handleDeleteAsset}
                         >
-                            Delete Tool
+                            Delete tool
                         </Button>
                     </DialogClose>
                 </DialogFooter>

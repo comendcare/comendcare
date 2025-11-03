@@ -12,7 +12,7 @@ export const templateMilestones = MILESTONE_TYPE_OPTIONS.map(typeData => ({
 
 // export const templateResearchPlans = [
 //     {
-//         title: 'ASO Research Plan',
+//         title: 'ASO research plan',
 //         description: 'Outlines each stage of developing an ASO therapy, from identifying the target gene to advancing through clinical trials, with the goal of bringing a safe and effective treatment to patients who urgently need it.',
 //         milestones: MILESTONE_TYPE_OPTIONS.filter((option: any) => [
 //             'NATURALHISTORYSTUDY', 

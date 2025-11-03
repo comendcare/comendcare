@@ -278,7 +278,7 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {
                 <Button variant={"link"} onClick={() => {
                     // window.functionalConsentedLocalStorage?.remove('isHidden')
                     setIsHidden(false)
-                }}>Show Research Plan Templates</Button>
+                }}>Show research plan templates</Button>
             </div>
         )
     }
@@ -287,7 +287,7 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {
         <Card className="w-full bg-gray-50 onborda-research-plan-templates-section">
             <CardHeader className="relative">
                 <CardTitle>
-                    Research Plan Templates
+                    Research plan templates
                 </CardTitle>
                 <CardDescription>
                     Create a research plan from one of our curated templates.
@@ -306,7 +306,7 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>{`Hide Research Plan Templates`}</p>
+                        <p>{`Hide research plan templates`}</p>
                     </TooltipContent>
                 </Tooltip>
             </CardHeader>

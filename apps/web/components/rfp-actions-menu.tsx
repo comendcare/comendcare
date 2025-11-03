@@ -96,29 +96,27 @@ export const RFPActionsMenu = ({rfp}: {rfp: RFP}) => {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="flex flex-col w-fit p-2 z-20" side={'left'} sideOffset={4} ref={popoverRef}>
-                <TooltipProvider>
-                    <Tooltip delayDuration={0}>
-                        <TooltipTrigger asChild>
-                            <DropdownMenuItem
-                                disabled={rfp.private}
-                                onClick={(e) => {
-                                    if (rfp.private) return
-                                    e.preventDefault()
-                                    handleShare()
-                                    setIsOpen(false)
-                                }}
-                            >
-                                <Share />
-                                Share
-                            </DropdownMenuItem>
-                        </TooltipTrigger>
-                        {rfp.private && (
-                            <TooltipContent side={"left"}>
-                                <p>This RFP is private. Make it public to share.</p>
-                            </TooltipContent>
-                        )}
-                    </Tooltip>
-                </TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <DropdownMenuItem
+                            disabled={rfp.private}
+                            onClick={(e) => {
+                                if (rfp.private) return
+                                e.preventDefault()
+                                handleShare()
+                                setIsOpen(false)
+                            }}
+                        >
+                            <Share />
+                            Share
+                        </DropdownMenuItem>
+                    </TooltipTrigger>
+                    {rfp.private && (
+                        <TooltipContent side={"left"}>
+                            <p>This RFP is private. Make it public to share.</p>
+                        </TooltipContent>
+                    )}
+                </Tooltip>
                 {/*<DropdownMenuItem*/}
                 {/*    onClick={(e) => {*/}
                 {/*        e.preventDefault()*/}

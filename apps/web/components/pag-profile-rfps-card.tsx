@@ -175,10 +175,15 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                         </Badge>
                     )}
                 </DialogTitle>
-                <DialogDescription className="text-sm text-muted-foreground">{rfp.description}</DialogDescription>
             </DialogHeader>
-            <div className="flex flex-col gap-4">
-                <ul className="pt-4 w-full flex flex-col gap-2 text-sm text-wrap break-words">
+            <div className="flex flex-col gap-4 pt-4 ">
+                {status?.daysRemaining !== undefined && (
+                    <Badge variant={"green"} className="w-full font-normal flex gap-2">
+                        <Clock size={18}/>
+                        {`${status.daysRemaining} days remaining to submit proposals`}
+                    </Badge>
+                )}
+                <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
                     {rfp.budget && (
                         <li>
                             <PropertyBadge icon={DollarSign}>
@@ -195,7 +200,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                                     .map((option: string) => {
                                         switch (option) {
                                             case "CRO":
-                                                return "Service Providers";
+                                                return "Service providers";
                                             case "ACADEMIC":
                                                 return "Academics";
                                             default:
@@ -220,18 +225,11 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                     )}
                 </ul>
 
-                {status?.daysRemaining !== undefined && (
-                    <Badge variant={"green"} className="w-full font-normal flex gap-2">
-                        <Clock size={18}/>
-                        {`${status.daysRemaining} days remaining to submit proposals`}
-                    </Badge>
-                )}
-
                 {(rfp.milestones && rfp.milestones.length > 0) && (
                     <div className="border-l-4 border-purple-200 pl-4 space-y-2">
                         <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
                             <Workflow className="h-4 w-4 min-w-4 text-purple-900" />
-                            <span className="text-purple-900 text-nowrap">Linked Projects</span>
+                            <span className="text-purple-900 text-nowrap">Linked projects</span>
                         </div>
                         <div className="flex flex-wrap gap-2">
                             {rfp.milestones.map((project: any) => (
@@ -243,6 +241,8 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                         </div>
                     </div>
                 )}
+
+                <DialogDescription className="text-sm text-muted-foreground">{rfp.description}</DialogDescription>
 
                 <Separator />
 
@@ -281,7 +281,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
 
                 {rfp.evaluationProcess && (
                     <CaretAccordion 
-                        title={'Evaluation Process'}
+                        title={'Evaluation process'}
                         content={
                             <p className="text-sm">{rfp.evaluationProcess}</p>
                         }
