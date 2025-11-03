@@ -13,6 +13,11 @@ const links = [
         comingSoon: false
     },
     {
+        name: "Creation requests",
+        href: "/creation-requests",
+        comingSoon: false,
+    },
+    {
         name: "Contact requests",
         href: "/contact-requests",
         comingSoon: false
