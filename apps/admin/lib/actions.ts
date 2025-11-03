@@ -15,6 +15,23 @@ export const getSessionInfo = async () => {
     return session
 }
 
+export const deleteFacilityCreateRequest = withAdminAuth(
+    async (id: string) => {
+        try {
+            const deletedRequest = await prisma.createFacilityRequest.delete({
+                where: {id}
+            })
+
+            revalidatePath(`/admin/companies/creation-requests`)
+
+            return {success: true, data: deletedRequest}
+        } catch (error: any) {
+            console.error("Error deleting facility create request: ", error)
+            return {success: false, error: "Database error. Please try again later."}
+        }
+    }
+)
+
 export const addEmailToWhitelist = withAdminAuth(
     async (email: string) => {
         try {

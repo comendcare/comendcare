@@ -2,8 +2,22 @@ import {Suspense} from "react"
 import PlaceholderCard from "@comend/components/placeholder-card"
 import {AdminCompaniesNav} from "~admin/components/admin-companies-nav";
 import { FacilityCreateRequestDataTable } from "~admin/components/facility-create-request-data-table/facility-create-request-data-table";
+import { getFacilityCreationRequests } from "~admin/lib/fetchers";
 
 export default async function ProviderCrationRequestCompaniesPage() {
+    const response = await getFacilityCreationRequests({
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        name: true,
+        biosampleId: true,
+        biosample: true,
+        diseaseModelId: true,
+        diseaseModel: true,
+        clinicalDatasetId: true,
+        clinicalDataset: true,
+    });
+
     return (
         <div className="mx-auto flex max-w-screen-xl flex-col space-y-12 p-8">
             <AdminCompaniesNav/>
@@ -32,7 +46,7 @@ export default async function ProviderCrationRequestCompaniesPage() {
                                 </div>
                             }
                         >
-                            <FacilityCreateRequestDataTable />
+                            <FacilityCreateRequestDataTable data={response.data ?? []}/>
                         </Suspense>
                     </div>
                 </Suspense>

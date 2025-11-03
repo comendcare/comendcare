@@ -47,7 +47,7 @@ import {
 } from "@comend/components/ui/select"
 import {Table as TanstackTable} from "@tanstack/react-table"
 import {DotsHorizontalIcon} from "@radix-ui/react-icons";
-import {removeProviderContactRequest} from "~admin/lib/actions"
+import {deleteFacilityCreateRequest, removeProviderContactRequest} from "~admin/lib/actions"
 import {getFacilityCreationRequests} from "~admin/lib/fetchers"
 import type {Biosample, CreateFacilityRequest, DiseaseModel, Tool} from "@prisma/client";
 import {
@@ -58,6 +58,7 @@ import {
     DialogDescription,
     DialogClose,
     DialogFooter,
+    DialogTrigger,
 } from "@comend/components/ui/dialog"
 import z from "zod"
 import { optionSchema, Option, BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS } from "@/packages/lib/types"
@@ -73,6 +74,8 @@ import {
     FormDescription,
 } from "@comend/components/ui/form"
 import MultipleSelector from "@/packages/components/ui/multiple-selector"
+import {revalidate} from "@/packages/lib/revalidate"
+import { revalidatePath } from "next/cache"
 
 interface DataTablePaginationProps<TData> {
     table: TanstackTable<TData>
@@ -250,8 +253,12 @@ export function FacilityCreateRequestDataTableRowActions<TData>({
     )
 }
 
-export function FacilityCreateRequestDataTable() {
-    const [data, setData] = React.useState<FacilityCreateRequest[]>([])
+export function FacilityCreateRequestDataTable({
+    data
+}: {
+    data: FacilityCreateRequest[]
+}) {
+    // const [data, setData] = React.useState<FacilityCreateRequest[]>([])
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -259,30 +266,30 @@ export function FacilityCreateRequestDataTable() {
     const [selectedRow, setSelectedRow] = React.useState<FacilityCreateRequest | null>(null)
     const [isDialogOpen, setIsDialogOpen] = React.useState(false)
 
-    useEffect(() => {
-        async function fetchData() {
-            const response = await getFacilityCreationRequests({
-                id: true,
-                createdAt: true,
-                updatedAt: true,
-                name: true,
-                biosampleId: true,
-                biosample: true,
-                diseaseModelId: true,
-                diseaseModel: true,
-                clinicalDatasetId: true,
-                clinicalDataset: true,
-            });
-            if (response.success) {
-                setData(response.data ?? [])
-            } else {
-                console.error(response.error);
-                toast.error(response.error)
-            }
-        }
+    // useEffect(() => {
+    //     async function fetchData() {
+    //         const response = await getFacilityCreationRequests({
+    //             id: true,
+    //             createdAt: true,
+    //             updatedAt: true,
+    //             name: true,
+    //             biosampleId: true,
+    //             biosample: true,
+    //             diseaseModelId: true,
+    //             diseaseModel: true,
+    //             clinicalDatasetId: true,
+    //             clinicalDataset: true,
+    //         });
+    //         if (response.success) {
+    //             setData(response.data ?? [])
+    //         } else {
+    //             console.error(response.error);
+    //             toast.error(response.error)
+    //         }
+    //     }
 
-        fetchData();
-    }, []);
+    //     fetchData();
+    // }, []);
 
     const table = useReactTable({
         data,
@@ -307,14 +314,14 @@ export function FacilityCreateRequestDataTable() {
         <>
             <div className="w-full">
                 <div className="flex items-center py-4">
-                    <Input
+                    {/* <Input
                         placeholder="Filter organizations..."
                         value={(table.getColumn("organization")?.getFilterValue() as string) ?? ""}
                         onChange={(event) =>
                             table.getColumn("organization")?.setFilterValue(event.target.value)
                         }
                         className="max-w-sm"
-                    />
+                    /> */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" className="ml-auto">
@@ -400,6 +407,7 @@ export function FacilityCreateRequestDataTable() {
                     {selectedRow && (
                         <CreateFacilityForm 
                             request={selectedRow}
+                            dialogClose={() => setIsDialogOpen(false)}
                         />
                     )}
                 </DialogContent>
@@ -418,11 +426,11 @@ const createFacilityForm = z.object({
 
 export const CreateFacilityForm = ({
     request,
+    dialogClose
 }: {
     request: FacilityCreateRequest,
+    dialogClose?: () => void
 }) => {
-    const [fetchedTools, setFetchedTools] = useState<Option[]>([])
-    
     const form = useForm<z.infer<typeof createFacilityForm>>({
         mode: "onChange",
         resolver: zodResolver(createFacilityForm),
@@ -475,11 +483,43 @@ export const CreateFacilityForm = ({
         }
     }
 
+    const handleDeleteRequest = async () => {
+        if (!request.id) {
+            toast.error(
+                "This request does not have an id.",
+                {position: "bottom-left"}
+            )
+            return
+        }
+
+        try {
+            await deleteFacilityCreateRequest(request.id)
+            if (dialogClose) dialogClose()
+            toast(
+                <div className="flex flex-col gap-2 w-full">
+                    <span className="flex justify-between items-center">
+                        <p className="font-semibold text-gray-900">
+                            {`Request deleted`}
+                        </p>
+                    </span>
+                    <p className="text-sm text-gray-500">
+                        {`Your request had been deleted successfully.`}
+                    </p>
+                </div>,
+                {position: "bottom-left", duration: 20000}
+            )
+        } catch (error) {
+            console.error("Error deleting request:", error);
+            toast.error(
+                "Failed to delete request.",
+                {position: "bottom-left"}
+            );
+        }
+    }
+
     const handleToolAsyncSearch = async (query: string): Promise<Option[]> => {
         const toolsResponse = await fetch(`/api/tools?search=${query}`)
         const toolsData = await toolsResponse.json()
-
-        console.log(`tools data`, toolsData)
 
         return toolsData
     }
@@ -570,20 +610,47 @@ export const CreateFacilityForm = ({
 
             <DialogFooter>
                 <DialogClose asChild>
-                    <Button 
-                        variant={"secondary"}
-                    >
+                    <Button variant={"secondary"}>
                         Cancel
                     </Button>
                 </DialogClose>
-                <DialogClose disabled={!form.formState.isValid}>
-                    <div className="bg-white rounded-md p-0">
-                        <Button
-                            variant={"cta"}
-                        >
-                            {`Create ${formData.type === 'cro' ? 'CRO/Service provider' : 'Institution'}`}
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button type="button" variant="destructive">
+                            Delete request
                         </Button>
-                    </div>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>
+                                Are you absolutely sure?
+                            </DialogTitle>
+                            <DialogDescription>
+                                {`This action cannot be undone. This will permanently delete your request and it's data.`}
+                            </DialogDescription>
+                            <DialogFooter>
+                                <DialogClose>
+                                    <Button type="button">
+                                        Cancel
+                                    </Button>
+                                </DialogClose>
+                                <DialogClose>
+                                    <Button
+                                        type="button"
+                                        variant={"destructive"}
+                                        onClick={handleDeleteRequest}
+                                    >
+                                        Delete request
+                                    </Button>
+                                </DialogClose>
+                            </DialogFooter>
+                        </DialogHeader>
+                    </DialogContent>
+                </Dialog>
+                <DialogClose asChild>
+                    <Button variant={"cta"}>
+                        {`Create ${formData.type === 'cro' ? 'CRO/Service provider' : 'Institution'}`}
+                    </Button>
                 </DialogClose>
             </DialogFooter>
 
