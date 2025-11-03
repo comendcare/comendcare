@@ -96,8 +96,10 @@ export const RFPSort = (rfps: RFP[]) => {
 
     // sort RFPs - 
     //      open (due earliest -> due latest, undefined at end) > 
+    //      rolling (no dates, use given order) >
     //      upcoming (starting earliest -> starting latest) > 
     //      closed (due latest -> due earliest)
+    const isRolling = (rfp: RFP) => !rfp.startDate && !rfp.endDate
     const isOpen = (rfp: RFP) => rfp.startDate && rfp.startDate <= now && (rfp.endDate ? rfp.endDate >= now : true)
     const isUpcoming = (rfp: RFP) => rfp.startDate && rfp.startDate > now
     const isClosed = (rfp: RFP) => rfp.endDate && rfp.endDate < now
@@ -106,6 +108,7 @@ export const RFPSort = (rfps: RFP[]) => {
         if (a.endDate && b.endDate) return a.endDate.getTime() - b.endDate.getTime()
         return 1
     })
+    const rollingRFPs = rfps.filter(rfp => isRolling(rfp))
     const upcomingRFPs = rfps.filter(rfp => isUpcoming(rfp)).sort((a: RFP, b: RFP) => {
         if (a.startDate && b.startDate) return a.startDate.getTime() - b.startDate.getTime()
         return 1
@@ -114,10 +117,11 @@ export const RFPSort = (rfps: RFP[]) => {
         if (a.endDate && b.endDate) return a.endDate.getTime() - b.endDate.getTime()
         return 1
     })
-    const otherRFPs = rfps.filter(rfp => !isOpen(rfp) && !isUpcoming(rfp) && !isClosed(rfp))
+    const otherRFPs = rfps.filter(rfp => !isOpen(rfp) && !isRolling(rfp) && !isUpcoming(rfp) && !isClosed(rfp))
 
     return ([
         ...openRFPs,
+        ...rollingRFPs,
         ...upcomingRFPs,
         ...closedRFPs,
         ...otherRFPs

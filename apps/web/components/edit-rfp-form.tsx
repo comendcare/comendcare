@@ -361,15 +361,6 @@ export function EditRFPForm({
                     moneyRaised: true,
                     moneyDeployed: true,
                     researchBudget: true,
-                    // address1                  String?
-                    // address2                  String?
-                    // formattedAddress          String?
-                    // city                      String?
-                    // region                    String?
-                    // postalCode                String?
-                    // country                   String?
-                    // lat                       String?
-                    // lng                       String?
                     createdAt: true,
                     updatedAt: true,
                     user: true,
@@ -413,7 +404,7 @@ export function EditRFPForm({
 
     return (
         <Form {...form}>
-            <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
+            <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
                 <ScrollBar />
                 <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6 m-1 pb-12">
                     <FormField
@@ -582,7 +573,7 @@ export function EditRFPForm({
                         )}
                     />
 
-                    <div className="bg-white border-white absolute right-4 bottom-0 flex gap-2">
+                    <div className="absolute right-4 bottom-0 flex gap-2">
                         <DialogClose asChild>
                             <Button 
                                 variant={"secondary"}
@@ -591,55 +582,47 @@ export function EditRFPForm({
                                 Cancel
                             </Button>
                         </DialogClose>
-                        <Dialog>
-                            <DialogTrigger asChild className={cn(rfpData.id ? "" : "hidden")}>
-                                <Button type="button" variant="destructive">
-                                    Delete RFP
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>
-                                        Are you absolutely sure?
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        {`This action cannot be undone. This will permanently delete your RFP and it's data.`}
-                                    </DialogDescription>
-                                    <DialogFooter>
-                                        <DialogClose>
-                                            <Button type="button">
-                                                Cancel
-                                            </Button>
-                                        </DialogClose>
-                                        <DialogClose>
-                                            <Button
-                                                type="button"
-                                                variant={"destructive"}
-                                                onClick={handleDeleteRFP}
-                                            >
-                                                Delete RFP
-                                            </Button>
-                                        </DialogClose>
-                                    </DialogFooter>
-                                </DialogHeader>
-                            </DialogContent>
-                        </Dialog>
-                        <DialogClose disabled={!form.formState.isValid}>
-                            <div className="bg-white rounded-md p-0">
-                                <Button
-                                    // disabled={!form.formState.isValid}
-                                    variant={"cta"}
-                                    type="submit"
-                                    // onClick={(e) => {
-                                    //     e.preventDefault()
-                                    //     handleFormSubmit(form.getValues())
-                                    //     if (closeDialog) closeDialog()
-                                    // }}
-                                >
-                                    Save changes
-                                </Button>
-                            </div>
-                        </DialogClose>
+                        {rfpData.id && (
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button type="button" variant="destructive">
+                                        Delete RFP
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>
+                                            Are you absolutely sure?
+                                        </DialogTitle>
+                                        <DialogDescription>
+                                            {`This action cannot be undone. This will permanently delete your RFP and it's data.`}
+                                        </DialogDescription>
+                                        <DialogFooter>
+                                            <DialogClose>
+                                                <Button type="button">
+                                                    Cancel
+                                                </Button>
+                                            </DialogClose>
+                                            <DialogClose>
+                                                <Button
+                                                    type="button"
+                                                    variant={"destructive"}
+                                                    onClick={handleDeleteRFP}
+                                                >
+                                                    Delete RFP
+                                                </Button>
+                                            </DialogClose>
+                                        </DialogFooter>
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
+                        )}
+                        <Button
+                            variant={"cta"}
+                            type="submit"
+                        >
+                            Save changes
+                        </Button>
                     </div>
                 </form>
             </ScrollArea>
