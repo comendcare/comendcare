@@ -1,5 +1,4 @@
 "use client"
-import {useEffect, useState} from "react"
 import * as React from "react"
 import {
     ColumnDef,
@@ -47,9 +46,8 @@ import {
 } from "@comend/components/ui/select"
 import {Table as TanstackTable} from "@tanstack/react-table"
 import {DotsHorizontalIcon} from "@radix-ui/react-icons";
-import {deleteFacilityCreateRequest, removeProviderContactRequest} from "~admin/lib/actions"
-import {getFacilityCreationRequests} from "~admin/lib/fetchers"
-import type {Biosample, CreateFacilityRequest, DiseaseModel, Tool} from "@prisma/client";
+import {createCompany, deleteFacilityCreateRequest, removeProviderContactRequest} from "~admin/lib/actions"
+import type {Biosample, DiseaseModel, Tool} from "@prisma/client";
 import {
     Dialog,
     DialogContent,
@@ -61,7 +59,7 @@ import {
     DialogTrigger,
 } from "@comend/components/ui/dialog"
 import z from "zod"
-import { optionSchema, Option, BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS } from "@/packages/lib/types"
+import { Option, BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS } from "@/packages/lib/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {useForm} from "react-hook-form"
 import {
@@ -71,11 +69,8 @@ import {
     FormLabel,
     FormItem,
     FormMessage,
-    FormDescription,
 } from "@comend/components/ui/form"
 import MultipleSelector from "@/packages/components/ui/multiple-selector"
-import {revalidate} from "@/packages/lib/revalidate"
-import { revalidatePath } from "next/cache"
 
 interface DataTablePaginationProps<TData> {
     table: TanstackTable<TData>
@@ -129,9 +124,7 @@ const columns: ColumnDef<FacilityCreateRequest>[] = [
     },
 ]
 
-export function FacilityCreateRequestDataTablePagination<TData>({
-                                                                     table,
-                                                                 }: DataTablePaginationProps<TData>) {
+export function FacilityCreateRequestDataTablePagination<TData>({table}: DataTablePaginationProps<TData>) {
     return (
         <div className="w-full flex items-center justify-between px-2">
             <div className="flex-1 text-sm text-muted-foreground">
@@ -253,43 +246,13 @@ export function FacilityCreateRequestDataTableRowActions<TData>({
     )
 }
 
-export function FacilityCreateRequestDataTable({
-    data
-}: {
-    data: FacilityCreateRequest[]
-}) {
-    // const [data, setData] = React.useState<FacilityCreateRequest[]>([])
+export function FacilityCreateRequestDataTable({data}: {data: FacilityCreateRequest[]}) {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
     const [selectedRow, setSelectedRow] = React.useState<FacilityCreateRequest | null>(null)
     const [isDialogOpen, setIsDialogOpen] = React.useState(false)
-
-    // useEffect(() => {
-    //     async function fetchData() {
-    //         const response = await getFacilityCreationRequests({
-    //             id: true,
-    //             createdAt: true,
-    //             updatedAt: true,
-    //             name: true,
-    //             biosampleId: true,
-    //             biosample: true,
-    //             diseaseModelId: true,
-    //             diseaseModel: true,
-    //             clinicalDatasetId: true,
-    //             clinicalDataset: true,
-    //         });
-    //         if (response.success) {
-    //             setData(response.data ?? [])
-    //         } else {
-    //             console.error(response.error);
-    //             toast.error(response.error)
-    //         }
-    //     }
-
-    //     fetchData();
-    // }, []);
 
     const table = useReactTable({
         data,
@@ -314,14 +277,6 @@ export function FacilityCreateRequestDataTable({
         <>
             <div className="w-full">
                 <div className="flex items-center py-4">
-                    {/* <Input
-                        placeholder="Filter organizations..."
-                        value={(table.getColumn("organization")?.getFilterValue() as string) ?? ""}
-                        onChange={(event) =>
-                            table.getColumn("organization")?.setFilterValue(event.target.value)
-                        }
-                        className="max-w-sm"
-                    /> */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" className="ml-auto">
