@@ -80,7 +80,7 @@ export function AssetBulkImportDialog() {
                     onClick={() => setIsOpen(true)}
                 >
                     <Import />
-                    <p>{`Import Clinical Datasets`}</p>
+                    <p>{`Import clinical datasets`}</p>
                 </Button>
             </DialogTrigger>
             <DialogContent className="flex flex-col justify-start">
@@ -103,7 +103,7 @@ export function AssetBulkImportDialog() {
                 <>
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
-                        Import Clinical Datasets
+                        Import clinical datasets
                     </DialogTitle>
                     <DialogDescription>
                         Import multiple clinical datasets at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1AJYdnvlPTYRR5nx2xz65lpQnK9RfCpkouEtshEsKSb0/edit?usp=sharing">clinical dataset input template</Link>, filling it out, downloading it as a CSV, and uploading it.

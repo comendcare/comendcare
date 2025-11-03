@@ -105,7 +105,7 @@ export default function Loading() {
 
     return (
         <main className="flex flex-col items-center h-full w-full mx-auto p-4 gap-4">
-            {/* Research Plan Templates */}
+            {/* Research plan templates */}
             <TemplatesSectionSkeleton />
 
             {/* Existing research plans section */}

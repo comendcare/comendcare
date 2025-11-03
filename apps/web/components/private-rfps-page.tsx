@@ -31,7 +31,7 @@ export function PrivateRFPsPage({ initialRFPs }: Props) {
     return (
         <main className="flex gap-4 flex-col w-full max-w-7xl p-4 h-full items-center mx-auto">
             <div className="flex gap-2 w-full justify-between items-center">
-                <h1 className="text-3xl font-semibold">Requests for Proposals (RFPs)</h1>
+                <h1 className="text-3xl font-semibold">Requests for proposals (RFPs)</h1>
                 <NewRFPDialog />
             </div>
 

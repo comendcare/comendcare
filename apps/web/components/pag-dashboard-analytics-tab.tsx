@@ -94,7 +94,7 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="flex flex-row items-center justify-start gap-x-2">
-                            <Megaphone className="h-5 w-5"/>
+                            <Megaphone className="h-5 w-5 min-w-5"/>
                             RFPs
                             <Button
                                 asChild

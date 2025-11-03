@@ -168,9 +168,9 @@ export const NewToolDialog = ({type}: { type: ToolType }) => {
     const closeDialog = () => setIsOpen(false);
 
     const title =
-        type === "biosample" ? "Create Biosample" :
-            type === "diseaseModel" ? "Create Disease Model" :
-                "Create Clinical Dataset";
+        type === "biosample" ? "Create biosample" :
+            type === "diseaseModel" ? "Create disease model" :
+                "Create clinical dataset";
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>

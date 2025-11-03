@@ -125,21 +125,19 @@ export default function FAQFeedbackForm({
                                     <FormLabel>Description</FormLabel>
                                     <FormDescription>
                                         {`Please don't include sensitive information. `}
-                                        <TooltipProvider delayDuration={50}>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        className="p-0 h-auto"
-                                                        variant="ghost"
-                                                    >
-                                                        <Info className="inline" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent className="max-w-64">
-                                                    <p>{`Sensitive information includes any information that should be protected. For example, don't include passwords, credit card information, or personal details.`}</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    className="p-0 h-auto"
+                                                    variant="ghost"
+                                                >
+                                                    <Info className="inline" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="max-w-64">
+                                                <p>{`Sensitive information includes any information that should be protected. For example, don't include passwords, credit card information, or personal details.`}</p>
+                                            </TooltipContent>
+                                        </Tooltip>
                                     </FormDescription>
                                     <FormControl>
                                         <Textarea

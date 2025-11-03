@@ -108,9 +108,9 @@ export default async function RoadmapPage({
             data: true,
             roadmapId: true,
         }),
-        getBiosamples(orgId, { id: true }),
-        getDiseaseModels(orgId, { id: true }),
-        getClinicalDatasets(orgId, { id: true }),
+        getBiosamples(orgId, { id: true, types: true }),
+        getDiseaseModels(orgId, { id: true, types: true }),
+        getClinicalDatasets(orgId, { id: true, types: true, title: true }),
         getRFPs(orgId, {id: true, title: true})
     ])
 

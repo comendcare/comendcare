@@ -50,51 +50,49 @@ export function BiopharmaConsentSwitch({organization}: { organization: Organizat
     }
 
     return (
-        <TooltipProvider>
-            <Form {...form}>
-                <form>
-                    <FormField
-                        control={form.control}
-                        name="biopharmaConsentSettings"
-                        render={({field}) => (
-                            <FormItem>
-                            <Tooltip>
-                                <TooltipTrigger onClick={(e) => e.preventDefault()} className={cn(session?.user?.membership?.role !== "owner" ? "opacity-50" : "")}>
-                                <div className="flex items-center space-x-2">
-                                    <FormControl>
-                                        <Switch
-                                            checked={field.value}
-                                            onCheckedChange={() => handleToggle()}
-                                            className="data-[state=checked]:bg-blue-dark data-[state=unchecked]:bg-blue-light"
-                                            disabled={session?.user?.membership?.role !== "owner"}
-                                        />
-                                    </FormControl>
-                                    <FormLabel htmlFor="biopharmaConsentSettings" className="inline-flex items-center gap-1">
-                                        {field.value ? "Biopharma consented" : "Biopharma not consented"}
-                                        {session?.user?.membership?.role === "owner" && (
-                                            <Tooltip delayDuration={0}>
-                                                <TooltipTrigger>
-                                                    <Info className="h-4 w-4"/>
-                                                </TooltipTrigger>
-                                                <TooltipContent className="max-w-80 text-wrap text-left">
-                                                    {`Enabling this setting enables us to connect you with biopharma partners based on your profile.`}
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        )}
-                                    </FormLabel>
-                                </div>
-                                </TooltipTrigger>
-                                {session?.user?.membership?.role !== "owner" && (
-                                    <TooltipContent className="max-w-80">
-                                        <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
-                                    </TooltipContent>
-                                )}
-                            </Tooltip>
-                            </FormItem>
-                        )}
-                    />
-                </form>
-            </Form>
-        </TooltipProvider>
+        <Form {...form}>
+            <form>
+                <FormField
+                    control={form.control}
+                    name="biopharmaConsentSettings"
+                    render={({field}) => (
+                        <FormItem>
+                        <Tooltip>
+                            <TooltipTrigger onClick={(e) => e.preventDefault()} className={cn(session?.user?.membership?.role !== "owner" ? "opacity-50" : "")}>
+                            <div className="flex items-center space-x-2">
+                                <FormControl>
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={() => handleToggle()}
+                                        className="data-[state=checked]:bg-blue-dark data-[state=unchecked]:bg-blue-light"
+                                        disabled={session?.user?.membership?.role !== "owner"}
+                                    />
+                                </FormControl>
+                                <FormLabel htmlFor="biopharmaConsentSettings" className="inline-flex items-center gap-1">
+                                    {field.value ? "Biopharma consented" : "Biopharma not consented"}
+                                    {session?.user?.membership?.role === "owner" && (
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <Info className="h-4 w-4"/>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="max-w-80 text-wrap text-left">
+                                                {`Enabling this setting enables us to connect you with biopharma partners based on your profile.`}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    )}
+                                </FormLabel>
+                            </div>
+                            </TooltipTrigger>
+                            {session?.user?.membership?.role !== "owner" && (
+                                <TooltipContent className="max-w-80">
+                                    <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                                </TooltipContent>
+                            )}
+                        </Tooltip>
+                        </FormItem>
+                    )}
+                />
+            </form>
+        </Form>
     )
 }

@@ -438,14 +438,14 @@ export const TimelineItemContent = ({
 
         <span className="flex flex-wrap gap-2 items-center">
             {(milestone?.types || []).map((milestoneType, index) => (
-                <Badge key={index} className="min-w-fit w-fit m-1 font-normal">
+                <Badge key={index} variant={'lightBlue'} className="min-w-fit w-fit">
                     {milestoneType?.milestoneType?.label || "No type"}
                 </Badge>
             ))}
             {(milestone.contacts || []).map((contact, index) => {
                 if (contact.affiliation) {
                     return (
-                        <Badge key={index} className="min-w-fit w-fit m-1 font-normal">
+                        <Badge key={index} className="min-w-fit w-fit">
                             <User size={16}/>
                             <p>{contact.affiliation}</p>
                         </Badge>
@@ -455,7 +455,7 @@ export const TimelineItemContent = ({
 
             {(milestone.budget) && (
                 <li>
-                    <Badge className="min-w-fit w-fit m-1 font-normal">
+                    <Badge className="min-w-fit w-fit">
                         <DollarSign size={16}/>
                         <p>{formatMoney(milestone.budget)}</p>
                     </Badge>
@@ -463,9 +463,31 @@ export const TimelineItemContent = ({
             )}
 
             {(milestone?.biosamples?.length > 0 || milestone?.diseaseModels?.length > 0 || milestone?.tools?.length > 0) && (
+                <li>
+                    <Badge variant={'green'}>
+                        <Microscope size={16} />
+                        {(milestone?.biosamples?.length + milestone?.diseaseModels?.length + milestone?.tools?.length) <= 1 
+                            ? `1 Linked tool` 
+                            : `${(milestone?.biosamples?.length + milestone?.diseaseModels?.length + milestone?.tools?.length)} Linked tools`}
+                    </Badge>
+                </li>
+            )}
+
+            {(milestone?.rfps?.length > 0) && (
+                <li>
+                    <Badge variant={'orange'}>
+                        <Microscope size={16} />
+                        {(milestone?.rfps?.length) <= 1 
+                            ? `1 Linked RFP` 
+                            : `${(milestone?.rfps?.length)} Linked RFPs`}
+                    </Badge>
+                </li>
+            )}
+
+            {/* {(milestone?.biosamples?.length > 0 || milestone?.diseaseModels?.length > 0 || milestone?.tools?.length > 0) && (
                 <>
                     {(milestone.biosamples || []).map(({biosample}, index) => {
-                        const type = BIOSAMPLE_TYPE_OPTIONS.find((option, index) => option.value === biosample.types[0])
+                        const type = BIOSAMPLE_TYPE_OPTIONS.find((option, index) => option.value === biosample.types?.[0])
                         return (
                             <Badge key={index} variant="green">
                                 <TestTubeDiagonal className="h-4 w-4" />
@@ -474,7 +496,7 @@ export const TimelineItemContent = ({
                         )
                     })}
                     {(milestone.diseaseModels || []).map(({diseaseModel}, index) => {
-                        const type = DISEASE_MODEL_TYPE_OPTIONS.find((option, index) => option.value === diseaseModel.types[0])
+                        const type = DISEASE_MODEL_TYPE_OPTIONS.find((option, index) => option.value === diseaseModel.types?.[0])
                         return (
                             <Badge key={index} variant="green">
                                 <Rat className="h-4 w-4" />
@@ -494,12 +516,12 @@ export const TimelineItemContent = ({
                 <>
                     {milestone.rfps.map(({rfp}, index) => (
                         <Badge variant="orange">
-                            <Megaphone className="h-4 w-4" />
+                            <Megaphone className="h-4 w-4 min-w-4" />
                             {`${rfp?.title}`}
                         </Badge>
                     ))}
                 </>
-            )}
+            )} */}
         </span>
 
         <li className="mt-4">

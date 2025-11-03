@@ -80,7 +80,7 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                         {tab === 'projects' ? (
                             <>
                                 <DialogTitle className="text-2xl">
-                                    Project Templates
+                                    Project templates
                                 </DialogTitle>
                                 <DialogDescription>
                                     Select the individual project templates you would like to add to your research plan.
@@ -89,7 +89,7 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                         ): (
                             <>
                                 <DialogTitle className="text-2xl">
-                                    Research Plan Templates
+                                    Research plan templates
                                 </DialogTitle>
                                 <DialogDescription>
                                     Select a research plan template to add a curated set of projects to your existing resarch plan.
@@ -100,20 +100,8 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
 
                     <Tabs value={tab} onValueChange={(newTab => setTab(newTab as TabType))} className="flex h-full flex-col">
                         <TabsList className="w-fit">
-                            <TabsTrigger value="projects">Project Templates</TabsTrigger>
-                            <TabsTrigger value="research-plans" className="flex gap-2">
-                                Research Plan Templates
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <div className="ml-auto">
-                                        <Info className="h-4 w-4"/>
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-80 text-wrap text-left">
-                                        {"Selected Projects from the template card will be added to your current research plan."}
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TabsTrigger>
+                            <TabsTrigger value="projects">Project templates</TabsTrigger>
+                            <TabsTrigger value="research-plans" className="flex gap-2">Research plan templates</TabsTrigger>
                         </TabsList>
 
                         <div className="flex-1 min-h-0">

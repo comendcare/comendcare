@@ -14,6 +14,7 @@ import {useWriteQueue} from "~web/state/writeQueue"
 import {beaconFlush} from "~web/lib/flushOps"
 import {usePathname} from "next/navigation"
 import {Session} from "next-auth";
+import { TooltipProvider } from "@/packages/components/ui/tooltip"
 
 
 export function Providers({children, session}: { children: React.ReactNode, session: Session | null }) {
@@ -57,7 +58,9 @@ export function Providers({children, session}: { children: React.ReactNode, sess
                         <MixpanelProvider>
                             <OnbordaProvider>
                                 <SettingsProvider>
+                                    <TooltipProvider delayDuration={500}>
                                     {children}
+                                    </TooltipProvider>
                                 </SettingsProvider>
                             </OnbordaProvider>
                         </MixpanelProvider>
