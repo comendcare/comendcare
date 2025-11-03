@@ -3962,7 +3962,7 @@ export const createRoadmap = withOrganizationAuth(
                     timestamp: new Date(),                 // or finalRoadmap?.createdAt if you select it
                     traits: {
                         // optional profile upserts (handy for segmentation):
-                        userName: actor?.userName,
+                        name: actor?.userName,
                         organization_id: organization.id,
                         organization_name: organization.name ?? finalRoadmap?.organization?.name,
                         organization_subdomain: organization.subdomain,

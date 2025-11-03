@@ -21,6 +21,7 @@ import {ASSOCIATED_CATEGORIES} from "@comend/lib/types";
 import {createRoadmap} from "@comend/lib/actions";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import CreateResearchPlanDialog from "~web/components/create-research-plan-dialog"
+import {useSession} from "next-auth/react";
 // import { consentedLocalStorage } from "@comend/lib/consent-scripts/functionalConsent";
 
 
@@ -355,13 +356,18 @@ export const CreateResearchPlanFromTemplateCard = ({plan, orgId, setIsLoading}: 
     orgId: string,
     setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
+    const {data: session} = useSession()
     const router = useRouter()
 
     return (
         <button
             onClick={async () => {
                 if (setIsLoading) setIsLoading(true)
-                const roadmap = await createRoadmap(orgId, plan)
+                const roadmap = await createRoadmap(
+                    orgId,
+                    plan,
+                    {userId: session?.user.id, userName: session?.user.name}
+                )
                 if (roadmap && roadmap.id) {
                     router.push(`/app/research-plan/${roadmap.id}`)
                 }

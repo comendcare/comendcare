@@ -259,7 +259,7 @@ export const authOptions: NextAuthOptions = {
             };
 
             const dbOrganization = await prisma.organization.findUnique({
-                where: {id: token.sub!},
+                where: {id: activeOrgId},
                 select: {
                     name: true,
                     subdomain: true,
