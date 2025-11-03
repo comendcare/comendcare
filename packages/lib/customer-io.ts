@@ -1,144 +1,145 @@
-'use server'
-import { Analytics } from "@customerio/cdp-analytics-node"
-import { nanoid } from "@reduxjs/toolkit";
-import { APIClient, SendEmailRequest } from "customerio-node"
-import { Session } from "next-auth";
+const isProd =
+    process.env.NODE_ENV === 'production' ||
+    process.env.NEXT_PUBLIC_APP_ENV === 'production';
 
-// NodeJS CustomerIO docs: https://customer.io/docs/cdp/sources/connections/servers/node/
+const CIO = {
+    siteId: process.env.CIO_TRACK_SITE_ID ?? '',   // <-- change this
+    apiKey: process.env.CIO_TRACK_API_KEY ?? '',   // <-- and this
+    region: (process.env.CIO_REGION ?? 'us') as 'us' | 'eu',
+};
 
-const IS_PROD = (() => {
-    // Highest precedence: Vercel’s environment flag if present
-    if (process.env.VERCEL_ENV) return process.env.VERCEL_ENV === "production"
-    // Fallback to your own flags
-    const env = process.env.NEXT_PUBLIC_NODE_ENV ?? process.env.NODE_ENV
-    return env === "production"
-})();
+const cioConfigured = Boolean(CIO.siteId && CIO.apiKey);
 
-type AnalyticsCall = (args: any) => Promise<void> | void
-class NoopAnalytics {
-    identify: AnalyticsCall = async () => {}
-    track:    AnalyticsCall = async () => {}
-    page:     AnalyticsCall = async () => {}
-    group:    AnalyticsCall = async () => {}
-    alias:    AnalyticsCall = async () => {}
-}
+// Import lazily to avoid bundling into client
+let _cio: any | null = null;
 
-class CustomerIO {
-    static instance: CustomerIO
-    analytics: Analytics | NoopAnalytics
-
-    private constructor() {
-        const envMsg = IS_PROD ? "production" : "non-production"
-        console.log(`[CustomerIO] Initializing analytics in ${envMsg} mode`)
-
-        this.analytics = IS_PROD
-            ? new Analytics({
-                writeKey: process.env.CUSTOMER_IO_WRITE_KEY || "",
-                host: "https://cdp.customer.io",
-            })
-            : new NoopAnalytics()
+export function getCio() {
+    if (!isProd) {
+        console.log('[CIO] getCio: skipped (not production env)', {
+            NODE_ENV: process.env.NODE_ENV,
+            NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
+        });
+        return null;
     }
-
-    static getInstance(): CustomerIO {
-        if (!CustomerIO.instance) CustomerIO.instance = new CustomerIO()
-        return CustomerIO.instance
+    if (!cioConfigured) {
+        console.error('[CIO] getCio: missing config', {
+            haveSiteId: Boolean(CIO.siteId),
+            haveApiKey: Boolean(CIO.apiKey),
+        });
+        return null;
     }
+    if (_cio) return _cio;
 
-    async flush() {
-        await (this.analytics as any).closeAndFlush()
-    }
-}
+    try {
+        // customerio-node >= v5 style exports
+        const mod = require('customerio-node');
+        const { TrackClient, RegionUS, RegionEU } = mod;
 
-export async function customerIOIdentify(distinctId: string, session: Session) {
-    const instance = CustomerIO.getInstance()
-    console.log(`[CustomerIO] Identify called for userId=${distinctId}`)
-
-    instance.analytics.identify({
-        userId: distinctId,
-        traits: {
-            name: session.user.name,
-            email: session.user.email,
+        if (typeof TrackClient !== 'function') {
+            console.error('[CIO] customerio-node exports', Object.keys(mod || {}));
+            throw new Error('TrackClient not found in customerio-node exports');
         }
-    })
-}
 
-export async function getCustomerIOInstance(): Promise<CustomerIO> {
-    return CustomerIO.getInstance()
-}
+        const region = CIO.region === 'eu' ? RegionEU : RegionUS;
 
-export async function customerIOTrack(data: { userId: string | undefined, event: string, properties: any}) {
-    const instance = await getCustomerIOInstance()
-    const resolvedUserId = data.userId || data.properties.email || nanoid()
-    console.log(`[CustomerIO] Track event=${data.event} userId=${resolvedUserId}`)
+        _cio = new TrackClient(CIO.siteId, CIO.apiKey, { region });
 
-    try {
-        instance.analytics.track({
-            userId: resolvedUserId,
-            event: data.event,
-            properties: data.properties,
-        })
-        console.log(`[CustomerIO] Track event '${data.event}' queued successfully`)
-    } catch (err) {
-        console.error(`[CustomerIO] Track event '${data.event}' failed:`, err)
-    }
-}
-
-export async function sendCustomerIOFeedbackEmail(emailPayload: any, attachments: any[]) {
-    const client = new APIClient(process.env.CUSTOMER_IO_API_KEY || "");
-    const request = new SendEmailRequest(emailPayload)
-
-    for (const attachment of attachments) {
-        request.attach(attachment.filename, attachment.content, { encode: false })
-    }
-
-    try {
-        client.sendEmail(request)
-    } catch (e) {
-        console.error(`Error sending email`, e)
-    }
-}
-
-export async function sendCustomerIOContactEmail(emailPayload: any) {
-    const client = new APIClient(process.env.CUSTOMER_IO_API_KEY || "");
-    const request = new SendEmailRequest(emailPayload)
-
-    try {
-        client.sendEmail(request)
-    } catch (e) {
-        console.error(`Error sending email`, e)
-    }
-}
-
-export async function customerIOOnResearchPlanCreated(
-    userId: string,
-    props: Record<string, any> = {}
-) {
-    const instance = await getCustomerIOInstance();
-    console.log(`[CustomerIO] Research plan created for userId=${userId}`);
-
-    try {
-        // ✅ await these so failures throw here (not after the function returns)
-        await instance.analytics.track({
-            userId,
-            event: "created_research_plan",
-            properties: props,
+        console.log('[CIO] initialized (TrackClient)', {
+            region: CIO.region,
+            siteIdPreview: String(CIO.siteId).slice(0, 4) + '***',
+            apiKeyPreview: String(CIO.apiKey).slice(0, 4) + '***',
         });
-        console.log("[CustomerIO] 'created_research_plan' event queued");
-
-        await instance.analytics.identify({
-            userId,
-            traits: { has_research_plan: true, ...props },
+    } catch (err: any) {
+        console.error('[CIO] failed to initialize SDK', {
+            error: String(err?.message || err),
+            stack: err?.stack,
         });
-        console.log("[CustomerIO] has_research_plan trait queued");
-    } catch (err) {
-        console.error("[CustomerIO] Error during research plan event/identify:", err);
-    } finally {
-        // ✅ In serverless, flush before returning so events aren't dropped
-        // Use a short timeout so you never hang the request
-        const FLUSH_TIMEOUT_MS = 1500;
-        await Promise.race([
-            instance.flush(),            // calls closeAndFlush under the hood
-            new Promise((r) => setTimeout(r, FLUSH_TIMEOUT_MS)),
-        ]);
+        return null;
+    }
+
+    return _cio;
+}
+
+/** Server-side track with best-effort identify+track + debug logs */
+export async function cioTrackServer(input: {
+    userId: string;
+    event: string;
+    properties?: Record<string, any>;
+    timestamp?: Date | number;
+    traits?: Record<string, any>;
+}) {
+    console.log('[CIO] track called', {
+        event: input.event,
+        userId: input.userId,
+        hasProps: Boolean(input.properties && Object.keys(input.properties).length),
+        hasTraits: Boolean(input.traits && Object.keys(input.traits).length),
+        isProd,
+        cioConfigured,
+    });
+
+    if (!isProd) {
+        console.log('[CIO] skipped (not prod)');
+        return { ok: true, skipped: true, reason: 'not prod' };
+    }
+
+    if (!cioConfigured) {
+        console.error('[CIO] skipped (missing config)');
+        return { ok: false, skipped: true, reason: 'no config' };
+    }
+
+    const cio = getCio();
+    if (!cio) {
+        console.error('[CIO] getCio returned null');
+        return { ok: false, error: 'CIO not configured' };
+    }
+
+    const { userId, event, properties, timestamp, traits } = input;
+
+    if (!userId) {
+        console.error('[CIO] skipped (no userId provided)');
+        return { ok: false, skipped: true, reason: 'no userId' };
+    }
+
+    const start = Date.now();
+
+    try {
+        console.log('[CIO] identify start', { userId, traits });
+        await cio.identify(userId, traits && Object.keys(traits).length ? traits : {});
+        console.log('[CIO] identify success', { ms: Date.now() - start });
+    } catch (e: any) {
+        console.error('[CIO] identify failed', e);
+    }
+
+    try {
+        const ts =
+            timestamp != null
+                ? Math.floor(new Date(timestamp).getTime() / 1000)
+                : undefined;
+
+        console.log('[CIO] track start', {
+            event,
+            timestamp: ts,
+            dataPreview: properties ? JSON.stringify(properties).slice(0, 200) : '{}',
+        });
+
+        await cio.track(userId, {
+            name: event,
+            data: properties ?? {},
+            timestamp: ts,
+        });
+
+        console.log('[CIO] track success', {
+            event,
+            ms: Date.now() - start,
+        });
+
+        return { ok: true };
+    } catch (err: any) {
+        console.error('[CIO] track failed', {
+            event,
+            error: err?.message,
+            stack: err?.stack,
+        });
+        return { ok: false, error: err?.message };
     }
 }
