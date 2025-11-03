@@ -527,7 +527,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                             data-disabled={disabled || undefined}
                                         >
                                             {option.icon && (
-                                                <DynamicIcon name={option.icon} className="h-4 w-4" />
+                                                <DynamicIcon name={option.icon} className="h-4 w-4 min-w-4 min-h-4" />
                                             )}
                                             {typeof option.img === 'string' && (
                                                 <img className="h-8 w-8 rounded-full mr-2 my-1" src={option.img}

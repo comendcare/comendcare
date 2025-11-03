@@ -547,10 +547,14 @@ export const SAMPLE_TRANSPORT_METHOD_OPTIONS: Option[] = [
 
 export const DIAGNOSIS_SEVERITY_OPTIONS: Option[] = [
     {label: 'Mild', value: 'MILD', badgeVariant: 'cyan'},
-    {label: 'Moderate', value: 'MODERATE', badgeVariant: 'emerald'},
-    {label: 'Severe', value: 'SEVERE', badgeVariant: 'lime'},
-    {label: 'Life-threatening/Critical', value: 'CRITICAL', badgeVariant: 'yellow'},
-    {label: 'Terminal', value: 'TERMINAL', badgeVariant: 'orange'},
+    // {label: 'Moderate', value: 'MODERATE', badgeVariant: 'emerald'},
+    // {label: 'Severe', value: 'SEVERE', badgeVariant: 'lime'},
+    // {label: 'Life-threatening/Critical', value: 'CRITICAL', badgeVariant: 'yellow'},
+    // {label: 'Terminal', value: 'TERMINAL', badgeVariant: 'orange'},
+    {label: 'Moderate', value: 'MODERATE', badgeVariant: 'cyan'},
+    {label: 'Severe', value: 'SEVERE', badgeVariant: 'cyan'},
+    {label: 'Life-threatening/Critical', value: 'CRITICAL', badgeVariant: 'cyan'},
+    {label: 'Terminal', value: 'TERMINAL', badgeVariant: 'cyan'},
 ]
 
 export const AVAILABILITY_OPTIONS: Option[] = [
@@ -873,7 +877,7 @@ export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
     //     value: 'ALL',
     // },
     {
-        label: 'Service Providers',
+        label: 'Service providers',
         value: 'CRO',
     },
     {
@@ -1496,19 +1500,19 @@ export const ASSOCIATED_CATEGORIES: { id: string; label: string; value: string; 
     },
     {
         id: '3',
-        label: 'Clinical Study',
+        label: 'Clinical study',
         value: 'clinical study',
         description: 'Involves human trials to evaluate the safety, efficacy, and outcomes of new medical interventions.',
     },
     {
         id: '4',
-        label: 'Disease Models',
+        label: 'Disease models',
         value: 'disease models',
         description: 'Utilizes experimental models to study disease mechanisms and test potential treatments.',
     },
     {
         id: '5',
-        label: 'Design & Manufacturing',
+        label: 'Design & manufacturing',
         value: 'design & manufacturing',
         description: 'Focuses on the engineering, production, and optimization of medical products and therapeutics.',
     },

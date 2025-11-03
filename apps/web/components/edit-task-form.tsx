@@ -563,7 +563,7 @@ export function EditTaskForm({
                                                 </SortableContext>
                                             </ol>
                                         </DndContext>
-                                        <Tooltip delayDuration={0}>
+                                        <Tooltip>
                                             <TooltipTrigger asChild>
                                                 <Button variant="secondary" size="icon" onClick={(e: any) => {
                                                         e.preventDefault()
@@ -600,7 +600,7 @@ export function EditTaskForm({
                             <DeleteTaskDialogContent taskData={taskData}/>
                         </Dialog>
                         <DialogClose>
-                            <Button variant={"cta"} type="submit">Save Changes</Button>
+                            <Button variant={"cta"} type="submit">Save changes</Button>
                         </DialogClose>
                     </span>
                 </form>

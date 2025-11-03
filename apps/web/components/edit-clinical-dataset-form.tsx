@@ -291,7 +291,7 @@ export function EditClincalDatasetForm({
                     <FormItem className="flex gap-2 items-center">
                         <FormLabel className="flex items-center gap-1 grow">
                             Visibility
-                            <Tooltip delayDuration={0}>
+                            <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Info className="h-4 w-4"/>
                                 </TooltipTrigger>
@@ -337,6 +337,7 @@ export function EditClincalDatasetForm({
                                     <MultipleSelector
                                         value={field.value}
                                         onChange={field.onChange}
+                                        badgeClassName={badgeVariants({variant: "lightBlue"})}
                                         options={TOOL_TYPE_OPTIONS}
                                         hidePlaceholderWhenSelected={true}
                                         showHoverCard={false}
@@ -379,7 +380,7 @@ export function EditClincalDatasetForm({
                         name="cohortSize"
                         render={({field}) => (
                             <FormItem className={cn("w-full flex gap-4 items-center")}>
-                                <FormLabel className="w-[100px]">{`Cohort Size`}</FormLabel>
+                                <FormLabel className="w-[100px]">{`Cohort size`}</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="-mt-2 w-full">
                                         <Input
@@ -401,12 +402,13 @@ export function EditClincalDatasetForm({
                         name="genes"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">Related Gene</FormLabel>
+                                <FormLabel className="w-[100px]">Related gene</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
                                             {...field}
                                             onSearch={handleGeneAsyncSearch}
+                                            badgeClassName={badgeVariants({variant: "teal"})}
                                             placeholder="Search for genes..."
                                             triggerSearchOnFocus={true}
                                             hidePlaceholderWhenSelected={true}
@@ -427,7 +429,7 @@ export function EditClincalDatasetForm({
                         name="storageFacility"
                         render={({field}) => (
                             <FormItem className={cn("w-full flex gap-4 items-center")}>
-                                <FormLabel className="w-[100px]">Storage Facility</FormLabel>
+                                <FormLabel className="w-[100px]">Stored with</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
@@ -484,7 +486,7 @@ export function EditClincalDatasetForm({
                         name="milestones"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">{`Linked Projects`}</FormLabel>
+                                <FormLabel className="w-[100px]">{`Linked projects`}</FormLabel>
                                 <FormControl>
                                     <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
                                 </FormControl>
@@ -498,11 +500,11 @@ export function EditClincalDatasetForm({
                         name="description"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">{`Description`}</FormLabel>
+                                <FormLabel className="w-[100px]">{`Notes`}</FormLabel>
                                 <FormControl>
                                     <Textarea
                                         id="description"
-                                        placeholder={`Enter a description...`}
+                                        placeholder={`Enter notes...`}
                                         {...field}
                                     />
                                 </FormControl>
@@ -519,7 +521,7 @@ export function EditClincalDatasetForm({
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
                                 <FormLabel className="w-[100px] flex items-center">
-                                <span>Internal Notes</span>
+                                <span>Internal notes</span>
                                 <Tooltip>
                                     <TooltipTrigger className="pl-2">
                                     <Lock className="h-4 w-4" />
@@ -556,7 +558,7 @@ export function EditClincalDatasetForm({
                 </DialogClose>
 
                 <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
-                    Delete Tool
+                    Delete tool
                 </Button>
                 <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                     <DeleteAssetDialog toolId={toolData.id} closeDialog={closeDialog}/>
@@ -576,7 +578,7 @@ export function EditClincalDatasetForm({
                                     <LoadingDots/>
                                 </div>
                             ) 
-                            : ("Save Changes")
+                            : ("Save changes")
                         }
                     </Button>
                 </div>

@@ -48,7 +48,7 @@ import {
     StatusType,
     Option,
     BIOSAMPLE_TYPE_OPTIONS,
-    DISEASE_MODEL_TYPE_OPTIONS
+    DISEASE_MODEL_TYPE_OPTIONS,
 } from "@comend/lib/types"
 import {
     Biosample,
@@ -302,7 +302,7 @@ export function EditMilestoneForm({
                             type: 'Biosamples',
                             icon: 'test-tube-diagonal',
                             // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
-                            label: `${biosample.id}`,
+                            label: `${biosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
                             biosample
                         }
                     )
@@ -311,7 +311,7 @@ export function EditMilestoneForm({
                     return (
                         {
                             value: diseaseModel.id,
-                            label: `${diseaseModel.id}`,
+                            label: `${diseaseModel.id} - ${(DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
                             icon: 'rat',
                             type: 'Disease Models',
                             diseaseModel
@@ -322,7 +322,7 @@ export function EditMilestoneForm({
                     return (
                         {
                             value: tool?.id,
-                            label: `${tool?.id}`,
+                            label: `${tool?.id} - ${tool?.title}`,
                             icon: 'database',
                             type: 'Clinical Datasets',
                             datasample: tool,
@@ -500,7 +500,7 @@ export function EditMilestoneForm({
                         type: 'Biosamples',
                         icon: "test-tube-diagonal",
                         // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
-                        label: `${biosample.id}`,
+                        label: `${biosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
                         biosample
                     }
                 )
@@ -509,7 +509,7 @@ export function EditMilestoneForm({
                 return (
                     {
                         value: diseaseModel.id || '',
-                        label: `${diseaseModel.id}`,
+                        label: `${diseaseModel.id} - ${(DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
                         icon: 'rat',
                         type: 'Disease Models',
                         diseaseModel
@@ -520,7 +520,7 @@ export function EditMilestoneForm({
                 return (
                     {
                         value: datasample.id || '',
-                        label: `${datasample.id}`,
+                        label: `${datasample?.id} - ${datasample?.title}`,
                         icon: 'database',
                         type: 'Clinical Datasets',
                         datasample
@@ -637,7 +637,7 @@ export function EditMilestoneForm({
                                                         })
                                                     }}
                                                 />
-                                                <Tooltip delayDuration={0}>
+                                                <Tooltip>
                                                     <TooltipTrigger asChild>
                                                         <div>
                                                             <Button
@@ -656,7 +656,7 @@ export function EditMilestoneForm({
                                                     </TooltipTrigger>
                                                     {formData.isPrivate && (
                                                         <TooltipContent side={"top"}>
-                                                            <p>This project is private. Make it public to share.</p>
+                                                            <p>Publish project to share.</p>
                                                         </TooltipContent>
                                                     )}
                                                 </Tooltip>
@@ -683,13 +683,13 @@ export function EditMilestoneForm({
                                             />
 
                                             <div>
-                                                <FormLabel>{`Project Type`}</FormLabel>
+                                                <FormLabel>{`Project type`}</FormLabel>
                                                 {formData?.types?.length === 3 &&
                                                     <FormDescription>{`Maximum selection is 3 types.`}</FormDescription>}
                                             </div>
                                             <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypeOptions}/>
 
-                                            <FormLabel>{`Project Status`}</FormLabel>
+                                            <FormLabel>{`Project status`}</FormLabel>
                                             <StatusFormField
                                                 form={form}
                                                 mixpanelTrackCallback={(updatedStatus) => {
@@ -701,7 +701,7 @@ export function EditMilestoneForm({
                                                 }}
                                             />
 
-                                            <FormLabel>Linked Tools</FormLabel>
+                                            <FormLabel>Linked tools</FormLabel>
                                             <FormField
                                                 control={form.control}
                                                 name="tools"
@@ -738,7 +738,7 @@ export function EditMilestoneForm({
                                                                             }}
                                                                             onClick={() => setCreateBiosampleIsOpen(true)}
                                                                         >
-                                                                            {`+ Create Biosample`}
+                                                                            {`+ Create biosample`}
                                                                         </Button>
                                                                         <Button
                                                                             value={undefined}
@@ -866,7 +866,7 @@ export function EditMilestoneForm({
                                                     name="startDate"
                                                     render={({field}) => (
                                                         <>
-                                                            <FormLabel>{'Start Date'}</FormLabel>
+                                                            <FormLabel>{'Start date'}</FormLabel>
                                                             <div className="flex gap-2">
                                                                 <Select
                                                                     defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
@@ -933,7 +933,7 @@ export function EditMilestoneForm({
                                                     name="endDate"
                                                     render={({field}) => (
                                                         <>
-                                                            <FormLabel>{'End Date'}</FormLabel>
+                                                            <FormLabel>{'End date'}</FormLabel>
                                                             <div className="flex flex-col gap-2">
                                                                 <div className="flex gap-2">
                                                                     <Select
@@ -1021,7 +1021,7 @@ export function EditMilestoneForm({
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
                                                         >
-                                                            {'+ Add Budget'}
+                                                            {'+ Add budget'}
                                                         </Button>
                                                     )}
                                                     {(!hasStartDate) && (
@@ -1030,7 +1030,7 @@ export function EditMilestoneForm({
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
                                                         >
-                                                            {'+ Add Start Date'}
+                                                            {'+ Add start date'}
                                                         </Button>
                                                     )}
                                                     {(!hasEndDate) && (
@@ -1039,7 +1039,7 @@ export function EditMilestoneForm({
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
                                                         >
-                                                            {'+ Add End Date'}
+                                                            {'+ Add end date'}
                                                         </Button>
                                                     )}
                                                     {(!formData?.contacts || formData?.contacts.length <= 0) && (
@@ -1052,7 +1052,7 @@ export function EditMilestoneForm({
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
                                                         >
-                                                            {'+ Add Contacts'}
+                                                            {'+ Add contacts'}
                                                         </Button>
                                                     )}
                                                     {(!formData?.attachments || formData?.attachments.length <= 0) && (
@@ -1065,7 +1065,7 @@ export function EditMilestoneForm({
                                                             variant={'secondary'}
                                                             className="p-2 max-h-[28px]"
                                                         >
-                                                            {'+ Add Links'}
+                                                            {'+ Add links'}
                                                         </Button>
                                                     )}
                                                 </span>
@@ -1079,7 +1079,7 @@ export function EditMilestoneForm({
                                             <Dialog>
                                                 <DialogTrigger asChild>
                                                     <Button type="button" variant="destructive">
-                                                        Delete Project
+                                                        Delete project
                                                     </Button>
                                                 </DialogTrigger>
                                                 <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
@@ -1094,7 +1094,7 @@ export function EditMilestoneForm({
                                                     onClose()
                                                 }}
                                             >
-                                                Save Changes
+                                                Save changes
                                             </Button>
                                         </span>
                                     </TabsContent>
@@ -1208,7 +1208,7 @@ export function EditMilestoneForm({
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
-                            Create Biosample Tool
+                            Create biosample tool
                         </DialogTitle>
                         <DialogDescription>
                             {`Create your Tool here. Click save when you're done.`}
@@ -1226,8 +1226,9 @@ export function EditMilestoneForm({
                                         value: newBiosample.id,
                                         type: 'Biosamples',
                                         // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
-                                        label: `${newBiosample.id}`,
-                                        biosample: newBiosample
+                                        label: `${newBiosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => newBiosample?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
+                                        biosample: newBiosample,
+                                        icon: 'test-tube-diagonal',
                                     }
                                 ])
                             }
@@ -1256,9 +1257,10 @@ export function EditMilestoneForm({
                                     ...(form.getValues("tools") || []),
                                     {
                                         value: newDiseaseModel.id,
-                                        label: `${newDiseaseModel.id}`,
+                                        label: `${newDiseaseModel.id} - ${(DISEASE_MODEL_TYPE_OPTIONS.filter(option => newDiseaseModel?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
                                         type: 'Disease Models',
-                                        diseaseModel: newDiseaseModel
+                                        diseaseModel: newDiseaseModel,
+                                        icon: 'rat',
                                     }
                                 ])
                             }
@@ -1287,9 +1289,10 @@ export function EditMilestoneForm({
                                     ...(form.getValues("tools") || []),
                                     {
                                         value: newDatasample.id,
-                                        label: newDatasample.id,
+                                        label: `${newDatasample.id} - ${newDatasample.title}`,
                                         type: 'Clinical Datasets',
-                                        datasample: newDatasample
+                                        datasample: newDatasample,
+                                        icon: 'database',
                                     }
                                 ])
                             }
@@ -1835,26 +1838,19 @@ export function AttachmentsFormField({form}: { form: UseFormReturn<any> }) {
                                     <FormLabel>{`Links`}</FormLabel>
                                     <FormDescription>{`Add any links that are not on the Comend platform.`}</FormDescription>
                                 </div>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Button
-                                            size={"icon"}
-                                            variant="secondary"
-                                            onClick={(e: any) => {
-                                                e.preventDefault()
-                                                form.setValue("attachments", [
-                                                    ...(field?.value || []),
-                                                    {name: '', link: ''}
-                                                ])
-                                            }}
-                                        >
-                                            <Plus/>
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
-                                        {`Add a link`}
-                                    </TooltipContent>
-                                </Tooltip>
+                                <Button
+                                    size={"icon"}
+                                    variant="secondary"
+                                    onClick={(e: any) => {
+                                        e.preventDefault()
+                                        form.setValue("attachments", [
+                                            ...(field?.value || []),
+                                            {name: '', link: ''}
+                                        ])
+                                    }}
+                                >
+                                    <Plus/>
+                                </Button>
                             </div>
 
                             {field.value && field.value.length > 0 && (
@@ -1901,26 +1897,19 @@ export const ContactsFormField = ({form}: { form: any }) => {
                             <FormLabel>{`Contacts`}</FormLabel>
                             <FormDescription>{`Add any external contacts that are not on the Comend platform.`}</FormDescription>
                         </div>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <Button
-                                    variant="secondary"
-                                    size={"icon"}
-                                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                        e.preventDefault()
-                                        form.setValue("contacts", [
-                                            ...(field.value || []),
-                                            {name: "", email: "", role: null}
-                                        ])
-                                    }}
-                                >
-                                    <Plus/>
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-80 text-wrap text-left font-normal">
-                                {`Add a contact`}
-                            </TooltipContent>
-                        </Tooltip>
+                        <Button
+                            variant="secondary"
+                            size={"icon"}
+                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                e.preventDefault()
+                                form.setValue("contacts", [
+                                    ...(field.value || []),
+                                    {name: "", email: "", role: null}
+                                ])
+                            }}
+                        >
+                            <Plus/>
+                        </Button>
                     </div>
 
                     {field?.value && field.value.length > 0 && (

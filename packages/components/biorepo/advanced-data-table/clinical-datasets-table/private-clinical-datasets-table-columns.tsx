@@ -3,6 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   CircleDashed,
+  FileText,
   Globe,
   Lock,
   Text,
@@ -15,6 +16,7 @@ import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-me
 import { Checkbox } from "./../../../ui/checkbox";
 import { handleAsyncGeneSearch, handleAsyncInstitutionSearch } from "./../../../../../packages/lib/utils";
 import Link from "next/link";
+import { Badge } from "./../../../ui/badge";
 
 export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
   const columns: ColumnDef<any>[] = [
@@ -99,7 +101,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             <DataTableColumnHeader 
                 column={column} 
                 title="Dataset ID"
-                tooltip="This is a unique ID assigned to this dataset. This ID is public, and will appear in the marketplace."
+                tooltip="Unique ID assigned to this dataset. This ID is public and appears in the marketplace."
             />
         ),
         cell: ({row}) => (
@@ -172,7 +174,13 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             <DataTableColumnHeader column={column} title="Gene"/>
         ),
         cell: ({row}) => (
-            <>{row.original.gene?.symbol}</>
+            <>
+                {row.original.gene?.symbol && (
+                    <Badge variant={"teal"}>
+                        {row.original.gene.symbol}
+                    </Badge>
+                )}
+            </>
         ),
         enableHiding: true,
         enableColumnFilter: true,
@@ -214,7 +222,15 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             <DataTableColumnHeader column={column} title="Stored with"/>
         ),
         cell: ({row}) => {
-            return <>{row.original.institution?.name || row.original.company?.title}</>
+            return (
+                <>
+                {(row.original.institution?.name || row.original.company?.title) && (
+                    <Badge>
+                        {row.original.institution?.name || row.original.company?.title}
+                    </Badge>
+                )}
+                </>
+            )
         },
         enableHiding: true,
         enableColumnFilter: true,
@@ -241,6 +257,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 ))}
             </ul>
         ),
+        meta: { label: "Point of contact" },
         enableSorting: false,
         enableHiding: true,
     },
@@ -266,6 +283,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 ))}
             </ul>
         ),
+        meta: { label: "Links" },
         enableSorting: false,
         enableHiding: true,
     },
@@ -289,17 +307,21 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
     {
         accessorKey: "milestones",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Linked Projects" />
+            <DataTableColumnHeader column={column} title="Linked projects" />
         ),
-        cell: ({ row }) => (
+        cell: ({row}) => (
             <ul className="flex flex-col gap-2">
                 {row.original.milestones?.map((milestone: any, index: number) => (
-                    <li key={index} className="line-clamp-2">
-                        {milestone.milestone?.title || undefined}
+                    <li key={index}>
+                        <Badge variant={"purple"}>
+                            <FileText className="h-4 w-4 min-h-4 min-w-4"/>
+                            {milestone.milestone?.title || undefined}
+                        </Badge>
                     </li>
                 ))}
             </ul>
         ),
+        meta: { label: "Linked projects" },
         enableSorting: false,
         enableHiding: true,
     },
@@ -307,27 +329,28 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         id: "description",
         accessorKey: "description",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Description" />
+            <DataTableColumnHeader column={column} title="Notes" />
         ),
         cell: ({ row }) => (
             <div className="line-clamp-3">
                 {row.original.description}
             </div>
         ),
+        meta: { label: "Notes" },
         enableHiding: true,
     },
     {
         id: "notes",
         accessorKey: "notes",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Internal Notes"/>
+            <DataTableColumnHeader column={column} title="Internal notes"/>
         ),
         cell: ({row}) => (
             <div className="line-clamp-3">
                 {row.original.notes}
             </div>
         ),
-        meta: { label: "Internal Notes" },
+        meta: { label: "Internal notes" },
         enableHiding: true,
     },
     // {

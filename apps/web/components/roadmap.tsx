@@ -9,7 +9,7 @@ import {
     ResizablePanelGroup,
     ResizableHandle
 } from "@comend/components/ui/resizable"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@comend/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@comend/components/ui/tabs"
 import { PrivateFlowView } from "~web/components/private-flow"
 import { EditMilestoneForm } from "./edit-milestone-form"
@@ -231,104 +231,81 @@ export function Roadmap({
     return (
         <ContextMenu>
         <ContextMenuTrigger autoFocus className="h-full w-full">
-            <TooltipProvider delayDuration={0}>
-                <ResizablePanelGroup
-                    direction="horizontal"
-                    className="h-full items-stretch"
-                >
-                    <ResizablePanel className="p-2 flex flex-col gap-2">
-                        <RoadmapHeader 
-                            researchPlanId={roadmapId}
-                            researchPlanDetails={{
-                                id: roadmapId,
-                                ...details
-                            }}
-                            setTab={setTab}
-                            setNewMilestoneIsOpen={setNewMilestoneIsOpen}
-                            milestoneTypes={milestoneTypes}
-                            // setBulkImportIsOpen={setBulkImportIsOpen}
-                            orgSubdomain={orgSubdomain}
-                        />
-                        <Tabs defaultValue={selectedView ? selectedView : "flow"} onValueChange={handleTabChange} className="flex flex-col gap-4">
-                            <div className="flex flex-row items-center gap-x-1 justify-start">
-                                <TabsList className="mr-auto">
-                                    <TabsTrigger value="flow" className="relative">
-                                        Flow View
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <div className="ml-2">
-                                                <Info className="h-4 w-4"/>
-                                                </div>
-                                            </TooltipTrigger>
-                                            <TooltipContent className="max-w-80 text-wrap text-left">
-                                                {"Interactive whiteboard to organize research plans. Project order changes in this view or the list stay separate."}
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TabsTrigger>
-                                    <TabsTrigger value="list">List View</TabsTrigger>
-                                </TabsList>
+            <ResizablePanelGroup
+                direction="horizontal"
+                className="h-full items-stretch"
+            >
+                <ResizablePanel className="p-2 flex flex-col gap-2">
+                    <RoadmapHeader 
+                        researchPlanId={roadmapId}
+                        researchPlanDetails={{
+                            id: roadmapId,
+                            ...details
+                        }}
+                        setTab={setTab}
+                        setNewMilestoneIsOpen={setNewMilestoneIsOpen}
+                        milestoneTypes={milestoneTypes}
+                        // setBulkImportIsOpen={setBulkImportIsOpen}
+                        orgSubdomain={orgSubdomain}
+                    />
+                    <Tabs defaultValue={selectedView ? selectedView : "flow"} onValueChange={handleTabChange} className="flex flex-col gap-4">
+                        <div className="flex flex-row items-center gap-x-1 justify-start">
+                            <TabsList className="mr-auto">
+                                <TabsTrigger value="flow" className="relative">
+                                    Flow view
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <div className="ml-2">
+                                            <Info className="h-4 w-4"/>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-80 text-wrap text-left" side="bottom">
+                                            {"Interactive whiteboard. Changes made here or in the list view update both."}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TabsTrigger>
+                                <TabsTrigger value="list">List view</TabsTrigger>
+                            </TabsList>
 
-                                {selectedView === "list" && (
-                                    <div className="flex flex-row gap-4 items-center">
-                                        <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
-                                            <SelectTrigger className="w-[180px]">
-                                                <SelectValue 
-                                                    // defaultValue={'custom'} 
-                                                    defaultValue={'default'}
-                                                    placeholder={"Sort by"}
-                                                >
-                                                    {(() => {
-                                                        switch(sortBy) {
-                                                            case "start":
-                                                                return "Sort by: Start Date"
-                                                            case "end":
-                                                                return "Sort by: End Date"
-                                                            // default:
-                                                            //     return "Sort by: Custom"
-                                                            default:
-                                                                return "Sort by: Default"
-                                                        }
-                                                    })()}
-                                                </SelectValue>
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {/* <SelectItem value="custom">{`Custom`}</SelectItem> */}
-                                                <SelectItem value="default">{`Default`}</SelectItem>
-                                                <SelectItem value="start">{`Start Date`}</SelectItem>
-                                                <SelectItem value="end">{`End Date`}</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                )}
+                            {selectedView === "list" && (
+                                <div className="flex flex-row gap-4 items-center">
+                                    <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
+                                        <SelectTrigger className="w-[180px]">
+                                            <SelectValue 
+                                                // defaultValue={'custom'} 
+                                                defaultValue={'default'}
+                                                placeholder={"Sort by"}
+                                            >
+                                                {(() => {
+                                                    switch(sortBy) {
+                                                        case "start":
+                                                            return "Sort by: start date"
+                                                        case "end":
+                                                            return "Sort by: end date"
+                                                        // default:
+                                                        //     return "Sort by: custom"
+                                                        default:
+                                                            return "Sort by: default"
+                                                    }
+                                                })()}
+                                            </SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {/* <SelectItem value="custom">{`Custom`}</SelectItem> */}
+                                            <SelectItem value="default">{`Default`}</SelectItem>
+                                            <SelectItem value="start">{`Start date`}</SelectItem>
+                                            <SelectItem value="end">{`End date`}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
 
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button 
-                                            data-skip-outside-click
-                                            onClick={(e) => {
-                                                undo() // undo updates zustand state
-                                                saveState() // save state to update database
-                                
-                                                if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
-                                                    // if there is a node selected, remount the milestone form
-                                                    // to update the form data after the undo was triggered
-                                                    setMilestoneRemountKey(prevKey => prevKey + 1)
-                                                }
-                                            }} size={"icon"} variant={"ghost"}
-                                        >
-                                            <Undo2 />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-80">
-                                        <p>{`Undo (⌘+Z)`}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button onClick={() => {
-                                            console.log("Redo action triggered")
-                                            redo() // undo updates zustand state
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button 
+                                        data-skip-outside-click
+                                        onClick={(e) => {
+                                            undo() // undo updates zustand state
                                             saveState() // save state to update database
                             
                                             if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
@@ -336,159 +313,180 @@ export function Roadmap({
                                                 // to update the form data after the undo was triggered
                                                 setMilestoneRemountKey(prevKey => prevKey + 1)
                                             }
-                                        }} size={"icon"} variant={"ghost"}>
-                                            <Redo2 />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-80">
-                                        <p>{`Redo (⌘+Shift+Z)`}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </div>
+                                        }} size={"icon"} variant={"ghost"}
+                                    >
+                                        <Undo2 />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80">
+                                    <p>{`Undo (⌘+Z)`}</p>
+                                </TooltipContent>
+                            </Tooltip>
 
-                            {/* Flow View */}
-                            <TabsContent
-                                value="flow"
-                                className="m-0 h-[calc(100vh-10rem)]"
-                            >
-                                {milestones.length > 0 ? (
-                                    <PrivateFlowView
-                                        width={defaultLayout[0]}
-                                        organization={organization}
-                                        contextMenuRef={contextMenuRef} 
-                                    />
-                                ): (
-                                    <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
-                                )}
-                            </TabsContent>
-                            
-                            {/* List view */}
-                            <TabsContent
-                                value="list"
-                                className="mt-0 h-[calc(100vh-12rem)]"
-                            >
-                                {milestones.length > 0 ? (
-                                    <TimelineView
-                                        sortBy={sortBy} 
-                                        organization={organization}
-                                        contextMenuRef={contextMenuRef} 
-                                    />
-                                ): (
-                                    <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
-                                )}
-                            </TabsContent>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button onClick={() => {
+                                        console.log("Redo action triggered")
+                                        redo() // undo updates zustand state
+                                        saveState() // save state to update database
+                        
+                                        if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
+                                            // if there is a node selected, remount the milestone form
+                                            // to update the form data after the undo was triggered
+                                            setMilestoneRemountKey(prevKey => prevKey + 1)
+                                        }
+                                    }} size={"icon"} variant={"ghost"}>
+                                        <Redo2 />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80">
+                                    <p>{`Redo (⌘+Shift+Z)`}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
 
-                        </Tabs>
-                    </ResizablePanel>
-
-                    {selectedNodeIds.length === 1 && selectedNodeIds[0] != null && (
-                        <>
-                            <ResizableHandle withHandle />
-
-                            <ResizablePanel
-                                // onClick={(e) => {e.stopPropagation(); e.preventDefault()}}
-                                defaultSize={40}
-                                minSize={25}
-                                className="bg-white h-full flex flex-col min-w-[400px]"
-                            >
-                                <MilestoneDetailsPanel
+                        {/* Flow view */}
+                        <TabsContent
+                            value="flow"
+                            className="m-0 h-[calc(100vh-10rem)]"
+                        >
+                            {milestones.length > 0 ? (
+                                <PrivateFlowView
+                                    width={defaultLayout[0]}
                                     organization={organization}
-                                    remountKey={milestoneRemountKey}
-                                    milestone={milestones.find(
-                                        milestone =>
-                                            milestone.nodeId === selectedNodeIds[0]
-                                    )}
-                                    handlePanelChange={handleMilestonePanelChange}
-                                    orgIsPublished={orgIsPublished}
-                                    biosampleOptions={biosampleOptions}
-                                    diseaseModelOptions={diseaseModelOptions}
-                                    clinicalDatasetOptions={clinicalDatasetOptions}
-                                    rfpOptions={rfpOptions}
-                                    milestoneTypeOptions={milestoneTypes}
+                                    contextMenuRef={contextMenuRef} 
                                 />
-                            </ResizablePanel>
-                        </>
-                    )}
+                            ): (
+                                <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
+                            )}
+                        </TabsContent>
+                        
+                        {/* List view */}
+                        <TabsContent
+                            value="list"
+                            className="mt-0 h-[calc(100vh-12rem)]"
+                        >
+                            {milestones.length > 0 ? (
+                                <TimelineView
+                                    sortBy={sortBy} 
+                                    organization={organization}
+                                    contextMenuRef={contextMenuRef} 
+                                />
+                            ): (
+                                <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
+                            )}
+                        </TabsContent>
 
-                    {/* <Dialog open={bulkImportIsOpen} onOpenChange={(open: boolean) => {
-                        setBulkImportIsOpen(open)
-                    }}>
-                        <DialogContent className="flex flex-col justify-start">
-                            <DialogHeader>
-                                <DialogTitle className="text-2xl">
-                                    Import projects
-                                </DialogTitle>
-                                <DialogDescription>
-                                    Import multiple projects at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">Project input template</Link>, filling it out, downloading it as a CSV, and uploading it.
-                                </DialogDescription>
-                            </DialogHeader>
+                    </Tabs>
+                </ResizablePanel>
 
-                            <FileUploadForm 
-                                accept=".csv" 
-                                onSubmit={async (file) => {
-                                    if (file && file.name.endsWith(".csv")) {
-                                        // parse CSV file
-                                        try {
-                                            const result = await parseCSV(
-                                                file,
-                                                [
-                                                    {key: 'title', required: true, defaultValue: 'Untitled Milestone', isValid: (entry) => typeof entry === 'string' && entry.length > 0},
-                                                    {key: 'description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                                                    {key: 'type', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string' && (milestoneTypes || []).find(type => type.label === entry) !== undefined}
-                                                ]
-                                            )
+                {selectedNodeIds.length === 1 && selectedNodeIds[0] != null && (
+                    <>
+                        <ResizableHandle withHandle />
 
-                                            if (milestoneTypes.length === 0) {
-                                                toast('Warning!', {
-                                                    position: "bottom-left",
-                                                    duration: 6000,
-                                                    description: `Could not find the type for one or more of your imported projects. Projects may be imported without the proper types.`
-                                                })
-                                            } else if (result.errors.length > 0) {
-                                                toast('Warning!', {
-                                                    position: "bottom-left",
-                                                    duration: 6000,
-                                                    description: `Missing fields in import file: A title is required for each project. Edit the Project to add title.`
-                                                })
-                                                console.error("Error: imported projects are missing required fields", result.errors)
-                                            }
+                        <ResizablePanel
+                            // onClick={(e) => {e.stopPropagation(); e.preventDefault()}}
+                            defaultSize={40}
+                            minSize={25}
+                            className="bg-white h-full flex flex-col min-w-[400px]"
+                        >
+                            <MilestoneDetailsPanel
+                                organization={organization}
+                                remountKey={milestoneRemountKey}
+                                milestone={milestones.find(
+                                    milestone =>
+                                        milestone.nodeId === selectedNodeIds[0]
+                                )}
+                                handlePanelChange={handleMilestonePanelChange}
+                                orgIsPublished={orgIsPublished}
+                                biosampleOptions={biosampleOptions}
+                                diseaseModelOptions={diseaseModelOptions}
+                                clinicalDatasetOptions={clinicalDatasetOptions}
+                                rfpOptions={rfpOptions}
+                                milestoneTypeOptions={milestoneTypes}
+                            />
+                        </ResizablePanel>
+                    </>
+                )}
 
-                                            const newNodes = await addMilestones(result.values.map(milestone => {
-                                                const foundType = milestoneTypes.find(type => type.label === milestone.type)
+                {/* <Dialog open={bulkImportIsOpen} onOpenChange={(open: boolean) => {
+                    setBulkImportIsOpen(open)
+                }}>
+                    <DialogContent className="flex flex-col justify-start">
+                        <DialogHeader>
+                            <DialogTitle className="text-2xl">
+                                Import projects
+                            </DialogTitle>
+                            <DialogDescription>
+                                Import multiple projects at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">Project input template</Link>, filling it out, downloading it as a CSV, and uploading it.
+                            </DialogDescription>
+                        </DialogHeader>
 
-                                                return {
-                                                    title: milestone.title, 
-                                                    description: milestone.description, 
-                                                    types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
-                                                    nodeType: "PROJECT"
-                                                }
-                                            }), "Import")
+                        <FileUploadForm 
+                            accept=".csv" 
+                            onSubmit={async (file) => {
+                                if (file && file.name.endsWith(".csv")) {
+                                    // parse CSV file
+                                    try {
+                                        const result = await parseCSV(
+                                            file,
+                                            [
+                                                {key: 'title', required: true, defaultValue: 'Untitled Milestone', isValid: (entry) => typeof entry === 'string' && entry.length > 0},
+                                                {key: 'description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                                                {key: 'type', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string' && (milestoneTypes || []).find(type => type.label === entry) !== undefined}
+                                            ]
+                                        )
 
-                                            if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
-                                        } catch (e) {
-                                            toast('Error!', {
+                                        if (milestoneTypes.length === 0) {
+                                            toast('Warning!', {
                                                 position: "bottom-left",
                                                 duration: 6000,
-                                                description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
+                                                description: `Could not find the type for one or more of your imported projects. Projects may be imported without the proper types.`
                                             })
-                                            console.error("Error: failed to import tools", e)
+                                        } else if (result.errors.length > 0) {
+                                            toast('Warning!', {
+                                                position: "bottom-left",
+                                                duration: 6000,
+                                                description: `Missing fields in import file: A title is required for each project. Edit the Project to add title.`
+                                            })
+                                            console.error("Error: imported projects are missing required fields", result.errors)
                                         }
-                                    } else {
-                                        console.error("Please upload a valid CSV file.");
-                                    }
-                                }}
-                            />
-                        </DialogContent>
-                    </Dialog> */}
 
-                    <NewMilestoneDialogForm 
-                        open={newMilestoneIsOpen}
-                        setOpen={setNewMilestoneIsOpen}
-                        tab={tab}
-                        setTab={setTab}
-                    />
-                </ResizablePanelGroup>
-            </TooltipProvider>
+                                        const newNodes = await addMilestones(result.values.map(milestone => {
+                                            const foundType = milestoneTypes.find(type => type.label === milestone.type)
+
+                                            return {
+                                                title: milestone.title, 
+                                                description: milestone.description, 
+                                                types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
+                                                nodeType: "PROJECT"
+                                            }
+                                        }), "Import")
+
+                                        if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
+                                    } catch (e) {
+                                        toast('Error!', {
+                                            position: "bottom-left",
+                                            duration: 6000,
+                                            description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
+                                        })
+                                        console.error("Error: failed to import tools", e)
+                                    }
+                                } else {
+                                    console.error("Please upload a valid CSV file.");
+                                }
+                            }}
+                        />
+                    </DialogContent>
+                </Dialog> */}
+
+                <NewMilestoneDialogForm 
+                    open={newMilestoneIsOpen}
+                    setOpen={setNewMilestoneIsOpen}
+                    tab={tab}
+                    setTab={setTab}
+                />
+            </ResizablePanelGroup>
         </ContextMenuTrigger>
 
         <ContextMenuContent ref={contextMenuRef}>
@@ -735,8 +733,16 @@ const RoadmapHeader = ({
         <div ref={parentRef} className="flex justify-between items-center">
             <span className="flex flex-row items-center">
                 <h1 className="h-full text-2xl font-semibold text-wrap line-clamp-2 pr-1">{researchPlanDetails.title || "Untitled Research Plan"}</h1>
+                <Button
+                    onClick={() => setEditResearchPlanIsOpen(true)} 
+                    variant="ghost"
+                    size={"icon"}
+                    className="min-w-[40px]"
+                >
+                    <Pencil />
+                </Button>
                 <div className="p-[6px] h-[40px]">
-                    <StageOfActivityBadge milestones={milestones} />
+                    <StageOfActivityBadge showTooltip={false} milestones={milestones} />
                 </div>
                 {milestones.filter(milestone => !milestone.private).length <= 0 
                     ? (
@@ -759,7 +765,7 @@ const RoadmapHeader = ({
                                 </TooltipTrigger>
                             </div>
                             <TooltipContent className="max-w-80">
-                                {`All projects in this plan are private and cannot be shared. Make at least one project published to enable sharing. Click to publish all projects.`}
+                                {`Private research plans cannot be shared externally. Click to publish all projects.`}
                             </TooltipContent>
                         </Tooltip>
                     )
@@ -783,26 +789,11 @@ const RoadmapHeader = ({
                                 </TooltipTrigger>
                             </div>
                             <TooltipContent className="max-w-80">
-                                {`This research plan is public and can be shared externally. Make all project private to hide this research plan and disable sharing. Click to make all projects private.`}
+                                {`Published research plans can be shared externally. Click to make all projects private.`}
                             </TooltipContent>
                         </Tooltip>
                     )
                 }
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            onClick={() => setEditResearchPlanIsOpen(true)} 
-                            variant="ghost"
-                            size={"icon"}
-                            className="min-w-[40px]"
-                        >
-                            <Pencil />
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-80">
-                        <p>{`Edit the details of your research plan, like the title and description.`}</p>
-                    </TooltipContent>
-                </Tooltip>
             </span>
 
             <span className="flex flex-row items-center justify-end">
@@ -825,17 +816,26 @@ const RoadmapHeader = ({
                     </TooltipContent>
                 </Tooltip> */}
 
-                <Button 
-                    variant={"ghost"}  
-                    onClick={() => {
-                        setTab('projects')
-                        setNewMilestoneIsOpen(true)
-                    }}
-                    size={isCollapsed ? "icon" : "default"}
-                >
-                    <LayoutTemplate />
-                    {!isCollapsed && <p>{`Templates`}</p>}
-                </Button>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button 
+                            variant={"ghost"}  
+                            onClick={() => {
+                                setTab('projects')
+                                setNewMilestoneIsOpen(true)
+                            }}
+                            size={isCollapsed ? "icon" : "default"}
+                        >
+                            <LayoutTemplate />
+                            {!isCollapsed && <p>{`Templates`}</p>}
+                        </Button>
+                    </TooltipTrigger>
+                    {isCollapsed && (
+                        <TooltipContent className="max-w-80">
+                            <p>{`Templates`}</p>
+                        </TooltipContent>
+                    )}
+                </Tooltip>
 
                 <Tooltip>
                     <TooltipTrigger asChild>
@@ -857,9 +857,11 @@ const RoadmapHeader = ({
                             {!isCollapsed && <p>{`Add an empty project`}</p>}
                         </Button>
                     </TooltipTrigger>
-                    <TooltipContent className="max-w-80">
-                        <p>{`Start from scratch. Add an empty project to your research plan.`}</p>
-                    </TooltipContent>
+                    {isCollapsed && (
+                        <TooltipContent className="max-w-80">
+                            <p>{`Add an empty project`}</p>
+                        </TooltipContent>
+                    )}
                 </Tooltip>
 
                 <DropdownMenu modal={false}>

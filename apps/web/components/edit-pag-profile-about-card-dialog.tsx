@@ -145,232 +145,218 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
     }
 
     return (
-        <TooltipProvider>
-            <Dialog
-                open={open}
-                onOpenChange={(state) => {
-                    if (!state) {
-                        // Reset the form to original values when dialog closes (e.g. cancel)
-                        editOrgForm.reset({
-                            description: organization.description || "",
-                            website: organization.website || "",
-                            therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
-                                label: ther,
-                                value: ther
-                            })) || [],
-                            otherTherapeuticsInDevelopment:
-                                typeof organization.metadata == "object"
-                                    ? (organization.metadata as any)?.otherTherapeuticsInDevelopment
-                                    : undefined,
-                            therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({
-                                label: ther,
-                                value: ther
-                            })) || [],
-                            otherTherapeuticsOfInterest:
-                                typeof organization.metadata == "object"
-                                    ? (organization.metadata as any)?.otherTherapeuticsOfInterest
-                                    : undefined,
-                        });
-                    }
-                    setOpen(state);
-                }}
-            >
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        {isOwner ? (
-                            <DialogTrigger asChild>
-                                <Button variant="ghost" size="icon" aria-label="Edit" data-testid="about-edit-btn">
-                                    <Pencil className="h-4 w-4"/>
-                                </Button>
-                            </DialogTrigger>
-                        ) : (
-                            <div>
-                                <Button variant="ghost" size="icon" aria-label="Owners only" disabled>
-                                    <Pencil className="h-4 w-4"/>
-                                </Button>
-                            </div>
-                        )}
-                    </TooltipTrigger>
-
-                    {!isOwner && (
-                        <TooltipContent className="max-w-80">
-                            Editing is owners-only. Visit the Team page to manage members.
-                        </TooltipContent>
+        <Dialog
+            open={open}
+            onOpenChange={(state) => {
+                if (!state) {
+                    // Reset the form to original values when dialog closes (e.g. cancel)
+                    editOrgForm.reset({
+                        description: organization.description || "",
+                        website: organization.website || "",
+                        therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
+                            label: ther,
+                            value: ther
+                        })) || [],
+                        otherTherapeuticsInDevelopment:
+                            typeof organization.metadata == "object"
+                                ? (organization.metadata as any)?.otherTherapeuticsInDevelopment
+                                : undefined,
+                        therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({
+                            label: ther,
+                            value: ther
+                        })) || [],
+                        otherTherapeuticsOfInterest:
+                            typeof organization.metadata == "object"
+                                ? (organization.metadata as any)?.otherTherapeuticsOfInterest
+                                : undefined,
+                    });
+                }
+                setOpen(state);
+            }}
+        >
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    {isOwner ? (
+                        <DialogTrigger asChild>
+                            <Button variant="ghost" size="icon" aria-label="Edit" data-testid="about-edit-btn">
+                                <Pencil className="h-4 w-4"/>
+                            </Button>
+                        </DialogTrigger>
+                    ) : (
+                        <div>
+                            <Button variant="ghost" size="icon" aria-label="Owners only" disabled>
+                                <Pencil className="h-4 w-4"/>
+                            </Button>
+                        </div>
                     )}
-                </Tooltip>
-                <DialogContent className="max-h-[80vh] overflow-y-auto" data-testid="dialog">
-                    <DialogHeader>
-                        <DialogTitle>Edit Organization Profile</DialogTitle>
-                        <DialogDescription>
-                            {`Update your organization's description and website.`}
-                        </DialogDescription>
-                    </DialogHeader>
-                    <Form {...editOrgForm}>
-                        <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
+                </TooltipTrigger>
+
+                {!isOwner && (
+                    <TooltipContent className="max-w-80">
+                        Editing is owners-only. Visit the Team page to manage members.
+                    </TooltipContent>
+                )}
+            </Tooltip>
+            <DialogContent className="max-h-[80vh] overflow-y-auto" data-testid="dialog">
+                <DialogHeader>
+                    <DialogTitle>Edit Organization Profile</DialogTitle>
+                    <DialogDescription>
+                        {`Update your organization's description and website.`}
+                    </DialogDescription>
+                </DialogHeader>
+                <Form {...editOrgForm}>
+                    <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
+                        <FormField
+                            control={editOrgForm.control}
+                            name="description"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Description</FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            {...field}
+                                            placeholder="Tell us about your organization"
+                                            data-testid="about-description-input"
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={editOrgForm.control}
+                            name="website"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>{`Website`}</FormLabel>
+                                    <FormDescription>
+                                        {`Your patient group's website URL (with the URL extension like http or https).`}
+                                    </FormDescription>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            id="website"
+                                            data-testid="website-input"
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={editOrgForm.control}
+                            name="therapeuticsInDevelopment"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Therapeutics under development
+                                    </FormLabel>
+                                    <FormDescription className="flex items-center">
+                                        {`What types of treatments is your organization currently developing? Select all that apply.`}
+                                    </FormDescription>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            defaultOptions={MODALITIES}
+                                            placeholder="Select modalities you like..."
+                                            hidePlaceholderWhenSelected={true}
+                                            emptyIndicator={
+                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                    no results found.
+                                                </p>
+                                            }
+                                            showHoverCard={false}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        {formData.therapeuticsInDevelopment?.some((item) => item.value === "Other" || item.value === "OTHER") && (
                             <FormField
                                 control={editOrgForm.control}
-                                name="description"
+                                name="otherTherapeuticsInDevelopment"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Description</FormLabel>
-                                        <FormControl>
-                                            <Textarea
-                                                {...field}
-                                                placeholder="Tell us about your organization"
-                                                data-testid="about-description-input"
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={editOrgForm.control}
-                                name="website"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>{`Website`}</FormLabel>
-                                        <FormDescription>
-                                            {`Your patient group's website URL (with the URL extension like http or https).`}
+                                        <FormDescription className="flex items-center">
+                                            {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
                                         </FormDescription>
                                         <FormControl>
                                             <Input
+                                                type="text"
+                                                id="modalities-other"
                                                 {...field}
-                                                id="website"
-                                                data-testid="website-input"
                                             />
                                         </FormControl>
                                         <FormMessage/>
                                     </FormItem>
                                 )}
                             />
+                        )}
 
+                        <FormField
+                            control={editOrgForm.control}
+                            name="therapeuticsOfInterest"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Therapeutics of interest
+                                    </FormLabel>
+                                    <FormDescription className="flex items-center">
+                                        {`Select all treatment modalities your organization is interested in. This helps us match you with experts in those specific areas.`}
+                                    </FormDescription>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            defaultOptions={MODALITIES}
+                                            placeholder="Select modalities you like..."
+                                            hidePlaceholderWhenSelected={true}
+                                            emptyIndicator={
+                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                    no results found.
+                                                </p>
+                                            }
+                                            showHoverCard={false}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        {editOrgForm.watch("therapeuticsOfInterest")?.some((item) => item.value === "Other" || item.value === "OTHER") && (
                             <FormField
                                 control={editOrgForm.control}
-                                name="therapeuticsInDevelopment"
+                                name="otherTherapeuticsOfInterest"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>
-                                            Therapeutics under development
-                                        </FormLabel>
                                         <FormDescription className="flex items-center">
-                                            {`What types of treatments is your organization currently developing? Select all that apply.`}
+                                            {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
                                         </FormDescription>
                                         <FormControl>
-                                            <MultipleSelector
+                                            <Input
+                                                type="text"
+                                                id="modalities-other"
                                                 {...field}
-                                                defaultOptions={MODALITIES}
-                                                placeholder="Select modalities you like..."
-                                                hidePlaceholderWhenSelected={true}
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                                showHoverCard={false}
                                             />
                                         </FormControl>
                                         <FormMessage/>
                                     </FormItem>
                                 )}
                             />
+                        )}
 
-                            {formData.therapeuticsInDevelopment?.some((item) => item.value === "Other" || item.value === "OTHER") && (
-                                <FormField
-                                    control={editOrgForm.control}
-                                    name="otherTherapeuticsInDevelopment"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormDescription className="flex items-center">
-                                                {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
-                                            </FormDescription>
-                                            <FormControl>
-                                                <Input
-                                                    type="text"
-                                                    id="modalities-other"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-                            )}
-
-                            <FormField
-                                control={editOrgForm.control}
-                                name="therapeuticsOfInterest"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Therapeutics of interest
-                                        </FormLabel>
-                                        <FormDescription className="flex items-center">
-                                            {`The treatment modalities your organization is interested in. Select all that apply.`}
-                                            <Tooltip delayDuration={0}>
-                                                {/*disabled to make the tooltip unclickable*/}
-                                                <TooltipTrigger disabled>
-                                                    <Info
-                                                        className="text-black h-4 inline-block align-baseline mx-1 h-4 w-4"/>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>
-                                                        {`This will help us match you with the experts of your particular modality.`}
-                                                    </p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={MODALITIES}
-                                                placeholder="Select modalities you like..."
-                                                hidePlaceholderWhenSelected={true}
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                                showHoverCard={false}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            {editOrgForm.watch("therapeuticsOfInterest")?.some((item) => item.value === "Other" || item.value === "OTHER") && (
-                                <FormField
-                                    control={editOrgForm.control}
-                                    name="otherTherapeuticsOfInterest"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormDescription className="flex items-center">
-                                                {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
-                                            </FormDescription>
-                                            <FormControl>
-                                                <Input
-                                                    type="text"
-                                                    id="modalities-other"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-                            )}
-
-                            <Button
-                                type="submit"
-                                data-testid="dialog-save-btn"
-                            >
-                                Save
-                            </Button>
-                        </form>
-                    </Form>
-                </DialogContent>
-            </Dialog>
-        </TooltipProvider>
+                        <Button
+                            type="submit"
+                            data-testid="dialog-save-btn"
+                        >
+                            Save
+                        </Button>
+                    </form>
+                </Form>
+            </DialogContent>
+        </Dialog>
     );
 }

@@ -72,7 +72,7 @@ export const DeleteDiseaseModelDialog = ({toolId, closeDialog}: {toolId: string 
                             variant={"destructive"}
                             onClick={handleDeleteAsset}
                         >
-                            Delete Tool
+                            Delete tool
                         </Button>
                     </DialogClose>
                 </DialogFooter>

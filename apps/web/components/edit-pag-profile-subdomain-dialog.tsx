@@ -180,83 +180,81 @@ export default function EditPagProfileSubdomainDialog({organization}: { organiza
     }
 
     return (
-        <TooltipProvider>
-            <Dialog
-                open={open}
-                onOpenChange={(state) => {
-                    if (!state) {
-                        // Reset form to current organization's subdomain when dialog is closed
-                        editOrgForm.reset({
-                            subdomain: organization?.subdomain || ""
-                        });
-                    }
-                    setOpen(state);
-                }}
-            >
-                <Tooltip>
-                    <TooltipTrigger onClick={(e) => e.preventDefault()}>
-                        <DialogTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                disabled={session?.user?.membership?.role !== "owner"}
-                            >
-                                <Pencil />
-                            </Button>
-                        </DialogTrigger>
-                    </TooltipTrigger>
-                    {session?.user?.membership?.role !== "owner" && (
-                        <TooltipContent className="max-w-80">
-                            <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
-                        </TooltipContent>
-                    )}
-                </Tooltip>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Organization Abbreviation (required)</DialogTitle>
-                        <DialogDescription>
-                            {`Choose the URL for your custom profile site.`}
-                            <br/>
-                            {editOrgForm.watch("subdomain") &&
-                                !editOrgForm.formState.errors.subdomain && (
-                                    <>
-                                        {`The custom site for your organization’s profile will be found at ${editOrgForm
-                                            .watch("subdomain")
-                                            .toLowerCase()
-                                            .replace(/\s+/g, "-")}.comend.io`}
-                                    </>
-                                )}
-                        </DialogDescription>
-                    </DialogHeader>
-                    <Form {...editOrgForm}>
-                        <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
+        <Dialog
+            open={open}
+            onOpenChange={(state) => {
+                if (!state) {
+                    // Reset form to current organization's subdomain when dialog is closed
+                    editOrgForm.reset({
+                        subdomain: organization?.subdomain || ""
+                    });
+                }
+                setOpen(state);
+            }}
+        >
+            <Tooltip>
+                <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                    <DialogTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            disabled={session?.user?.membership?.role !== "owner"}
+                        >
+                            <Pencil />
+                        </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                {session?.user?.membership?.role !== "owner" && (
+                    <TooltipContent className="max-w-80">
+                        <p>Profile editing is only enabled for organization owners. Please contact the owners of your organization. Owners are visible in the Organization Settings tab in the memberships section.</p>
+                    </TooltipContent>
+                )}
+            </Tooltip>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Organization Abbreviation (required)</DialogTitle>
+                    <DialogDescription>
+                        {`Choose the URL for your custom profile site.`}
+                        <br/>
+                        {editOrgForm.watch("subdomain") &&
+                            !editOrgForm.formState.errors.subdomain && (
+                                <>
+                                    {`The custom site for your organization’s profile will be found at ${editOrgForm
+                                        .watch("subdomain")
+                                        .toLowerCase()
+                                        .replace(/\s+/g, "-")}.comend.io`}
+                                </>
+                            )}
+                    </DialogDescription>
+                </DialogHeader>
+                <Form {...editOrgForm}>
+                    <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
 
-                            <FormField
-                                control={editOrgForm.control}
-                                name="subdomain"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormControl>
-                                            <Input
-                                                type="text"
-                                                id="name"
-                                                autoComplete="name"
-                                                {...field}
-                                                onChange={(e) => {
-                                                    const value = e.target.value.toLowerCase().replace(/\s+/g, "-");
-                                                    field.onChange(value); // Update the form state with processed value
-                                                }}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                        <FormField
+                            control={editOrgForm.control}
+                            name="subdomain"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input
+                                            type="text"
+                                            id="name"
+                                            autoComplete="name"
+                                            {...field}
+                                            onChange={(e) => {
+                                                const value = e.target.value.toLowerCase().replace(/\s+/g, "-");
+                                                field.onChange(value); // Update the form state with processed value
+                                            }}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
 
-                            <Button type="submit">Save</Button>
-                        </form>
-                    </Form>
-                </DialogContent>
-            </Dialog>
-        </TooltipProvider>
+                        <Button type="submit">Save</Button>
+                    </form>
+                </Form>
+            </DialogContent>
+        </Dialog>
     );
 }

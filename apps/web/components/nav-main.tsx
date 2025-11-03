@@ -13,7 +13,6 @@ import {usePathname} from "next/navigation"
 import {
     Tooltip,
     TooltipContent,
-    TooltipProvider,
     TooltipTrigger,
 } from "@comend/components/ui/tooltip"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
@@ -45,91 +44,89 @@ export function NavMain({items}: { items: Item[] }) {
     const {state} = useSidebar()
 
     return (
-        <TooltipProvider>
-            <SidebarMenu>
-                {items.map((item) => {
-                    // const isActive = pathname === item.url
-                    const isActive = item.match ? item.match(pathname) : pathname === item.url
-                    const badge = item.badge
-                    const isComingSoon = item.comingSoon
+        <SidebarMenu>
+            {items.map((item) => {
+                // const isActive = pathname === item.url
+                const isActive = item.match ? item.match(pathname) : pathname === item.url
+                const badge = item.badge
+                const isComingSoon = item.comingSoon
 
-                    return (
-                        <SidebarMenuItem key={item.title}>
-                            {isComingSoon ? (
-                                <Tooltip delayDuration={0}>
-                                    <TooltipTrigger asChild>
-                                        <>
-                                            <SidebarMenuButton
-                                                asChild
-                                                className="cursor-not-allowed opacity-50"
-                                                disabled={isComingSoon}
-                                            >
-                                                <div className="flex items-center">
-                                                    {item.icon && <item.icon className="mr-2 h-4 w-4"/>}
-                                                    {item.title}
-                                                </div>
-                                            </SidebarMenuButton>
-                                            <SidebarMenuBadge>
-                                                <div
-                                                    aria-hidden="true"
-                                                    className="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-white px-2.5 py-0.5 text-center text-xs/5 font-medium text-gray-600 ring-1 ring-inset ring-gray-200"
-                                                >
-                                                    {badge}
-                                                </div>
-                                            </SidebarMenuBadge>
-                                        </>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        Coming soon
-                                    </TooltipContent>
-                                </Tooltip>
-                            ) : (
-                                <SidebarMenuButton
-                                    asChild
-                                    className={isActive ? "bg-blue-light border border-blue-dark text-primary" : ""}
-                                >
-                                    <Link href={item.url} className="flex">
-                                        <div className="relative">
-                                            {item.icon && <item.icon className="mr-2 h-4 w-4"/>}
-                                            {state === "collapsed" &&
-                                                <NavNotificationCollapsedIcon item={item}/>
-                                            }
-                                        </div>
-                                        {item.title}
-                                        {state === "expanded" &&
-                                            <NavNotificationExpandedIcon item={item}/>
-                                        }
-                                    </Link>
-                                </SidebarMenuButton>
-                            )}
-                            {(item?.subPages || []).map((subItem) => (
-                                <SidebarMenuSub key={subItem.title}>
-                                    <SidebarMenuSubItem>
-                                        <SidebarMenuSubButton
+                return (
+                    <SidebarMenuItem key={item.title}>
+                        {isComingSoon ? (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <>
+                                        <SidebarMenuButton
                                             asChild
-                                            className={pathname === subItem.url ? "bg-blue-light text-primary" : ""}
+                                            className="cursor-not-allowed opacity-50"
+                                            disabled={isComingSoon}
                                         >
-                                            <Link href={subItem.url} className="flex">
-                                                <div className="relative">
-                                                    {subItem.icon && <subItem.icon className="mr-2 h-4 w-4"/>}
-                                                    {state === "collapsed" &&
-                                                        <NavNotificationCollapsedIcon item={subItem}/>
-                                                    }
-                                                </div>
-                                                {subItem.title}
-                                                {state === "expanded" &&
-                                                    <NavNotificationExpandedIcon item={subItem}/>
+                                            <div className="flex items-center">
+                                                {item.icon && <item.icon className="mr-2 h-4 w-4"/>}
+                                                {item.title}
+                                            </div>
+                                        </SidebarMenuButton>
+                                        <SidebarMenuBadge>
+                                            <div
+                                                aria-hidden="true"
+                                                className="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-white px-2.5 py-0.5 text-center text-xs/5 font-medium text-gray-600 ring-1 ring-inset ring-gray-200"
+                                            >
+                                                {badge}
+                                            </div>
+                                        </SidebarMenuBadge>
+                                    </>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    Coming soon
+                                </TooltipContent>
+                            </Tooltip>
+                        ) : (
+                            <SidebarMenuButton
+                                asChild
+                                className={isActive ? "bg-blue-light border border-blue-dark text-primary" : ""}
+                            >
+                                <Link href={item.url} className="flex">
+                                    <div className="relative">
+                                        {item.icon && <item.icon className="mr-2 h-4 w-4"/>}
+                                        {state === "collapsed" &&
+                                            <NavNotificationCollapsedIcon item={item}/>
+                                        }
+                                    </div>
+                                    {item.title}
+                                    {state === "expanded" &&
+                                        <NavNotificationExpandedIcon item={item}/>
+                                    }
+                                </Link>
+                            </SidebarMenuButton>
+                        )}
+                        {(item?.subPages || []).map((subItem) => (
+                            <SidebarMenuSub key={subItem.title}>
+                                <SidebarMenuSubItem>
+                                    <SidebarMenuSubButton
+                                        asChild
+                                        className={pathname === subItem.url ? "bg-blue-light text-primary" : ""}
+                                    >
+                                        <Link href={subItem.url} className="flex">
+                                            <div className="relative">
+                                                {subItem.icon && <subItem.icon className="mr-2 h-4 w-4"/>}
+                                                {state === "collapsed" &&
+                                                    <NavNotificationCollapsedIcon item={subItem}/>
                                                 }
-                                            </Link>
-                                        </SidebarMenuSubButton>
-                                    </SidebarMenuSubItem>
-                                </SidebarMenuSub>
-                            ))}
-                        </SidebarMenuItem>
-                    )
-                })}
-            </SidebarMenu>
-        </TooltipProvider>
+                                            </div>
+                                            {subItem.title}
+                                            {state === "expanded" &&
+                                                <NavNotificationExpandedIcon item={subItem}/>
+                                            }
+                                        </Link>
+                                    </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                            </SidebarMenuSub>
+                        ))}
+                    </SidebarMenuItem>
+                )
+            })}
+        </SidebarMenu>
     )
 }
 

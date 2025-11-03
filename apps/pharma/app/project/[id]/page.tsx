@@ -138,7 +138,7 @@ export default function PharmaProjectPage() {
                         <FileSignature className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                         IP repository
                     </TabsTrigger>
-                    <TooltipProvider delayDuration={0}>
+                    <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <div>
@@ -154,7 +154,7 @@ export default function PharmaProjectPage() {
                         </Tooltip>
                     </TooltipProvider>
 
-                    <TooltipProvider delayDuration={0}>
+                    <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <div>
@@ -170,7 +170,7 @@ export default function PharmaProjectPage() {
                         </Tooltip>
                     </TooltipProvider>
 
-                    <TooltipProvider delayDuration={0}>
+                    <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <div>

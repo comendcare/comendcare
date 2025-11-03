@@ -43,6 +43,7 @@ import ProjectMultipleSelector from "./project-multiple-selector"
 import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog"
 import { SubmitCreateRequest } from "./create-facility-request-button"
 import { Badge } from "@/packages/components/ui/badge"
+import { badgeVariants } from "@/packages/components/ui/badge"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -269,7 +270,7 @@ export function EditDiseaseModelToolForm({
                     <FormItem className="flex gap-2 items-center">
                         <FormLabel className="flex items-center gap-1 grow">
                             Visibility
-                            <Tooltip delayDuration={0}>
+                            <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Info className="h-4 w-4"/>
                                 </TooltipTrigger>
@@ -290,11 +291,12 @@ export function EditDiseaseModelToolForm({
                         name="types"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">{`Disease Model Type`}</FormLabel>
+                                <FormLabel className="w-[100px]">{`Disease model type`}</FormLabel>
                                 <FormControl>
                                     <MultipleSelector
                                         value={field.value}
                                         onChange={field.onChange}
+                                        badgeClassName={badgeVariants({variant: "lightBlue"})}
                                         options={DISEASE_MODEL_TYPE_OPTIONS}
                                         hidePlaceholderWhenSelected={true}
                                         showHoverCard={false}
@@ -358,12 +360,13 @@ export function EditDiseaseModelToolForm({
                         name="genes"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">Related Gene</FormLabel>
+                                <FormLabel className="w-[100px]">Related gene</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
                                             {...field}
                                             onSearch={handleGeneAsyncSearch}
+                                            badgeClassName={badgeVariants({variant: "teal"})}
                                             placeholder="Search for genes..."
                                             triggerSearchOnFocus={true}
                                             hidePlaceholderWhenSelected={true}
@@ -405,7 +408,7 @@ export function EditDiseaseModelToolForm({
                         name="storageFacility"
                         render={({field}) => (
                             <FormItem className={cn("w-full flex gap-4 items-center")}>
-                                <FormLabel className="w-[100px]">Storage Facility</FormLabel>
+                                <FormLabel className="w-[100px]">Stored with</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
@@ -462,7 +465,7 @@ export function EditDiseaseModelToolForm({
                         name="milestones"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">{`Linked Projects`}</FormLabel>
+                                <FormLabel className="w-[100px]">{`Linked projects`}</FormLabel>
                                 <FormControl>
                                     <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
                                 </FormControl>
@@ -497,7 +500,7 @@ export function EditDiseaseModelToolForm({
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
                                 <FormLabel className="w-[100px] flex items-center">
-                                <span>Internal Notes</span>
+                                <span>Internal notes</span>
                                 <Tooltip>
                                     <TooltipTrigger className="pl-2">
                                         <Lock className="h-4 w-4" />
@@ -534,7 +537,7 @@ export function EditDiseaseModelToolForm({
                 </DialogClose>
 
                 <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
-                    Delete Tool
+                    Delete tool
                 </Button>
                 <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                     <DeleteDiseaseModelDialog toolId={toolData.id} closeDialog={closeDialog}/>
@@ -554,7 +557,7 @@ export function EditDiseaseModelToolForm({
                                     <LoadingDots/>
                                 </div>
                             ) 
-                            : ("Save Changes")
+                            : ("Save changes")
                         }
                     </Button>
                 </div>

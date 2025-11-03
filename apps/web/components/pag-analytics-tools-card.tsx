@@ -96,7 +96,7 @@ export default function PAGAnalyticsToolsCard({organization}: { organization: Or
                     <div className="flex items-center justify-between">
                         <span className="flex flex-row items-center justify-center gap-x-2 text-sm font-medium">
                             Open access requests
-                            <TooltipProvider delayDuration={50}>
+                            <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
