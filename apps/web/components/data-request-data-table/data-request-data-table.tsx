@@ -82,7 +82,7 @@ export const columns: ColumnDef<Asset>[] = [
     {
         accessorKey: "tool.milestones",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Linked Projects" />
+            <DataTableColumnHeader column={column} title="Linked projects" />
         ),
         cell: ({ row }) => (
             <ul className="flex flex-col gap-2">
@@ -94,7 +94,7 @@ export const columns: ColumnDef<Asset>[] = [
             </ul>
         ),
         enableHiding: true,
-        meta: { name: "Linked Projects" }
+        meta: { name: "Linked projects" }
     },
     {
         accessorKey: "tool.contacts",

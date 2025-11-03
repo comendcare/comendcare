@@ -52,6 +52,7 @@ import { CommandItem } from "@/packages/components/ui/command"
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog"
 import { Badge } from "@/packages/components/ui/badge"
 import { SubmitCreateRequest } from "./create-facility-request-button"
+import { badgeVariants } from "@/packages/components/ui/badge"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -383,7 +384,7 @@ export function EditBiosampleToolForm({
                     <FormItem className="flex gap-2 items-center">
                         <FormLabel className="flex items-center gap-1 grow">
                             Visibility
-                            <Tooltip delayDuration={0}>
+                            <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Info className="h-4 w-4"/>
                                 </TooltipTrigger>
@@ -400,11 +401,12 @@ export function EditBiosampleToolForm({
                         name="types"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">{`Biosample Type`}</FormLabel>
+                                <FormLabel className="w-[100px]">{`Biosample type`}</FormLabel>
                                 <FormControl>
                                     <MultipleSelector
                                         value={field.value}
                                         onChange={field.onChange}
+                                        badgeClassName={badgeVariants({variant: "lightBlue"})}
                                         options={BIOSAMPLE_TYPE_OPTIONS}
                                         hidePlaceholderWhenSelected={true}
                                         showHoverCard={false}
@@ -447,12 +449,13 @@ export function EditBiosampleToolForm({
                         name="genes"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">Related Gene</FormLabel>
+                                <FormLabel className="w-[100px]">Related gene</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
                                             {...field}
                                             onSearch={handleGeneAsyncSearch}
+                                            badgeClassName={badgeVariants({variant: "teal"})}
                                             placeholder="Search for genes..."
                                             triggerSearchOnFocus={true}
                                             hidePlaceholderWhenSelected={true}
@@ -490,7 +493,7 @@ export function EditBiosampleToolForm({
                     />
 
                     <FormItem className={cn("w-full flex gap-4 items-center")}>
-                        <FormLabel className="w-[100px]">{'Total Available Quantity'}</FormLabel>
+                        <FormLabel className="w-[100px]">{'Total available quantity'}</FormLabel>
                         <div className="w-full gap-2 flex">
                             <FormField
                                 control={form.control}
@@ -553,7 +556,7 @@ export function EditBiosampleToolForm({
                         name="storageFacility"
                         render={({field}) => (
                             <FormItem className={cn("w-full flex gap-4 items-center")}>
-                                <FormLabel className="w-[100px]">Storage Facility</FormLabel>
+                                <FormLabel className="w-[100px]">Stored with</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
@@ -610,7 +613,7 @@ export function EditBiosampleToolForm({
                         name="milestones"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">{`Linked Projects`}</FormLabel>
+                                <FormLabel className="w-[100px]">{`Linked projects`}</FormLabel>
                                 <FormControl>
                                     <ProjectMultipleSelector value={field.value} onChange={field.onChange}/>
                                 </FormControl>
@@ -645,7 +648,7 @@ export function EditBiosampleToolForm({
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
                                 <FormLabel className="w-[100px] flex items-center">
-                                <span>Internal Notes</span>
+                                <span>Internal notes</span>
                                 <Tooltip>
                                     <TooltipTrigger className="pl-2">
                                     <Lock className="h-4 w-4" />
@@ -686,7 +689,7 @@ export function EditBiosampleToolForm({
                 </DialogClose>
 
                 <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
-                    Delete Tool
+                    Delete tool
                 </Button>
                 <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                     <DeleteBiosampleDialog toolId={toolData.id} closeDialog={closeDialog}/>
@@ -706,7 +709,7 @@ export function EditBiosampleToolForm({
                                     <LoadingDots/>
                                 </div>
                             ) 
-                            : ("Save Changes")
+                            : ("Save changes")
                         }
                     </Button>
                 </div>
@@ -735,7 +738,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
         <>
         <div className="flex gap-1 items-center">
             <h1 className="font-semibold text-md py-0 my-0">Donor Information</h1>
-            <Tooltip delayDuration={0}>
+            <Tooltip>
                 <TooltipTrigger>
                     <Info className="h-4 w-4"/>
                 </TooltipTrigger>
@@ -753,13 +756,13 @@ export const DonorFormFields = ({form}: {form: any}) => {
                     <div className="w-full flex items-center justify-end">
                         {!createNewDonor && (
                             <FormLabel className="flex items-center gap-1 grow"> 
-                                Public Donor ID
-                                <Tooltip delayDuration={0}>
+                                Public donor ID
+                                <Tooltip>
                                     <TooltipTrigger>
                                         <Info className="h-4 w-4"/>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left">
-                                        {`This is a unique de-identified ID assigned to the donor of this sample. This ID is public, and will appear in the marketplace.`}
+                                        {`This is a unique, public de-identified ID. It will appear in the marketplace.`}
                                     </TooltipContent>
                                 </Tooltip>
                             </FormLabel>
@@ -773,7 +776,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                                     if (checked) form.setValue("donor", [])
                                 }}
                             />
-                            <Label htmlFor="create-new-donor">Create New Donor</Label>
+                            <Label htmlFor="create-new-donor">Create new donor</Label>
                         </div>
                     </div>
                     {!createNewDonor && (
@@ -802,13 +805,13 @@ export const DonorFormFields = ({form}: {form: any}) => {
             render={({field}) => (
                 <FormItem>
                     <FormLabel className="flex items-center gap-1 grow pb-3">
-                        {`Internal Donor ID`}
-                        <Tooltip delayDuration={0}>
+                        {`Internal donor ID`}
+                        <Tooltip>
                             <TooltipTrigger asChild>
                                 <Info className="h-4 w-4"/>
                             </TooltipTrigger>
                             <TooltipContent className="max-w-80 text-wrap text-left">
-                                {`This ID is optional, and can be used to track donor IDs from any previously used donor identification system outside the Comend platform. This ID cannot be guaranteed to be unique across our platform, and will only be visible to members of your organization.`}
+                                {`Optional internal ID for your organization’s tracking system. Not guaranteed to be unique or visible outside your organization.`}
                             </TooltipContent>
                         </Tooltip>
                     </FormLabel>

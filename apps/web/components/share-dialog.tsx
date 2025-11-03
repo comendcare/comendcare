@@ -91,7 +91,7 @@ export default function ShareDialog({
     return (
         <>
             <DialogHeader className="gap-2">
-                <DialogTitle>Share Page</DialogTitle>
+                <DialogTitle>Share page</DialogTitle>
                 <DialogDescription className="flex flex-col space-y-4">
                     <div className="flex justify-center items-center">
                         <div className="grid grid-cols-2 gap-4 sm:flex sm:justify-around">
@@ -274,7 +274,7 @@ export default function ShareDialog({
                     {embeddedResearchPlansData?.embeddedResearchPlansLink && (
                         <AccordionItem value="item-1">
                             <AccordionTrigger className="font-semibold text-primary">
-                                Embed Research Plans Table
+                                Embed research plans table
                             </AccordionTrigger>
                             <AccordionContent>
                                 <CopyCodeBlock 
@@ -296,7 +296,7 @@ export default function ShareDialog({
                     {embeddedResearchPlanData?.embeddedResearchPlanLink && (
                         <AccordionItem value="item-2">
                             <AccordionTrigger className="font-semibold text-primary">
-                                Embed Research Plan
+                                Embed research plan
                             </AccordionTrigger>
                             <AccordionContent className="flex flex-col gap-2">
                                 <span className="flex gap-2 items-center">
@@ -329,7 +329,7 @@ export default function ShareDialog({
                     {embeddedProjectData?.embeddedProjectLink && (
                         <AccordionItem value="item-3">
                             <AccordionTrigger className="font-semibold text-primary">
-                                Embed Project
+                                Embed project
                             </AccordionTrigger>
                             <AccordionContent>
                                 <CopyCodeBlock 

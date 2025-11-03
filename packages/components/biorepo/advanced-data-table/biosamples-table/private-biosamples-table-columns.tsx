@@ -3,6 +3,7 @@
 import type {ColumnDef} from "@tanstack/react-table";
 import {
     CircleDashed,
+    FileText,
     Globe,
     Info,
     Lock,
@@ -133,7 +134,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     column={column} 
                     className="min-w-fit text-nowrap"
                     title="Public donor ID"
-                    tooltip="This is a unique de-identified ID assigned to the donor of this sample. This ID is public, and will appear in the marketplace."
+                    tooltip="This is a unique, public de-identified ID. It will appear in the marketplace.."
                 />
             ),
             cell: ({row}) => (
@@ -153,7 +154,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     column={column} 
                     className="min-w-fit text-nowrap"
                     title="Internal donor ID" 
-                    tooltip="This ID is optional, and can be used to track donor IDs from any previously used donor identification system outside the Comend platform. This ID cannot be guaranteed to be unique across our platform, and will only be visible to members of your organization."
+                    tooltip="Optional internal ID for your organization’s tracking system. Not guaranteed to be unique or visible outside your organization."
                 />
             ),
             enableHiding: true,
@@ -167,7 +168,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     column={column} 
                     title="Sample ID"
                     className="min-w-fit text-nowrap"
-                    tooltip="This is a unique ID assigned to this sample. This ID is public, and will appear in the marketplace."
+                    tooltip="Unique ID assigned to this sample. This ID is public and appears in the marketplace."
                 />
             ),
             cell: ({row}) => (
@@ -218,7 +219,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({row}) => (
-                <>{row.original.gene?.symbol}</>
+                <>
+                    {row.original.gene?.symbol && (
+                        <Badge variant={"teal"}>
+                            {row.original.gene.symbol}
+                        </Badge>
+                    )}
+                </>
             ),
             enableHiding: true,
             enableColumnFilter: true,
@@ -268,7 +275,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             cell: ({row}) => (
                 <>
-                    {DONOR_SEX_OPTIONS.find(t => t.value === row.original.donor?.sex)?.label}
+                    {DONOR_SEX_OPTIONS.find(t => t.value === row.original.donor?.sex)?.label && (
+                        <Badge>
+                            {DONOR_SEX_OPTIONS.find(t => t.value === row.original.donor?.sex)?.label}
+                        </Badge>
+                    )}
                 </>
             ),
             enableHiding: true,
@@ -293,7 +304,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             cell: ({row}) => (
                 <>
-                    {DONOR_RACE_OPTIONS.find(t => t.value === row.original.donor?.race)?.label}
+                    {DONOR_RACE_OPTIONS.find(t => t.value === row.original.donor?.race)?.label && (
+                        <Badge>
+                            {DONOR_RACE_OPTIONS.find(t => t.value === row.original.donor?.race)?.label}
+                        </Badge>
+                    )}
                 </>
             ),
             enableHiding: true,
@@ -335,9 +350,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                     {row.original.donor?.diagnoses?.map((diagnosis: any, index: number) => {
                         const severityOption = DIAGNOSIS_SEVERITY_OPTIONS.find(option => option.value === diagnosis.severity)
                         return (
-                            <li key={index} className="grid grid-cols-[minmax(100px,_1fr)_150px] gap-4 items-center">
-                                {diagnosis?.type?.label} 
-                                {severityOption && <Badge className="w-fit" variant={severityOption.badgeVariant}>{severityOption.label}</Badge>}
+                            <li key={index} className="flex gap-2 items-center">
+                                <Badge>
+                                    {diagnosis?.type?.label} 
+                                </Badge>
+                                {severityOption && <Badge>{severityOption.label}</Badge>}
                             </li>
                         )
                     })}
@@ -423,7 +440,15 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 />
             ),
             cell: ({row}) => {
-                return <>{row.original.institution?.name || row.original.company?.title}</>
+                return (
+                    <>
+                    {(row.original.institution?.name || row.original.company?.title) && (
+                        <Badge>
+                            {row.original.institution?.name || row.original.company?.title}
+                        </Badge>
+                    )}
+                    </>
+                )
             },
             enableHiding: true,
             enableColumnFilter: true,
@@ -745,7 +770,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             accessorKey: "milestones",
             header: ({column}) => (
                 <DataTableColumnHeader 
-                    className="min-w-fit text-nowrap"
+                    className="text-nowrap"
                     column={column} 
                     title="Linked projects"
                 />
@@ -753,8 +778,11 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             cell: ({row}) => (
                 <ul className="flex flex-col gap-2">
                     {row.original.milestones?.map((milestone: any, index: number) => (
-                        <li key={index} className="line-clamp-2">
-                            {milestone.milestone?.title || undefined}
+                        <li key={index}>
+                            <Badge variant={"purple"}>
+                                <FileText className="h-4 w-4 min-h-4 min-w-4"/>
+                                {milestone.milestone?.title || undefined}
+                            </Badge>
                         </li>
                     ))}
                 </ul>

@@ -4,7 +4,7 @@ import {formatMoney, getStage, truncate} from "@comend/lib/utils";
 import {Badge} from "@comend/components/ui/badge";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Separator} from "@comend/components/ui/separator";
-import {FileText, HandCoins, Megaphone, MegaphoneIcon, Microscope, MicroscopeIcon, Users, Workflow} from "lucide-react";
+import {CircleDollarSign, FileText, HandCoins, Megaphone, MegaphoneIcon, Microscope, MicroscopeIcon, Users, Workflow} from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import {PropertyBadge} from "../property-badge";
 import SaveOrganizationDialog from "../save-organization-dialog";
@@ -92,7 +92,7 @@ export function OrganizationMarketplaceCard({
                     <div className="w-full grid gap-2 grid-cols-2 min-h-[20px]">
                         {moneyDeployed !== null && moneyDeployed > 0 && (
                             <div className="text-sm text-gray-700 m-0 flex items-center">
-                                <HandCoins className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
+                                <CircleDollarSign className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
                                 {formatMoney(moneyDeployed)} deployed
                             </div>
                         )}

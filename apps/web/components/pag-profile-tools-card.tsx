@@ -83,77 +83,74 @@ export const PAGProfileToolsCard = ({
             <CardHeader className="w-full flex flex-row items-start justify-between gap-4">
                 <CardTitle className="w-full flex flex-col items-start justify-between gap-4">
                     Toolkit
-                    <div className="text-muted-foreground text-sm flex flex-wrap gap-2 justify-end">
-                        {(toolCounts.biosampleCount > 0) && (
-                            <Button
-                                variant={"link"}
-                                onClick={async () => {
-                                    const searchParams = new URLSearchParams()
-                                    searchParams.set("sort", "")
-                                    searchParams.set("page", "1")
-                                    searchParams.set("view", "biosamples")
-                                    router.push(`?${searchParams.toString()}`, {scroll: false})
-                                    setSection("biosamples");
-                                }}
-                                className={cn(
-                                    "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
-                                    section === 'biosamples'
-                                        ? "bg-blue-light font-medium text-primary"
-                                        : "text-muted-foreground",
-                                )}
-                            >
-                                {<TestTubeDiagonal className="mr-2 h-4 w-4"/>}
-                                Biosamples ({toolCounts.biosampleCount})
-                            </Button>
-                        )}
-                        {(toolCounts.diseaseModelCount > 0) && (
-                            <Button
-                                variant={"link"}
-                                onClick={async () => {
-                                    const searchParams = new URLSearchParams()
-                                    searchParams.set("sort", "")
-                                    searchParams.set("page", "1")
-                                    searchParams.set("view", "disease-models")
-                                    router.push(`?${searchParams.toString()}`, {scroll: false})
-                                    setSection("disease-models");
-                                }}
-                                className={cn(
-                                    "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
-                                    section === 'disease-models'
-                                        ? "bg-blue-light font-medium text-primary"
-                                        : "text-muted-foreground",
-                                )}
-                            >
-                                {<Rat className="mr-2 h-4 w-4"/>}
-                                Disease Models ({toolCounts.diseaseModelCount})
-                            </Button>
-                        )}
-                        {(toolCounts.clinicalDatasetCount > 0) && (
-                            <Button
-                                variant={"link"}
-                                onClick={async () => {
-                                    const searchParams = new URLSearchParams()
-                                    searchParams.set("sort", "")
-                                    searchParams.set("page", "1")
-                                    searchParams.set("view", "clinical-datasets")
-                                    router.push(`?${searchParams.toString()}`, {scroll: false})
-                                    setSection('clinical-datasets')
-                                }}
-                                className={cn(
-                                    "hover:no-underline min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
-                                    section === 'clinical-datasets'
-                                        ? "bg-blue-light font-medium text-primary"
-                                        : "text-muted-foreground",
-                                )}
-                            >
-                                {<Database className="mr-2 h-4 w-4"/>}
-                                Clinical Datasets ({toolCounts.clinicalDatasetCount})
-                            </Button>
-                        )}
-                    </div>
                 </CardTitle>
             </CardHeader>
             <CardContent className="w-full max-w-full">
+                <div className="text-muted-foreground text-sm flex flex-wrap gap-2 justify-end pb-4">
+                    {(toolCounts.biosampleCount > 0) && (
+                        <div
+                            onClick={async () => {
+                                const searchParams = new URLSearchParams()
+                                searchParams.set("sort", "")
+                                searchParams.set("page", "1")
+                                searchParams.set("view", "biosamples")
+                                router.push(`?${searchParams.toString()}`, {scroll: false})
+                                setSection("biosamples");
+                            }}
+                            className={cn(
+                                "min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-base transition-colors hover:text-primary cursor-pointer",
+                                section === 'biosamples'
+                                    ? "bg-blue-light font-medium text-primary"
+                                    : "text-muted-foreground",
+                            )}
+                        >
+                            {<TestTubeDiagonal className="mr-2 h-6 w-6"/>}
+                            Patient biosamples ({toolCounts.biosampleCount})
+                        </div>
+                    )}
+                    {(toolCounts.diseaseModelCount > 0) && (
+                        <div
+                            onClick={async () => {
+                                const searchParams = new URLSearchParams()
+                                searchParams.set("sort", "")
+                                searchParams.set("page", "1")
+                                searchParams.set("view", "disease-models")
+                                router.push(`?${searchParams.toString()}`, {scroll: false})
+                                setSection("disease-models");
+                            }}
+                            className={cn(
+                                "min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-base transition-colors hover:text-primary cursor-pointer",
+                                section === 'disease-models'
+                                    ? "bg-blue-light font-medium text-primary"
+                                    : "text-muted-foreground",
+                            )}
+                        >
+                            {<Rat className="mr-2 h-6 w-6"/>}
+                            Disease models ({toolCounts.diseaseModelCount})
+                        </div>
+                    )}
+                    {(toolCounts.clinicalDatasetCount > 0) && (
+                        <div
+                            onClick={async () => {
+                                const searchParams = new URLSearchParams()
+                                searchParams.set("sort", "")
+                                searchParams.set("page", "1")
+                                searchParams.set("view", "clinical-datasets")
+                                router.push(`?${searchParams.toString()}`, {scroll: false})
+                                setSection('clinical-datasets')
+                            }}
+                            className={cn(
+                                "min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-base transition-colors hover:text-primary cursor-pointer",
+                                section === 'clinical-datasets'
+                                    ? "bg-blue-light font-medium text-primary"
+                                    : "text-muted-foreground",
+                            )}
+                        >
+                            {<Database className="mr-2 h-6 w-6"/>}
+                            Clinical datasets ({toolCounts.clinicalDatasetCount})
+                        </div>
+                    )}
+                </div>
                 {(isInitialized && section === 'biosamples') && 
                     (biosamples.length === 0 ? (
                         <div className="bg-gray-100 rounded-md w-full h-[200px]" />

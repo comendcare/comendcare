@@ -189,7 +189,7 @@ export function DiseaseModelBulkImportDialog() {
                     onClick={() => setIsOpen(true)}
                 >
                     <Import />
-                    <p>{`Import Disease Models`}</p>
+                    <p>{`Import disease models`}</p>
                 </Button>
             </DialogTrigger>
             <DialogContent className="flex flex-col justify-start">
@@ -212,7 +212,7 @@ export function DiseaseModelBulkImportDialog() {
                 <>
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
-                        Import Disease Models
+                        Import disease models
                     </DialogTitle>
                     <DialogDescription>
                         Import multiple disease models at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1Hwdh6LOwWhiK3lEt3gLnURLmQgfsy59CXbxYCqm5uxs/edit?usp=sharing">Disease model input template</Link>, filling it out, downloading it as a CSV, and uploading it.

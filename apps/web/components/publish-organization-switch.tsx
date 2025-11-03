@@ -68,7 +68,7 @@ export function PublishOrganizationSwitch({organization}: { organization: Organi
                                     </FormControl>
                                     <FormLabel htmlFor="published" className="inline-flex items-center gap-1">
                                         {field.value ? "Published" : "Unpublished"}
-                                        <Tooltip delayDuration={0}>
+                                        <Tooltip>
                                             <TooltipTrigger>
                                                 <Info className="h-4 w-4"/>
                                             </TooltipTrigger>
