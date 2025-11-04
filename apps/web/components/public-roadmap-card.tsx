@@ -175,7 +175,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
     const MODALITY_OPTIONS = RESEARCH_PLAN_TYPES.map(type => type.value)
     const otherRoadmaps = roadmaps.filter(roadmap => (
         roadmap.modalities.filter((modality: string) => MODALITY_OPTIONS.includes(modality)).length <= 0 ||
-        roadmap.modalities.includes("OTHER").length > 0
+        roadmap.modalities.includes("OTHER")
     ))
 
     return (

@@ -33,7 +33,10 @@ import {
 
 
 export default function ResearcherProfile({researcherData}: any) {
-    const {openAlex, researcher, publications, mergedFields} = researcherData;
+    const openAlex = researcherData?.openAlex ?? {};
+    const researcher = researcherData?.researcher ?? null;
+    const publications: any[] = Array.isArray(researcherData?.publications) ? researcherData!.publications : [];
+    const mergedFields = researcherData?.mergedFields ?? { name: "Unknown Researcher", title: null, email: null, researchInterests: [] as string[] };
 
     const ITEMS_PER_PAGE = 5
     const [currentPage, setCurrentPage] = useState(1)
@@ -88,7 +91,7 @@ export default function ResearcherProfile({researcherData}: any) {
                                     <h1 className="text-3xl font-bold text-gray-900">
                                         {displayName}
                                     </h1>
-                                    <p className="text-xl text-gray-600 mt-1">
+                                    <p className="capitalize text-xl text-gray-600 mt-1">
                                         {mergedFields.title || "Title not available"}
                                     </p>
 
@@ -320,7 +323,7 @@ export default function ResearcherProfile({researcherData}: any) {
                                             className="w-full h-full flex flex-col space-y-4 justify-center items-center mx-auto text-center text-gray-500 p-8">
                                             <div>
                                                 <p>No publications found.</p>
-                                                {researcherData.orcid ?
+                                                {researcherData?.orcid ?
                                                     <p>
                                                         Try adjusting your filters or search terms.
                                                     </p>
