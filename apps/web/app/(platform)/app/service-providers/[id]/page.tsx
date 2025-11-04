@@ -57,7 +57,10 @@ export default async function CompanyHomePage({
             savedByOrganizations: true,
             createdAt: true,
             updatedAt: true,
-            metadata: true
+            metadata: true,
+            biosamples: true,
+            diseaseModel: true,
+            tool: true,
         },
     });
 
