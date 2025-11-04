@@ -17,6 +17,37 @@ import {formatNumberWithCommas} from "@/packages/lib/utils";
 import EditResearcherProfileDialog from "~researcher/components/edit-researcher-profile-dialog";
 import ResearcherProfilePublicationsSection from "~researcher/components/researcher-profile-publications-section";
 
+function formatYearRanges(years: number[] | string[] = []): string {
+    const nums = years
+        .map((y) => parseInt(y as string))
+        .filter((y) => !isNaN(y))
+        .sort((a, b) => a - b);
+
+    if (nums.length === 0) return "";
+
+    const ranges: string[] = [];
+    let start = nums[0];
+    let prev = nums[0];
+
+    for (let i = 1; i <= nums.length; i++) {
+        const year = nums[i];
+        if (year === prev + 1) {
+            prev = year;
+            continue;
+        }
+
+        if (start === prev) {
+            ranges.push(`${start}`);
+        } else {
+            ranges.push(`${start}-${prev}`);
+        }
+
+        start = year;
+        prev = year;
+    }
+
+    return ranges.join(", ");
+}
 
 export default function ResearcherProfile({researcherData}: any) {
     const openAlex = researcherData?.openAlex ?? {};
@@ -172,7 +203,7 @@ export default function ResearcherProfile({researcherData}: any) {
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    <GraduationCap className="w-5 h-5"/>
+                                    <GraduationCap className="w-5 h-5" />
                                     Education
                                 </CardTitle>
                             </CardHeader>
@@ -183,7 +214,11 @@ export default function ResearcherProfile({researcherData}: any) {
                                         .map((aff: any, index: number) => (
                                             <div key={index}>
                                                 <div className="font-semibold">{aff.institution.display_name}</div>
-                                                <div className="text-sm text-gray-600">{aff.years?.join(", ")}</div>
+                                                {aff.years && (
+                                                    <div className="text-sm text-gray-600">
+                                                        {formatYearRanges(aff.years)}
+                                                    </div>
+                                                )}
                                             </div>
                                         ))
                                 ) : (

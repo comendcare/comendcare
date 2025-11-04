@@ -38,7 +38,7 @@ import {getPubMedSearchResultIds, getPubMedSearchResultData} from "./pubmed";
 import {filterColumns} from "./filter-columns";
 import {nanoid} from "nanoid";
 import {BIOSAMPLE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS, Option} from "./types";
-import {mergeResearcherData} from "./../../apps/researcher/lib/utils";
+import {mergeResearcherData, mergeResearcherDataAdvanced} from "./../../apps/researcher/lib/utils";
 import {
     GetBiosamplesSchema,
     GetClinicalDatasetsSchema,
@@ -2286,6 +2286,81 @@ export const getResearcherFromOrcidApi = withUserAuth(
         }
     }
 );
+
+export const getResearcherWithMergedDataAdvanced = withUserAuth(async () => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "No session found" };
+
+    const dbResearcher = await prisma.researcher.findUnique({
+        where: { userId: session.user.id },
+        include: {
+            affiliations: {
+                include: { institution: true },
+            },
+        },
+    });
+
+    if (!dbResearcher) return { success: false, error: "Researcher not found" };
+
+    const hasOrcid = !!dbResearcher.orcid;
+    let openAlexAuthor: any = null;
+    let openAlexPublications: any[] = [];
+
+    // Fetch OpenAlex (as before)
+    if (hasOrcid) {
+        const res = await fetch(`https://api.openalex.org/authors?filter=orcid:${dbResearcher.orcid}`);
+        if (res.ok) {
+            const openAlexJson = await res.json();
+            openAlexAuthor = openAlexJson.results?.[0] ?? null;
+
+            if (openAlexAuthor?.works_api_url) {
+                const worksRes = await fetch(`${openAlexAuthor.works_api_url}&per-page=25`);
+                if (worksRes.ok) {
+                    const worksJson = await worksRes.json();
+                    openAlexPublications = worksJson.results || [];
+                }
+            }
+        }
+    }
+
+    // NEW: Fetch Crossref, Europe PMC, DataCite in parallel (ORCID-based)
+    let crossrefItems: any[] = [];
+    let europePmcResults: any[] = [];
+    let dataciteItems: any[] = [];
+
+    if (hasOrcid) {
+        const orcid = dbResearcher.orcid as string;
+        const [crRes, epmcRes, dcRes] = await Promise.all([
+            fetch(`https://api.crossref.org/works?filter=orcid:${encodeURIComponent(orcid)}&rows=25`),
+            fetch(`https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=ORCID:${encodeURIComponent(orcid)}&format=json&pageSize=25`),
+            fetch(`https://api.datacite.org/dois?query=creators.nameIdentifiers.nameIdentifier:${encodeURIComponent(orcid)}&page[size]=25`),
+        ]);
+
+        const [crossref, epmc, datacite] = await Promise.all([
+            crRes.ok ? crRes.json() : Promise.resolve(null),
+            epmcRes.ok ? epmcRes.json() : Promise.resolve(null),
+            dcRes.ok ? dcRes.json() : Promise.resolve(null),
+        ]);
+
+        crossrefItems = crossref?.message?.items ?? [];
+        europePmcResults = epmc?.resultList?.result ?? [];
+        dataciteItems = datacite?.data ?? [];
+    }
+
+    // Your existing merge
+    const merged = mergeResearcherDataAdvanced(dbResearcher, openAlexAuthor, openAlexPublications);
+
+    // Return merged plus the extra sources (non-breaking addition)
+    return {
+        success: true,
+        data: {
+            ...merged,
+            crossref: crossrefItems,
+            europePmc: europePmcResults,
+            datacite: dataciteItems,
+        },
+    };
+});
 
 export const getResearcherWithMergedData = withUserAuth(async () => {
     const session = await getSession();
