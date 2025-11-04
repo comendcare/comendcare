@@ -83,15 +83,18 @@ export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rf
                                 </Badge>
                             )}
                         </div>
-
-                        <CardDescription className="line-clamp-3 overflow-hidden">
-                            {rfp.description}
-                        </CardDescription>
                     </>
                 )}
             </CardHeader>
 
             <CardContent className="flex flex-col gap-4">
+                {status?.daysRemaining !== undefined && (
+                    <Badge variant={"green"} className="w-full font-normal flex gap-2">
+                        <Clock size={18}/>
+                        {`${status.daysRemaining} days remaining to submit proposals`}
+                    </Badge>
+                )}
+
                 <ul className="w-full flex flex-col flex-wrap gap-2 text-sm text-wrap break-words">
                     {rfp.budget && (
                         <li>
@@ -134,12 +137,9 @@ export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rf
                     )}
                 </ul>
 
-                {status?.daysRemaining !== undefined && (
-                    <Badge variant={"green"} className="w-full font-normal flex gap-2">
-                        <Clock size={18}/>
-                        {`${status.daysRemaining} days remaining to submit proposals`}
-                    </Badge>
-                )}
+                <CardDescription className="line-clamp-3 overflow-hidden">
+                    {rfp.description}
+                </CardDescription>
 
                 {(rfp.milestones && rfp.milestones.length > 0) && (
                     <Badge className="font-normal w-fit" variant={"purple"}>
