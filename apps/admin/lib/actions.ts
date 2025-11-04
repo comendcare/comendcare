@@ -10,7 +10,7 @@ import {getCategoriesAndMilestones} from "@comend/lib/utils"
 import { JsonValue } from "@prisma/client/runtime/library"
 import {writeRawEvent} from "@comend/lib/raw-events";
 import z from "zod"
-import { companyFormSchema } from "./types"
+import { companyFormSchema, institutionFormSchema } from "./types"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
@@ -106,6 +106,59 @@ export const removeEmailFromBlacklist = withAdminAuth(
         } catch (error: any) {
             console.error("Error removing email to blacklist:", error);
             return {success: false, error: "Database error. Please try again later."};
+        }
+    }
+)
+
+export const createInstitution = withAdminAuth(
+    async (formData: z.infer<typeof institutionFormSchema>) => {
+        const name = formData.name as string
+        const biosamples = formData.tools?.filter(tool => tool.type === "Biosamples")
+        const diseaseModels = formData.tools?.filter(tool => tool.type === "Disease models")
+        const clinicalDatasets = formData.tools?.filter(tool => tool.type === "Clinical datasets")
+
+        try {
+            const institution = await prisma.institution.create({
+                data: {
+                    name,
+                    ...(biosamples && biosamples.length > 0 && ({
+                        biosamples: {connect: biosamples.map(b => ({id: b.value}))}
+                    })),
+                    ...(diseaseModels && diseaseModels.length > 0 && ({
+                        diseaseModel: {connect: diseaseModels.map(d => ({id: d.value}))}
+                    })),
+                    ...(clinicalDatasets && clinicalDatasets.length > 0 && ({
+                        tool: {connect: clinicalDatasets.map(c => ({id: c.value}))}
+                    }))
+                },
+            })
+
+            await writeRawEvent({
+                provider: "app",
+                eventType: "institution_created",
+                externalId: institution.id,
+                occurredAt: new Date(),
+                payload: {
+                    companyId: institution.id,
+                    name: institution.name,
+                },
+            });
+
+            // await addTypeSenseDocument(
+            //     `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+            //     process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+            //         ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY!
+            //         : process.env.TYPESENSE_ADMIN_API_KEY!,
+            //     company,
+            //     "companies"
+            // )
+
+            await revalidateTag(`${institution.id}-institution-metadata`)
+
+            return {success: true, data: institution}
+        } catch (error) {
+            console.error("Error creating institution:", error)
+            return {success: false, error: "Database error. Please try again later."}   
         }
     }
 )

@@ -46,7 +46,7 @@ import {
 } from "@comend/components/ui/select"
 import {Table as TanstackTable} from "@tanstack/react-table"
 import {DotsHorizontalIcon} from "@radix-ui/react-icons";
-import {deleteFacilityCreateRequest, removeProviderContactRequest} from "~admin/lib/actions"
+import {createInstitution, deleteFacilityCreateRequest, removeProviderContactRequest} from "~admin/lib/actions"
 import type {Biosample, DiseaseModel, Tool} from "@prisma/client";
 import {
     Dialog,
@@ -72,7 +72,7 @@ import {
     FormDescription,
 } from "@comend/components/ui/form"
 import MultipleSelector from "@/packages/components/ui/multiple-selector"
-import { FacilityType } from "~admin/lib/types"
+import { FacilityType, institutionFormSchema } from "~admin/lib/types"
 import { useState } from "react"
 import { CreateCompanyForm } from "../create-company-dialog"
 import { ScrollArea, ScrollBar } from "@/packages/components/ui/scroll-area"
@@ -452,8 +452,179 @@ export const CreateFacilityForm = ({
                 handleRequestDeleteCallback={handleDeleteRequest}
             />
         ) : (
-            <></>
+            <CreateInstitutionForm 
+                request={request}
+                onCloseCallback={async () => {
+                    await handleDeleteRequest()
+                    if (dialogClose) dialogClose()
+                }}
+                handleRequestDeleteCallback={handleDeleteRequest}
+            />
         )}
         </ScrollArea>
+    )
+}
+
+export function CreateInstitutionForm({
+    request, 
+    onCloseCallback,
+    handleRequestDeleteCallback
+}: {
+    request?: FacilityCreateRequest, 
+    onCloseCallback?: () => void,
+    handleRequestDeleteCallback?: () => void,
+}) {
+    const [loading, setLoading] = useState(false)
+    const form = useForm<z.infer<typeof institutionFormSchema>>({
+        resolver: zodResolver(institutionFormSchema),
+        defaultValues: {
+            name: request?.name ?? "",
+            tools: request 
+                ? [
+                    request.biosample ? {
+                        value: request.biosample.id,
+                        type: 'Biosamples',
+                        icon: 'test-tube-diagonal',
+                        // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
+                        label: `${request.biosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter((option: Option) => request.biosample.types?.includes(option.value)))?.map((option: Option) => option?.label)?.join(', ')}`,
+                        biosample: request.biosample
+                    } : undefined,
+                    request.diseaseModel ? {
+                        value: request.diseaseModel.id,
+                        label: `${request.diseaseModel.id} - ${(DISEASE_MODEL_TYPE_OPTIONS.filter((option: Option) => request.diseaseModel.types?.includes(option.value)))?.map((option: Option) => option?.label)?.join(', ')}`,
+                        icon: 'rat',
+                        type: 'Disease Models',
+                        diseaseModel: request.diseaseModel
+                    } : undefined,
+                    request.clinicalDataset ? {
+                        value: request.clinicalDataset.id,
+                        label: `${request.clinicalDataset.id} - ${request.clinicalDataset.title}`,
+                        icon: 'database',
+                        type: 'Clinical Datasets',
+                        datasample: request.clinicalDataset,
+                    } : undefined
+                ].filter(option => option !== undefined) 
+                : [],
+        },
+    })
+
+    const handleToolAsyncSearch = async (query: string): Promise<Option[]> => {
+        const toolsResponse = await fetch(`/api/tools?search=${query}`)
+        const toolsData = await toolsResponse.json()
+
+        return toolsData
+    }
+
+    const handleSubmit = async (values: z.infer<typeof institutionFormSchema>) => {
+        setLoading(true)
+        try {
+            const response = await createInstitution(values)
+
+            if (response.success) {
+                toast.success("Institution created successfully")
+                form.reset()
+                if (onCloseCallback) onCloseCallback()
+            } else {
+                toast.error(response.error || "An error occurred while creating the Institution.")
+            }
+        } catch (error) {
+            console.error("Create Institution error:", error)
+            toast.error("An unexpected error occurred.")
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="grid gap-4 p-1 py-4">
+                <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Name</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Institution Name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="tools"
+                    render={({field}) => (
+                        <FormItem className="w-full">
+                            <FormLabel>{`Linked Tools`}</FormLabel>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    onSearch={handleToolAsyncSearch}
+                                    hidePlaceholderWhenSelected={true}
+                                    showHoverCard={false}
+                                    placeholder="Search..."
+                                    badgeClassName="border-transparent bg-green-100 text-green-900"
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                    groupBy={'type'}
+                                />
+                            </FormControl>
+                            <FormMessage className="text-primary"/>
+                        </FormItem>
+                    )}
+                />
+
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button variant={"secondary"}>
+                            Cancel
+                        </Button>
+                    </DialogClose>
+                    {(request && handleRequestDeleteCallback) && (
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button type="button" variant="destructive">
+                                    Delete request
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>
+                                        Are you absolutely sure?
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                        {`This action cannot be undone. This will permanently delete your request and it's data.`}
+                                    </DialogDescription>
+                                    <DialogFooter>
+                                        <DialogClose>
+                                            <Button type="button">
+                                                Cancel
+                                            </Button>
+                                        </DialogClose>
+                                        <DialogClose>
+                                            <Button
+                                                type="button"
+                                                variant={"destructive"}
+                                                onClick={() => handleRequestDeleteCallback()}
+                                            >
+                                                Delete request
+                                            </Button>
+                                        </DialogClose>
+                                    </DialogFooter>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
+                    )}
+                    <Button type="submit" disabled={loading}>
+                        {loading ? "Creating..." : "Create institution"}
+                    </Button>
+                </DialogFooter>
+            </form>
+        </Form>
     )
 }
