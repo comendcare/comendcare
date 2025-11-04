@@ -48,7 +48,7 @@ export async function GET(req: Request) {
             value: diseaseModel.id,
             // label: `${diseaseModel.id} - ${(DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
             icon: 'rat',
-            type: 'Disease Models',
+            type: 'Disease models',
             // diseaseModel
         }));
 
@@ -80,7 +80,7 @@ export async function GET(req: Request) {
             value: clinicalDataset.id,
             // label: `${datasample?.id} - ${datasample?.title}`,
             icon: 'database',
-            type: 'Clinical Datasets',
+            type: 'Clinical datasets',
             // datasample
         }));
 

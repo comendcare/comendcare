@@ -46,7 +46,7 @@ import {
 } from "@comend/components/ui/select"
 import {Table as TanstackTable} from "@tanstack/react-table"
 import {DotsHorizontalIcon} from "@radix-ui/react-icons";
-import {createCompany, deleteFacilityCreateRequest, removeProviderContactRequest} from "~admin/lib/actions"
+import {deleteFacilityCreateRequest, removeProviderContactRequest} from "~admin/lib/actions"
 import type {Biosample, DiseaseModel, Tool} from "@prisma/client";
 import {
     Dialog,
@@ -69,8 +69,13 @@ import {
     FormLabel,
     FormItem,
     FormMessage,
+    FormDescription,
 } from "@comend/components/ui/form"
 import MultipleSelector from "@/packages/components/ui/multiple-selector"
+import { FacilityType } from "~admin/lib/types"
+import { useState } from "react"
+import { CreateCompanyForm } from "../create-company-dialog"
+import { ScrollArea, ScrollBar } from "@/packages/components/ui/scroll-area"
 
 interface DataTablePaginationProps<TData> {
     table: TanstackTable<TData>
@@ -371,14 +376,6 @@ export function FacilityCreateRequestDataTable({data}: {data: FacilityCreateRequ
     )
 }
 
-type FacilityType = 'cro' | 'institution'
-
-const createFacilityForm = z.object({
-    type: z.custom<FacilityType>(),
-    name: z.string(),
-    tools: z.array(z.custom<Option>()).optional(),
-})
-
 export const CreateFacilityForm = ({
     request,
     dialogClose
@@ -386,58 +383,7 @@ export const CreateFacilityForm = ({
     request: FacilityCreateRequest,
     dialogClose?: () => void
 }) => {
-    const form = useForm<z.infer<typeof createFacilityForm>>({
-        mode: "onChange",
-        resolver: zodResolver(createFacilityForm),
-        defaultValues: {
-            type: 'cro',
-            name: request.name,
-            tools: [
-
-                request.biosample ? {
-                    value: request.biosample.id,
-                    type: 'Biosamples',
-                    icon: 'test-tube-diagonal',
-                    // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
-                    label: `${request.biosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => request.biosample.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
-                    biosample: request.biosample
-                } : undefined,
-                request.diseaseModel ? {
-                    value: request.diseaseModel.id,
-                    label: `${request.diseaseModel.id} - ${(DISEASE_MODEL_TYPE_OPTIONS.filter(option => request.diseaseModel.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
-                    icon: 'rat',
-                    type: 'Disease Models',
-                    diseaseModel: request.diseaseModel
-                } : undefined,
-                request.clinicalDataset ? {
-                    value: request.clinicalDataset.id,
-                    label: `${request.clinicalDataset.id} - ${request.clinicalDataset.title}`,
-                    icon: 'database',
-                    type: 'Clinical Datasets',
-                    datasample: request.clinicalDataset,
-                } : undefined
-            ].filter(option => option !== undefined),
-            // biosamples: request.biosample ? [{value: request.biosample.id, label: request.biosample.id} ]: [],
-            // diseaseModels: request.diseaseModel ? [{value: request.diseaseModel.id, label: request.diseaseModel.id} ]: [],
-            // clinicalDatasets: request.clinicalDataset ? [{value: request.clinicalDataset.id, label: request.clinicalDataset.title} ]: [],
-        }
-    })
-
-    const handleFormSubmit = async (values: z.infer<typeof createFacilityForm>) => {
-        switch (values.type) {
-            case 'cro':
-                // TODO create cro
-                console.log(`Create CRO`, values)
-                break;
-            case 'institution':
-                // TODO create institution
-                console.log(`Create institution`, values)
-                break;
-            default:
-                break;
-        }
-    }
-
+    const [type, setType] = useState<FacilityType>('cro')
     const handleDeleteRequest = async () => {
         if (!request.id) {
             toast.error(
@@ -472,144 +418,42 @@ export const CreateFacilityForm = ({
         }
     }
 
-    const handleToolAsyncSearch = async (query: string): Promise<Option[]> => {
-        const toolsResponse = await fetch(`/api/tools?search=${query}`)
-        const toolsData = await toolsResponse.json()
-
-        return toolsData
-    }
-
     const TYPE_OPTIONS = [
         {value: 'cro', label: 'CRO/Service Provider'},
         {value: 'institution', label: 'Institution'},
     ]
 
-    const formData = form.watch()
-
     return (
-        <Form {...form}>
-            <form 
-                onSubmit={form.handleSubmit(handleFormSubmit)}
-                className="flex flex-col gap-6"
+        <ScrollArea className="max-h-[60vh] pr-2">
+        <ScrollBar />
+        <div className="p-1">
+            <Select
+                value={type} 
+                onValueChange={(newVal: FacilityType) => setType(newVal)}
             >
+                <SelectTrigger>
+                    <SelectValue placeholder="Select a value" />
+                </SelectTrigger>
+                <SelectContent>
+                    {TYPE_OPTIONS.map((option, index) => (
+                        <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </div>
 
-            <FormField 
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>{`Facility Type`}</FormLabel>
-                        <FormControl>
-                            <Select
-                                value={field.value} 
-                                onValueChange={(newVal: FacilityType) => form.setValue("type", newVal)}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a value" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {TYPE_OPTIONS.map((option, index) => (
-                                        <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </FormControl>
-                    </FormItem>
-                )}
+        {type === 'cro' ? (
+            <CreateCompanyForm 
+                request={request}
+                onCloseCallback={async () => {
+                    await handleDeleteRequest()
+                    if (dialogClose) dialogClose()
+                }}
+                handleRequestDeleteCallback={handleDeleteRequest}
             />
-
-            <FormField
-                control={form.control}
-                name="name"
-                render={({field}) => (
-                    <FormItem>
-                        <FormLabel>{`Name`}</FormLabel>
-                        <FormControl>
-                            <Input
-                                id="name"
-                                placeholder={`Enter a name`}
-                                {...field}
-                            />
-                        </FormControl>
-                        <FormMessage/>
-                    </FormItem>
-                )}
-            />
-
-            <FormField
-                control={form.control}
-                name="tools"
-                render={({field}) => (
-                    <FormItem className="w-full">
-                        <FormLabel>{`Linked Tools`}</FormLabel>
-                        <FormControl>
-                            <MultipleSelector
-                                {...field}
-                                onSearch={handleToolAsyncSearch}
-                                hidePlaceholderWhenSelected={true}
-                                showHoverCard={false}
-                                placeholder="Search..."
-                                badgeClassName="border-transparent bg-green-100 text-green-900"
-                                emptyIndicator={
-                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                        no results found.
-                                    </p>
-                                }
-                                groupBy={'type'}
-                            />
-                        </FormControl>
-                        <FormMessage className="text-primary"/>
-                    </FormItem>
-                )}
-            />
-
-            <DialogFooter>
-                <DialogClose asChild>
-                    <Button variant={"secondary"}>
-                        Cancel
-                    </Button>
-                </DialogClose>
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button type="button" variant="destructive">
-                            Delete request
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>
-                                Are you absolutely sure?
-                            </DialogTitle>
-                            <DialogDescription>
-                                {`This action cannot be undone. This will permanently delete your request and it's data.`}
-                            </DialogDescription>
-                            <DialogFooter>
-                                <DialogClose>
-                                    <Button type="button">
-                                        Cancel
-                                    </Button>
-                                </DialogClose>
-                                <DialogClose>
-                                    <Button
-                                        type="button"
-                                        variant={"destructive"}
-                                        onClick={handleDeleteRequest}
-                                    >
-                                        Delete request
-                                    </Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogHeader>
-                    </DialogContent>
-                </Dialog>
-                <DialogClose asChild>
-                    <Button variant={"cta"}>
-                        {`Create ${formData.type === 'cro' ? 'CRO/Service provider' : 'Institution'}`}
-                    </Button>
-                </DialogClose>
-            </DialogFooter>
-
-            </form>
-        </Form>
+        ) : (
+            <></>
+        )}
+        </ScrollArea>
     )
 }
