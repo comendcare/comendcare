@@ -22,7 +22,8 @@ import type {
     SavedOrganization,
     Biosample,
     DiseaseModel,
-    Invitation
+    Invitation,
+    Tool
 } from "@prisma/client";
 import {Prisma} from "@prisma/client";
 import {z} from "zod";
@@ -363,6 +364,9 @@ export type SavedOrganizationData = SavedOrganization & {
 }
 
 export interface CompanyWithReviewsAndServices extends Company {
+    biosamples: Biosample[];
+    diseaseModel: DiseaseModel[];
+    tool: Tool[];
     reviews: ReviewWithAuthor[];
     services: Service[]
 }
