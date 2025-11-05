@@ -29,7 +29,7 @@ export const PublicPageNavbarLoginOnly: React.FC = ({externalOpen = false}: { ex
     })
 
     return (
-        <motion.div ref={ref} className="w-full fixed top-0 inset-x-0 z-50">
+        <motion.div ref={ref} className="w-full fixed inset-x-0 z-50" style={{ top: "var(--banner-height, 0px)" }}>
             <DesktopNav visible={visible}/>
             <MobileNav visible={visible}/>
         </motion.div>
