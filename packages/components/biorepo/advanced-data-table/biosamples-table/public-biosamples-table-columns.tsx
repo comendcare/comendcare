@@ -335,7 +335,15 @@ export function useBiosamplesTableColumns(
 
     const presets: Record<Preset, string[]> = {
         default: columns.map((c) => c.id as string),
-        profile: ["types", "type.label", "contacts", "links", "gene.symbol", "genotype", "genotype.genotype"],
+        profile: [
+            "types", 
+            "type.label", 
+            // "contacts", 
+            "links", 
+            "gene.symbol", 
+            "genotype", 
+            "genotype.genotype"
+        ],
     };
 
     const wanted = new Set(presets[preset]);
