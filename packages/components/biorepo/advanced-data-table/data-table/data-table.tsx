@@ -133,7 +133,7 @@ export function DataTable<TData>({
                   <TableRow className="invisible">
                     <TableCell
                       colSpan={table.getAllColumns().length}
-                      className="h-24 text-center"
+                      className="h-4 text-center"
                     >
                       No results.
                     </TableCell>
@@ -147,7 +147,8 @@ export function DataTable<TData>({
         {!table.getRowModel().rows?.length && (
           <div
             className={cn(
-              "absolute left-0 top-0 flex justify-center items-center"
+              "flex justify-center items-center",
+              noResults && "absolute left-0 top-0"
             )}
             style={{zIndex: 0, height: overlayStyle.height, width: overlayStyle.width, paddingTop: overlayStyle.paddingTop - 32, marginTop: 32}}
           >
