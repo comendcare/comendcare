@@ -140,7 +140,7 @@ export function EditResearchPlanForm({
                         : undefined),
                     otherModalities: values.otherModalities,
                 } as JsonObject,
-            })
+            }, {userId: session?.user.id, userName: session?.user.name})
 
             if (roadmap && roadmap.id) {
                 router.push(`/app/research-plan/${roadmap.id}`)
