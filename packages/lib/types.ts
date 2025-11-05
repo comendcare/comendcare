@@ -913,6 +913,7 @@ export const DISEASE_MODEL_TYPE_OPTIONS: Option[] = [
 
 export const RFP_STATUS_TYPE_OPTIONS: Option[] = [
     {value: 'OPEN', label: 'Open'},
+    {value: 'ROLLING', label: 'Rolling'},
     {value: 'COMINGSOON', label: 'Coming soon'},
     {value: 'CLOSED', label: 'Closed'}
 ]
