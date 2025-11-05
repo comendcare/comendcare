@@ -276,7 +276,7 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {
         return (
             <div className="w-full flex justify-end">
                 <Button variant={"link"} onClick={() => {
-                    // window.functionalConsentedLocalStorage?.remove('isHidden')
+                    window.functionalConsentedLocalStorage?.remove('isHidden')
                     setIsHidden(false)
                 }}>Show research plan templates</Button>
             </div>

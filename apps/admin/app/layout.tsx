@@ -8,7 +8,7 @@ import {Poppins, Source_Sans_3} from "next/font/google"
 import {Providers} from "~admin/providers"
 import {Suspense} from "react"
 import Loading from "@/loading";
-
+import { CookieyesScripts } from "@comend/lib/cookie-yes-scripts";
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -83,34 +83,7 @@ export default function RootLayout({
         >
         <head>
             {/* consent scripts added so cookieyes can block cookies & localStorage where necessary, if the user has not consented */}
-            {process.env.NODE_ENV !== "production" ? (
-                <>
-                    <script
-                        data-cookieyes='cookieyes-functional'
-                        src={`/functional-localstorage-manager.js`}
-                    />
-                    <script
-                        data-cookieyes='cookieyes-analytics'
-                        src={`/analytics-localstorage-manager.js`}
-                    />
-                </>
-            ) : (
-                <>
-                    <script
-                        id="cookieyes"
-                        type="text/javascript"
-                        src={`https://cdn-cookieyes.com/client_data/${process.env.COOKIE_YES_WEBSITE_KEY}/script.js`}
-                    ></script>
-                    <script
-                        data-cookieyes='cookieyes-functional'
-                        src={`/functional-localstorage-manager.js`}
-                    />
-                    <script
-                        data-cookieyes='cookieyes-analytics'
-                        src={`/analytics-localstorage-manager.js`}
-                    />
-                </>
-            )}
+            <CookieyesScripts />
         </head>
         <body>
         <Suspense fallback={<Loading/>}>
