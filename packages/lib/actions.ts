@@ -3697,8 +3697,8 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     },
                     private: rfpData.private ?? false,
                     openTo: rfpData.openTo ?? [],
-                    startDate: rfpData.startDate,
-                    endDate: rfpData.endDate,
+                    startDate: rfpData.startDate || null, // remove start date if not provided
+                    endDate: rfpData.endDate || null, // remove end date if not provided
                     milestones: {
                         deleteMany: {},
                         create: (rfpData.milestones || []).map((milestone: any) => ({

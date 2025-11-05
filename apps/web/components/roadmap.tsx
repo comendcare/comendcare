@@ -864,66 +864,33 @@ const RoadmapHeader = ({
                     )}
                 </Tooltip>
 
-                <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            onClick={(e) => {
-                                e.preventDefault()
-                                e.stopPropagation()
-                            }}
-                            variant="ghost"
-                            size={"icon"}
-                        >
-                            <Ellipsis/>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="left" sideOffset={4} className="p-1">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div>
-                                        <DropdownMenuItem asChild disabled={milestones.filter(milestone => !milestone.private).length <= 0}>
-                                            <Link
-                                                href={orgSubdomain ? `http://${orgSubdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/public"}
-                                                className={cn(
-                                                    "flex items-center"
-                                                )}
-                                                target={"_blank"}
-                                            >
-                                                <ExternalLink/>
-                                                View public research plan
-                                            </Link>
-                                        </DropdownMenuItem>
-                                    </div>
-                                </TooltipTrigger>
-                                {milestones.filter(milestone => !milestone.private).length <= 0 && (
-                                    <TooltipContent>
-                                        {`All projects in this plan are private and cannot be shared. Make at least one project public to enable a public research plan page.`}
-                                    </TooltipContent>
-                                )}
-                            </Tooltip>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div>
-                                        <DropdownMenuItem
-                                            disabled={milestones.filter(milestone => !milestone.private).length <= 0}
-                                            onClick={(e) => {
-                                                e.preventDefault()
-                                                handleShare()
-                                            }}
-                                        >
-                                            <Share />
-                                            Share
-                                        </DropdownMenuItem>
-                                    </div>
-                                </TooltipTrigger>
-                                {milestones.filter(milestone => !milestone.private).length <= 0 && (
-                                    <TooltipContent>
-                                        {`All projects in this plan are private and cannot be shared. Make at least one project public to enable sharing.`}
-                                    </TooltipContent>
-                                )}
-                            </Tooltip>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <div>
+                            <Button
+                                variant={"ghost"} 
+                                disabled={milestones.filter(milestone => !milestone.private).length <= 0}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    handleShare()
+                                }}
+                                size={isCollapsed ? "icon" : "default"}
+                            >
+                                <Share />
+                                {!isCollapsed && <p>{`Share`}</p>}
+                            </Button>
+                        </div>
+                    </TooltipTrigger>
+                    {milestones.filter(milestone => !milestone.private).length <= 0 
+                        ? (
+                            <TooltipContent className="max-w-[280px]">
+                                {`All projects in this plan are private and cannot be shared. Make at least one project public to enable sharing.`}
+                            </TooltipContent>
+                        )
+                        : (
+                            <TooltipContent>{`Share`}</TooltipContent>
+                        )}
+                </Tooltip>
             </span>
 
             <Dialog open={editResearchPlanIsOpen} onOpenChange={setEditResearchPlanIsOpen}>

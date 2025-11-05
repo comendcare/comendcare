@@ -4,7 +4,7 @@ import {getSession} from "@/packages/lib/auth";
 import {getResearcher, getResearcherFromOrcidApi, getResearcherWithMergedData} from "@comend/lib/fetchers";
 import {toast} from "sonner";
 
-export default async function CompanyHomePage({
+export default async function ResearcherProfilePage({
                                                   params
                                               }: {
     params: { id: string }

@@ -15,7 +15,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/packages/lib/auth";
 import CustomerIOSnippet from "@/packages/components/customerio";
 import { headers } from 'next/headers';
-import { CookieyesScripts } from "./cookie-yes-scripts";
+import { CookieyesScripts } from "@comend/lib/cookie-yes-scripts";
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({

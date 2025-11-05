@@ -9,7 +9,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog";
-import {Calendar, DollarSign, FileText, Link as LinkIcon, School, User, Clock, ChevronDown, ChevronRight, Mail, Workflow} from "lucide-react";
+import {Calendar, DollarSign, FileText, Link as LinkIcon, School, User, Clock, ChevronDown, ChevronRight, Mail, Workflow, ExternalLink} from "lucide-react";
 import Link from "next/link";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {PropertyBadge} from "./property-badge";
@@ -167,12 +167,21 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
         <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
             <Scrollbar />
             <DialogHeader>
-                <DialogTitle className="text-2xl font-semibold flex gap-2 items-center">
+                <DialogTitle className="text-2xl font-semibold flex gap-2 items-center flex-wrap">
                     {rfp.title}
                     {status && (
-                        <Badge variant={status.variant as any} className="text-sm">
+                        <Badge variant={status.variant as any} className="text-sm inline-flex">
                             {status.label}
                         </Badge>
+                    )}
+                    {(rfp?.contacts && rfp?.contacts?.length > 0) && (
+                        <Link
+                            href={`mailto:${rfp.contacts[0].email}`}
+                            className="mt-1 ml-auto text-sm font-normal underline flex gap-1 items-center"
+                        >
+                            Contact
+                            <ExternalLink className="h-4 w-4 min-h-4 min-w-4"/>
+                        </Link>
                     )}
                 </DialogTitle>
             </DialogHeader>
@@ -229,7 +238,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                     <div className="border-l-4 border-purple-200 pl-4 space-y-2">
                         <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
                             <Workflow className="h-4 w-4 min-w-4 text-purple-900" />
-                            <span className="text-purple-900 text-nowrap">Linked projects</span>
+                            <span className="text-purple-900 text-nowrap">Projects</span>
                         </div>
                         <div className="flex flex-wrap gap-2">
                             {rfp.milestones.map((project: any) => (
@@ -292,7 +301,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
 
                 {rfp.contacts && rfp.contacts.length > 0 && (
                     <div className="flex flex-col gap-2 w-full">
-                        <h3 className="text-lg font-semibold">Primary Contacts</h3>
+                        <h3 className="text-lg font-semibold">Contacts</h3>
                         {rfp?.contacts?.map((contact: ExternalContact) => (
                             <span className="flex items-center gap-2 text-wrap w-full text-sm">
                                 <Mail className="mt-1 h-4 w-4 min-h-4 min-w-4"/>
@@ -314,7 +323,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
 
                 {rfp.attachments && rfp.attachments.length > 0 && (
                     <div className="flex flex-col gap-2 w-full">
-                        <h3 className="text-lg font-semibold">Primary Attachments</h3>
+                        <h3 className="text-lg font-semibold">Attachments</h3>
                         {rfp?.attachments?.map((attachment: ExternalAttachment) => (
                             <span className="flex items-start gap-2 text-wrap w-full text-sm">
                                 <LinkIcon className="mt-1 h-4 w-4 min-h-4 min-w-4"/>
