@@ -20,12 +20,20 @@ function useColumnsPreset(explicit?: Preset) {
     return "default";
 }
 
-export function useDiseaseModelsTableColumns(enableSorting: boolean = true, enableHiding: boolean = true, presetName?: Preset): ColumnDef<any>[] {
+export function useDiseaseModelsTableColumns(
+    enableSorting: boolean = true, 
+    enableHiding: boolean = true, 
+    typesenseSearch: boolean = true,
+    presetName?: Preset,
+): ColumnDef<any>[] {
     const preset = useColumnsPreset(presetName);
 
     const columns: ColumnDef<any>[] = [
         {
-            id: "sortId.id", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            id: typesenseSearch
+                ? 'sortId.id' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+                : 'id',
+            // id: "sortId.id", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "id",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -44,7 +52,10 @@ export function useDiseaseModelsTableColumns(enableSorting: boolean = true, enab
             meta: { label: "Model ID" }
         },
         {
-            id: "type.label", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            id: typesenseSearch
+                ? 'type.label' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+                : 'types',
+            // id: "type.label", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "types",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -132,7 +143,10 @@ export function useDiseaseModelsTableColumns(enableSorting: boolean = true, enab
             meta: { label: "Gene" }
         },
         {
-            id: "genotype.genotype", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            id: typesenseSearch
+                ? 'genotype.genotype' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+                : 'genotype',
+            // id: "genotype.genotype", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "genotype",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -282,7 +296,7 @@ export function useDiseaseModelsTableColumns(enableSorting: boolean = true, enab
 
     const presets: Record<Preset, string[]> = {
         default: columns.map((c) => c.id as string),
-        profile: ["type.label", "contacts", "links", "gene.symbol", "genotype.genotype"],
+        profile: ["types", "type.label", "contacts", "links", "gene.symbol", "genotype.genotype", "genotype"],
     };
 
     const wanted = new Set(presets[preset]);

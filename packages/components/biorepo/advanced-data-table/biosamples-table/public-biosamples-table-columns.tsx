@@ -19,12 +19,20 @@ function useColumnsPreset(explicit?: Preset) {
     return "default";
 }
 
-export function useBiosamplesTableColumns(enableSorting: boolean = true, enableHiding: boolean = true, presetName?: Preset): ColumnDef<any>[] {
+export function useBiosamplesTableColumns(
+    enableSorting: boolean = true, 
+    enableHiding: boolean = true, 
+    typesenseSearch: boolean = true,
+    presetName?: Preset,
+): ColumnDef<any>[] {
     const preset = useColumnsPreset(presetName);
 
     const columns: ColumnDef<any>[] = [
         {
-            id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            id: typesenseSearch
+                ? 'sortId.id' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+                : 'id',
+            // id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "id",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -62,8 +70,38 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
             enableSorting,
             meta: { label: "Donor ID" },
         },
+        // {
+        //     // id: presetName === "profile" 
+        //     //     ? "types" // profile sort id
+        //     //     : "type.label", // typesense sort id: must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+        //     id: "type.label",
+        //     accessorKey: "types",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader 
+        //             className="min-w-fit text-nowrap"
+        //             column={column} 
+        //             title="Type"
+        //         />
+        //     ),
+        //     cell: ({row}) => (
+        //         <>
+        //             {(row.original.types || []).map((type: string, index: number) => {
+        //                 const typeOption = BIOSAMPLE_TYPE_OPTIONS.find(t => t.value === type)
+        //                 return (
+        //                     <MilestoneTypeBadge label={typeOption?.label} key={index}/>
+        //                 )
+        //             })}
+        //         </>
+        //     ),
+        //     enableHiding,
+        //     enableSorting,
+        //     meta: { label: "Type" }
+        // },
         {
-            id: "type.label", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            id: typesenseSearch
+                ? 'type.label' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+                : 'types',
+            // id: "type.label",
             accessorKey: "types",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -82,12 +120,20 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
                     })}
                 </>
             ),
-            enableHiding,
-            enableSorting,
-            meta: { label: "Type" }
+            enableHiding: true,
+            enableColumnFilter: true,
+            meta: {
+                label: "Type",
+                // variant: "multiSelect",
+                // options: BIOSAMPLE_TYPE_OPTIONS,
+                // icon: CircleDashed,
+            },
         },
         {
-            id: "condition.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            id: typesenseSearch
+                ? 'condition.name' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+                : 'condition',
+            // id: "condition.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "condition",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -129,7 +175,10 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
             meta: { label: "Gene" }
         },
         {
-            id: "genotype.genotype", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            id: typesenseSearch
+                ? 'genotype.genotype' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+                : 'genotype',
+            // id: "genotype.genotype", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "genotype",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -286,7 +335,7 @@ export function useBiosamplesTableColumns(enableSorting: boolean = true, enableH
 
     const presets: Record<Preset, string[]> = {
         default: columns.map((c) => c.id as string),
-        profile: ["type.label", "contacts", "links", "gene.symbol", "genotype.genotype"],
+        profile: ["types", "type.label", "contacts", "links", "gene.symbol", "genotype", "genotype.genotype"],
     };
 
     const wanted = new Set(presets[preset]);

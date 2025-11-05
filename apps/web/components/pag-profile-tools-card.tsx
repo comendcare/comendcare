@@ -1,10 +1,10 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import { Database, Rat, TestTubeDiagonal } from "lucide-react";
-import { cn } from "@comend/lib/utils";
+import { cn, sleep } from "@comend/lib/utils";
 import { useEffect, useState } from "react";
 import { Button } from "@/packages/components/ui/button";
-import { BiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table";
+import { DatabaseBiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table";
 import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
 import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns";
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
@@ -15,6 +15,7 @@ import type { Organization, Biosample, DiseaseModel, Tool } from "@prisma/client
 import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import { ToolCounts } from "./profile-page";
 import { useRouter } from "next/navigation";
+import Image from "next/image"
 
 const getInitState = (
     counts: {
@@ -59,16 +60,19 @@ export const PAGProfileToolsCard = ({
     const biosampleColumns = useBiosamplesTableColumns(
         true, // enable sorting
         true, // enable hiding
+        false,
         "profile",
     )
     const diseaseModelColumns = useDiseaseModelsTableColumns(
         true, // enable sorting
         true, // enable hiding
+        false,
         "profile"
     )
     const clinicalDatasetColumns = useClinicalDatasetsTableColumns(
         true, // enable sorting
         true, // enable hiding
+        false,
         "profile"
     )
     const router = useRouter();
@@ -78,6 +82,14 @@ export const PAGProfileToolsCard = ({
         setIsInitialized(true)
     }, [])
 
+    useEffect(() => {
+        console.log(`input data changed`)
+        console.log(biosamples)
+        console.log(diseaseModels)
+        console.log(clinicalDatasets)
+        setIsInitialized(true)
+    }, [biosamples, diseaseModels, clinicalDatasets])
+
     return (
         <Card className="organization-profile-tour-step5">
             <CardHeader className="w-full flex flex-row items-start justify-between gap-4">
@@ -85,17 +97,20 @@ export const PAGProfileToolsCard = ({
                     Toolkit
                 </CardTitle>
             </CardHeader>
-            <CardContent className="w-full max-w-full">
-                <div className="text-muted-foreground text-sm flex flex-wrap gap-2 justify-end pb-4">
+            <CardContent className="w-full max-w-full flex flex-col justify-center items-center">
+                <div className="w-full text-muted-foreground text-sm flex flex-wrap gap-2 justify-end pb-4">
                     {(toolCounts.biosampleCount > 0) && (
                         <div
                             onClick={async () => {
+                                setIsInitialized(false)
                                 const searchParams = new URLSearchParams()
                                 searchParams.set("sort", "")
                                 searchParams.set("page", "1")
                                 searchParams.set("view", "biosamples")
                                 router.push(`?${searchParams.toString()}`, {scroll: false})
                                 setSection("biosamples");
+                                // await sleep(1000)
+                                // setIsInitialized(true)
                             }}
                             className={cn(
                                 "min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-base transition-colors hover:text-primary cursor-pointer",
@@ -111,12 +126,15 @@ export const PAGProfileToolsCard = ({
                     {(toolCounts.diseaseModelCount > 0) && (
                         <div
                             onClick={async () => {
+                                setIsInitialized(false)
                                 const searchParams = new URLSearchParams()
                                 searchParams.set("sort", "")
                                 searchParams.set("page", "1")
                                 searchParams.set("view", "disease-models")
                                 router.push(`?${searchParams.toString()}`, {scroll: false})
                                 setSection("disease-models");
+                                // await sleep(1000)
+                                // setIsInitialized(true)
                             }}
                             className={cn(
                                 "min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-base transition-colors hover:text-primary cursor-pointer",
@@ -132,12 +150,15 @@ export const PAGProfileToolsCard = ({
                     {(toolCounts.clinicalDatasetCount > 0) && (
                         <div
                             onClick={async () => {
+                                setIsInitialized(false)
                                 const searchParams = new URLSearchParams()
                                 searchParams.set("sort", "")
                                 searchParams.set("page", "1")
                                 searchParams.set("view", "clinical-datasets")
                                 router.push(`?${searchParams.toString()}`, {scroll: false})
                                 setSection('clinical-datasets')
+                                // await sleep(1000)
+                                // setIsInitialized(true)
                             }}
                             className={cn(
                                 "min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-base transition-colors hover:text-primary cursor-pointer",
@@ -151,59 +172,75 @@ export const PAGProfileToolsCard = ({
                         </div>
                     )}
                 </div>
-                {(isInitialized && section === 'biosamples') && 
-                    (biosamples.length === 0 ? (
-                        <div className="bg-gray-100 rounded-md w-full h-[200px]" />
-                    ) : (
-                        <div className="max-w-7xl w-full overflow-auto">
-                            <FeatureFlagsProvider showFilters={false}>
-                                <BiosamplesTable
-                                    data={biosamples as any[] || []}
-                                    pageCount={biosamplesPageCount}
-                                    columns={biosampleColumns}
-                                    searchParams={{}}
-                                    interactive={false}
-                                    showPagination={toolCounts.biosampleCount > 10}
-                                />
-                            </FeatureFlagsProvider>
-                        </div>
-                    ))
+
+                {!isInitialized 
+                    ? (<div className="bg-gray-100 rounded-md w-full h-[200px]" />) 
+                    : (
+                        <>
+                            {(section === 'biosamples' && toolCounts.biosampleCount > 0) && (
+                                <div className="max-w-7xl w-full overflow-auto">
+                                    <FeatureFlagsProvider showFilters={false}>
+                                        <DatabaseBiosamplesTable
+                                            data={biosamples as any[] || []}
+                                            pageCount={biosamplesPageCount}
+                                            columns={biosampleColumns}
+                                            searchParams={{}}
+                                            interactive={false}
+                                            showPagination={toolCounts.biosampleCount > 10}
+                                            noResultsOverride={false}
+                                        />
+                                    </FeatureFlagsProvider>
+                                </div>
+                            )}
+                            {(section === 'disease-models' && toolCounts.diseaseModelCount > 0) && (
+                                <div className="max-w-7xl w-full overflow-auto">
+                                    <FeatureFlagsProvider showFilters={false}>
+                                        <DiseaseModelsTable
+                                            data={diseaseModels as any[] || []}
+                                            pageCount={diseaseModelsPageCount}
+                                            columns={diseaseModelColumns}
+                                            searchParams={{}}
+                                            interactive={false}
+                                            showPagination={toolCounts.diseaseModelCount > 10}
+                                            noResultsOverride={false}
+                                        />
+                                    </FeatureFlagsProvider>
+                                </div>
+                            )}
+                            {(section === 'clinical-datasets' && toolCounts.clinicalDatasetCount > 0) && (
+                                <div className="max-w-7xl w-full overflow-auto">
+                                    <FeatureFlagsProvider showFilters={false}>
+                                        <ClinicalDatasetsTable
+                                            data={clinicalDatasets || []}
+                                            pageCount={clinicalDatasetsPageCount}
+                                            columns={clinicalDatasetColumns}
+                                            searchParams={{}}
+                                            interactive={false}
+                                            showPagination={toolCounts.clinicalDatasetCount > 10}
+                                            noResultsOverride={false}
+                                        />
+                                    </FeatureFlagsProvider>
+                                </div>
+                            )}
+                        </>
+                    )
                 }
-                {(isInitialized && section === 'disease-models') && (
-                    diseaseModels.length === 0 ? (
-                        <div className="bg-gray-100 rounded-md w-full h-[200px]" />
-                    ) : (
-                        <div className="max-w-7xl w-full overflow-auto">
-                            <FeatureFlagsProvider showFilters={false}>
-                                <DiseaseModelsTable
-                                    data={diseaseModels as any[] || []}
-                                    pageCount={diseaseModelsPageCount}
-                                    columns={diseaseModelColumns}
-                                    searchParams={{}}
-                                    interactive={false}
-                                    showPagination={toolCounts.diseaseModelCount > 10}
-                                />
-                            </FeatureFlagsProvider>
+
+                {(toolCounts.biosampleCount === 0 && toolCounts.diseaseModelCount === 0 && toolCounts.clinicalDatasetCount == 0) && (
+                    <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8 px-auto">
+                        <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
+                            <h1 className="font-cal text-4xl">You do not have any Tools</h1>
+                            <Image
+                                alt="No Data Tools"
+                                src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                                width={300}
+                                height={300}
+                            />
+                            <p className="text-lg text-stone-500">
+                                A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, biosamples.
+                            </p>
                         </div>
-                    )
-                )}
-                {(isInitialized && section === 'clinical-datasets') && (
-                    clinicalDatasets.length === 0 ? (
-                        <div className="bg-gray-100 rounded-md w-full h-[200px]" />
-                    ) : (
-                        <div className="max-w-7xl w-full overflow-auto">
-                            <FeatureFlagsProvider showFilters={false}>
-                                <ClinicalDatasetsTable
-                                    data={clinicalDatasets || []}
-                                    pageCount={clinicalDatasetsPageCount}
-                                    columns={clinicalDatasetColumns}
-                                    searchParams={{}}
-                                    interactive={false}
-                                    showPagination={toolCounts.clinicalDatasetCount > 10}
-                                />
-                            </FeatureFlagsProvider>
-                        </div>
-                    )
+                    </div>
                 )}
             </CardContent>
         </Card>

@@ -177,7 +177,9 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 </div>
             ),
             enableHiding: true,
-            meta: { label: "Sample ID" }
+            meta: { 
+                label: "Sample ID",
+            }
         },
         {
             id: "types",
