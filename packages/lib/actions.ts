@@ -1246,6 +1246,21 @@ export const inviteUser = withOrganizationAuth(
                 return res
             })
 
+            await customerIOTrack({
+                userId: session.user.id,
+                event: 'organization_invitation_sent',
+                timestamp: new Date(),
+                // Keep org / invite-specific data on the EVENT, not person traits (users can have multiple invites)
+                properties: {
+                    invitation_id: invitation.id,
+                    organization_id: organization.id,
+                    organization_name: organization.name,
+                    invitee_email: lowerCaseEmail,
+                    role: role,
+                    inviter_user_id: session.user.id,
+                },
+            });
+
             // Upsert so that if it already is whitelisted, nothing changes, and if not, they are whitelisted
             await prisma.whitelist.upsert({
                 where: {email: lowerCaseEmail},
@@ -1464,11 +1479,31 @@ export const denyMemberRequest = withOrganizationAuth(
 
 export const deleteInvitation = withOrganizationAuth(
     async (_: Organization, invitation: Invitation): Promise<ApiResponse<any>> => {
+        const session = await getSession();
+
         if (!invitation) {
             throw new Error("Invalid invitation");
         }
 
         try {
+            try {
+                await customerIOTrack({
+                    userId: session?.user.id ? undefined : undefined, // keep person traits clean; attribution is optional here
+                    event: 'organization_invitation_revoked',
+                    timestamp: new Date(),
+                    properties: {
+                        invitation_id: invitation.id,           // 🔑 correlate to the sent event
+                        organization_id: invitation.organizationId,
+                        invitee_email: invitation.email,
+                        role: invitation.role,
+                        revoked_by_user_id: await session?.user.id, // the admin doing the delete
+                        reason: 'org_deleted_invitation',
+                    },
+                });
+            } catch (e) {
+                console.error('[CIO] track organization_invitation_revoked failed:', e);
+            }
+
             // Ensure the composite key is valid or fallback to another unique identifier like `id`
             const deletedInvitation = await prisma.invitation.delete({
                 where: {
@@ -1511,8 +1546,24 @@ export const declineAndDeleteInvitation = withAuth(
             if (invitation?.email !== session.user.email) {
                 return {
                     success: false,
-                    error: "Error accepting invitation: active user email does not match the invite email."
+                    error: "Error declining invitation: active user email does not match the invite email."
                 }
+            }
+
+            try {
+                await customerIOTrack({
+                    userId: session.user.id, // the person performing the decline
+                    event: 'organization_invitation_declined',
+                    timestamp: new Date(),
+                    properties: {
+                        invitation_id: invitation.id,
+                        organization_id: invitation.organizationId,
+                        invitee_email: invitation.email,
+                        role: invitation.role,
+                    },
+                });
+            } catch (e) {
+                console.error('[CIO] track organization_invitation_declined failed:', e);
             }
 
             // Ensure the composite key is valid or fallback to another unique identifier like `id`
@@ -2046,6 +2097,17 @@ export const acceptInvitation = withAuth(
                     data: {activeOrganizationId: invitation.organization.id},
                 })
             ]);
+
+            await customerIOTrack({
+                userId: session.user.id ?? undefined,   // if you have it
+                event: 'organization_invitation_accepted',
+                timestamp: new Date(),
+                properties: {
+                    invitation_id: invitation.id,        // 🔑 must match the “sent” event
+                    organization_id: invitation.organizationId,
+                    invitee_email: invitation.email,
+                },
+            });
 
             await writeRawEvent({
                 provider: "app",
