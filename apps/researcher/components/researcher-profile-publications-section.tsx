@@ -1,3 +1,4 @@
+"use client"
 import {TabsContent} from "@/packages/components/ui/tabs";
 import {Button} from "@/packages/components/ui/button";
 import {Card, CardContent} from "@/packages/components/ui/card";
