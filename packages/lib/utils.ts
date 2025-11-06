@@ -58,7 +58,7 @@ export function getSortRank(rfp: RFP) {
     return 0
 }
 
-type DateStatus =
+export type DateStatus =
     | { status: "COMINGSOON"; label: "Coming soon"; daysRemaining: number | undefined; variant: "yellow" }
     | { status: "ROLLING"; label: "Rolling"; daysRemaining: number | undefined; variant: "orange" }
     | { status: "OPEN"; label: "Open"; daysRemaining: number | undefined; variant: "green" }
@@ -81,8 +81,14 @@ export function checkDateRangeUTC(startDateStr?: string | Date, endDateStr?: str
     const start = startRaw ? toUTCDateOnly(startRaw) : undefined;
     const end = endRaw ? toUTCDateOnly(endRaw) : undefined;
 
-    if (start && todayUTC < start) return {status: "COMINGSOON", label: "Coming soon", daysRemaining: undefined, variant: "yellow"};
-    if (end && todayUTC > end) return {status: "CLOSED", label: "Closed", daysRemaining: undefined, variant: "red"};
+    if (start && todayUTC < start) {
+        const daysRemaining = start ? Math.ceil((start.getTime() - todayUTC.getTime()) / 86400000) : 0;
+        return {status: "COMINGSOON", label: "Coming soon", daysRemaining: daysRemaining, variant: "yellow"};
+    }
+    if (end && todayUTC > end) {
+        const daysRemaining = end ? Math.ceil((todayUTC.getTime() - end.getTime()) / 86400000) : 0;
+        return {status: "CLOSED", label: "Closed", daysRemaining: daysRemaining, variant: "red"};
+    }
 
     if ((!start || todayUTC >= start) && (!end || todayUTC <= end)) {
         const daysRemaining = end ? Math.ceil((end.getTime() - todayUTC.getTime()) / 86400000) : 0;

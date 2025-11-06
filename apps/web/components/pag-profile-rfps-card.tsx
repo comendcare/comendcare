@@ -17,7 +17,7 @@ import {checkDateRangeUTC, cn, formatDateUTC, formatMoney, RFPSort} from "@comen
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {useSearchParams} from "next/navigation";
 import {NoRFPs} from "./no-rfps";
-import {RFPCard} from "./rfp-card";
+import {RFPCard, RFPStatusBadge} from "./rfp-card";
 import {
     Carousel,
     CarouselContent,
@@ -170,50 +170,32 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
     const status = useMemo(() => checkDateRangeUTC(rfp.startDate, rfp.endDate), [rfp.startDate, rfp.endDate]);
 
     return (
-        <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
+        <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 mt-2"} type={"always"}>
             <Scrollbar />
             <DialogHeader>
-                <DialogTitle className="text-2xl font-semibold flex gap-2 items-center flex-wrap">
-                    {rfp.title}
-                    {status && (
-                        <Badge variant={status.variant as any} className="text-sm inline-flex">
-                            {status.label}
-                        </Badge>
-                    )}
+                <div className="flex gap-2 justify-center items-center flex-wrap">
+                    <DialogTitle className="text-2xl font-semibold">{rfp.title}</DialogTitle>
                     {(rfp?.contacts && rfp?.contacts?.length > 0) && (
-                        <Link
-                            href={`mailto:${rfp.contacts[0].email}`}
-                            className="mt-1 ml-auto text-sm font-normal underline flex gap-1 items-center"
+                        <Button 
+                            variant="cta"
+                            className="ml-auto font-normal"
+                            asChild
                         >
-                            Contact
-                            <ExternalLink className="h-4 w-4 min-h-4 min-w-4"/>
-                        </Link>
+                            <Link href={`mailto:${rfp.contacts[0].email}`}>
+                                <Mail className="h-4 w-4 min-h-4 min-w-4"/>
+                                Contact
+                            </Link>
+                        </Button>
                     )}
-                </DialogTitle>
+                </div>
             </DialogHeader>
             <div className="flex flex-col gap-4 pt-4 ">
-                {status?.daysRemaining !== undefined && (
-                    <Badge variant={"green"} className="w-full font-normal flex gap-2">
-                        <Clock size={18}/>
-                        {`${status.daysRemaining} days remaining to submit proposals`}
-                    </Badge>
-                )}
+                <RFPStatusBadge status={status} />
+                
                 <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
-                    {rfp.budget && (
-                        <li>
-                            <PropertyBadge 
-                                // icon={DollarSign}
-                            >
-                                <p><b>Budget: </b> ${formatMoney(rfp.budget)}</p>
-                            </PropertyBadge>
-                        </li>
-                    )}
-
                     {Array.isArray(rfp.openTo) && rfp.openTo.length > 0 && (
                         <li>
-                            <PropertyBadge 
-                                // icon={School}
-                            >
+                            <PropertyBadge>
                                 <b>Open to:</b>
                                 {rfp.openTo
                                     .map((option: string) => {
@@ -231,11 +213,17 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                         </li>
                     )}
 
+                    {rfp.budget && (
+                        <li>
+                            <PropertyBadge>
+                                <p><b>Budget: </b> ${formatMoney(rfp.budget)}</p>
+                            </PropertyBadge>
+                        </li>
+                    )}
+
                     {rfp.startDate && (
                         <li>
-                            <PropertyBadge 
-                                // icon={Calendar}
-                            >
+                            <PropertyBadge>
                                 <b>Opens: </b>{formatDateUTC(rfp.startDate)}
                             </PropertyBadge>
                         </li>
@@ -243,9 +231,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
 
                     {rfp.endDate && (
                         <li>
-                            <PropertyBadge 
-                                // icon={Calendar}
-                            >
+                            <PropertyBadge>
                                 <b>Due: </b>{formatDateUTC(rfp.endDate)}
                             </PropertyBadge>
                         </li>
