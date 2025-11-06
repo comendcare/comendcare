@@ -54,8 +54,6 @@ export default async function DataToolsPage(props: IndexPageProps) {
         {...search, q: globalFilter, filters: validFilters}
     )
 
-    console.log(`data`, data)
-
     // not part of an org
     if (!orgId) return <NoOrganization />
     return <PrivateDatasampleToolsPage data={[...data]} pageCount={pageCount} searchParams={searchParams} />
