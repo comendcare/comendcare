@@ -144,7 +144,7 @@ export default async function FeedPage() {
                         </p>
                         <Separator/>
                     </div>
-                    <FeedList initialPage={initialPage as FeedPageDTO} orgId={session?.user.organizationId}/>
+                    <FeedList initialPage={initialPage as FeedPageDTO} orgId={session?.user.organizationId || undefined}/>
                 </main>
             )
         }
