@@ -840,41 +840,6 @@ export const syncToTypesense = async (env: {
                 endDate: true
             }
         })
-        const rfps = await prisma.rFP.findMany({
-            where: {
-                private: false // only sync public biosamples
-            },
-            select: {
-                createdAt: true,
-                // this list must include ALL items that allow sorting in the table
-                // otherwise the sorting will not function
-                organization: {
-                    select: {
-                        id: true,
-                        name: true,
-                        conditions: {
-                            select: {
-                                condition: {
-                                    select: {
-                                        name: true,
-                                        causalGenes: true,
-                                        associatedGenes: true,
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                id: true,
-                title: true,
-                description: true,
-                eligibility: true,
-                evaluationProcess: true,
-                openTo: true,
-                startDate: true,
-                endDate: true
-            }
-        })
 
         console.log('Raw organizations data:', organizations);
         console.log('Raw milestones data:', milestones);
