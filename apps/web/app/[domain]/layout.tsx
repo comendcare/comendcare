@@ -8,6 +8,7 @@ import {PublicPageNavbarLoginOnly} from "~web/components/public-page-navbar-logi
 import {StickyBanner} from "@/packages/components/ui/sticky-banner";
 import {Button} from "@/packages/components/ui/button";
 import Link from "next/link";
+import PublicPageBottomBanner from "~web/components/public-page-bottom-banner";
 
 export async function generateMetadata({
                                            params
@@ -212,7 +213,8 @@ export default async function SiteLayout({
                 </StickyBanner> */}
                 <PublicPageNavbarLoginOnly/>
                 {children}
-                <PublicPageFooter/>
+                <PublicPageBottomBanner/>
+                {/*<PublicPageFooter/>*/}
             </TooltipProvider>
         </div>
     )

@@ -258,13 +258,18 @@ export const authOptions: NextAuthOptions = {
                 membership,
             };
 
-            const dbOrganization = await prisma.organization.findUnique({
-                where: {id: activeOrgId},
-                select: {
-                    name: true,
-                    subdomain: true,
+            let dbOrganization: { name: string; subdomain: string } | null = null;
+            if (activeOrgId) {
+                try {
+                    dbOrganization = await prisma.organization.findUnique({
+                        where: { id: activeOrgId }, // <-- was token.sub! (wrong)
+                        select: { name: true, subdomain: true },
+                    });
+                } catch (e) {
+                    // Never throw from session(); swallow & continue
+                    dbOrganization = null;
                 }
-            });
+            }
 
             try {
                 if (isProd) {
