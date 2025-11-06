@@ -16,6 +16,7 @@ import {PrivateNoResearchPlansColumn, PrivateNoResearchPlansRow, PublicNoResearc
 import {NoProjects} from "./no-projects";
 import {FunctionComponent, ReactElement, useState} from "react";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/packages/components/ui/tooltip";
+import { PropertyBadge } from "./property-badge";
 
 export const RoadmapsCard = ({
                                  roadmaps,
@@ -236,12 +237,6 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
 
 export const RoadmapRow = ({roadmap, rowClickCallback}: {roadmap: any, rowClickCallback: (roadmap: any) => void}) => {
     const numProjects = roadmap.milestones.length
-    const numTools = (
-        (roadmap.milestones || []).flatMap((milestone: any) => milestone.biosamples || []).length + 
-        (roadmap.milestones || []).flatMap((milestone: any) => milestone.diseasesModels || []).length +
-        (roadmap.milestones || []).flatMap((milestone: any) => milestone.tools || []).length
-    )
-    const numRFPs = (roadmap.milestones || []).flatMap((milestone: any) => milestone.rfps || []).length
 
     return (
         <TableRow 
@@ -253,26 +248,14 @@ export const RoadmapRow = ({roadmap, rowClickCallback}: {roadmap: any, rowClickC
                 <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
             </TableCell>
             <TableCell>
-                <ul className="flex gap-2 justify-end items-center text-nowrap">
-                    <li>
-                        <Badge variant={'purple'}>
-                            <FileText className="h-4 w-4 min-h-4 min-w-4"/>
-                            <p>{numProjects === 1 ? `${numProjects} project` : `${numProjects} projects`}</p>
-                        </Badge>
-                    </li>
-                    <li>
-                        <Badge variant={'green'}>
-                            <Microscope className="h-4 w-4 min-h-4 min-w-4"/>
-                            <p>{numTools === 1 ? `${numTools} tool` : `${numTools} tools`}</p>
-                        </Badge>
-                    </li>
-                    <li>
-                        <Badge variant={'orange'}>
-                            <Megaphone className="h-4 w-4 min-h-4 min-w-4"/>
-                            <p>{numRFPs === 1 ? `${numRFPs} RFP` : `${numRFPs} RFPs`}</p>
-                        </Badge>
-                    </li>
-                </ul>
+                {numProjects > 0 && (
+                    <PropertyBadge 
+                        className="text-nowrap border-purple-200 text-purple-900 font-semibold" 
+                        icon={FileText}
+                    >
+                        {numProjects === 1 ? `${numProjects} project` : `${numProjects} projects`}
+                    </PropertyBadge>
+                )}
             </TableCell>
             <TableCell className="pr-0">
                 <div className="flex gap-2 justify-end items-center text-nowrap">

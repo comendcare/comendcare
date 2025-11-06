@@ -121,7 +121,9 @@ export const AssetDetails = ({tool}: { tool: any }) => {
                 {(tool.milestones || []).map((milestone: any, index: number) => {
                     return (
                         <li key={index}>
-                            <PropertyBadge icon={FileText}>
+                            <PropertyBadge 
+                                // icon={FileText}
+                            >
                                 <p className="text-wrap break-words">{milestone.milestone.title}</p>
                             </PropertyBadge>
                         </li>
@@ -131,7 +133,9 @@ export const AssetDetails = ({tool}: { tool: any }) => {
                 {(tool.contacts || []).map((contact: any, index: number) => {
                     return (
                         <li key={index}>
-                            <PropertyBadge icon={User}>
+                            <PropertyBadge 
+                                // icon={User}
+                            >
                                 <p className="text-wrap break-words">
                                     {[contact.name, contact.email, contact.affiliation].filter(x => x).join(` \u2022 `)}
                                 </p>
@@ -143,7 +147,9 @@ export const AssetDetails = ({tool}: { tool: any }) => {
                 {(tool.attachments || []).map((attachment: any, index: number) => {
                     return (
                         <li key={index}>
-                            <PropertyBadge icon={LinkIcon}>
+                            <PropertyBadge 
+                                // icon={LinkIcon}
+                            >
                                 <Link
                                     target="_blank"
                                     className="text-wrap break-words underline"
@@ -195,7 +201,9 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                 <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
                     {rfp.budget && (
                         <li>
-                            <PropertyBadge icon={DollarSign}>
+                            <PropertyBadge 
+                                // icon={DollarSign}
+                            >
                                 <p><b>Budget: </b> ${formatMoney(rfp.budget)}</p>
                             </PropertyBadge>
                         </li>
@@ -203,7 +211,9 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
 
                     {Array.isArray(rfp.openTo) && rfp.openTo.length > 0 && (
                         <li>
-                            <PropertyBadge icon={School}>
+                            <PropertyBadge 
+                                // icon={School}
+                            >
                                 <b>Open to:</b>
                                 {rfp.openTo
                                     .map((option: string) => {
@@ -223,19 +233,27 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
 
                     {rfp.startDate && (
                         <li>
-                            <PropertyBadge icon={Calendar}><b>Opens: </b>{formatDateUTC(rfp.startDate)}</PropertyBadge>
+                            <PropertyBadge 
+                                // icon={Calendar}
+                            >
+                                <b>Opens: </b>{formatDateUTC(rfp.startDate)}
+                            </PropertyBadge>
                         </li>
                     )}
 
                     {rfp.endDate && (
                         <li>
-                            <PropertyBadge icon={Calendar}><b>Due: </b>{formatDateUTC(rfp.endDate)}</PropertyBadge>
+                            <PropertyBadge 
+                                // icon={Calendar}
+                            >
+                                <b>Due: </b>{formatDateUTC(rfp.endDate)}
+                            </PropertyBadge>
                         </li>
                     )}
                 </ul>
 
                 {(rfp.milestones && rfp.milestones.length > 0) && (
-                    <div className="border-l-4 border-purple-200 pl-4 space-y-2">
+                    <div className="border-l-2 border-purple-200 pl-2 space-y-2">
                         <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
                             <Workflow className="h-4 w-4 min-w-4 text-purple-900" />
                             <span className="text-purple-900 text-nowrap">Projects</span>
