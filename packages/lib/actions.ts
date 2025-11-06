@@ -2760,6 +2760,7 @@ function generateDonorNanoid() {
 
 export const createClinicalDataset = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editDataToolForm>) => {
+        const session = await getSession()
         try {
             if (!organization.id) {
                 throw new Error("No organization id provided.")
@@ -2867,6 +2868,28 @@ export const createClinicalDataset = withOrganizationAuth(
                         : ({institution: undefined})), // if company does not exist in database, don't connect
                 }
             })
+
+            try {
+                await customerIOTrack({
+                    userId: session?.user.id,
+                    event: 'org_toolkit_item_added',
+                    timestamp: new Date(),
+                    traits: {
+                        name: session?.user.name,
+                        organization_id: organization.id,
+                        organization_name: organization.name,
+                        organization_subdomain: organization.subdomain,
+                    },
+                    properties: {
+                        orgId: organization.id,
+                        itemId: dataToolData.id,
+                        itemType: dataToolData.type,       // e.g. "cell_line", "biosample"
+                        itemTitle: dataToolData.title,
+                    },
+                });
+            } catch (e) {
+                console.error('[CIO] track org_toolkit_item_added failed:', e);
+            }
 
             revalidatePath("/app/tools/data")
 
@@ -3291,6 +3314,28 @@ export const createBiosample = withOrganizationAuth(
                         userName: session?.user.name,
                     },
                 });
+
+                try {
+                    await customerIOTrack({
+                        userId: session?.user.id,
+                        event: 'org_toolkit_item_added',
+                        timestamp: new Date(),
+                        traits: {
+                            name: session?.user.name,
+                            organization_id: organization.id,
+                            organization_name: organization.name,
+                            organization_subdomain: organization.subdomain,
+                        },
+                        properties: {
+                            orgId: organization.id,
+                            itemId: biosampleData.id,
+                            itemType: biosampleData.types,
+                            itemTitle: biosampleData.title,
+                        },
+                    });
+                } catch (e) {
+                    console.error('[CIO] track org_toolkit_item_added failed:', e);
+                }
             }
 
             revalidatePath("/app/tools/biosample")
@@ -3693,6 +3738,8 @@ export const createOrUpdateRFP = withOrganizationAuth(
         rfpData: Partial<RFP>,
         actor?: Actor
     ) => {
+        const session = await getSession()
+
         try {
             if (!organization.id) {
                 throw new Error("No organization id provided.");
@@ -3868,6 +3915,29 @@ export const createOrUpdateRFP = withOrganizationAuth(
                         userName: actor?.userName,
                     },
                 });
+
+                try {
+                    await customerIOTrack({
+                        userId: session?.user.id,
+                        event: 'org_rfp_created',
+                        timestamp: new Date(),
+                        traits: {
+                            name: actor?.userName,
+                            organization_id: organization.id,
+                            organization_name: organization.name,
+                            organization_subdomain: organization.subdomain,
+                        },
+                        properties: {
+                            orgId: organization.id,
+                            rfpId: rfpData.id,
+                            title: rfpData.title,
+                            fundingAmount: rfpData.budget,
+                            deadline: rfpData.endDate,
+                        },
+                    });
+                } catch (e) {
+                    console.error('[CIO] track org_rfp_created failed:', e);
+                }
             }
 
             // 3) RFP_CLOSED — endDate exists AND is now in the past
