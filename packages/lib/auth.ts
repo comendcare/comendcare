@@ -258,19 +258,13 @@ export const authOptions: NextAuthOptions = {
                 membership,
             };
 
-            if (!activeOrgId) console.warn("session(): user has no activeOrgId; skipping org lookup", { userId: dbUser.id });
-
-            let dbOrganization: { name: string; subdomain: string } | null = null;
-            if (activeOrgId) {
-                try {
-                    dbOrganization = await prisma.organization.findUnique({
-                        where: { id: activeOrgId },
-                        select: { name: true, subdomain: true },
-                    }) as any;
-                } catch (e) {
-                    dbOrganization = null;
+            const dbOrganization = await prisma.organization.findUnique({
+                where: {id: activeOrgId},
+                select: {
+                    name: true,
+                    subdomain: true,
                 }
-            }
+            });
 
             try {
                 if (isProd) {
@@ -305,7 +299,7 @@ export function getSession() {
             username: string
             email: string
             image: string
-            organizationId: string | null
+            organizationId: string
             membership: any
         }
     } | null>

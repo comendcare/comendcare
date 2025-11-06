@@ -213,8 +213,8 @@ export default async function SiteLayout({
                 </StickyBanner> */}
                 <PublicPageNavbarLoginOnly/>
                 {children}
-                <PublicPageBottomBanner/>
-                {/*<PublicPageFooter/>*/}
+                {/*<PublicPageBottomBanner/>*/}
+                <PublicPageFooter/>
             </TooltipProvider>
         </div>
     )
