@@ -158,23 +158,23 @@ export function useClinicalDatasetsTableColumns(
         }
     },
     {
-        id: "gene.symbol", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
-        accessorKey: "gene",
+        id: "genes", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+        accessorKey: "genes",
         header: ({column}) => (
             <DataTableColumnHeader 
                 className="min-w-fit text-nowrap"
                 column={column} 
-                title="Gene"
+                title="Genes"
             />
         ),
         cell: ({row}) => (
-            <>
-                {row.original.gene?.symbol && (
-                    <Badge variant={"teal"}>
-                        {row.original.gene.symbol}
+            <div className="flex gap-2 flex-wrap">
+                {row.original.genes?.map((gene: string, index: number) => (
+                    <Badge variant={"teal"} key={index}>
+                        {gene}
                     </Badge>
-                )}
-            </>
+                ))}
+            </div>
         ),
         enableHiding,
         enableSorting,

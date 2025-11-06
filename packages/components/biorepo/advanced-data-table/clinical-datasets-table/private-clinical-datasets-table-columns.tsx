@@ -168,24 +168,24 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         }
     },
     {
-        id: "gene.symbol",
-        accessorKey: "gene.symbol",
+        id: "genes",
+        accessorKey: "genes",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Gene"/>
+            <DataTableColumnHeader column={column} title="Genes"/>
         ),
         cell: ({row}) => (
-            <>
-                {row.original.gene?.symbol && (
-                    <Badge variant={"teal"}>
-                        {row.original.gene.symbol}
+            <div className="flex gap-2 flex-wrap">
+                {row.original.genes?.map((gene: string, index: number) => (
+                    <Badge variant={"teal"} key={index}>
+                        {gene}
                     </Badge>
-                )}
-            </>
+                ))}
+            </div>
         ),
         enableHiding: true,
         enableColumnFilter: true,
         meta: {
-            label: "Gene",
+            label: "Genes",
             variant: "select",
             icon: CircleDashed,
             showInAdvancedOnly: true,

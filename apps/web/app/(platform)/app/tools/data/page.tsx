@@ -46,12 +46,15 @@ export default async function DataToolsPage(props: IndexPageProps) {
             company: true,
             geneId: true,
             gene: true,
+            genes: true,
             organizationId: true,
             organization: {include: {conditions: {include: {condition: true}}}},
             milestones: {include: {milestone: true}},
         },
         {...search, q: globalFilter, filters: validFilters}
     )
+
+    console.log(`data`, data)
 
     // not part of an org
     if (!orgId) return <NoOrganization />
