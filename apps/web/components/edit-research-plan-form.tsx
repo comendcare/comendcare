@@ -244,7 +244,7 @@ export function EditResearchPlanForm({
                                 <Button
                                     type="button"
                                     variant="destructive"
-                                    disabled={session?.user?.membership?.role !== "owner"}
+                                    disabled={!["owner", "support"].includes(session?.user?.membership?.role)}
                                 >
                                     Delete Research Plan
                                 </Button>
@@ -269,7 +269,7 @@ export function EditResearchPlanForm({
                                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                                             <AlertDialogAction
                                                 asChild
-                                                disabled={session?.user?.membership?.role !== "owner"}
+                                                disabled={!["owner", "support"].includes(session?.user?.membership?.role)}
                                             >
                                                 <Button
                                                     type="button"

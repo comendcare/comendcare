@@ -244,7 +244,7 @@ export default async function ProfilePage(props: IndexPageProps) {
         true // public only
     )
 
-    const isOwner = session?.user?.membership?.role === "owner";
+    const isOwner = ["owner", "support"].includes(session?.user?.membership?.role);
 
     const safeOrg = {
         ...organization,

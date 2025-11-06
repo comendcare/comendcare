@@ -63,7 +63,7 @@ const editOrgFormSchema = z.object({
 export default function EditPAGProfileHeaderDialog({organization}: { organization: Organization }) {
     const {data: session} = useSession();
     const [open, setOpen] = useState(false);
-    const isOwner = session?.user?.membership?.role === "owner";
+    const isOwner = ["owner", "support"].includes(session?.user?.membership?.role);
 
     const editOrgForm = useForm<z.infer<typeof editOrgFormSchema>>({
         mode: "onChange",
