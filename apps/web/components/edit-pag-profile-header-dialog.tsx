@@ -42,6 +42,11 @@ import {BiopharmaConsentSwitch} from "~web/components/biopharma-consent-switch";
 import {checkSubdomainAvailability} from "@/packages/lib/fetchers";
 import {useDebounce} from "use-debounce";
 
+const moneyField = z.preprocess(
+    (v) => (v === "" || v === null || typeof v === "undefined" ? undefined : Number(v)),
+    z.number().min(0).optional()
+);
+
 const editOrgFormSchema = z.object({
     name: z.string().min(2).max(60),
     subdomain: z.string().min(2, {
@@ -55,9 +60,9 @@ const editOrgFormSchema = z.object({
     ),
     founded: z.string().optional(),
     incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"]).optional(),
-    raised: z.number().optional(),
-    deployed: z.number().optional(),
-    budget: z.number().optional()
+    raised: moneyField,
+    deployed: moneyField,
+    budget: moneyField,
 });
 
 export default function EditPAGProfileHeaderDialog({organization}: { organization: Organization }) {

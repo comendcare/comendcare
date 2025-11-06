@@ -746,35 +746,28 @@ export const updateOrganization = withOrganizationAuth(
         const data: Record<string, any> = {};
 
         formData.forEach((value, key) => {
-            // Attempt to parse numbers
-
-            if (!isNaN(Number(value)) && value !== "") {
-                data[key] = Number(value);
-            } else {
-                data[key] = value;
-            }
-
             if (key === "yearFounded") {
                 data[key] = value.toString();
+                return;
             }
 
-            if ((key === "image" || key === "headerImage") && !value) {
-                // remove image
-                data[key] = null
+            if ((key === "image" || key === "headerImage") && value === "") {
+                data[key] = null;
+                return;
             }
 
-            if (key === "therapeuticsInDevelopment") {
+            if (key === "therapeuticsInDevelopment" || key === "therapeuticsOfInterest") {
                 data[key] = value.toString().split(",");
-            }
-
-            if (key === "therapeuticsOfInterest") {
-                data[key] = value.toString().split(",");
+                return;
             }
 
             if (key === "metadata") {
-                data[key] = JSON.parse(value.toString()) as JsonValue
+                data[key] = JSON.parse(value.toString());
+                return;
             }
 
+            const n = Number(value);
+            data[key] = Number.isNaN(n) ? value : n; // preserves 0
         });
 
         try {
