@@ -21,19 +21,18 @@ export default function PublicPageFooter() {
     return (
         <footer className="bg-white">
             <Separator className="max-w-7xl mx-auto mt-8"/>
-            <div className="mx-auto max-w-screen-xl space-y-8 px-4 py-16 sm:px-6 lg:space-y-16 lg:px-8">
+            <div className="mx-auto max-w-screen-xl space-y-8 px-4 py-8 sm:py-16 sm:px-6 lg:space-y-16 lg:px-8">
                 {/* Adjust flex and alignment for mobile and larger screens */}
                 <div
-                    className="flex flex-col items-center space-y-8 sm:grid sm:grid-cols-2 sm:space-y-0">
-                    <p className="inline-flex items-center self-start place-self-start justify-start">
-                        Built with ❤️ on 
+                    className="flex flex-col items-center text-center space-y-6 sm:grid sm:grid-cols-2 sm:space-y-0 sm:text-left">
+                    <p className="inline-flex items-center justify-center sm:justify-start mx-auto sm:mx-0">
+                        Built with ❤️ on&nbsp;
                         <LinkPreview url={"https://www.comendcare.com/"} target="_blank">
                             <Image className="w-24 inline" src={logo} alt={"Comend Logo"}/>
                         </LinkPreview>
                     </p>
 
-                    {/* Ensure icons are centered on mobile and justified on larger screens */}
-                    <ul className="flex gap-6 place-self-end justify-center">
+                    <ul className="flex gap-6 justify-center sm:justify-end mx-auto sm:mx-0">
                         {/*<li>*/}
                         {/*    <a*/}
                         {/*        href="https://www.facebook.com/comendcare/"*/}

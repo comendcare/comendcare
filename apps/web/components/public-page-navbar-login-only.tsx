@@ -4,12 +4,18 @@ import {
     motion,
     useScroll,
     useMotionValueEvent,
+    AnimatePresence,
 } from "framer-motion"
 import Link from "next/link"
 import React, {useRef, useState} from "react"
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {Button, buttonVariants} from "@/packages/components/ui/button";
+import Image from "next/image";
+import { X, Menu as MenuIcon } from "lucide-react"
+import logo from "@/public/logos/comend-full-logo.png"
+
+const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN
 
 interface NavbarProps {
     visible: boolean
@@ -59,10 +65,15 @@ const DesktopNav: React.FC<NavbarProps> = ({visible}) => {
                 minWidth: "800px"
             }}
             className={cn(
-                "self-start bg-transparent dark:bg-transparent items-end justify-end py-4 max-w-7xl mx-auto px-4 rounded-full relative z-[60] w-full",
+                "hidden lg:grid grid-cols-3 self-start bg-transparent dark:bg-transparent items-center justify-between py-4 max-w-7xl mx-auto px-4 rounded-full relative z-[60] w-full",
                 visible && "bg-white/80 dark:bg-neutral-950/80"
             )}
         >
+            <Link href={process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/` : `http://${rootDomain}/`}
+            >
+                <Image className="w-36 inline" src={logo} alt="Comend Logo"/>
+            </Link>
 
             {session &&
                 <div
@@ -119,13 +130,63 @@ const MobileNav: React.FC<NavbarProps> = ({visible}) => {
                     visible && "bg-white/80 dark:bg-neutral-950/80"
                 )}
             >
-                <Link
-                    href="signin"
-                    onClick={() => setOpen(false)}
-                    className={cn(buttonVariants({variant: "default"}), "block md:hidden w-full")}
-                >
-                    Login
-                </Link>
+                <div className="flex flex-row justify-between items-center w-full">
+                    <Link href={process.env.NEXT_PUBLIC_VERCEL_ENV
+                        ? `https://${rootDomain}/` : `http://${rootDomain}/`}
+                    >
+                        <Image
+                            className="w-24 inline"
+                            src={logo}
+                            alt="Comend Logo"
+                        />
+                    </Link>
+                    {open ? (
+                        <X
+                            className="text-black dark:text-white"
+                            onClick={() => setOpen(!open)}
+                        />
+                    ) : (
+                        <MenuIcon
+                            className="text-black dark:text-white"
+                            onClick={() => setOpen(!open)}
+                        />
+                    )}
+                </div>
+
+                <AnimatePresence>
+                    {open && (
+                        <motion.div
+                            initial={{opacity: 0}}
+                            animate={{opacity: 1}}
+                            exit={{opacity: 0}}
+                            className="flex rounded-lg absolute top-16 bg-white dark:bg-neutral-950 inset-x-0 z-50 flex-col items-start justify-start gap-4 w-full px-4 py-8"
+                        >
+                            {session &&
+                                <div
+                                    className="flex space-x-4 justify-end"
+                                >
+                                    <Button
+                                        className="w-fit text-base"
+                                        onClick={() => router.push("/login")}
+                                        variant="ghost"
+                                    >
+                                        Log in
+                                    </Button>
+
+                                    <Button
+                                        variant="cta"
+                                        className="w-fit"
+                                        asChild
+                                    >
+                                        <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                                            Sign up
+                                        </Link>
+                                    </Button>
+                                </div>
+                            }
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </motion.div>
         </>
     )
