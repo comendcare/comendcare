@@ -1561,9 +1561,13 @@ export const leaveOrganization = withOrganizationAuth(
             }
 
             // If owner, ensure not the last owner
-            if (currentMember.role === "owner") {
+            if (currentMember.role === "owner" || currentMember.role === "support") {
                 const ownerCount = await prisma.member.count({
-                    where: {organizationId: organization.id, role: "owner"},
+                    where: {
+                        organizationId: organization.id, role: {
+                            in: ["owner", "support"]
+                        }
+                    },
                 });
                 if (ownerCount <= 1) {
                     return {
@@ -1686,7 +1690,7 @@ export const updateMemberWithOwnerPermission = withOrganizationAuth(
 
             // Prevent demoting the last owner to member
             if (
-                targetMember.role === "owner" &&
+                targetMember.role === "owner" || targetMember.role === "support" &&
                 data.role === "member"
             ) {
                 const ownerCount = await prisma.member.count({
