@@ -61,18 +61,13 @@ export default function RoadmapsPage({ orgId, organization, roadmaps }: Props) {
                         Share
                     </Button>
                 </div>
-                {/* {roadmaps.length > 0 && ( */}
-                    <RoadmapsTable 
-                        roadmaps={roadmaps} 
-                        rowClickCallback={(roadmap) => {
-                            setIsLoading(true)
-                            router.push(`/app/research-plan/${roadmap.id}`)
-                        }}
-                    />
-                {/* )} */}
-                {/* {roadmaps.length === 0 && (
-                    <PrivateNoResearchPlansRow />
-                )} */}
+                <RoadmapsTable 
+                    roadmaps={roadmaps} 
+                    rowClickCallback={(roadmap) => {
+                        setIsLoading(true)
+                        router.push(`/app/research-plan/${roadmap.id}`)
+                    }}
+                />
             </div>
             
             <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>

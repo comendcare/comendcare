@@ -98,7 +98,9 @@ export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rf
                 <ul className="w-full flex flex-col flex-wrap gap-2 text-sm text-wrap break-words">
                     {rfp.budget && (
                         <li>
-                            <PropertyBadge icon={DollarSign}>
+                            <PropertyBadge 
+                                // icon={DollarSign}
+                            >
                                 <p><b>Budget: </b> ${formatMoney(rfp.budget)}</p>
                             </PropertyBadge>
                         </li>
@@ -106,7 +108,9 @@ export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rf
 
                     {Array.isArray(rfp.openTo) && rfp.openTo.length > 0 && (
                         <li>
-                            <PropertyBadge icon={School}>
+                            <PropertyBadge 
+                                // icon={School}
+                            >
                                 <b>Open to:</b>
                                 {rfp.openTo
                                     .map((option: string) => {
@@ -126,13 +130,21 @@ export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rf
 
                     {rfp.startDate && (
                         <li>
-                            <PropertyBadge icon={Calendar}><b>Opens: </b>{formatDateUTC(rfp.startDate)}</PropertyBadge>
+                            <PropertyBadge 
+                                // icon={Calendar}
+                            >
+                                <b>Opens: </b>{formatDateUTC(rfp.startDate)}
+                            </PropertyBadge>
                         </li>
                     )}
 
                     {rfp.endDate && (
                         <li>
-                            <PropertyBadge icon={Calendar}><b>Due: </b>{formatDateUTC(rfp.endDate)}</PropertyBadge>
+                            <PropertyBadge 
+                                // icon={Calendar}
+                            >
+                                <b>Due: </b>{formatDateUTC(rfp.endDate)}
+                            </PropertyBadge>
                         </li>
                     )}
                 </ul>
