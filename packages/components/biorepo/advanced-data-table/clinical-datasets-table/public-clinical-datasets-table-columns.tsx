@@ -177,7 +177,7 @@ export function useClinicalDatasetsTableColumns(
             </div>
         ),
         enableHiding,
-        enableSorting,
+        enableSorting: false,
         meta: {
             label: "Gene"
         }

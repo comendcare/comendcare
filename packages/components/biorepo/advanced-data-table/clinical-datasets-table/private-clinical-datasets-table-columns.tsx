@@ -184,6 +184,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         ),
         enableHiding: true,
         enableColumnFilter: true,
+        enableSorting: false,
         meta: {
             label: "Genes",
             variant: "select",
