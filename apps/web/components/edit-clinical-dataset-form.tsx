@@ -88,7 +88,8 @@ export function EditClincalDatasetForm({
             contacts: toolData?.contacts || undefined,
             milestones: (toolData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
 
-            genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
+            // genes: toolData?.gene ? [{label: toolData.gene.symbol, value: toolData.gene.symbol}] : [],
+            genes: (toolData?.genes || []).map((gene: any) => ({label: gene, value: gene})) || [],
             cohortSize: toolData?.cohortSize?.toString() || undefined,
             storageFacility: (toolData?.company || toolData?.institution) ? (
                 (toolData?.company ? ([{
@@ -402,7 +403,7 @@ export function EditClincalDatasetForm({
                         name="genes"
                         render={({field}) => (
                             <FormItem className="w-full flex gap-4 items-center">
-                                <FormLabel className="w-[100px]">Related gene</FormLabel>
+                                <FormLabel className="w-[100px]">Related genes</FormLabel>
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector

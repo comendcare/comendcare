@@ -318,6 +318,7 @@ model Tool {
   company                       Company?                             @relation(fields: [companyId], references: [id], onDelete: SetNull)
   institutionId                 String?
   institution                   Institution?                         @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  genes                         String[]
   geneId                        Int?
   gene                          Gene?                                @relation(fields: [geneId], references: [id])
   organizationId                String?
@@ -347,6 +348,7 @@ model DiseaseModel {
   company                       Company?                                     @relation(fields: [companyId], references: [id], onDelete: SetNull)
   institutionId                 String?
   institution                   Institution?                                 @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  genes                         String[]
   geneId                        Int?
   gene                          Gene?                                        @relation(fields: [geneId], references: [id])
   conditionId                   String?
@@ -372,6 +374,7 @@ model Biosample {
   types       String[] // values (BiosampleType ids)
   genotype    String?
 
+  genes               String[]
   gene                Gene?     @relation(fields: [geneId], references: [id])
   variant             String?
   availability        String?
