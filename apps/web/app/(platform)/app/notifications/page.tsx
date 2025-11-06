@@ -86,7 +86,7 @@ export default async function FeedPage() {
     })
     const first = await fetchFeedPage(
         {
-            orgId: session?.user.organizationId,
+            orgId: session?.user.organizationId || undefined,
             cursor: null,
             limit: 10
         }
