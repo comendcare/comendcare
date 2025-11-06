@@ -214,6 +214,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
             company: true,
             geneId: true,
             gene: true,
+            genes: true,
             organizationId: true,
             organization: true,
             materialAndDataAccessRequests: true
@@ -245,6 +246,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
             company: true,
             geneId: true,
             gene: true,
+            genes: true,
             conditionId: true,
             condition: true,
             organizationId: true,
@@ -278,6 +280,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
             company: true,
             geneId: true,
             gene: true,
+            genes: true,
             organizationId: true,
             organization: {include: {conditions: {include: {condition: true}}}},
             milestones: {include: {milestone: true}},

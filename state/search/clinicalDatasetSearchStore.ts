@@ -59,7 +59,7 @@ function generateFiltersString(filters: FiltersType): string {
     // genes
     if (filters?.genes && filters.genes.length > 0) {
         const geneFilter = filters.genes
-            .map(gene => `gene.symbol:=[${escapeValue(gene.value)}]`)
+            .map(gene => `genes:=${escapeValue(gene.value)}`)
             .join(" || ");
         filtersList.push(`(${geneFilter})`);
     }
@@ -112,7 +112,7 @@ const getUpdatedSearchResults = async (
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "title,description,gene.symbol,type.label,organization.conditions.condition.name,organization,institution.name",
+            query_by: "title,description,genes,type.label,organization.conditions.condition.name,organization,institution.name",
             per_page: state.resultsPerPage,
             page: state.page,
             ...(filtersString ? { filter_by: filtersString } : undefined),
