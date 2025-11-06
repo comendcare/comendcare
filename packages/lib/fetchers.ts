@@ -2500,6 +2500,7 @@ const fetchDiseaseModels = async (
                     contacts: true,
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
+                    // genes: true,
                     institution: true,
                     company: true,
                     milestones: {include: {milestone: true}},
@@ -2731,6 +2732,7 @@ const fetchBiosamples = async (
                     contacts: true,
                     attachments: true,
                     gene: true,
+                    // genes: true,
                     donor: {
                         include: {diagnoses: {include: {type: true}}}
                     },
@@ -3088,6 +3090,7 @@ const fetchClinicalDatsets = async (
                     institution: true,
                     company: true,
                     gene: true,
+                    // genes: true,
                     createFacilityRequests: true,
                 },
                 orderBy,
