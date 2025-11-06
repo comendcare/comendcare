@@ -163,6 +163,16 @@ const editRFPForm = z.object({
             message: "At least one contact is required.",
             path: ["contacts"]
         })
+    } else {
+        rfp.contacts.map(contact => {
+            if (!contact.email) {
+                ctx.addIssue({
+                    code: "custom",
+                    message: "All contacts require an email address.",
+                    path: ["contacts"]
+                })
+            }
+        })
     }
 })
 
