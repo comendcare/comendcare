@@ -103,6 +103,7 @@ const orgDeepInclude = {
             institution: true,
             company: true,
             gene: true,
+            genes: true,
         },
     },
     biosamples: {
@@ -118,6 +119,7 @@ const orgDeepInclude = {
                 },
             },
             gene: true,
+            genes: true,
         },
     },
     donors: {
@@ -134,6 +136,7 @@ const orgDeepInclude = {
             institution: true,
             company: true,
             gene: true,
+            genes: true,
             condition: true,
         },
     },

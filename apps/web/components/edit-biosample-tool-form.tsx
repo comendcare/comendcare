@@ -463,6 +463,7 @@ export function EditBiosampleToolForm({
                                             emptyIndicator={<p>No genes found.</p>}
                                             showHoverCard={false}
                                             className="-mt-2 w-full min-h-[40px]"
+                                            maxSelected={1}
                                         />
                                     </FormControl>
                                     <FormMessage/>
