@@ -6364,6 +6364,14 @@ export async function subscribeToOrganization(email: string, host?: string | nul
 
         if (!org) return { success: false, error: "Organization not found." };
 
+        const existing = await prisma.subscription.findFirst({
+            where: { organizationId: org.id, email: lower },
+            select: { id: true },
+        });
+        if (existing) {
+            return { success: false, error: "You're already subscribed to this organization." };
+        }
+
         const record = await prisma.subscription.create({
             data: {
                 organizationId: org.id,
@@ -6388,8 +6396,11 @@ export async function subscribeToOrganization(email: string, host?: string | nul
         });
 
         return { success: true, data: { id: record.id } };
-    } catch (err) {
+    } catch (err: any) {
         console.error("subscribePublic error", err);
+        if (err?.code === "P2002") {
+            return { success: false, error: "You're already subscribed to this organization." };
+        }
         return { success: false, error: "Database error. Please try again later." };
     }
 }
