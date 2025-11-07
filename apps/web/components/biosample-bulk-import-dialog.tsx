@@ -56,8 +56,8 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
                 // ? new Date(biosample['Collection Date'])
                   ? (() => {
                         const d = new Date(biosample["Collection Date"])
-                        // strip time, only store date (midnight, EST is stored as time in DB)
-                        return new Date(d.getFullYear(), d.getMonth(), d.getDate())
+                        // strip time, only store date. Store at midnight UTC - when displaying display in UTC
+                        return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
                     })()
                 : undefined,
         preservationMethod: SAMPLE_PRESERVATION_METHOD_OPTIONS.find(option => option.label === biosample['Preservation Method'])?.value,
