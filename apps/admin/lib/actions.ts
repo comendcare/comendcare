@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@comend/lib/prisma"
-import type {Company} from "@prisma/client"
+import type {Company, Organization} from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withAdminAuth} from "./auth"
 import {getSession} from "@/packages/lib/auth"
@@ -11,11 +11,118 @@ import { JsonValue } from "@prisma/client/runtime/library"
 import {writeRawEvent} from "@comend/lib/raw-events";
 import z from "zod"
 import { companyFormSchema, institutionFormSchema } from "./types"
+import { ApiResponse } from "@/packages/lib/types"
+import { validateEmailDomain } from "@/packages/lib/server-utils"
+import { sendInviteEmail } from "@/packages/lib/emails"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
     return session
 }
+
+// Invite user function with updated Organization model
+export const inviteUser = withAdminAuth(
+    async (
+        organization: Organization,
+        email: string,
+        role: string = "member",
+        ip: string,
+    ): Promise<ApiResponse<any>> => {
+        const session = await getSession();
+
+        try {
+            if (!session) {
+                throw new Error("You must be signed in to perform this action")
+            }
+
+            const lowerCaseEmail = email.toLowerCase()
+
+            const isDomainValid = await validateEmailDomain(lowerCaseEmail);
+            if (!isDomainValid) {
+                return {success: false, error: "Email domain is invalid or cannot receive emails."};
+            }
+
+            // Check if the user is already a member of the organization
+            const existingMember = await prisma.member.findFirst({
+                where: {
+                    email: lowerCaseEmail,
+                    // organizationId: organization.id
+                }
+            });
+
+            if (existingMember) {
+                return {success: false, error: "User is already a member of this organization."}
+            }
+
+            // Check if an invitation has already been sent to this email for the same organization
+            const existingInvitation = await prisma.invitation.findFirst({
+                where: {
+                    email: lowerCaseEmail,
+                    organizationId: organization.id
+                }
+            });
+
+            if (existingInvitation) {
+                return {success: false, error: "An invitation has already been sent to this email."}
+            }
+
+            const invitation = await prisma.invitation.create({
+                data: {
+                    email: lowerCaseEmail,
+                    role: role,
+                    organizationId: organization.id
+                }
+            }).then((res) => {
+                return res
+            })
+
+            // Upsert so that if it already is whitelisted, nothing changes, and if not, they are whitelisted
+            await prisma.whitelist.upsert({
+                where: {email: lowerCaseEmail},
+                update: {}, // No fields to update
+                create: {email: lowerCaseEmail},
+            });
+
+            const inviter = await prisma.user.findUnique({
+                where: {id: session?.user.id}
+            })
+
+            await sendInviteEmail(
+                {
+                    invitee: {
+                        name: "",
+                        email: email,
+                        image: ""
+                    },
+                    inviter: {
+                        name: inviter?.name || session?.user.name,
+                        email: inviter?.email || session?.user.email,
+                        image: inviter?.image || session?.user.image,
+                        organizationName: organization.name || undefined,
+                        organizationImage: organization.image || undefined,
+                        ip: ip,
+                    },
+                    inviteLink: `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
+                }
+            ).then(() => {
+                console.log("email sent")
+            })
+
+            if (!invitation) {
+                console.error("Error inviting user.")
+                return {success: false, error: "Database error. please try again later."}
+            }
+
+            revalidatePath("/app/team")
+            revalidatePath("/app/profile")
+
+            return {success: true, data: invitation}
+        } catch (error: any) {
+            console.error("Error inviting user:", error)
+            return {success: false, error: "Database error. please try again later."}
+        }
+    }
+)
 
 export const deleteFacilityCreateRequest = withAdminAuth(
     async (id: string) => {
