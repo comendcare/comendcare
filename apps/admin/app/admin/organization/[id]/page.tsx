@@ -80,9 +80,6 @@ export default async function AdminOrganizationPage({
                 <EditPAGProfileDialog organization={data} />
 
                 <DeleteOrganizationAlertDialog organization={data} />
-
-                <InviteUserToOrgDialog organization={data}/>
-
             </div>
             <OrganizationRoadmaps organizationId={decodeURIComponent(params.id)} />
         </>
