@@ -1,19 +1,21 @@
+"use client"
+
 import BlurImage from "@comend/components/blur-image"
-import { placeholderBlurhash, random } from "@comend/lib/utils"
+// import { placeholderBlurhash, random } from "@comend/lib/utils"
 import Placeholder from "@/public/placeholder.png"
 import type {Organization} from "@prisma/client"
 import {FolderKanban} from "lucide-react"
 import Link from "next/link"
-import prisma from "@comend/lib/prisma";
+// import prisma from "@comend/lib/prisma";
 
-export default async function OrganizationCard({ data }: { data: Organization }) {
+export function OrganizationCard({ data }: { data: Organization }) {
     const url = `${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
 
-    const projectCount = await prisma.milestone.count({
-        where: {
-            organizationId: data.id, // replace with the actual org ID
-        },
-    })
+    // const projectCount = await prisma.milestone.count({
+    //     where: {
+    //         organizationId: data.id, // replace with the actual org ID
+    //     },
+    // })
 
     return (
         <div className="relative rounded-lg border border-stone-200 pb-10 shadow-md transition-all hover:shadow-xl dark:border-stone-700 dark:hover:border-white">
@@ -28,7 +30,7 @@ export default async function OrganizationCard({ data }: { data: Organization })
                     className="h-44 object-cover"
                     src={data.image ?? Placeholder.src}
                     placeholder="blur"
-                    blurDataURL={data.imageBlurhash ?? placeholderBlurhash}
+                    blurDataURL={data.imageBlurhash ?? ''}
                 />
                 <div className="border-t border-stone-200 p-4 dark:border-stone-700">
                     <h3 className="my-0 truncate font-cal text-xl font-bold tracking-wide dark:text-white">
@@ -52,13 +54,13 @@ export default async function OrganizationCard({ data }: { data: Organization })
                 >
                     {url} ↗
                 </a>
-                <Link
+                {/* <Link
                     href={`/admin/organization/${data.id}/analytics`}
                     className="flex items-center rounded-md bg-green-100 px-2 py-1 text-sm font-medium text-green-600 transition-colors hover:bg-green-200 dark:bg-green-900 dark:bg-opacity-50 dark:text-green-400 dark:hover:bg-green-800 dark:hover:bg-opacity-50"
                 >
                     <FolderKanban height={16} />
                     <p>{projectCount}</p>
-                </Link>
+                </Link> */}
             </div>
         </div>
     )

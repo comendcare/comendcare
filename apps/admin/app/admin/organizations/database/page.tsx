@@ -4,8 +4,23 @@ import PlaceholderCard from "@comend/components/placeholder-card"
 import CreateOrganizationButton from "~admin/components/create-organization-button"
 import CreateOrganizationModal from "@comend/components/modal/create-organization"
 import {AdminOrganizationsNav} from "~admin/components/admin-organizations-nav";
+import { redirect } from "next/navigation"
+import { getSession } from "next-auth/react"
+import prisma from "@comend/lib/prisma"
 
-export default function AllOrganizations() {
+export default async function AllOrganizations() {
+    const session = await getSession()
+    // if (!session) {
+    //     redirect("/login")
+    // }
+
+    const organizations = await prisma.organization.findMany({
+        orderBy: {
+            createdAt: "desc"
+        },
+        // ...(limit ? { take: limit } : {})
+    })
+
     return (
         <div className="mx-auto flex max-w-screen-xl flex-col space-y-12 p-8">
             <div className="flex flex-col space-y-6">
@@ -18,7 +33,7 @@ export default function AllOrganizations() {
                         <CreateOrganizationModal />
                     </CreateOrganizationButton>
                 </div>
-                <Suspense
+                {/* <Suspense
                     fallback={
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                             {Array.from({ length: 8 }).map((_, i) => (
@@ -26,9 +41,9 @@ export default function AllOrganizations() {
                             ))}
                         </div>
                     }
-                >
-                    <Organizations />
-                </Suspense>
+                > */}
+                    <Organizations organizations={organizations}/>
+                {/* </Suspense> */}
             </div>
         </div>
     )
