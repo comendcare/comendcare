@@ -24,8 +24,10 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
     const res = await fetch(`/api/genes?search=${encodeURIComponent(biosample['Gene'] || "")}`);
     const foundGenes = await res.json();
 
-    const institutionsResponse = await fetch(`/api/institutions?search=${encodeURIComponent(biosample['Storage Facility'].trim() || '')}`)
+    const institutionsResponse = await fetch(`/api/institutions?search=${encodeURIComponent(biosample['Storage Facility']?.trim() || '')}`)
     const foundInstitutions = await institutionsResponse.json()
+
+    console.log(`found institution`, foundInstitutions)
 
     const data: z.infer<typeof editBiosampleForm> = {
         types: (() => {
@@ -44,7 +46,7 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
         variant: biosample['Variant'],
         availability: AVAILABILITY_OPTIONS.find(option => option.label === biosample['Availability'])?.value,
         quantity: biosample['Total Available Quantity (in ml)'],
-        quantityUnit: 'ml',
+        quantityUnit: QUANTITY_OPTIONS.find(option => option.label === biosample['Quantity Unit'])?.value || 'ml',
         sex: DONOR_SEX_OPTIONS.find(option => option.label === biosample['Sex'])?.value,
         description: biosample.Description,
         currentCountry: COUNTRY_OPTIONS.find(option => option.label === biosample['Current Location'])?.value,
@@ -106,6 +108,7 @@ export function BiosampleBulkImportDialog() {
                     [
                         {key: 'Type', required: false, defaultValue: undefined, isValid: (entry) => BIOSAMPLE_TYPE_OPTIONS.find(option => option.labal === entry.Type) !== undefined},
                         {key: 'Gene', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Storage Facility', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Diagnoses', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Variant', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Availability', required: false, defaultValue: undefined, isValid: (entry) => AVAILABILITY_OPTIONS.find(option => option.label === entry) !== undefined},
