@@ -123,7 +123,7 @@ export const PagProfileAboutCard = ({
                         <div className="flex flex-wrap justify-between items-baseline gap-x-2 gap-y-1">
                             <h4 className="scroll-m-20 text-base font-semibold">Members</h4>
                             {editable && (
-                                <Link href="/app/settings" className="font-normal text-base hover:underline" data-testid="members-view-all-link">
+                                <Link href="/app/team" className="font-normal text-base hover:underline" data-testid="members-view-all-link">
                                     View all
                                 </Link>
                             )}

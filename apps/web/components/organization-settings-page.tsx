@@ -75,7 +75,7 @@ export default function OrganizationSettingsPage({organization}: { organization:
         });
     };
 
-    const disabled = session?.user?.membership?.role !== "owner";
+    const disabled = !["owner", "support"].includes(session?.user?.membership?.role);
 
     return (
         <main className="flex flex-col items-start w-full h-full mx-auto p-8 space-y-8">

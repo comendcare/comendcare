@@ -834,7 +834,7 @@ export const updateOrganization = withOrganizationAuth(
             throw new Error(error.message || "Failed to update organization.");
         }
     },
-    ['owner']
+    ['owner', 'support']
 );
 
 export const deleteOrganization = withOrganizationAuth(
@@ -925,7 +925,7 @@ export const deleteOrganization = withOrganizationAuth(
 
         return {success: true, data: deletedOrg};
     },
-    ["owner"]
+    ["owner", 'support']
 );
 
 export const updateRoadmap = withOrganizationAuth(
@@ -1139,7 +1139,7 @@ export const deleteRoadmap = withOrganizationAuth(
             }
         }
     },
-    ['owner']
+    ['owner', 'support']
 )
 
 export const editUser = withAuth(
@@ -1285,7 +1285,7 @@ export const inviteUser = withOrganizationAuth(
             return {success: false, error: "Database error. please try again later."}
         }
     },
-    ['owner'] // this function is only available to owners of this organization
+    ['owner', 'support'] // this function is only available to owners of this organization
 )
 
 export const approveMemberRequestAndCreateMember = withOrganizationAuth(
@@ -1373,7 +1373,7 @@ export const approveMemberRequestAndCreateMember = withOrganizationAuth(
             throw new Error("Failed to add member to organization.");
         }
     },
-    ['owner']
+    ['owner', 'support']
 )
 
 export const deleteMemberRequest = withUserAuth(
@@ -1452,7 +1452,7 @@ export const denyMemberRequest = withOrganizationAuth(
             return {success: false, error: "Failed to delete member request."};
         }
     },
-    ['owner']
+    ['owner', 'support']
 )
 
 export const deleteInvitation = withOrganizationAuth(
@@ -1483,7 +1483,7 @@ export const deleteInvitation = withOrganizationAuth(
             return {success: false, error: "Failed to delete invitation."};
         }
     },
-    ['owner']
+    ['owner', 'support']
 )
 
 export const declineAndDeleteInvitation = withAuth(
@@ -1554,9 +1554,13 @@ export const leaveOrganization = withOrganizationAuth(
             }
 
             // If owner, ensure not the last owner
-            if (currentMember.role === "owner") {
+            if (currentMember.role === "owner" || currentMember.role === "support") {
                 const ownerCount = await prisma.member.count({
-                    where: {organizationId: organization.id, role: "owner"},
+                    where: {
+                        organizationId: organization.id, role: {
+                            in: ["owner", "support"]
+                        }
+                    },
                 });
                 if (ownerCount <= 1) {
                     return {
@@ -1679,7 +1683,7 @@ export const updateMemberWithOwnerPermission = withOrganizationAuth(
 
             // Prevent demoting the last owner to member
             if (
-                targetMember.role === "owner" &&
+                targetMember.role === "owner" || targetMember.role === "support" &&
                 data.role === "member"
             ) {
                 const ownerCount = await prisma.member.count({
@@ -1712,7 +1716,7 @@ export const updateMemberWithOwnerPermission = withOrganizationAuth(
             return {success: false, error: "Internal server error"};
         }
     },
-    ["owner"]
+    ["owner", 'support']
 );
 
 // Invite user function with updated Organization model
@@ -1768,7 +1772,7 @@ export const deleteMember = withOrganizationAuth(
             return {success: false, error: "Internal server error"};
         }
     },
-    ["owner"]
+    ["owner", 'support']
 );
 
 // Invite user function with updated Organization model
