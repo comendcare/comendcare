@@ -46,7 +46,7 @@ export const inviteUser = withAdminAuth(
             const existingMember = await prisma.member.findFirst({
                 where: {
                     email: lowerCaseEmail,
-                    // organizationId: organization.id
+                    organizationId: organization.id
                 }
             });
 

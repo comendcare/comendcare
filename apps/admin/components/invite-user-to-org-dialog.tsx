@@ -41,7 +41,7 @@ import { inviteUser } from "~admin/lib/actions";
 
 const invitationFormSchema = z.object({
     email: z.string().email({ message: "Please enter a valid email address." }),
-    role: z.enum(["member", "owner"], { message: "Role must be either Member or Owner." }),
+    role: z.enum(["member", "owner", "support"], { message: "Role must be either Support, Member, or Owner." }),
 });
 
 export default function InviteUserToOrgDialog({organization}: {organization: Organization}) {
@@ -139,6 +139,7 @@ export default function InviteUserToOrgDialog({organization}: {organization: Org
                                         <SelectContent>
                                             <SelectItem value="member">Member</SelectItem>
                                             <SelectItem value="owner">Owner</SelectItem>
+                                            <SelectItem value="support">Support</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
