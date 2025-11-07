@@ -2645,7 +2645,7 @@ export const createDiseaseModel = withOrganizationAuth(
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
                     ...(diseaseModelData.company 
                         ? ({company: {connect: {id: diseaseModelData.company.id}}}) // if company exists in database, connect
-                        : ({institution: undefined})), // if company does not exist in database, don't connect
+                        : ({company: undefined})), // if company does not exist in database, don't connect
                     attachments: {
                         createMany: {
                             data: (diseaseModelData?.attachments || []).map((attachment: any) => ({
@@ -2803,7 +2803,7 @@ export const createClinicalDataset = withOrganizationAuth(
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
                     ...(dataToolData.company 
                         ? ({company: {connect: {id: dataToolData.company.id}}}) // if company exists in database, connect
-                        : ({institution: undefined})), // if company does not exist in database, don't connect
+                        : ({company: undefined})), // if company does not exist in database, don't connect
                 }
             })
 
