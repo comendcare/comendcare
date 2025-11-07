@@ -4,16 +4,9 @@ import PlaceholderCard from "@comend/components/placeholder-card"
 import CreateOrganizationButton from "~admin/components/create-organization-button"
 import CreateOrganizationModal from "@comend/components/modal/create-organization"
 import {AdminOrganizationsNav} from "~admin/components/admin-organizations-nav";
-import { redirect } from "next/navigation"
-import { getSession } from "next-auth/react"
 import prisma from "@comend/lib/prisma"
 
 export default async function AllOrganizations() {
-    const session = await getSession()
-    if (!session) {
-        redirect("/login")
-    }
-
     const organizations = await prisma.organization.findMany({
         orderBy: {
             createdAt: "desc"

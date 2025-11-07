@@ -10,7 +10,7 @@ import {OrganizationCard} from "comend-pag-platform/components/organization-card
 import { debounce } from "lodash"
 import { useCallback, useMemo, useState } from "react"
 
-export default function Organizations({ organizations }: { organizations: Organization[] }) {
+export default function Organizations({ organizations, searchable = true }: { organizations: Organization[], searchable?: boolean }) {
     const [query, setQuery] = useState('')
     const [filteredOrganizations, setFilteredOrganizations] = useState(organizations)
 
@@ -29,16 +29,18 @@ export default function Organizations({ organizations }: { organizations: Organi
 
     return (organizations && organizations.length > 0) ? (
         <div className="flex flex-col gap-4">
-            <Input
-                type="text"
-                placeholder="Search..."
-                value={query}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    const search: string = e.target.value
-                    setQuery(search)
-                    debounceHandleInputChange(search)
-                }}
-            />
+            {searchable && (
+                <Input
+                    type="text"
+                    placeholder="Search..."
+                    value={query}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        const search: string = e.target.value
+                        setQuery(search)
+                        debounceHandleInputChange(search)
+                    }}
+                />
+            )}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {filteredOrganizations.map(organizations => (
                     <OrganizationCard key={organizations.id} data={organizations} />

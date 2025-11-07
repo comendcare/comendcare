@@ -41,7 +41,7 @@ export default async function Overview() {
                         </div>
                     }
                 >
-                    <Organizations organizations={organizations}/>
+                    <Organizations searchable={false} organizations={organizations}/>
                 </Suspense>
             </div>
 
