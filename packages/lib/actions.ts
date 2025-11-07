@@ -6330,3 +6330,66 @@ export async function switchOrganization(organizationId: string) {
 
     return {success: true};
 }
+
+export async function subscribeToOrganization(email: string, host?: string | null): Promise<ApiResponse<{ id: string }>> {
+    try {
+        const lower = email.trim().toLowerCase();
+        const isDomainValid = await validateEmailDomain(lower);
+
+        if (!isDomainValid) {
+            return {success: false, error: "Email domain is invalid or cannot receive emails."};
+        }
+
+        if (!host) return { success: false, error: "Missing host." };
+
+        // Try custom domain first
+        let org = await prisma.organization.findFirst({
+            where: { customDomain: host, public: true, published: true },
+            select: { id: true, subdomain: true },
+        });
+
+        // If not a custom domain, try subdomain.<ROOT_DOMAIN>
+        if (!org) {
+            const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN;
+            const isSubOnRoot = root && host.endsWith(`.${root}`);
+            const sub = isSubOnRoot ? host.slice(0, -(root.length + 1)) : null;
+
+            if (sub) {
+                org = await prisma.organization.findFirst({
+                    where: { subdomain: sub, public: true, published: true },
+                    select: { id: true, subdomain: true },
+                });
+            }
+        }
+
+        if (!org) return { success: false, error: "Organization not found." };
+
+        const record = await prisma.subscription.create({
+            data: {
+                organizationId: org.id,
+                email: lower,
+            },
+            select: { id: true },
+        });
+
+        await customerIOTrack({
+            userId: null, // public form, no session
+            event: "user_subscribed_to_organization",
+            timestamp: new Date(),
+            traits: {
+                email: lower,
+                organization_id: org.id,
+            },
+            properties: {
+                email: lower,
+                organizationId: org.id,
+                organizationHost: host,
+            },
+        });
+
+        return { success: true, data: { id: record.id } };
+    } catch (err) {
+        console.error("subscribePublic error", err);
+        return { success: false, error: "Database error. Please try again later." };
+    }
+}
