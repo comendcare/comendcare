@@ -125,7 +125,7 @@ export default function ResearcherProfile({researcherData}: any) {
                                     {/*    <Mail className="w-4 h-4 mr-2" />*/}
                                     {/*    Contact*/}
                                     {/*</Button>*/}
-                                    <EditResearcherProfileDialog/>
+                                    <EditResearcherProfileDialog researcher={researcherData.researcher}/>
                                 </div>
                             </div>
                         </div>
