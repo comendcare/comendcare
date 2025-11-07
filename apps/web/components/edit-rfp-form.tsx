@@ -53,6 +53,7 @@ import MoneyInput from "@comend/components/money-input"
 import ProjectMultipleSelector from "./project-multiple-selector"
 import { revalidate } from "@/packages/lib/revalidate"
 import { Separator } from "@/packages/components/ui/separator"
+import { Checkbox } from "@/packages/components/ui/checkbox"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -100,26 +101,80 @@ const editRFPForm = z.object({
         })
         .min(1, "Title is required")
         .max(200, "Title must be less than 200 characters"),
-    description: z.string().optional(),
+    description: z.string({
+        required_error: "Please provide a scope"
+    }).min(1, "Scope is required"),
     eligibility: z.string().optional(),
     instructions: z.string().optional(),
     evaluationProcess: z.string().optional(),
     attachments: z.array(z.custom<AttachmentType>()).optional(),
     isPrivate: z.boolean(),
+    // hack, contacts are actuall required, but in order to keep all error messages working we verify this later.
     contacts: z.array(z.custom<any>()).optional(),
-    openTo: z.array(z.string()).optional(),
+    openTo: z.array(z.string()).min(1, "At least one applicable party is required."),
     startDate: z.date().optional(),
     endDate: z.date().optional(),
     milestones: z.array(z.custom<Milestone>()).optional(),
     budget: z.number().max(2147483647).min(0).optional(),
     notes: z.string().optional(),
-}).refine(
-    (rfp) => rfp.startDate && rfp.endDate ? rfp.startDate?.getTime() <= rfp.endDate?.getTime() : true, 
-    {
-        message: "Error: Please adjust the dates so the acceptance date comes before the deadline.",
-        path: ["endDate"]
+    isRolling: z.boolean(),
+    fundingIsFlexible: z.boolean(),
+}).superRefine((rfp, ctx) => {
+    if (rfp.startDate && rfp.endDate) {
+        if (rfp.startDate?.getTime() >= rfp.endDate?.getTime()) {
+            ctx.addIssue({
+                code: "custom",
+                message: "Please adjust the dates so the acceptance date comes before the deadline.",
+                path: ["endDate"]
+            })
+        }
     }
-)
+
+    if (!rfp.fundingIsFlexible) {
+        if (!rfp.budget) {
+            ctx.addIssue({
+                code: "custom",
+                message: "A funding value is required.",
+                path: ["budget"]
+            })
+        }
+    }
+
+    if (!rfp.isRolling) {
+        if (!rfp.startDate) {
+            ctx.addIssue({
+                code: "custom",
+                message: "Start date is required for non-rolling RFPs.",
+                path: ["startDate"],
+            });
+        }
+        if (!rfp.endDate) {
+            ctx.addIssue({
+                code: "custom",
+                message: "End date is required for non-rolling RFPs.",
+                path: ["endDate"],
+            });
+        }
+    }
+
+    if (!rfp.contacts || rfp.contacts.length <= 0) {
+        ctx.addIssue({
+            code: "custom",
+            message: "At least one contact is required.",
+            path: ["contacts"]
+        })
+    } else {
+        rfp.contacts.map(contact => {
+            if (!contact.email) {
+                ctx.addIssue({
+                    code: "custom",
+                    message: "All contacts require an email address.",
+                    path: ["contacts"]
+                })
+            }
+        })
+    }
+})
 
 const rfpSelector = (state: RFPState) => ({
     createRFP: state.createRFP,
@@ -170,6 +225,8 @@ export function EditRFPForm({
             milestones: (rfpData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
             budget: rfpData?.budget || undefined,
             notes: rfpData?.notes || "",
+            isRolling: (rfpData?.id ? !rfpData?.startDate && !rfpData?.endDate : false) as boolean,
+            fundingIsFlexible: rfpData?.id ? !rfpData?.budget : false
         }
     })
 
@@ -185,6 +242,7 @@ export function EditRFPForm({
         endDate: form.watch("endDate"),
         milestones: form.watch("milestones"),
         budget: form.watch("budget"),
+        fundingIsFlexible: form.watch("fundingIsFlexible"),
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editRFPForm>) => {
@@ -204,7 +262,9 @@ export function EditRFPForm({
             endDate,
             milestones,
             budget,
-            notes
+            notes,
+            isRolling,
+            fundingIsFlexible
         } = values;
 
         const updateData: Partial<RFP> = {
@@ -225,10 +285,11 @@ export function EditRFPForm({
             ...(attachments ? {attachments} : undefined),
             ...(contacts ? {contacts} : undefined),
             ...(openTo ? {openTo} : undefined),
-            ...(startDate ? {startDate} : undefined),
-            ...(endDate ? {endDate} : undefined),
+            ...(startDate && !isRolling ? {startDate} : {startDate: null}),
+            ...(endDate && !isRolling ? {endDate} : {endDate: null}),
             ...(budget ? {budget} : undefined),
             ...(notes !== undefined && notes !== null ? {notes} : undefined),
+            ...(budget && !fundingIsFlexible ? {budget} : {budget: null}),
         }
 
         if (!session?.user?.organizationId) {
@@ -336,15 +397,6 @@ export function EditRFPForm({
                     moneyRaised: true,
                     moneyDeployed: true,
                     researchBudget: true,
-                    // address1                  String?
-                    // address2                  String?
-                    // formattedAddress          String?
-                    // city                      String?
-                    // region                    String?
-                    // postalCode                String?
-                    // country                   String?
-                    // lat                       String?
-                    // lng                       String?
                     createdAt: true,
                     updatedAt: true,
                     user: true,
@@ -381,71 +433,22 @@ export function EditRFPForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    useEffect(() => {
-        // Forces re-validation whenever startDate or endDate changes
-        if (!initializing.current) form.trigger()
-    }, [formData.startDate, formData.endDate])
+    // useEffect(() => {
+    //     // Forces re-validation whenever startDate or endDate changes
+    //     if (!initializing.current) form.trigger()
+    // }, [formData.startDate, formData.endDate])
 
     return (
         <Form {...form}>
-            {/* <FormField
-                control={form.control}
-                name="headerImage"
-                render={({field}) => (
-                    <div className="absolute top-0 w-full h-[80px] left-0 flex justify-end items-end absolute -top-px -left-px w-[calc(100%+4px)] bg-blue-light rounded-t-md">
-                        <img
-                            src={field.value}
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                                objectPosition: "center"
-                            }}
-                            className="absolute w-full rounded-t-md"
-                        />
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button className="relative bottom-0 right-0 hover:bg-transparent" variant="ghost">
-                                    <Pencil />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-32">
-                            <DropdownMenuRadioGroup value={field.value} onValueChange={(value) => form.setValue("headerImage", value, {shouldValidate: true})}>
-                                {
-                                    HEADER_IMAGE_OPTIONS.map(({label, path}, index) => (
-                                        <DropdownMenuRadioItem key={index} value={path} className="flex justify-between">
-                                            {label}
-                                            <img
-                                                src={path}
-                                                style={{
-                                                    width: "100%",
-                                                    height: "100%",
-                                                    objectFit: "cover",
-                                                    objectPosition: "start"
-                                                }}
-                                                className="h-4 w-4 rounded-full"
-                                            />
-                                        </DropdownMenuRadioItem>
-                                    ))
-                                }
-                            </DropdownMenuRadioGroup>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                )}
-            /> */}
-
-            <ScrollArea className={"max-h-[60vh] -mr-2 pr-3"} type={"always"}>
+            <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
                 <ScrollBar />
-                <div
-                    className="space-y-6 m-1 pb-12"
-                >
+                <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6 m-1 pb-12">
                     <FormField
                         control={form.control}
                         name="title"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>{`Title`}</FormLabel>
+                                <FormLabel>{`Title (required)`}</FormLabel>
                                 <FormControl>
                                     <Input
                                         id="title"
@@ -458,12 +461,91 @@ export function EditRFPForm({
                         )}
                     />
 
+                    <FormItem className="flex gap-4 items-center">
+                        <div className="grow">
+                            <FormLabel>{`Visibility`}</FormLabel>
+                            <FormDescription>
+                                {`Private RFPs will not be shown to people outside of your organization.`}
+                            </FormDescription>
+                        </div>
+                        <div className="w-[90px]">
+                            <PrivatePublicFormField 
+                                form={form} 
+                                formData={formData} 
+                            />
+                        </div>
+                    </FormItem>
+
+                    <ProposalTimelineInput form={form}/>
+
+                    <OpenToFormField form={form}/>
+
+                    <div className="flex flex-col gap-4 rounded-md border p-4">
+                        <FormLabel>{`Funding amount`}</FormLabel>
+                        <FormField
+                            control={form.control}
+                            name="fundingIsFlexible"
+                            render={({field}) => (
+                                <>
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={!field.value}
+                                            onCheckedChange={(checked: boolean) => {
+                                                field.onChange(!checked)
+                                            }}
+                                        />
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                        <FormLabel>
+                                            {`I have a set amount`}
+                                        </FormLabel>
+                                        <FormDescription>
+                                            {`If you have a fixed budget amount, select this option`}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+
+                                {!formData.fundingIsFlexible && (
+                                    <MoneyInput 
+                                        form={form}
+                                        className="-mt-2"
+                                        name="budget"
+                                        placeholder="Enter total funding for project..."
+                                    />
+                                )}
+
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                        <FormLabel>
+                                            {`Funding amount is flexible`}
+                                        </FormLabel>
+                                        <FormDescription>
+                                            {`If your funding is proposal dependent or you have not set a budget aside, select this option.`}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                                </>
+                            )}
+                        />
+                    </div>
+
+                    <ContactsFormField form={form} title={'Contacts (required)'}/>
+
                     <FormField
                         control={form.control}
                         name="description"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel >{`Scope`}</FormLabel>
+                                <FormLabel >{`Scope (required)`}</FormLabel>
                                 <FormControl>
                                     <Textarea
                                         id="scope"
@@ -530,22 +612,6 @@ export function EditRFPForm({
                         )}
                     />
 
-                    <FormItem className="flex gap-4 items-center">
-                        <div className="grow">
-                        <FormLabel>Visibility</FormLabel>
-                        <FormDescription>
-                            {`Private RFPs will not be shown to people outside of your organization.`}
-                        </FormDescription>
-                        </div>
-                        <div className="w-[90px]">
-                        <PrivatePublicFormField 
-                            form={form} 
-                            formData={formData} 
-                            // disabled={!orgIsPublished}
-                        />
-                        </div>
-                    </FormItem>
-
                     <FormField
                         control={form.control}
                         name="milestones"
@@ -558,20 +624,8 @@ export function EditRFPForm({
                                 <FormMessage className="text-primary"/>
                             </FormItem>
                         )}
-                    />
+                    />                  
 
-                    <OpenToFormField form={form}/>
-                    <FormItem className="w-full mt-2">
-                        <FormLabel>{`Award amount`}</FormLabel>
-                        <FormDescription>{`The total funding amount available for this research project award.`}</FormDescription>
-                        <MoneyInput 
-                            form={form}
-                            name="budget"
-                        />
-                    </FormItem>                    
-                    <ProposalTimelineInput form={form}/>
-
-                    <ContactsFormField form={form} />
                     <AttachmentsFormField form={form} />
 
                     <Separator />
@@ -605,142 +659,165 @@ export function EditRFPForm({
                             </FormItem>
                         )}
                     />
-                </div>
-            </ScrollArea>
 
-            <DialogFooter className="pt-1">
-                <DialogClose asChild>
-                    <Button 
-                        variant={"secondary"}
-                        onClick={() => {if (closeDialog) closeDialog()}}
-                    >
-                        Cancel
-                    </Button>
-                </DialogClose>
-                <Dialog>
-                    <DialogTrigger asChild className={cn(rfpData.id ? "" : "hidden")}>
-                        <Button type="button" variant="destructive">
-                            Delete RFP
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>
-                                Are you absolutely sure?
-                            </DialogTitle>
-                            <DialogDescription>
-                                {`This action cannot be undone. This will permanently delete your RFP and it's data.`}
-                            </DialogDescription>
-                            <DialogFooter>
-                                <DialogClose>
-                                    <Button type="button">
-                                        Cancel
-                                    </Button>
-                                </DialogClose>
-                                <DialogClose>
-                                    <Button
-                                        type="button"
-                                        variant={"destructive"}
-                                        onClick={handleDeleteRFP}
-                                    >
+                    <div className="absolute right-4 bottom-0 flex gap-2">
+                        <DialogClose asChild>
+                            <Button 
+                                variant={"secondary"}
+                                onClick={() => {if (closeDialog) closeDialog()}}
+                            >
+                                Cancel
+                            </Button>
+                        </DialogClose>
+                        {rfpData.id && (
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button type="button" variant="destructive">
                                         Delete RFP
                                     </Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogHeader>
-                    </DialogContent>
-                </Dialog>
-                <DialogClose disabled={!form.formState.isValid}>
-                    <div className="bg-white rounded-md p-0">
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>
+                                            Are you absolutely sure?
+                                        </DialogTitle>
+                                        <DialogDescription>
+                                            {`This action cannot be undone. This will permanently delete your RFP and it's data.`}
+                                        </DialogDescription>
+                                        <DialogFooter>
+                                            <DialogClose>
+                                                <Button type="button">
+                                                    Cancel
+                                                </Button>
+                                            </DialogClose>
+                                            <DialogClose>
+                                                <Button
+                                                    type="button"
+                                                    variant={"destructive"}
+                                                    onClick={handleDeleteRFP}
+                                                >
+                                                    Delete RFP
+                                                </Button>
+                                            </DialogClose>
+                                        </DialogFooter>
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
+                        )}
                         <Button
-                            disabled={!form.formState.isValid}
                             variant={"cta"}
-                            onClick={(e) => {
-                                e.preventDefault()
-                                handleFormSubmit(form.getValues())
-                                if (closeDialog) closeDialog()
-                            }}
+                            type="submit"
                         >
                             Save changes
                         </Button>
                     </div>
-                </DialogClose>
-            </DialogFooter>
+                </form>
+            </ScrollArea>
         </Form>
     )
 }
 
 const ProposalTimelineInput = ({form}: {form: any}) => {
-    return (
-        <>
-        <FormField
-            control={form.control}
-            name="startDate"
-            render={({field}) => (
-                <FormItem>
-                    <FormLabel>{`Request opens`}</FormLabel>
-                    <FormDescription>{`The date you'll begin accepting proposals.`}</FormDescription>
-                    <div>
-                        <Popover >
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant={"outline"}
-                                    className={cn(
-                                        "w-full justify-start text-left font-normal",
-                                        !field.value && "text-muted-foreground"
-                                    )}
-                                >
-                                <CalendarIcon className="mr-2" />
-                                {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-                                <Calendar
-                                    mode="single"
-                                    selected={field.value || new Date()}
-                                    onSelect={field.onChange}
-                                    initialFocus
-                                />
-                            </PopoverContent>
-                        </Popover>
-                    </div>
-                </FormItem>
-            )}
-        />
+    const isRolling = form.watch("isRolling")
 
-        <FormField
-            control={form.control}
-            name="endDate"
-            render={({field}) => (
-                <FormItem>
-                    <FormLabel>{`Deadline for proposals`}</FormLabel>
-                    <FormDescription>{`The last day you will be accepting proposals.`}</FormDescription>
-                    <Popover >
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant={"outline"}
-                                className={cn(
-                                    "w-full justify-start text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                )}
-                            >
-                            <CalendarIcon className="mr-2" />
-                            {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={field.value || new Date()}
-                                onSelect={field.onChange}
-                                initialFocus
+    return (
+        <div className="flex flex-col gap-4 rounded-md border p-4">
+            <FormLabel>{`Application timeline`}</FormLabel>
+            <FormField
+                control={form.control}
+                name="isRolling"
+                render={({field}) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                            <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
                             />
-                        </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                </FormItem>
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                            <FormLabel>
+                                {`Rolling RFP`}
+                            </FormLabel>
+                            <FormDescription>
+                                {`Rolling RFPs do not include any dates, and are always open.`}
+                            </FormDescription>
+                            <FormMessage />
+                        </div>
+                    </FormItem>
+                )}
+            />
+
+            {!isRolling && (
+                <div className="flex gap-2">
+                <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({field}) => (
+                        <FormItem className="w-full">
+                            <FormLabel>{`Request opens (required)`}</FormLabel>
+                            <div>
+                                <Popover >
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-full justify-start text-left font-normal",
+                                                !field.value && "text-muted-foreground"
+                                            )}
+                                        >
+                                        <CalendarIcon className="mr-2" />
+                                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                        <Calendar
+                                            mode="single"
+                                            selected={field.value || new Date()}
+                                            onSelect={field.onChange}
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="endDate"
+                    render={({field}) => (
+                        <FormItem className="w-full">
+                            <FormLabel>{`Deadline for proposals (required)`}</FormLabel>
+                            <Popover >
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal",
+                                            !field.value && "text-muted-foreground"
+                                        )}
+                                    >
+                                    <CalendarIcon className="mr-2" />
+                                    {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                    <Calendar
+                                        mode="single"
+                                        selected={field.value || new Date()}
+                                        onSelect={field.onChange}
+                                        initialFocus
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                </div>
             )}
-        />
-        </>
+        </div>
     )
 }

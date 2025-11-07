@@ -9,7 +9,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@comend/components/ui/dialog";
-import {Calendar, DollarSign, FileText, Link as LinkIcon, School, User, Clock, ChevronDown, ChevronRight, Mail, Workflow} from "lucide-react";
+import {Calendar, DollarSign, FileText, Link as LinkIcon, School, User, Clock, ChevronDown, ChevronRight, Mail, Workflow, ExternalLink} from "lucide-react";
 import Link from "next/link";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {PropertyBadge} from "./property-badge";
@@ -17,7 +17,7 @@ import {checkDateRangeUTC, cn, formatDateUTC, formatMoney, RFPSort} from "@comen
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {useSearchParams} from "next/navigation";
 import {NoRFPs} from "./no-rfps";
-import {RFPCard} from "./rfp-card";
+import {RFPCard, RFPStatusBadge} from "./rfp-card";
 import {
     Carousel,
     CarouselContent,
@@ -121,7 +121,9 @@ export const AssetDetails = ({tool}: { tool: any }) => {
                 {(tool.milestones || []).map((milestone: any, index: number) => {
                     return (
                         <li key={index}>
-                            <PropertyBadge icon={FileText}>
+                            <PropertyBadge 
+                                // icon={FileText}
+                            >
                                 <p className="text-wrap break-words">{milestone.milestone.title}</p>
                             </PropertyBadge>
                         </li>
@@ -131,7 +133,9 @@ export const AssetDetails = ({tool}: { tool: any }) => {
                 {(tool.contacts || []).map((contact: any, index: number) => {
                     return (
                         <li key={index}>
-                            <PropertyBadge icon={User}>
+                            <PropertyBadge 
+                                // icon={User}
+                            >
                                 <p className="text-wrap break-words">
                                     {[contact.name, contact.email, contact.affiliation].filter(x => x).join(` \u2022 `)}
                                 </p>
@@ -143,7 +147,9 @@ export const AssetDetails = ({tool}: { tool: any }) => {
                 {(tool.attachments || []).map((attachment: any, index: number) => {
                     return (
                         <li key={index}>
-                            <PropertyBadge icon={LinkIcon}>
+                            <PropertyBadge 
+                                // icon={LinkIcon}
+                            >
                                 <Link
                                     target="_blank"
                                     className="text-wrap break-words underline"
@@ -164,37 +170,32 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
     const status = useMemo(() => checkDateRangeUTC(rfp.startDate, rfp.endDate), [rfp.startDate, rfp.endDate]);
 
     return (
-        <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
+        <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 mt-2"} type={"always"}>
             <Scrollbar />
             <DialogHeader>
-                <DialogTitle className="text-2xl font-semibold flex gap-2 items-center">
-                    {rfp.title}
-                    {status && (
-                        <Badge variant={status.variant as any} className="text-sm">
-                            {status.label}
-                        </Badge>
+                <div className="flex gap-2 justify-center items-center flex-wrap">
+                    <DialogTitle className="text-2xl font-semibold">{rfp.title}</DialogTitle>
+                    {(rfp?.contacts && rfp?.contacts?.length > 0) && (
+                        <Button 
+                            variant="cta"
+                            className="ml-auto font-normal"
+                            asChild
+                        >
+                            <Link href={`mailto:${rfp.contacts[0].email}`}>
+                                <Mail className="h-4 w-4 min-h-4 min-w-4"/>
+                                Contact
+                            </Link>
+                        </Button>
                     )}
-                </DialogTitle>
+                </div>
             </DialogHeader>
             <div className="flex flex-col gap-4 pt-4 ">
-                {status?.daysRemaining !== undefined && (
-                    <Badge variant={"green"} className="w-full font-normal flex gap-2">
-                        <Clock size={18}/>
-                        {`${status.daysRemaining} days remaining to submit proposals`}
-                    </Badge>
-                )}
+                <RFPStatusBadge status={status} />
+                
                 <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
-                    {rfp.budget && (
-                        <li>
-                            <PropertyBadge icon={DollarSign}>
-                                <p><b>Budget: </b> ${formatMoney(rfp.budget)}</p>
-                            </PropertyBadge>
-                        </li>
-                    )}
-
                     {Array.isArray(rfp.openTo) && rfp.openTo.length > 0 && (
                         <li>
-                            <PropertyBadge icon={School}>
+                            <PropertyBadge>
                                 <b>Open to:</b>
                                 {rfp.openTo
                                     .map((option: string) => {
@@ -212,24 +213,36 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                         </li>
                     )}
 
+                    {rfp.budget && (
+                        <li>
+                            <PropertyBadge>
+                                <p><b>Budget: </b> ${formatMoney(rfp.budget)}</p>
+                            </PropertyBadge>
+                        </li>
+                    )}
+
                     {rfp.startDate && (
                         <li>
-                            <PropertyBadge icon={Calendar}><b>Opens: </b>{formatDateUTC(rfp.startDate)}</PropertyBadge>
+                            <PropertyBadge>
+                                <b>Opens: </b>{formatDateUTC(rfp.startDate)}
+                            </PropertyBadge>
                         </li>
                     )}
 
                     {rfp.endDate && (
                         <li>
-                            <PropertyBadge icon={Calendar}><b>Due: </b>{formatDateUTC(rfp.endDate)}</PropertyBadge>
+                            <PropertyBadge>
+                                <b>Due: </b>{formatDateUTC(rfp.endDate)}
+                            </PropertyBadge>
                         </li>
                     )}
                 </ul>
 
                 {(rfp.milestones && rfp.milestones.length > 0) && (
-                    <div className="border-l-4 border-purple-200 pl-4 space-y-2">
+                    <div className="border-l-2 border-purple-200 pl-2 space-y-2">
                         <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
                             <Workflow className="h-4 w-4 min-w-4 text-purple-900" />
-                            <span className="text-purple-900 text-nowrap">Linked projects</span>
+                            <span className="text-purple-900 text-nowrap">Projects</span>
                         </div>
                         <div className="flex flex-wrap gap-2">
                             {rfp.milestones.map((project: any) => (
@@ -292,7 +305,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
 
                 {rfp.contacts && rfp.contacts.length > 0 && (
                     <div className="flex flex-col gap-2 w-full">
-                        <h3 className="text-lg font-semibold">Primary Contacts</h3>
+                        <h3 className="text-lg font-semibold">Contacts</h3>
                         {rfp?.contacts?.map((contact: ExternalContact) => (
                             <span className="flex items-center gap-2 text-wrap w-full text-sm">
                                 <Mail className="mt-1 h-4 w-4 min-h-4 min-w-4"/>
@@ -314,7 +327,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
 
                 {rfp.attachments && rfp.attachments.length > 0 && (
                     <div className="flex flex-col gap-2 w-full">
-                        <h3 className="text-lg font-semibold">Primary Attachments</h3>
+                        <h3 className="text-lg font-semibold">Attachments</h3>
                         {rfp?.attachments?.map((attachment: ExternalAttachment) => (
                             <span className="flex items-start gap-2 text-wrap w-full text-sm">
                                 <LinkIcon className="mt-1 h-4 w-4 min-h-4 min-w-4"/>

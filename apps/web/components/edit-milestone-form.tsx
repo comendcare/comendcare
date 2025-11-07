@@ -549,9 +549,12 @@ export function EditMilestoneForm({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    // useEffect(() => {
-    //     if (tab === "recommendations") setRecommendationsViewed(true)
-    // }, [tab])
+    useEffect(() => {
+        // handle updating any properties that can be edited externally (outside this form)
+        if (milestoneData.private !== form.getValues("isPrivate")) {
+            form.setValue("isPrivate", milestoneData.private)
+        }
+    }, [milestoneData])
 
     // Watch form changes, don't watch while initializing
     useEffect(() => {
@@ -563,13 +566,6 @@ export function EditMilestoneForm({
         // Forces re-validation whenever the startDate or endDate changes
         if (!initializing.current) form.trigger()
     }, [formData.startDate, formData.endDate])
-
-    // // handle onborda steps
-    // useEffect(() => {
-    //     if (step === ".onborda-recommendations" && isOnbordaVisible) {
-    //         setTab("recommendations")
-    //     }
-    // }, [step])
 
     return (
         <>
@@ -1445,71 +1441,12 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
 export const PrivatePublicFormField = ({
                                            form,
                                            formData,
-                                           //    disabled = false,
                                            mixpanelTrackCallback
                                        }: {
     form: any,
     formData: any,
-    // disabled?: boolean,
     mixpanelTrackCallback?: (isPrivate: boolean) => void
 }) => {
-    // if (disabled) {
-    //     return (
-    //         <FormField
-    //             control={form.control}
-    //             name="isPrivate"
-    //             render={({field}) => (
-    //                 <div className="h-full items-center flex flex-row justify-end gap-4">
-    //                     <FormControl>
-    //                         <Tooltip>
-    //                             <TooltipTrigger>
-    //                                 <RadioGroup
-    //                                     onValueChange={(value) => {
-    //                                         if (mixpanelTrackCallback) mixpanelTrackCallback(value === "PRIVATE")
-    //                                         form.setValue("isPrivate", value === "PRIVATE", {shouldValidate: true})
-    //                                     }}
-    //                                     defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
-    //                                     className={cn("flex flex-wrap space-y-0", disabled ? "opacity-50" : "")}
-    //                                     disabled={disabled}
-    //                                 >
-    //                                     <FormItem className="flex items-center space-y-0">
-    //                                         <FormControl>
-    //                                         <span className="flex gap-2">
-    //                                             <RadioGroupItem value="PRIVATE"/>
-    //                                                 <FormLabel className="font-normal flex gap-1 items-center">
-    //                                                     <Lock className="h-4 w-4"/>
-    //                                                     {`Private`}
-    //                                                 </FormLabel>
-    //                                         </span>
-    //                                         </FormControl>
-    //                                     </FormItem>
-    //                                     <FormItem className="flex items-center space-y-0">
-    //                                         <FormControl>
-    //                                         <span className="flex gap-2">
-    //                                             <RadioGroupItem value="PUBLIC"/>
-    //                                             <FormLabel className="font-normal flex gap-1 items-center">
-    //                                                 <Globe className="h-4 w-4"/>
-    //                                                 {`Published`}
-    //                                             </FormLabel>
-    //                                         </span>
-    //                                         </FormControl>
-    //                                     </FormItem>
-    //                                 </RadioGroup>
-    //                             </TooltipTrigger>
-    //                             {disabled && (
-    //                                 <TooltipContent className="max-w-80 text-wrap text-left">
-    //                                     {`Publish your organization to create public projects.`}
-    //                                 </TooltipContent>
-    //                             )}
-    //                         </Tooltip>
-    //                     </FormControl>
-    //                     <FormMessage/>
-    //                 </div>
-    //             )}
-    //         />
-    //     )
-    // }
-
     return (
         <FormField
             control={form.control}
@@ -1522,32 +1459,20 @@ export const PrivatePublicFormField = ({
                                 if (mixpanelTrackCallback) mixpanelTrackCallback(value === "PRIVATE")
                                 form.setValue("isPrivate", value === "PRIVATE")
                             }}
-                            defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
+                            value={field.value ? "PRIVATE" : "PUBLIC"}
                             className={cn("flex flex-wrap space-y-0")}
-                            // className={cn("flex flex-wrap space-y-0", disabled ? "opacity-50" : "")}
-                            // disabled={disabled}
                         >
                             <FormItem className="flex items-center space-y-0">
                                 <FormControl>
                                     <span className="flex gap-2">
                                         <RadioGroupItem value="PRIVATE"/>
-                                        <Tooltip
-                                            // disableHoverableContent={disabled}
-                                        >
-                                            <TooltipTrigger
-                                                // disabled={disabled} 
-                                                asChild
-                                            >
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
                                                 <FormLabel className="font-normal flex gap-1 items-center">
                                                     <Lock className="h-4 w-4"/>
                                                     {`Private`}
                                                 </FormLabel>
                                             </TooltipTrigger>
-                                            {/* {!disabled && (
-                                                <TooltipContent className="max-w-80 text-wrap text-left">
-                                                    {`Private projects are only visible to your team.`}
-                                                </TooltipContent>
-                                            )} */}
                                         </Tooltip>
                                     </span>
                                 </FormControl>
@@ -1556,23 +1481,13 @@ export const PrivatePublicFormField = ({
                                 <FormControl>
                                     <span className="flex gap-2">
                                         <RadioGroupItem value="PUBLIC"/>
-                                        <Tooltip
-                                            // disableHoverableContent={disabled}
-                                        >
-                                        <TooltipTrigger
-                                            // disabled={disabled} 
-                                            asChild
-                                        >
+                                        <Tooltip>
+                                        <TooltipTrigger asChild>
                                             <FormLabel className="font-normal flex gap-1 items-center">
                                                 <Globe className="h-4 w-4"/>
                                                 {`Published`}
                                             </FormLabel>
                                         </TooltipTrigger>
-                                            {/* {!disabled && (
-                                                <TooltipContent className="max-w-80 text-wrap text-left">
-                                                    {`Published projects are visible on your profile and discoverable in the marketplace.`}
-                                                </TooltipContent>
-                                            )} */}
                                     </Tooltip>
                                     </span>
                                 </FormControl>
@@ -1795,7 +1710,7 @@ export const OpenToFormField = ({form}: { form: any }) => {
             name="openTo"
             render={({field}) => (
                 <FormItem>
-                    <FormLabel>{`Open to`}</FormLabel>
+                    <FormLabel>{`Open to (required)`}</FormLabel>
                     <FormDescription>{`Specify which parties you wish to source proposals from.`}</FormDescription>
                     <FormControl>
                         <ToggleGroup
@@ -1885,7 +1800,7 @@ export function AttachmentsFormField({form}: { form: UseFormReturn<any> }) {
     )
 }
 
-export const ContactsFormField = ({form}: { form: any }) => {
+export const ContactsFormField = ({form, title}: { form: any, title?: string }) => {
     return (
         <FormField
             control={form.control}
@@ -1894,8 +1809,9 @@ export const ContactsFormField = ({form}: { form: any }) => {
                 <FormItem>
                     <div className="flex flex-row justify-between gap-2 items-center">
                         <div className="flex flex-col">
-                            <FormLabel>{`Contacts`}</FormLabel>
+                            <FormLabel>{title || `Contacts`}</FormLabel>
                             <FormDescription>{`Add any external contacts that are not on the Comend platform.`}</FormDescription>
+                            <FormMessage />
                         </div>
                         <Button
                             variant="secondary"
@@ -1935,7 +1851,6 @@ export const ContactsFormField = ({form}: { form: any }) => {
                             ))}
                         </ol>
                     )}
-
                 </FormItem>
             )}
         />

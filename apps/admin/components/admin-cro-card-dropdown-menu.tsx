@@ -22,7 +22,7 @@ import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { CompanyWithReviewsAndServices } from "@comend/lib/types";
+import { BIOSAMPLE_TYPE_OPTIONS, CompanyWithReviewsAndServices, DISEASE_MODEL_TYPE_OPTIONS } from "@comend/lib/types";
 import { Ellipsis, Pencil, Trash } from "lucide-react";
 import { Input } from "@comend/components/ui/input";
 import { Textarea } from "@comend/components/ui/textarea";
@@ -33,8 +33,9 @@ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, Form
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {BUSINESS_TYPES, CRO_CERTIFICATIONS, CRO_TAGS} from "@comend/lib/types";
 import React from "react";
-import {optionSchema} from "@comend/lib/types"
+import {optionSchema, Option} from "@comend/lib/types"
 import { deleteCompany, updateCompany } from "~admin/lib/actions";
+import { companyFormSchema } from "~admin/lib/types";
 
 const formSchema = z.object({
     name: z.string().min(1),
@@ -59,8 +60,8 @@ const handleAsyncSearch = async (query: string) => {
 
 export default function AdminCROCardDropdownMenu({ cro }: { cro: CompanyWithReviewsAndServices }) {
     const router = useRouter();
-    const form = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
+    const form = useForm<z.infer<typeof companyFormSchema>>({
+        resolver: zodResolver(companyFormSchema),
         defaultValues: {
             name: cro.title,
             description: cro.description || "",
@@ -80,8 +81,37 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: CompanyWithRevi
                 label: s.name,
                 value: s.id,
             })) || [],
+            tools: (cro.biosamples || cro.diseaseModel || cro.tool) 
+                ? ((cro.biosamples || []).map(biosample => ({
+                        value: biosample.id,
+                        type: 'Biosamples',
+                        icon: 'test-tube-diagonal',
+                        // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
+                        label: `${biosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter((option: Option) => biosample.types?.includes(option.value)))?.map((option: Option) => option?.label)?.join(', ')}`,
+                        biosample: biosample
+                    } as Option))).concat((cro.diseaseModel || []).map(diseaseModel => ({
+                        value: diseaseModel.id,
+                        label: `${diseaseModel.id} - ${(DISEASE_MODEL_TYPE_OPTIONS.filter((option: Option) => diseaseModel.types?.includes(option.value)))?.map((option: Option) => option?.label)?.join(', ')}`,
+                        icon: 'rat',
+                        type: 'Disease Models',
+                        diseaseModel: diseaseModel
+                    } as Option))).concat((cro.tool || []).map(clinicalDataset => ({
+                        value: clinicalDataset.id,
+                        label: `${clinicalDataset.id} - ${clinicalDataset.title}`,
+                        icon: 'database',
+                        type: 'Clinical Datasets',
+                        datasample: clinicalDataset,
+                    } as Option)))
+                : [] as Option[]
         },
     });
+
+    const handleToolAsyncSearch = async (query: string): Promise<Option[]> => {
+        const toolsResponse = await fetch(`/api/tools?search=${query}`)
+        const toolsData = await toolsResponse.json()
+
+        return toolsData
+    }
 
     const handleDeleteCompany = async () => {
         try {
@@ -101,27 +131,8 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: CompanyWithRevi
         }
     };
 
-    const handleUpdateCompany = async (values: FormValues) => {
-        const formData = new FormData();
-        formData.set("orgName", values.name);
-        formData.set("description", values.description);
-        formData.set("website", values.website);
-        formData.set("founded", values.yearFounded || "");
-        formData.set("headquarters", values.headquarters || "");
-        formData.set("type", values.type || "");
-
-        const mappedData: Record<string, any> = {
-            certifications: values.certifications?.map(i => i.label) || [],
-            tags: values.tags?.map(i => i.label) || [],
-            // ✅ send the selected service IDs (or names, depending on your API)
-            services: values.services?.map(i => i.value) || [],
-        };
-
-        Object.entries(mappedData).forEach(([key, value]) => {
-            formData.append(key, Array.isArray(value) ? JSON.stringify(value) : String(value));
-        });
-
-        const response = await updateCompany(cro.id, formData);
+    const handleUpdateCompany = async (values: z.infer<typeof companyFormSchema>) => {
+        const response = await updateCompany(cro.id, values);
         if (response.success) {
             toast.success("Company updated successfully");
             router.refresh();
@@ -343,6 +354,33 @@ export default function AdminCROCardDropdownMenu({ cro }: { cro: CompanyWithRevi
                                         />
                                     </FormControl>
                                     <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="tools"
+                            render={({field}) => (
+                                <FormItem className="w-full">
+                                    <FormLabel>{`Linked Tools`}</FormLabel>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            onSearch={handleToolAsyncSearch}
+                                            hidePlaceholderWhenSelected={true}
+                                            showHoverCard={false}
+                                            placeholder="Search..."
+                                            badgeClassName="border-transparent bg-green-100 text-green-900"
+                                            emptyIndicator={
+                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                    no results found.
+                                                </p>
+                                            }
+                                            groupBy={'type'}
+                                        />
+                                    </FormControl>
+                                    <FormMessage className="text-primary"/>
                                 </FormItem>
                             )}
                         />

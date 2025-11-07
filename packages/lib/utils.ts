@@ -21,8 +21,9 @@ import type { RFP } from "@prisma/client";
 
 const STATUS_PRIORITY = {
   'OPEN': 1,
-  'COMINGSOON': 2,
-  'CLOSED': 3,
+  'ROLLING': 2,
+  'COMINGSOON': 3,
+  'CLOSED': 4,
 }
 
 export function getSortRank(rfp: RFP) {
@@ -40,6 +41,10 @@ export function getSortRank(rfp: RFP) {
         return base
     }
 
+    if (status.status === 'ROLLING') {
+        return base
+    }
+
     if (status.status === 'COMINGSOON' && rfp.startDate) {
         // ascending by start_date
         return base + rfp.startDate.getTime()
@@ -53,8 +58,9 @@ export function getSortRank(rfp: RFP) {
     return 0
 }
 
-type DateStatus =
+export type DateStatus =
     | { status: "COMINGSOON"; label: "Coming soon"; daysRemaining: number | undefined; variant: "yellow" }
+    | { status: "ROLLING"; label: "Rolling"; daysRemaining: number | undefined; variant: "orange" }
     | { status: "OPEN"; label: "Open"; daysRemaining: number | undefined; variant: "green" }
     | { status: "CLOSED"; label: "Closed"; daysRemaining: number | undefined; variant: "red" }
     | undefined;
@@ -64,7 +70,7 @@ function toUTCDateOnly(d: Date) {
 }
 
 export function checkDateRangeUTC(startDateStr?: string | Date, endDateStr?: string | Date): DateStatus {
-    if (!startDateStr && !endDateStr) return undefined;
+    if (!startDateStr && !endDateStr) return { status: "ROLLING", label: "Rolling", daysRemaining: undefined, variant: "orange" }
 
     const todayUTC = toUTCDateOnly(new Date());
     const startRaw = startDateStr ? new Date(startDateStr) : undefined;
@@ -75,8 +81,14 @@ export function checkDateRangeUTC(startDateStr?: string | Date, endDateStr?: str
     const start = startRaw ? toUTCDateOnly(startRaw) : undefined;
     const end = endRaw ? toUTCDateOnly(endRaw) : undefined;
 
-    if (start && todayUTC < start) return {status: "COMINGSOON", label: "Coming soon", daysRemaining: undefined, variant: "yellow"};
-    if (end && todayUTC > end) return {status: "CLOSED", label: "Closed", daysRemaining: undefined, variant: "red"};
+    if (start && todayUTC < start) {
+        const daysRemaining = start ? Math.ceil((start.getTime() - todayUTC.getTime()) / 86400000) : 0;
+        return {status: "COMINGSOON", label: "Coming soon", daysRemaining: daysRemaining, variant: "yellow"};
+    }
+    if (end && todayUTC > end) {
+        const daysRemaining = end ? Math.ceil((todayUTC.getTime() - end.getTime()) / 86400000) : 0;
+        return {status: "CLOSED", label: "Closed", daysRemaining: daysRemaining, variant: "red"};
+    }
 
     if ((!start || todayUTC >= start) && (!end || todayUTC <= end)) {
         const daysRemaining = end ? Math.ceil((end.getTime() - todayUTC.getTime()) / 86400000) : 0;
@@ -90,8 +102,10 @@ export const RFPSort = (rfps: RFP[]) => {
 
     // sort RFPs - 
     //      open (due earliest -> due latest, undefined at end) > 
+    //      rolling (no dates, use given order) >
     //      upcoming (starting earliest -> starting latest) > 
     //      closed (due latest -> due earliest)
+    const isRolling = (rfp: RFP) => !rfp.startDate && !rfp.endDate
     const isOpen = (rfp: RFP) => rfp.startDate && rfp.startDate <= now && (rfp.endDate ? rfp.endDate >= now : true)
     const isUpcoming = (rfp: RFP) => rfp.startDate && rfp.startDate > now
     const isClosed = (rfp: RFP) => rfp.endDate && rfp.endDate < now
@@ -100,6 +114,7 @@ export const RFPSort = (rfps: RFP[]) => {
         if (a.endDate && b.endDate) return a.endDate.getTime() - b.endDate.getTime()
         return 1
     })
+    const rollingRFPs = rfps.filter(rfp => isRolling(rfp))
     const upcomingRFPs = rfps.filter(rfp => isUpcoming(rfp)).sort((a: RFP, b: RFP) => {
         if (a.startDate && b.startDate) return a.startDate.getTime() - b.startDate.getTime()
         return 1
@@ -108,10 +123,11 @@ export const RFPSort = (rfps: RFP[]) => {
         if (a.endDate && b.endDate) return a.endDate.getTime() - b.endDate.getTime()
         return 1
     })
-    const otherRFPs = rfps.filter(rfp => !isOpen(rfp) && !isUpcoming(rfp) && !isClosed(rfp))
+    const otherRFPs = rfps.filter(rfp => !isOpen(rfp) && !isRolling(rfp) && !isUpcoming(rfp) && !isClosed(rfp))
 
     return ([
         ...openRFPs,
+        ...rollingRFPs,
         ...upcomingRFPs,
         ...closedRFPs,
         ...otherRFPs

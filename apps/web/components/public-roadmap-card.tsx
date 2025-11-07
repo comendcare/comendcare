@@ -7,7 +7,7 @@ import {PublicFlowView} from "./public-flow";
 import {PublicTimelineView} from "./public-timeline";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import {Button} from "@comend/components/ui/button";
-import {ChevronsUpDown, Pencil, Plus, Variable} from "lucide-react";
+import {ChevronsUpDown, FileText, Megaphone, Microscope, Pencil, Plus, Variable} from "lucide-react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@comend/components/ui/table";
 import {Milestone, milestoneCategories, MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap} from "@comend/lib/types";
 import {Badge} from "@comend/components/ui/badge";
@@ -16,6 +16,7 @@ import {PrivateNoResearchPlansColumn, PrivateNoResearchPlansRow, PublicNoResearc
 import {NoProjects} from "./no-projects";
 import {FunctionComponent, ReactElement, useState} from "react";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/packages/components/ui/tooltip";
+import { PropertyBadge } from "./property-badge";
 
 export const RoadmapsCard = ({
                                  roadmaps,
@@ -175,7 +176,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
     const MODALITY_OPTIONS = RESEARCH_PLAN_TYPES.map(type => type.value)
     const otherRoadmaps = roadmaps.filter(roadmap => (
         roadmap.modalities.filter((modality: string) => MODALITY_OPTIONS.includes(modality)).length <= 0 ||
-        roadmap.modalities.includes("OTHER").length > 0
+        roadmap.modalities.includes("OTHER")
     ))
 
     return (
@@ -183,6 +184,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
             <TableHeader className="px-0">
                 <TableRow className="pointer-events-none px-0">
                     <TableHead className="w-full px-0">Therapeutic strategy</TableHead>
+                    <TableHead></TableHead>
                     <TableHead className="self-end text-right w-fit text-nowrap px-0">Stage</TableHead>
                 </TableRow>
             </TableHeader>
@@ -196,22 +198,14 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
                         <CollapsibleTableGroup
                             key={index}
                             label={type.label}
-                            colSpan={2}
+                            colSpan={3}
                             disabled={true}
                         >
                             {roadmapsForModality.map(roadmap => (
-                                <TableRow key={roadmap.id} className="cursor-pointer px-0"
-                                          onClick={() => rowClickCallback(roadmap)}>
-                                    <TableCell className="px-0">
-                                        <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
-                                        {/* {roadmap.description && (
-                                            <p className="line-clamp-2 text-muted-foreground">{roadmap.description}</p>
-                                        )} */}
-                                    </TableCell>
-                                    <TableCell className="flex justify-end items-center px-0">
-                                        <StageOfActivityBadge showTooltip={false} milestones={roadmap.milestones}/>
-                                    </TableCell>
-                                </TableRow>
+                                <RoadmapRow 
+                                    roadmap={roadmap}
+                                    rowClickCallback={rowClickCallback}
+                                />
                             ))}
                         </CollapsibleTableGroup>
                     )
@@ -220,19 +214,14 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
                     // group research plans with no type or 'other' type together in the table
                     <CollapsibleTableGroup
                         label={'Other'}
-                        colSpan={2}
+                        colSpan={3}
                         disabled={true}
                     >
                         {otherRoadmaps.map(roadmap => (
-                            <TableRow key={roadmap.id} className="cursor-pointer"
-                                      onClick={() => rowClickCallback(roadmap)}>
-                                <TableCell>
-                                    <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
-                                </TableCell>
-                                <TableCell className="flex justify-end items-center">
-                                    <StageOfActivityBadge showTooltip={false} milestones={roadmap.milestones}/>
-                                </TableCell>
-                            </TableRow>
+                            <RoadmapRow 
+                                roadmap={roadmap}
+                                rowClickCallback={rowClickCallback}
+                            />
                         ))}
                     </CollapsibleTableGroup>
                 )}
@@ -243,6 +232,37 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
                 )}
             </TableBody>
         </Table>
+    )
+}
+
+export const RoadmapRow = ({roadmap, rowClickCallback}: {roadmap: any, rowClickCallback: (roadmap: any) => void}) => {
+    const numProjects = roadmap.milestones.length
+
+    return (
+        <TableRow 
+            key={roadmap.id} 
+            className="cursor-pointer px-0"
+            onClick={() => rowClickCallback(roadmap)}
+        >
+            <TableCell className="pl-0">
+                <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
+            </TableCell>
+            <TableCell>
+                {numProjects > 0 && (
+                    <PropertyBadge 
+                        className="text-nowrap border-purple-200 text-purple-900 font-semibold" 
+                        icon={FileText}
+                    >
+                        {numProjects === 1 ? `${numProjects} project` : `${numProjects} projects`}
+                    </PropertyBadge>
+                )}
+            </TableCell>
+            <TableCell className="pr-0">
+                <div className="flex gap-2 justify-end items-center text-nowrap">
+                    <StageOfActivityBadge showTooltip={false} milestones={roadmap.milestones}/>
+                </div>
+            </TableCell>
+        </TableRow>
     )
 }
 

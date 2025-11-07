@@ -2,12 +2,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator fieldEncryptionMigrations {
-  provider = "prisma-field-encryption"
-  output   = "./prisma/field-encryption-migrations"
-  // Optional: turn on parallel model migration (can stress DBs)
-  // concurrently = true
-}
+// generator fieldEncryptionMigrations {
+//   provider = "prisma-field-encryption"
+//   output   = "./prisma/field-encryption-migrations"
+//   // Optional: turn on parallel model migration (can stress DBs)
+//   // concurrently = true
+// }
 
 datasource db {
   provider = "postgresql"
@@ -318,6 +318,7 @@ model Tool {
   company                       Company?                             @relation(fields: [companyId], references: [id], onDelete: SetNull)
   institutionId                 String?
   institution                   Institution?                         @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  genes                         String[]
   geneId                        Int?
   gene                          Gene?                                @relation(fields: [geneId], references: [id])
   organizationId                String?
@@ -347,6 +348,7 @@ model DiseaseModel {
   company                       Company?                                     @relation(fields: [companyId], references: [id], onDelete: SetNull)
   institutionId                 String?
   institution                   Institution?                                 @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  genes                         String[]
   geneId                        Int?
   gene                          Gene?                                        @relation(fields: [geneId], references: [id])
   conditionId                   String?
@@ -372,6 +374,7 @@ model Biosample {
   types       String[] // values (BiosampleType ids)
   genotype    String?
 
+  genes               String[]
   gene                Gene?     @relation(fields: [geneId], references: [id])
   variant             String?
   availability        String?
@@ -741,8 +744,22 @@ model Organization {
   materialAndDataAccessRequests MaterialAndDataAccessRequest[]
   metadata                      Json?
   diseaseModel                  DiseaseModel[]
+  subscriptions                 Subscription[]
 
   @@index([userId])
+}
+
+model Subscription {
+  id             String       @id @default(cuid())
+  email          String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([organizationId, email]) // one row per org/email
+  @@index([organizationId])
 }
 
 model SavedOrganization {

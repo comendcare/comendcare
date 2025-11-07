@@ -9,11 +9,30 @@ import {addTypeSenseDocument, deleteTypeSenseDocument, updateTypeSenseDocument} 
 import {getCategoriesAndMilestones} from "@comend/lib/utils"
 import { JsonValue } from "@prisma/client/runtime/library"
 import {writeRawEvent} from "@comend/lib/raw-events";
+import z from "zod"
+import { companyFormSchema, institutionFormSchema } from "./types"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
     return session
 }
+
+export const deleteFacilityCreateRequest = withAdminAuth(
+    async (id: string) => {
+        try {
+            const deletedRequest = await prisma.createFacilityRequest.delete({
+                where: {id}
+            })
+
+            revalidatePath(`/admin/companies/creation-requests`)
+
+            return {success: true, data: deletedRequest}
+        } catch (error: any) {
+            console.error("Error deleting facility create request: ", error)
+            return {success: false, error: "Database error. Please try again later."}
+        }
+    }
+)
 
 export const addEmailToWhitelist = withAdminAuth(
     async (email: string) => {
@@ -91,19 +110,75 @@ export const removeEmailFromBlacklist = withAdminAuth(
     }
 )
 
+export const createInstitution = withAdminAuth(
+    async (formData: z.infer<typeof institutionFormSchema>) => {
+        const name = formData.name as string
+        const biosamples = formData.tools?.filter(tool => tool.type === "Biosamples")
+        const diseaseModels = formData.tools?.filter(tool => tool.type === "Disease models")
+        const clinicalDatasets = formData.tools?.filter(tool => tool.type === "Clinical datasets")
+
+        try {
+            const institution = await prisma.institution.create({
+                data: {
+                    name,
+                    ...(biosamples && biosamples.length > 0 && ({
+                        biosamples: {connect: biosamples.map(b => ({id: b.value}))}
+                    })),
+                    ...(diseaseModels && diseaseModels.length > 0 && ({
+                        diseaseModel: {connect: diseaseModels.map(d => ({id: d.value}))}
+                    })),
+                    ...(clinicalDatasets && clinicalDatasets.length > 0 && ({
+                        tool: {connect: clinicalDatasets.map(c => ({id: c.value}))}
+                    }))
+                },
+            })
+
+            await writeRawEvent({
+                provider: "app",
+                eventType: "institution_created",
+                externalId: institution.id,
+                occurredAt: new Date(),
+                payload: {
+                    companyId: institution.id,
+                    name: institution.name,
+                },
+            });
+
+            // await addTypeSenseDocument(
+            //     `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+            //     process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+            //         ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY!
+            //         : process.env.TYPESENSE_ADMIN_API_KEY!,
+            //     company,
+            //     "companies"
+            // )
+
+            await revalidateTag(`${institution.id}-institution-metadata`)
+
+            return {success: true, data: institution}
+        } catch (error) {
+            console.error("Error creating institution:", error)
+            return {success: false, error: "Database error. Please try again later."}   
+        }
+    }
+)
+
 export const createCompany = withAdminAuth(
-    async (formData: FormData) => {
+    async (formData: z.infer<typeof companyFormSchema>) => {
         const session = await getSession()
 
-        const title = formData.get("orgName") as string
-        const description = formData.get("description") as string
-        const yearEstablished = parseInt(formData.get("founded") as string)
-        const headquarters = formData.get("headquarters") as string
-        const companyType = formData.get("type") as string
-        const url = formData.get("website") as string
-        const servicesRaw = formData.get("services") as string
-        const certificationsRaw = formData.get("certifications") as string
-        const tagsRaw = formData.get("tags") as string
+        const title = formData.name as string
+        const description = formData.description as string
+        const yearEstablished = parseInt(formData.yearFounded as string)
+        const headquarters = formData.headquarters as string
+        const companyType = formData.type as string
+        const url = formData.website as string
+        const servicesRaw = (formData.services?.map((service) => service.label).join(",") || "") as string
+        const certificationsRaw = (formData.certifications?.map((cert) => cert.label).join(",") || "") as string
+        const tagsRaw = (formData.tags?.map((tag) => tag.label).join(",") || "") as string
+        const biosamples = formData.tools?.filter(tool => tool.type === "Biosamples")
+        const diseaseModels = formData.tools?.filter(tool => tool.type === "Disease models")
+        const clinicalDatasets = formData.tools?.filter(tool => tool.type === "Clinical datasets")
 
         const parsedServices = servicesRaw
             ? servicesRaw.split(",").map((name) => name.trim())
@@ -146,6 +221,15 @@ export const createCompany = withAdminAuth(
                     tags: parsedTags,
                     categories,
                     milestoneTypes,
+                    ...(biosamples && biosamples.length > 0 && ({
+                        biosamples: {connect: biosamples.map(b => ({id: b.value}))}
+                    })),
+                    ...(diseaseModels && diseaseModels.length > 0 && ({
+                        diseaseModel: {connect: diseaseModels.map(d => ({id: d.value}))}
+                    })),
+                    ...(clinicalDatasets && clinicalDatasets.length > 0 && ({
+                        tool: {connect: clinicalDatasets.map(c => ({id: c.value}))}
+                    }))
                 },
                 include: {services: true},
             })
@@ -192,20 +276,29 @@ export const createCompany = withAdminAuth(
 )
 
 export const updateCompany = withAdminAuth(
-        async (companyId: string, formData: FormData) => {
-            const title = formData.get("orgName") as string;
-            const description = formData.get("description") as string;
-            const yearEstablished = parseInt(formData.get("founded") as string);
-            const headquarters = formData.get("headquarters") as string;
-            const companyType = formData.get("type") as string;
-            const url = formData.get("website") as string;
-            const servicesRaw = formData.get("services") as string;
-            const certificationsRaw = formData.get("certifications") as string;
-            const tagsRaw = formData.get("tags") as string;
+        async (companyId: string, formData: z.infer<typeof companyFormSchema>) => {
+            const title = formData.name as string;
+            const description = formData.description as string;
+            const yearEstablished = parseInt(formData.yearFounded as string);
+            const headquarters = formData.headquarters as string;
+            const companyType = formData.type as string;
+            const url = formData.website as string;
+            const servicesRaw = (formData.services?.map((service) => service.label).join(",") || "") as string
+            const certificationsRaw = (formData.certifications?.map((cert) => cert.label).join(",") || "") as string
+            const tagsRaw = (formData.tags?.map((tag) => tag.label).join(",") || "") as string
+            const biosamples = formData.tools?.filter(tool => tool.type === "Biosamples")
+            const diseaseModels = formData.tools?.filter(tool => tool.type === "Disease models")
+            const clinicalDatasets = formData.tools?.filter(tool => tool.type === "Clinical datasets")
 
-            const parsedCertifications = certificationsRaw ? JSON.parse(certificationsRaw) : [];
-            const parsedTags = tagsRaw ? JSON.parse(tagsRaw) : [];
-            const parsedServices = servicesRaw ? JSON.parse(servicesRaw) : [];
+            const parsedServices = servicesRaw
+                ? servicesRaw.split(",").map((name) => name.trim())
+                : []
+            const parsedCertifications = certificationsRaw
+                ? certificationsRaw.split(",").map((name) => name.trim())
+                : []
+            const parsedTags = tagsRaw
+                ? tagsRaw.split(",").map((name) => name.trim())
+                : []
 
             const {categories, milestoneTypes} = getCategoriesAndMilestones(parsedServices);
 
@@ -237,6 +330,15 @@ export const updateCompany = withAdminAuth(
                                 create: {name},
                             })),
                         },
+                        ...(biosamples && biosamples.length > 0 && ({
+                            biosamples: {connect: biosamples.map(b => ({id: b.value}))}
+                        })),
+                        ...(diseaseModels && diseaseModels.length > 0 && ({
+                            diseaseModel: {connect: diseaseModels.map(d => ({id: d.value}))}
+                        })),
+                        ...(clinicalDatasets && clinicalDatasets.length > 0 && ({
+                            tool: {connect: clinicalDatasets.map(c => ({id: c.value}))}
+                        }))
                     },
                 });
 

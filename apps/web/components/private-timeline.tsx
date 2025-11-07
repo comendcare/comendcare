@@ -30,7 +30,6 @@ import {
 } from "@dnd-kit/sortable"
 import {GripVertical, Megaphone, Microscope, User, Lock, Calendar, DollarSign, Database, Rat, TestTubeDiagonal, Globe} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
-import { PropertyBadge } from "./property-badge"
 import { ProjectActionsMenu } from "./project-actions-menu";
 import { TypeBadge } from "./type-badge";
 import { Badge } from "@/packages/components/ui/badge";

@@ -30,7 +30,7 @@ const globalFilterFn = (row: any, columnIds: string[], filterValue: any) => {
     return sampleId.includes(search) || donorId.includes(search);
 }
 
-export function BiosamplesTable({
+export function DatabaseBiosamplesTable({
     data, 
     pageCount, 
     columns, 
@@ -38,7 +38,8 @@ export function BiosamplesTable({
     searchParams,
     showFilters = true,
     showPagination = true,
-    interactive = true
+    interactive = true,
+    noResultsOverride = true,
 }: {
     data: Biosample[],
     pageCount: number,
@@ -47,7 +48,8 @@ export function BiosamplesTable({
     searchParams: SearchParams,
     showFilters?: boolean,
     showPagination?: boolean,
-    interactive?: boolean
+    interactive?: boolean,
+    noResultsOverride?: boolean,
 }) {
     const [editingTool, setEditingTool] = useState<any | undefined>(undefined)
     const {enableAdvancedFilter, filterFlag} = useFeatureFlags()
@@ -80,7 +82,7 @@ export function BiosamplesTable({
                 table={table}
                 showPagination={showPagination}
                 noResults={
-                    (data.length === 0 && Object.keys(searchParams).length === 0) 
+                    (noResultsOverride && data.length === 0 && Object.keys(searchParams).length === 0) 
                     ? (
                         <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
                             <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">

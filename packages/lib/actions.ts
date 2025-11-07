@@ -746,35 +746,28 @@ export const updateOrganization = withOrganizationAuth(
         const data: Record<string, any> = {};
 
         formData.forEach((value, key) => {
-            // Attempt to parse numbers
-
-            if (!isNaN(Number(value)) && value !== "") {
-                data[key] = Number(value);
-            } else {
-                data[key] = value;
-            }
-
             if (key === "yearFounded") {
                 data[key] = value.toString();
+                return;
             }
 
-            if ((key === "image" || key === "headerImage") && !value) {
-                // remove image
-                data[key] = null
+            if ((key === "image" || key === "headerImage") && value === "") {
+                data[key] = null;
+                return;
             }
 
-            if (key === "therapeuticsInDevelopment") {
+            if (key === "therapeuticsInDevelopment" || key === "therapeuticsOfInterest") {
                 data[key] = value.toString().split(",");
-            }
-
-            if (key === "therapeuticsOfInterest") {
-                data[key] = value.toString().split(",");
+                return;
             }
 
             if (key === "metadata") {
-                data[key] = JSON.parse(value.toString()) as JsonValue
+                data[key] = JSON.parse(value.toString());
+                return;
             }
 
+            const n = Number(value);
+            data[key] = Number.isNaN(n) ? value : n; // preserves 0
         });
 
         try {
@@ -2565,6 +2558,7 @@ export const updateDiseaseModel = withOrganizationAuth(
                     attachments: true,
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
+                    // genes: true,
                     institution: true,
                     company: true,
                 },
@@ -2688,6 +2682,7 @@ export const createDiseaseModel = withOrganizationAuth(
                     contacts: true,
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
+                    // genes: true,
                     institution: true,
                     company: true,
                 },
@@ -2797,7 +2792,8 @@ export const createClinicalDataset = withOrganizationAuth(
                 description: data.description,
                 attachments: data.attachments,
                 contacts: data.contacts,
-                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                // gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                genes: (data.genes || []).map(gene => gene.value),
                 ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
                 institution: foundInstitution,
                 company: foundCompany,
@@ -2967,7 +2963,8 @@ export const updateClinicalDataset = withOrganizationAuth(
                 description: data.description,
                 attachments: data.attachments,
                 contacts: data.contacts,
-                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                // gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                genes: (data.genes || []).map(gene => gene.value),
                 ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
                 institution: foundInstitution,
                 company: foundCompany,
@@ -3806,8 +3803,8 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     },
                     private: rfpData.private ?? false,
                     openTo: rfpData.openTo ?? [],
-                    startDate: rfpData.startDate,
-                    endDate: rfpData.endDate,
+                    startDate: rfpData.startDate || null, // remove start date if not provided
+                    endDate: rfpData.endDate || null, // remove end date if not provided
                     milestones: {
                         deleteMany: {},
                         create: (rfpData.milestones || []).map((milestone: any) => ({
@@ -6464,4 +6461,67 @@ export async function switchOrganization(organizationId: string) {
     }
 
     return {success: true};
+}
+
+export async function subscribeToOrganization(email: string, host?: string | null): Promise<ApiResponse<{ id: string }>> {
+    try {
+        const lower = email.trim().toLowerCase();
+        const isDomainValid = await validateEmailDomain(lower);
+
+        if (!isDomainValid) {
+            return {success: false, error: "Email domain is invalid or cannot receive emails."};
+        }
+
+        if (!host) return { success: false, error: "Missing host." };
+
+        // Try custom domain first
+        let org = await prisma.organization.findFirst({
+            where: { customDomain: host, public: true, published: true },
+            select: { id: true, subdomain: true },
+        });
+
+        // If not a custom domain, try subdomain.<ROOT_DOMAIN>
+        if (!org) {
+            const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN;
+            const isSubOnRoot = root && host.endsWith(`.${root}`);
+            const sub = isSubOnRoot ? host.slice(0, -(root.length + 1)) : null;
+
+            if (sub) {
+                org = await prisma.organization.findFirst({
+                    where: { subdomain: sub, public: true, published: true },
+                    select: { id: true, subdomain: true },
+                });
+            }
+        }
+
+        if (!org) return { success: false, error: "Organization not found." };
+
+        const record = await prisma.subscription.create({
+            data: {
+                organizationId: org.id,
+                email: lower,
+            },
+            select: { id: true },
+        });
+
+        await customerIOTrack({
+            userId: null, // public form, no session
+            event: "user_subscribed_to_organization",
+            timestamp: new Date(),
+            traits: {
+                email: lower,
+                organization_id: org.id,
+            },
+            properties: {
+                email: lower,
+                organizationId: org.id,
+                organizationHost: host,
+            },
+        });
+
+        return { success: true, data: { id: record.id } };
+    } catch (err) {
+        console.error("subscribePublic error", err);
+        return { success: false, error: "Database error. Please try again later." };
+    }
 }

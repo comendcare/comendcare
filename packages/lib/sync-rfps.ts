@@ -58,8 +58,9 @@ const manageCollection = async (
 
 const STATUS_PRIORITY = {
   'OPEN': 1,
-  'COMINGSOON': 2,
-  'CLOSED': 3,
+  'ROLLING': 2,
+  'COMINGSOON': 3,
+  'CLOSED': 4,
 }
 
 function getSortRank(rfp: RFP) {
@@ -74,6 +75,10 @@ function getSortRank(rfp: RFP) {
         if (rfp.endDate) return rfp.endDate.getTime()
 
         // if end date does not exist on this RFP put it at the end of the Open section
+        return base
+    }
+
+    if (status.status === 'ROLLING') {
         return base
     }
 
