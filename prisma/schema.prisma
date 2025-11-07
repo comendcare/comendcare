@@ -2,12 +2,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator fieldEncryptionMigrations {
-  provider = "prisma-field-encryption"
-  output   = "./prisma/field-encryption-migrations"
-  // Optional: turn on parallel model migration (can stress DBs)
-  // concurrently = true
-}
+// generator fieldEncryptionMigrations {
+//   provider = "prisma-field-encryption"
+//   output   = "./prisma/field-encryption-migrations"
+//   // Optional: turn on parallel model migration (can stress DBs)
+//   // concurrently = true
+// }
 
 datasource db {
   provider = "postgresql"
@@ -744,8 +744,22 @@ model Organization {
   materialAndDataAccessRequests MaterialAndDataAccessRequest[]
   metadata                      Json?
   diseaseModel                  DiseaseModel[]
+  subscriptions                 Subscription[]
 
   @@index([userId])
+}
+
+model Subscription {
+  id             String       @id @default(cuid())
+  email          String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([organizationId, email]) // one row per org/email
+  @@index([organizationId])
 }
 
 model SavedOrganization {

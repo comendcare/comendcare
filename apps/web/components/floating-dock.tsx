@@ -69,13 +69,13 @@ const FloatingDockMobile = ({
     const [open, setOpen] = useState(false);
 
     return (
-        <div className={cn("fixed bottom-4 right-4 md:hidden z-50", className)}>
+        <div className={cn("fixed right-4 top-1/2 md:hidden z-50", className)}>
             <AnimatePresence>
                 {open && (
                     <motion.div
                         layoutId="nav"
                         className={cn(
-                            "absolute bottom-full mb-2 right-0 flex gap-2 bg-white bg-blue-light dark:bg-neutral-900 p-2 rounded-xl shadow-lg",
+                            "absolute bottom-full mb-2 right-0 flex gap-2 bg-white bg-[rgba(220,235,254,0.7)] dark:bg-neutral-900 p-2 rounded-xl shadow-lg",
                             orientation === "vertical" ? "flex-col" : "flex-row"
                         )}
                     >
@@ -153,7 +153,7 @@ const FloatingDockDesktop = ({
                 mouseY.set(Infinity);
             }}
             className={cn(
-                "hidden md:flex gap-4 items-end rounded-2xl bg-blue-light dark:bg-neutral-900 p-4",
+                "hidden md:flex gap-4 items-end rounded-2xl bg-[rgba(220,235,254,0.7)] dark:bg-neutral-900 p-4",
                 orientation === "vertical"
                     ? "flex-col h-auto fixed top-1/2 right-4 transform -translate-y-1/2"
                     : "flex-row h-16 mx-auto",
