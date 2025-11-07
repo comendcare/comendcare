@@ -34,8 +34,7 @@ function PublicPageBottomBanner() {
             className="px-4 sticky bottom-4 z-40 w-full mt-8 flex justify-center sm:justify-start"
         >
             <div
-                // className="mx-auto backdrop-blur bg-[radial-gradient(circle_at_center,rgba(220,235,254,0.1),rgba(220,235,254,0.7))] inline-flex flex-wrap items-center text-center rounded-full px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base leading-5 sm:leading-6 text-gray-500 ring-1 ring-gray-900/10 hover:ring-gray-900/20"
-                className="mx-auto backdrop-blur bg-[rgba(220,235,254,0.7)] inline-flex flex-wrap items-center text-center rounded-full px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base leading-5 sm:leading-6 text-gray-500 ring-1 ring-gray-900/10 hover:ring-gray-900/20"
+                className="mx-auto backdrop-blur bg-[rgba(220,235,254,0.7)] inline-flex flex-col space-y-2 sm:space-y-0 sm:flex-row flex-wrap items-center text-center rounded-full px-4 py-2 sm:px-6 sm:py-3 text-base leading-5 sm:leading-6 text-gray-800 ring-1 ring-gray-900/10 hover:ring-gray-900/20"
             >
                 <span className="mr-3">
                     Get updates on our research

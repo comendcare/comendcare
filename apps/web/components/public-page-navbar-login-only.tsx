@@ -65,7 +65,7 @@ const DesktopNav: React.FC<NavbarProps> = ({visible}) => {
                 minWidth: "800px"
             }}
             className={cn(
-                "hidden lg:grid grid-cols-3 self-start bg-transparent dark:bg-transparent items-center justify-between py-4 max-w-7xl mx-auto px-4 rounded-full relative z-[60] w-full",
+                "hidden lg:grid grid-cols-2 self-start bg-transparent dark:bg-transparent items-center justify-between py-4 max-w-7xl mx-auto px-4 rounded-full relative z-[60] w-full",
                 visible && "bg-white/80 dark:bg-neutral-950/80"
             )}
         >
@@ -104,6 +104,8 @@ const DesktopNav: React.FC<NavbarProps> = ({visible}) => {
 }
 
 const MobileNav: React.FC<NavbarProps> = ({visible}) => {
+    const session = useSession()
+    const router = useRouter()
     const [open, setOpen] = useState(false)
 
     return (
