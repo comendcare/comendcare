@@ -763,6 +763,29 @@ export const COUNTRY_OPTIONS: Option[] = [
   { label: 'Zimbabwe', value: 'ZW' }
 ];
 
+export const QUANTITY_OPTIONS: Option[] = [
+    {
+        value: 'microliters',
+        label: 'μL',
+    },
+    {
+        value: 'ml',
+        label: 'ml'
+    },
+    {
+        value: 'units',
+        label: 'units',
+    },
+    {
+        value: 'mg',
+        label: 'mg'
+    },
+    {
+        value: 'sqmm',
+        label: 'mm'
+    }
+]
+
 export const DONOR_SEX_OPTIONS: Option[] = [
     {
         label: 'Male',
@@ -2042,6 +2065,7 @@ export const editBiosampleForm = z.object({
     quantity: z.string().optional(),
     quantityUnit: z.string(),
     productCode: z.string().optional(),
+    bsiId: z.string().optional(),
     // priceUSD: z.string().optional(),
     // priceGBP: z.string().optional(),
     // priceEUR: z.string().optional(),

@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { createBiosample } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
 import { cn, parseCSV, validateImport } from "@comend/lib/utils";
-import { ANATOMICAL_SITE_OPTIONS, AVAILABILITY_OPTIONS, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, editBiosampleForm, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS } from "@/packages/lib/types";
+import { ANATOMICAL_SITE_OPTIONS, AVAILABILITY_OPTIONS, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, editBiosampleForm, QUANTITY_OPTIONS, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS } from "@/packages/lib/types";
 import { revalidate } from "@/packages/lib/revalidate";
 import z from "zod";
 import { getOrganizationData, getOrganizationFromOrganizationId } from "@/packages/lib/fetchers";
@@ -23,6 +23,9 @@ import Loading from "@/loading";
 export async function formatBiosampleData(biosample: any): Promise<z.infer<typeof editBiosampleForm>> {
     const res = await fetch(`/api/genes?search=${encodeURIComponent(biosample['Gene'] || "")}`);
     const foundGenes = await res.json();
+
+    const institutionsResponse = await fetch(`/api/institutions?search=${encodeURIComponent(biosample['Storage Facility'].trim() || '')}`)
+    const foundInstitutions = await institutionsResponse.json()
 
     const data: z.infer<typeof editBiosampleForm> = {
         types: (() => {
@@ -70,6 +73,15 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
         treatments: biosample['Donor Medical Treatments']?.split(",") || [],
         priceUnit: 'usd',
         genotype: biosample['Genotype'] || undefined,
+        // storage facility
+        storageFacility: (() => {
+            if (foundInstitutions && foundInstitutions.length > 0 && biosample['Storage Facility']) {
+                return foundInstitutions
+            }
+
+            return []
+        })(),
+        bsiId: biosample['BSI ID'],
         isPrivate: biosample['Visibility'] ? (biosample['Visibility'] === 'Published' ? false : true) : true
     }
     return data
@@ -98,6 +110,7 @@ export function BiosampleBulkImportDialog() {
                         {key: 'Variant', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Availability', required: false, defaultValue: undefined, isValid: (entry) => AVAILABILITY_OPTIONS.find(option => option.label === entry) !== undefined},
                         {key: 'Total Available Quantity (in ml)', required: false, defaultValue: undefined, isValid: (entry) => JSON.parse(entry) > 0},
+                        {key: 'Quantity Unit', required: false, defaultValue: undefined, isValid: (entry) => QUANTITY_OPTIONS.find(option => option.label === entry) !== undefined},
                         {key: 'Sex', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Current Location', required: false, defaultValue: undefined, isValid: (entry) => COUNTRY_OPTIONS.find(option => option.label === entry) !== undefined},
@@ -117,6 +130,7 @@ export function BiosampleBulkImportDialog() {
                         {key: 'Donor Medications', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Donor Medical Treatments', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Genotype', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'BSI ID', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Visibility', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                     ]
                 )

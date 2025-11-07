@@ -3107,6 +3107,7 @@ export const createBiosample = withOrganizationAuth(
                 company: foundCompany,
                 genotype: data.genotype,
                 notes: data.notes,
+                bsiId: data.bsiId,
                 // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
                 // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
             }
@@ -3332,6 +3333,7 @@ export const updateBiosample = withOrganizationAuth(
                 company: foundCompany,
                 genotype: data.genotype,
                 notes: data.notes,
+                bsiId: data.bsiId,
             };
 
             const newBiosample = await prisma.biosample.update({
