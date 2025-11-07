@@ -54,7 +54,7 @@ export function DeleteOrganizationAlertDialog({organization}: { organization: Or
 
     return (
         <AlertDialog>
-            <AlertDialogTrigger asChild disabled={session?.user?.membership?.role !== "owner"}>
+            <AlertDialogTrigger asChild disabled={!["owner", "support"].includes(session?.user?.membership?.role)}>
                 <Button variant="destructive">
                     Delete organization
                 </Button>
