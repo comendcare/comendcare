@@ -5,8 +5,9 @@ import {Button} from "@comend/components/ui/button"
 import {Input} from "@comend/components/ui/input"
 import {Form, FormField, FormItem, FormControl} from "@comend/components/ui/form"
 import {useForm} from "react-hook-form"
+import {subscribeToOrganization} from "@/packages/lib/actions";
 
-function PublicPageBottomBanner() {
+export default function PublicPageBottomBanner() {
     const form = useForm({
         defaultValues: {
             email: "",
@@ -15,16 +16,23 @@ function PublicPageBottomBanner() {
 
     const [loading, setLoading] = useState(false)
 
-    const onSubmit = async (values: {email: string}) => {
-        setLoading(true)
+    const onSubmit = async (values: { email: string }) => {
+        setLoading(true);
         try {
-            console.log("Submitted email:", values.email)
+            const host = typeof window !== "undefined" ? window.location.hostname : null;
+            const res = await subscribeToOrganization(values.email, host);
+            if (!res.success) {
+                console.error(res.error);
+                // optional: surface a toast here
+            } else {
+                // optional: toast "Thanks! You're subscribed."
+            }
         } catch (err) {
-            console.error(err)
+            console.error(err);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     return (
         <motion.div
@@ -66,5 +74,3 @@ function PublicPageBottomBanner() {
         </motion.div>
     )
 }
-
-export default PublicPageBottomBanner
