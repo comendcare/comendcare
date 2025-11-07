@@ -3103,8 +3103,8 @@ export const createBiosample = withOrganizationAuth(
                 priceUnit: data.priceUnit,
                 gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
                 variant: data.variant,
-                institution: foundInstitution || undefined,
-                company: foundCompany || undefined,
+                institution: foundInstitution,
+                company: foundCompany,
                 genotype: data.genotype,
                 notes: data.notes,
                 bsiId: data.bsiId,
@@ -3169,7 +3169,7 @@ export const createBiosample = withOrganizationAuth(
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
                     ...(biosampleData.company 
                         ? ({company: {connect: {id: biosampleData.company.id}}}) // if company exists in database, connect
-                        : ({institution: undefined})), // if company does not exist in database, don't connect
+                        : ({company: undefined})), // if company does not exist in database, don't connect
                     donor: {
                         connectOrCreate: {
                             where: {id: data.donorId || nanoid()},
