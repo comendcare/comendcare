@@ -1710,7 +1710,7 @@ export const OpenToFormField = ({form}: { form: any }) => {
             name="openTo"
             render={({field}) => (
                 <FormItem>
-                    <FormLabel>{`Open to`}</FormLabel>
+                    <FormLabel>{`Open to (required)`}</FormLabel>
                     <FormDescription>{`Specify which parties you wish to source proposals from.`}</FormDescription>
                     <FormControl>
                         <ToggleGroup
@@ -1800,7 +1800,7 @@ export function AttachmentsFormField({form}: { form: UseFormReturn<any> }) {
     )
 }
 
-export const ContactsFormField = ({form}: { form: any }) => {
+export const ContactsFormField = ({form, title}: { form: any, title?: string }) => {
     return (
         <FormField
             control={form.control}
@@ -1809,8 +1809,9 @@ export const ContactsFormField = ({form}: { form: any }) => {
                 <FormItem>
                     <div className="flex flex-row justify-between gap-2 items-center">
                         <div className="flex flex-col">
-                            <FormLabel>{`Contacts`}</FormLabel>
+                            <FormLabel>{title || `Contacts`}</FormLabel>
                             <FormDescription>{`Add any external contacts that are not on the Comend platform.`}</FormDescription>
+                            <FormMessage />
                         </div>
                         <Button
                             variant="secondary"
@@ -1850,7 +1851,6 @@ export const ContactsFormField = ({form}: { form: any }) => {
                             ))}
                         </ol>
                     )}
-
                 </FormItem>
             )}
         />

@@ -8,6 +8,7 @@ import {PublicPageNavbarLoginOnly} from "~web/components/public-page-navbar-logi
 import {StickyBanner} from "@/packages/components/ui/sticky-banner";
 import {Button} from "@/packages/components/ui/button";
 import Link from "next/link";
+import PublicPageBottomBanner from "~web/components/public-page-bottom-banner";
 
 export async function generateMetadata({
                                            params
@@ -194,7 +195,7 @@ export default async function SiteLayout({
     return (
         <div>
             <TooltipProvider>
-                <StickyBanner className="bg-blue-light flex-row space-x-4">
+                {/* <StickyBanner className="bg-blue-light flex-row space-x-4">
                     <p className="mx-0 max-w-[90%] text-black drop-shadow-md">
                         Announcing $10M seed funding from project mayhem ventures.{" "}
                         <a href="#" className="transition duration-200 hover:underline">
@@ -209,9 +210,10 @@ export default async function SiteLayout({
                             Sign up <span aria-hidden="true">&rarr;</span>
                         </Link>
                     </Button>
-                </StickyBanner>
+                </StickyBanner> */}
                 <PublicPageNavbarLoginOnly/>
                 {children}
+                {/*<PublicPageBottomBanner/>*/}
                 <PublicPageFooter/>
             </TooltipProvider>
         </div>

@@ -746,35 +746,28 @@ export const updateOrganization = withOrganizationAuth(
         const data: Record<string, any> = {};
 
         formData.forEach((value, key) => {
-            // Attempt to parse numbers
-
-            if (!isNaN(Number(value)) && value !== "") {
-                data[key] = Number(value);
-            } else {
-                data[key] = value;
-            }
-
             if (key === "yearFounded") {
                 data[key] = value.toString();
+                return;
             }
 
-            if ((key === "image" || key === "headerImage") && !value) {
-                // remove image
-                data[key] = null
+            if ((key === "image" || key === "headerImage") && value === "") {
+                data[key] = null;
+                return;
             }
 
-            if (key === "therapeuticsInDevelopment") {
+            if (key === "therapeuticsInDevelopment" || key === "therapeuticsOfInterest") {
                 data[key] = value.toString().split(",");
-            }
-
-            if (key === "therapeuticsOfInterest") {
-                data[key] = value.toString().split(",");
+                return;
             }
 
             if (key === "metadata") {
-                data[key] = JSON.parse(value.toString()) as JsonValue
+                data[key] = JSON.parse(value.toString());
+                return;
             }
 
+            const n = Number(value);
+            data[key] = Number.isNaN(n) ? value : n; // preserves 0
         });
 
         try {
@@ -2507,6 +2500,7 @@ export const updateDiseaseModel = withOrganizationAuth(
                     attachments: true,
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
+                    // genes: true,
                     institution: true,
                     company: true,
                 },
@@ -2630,6 +2624,7 @@ export const createDiseaseModel = withOrganizationAuth(
                     contacts: true,
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
+                    // genes: true,
                     institution: true,
                     company: true,
                 },
@@ -2738,7 +2733,8 @@ export const createClinicalDataset = withOrganizationAuth(
                 description: data.description,
                 attachments: data.attachments,
                 contacts: data.contacts,
-                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                // gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                genes: (data.genes || []).map(gene => gene.value),
                 ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
                 institution: foundInstitution,
                 company: foundCompany,
@@ -2886,7 +2882,8 @@ export const updateClinicalDataset = withOrganizationAuth(
                 description: data.description,
                 attachments: data.attachments,
                 contacts: data.contacts,
-                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                // gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                genes: (data.genes || []).map(gene => gene.value),
                 ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
                 institution: foundInstitution,
                 company: foundCompany,
@@ -3966,7 +3963,7 @@ export const createRoadmap = withOrganizationAuth(
                     timestamp: new Date(),                 // or finalRoadmap?.createdAt if you select it
                     traits: {
                         // optional profile upserts (handy for segmentation):
-                        userName: actor?.userName,
+                        name: actor?.userName,
                         organization_id: organization.id,
                         organization_name: organization.name ?? finalRoadmap?.organization?.name,
                         organization_subdomain: organization.subdomain,

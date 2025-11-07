@@ -5,7 +5,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend
 import {PrivateBadge} from "~web/components/private-badge";
 import {Calendar, Clock, DollarSign, FileText, School} from "lucide-react";
 import {PropertyBadge} from "./property-badge";
-import {checkDateRangeUTC, formatDateUTC, formatMoney} from "@comend/lib/utils";
+import {checkDateRangeUTC, DateStatus, formatDateUTC, formatMoney} from "@comend/lib/utils";
 import {RFPActionsMenu} from "./rfp-actions-menu";
 import {Badge} from "@/packages/components/ui/badge";
 import {Skeleton} from "@comend/components/ui/skeleton";
@@ -35,6 +35,34 @@ const rfpSelector = (state: RFPState) => ({
     updateRFP: state.updateRFP,
 })
 
+export const RFPStatusBadge = ({status}: {status: DateStatus}) => {
+    return (
+        <Badge variant={status?.variant || 'green'} className="w-full font-normal flex gap-2">
+                <Clock size={18}/>
+                <>
+                    {(() => {
+                        switch (status?.status) {
+                            case 'OPEN':
+                                return `${status?.daysRemaining} days remaining to submit proposals`
+                            case 'ROLLING':
+                                return `Open for proposals`
+                            case 'COMINGSOON':
+                                return (status?.daysRemaining === 1 
+                                    ? `Opens in ${status?.daysRemaining} day` 
+                                    : `Opens in ${status?.daysRemaining} days`)
+                            case 'CLOSED':
+                                return (status?.daysRemaining === 1
+                                    ? `Closed ${status?.daysRemaining} day ago`
+                                    : `Closed ${status?.daysRemaining} days ago`)
+                            default:
+                                return <></>
+                        }
+                    })()}
+                </>
+            </Badge>
+    )
+}
+
 export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rfp: any; showOrganization?: boolean; isPrivate?: boolean }) => {
     // Gate the header (and actions menu) until after hydration
     const [mounted, setMounted] = useState(false);
@@ -44,8 +72,8 @@ export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rf
     const status = useMemo(() => checkDateRangeUTC(rfp.startDate, rfp.endDate), [rfp.startDate, rfp.endDate]);
 
     return (
-        <Card className="h-full w-full text-left flex flex-col justify-between">
-            <CardHeader className="gap-2 relative">
+        <Card className="h-full w-full text-left flex flex-col">
+            <CardHeader className="gap-2 relative pb-2">
                 {/* Actions menu only after mount to avoid portal jank */}
                 {isPrivate && mounted && (
                     <div className="absolute top-1 right-1">
@@ -77,40 +105,17 @@ export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rf
                                 )}
                                 {rfp.title}
                             </CardTitle>
-                            {status && (
-                                <Badge variant={status.variant as any} className="text-sm">
-                                    {status.label}
-                                </Badge>
-                            )}
                         </div>
                     </>
                 )}
             </CardHeader>
 
-            <CardContent className="flex flex-col gap-4">
-                {status?.daysRemaining !== undefined && (
-                    <Badge variant={"green"} className="w-full font-normal flex gap-2">
-                        <Clock size={18}/>
-                        {`${status.daysRemaining} days remaining to submit proposals`}
-                    </Badge>
-                )}
+            <CardContent className="h-full flex flex-col gap-4">
+                <RFPStatusBadge status={status} />
 
                 <ul className="w-full flex flex-col flex-wrap gap-2 text-sm text-wrap break-words">
-                    {rfp.budget && (
                         <li>
-                            <PropertyBadge 
-                                // icon={DollarSign}
-                            >
-                                <p><b>Budget: </b> ${formatMoney(rfp.budget)}</p>
-                            </PropertyBadge>
-                        </li>
-                    )}
-
-                    {Array.isArray(rfp.openTo) && rfp.openTo.length > 0 && (
-                        <li>
-                            <PropertyBadge 
-                                // icon={School}
-                            >
+                            <PropertyBadge>
                                 <b>Open to:</b>
                                 {rfp.openTo
                                     .map((option: string) => {
@@ -126,43 +131,21 @@ export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rf
                                     .join(", ")}
                             </PropertyBadge>
                         </li>
-                    )}
 
-                    {rfp.startDate && (
                         <li>
-                            <PropertyBadge 
-                                // icon={Calendar}
-                            >
-                                <b>Opens: </b>{formatDateUTC(rfp.startDate)}
+                            <PropertyBadge>
+                                <p><b>Budget: </b>{rfp.budget ? `$${formatMoney(rfp.budget)}` : `Project based`}</p>
                             </PropertyBadge>
                         </li>
-                    )}
-
-                    {rfp.endDate && (
-                        <li>
-                            <PropertyBadge 
-                                // icon={Calendar}
-                            >
-                                <b>Due: </b>{formatDateUTC(rfp.endDate)}
-                            </PropertyBadge>
-                        </li>
-                    )}
                 </ul>
 
                 <CardDescription className="line-clamp-3 overflow-hidden">
                     {rfp.description}
                 </CardDescription>
 
-                {(rfp.milestones && rfp.milestones.length > 0) && (
-                    <Badge className="font-normal w-fit" variant={"purple"}>
-                        <FileText className="h-4 w-4 min-h-4 min-w-4"/>
-                        {rfp.milestones.length <= 1 ? `${rfp.milestones.length} Linked project` : `${rfp.milestones.length} Linked projects`}
-                    </Badge>
-                )}
-
                 {showOrganization && rfp.organization && (
                     <>
-                        <Separator />
+                        <Separator className="mt-auto" />
                         <a
                             href={`http://${rfp.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
                             onClick={(e) => e.stopPropagation()}
