@@ -87,7 +87,7 @@ export default function InviteUserToOrgDialog({organization}: {organization: Org
         }
     }
 
-    const disabled = session?.user?.membership?.role !== "owner" || status !== "authenticated";
+    const disabled = !["owner", "support"].includes(session?.user?.membership?.role) || status !== "authenticated";
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>

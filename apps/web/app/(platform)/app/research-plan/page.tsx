@@ -36,9 +36,13 @@ export default async function RoadmapPage() {
             userId: true,
             edges: true,
             milestones: {
-                where: {private: false},
+                // where: {private: false},
                 include: {
                     types: {include: {milestoneType: true}},
+                    biosamples: true,
+                    diseaseModels: true,
+                    tools: true,
+                    rfps: true,
                 },
                 orderBy: [{createdAt: "desc"}]
             },

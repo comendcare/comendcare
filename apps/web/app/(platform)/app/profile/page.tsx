@@ -172,6 +172,7 @@ export default async function ProfilePage(props: IndexPageProps) {
             company: true,
             geneId: true,
             gene: true,
+            genes: true,
             organizationId: true,
             organization: true,
             materialAndDataAccessRequests: true
@@ -203,6 +204,7 @@ export default async function ProfilePage(props: IndexPageProps) {
             company: true,
             geneId: true,
             gene: true,
+            genes: true,
             conditionId: true,
             condition: true,
             organizationId: true,
@@ -236,6 +238,7 @@ export default async function ProfilePage(props: IndexPageProps) {
             company: true,
             geneId: true,
             gene: true,
+            genes: true,
             organizationId: true,
             organization: {include: {conditions: {include: {condition: true}}}},
             milestones: {include: {milestone: true}},
@@ -244,7 +247,7 @@ export default async function ProfilePage(props: IndexPageProps) {
         true // public only
     )
 
-    const isOwner = session?.user?.membership?.role === "owner";
+    const isOwner = ["owner", "support"].includes(session?.user?.membership?.role);
 
     const safeOrg = {
         ...organization,

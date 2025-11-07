@@ -471,11 +471,12 @@ export const createOrganization = withAuth(
                     },
                 });
 
+                // If user is a comendcare.com user, set role to support, not owner
                 const membership = await tx.member.create({
                     data: {
                         userId: session.user.id,
                         email: session.user.email,
-                        role: "owner",
+                        role: session.user.email?.toLowerCase().endsWith("@comendcare.com") ? "support" : "owner",
                         title,
                         organizationId: organization.id,
                     },
@@ -746,35 +747,28 @@ export const updateOrganization = withOrganizationAuth(
         const data: Record<string, any> = {};
 
         formData.forEach((value, key) => {
-            // Attempt to parse numbers
-
-            if (!isNaN(Number(value)) && value !== "") {
-                data[key] = Number(value);
-            } else {
-                data[key] = value;
-            }
-
             if (key === "yearFounded") {
                 data[key] = value.toString();
+                return;
             }
 
-            if ((key === "image" || key === "headerImage") && !value) {
-                // remove image
-                data[key] = null
+            if ((key === "image" || key === "headerImage") && value === "") {
+                data[key] = null;
+                return;
             }
 
-            if (key === "therapeuticsInDevelopment") {
+            if (key === "therapeuticsInDevelopment" || key === "therapeuticsOfInterest") {
                 data[key] = value.toString().split(",");
-            }
-
-            if (key === "therapeuticsOfInterest") {
-                data[key] = value.toString().split(",");
+                return;
             }
 
             if (key === "metadata") {
-                data[key] = JSON.parse(value.toString()) as JsonValue
+                data[key] = JSON.parse(value.toString());
+                return;
             }
 
+            const n = Number(value);
+            data[key] = Number.isNaN(n) ? value : n; // preserves 0
         });
 
         try {
@@ -841,7 +835,7 @@ export const updateOrganization = withOrganizationAuth(
             throw new Error(error.message || "Failed to update organization.");
         }
     },
-    ['owner']
+    ['owner', 'support']
 );
 
 export const deleteOrganization = withOrganizationAuth(
@@ -932,7 +926,7 @@ export const deleteOrganization = withOrganizationAuth(
 
         return {success: true, data: deletedOrg};
     },
-    ["owner"]
+    ["owner", 'support']
 );
 
 export const updateRoadmap = withOrganizationAuth(
@@ -1146,7 +1140,7 @@ export const deleteRoadmap = withOrganizationAuth(
             }
         }
     },
-    ['owner']
+    ['owner', 'support']
 )
 
 export const editUser = withAuth(
@@ -1292,7 +1286,7 @@ export const inviteUser = withOrganizationAuth(
             return {success: false, error: "Database error. please try again later."}
         }
     },
-    ['owner'] // this function is only available to owners of this organization
+    ['owner', 'support'] // this function is only available to owners of this organization
 )
 
 export const approveMemberRequestAndCreateMember = withOrganizationAuth(
@@ -1380,7 +1374,7 @@ export const approveMemberRequestAndCreateMember = withOrganizationAuth(
             throw new Error("Failed to add member to organization.");
         }
     },
-    ['owner']
+    ['owner', 'support']
 )
 
 export const deleteMemberRequest = withUserAuth(
@@ -1459,7 +1453,7 @@ export const denyMemberRequest = withOrganizationAuth(
             return {success: false, error: "Failed to delete member request."};
         }
     },
-    ['owner']
+    ['owner', 'support']
 )
 
 export const deleteInvitation = withOrganizationAuth(
@@ -1490,7 +1484,7 @@ export const deleteInvitation = withOrganizationAuth(
             return {success: false, error: "Failed to delete invitation."};
         }
     },
-    ['owner']
+    ['owner', 'support']
 )
 
 export const declineAndDeleteInvitation = withAuth(
@@ -1561,9 +1555,13 @@ export const leaveOrganization = withOrganizationAuth(
             }
 
             // If owner, ensure not the last owner
-            if (currentMember.role === "owner") {
+            if (currentMember.role === "owner" || currentMember.role === "support") {
                 const ownerCount = await prisma.member.count({
-                    where: {organizationId: organization.id, role: "owner"},
+                    where: {
+                        organizationId: organization.id, role: {
+                            in: ["owner", "support"]
+                        }
+                    },
                 });
                 if (ownerCount <= 1) {
                     return {
@@ -1686,7 +1684,7 @@ export const updateMemberWithOwnerPermission = withOrganizationAuth(
 
             // Prevent demoting the last owner to member
             if (
-                targetMember.role === "owner" &&
+                targetMember.role === "owner" || targetMember.role === "support" &&
                 data.role === "member"
             ) {
                 const ownerCount = await prisma.member.count({
@@ -1719,7 +1717,7 @@ export const updateMemberWithOwnerPermission = withOrganizationAuth(
             return {success: false, error: "Internal server error"};
         }
     },
-    ["owner"]
+    ["owner", 'support']
 );
 
 // Invite user function with updated Organization model
@@ -1775,7 +1773,7 @@ export const deleteMember = withOrganizationAuth(
             return {success: false, error: "Internal server error"};
         }
     },
-    ["owner"]
+    ["owner", 'support']
 );
 
 // Invite user function with updated Organization model
@@ -2503,6 +2501,7 @@ export const updateDiseaseModel = withOrganizationAuth(
                     attachments: true,
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
+                    // genes: true,
                     institution: true,
                     company: true,
                 },
@@ -2626,6 +2625,7 @@ export const createDiseaseModel = withOrganizationAuth(
                     contacts: true,
                     organization: {include: {conditions: {include: {condition: true}}}},
                     gene: true,
+                    // genes: true,
                     institution: true,
                     company: true,
                 },
@@ -2734,7 +2734,8 @@ export const createClinicalDataset = withOrganizationAuth(
                 description: data.description,
                 attachments: data.attachments,
                 contacts: data.contacts,
-                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                // gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                genes: (data.genes || []).map(gene => gene.value),
                 ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
                 institution: foundInstitution,
                 company: foundCompany,
@@ -2882,7 +2883,8 @@ export const updateClinicalDataset = withOrganizationAuth(
                 description: data.description,
                 attachments: data.attachments,
                 contacts: data.contacts,
-                gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                // gene: data.genes && data.genes.length > 0 ? data.genes[0] : undefined,
+                genes: (data.genes || []).map(gene => gene.value),
                 ...(data.cohortSize !== undefined && data.cohortSize !== null ? {cohortSize: JSON.parse(data.cohortSize)} : undefined),
                 institution: foundInstitution,
                 company: foundCompany,
@@ -3697,8 +3699,8 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     },
                     private: rfpData.private ?? false,
                     openTo: rfpData.openTo ?? [],
-                    startDate: rfpData.startDate,
-                    endDate: rfpData.endDate,
+                    startDate: rfpData.startDate || null, // remove start date if not provided
+                    endDate: rfpData.endDate || null, // remove end date if not provided
                     milestones: {
                         deleteMany: {},
                         create: (rfpData.milestones || []).map((milestone: any) => ({
@@ -3962,7 +3964,7 @@ export const createRoadmap = withOrganizationAuth(
                     timestamp: new Date(),                 // or finalRoadmap?.createdAt if you select it
                     traits: {
                         // optional profile upserts (handy for segmentation):
-                        userName: actor?.userName,
+                        name: actor?.userName,
                         organization_id: organization.id,
                         organization_name: organization.name ?? finalRoadmap?.organization?.name,
                         organization_subdomain: organization.subdomain,
@@ -6332,4 +6334,78 @@ export async function switchOrganization(organizationId: string) {
     }
 
     return {success: true};
+}
+
+export async function subscribeToOrganization(email: string, host?: string | null): Promise<ApiResponse<{ id: string }>> {
+    try {
+        const lower = email.trim().toLowerCase();
+        const isDomainValid = await validateEmailDomain(lower);
+
+        if (!isDomainValid) {
+            return {success: false, error: "Email domain is invalid or cannot receive emails."};
+        }
+
+        if (!host) return { success: false, error: "Missing host." };
+
+        // Try custom domain first
+        let org = await prisma.organization.findFirst({
+            where: { customDomain: host, public: true, published: true },
+            select: { id: true, subdomain: true },
+        });
+
+        // If not a custom domain, try subdomain.<ROOT_DOMAIN>
+        if (!org) {
+            const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN;
+            const isSubOnRoot = root && host.endsWith(`.${root}`);
+            const sub = isSubOnRoot ? host.slice(0, -(root.length + 1)) : null;
+
+            if (sub) {
+                org = await prisma.organization.findFirst({
+                    where: { subdomain: sub, public: true, published: true },
+                    select: { id: true, subdomain: true },
+                });
+            }
+        }
+
+        if (!org) return { success: false, error: "Organization not found." };
+
+        const existing = await prisma.subscription.findFirst({
+            where: { organizationId: org.id, email: lower },
+            select: { id: true },
+        });
+        if (existing) {
+            return { success: false, error: "You're already subscribed to this organization." };
+        }
+
+        const record = await prisma.subscription.create({
+            data: {
+                organizationId: org.id,
+                email: lower,
+            },
+            select: { id: true },
+        });
+
+        await customerIOTrack({
+            userId: null, // public form, no session
+            event: "user_subscribed_to_organization",
+            timestamp: new Date(),
+            traits: {
+                email: lower,
+                organization_id: org.id,
+            },
+            properties: {
+                email: lower,
+                organizationId: org.id,
+                organizationHost: host,
+            },
+        });
+
+        return { success: true, data: { id: record.id } };
+    } catch (err: any) {
+        console.error("subscribePublic error", err);
+        if (err?.code === "P2002") {
+            return { success: false, error: "You're already subscribed to this organization." };
+        }
+        return { success: false, error: "Database error. Please try again later." };
+    }
 }

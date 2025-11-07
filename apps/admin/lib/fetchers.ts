@@ -866,6 +866,36 @@ export const getOverviewAnalytics = withAdminAuth(
     }
 )
 
+export const getFacilityCreationRequests = withAdminAuth(
+    async (
+        select: Prisma.CreateFacilityRequestSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        try {
+            const facilityCreationRequests = await prisma.createFacilityRequest.findMany({
+                orderBy: { createdAt: "desc" },
+                select
+            })
+
+            if (!facilityCreationRequests) {
+                return {success: false, error: "Facility creation requests not found"};
+            }
+
+            return {
+                success: true,
+                data: facilityCreationRequests
+            };
+        } catch (error: any) {
+            logError("Error fetching facility creation requests", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
 export const getCompanyContactRequests = withAdminAuth(
     async (
         select: Prisma.CompanyContactRequestSelect<InternalArgs & {

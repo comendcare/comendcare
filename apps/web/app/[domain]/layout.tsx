@@ -5,6 +5,10 @@ import {Metadata} from "next"
 import PublicPageFooter from "~web/components/public-page-footer"
 import {TooltipProvider} from "@radix-ui/react-tooltip"
 import {PublicPageNavbarLoginOnly} from "~web/components/public-page-navbar-login-only";
+import {StickyBanner} from "@/packages/components/ui/sticky-banner";
+import {Button} from "@/packages/components/ui/button";
+import Link from "next/link";
+import PublicPageBottomBanner from "~web/components/public-page-bottom-banner";
 
 export async function generateMetadata({
                                            params
@@ -191,10 +195,25 @@ export default async function SiteLayout({
     return (
         <div>
             <TooltipProvider>
+                {/* <StickyBanner className="bg-blue-light flex-row space-x-4">
+                    <p className="mx-0 max-w-[90%] text-black drop-shadow-md">
+                        Announcing $10M seed funding from project mayhem ventures.{" "}
+                        <a href="#" className="transition duration-200 hover:underline">
+                            Read announcement
+                        </a>
+                    </p>
+                    <Button
+                        className="w-fit ml-2 inline-block rounded-full bg-blue-dark px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+                        asChild
+                    >
+                        <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                            Sign up <span aria-hidden="true">&rarr;</span>
+                        </Link>
+                    </Button>
+                </StickyBanner> */}
                 <PublicPageNavbarLoginOnly/>
-                <div>
-                    {children}
-                </div>
+                {children}
+                <PublicPageBottomBanner/>
                 <PublicPageFooter/>
             </TooltipProvider>
         </div>

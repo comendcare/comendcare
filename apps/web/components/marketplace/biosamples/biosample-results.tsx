@@ -5,7 +5,7 @@ import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/bi
 import { useShallow } from "zustand/react/shallow";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
-import { BiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table";
+import { TypesenseBiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table";
 import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
 import { SearchParams } from "@/packages/components/types";
 
@@ -52,7 +52,7 @@ export function BiosampleSearchResults({
                 <NoResultsView />
             ): (
                 <div className="max-w-7xl w-full overflow-auto">
-                    <BiosamplesTable data={searchResults} pageCount={1} columns={columns} searchParams={{}}/>
+                    <TypesenseBiosamplesTable data={searchResults} pageCount={1} columns={columns} searchParams={{}}/>
                 </div>
             )}
         </div>

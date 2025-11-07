@@ -222,17 +222,11 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                             metadata: true
                         })
 
-                        // keep your current logic that uses email in dev/preview and user.id in prod
-                        const canonicalId =
-                            process.env.NEXT_PUBLIC_NODE_ENV !== "production"
-                                ? session.user.email!               // you already identify Mixpanel with email in dev
-                                : session.user.id!;                 // and with user.id in prod
-
                         // Identify in Customer.io Web SDK with the same id
                         if (process.env.NEXT_PUBLIC_APP_ENV === 'production') {
                             const cio = (window as any)._cio;
-                            if (cio && canonicalId) {
-                                cio.identify(canonicalId, {
+                            if (cio && session?.user?.id) {
+                                cio.identify(session.user.id, {
                                     email: session.user.email ?? undefined,
                                     name: session.user.name ?? undefined,
                                     // optional: mirror org traits so web-events have them, too

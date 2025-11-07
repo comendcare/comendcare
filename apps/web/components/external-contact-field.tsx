@@ -40,7 +40,7 @@ export const ExternalContactField = ({
             </div>
             <div className="h-fit w-full grow row-start-2 col-start-2 lg:row-start-1 lg:col-start-3">
             <Input
-                placeholder={`Email`}
+                placeholder={`Email (required)`}
                 value={value.email}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                     onValueChange({

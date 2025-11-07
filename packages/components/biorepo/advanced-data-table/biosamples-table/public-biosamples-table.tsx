@@ -9,7 +9,7 @@ import { SearchParams } from "typesense/lib/Typesense/Documents";
 import { useBiosampleSearchStore } from "../../../../../state/search/biosampleSearchStore";
 import {DataTableToolbar} from "./../data-table/data-table-toolbar";
 
-export function BiosamplesTable({
+export function TypesenseBiosamplesTable({
     data, 
     pageCount, 
     columns, 

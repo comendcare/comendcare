@@ -51,6 +51,9 @@ export async function POST(req: Request) {
                 },
                 rfis: true,
                 reviews: true,
+                biosamples: true,
+                diseaseModel: true,
+                tool: true,
             },
         });
 
