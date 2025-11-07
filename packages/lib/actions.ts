@@ -471,11 +471,12 @@ export const createOrganization = withAuth(
                     },
                 });
 
+                // If user is a comendcare.com user, set role to support, not owner
                 const membership = await tx.member.create({
                     data: {
                         userId: session.user.id,
                         email: session.user.email,
-                        role: "owner",
+                        role: session.user.email?.toLowerCase().endsWith("@comendcare.com") ? "support" : "owner",
                         title,
                         organizationId: organization.id,
                     },
