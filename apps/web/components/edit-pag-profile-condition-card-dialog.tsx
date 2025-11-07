@@ -41,7 +41,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [defaultResearchValues, setDefaultResearchValues] = useState<z.infer<typeof researchFormSchema> | undefined>(undefined);
-    const isOwner = session?.user?.membership?.role === "owner";
+    const isOwner = ["owner", "support"].includes(session?.user?.membership?.role);
 
     const editResearchForm = useForm<z.infer<typeof researchFormSchema>>({
         mode: "onChange",

@@ -6,6 +6,7 @@ import {Input} from "@comend/components/ui/input"
 import {Form, FormField, FormItem, FormControl} from "@comend/components/ui/form"
 import {useForm} from "react-hook-form"
 import {subscribeToOrganization} from "@/packages/lib/actions";
+import {toast} from "sonner";
 
 export default function PublicPageBottomBanner() {
     const form = useForm({
@@ -22,10 +23,9 @@ export default function PublicPageBottomBanner() {
             const host = typeof window !== "undefined" ? window.location.hostname : null;
             const res = await subscribeToOrganization(values.email, host);
             if (!res.success) {
-                console.error(res.error);
-                // optional: surface a toast here
+                toast.error(res.error || "Something went wrong. Please try again.");
             } else {
-                // optional: toast "Thanks! You're subscribed."
+                toast.success("You’ve successfully been subscribed for updates.");
             }
         } catch (err) {
             console.error(err);
