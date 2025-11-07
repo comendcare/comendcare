@@ -10,14 +10,12 @@ import {OrganizationCard} from "comend-pag-platform/components/organization-card
 import { debounce } from "lodash"
 import { useCallback, useMemo, useState } from "react"
 
-export default function Organizations({ organizations, limit }: { organizations: Organization[], limit?: number }) {
+export default function Organizations({ organizations }: { organizations: Organization[] }) {
     const [query, setQuery] = useState('')
-    // const [searchTerm, setSearchTerm] = useState('')
     const [filteredOrganizations, setFilteredOrganizations] = useState(organizations)
 
     const handleInputChangeCallback = useCallback(
         (search: string) => {
-            // setSearchTerm(search)
             setFilteredOrganizations(organizations.filter(org => org.name?.toLocaleLowerCase()?.includes(search?.toLocaleLowerCase())))
         },
         [setFilteredOrganizations]

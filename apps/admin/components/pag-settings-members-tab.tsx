@@ -29,9 +29,6 @@ export default async function PAGSettingsMembersTab({members}: {members: MemberW
                 <p className="font-title text-xl text-stone-600 dark:text-stone-400">
                     {`You're not part of an organization yet.`}
                 </p>
-                <div className="mt-8">
-                    {/* <CreateOrJoinOrganizationButton /> */}
-                </div>
             </div>
         )
     }
@@ -97,9 +94,6 @@ export default async function PAGSettingsMembersTab({members}: {members: MemberW
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
                                             {new Date(person?.createdAt).toDateString()}
-                                        </td>
-                                        <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                            {/* <MembersDropdown member={person} /> */}
                                         </td>
                                     </tr>
                                 ))}

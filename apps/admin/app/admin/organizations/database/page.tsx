@@ -10,15 +10,14 @@ import prisma from "@comend/lib/prisma"
 
 export default async function AllOrganizations() {
     const session = await getSession()
-    // if (!session) {
-    //     redirect("/login")
-    // }
+    if (!session) {
+        redirect("/login")
+    }
 
     const organizations = await prisma.organization.findMany({
         orderBy: {
             createdAt: "desc"
         },
-        // ...(limit ? { take: limit } : {})
     })
 
     return (
@@ -33,7 +32,7 @@ export default async function AllOrganizations() {
                         <CreateOrganizationModal />
                     </CreateOrganizationButton>
                 </div>
-                {/* <Suspense
+                <Suspense
                     fallback={
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                             {Array.from({ length: 8 }).map((_, i) => (
@@ -41,9 +40,9 @@ export default async function AllOrganizations() {
                             ))}
                         </div>
                     }
-                > */}
+                >
                     <Organizations organizations={organizations}/>
-                {/* </Suspense> */}
+                </Suspense>
             </div>
         </div>
     )

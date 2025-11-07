@@ -1,8 +1,5 @@
 import Image from "next/image"
-// import InviteUserToOrgDialog from "~web/components/invite-user-to-org-dialog"
-// import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organization-button"
 import { ProfilePhoto } from "@comend/components/profile-photo"
-// import InvitationsDropdown from "~web/components/invitations-dropdown"
 import {Invitation, Prisma} from "@prisma/client";
 import {getSession} from "@/packages/lib/auth";
 
@@ -33,9 +30,6 @@ export default async function PAGSettingsInvitationsTab({organization}: {organiz
                 <p className="font-title text-xl text-stone-600 dark:text-stone-400">
                     {`You're not part of an organization yet.`}
                 </p>
-                <div className="mt-8">
-                    {/* <CreateOrJoinOrganizationButton /> */}
-                </div>
             </div>
         )
     }
@@ -48,7 +42,6 @@ export default async function PAGSettingsInvitationsTab({organization}: {organiz
                         <h2 className="text-xl font-semibold leading-6 text-gray-900">Invitations</h2>
                         <p className="text-sm text-gray-700">All open invitations sent by your organization.</p>
                     </div>
-                    {/* <InviteUserToOrgDialog organization={organization}/> */}
                 </div>
                 <Image
                     alt="No open invitations"
@@ -78,7 +71,6 @@ export default async function PAGSettingsInvitationsTab({organization}: {organiz
                     <h2 className="text-xl font-semibold leading-6 text-gray-900">Invitations</h2>
                     <p className="text-sm text-gray-700">All open invitations sent by your organization.</p>
                 </div>
-                {/* <InviteUserToOrgDialog organization={organization}/> */}
             </div>
 
             <div className="mt-8 flow-root">
@@ -123,9 +115,6 @@ export default async function PAGSettingsInvitationsTab({organization}: {organiz
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
                                         {new Date(person.createdAt).toLocaleDateString()}
-                                    </td>
-                                    <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                        {/* <InvitationsDropdown invitation={person} /> */}
                                     </td>
                                 </tr>
                             ))}

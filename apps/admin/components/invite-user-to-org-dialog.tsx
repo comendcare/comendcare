@@ -32,7 +32,6 @@ import {
     DialogTrigger,
 } from "@comend/components/ui/dialog";
 import { toast } from "sonner";
-import { getOrganizationFromOrganizationId } from "@comend/lib/fetchers";
 import { UserPlus } from "lucide-react";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import LoadingDots from "@comend/components/icons/loading-dots";
@@ -86,8 +85,6 @@ export default function InviteUserToOrgDialog({organization}: {organization: Org
             setLoading(false);
         }
     }
-
-    // const disabled = session?.user?.membership?.role !== "owner" || status !== "authenticated";
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
