@@ -61,10 +61,13 @@ export default function ResearcherProfilePublicationsSection({researcherData}: {
                                         </p>
                                         <div
                                             className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                                                            <span
-                                                                className="font-medium">{pub.host_venue?.display_name || "Unknown Journal"}</span>
+                                            <span
+                                                className="font-medium"
+                                            >
+                                                {pub.host_venue?.display_name || "Unknown Journal"}
+                                            </span>
                                             <span>{pub.publication_year}</span>
-                                            <Badge variant="outline" className="text-xs">
+                                            <Badge variant="outline" className="capitalize text-xs">
                                                 {pub.type}
                                             </Badge>
                                         </div>

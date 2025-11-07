@@ -6025,6 +6025,7 @@ export const updateResearcher = withAuth(
                 where: {userId: session.user.id},
                 data: {
                     title: data.title,
+                    orcid: data.orcid,
                     researchInterests: {
                         set: data.researchInterests?.map((r: any) => r.value) || [],
                     },

@@ -1,5 +1,6 @@
 "use client";
 
+import React, {useEffect, useState} from "react";
 import {
     Dialog,
     DialogContent,
@@ -36,7 +37,6 @@ import {
     getUser,
     getResearcherFromUserId,
 } from "@comend/lib/fetchers";
-import React, {useEffect, useState} from "react";
 import {useSession} from "next-auth/react";
 import {Skeleton} from "@/packages/components/ui/skeleton";
 import {badgeVariants} from "@/packages/components/ui/badge";
@@ -216,7 +216,7 @@ export default function EditResearcherProfileDialog() {
             <DialogContent className="max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Edit Researcher</DialogTitle>
-                    <DialogDescription>Update user profile information below.</DialogDescription>
+                    <DialogDescription>Update your researcher profile information below.</DialogDescription>
                 </DialogHeader>
 
                 <Form {...form}>
