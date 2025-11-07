@@ -4317,7 +4317,8 @@ export const createMilestones = withOrganizationAuth(
                             biosamples: {include: {biosample: true}},
                             diseaseModels: {include: {diseaseModel: true}},
                             tools: {include: {tool: true}},
-                            rfps: {include: {rfp: true}}
+                            rfps: {include: {rfp: true}},
+                            createFacilityRequests: true,
                         },
                         data: {
                             id: milestone?.id,
@@ -4785,6 +4786,22 @@ export const updateMilestones = withOrganizationAuth(
                         );
                     }
 
+                    let foundInstitutions = undefined
+                    let foundCompanies = undefined
+
+                    // if (milestone.partners && milestone.partners.length > 0) {
+                    //     foundInstitution = await prisma.institution.findUnique({
+                    //         where: {
+                    //             id: milestone?.partners?.[0]?.value
+                    //         }
+                    //     })
+                    //     foundCompany = await prisma.company.findUnique({
+                    //         where: {
+                    //             id: milestone?.partners?.[0]?.value
+                    //         }
+                    //     })
+                    // }
+
                     const m = await prisma.milestone.update({
                         where: {nodeId: milestone.nodeId},
                         include: {
@@ -4797,6 +4814,7 @@ export const updateMilestones = withOrganizationAuth(
                             diseaseModels: {include: {diseaseModel: true}},
                             tools: {include: {tool: true}},
                             rfps: {include: {rfp: true}},
+                            createFacilityRequests: true,
                         },
                         data: {
                             title: milestone.title,
@@ -4841,6 +4859,18 @@ export const updateMilestones = withOrganizationAuth(
                                     },
                                 })),
                             },
+                            // institutions: {
+                            //     deleteMany: {},
+                            //     create: (foundInstitutions || []).map((institution: any) => ({
+                            //         institution: {connect: {id: institution.institutionId || institution.institution.id}}
+                            //     }))
+                            // },
+                            // companies: {
+                            //     deleteMany: {},
+                            //     create: (foundCompanies || []).map((company: any) => ({
+                            //         company: {connect: {id: company.companyId || company.company.id}}
+                            //     }))
+                            // },
                             timelineOrder: milestone.timelineOrder,
                             otherTypeDetails: milestone.otherTypeDetails,
                             description: milestone.description,

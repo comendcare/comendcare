@@ -300,7 +300,8 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
         biosamples: { include: {biosample: true, biosampleId: true, milestoneId: true}},
         diseaseModels: {include: {diseaseModel: true, diseaseModelId: true, milestoneId: true}},
         tools: { include: { tool: true, toolId: true, milestoneId: true } },
-        rfps: { include: { rfp: true, rfpId: true, milestoneId: true } }
+        rfps: { include: { rfp: true, rfpId: true, milestoneId: true } },
+        createFacilityRequests: true,
     }
 }>, ("types" | "tools" | "rfps")> & {
     types: Array<{
