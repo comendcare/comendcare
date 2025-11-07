@@ -54,8 +54,8 @@ export default function MemberRequestsDropdown({memberRequest}: { memberRequest:
         }
     }
 
-    const canApproveRequest = session?.data?.user?.membership?.role === "owner"
-    const canDenyRequest = session?.data?.user?.membership?.role === "owner"
+    const canApproveRequest = ["owner", "support"].includes(session?.data?.user?.membership?.role);
+    const canDenyRequest = ["owner", "support"].includes(session?.data?.user?.membership?.role);
 
     const showDropdownTrigger = canApproveRequest || canDenyRequest
 

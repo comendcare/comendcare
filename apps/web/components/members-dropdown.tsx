@@ -29,7 +29,7 @@ import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 const formSchema = z.object({
     title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
-    role: z.enum(["member", "owner"], {message: "Role must be either Member or Owner."}),
+    role: z.enum(["member", "owner"], {message: "Role must be either Member or Owner."}).optional(),
 })
 
 
@@ -38,13 +38,15 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
     const {data: session, update} = useSession()
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isLastOwner, setIsLastOwner] = useState(false)
+    const role = session?.user?.membership?.role;
+    const isManager = ["owner", "support"].includes(role as string);
 
     const form = useForm<z.infer<typeof formSchema>>({
         mode: "onChange",
         resolver: zodResolver(formSchema),
         defaultValues: {
             title: member.title || "",
-            role: member.role as z.infer<typeof formSchema>["role"],
+            role: member.role === "support" ? undefined : (member.role as "member" | "owner"),
         }
     })
 
@@ -66,10 +68,9 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                         const currentOrgMemberships = response.data.filter(
                             (m: MembershipWithOrganization) => m.organizationId === currentOrgId
                         );
-                        const ownerCount = currentOrgMemberships.filter((m) => m.role === "owner").length;
-
-                        if (ownerCount === 1 && session.user.id === member.user.id && member.role === "owner") {
-                            setIsLastOwner(true);
+                        const managerCount = currentOrgMemberships.filter((m) => ["owner","support"].includes(m.role as string)).length;
+                        if (managerCount === 1 && session.user.id === member.user.id && ["owner","support"].includes(member.role as string)) {
+                            setIsLastOwner(true); // optionally rename to setIsLastManager
                         }
                     } else {
                         console.error(response.error)
@@ -89,13 +90,15 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
     async function onEditMembershipSubmit(values: z.infer<typeof formSchema>) {
         if (!session?.user.organizationId) return;
 
-        const res = session.user.membership?.role === "owner"
-            ? await updateMemberWithOwnerPermission(session.user.organizationId, member.id, values)
-            : await updateMemberWithMemberPermission(session.user.organizationId, member.id, values);
+        const payload: any = {};
+        if (values.title !== member.title) payload.title = values.title;
+        if (values.role && values.role !== member.role) payload.role = values.role; // omitted for support
 
-        if (!res.success) {
-            console.error(res.error); toast.error(res.error); return;
-        }
+        const res = isManager
+            ? await updateMemberWithOwnerPermission(session.user.organizationId, member.id, payload)
+            : await updateMemberWithMemberPermission(session.user.organizationId, member.id, payload);
+
+        if (!res.success) { console.error(res.error); toast.error(res.error); return; }
 
         mixpanelTrack("Membership Updated", {
             "Member Name": res.data.user.name,
@@ -148,9 +151,9 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
         router.push("/app/profile");
     };
 
-    const canEditMembership = session?.user?.id === member?.user?.id || session?.user?.membership?.role === "owner";
+    const canEditMembership = session?.user?.id === member?.user?.id || isManager;
+    const canRevokeMembership = isManager && session?.user?.id !== member?.user?.id;
     const canLeaveOrganization = session?.user?.id === member?.user?.id;
-    const canRevokeMembership = session?.user?.membership?.role === "owner" && session?.user?.id !== member?.user?.id;
 
     const showDropdownTrigger = canEditMembership || canLeaveOrganization || canRevokeMembership;
 
@@ -177,7 +180,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     {
-                        (session?.user?.id === member?.user?.id || session?.user?.membership?.role === "owner") && (
+                        (session?.user?.id === member?.user?.id || isManager) && (
                             <DialogTrigger asChild>
                                 <DropdownMenuItem>
                                     <Pencil/>
@@ -197,7 +200,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                                 <UserX/>
                                 Leave organization
                             </DropdownMenuItem>
-                        ) : session?.user?.membership?.role === "owner" ? (
+                        ) : isManager ? (
                             // Case 2: The current user is an owner and viewing someone else's membership
                             <DropdownMenuItem
                                 onClick={() => revokeMembership(member)}
@@ -239,7 +242,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                             />
 
                             {
-                                session?.user?.membership?.role === "owner" &&
+                                isManager &&
                                 <FormField
                                     control={form.control}
                                     name="role"
