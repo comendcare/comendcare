@@ -45,7 +45,7 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
         })(),
         variant: biosample['Variant'],
         availability: AVAILABILITY_OPTIONS.find(option => option.label === biosample['Availability'])?.value,
-        quantity: biosample['Total Available Quantity (in ml)'],
+        quantity: biosample['Total Available Quantity'],
         quantityUnit: QUANTITY_OPTIONS.find(option => option.label === biosample['Quantity Unit'])?.value || 'ml',
         sex: DONOR_SEX_OPTIONS.find(option => option.label === biosample['Sex'])?.value,
         description: biosample.Description,
