@@ -1024,59 +1024,62 @@ export function EditMilestoneForm({
                                                     )}
                                                 />
                                             )}
-                                        </div>
 
-                                        <FormField
-                                            control={form.control}
-                                            name="partners"
-                                            render={({field}) => (
-                                                <FormItem className={cn("w-full flex gap-4 items-center")}>
-                                                    <FormLabel className="w-[110px]">Partners</FormLabel>
-                                                    <div className="w-full">
-                                                        <FormControl className="w-full">
-                                                            <MultipleSelector
-                                                                {...field}
-                                                                ref={storageFacilityRef}
-                                                                creatable={true}
-                                                                createOnBlur={false}
-                                                                creatableItemOverride={(props) => (
-                                                                    <SubmitCreateRequest
-                                                                        {...props}
-                                                                        parentRef={storageFacilityRef}
-                                                                        onClickCallback={async (e) => {
-                                                                            e.preventDefault()
-                                                                            e.stopPropagation()
-                                                                            const newRequest = await createCreateFacilityRequest(
-                                                                                session?.user.organizationId,
-                                                                                {
-                                                                                    name: props.inputValue,
-                                                                                    milestoneId: milestoneData.id
-                                                                                }
-                                                                            )
-                                                                            setCreateRequests(prev => [...prev, newRequest])
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                                triggerSearchOnFocus={true}
-                                                                onSearch={handleStorageFacilityAsyncSearch}
-                                                                placeholder="Search..."
-                                                                hidePlaceholderWhenSelected={true}
-                                                                loadingIndicator={<p>Loading results...</p>}
-                                                                emptyIndicator={<p>No results found. Try a different search.</p>}
-                                                                showHoverCard={false}
-                                                                className="-mt-2 w-full min-h-[40px]"
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage/>
-                                                    </div>
-                                                </FormItem>
-                                            )}
-                                        />
+                                            <FormField
+                                                control={form.control}
+                                                name="partners"
+                                                render={({field}) => (
+                                                    <>
+                                                        <FormLabel>Partners</FormLabel>
+                                                        <span className="w-full flex gap-2">
+                                                            <FormControl className="w-full">
+                                                                <MultipleSelector
+                                                                    {...field}
+                                                                    ref={storageFacilityRef}
+                                                                    creatable={true}
+                                                                    createOnBlur={false}
+                                                                    creatableItemOverride={(props) => (
+                                                                        <SubmitCreateRequest
+                                                                            {...props}
+                                                                            parentRef={storageFacilityRef}
+                                                                            onClickCallback={async (e) => {
+                                                                                e.preventDefault()
+                                                                                e.stopPropagation()
+                                                                                const newRequest = await createCreateFacilityRequest(
+                                                                                    session?.user.organizationId,
+                                                                                    {
+                                                                                        name: props.inputValue,
+                                                                                        milestoneId: milestoneData.id
+                                                                                    }
+                                                                                )
+                                                                                setCreateRequests(prev => [...prev, newRequest])
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                    triggerSearchOnFocus={true}
+                                                                    onSearch={handleStorageFacilityAsyncSearch}
+                                                                    placeholder="Search..."
+                                                                    hidePlaceholderWhenSelected={true}
+                                                                    loadingIndicator={<p>Loading results...</p>}
+                                                                    emptyIndicator={<p>No results found. Try a different search.</p>}
+                                                                    showHoverCard={false}
+                                                                    className="w-full min-h-[40px]"
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage/>
+                                                        </span>
+                                                    </>
+                                                )}
+                                            />
+                                            
+                                            {/* spacer */}
+                                            <div></div> 
 
-                                        <div className="flex flex-col gap-2">
-                                            {createRequests.map((request, index) => (
-                                                <Badge className="w-full text-sm font-normal" key={index}>{`Creation request for "${request?.name}" submitted.`}</Badge>
-                                            ))}
+                                            <div className="flex flex-col gap-2">
+                                                {createRequests.map((request, index) => (
+                                                    <Badge className="w-full text-sm font-normal" key={index}>{`Creation request for "${request?.name}" submitted.`}</Badge>
+                                                ))}
+                                            </div>
                                         </div>
 
                                         {(formData?.contacts && formData?.contacts.length > 0) && (
