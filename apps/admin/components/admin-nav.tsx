@@ -79,6 +79,12 @@ export default function AdminNav({children}: { children: ReactNode }) {
                     isActive: segments.includes("analytics"),
                     icon: <BarChart3 width={18}/>
                 },
+                {
+                    name: "Members",
+                    href: `/admin/organization/${id}/members`,
+                    isActive: segments.includes("members"),
+                    icon: <Users width={18}/>
+                },
                 // {
                 //     name: "Settings",
                 //     href: `/admin/organization/${id}/settings`,

@@ -4,8 +4,15 @@ import PlaceholderCard from "@comend/components/placeholder-card"
 import CreateOrganizationButton from "~admin/components/create-organization-button"
 import CreateOrganizationModal from "@comend/components/modal/create-organization"
 import {AdminOrganizationsNav} from "~admin/components/admin-organizations-nav";
+import prisma from "@comend/lib/prisma"
 
-export default function AllOrganizations() {
+export default async function AllOrganizations() {
+    const organizations = await prisma.organization.findMany({
+        orderBy: {
+            createdAt: "desc"
+        },
+    })
+
     return (
         <div className="mx-auto flex max-w-screen-xl flex-col space-y-12 p-8">
             <div className="flex flex-col space-y-6">
@@ -27,7 +34,7 @@ export default function AllOrganizations() {
                         </div>
                     }
                 >
-                    <Organizations />
+                    <Organizations organizations={organizations}/>
                 </Suspense>
             </div>
         </div>
