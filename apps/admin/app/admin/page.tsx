@@ -4,8 +4,16 @@ import OverviewStats from "~admin/components/overview-stats";
 import Roadmaps from "~admin/components/roadmaps";
 import PlaceholderCard from "@comend/components/placeholder-card";
 import OverviewOrganizationsCTA from "~admin/components/overview-organizations-cta";
+import prisma from "@comend/lib/prisma"
 
-export default function Overview() {
+export default async function Overview() {
+    const organizations = await prisma.organization.findMany({
+        orderBy: {
+            createdAt: "desc"
+        },
+        take: 4 // only fetch 4 for overview
+    })
+    
     return (
         <div className="flex max-w-screen-xl flex-col space-y-12 p-8">
             <div className="flex flex-col space-y-6">
@@ -33,7 +41,7 @@ export default function Overview() {
                         </div>
                     }
                 >
-                    <Organizations limit={4}/>
+                    <Organizations searchable={false} organizations={organizations}/>
                 </Suspense>
             </div>
 
