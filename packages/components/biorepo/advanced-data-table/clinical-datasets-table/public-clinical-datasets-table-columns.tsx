@@ -314,7 +314,7 @@ export function useClinicalDatasetsTableColumns(
 
     const presets: Record<Preset, string[]> = {
         default: comendColumns.map((c) => c.id as string),
-        profile: ["types", "title", "title.title", "type.label", "gene.symbol", "cohortSize", "contacts", "links"],
+        profile: ["types", "title", "title.title", "type.label", "genes", "gene.symbol", "cohortSize", "links"],
     };
 
     const wanted = new Set(presets[preset]);
