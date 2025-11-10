@@ -19,10 +19,12 @@ export const companyFormSchema = z.object({
     services: z.array(optionSchema).optional(),
     certifications: z.array(optionSchema).optional(),
     tags: z.array(optionSchema).optional(),
+    milestones: z.array(z.custom<Option>()).optional(),
     tools: z.array(z.custom<Option>()).optional(),
 })
 
 export const institutionFormSchema = z.object({
     name: z.string().min(1, "Name is required"),
+    milestones: z.array(z.custom<Option>()).optional(),
     tools: z.array(z.custom<Option>()).optional(),
 })

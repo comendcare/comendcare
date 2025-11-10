@@ -10,6 +10,8 @@ export default async function ProviderCrationRequestCompaniesPage() {
         createdAt: true,
         updatedAt: true,
         name: true,
+        milestoneId: true,
+        milestone: true,
         biosampleId: true,
         biosample: true,
         diseaseModelId: true,

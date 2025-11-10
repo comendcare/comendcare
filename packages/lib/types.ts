@@ -300,7 +300,10 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
         biosamples: { include: {biosample: true, biosampleId: true, milestoneId: true}},
         diseaseModels: {include: {diseaseModel: true, diseaseModelId: true, milestoneId: true}},
         tools: { include: { tool: true, toolId: true, milestoneId: true } },
-        rfps: { include: { rfp: true, rfpId: true, milestoneId: true } }
+        rfps: { include: { rfp: true, rfpId: true, milestoneId: true } },
+        companies: {include: {company: true, companyId: true, milestoneId: true}},
+        institutions: {include: {institution: true, institutionId: true, milestoneId: true}}
+        createFacilityRequests: true,
     }
 }>, ("types" | "tools" | "rfps")> & {
     types: Array<{
@@ -327,6 +330,16 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
         rfp?: DBRFP,
         milestoneId?: string,
         rfpId: string,
+    }>,
+    companies: Array<{
+        company?: Company,
+        milestoneId?: string,
+        companyId: string,
+    }>,
+    institutions: Array<{
+        institution?: Institution,
+        milestoneId?: string,
+        institutionId: string,
     }>
     label?: string // used for badges in the provider marketplace
 };
