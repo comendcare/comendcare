@@ -84,8 +84,9 @@ export function CreateCompanyForm({
                 ? ([{
                     value: request.milestone.id,
                     type: 'Project',
-                    label: request.milestone.id,
-                    milestone: request.milestone
+                    label: request.milestone.title,
+                    milestone: request.milestone,
+                    icon: 'file-text'
                 }]) 
                 : ([]),
             tools: request 
@@ -353,7 +354,7 @@ export function CreateCompanyForm({
                                     hidePlaceholderWhenSelected={true}
                                     showHoverCard={false}
                                     placeholder="Search..."
-                                    badgeClassName="border-transparent bg-green-100 text-green-900"
+                                    badgeClassName="border-transparent bg-purple-100 text-purple-900"
                                     emptyIndicator={
                                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                             no results found.

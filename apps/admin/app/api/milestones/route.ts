@@ -21,7 +21,7 @@ export async function GET(req: Request) {
 
         // Format for selector input (e.g., dropdown)
         const formattedResults = milestones.map((milestone) => ({
-            label: milestone.id,
+            label: milestone.title,
             value: milestone.id,
             type: 'Project',
             icon: "file-text",
