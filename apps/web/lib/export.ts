@@ -59,6 +59,9 @@ const orgDeepInclude = {
                     savedCompanies: true,
                     attachments: true,
                     contacts: true,
+                    companies: {include: {company: true}},
+                    institutions: {include: {institution: true}},
+                    createFacilityRequests: true
                 },
             },
         },
@@ -76,6 +79,9 @@ const orgDeepInclude = {
             attachments: true,
             contacts: true,
             roadmap: true,
+            companies: {include: {company: true}},
+            institutions: {include: {institution: true}},
+            createFacilityRequests: true
         },
     },
 

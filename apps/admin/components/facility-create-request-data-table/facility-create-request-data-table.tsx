@@ -47,7 +47,7 @@ import {
 import {Table as TanstackTable} from "@tanstack/react-table"
 import {DotsHorizontalIcon} from "@radix-ui/react-icons";
 import {createInstitution, deleteFacilityCreateRequest, removeProviderContactRequest} from "~admin/lib/actions"
-import type {Biosample, DiseaseModel, Tool} from "@prisma/client";
+import type {Biosample, DiseaseModel, Milestone, Tool} from "@prisma/client";
 import {
     Dialog,
     DialogContent,
@@ -86,6 +86,8 @@ export type FacilityCreateRequest = {
     cratedAt: string
     updatedAt: string
     name: string
+    milestoneId: string,
+    milestone: Milestone,
     biosampleId: string
     biosample: Biosample
     diseaseModelId: string
@@ -479,6 +481,14 @@ export function CreateInstitutionForm({
         resolver: zodResolver(institutionFormSchema),
         defaultValues: {
             name: request?.name ?? "",
+            milestones: request?.milestone 
+                ? ([{
+                    value: request.milestone.id,
+                    type: 'Project',
+                    label: request.milestone.id,
+                    milestone: request.milestone
+                }]) 
+                : ([]),
             tools: request 
                 ? [
                     request.biosample ? {
@@ -510,6 +520,13 @@ export function CreateInstitutionForm({
 
     const handleToolAsyncSearch = async (query: string): Promise<Option[]> => {
         const toolsResponse = await fetch(`/api/tools?search=${query}`)
+        const toolsData = await toolsResponse.json()
+
+        return toolsData
+    }
+
+    const handleProjectAsyncSearch = async (query: string): Promise<Option[]> => {
+        const toolsResponse = await fetch(`/api/milestones?search=${query}`)
         const toolsData = await toolsResponse.json()
 
         return toolsData
@@ -548,6 +565,32 @@ export function CreateInstitutionForm({
                                 <Input placeholder="Institution Name" {...field} />
                             </FormControl>
                             <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="milestones"
+                    render={({field}) => (
+                        <FormItem className="w-full">
+                            <FormLabel>{`Linked Projects`}</FormLabel>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    onSearch={handleProjectAsyncSearch}
+                                    hidePlaceholderWhenSelected={true}
+                                    showHoverCard={false}
+                                    placeholder="Search..."
+                                    badgeClassName="border-transparent bg-green-100 text-green-900"
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                />
+                            </FormControl>
+                            <FormMessage className="text-primary"/>
                         </FormItem>
                     )}
                 />

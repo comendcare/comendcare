@@ -2984,6 +2984,7 @@ export const updateCreateFacilityRequest = withOrganizationAuth(
     async (organization: Organization, data: {
         id: string,
         name: string,
+        milestoneId?: string,
         biosampleId?: string,
         diseaseModelId?: string,
         clinicalDatasetId?: string
@@ -2994,12 +2995,16 @@ export const updateCreateFacilityRequest = withOrganizationAuth(
                 id: data.id
             },
             include: {
+                milestone: true,
                 biosample: true,
                 diseaseModel: true,
                 clinicalDataset: true,
             },
             data: {
                 name: data.name,
+                ...(data.milestoneId
+                    ? ({milestone: {connect: {id: data.milestoneId}}})
+                    : undefined),
                 ...(data.biosampleId
                     ? ({biosample: {connect: {id: data.biosampleId}}}) 
                     : undefined),
@@ -3019,6 +3024,7 @@ export const updateCreateFacilityRequest = withOrganizationAuth(
 export const createCreateFacilityRequest = withOrganizationAuth(
     async (organization: Organization, data: {
         name: string,
+        milestoneId?: string,
         biosampleId?: string,
         diseaseModelId?: string,
         clinicalDatasetId?: string
@@ -3026,12 +3032,16 @@ export const createCreateFacilityRequest = withOrganizationAuth(
         console.log(`create data`, data)
         const newRequest = await prisma.createFacilityRequest.create({
             include: {
+                milestone: true,
                 biosample: true,
                 diseaseModel: true,
                 clinicalDataset: true,
             },
             data: {
                 name: data.name,
+                ...(data.milestoneId
+                    ? ({milestone: {connect: {id: data.milestoneId}}})
+                    : undefined),
                 ...(data.biosampleId
                     ? ({biosample: {connect: {id: data.biosampleId}}}) 
                     : undefined),
@@ -4318,6 +4328,8 @@ export const createMilestones = withOrganizationAuth(
                             diseaseModels: {include: {diseaseModel: true}},
                             tools: {include: {tool: true}},
                             rfps: {include: {rfp: true}},
+                            companies: {include: {company: true}},
+                            institutions: {include: {institution: true}},
                             createFacilityRequests: true,
                         },
                         data: {
@@ -4365,7 +4377,21 @@ export const createMilestones = withOrganizationAuth(
                             },
                             status: milestone?.status || "PLANNED",
                             private: milestone?.private || true,
-                            nodeType: milestone?.nodeType || "PROJECT"
+                            nodeType: milestone?.nodeType || "PROJECT",
+                            companies: {
+                                create: (milestone?.companies || []).map((company: any) => ({
+                                    company: {
+                                        connect: {id: company.companyId}
+                                    }
+                                }))
+                            },
+                            institutions: {
+                                create: (milestone?.institutions || []).map((institution: any) => ({
+                                    institution: {
+                                        connect: {id: institution.institutionId}
+                                    }
+                                }))
+                            },
 
                             // create associated node
                             // node: {
@@ -4770,13 +4796,7 @@ export const updateMilestones = withOrganizationAuth(
                         where: {nodeId: milestone.nodeId},
                         select: {
                             id: true,
-                            private: true,
-                            // node: true,
-                            // contacts: true,
-                            // attachments: true,
-                            // types: {include: {milestoneType: true}},
-                            // tools: {include: {tool: true}},
-                            // rfps: {include: {rfp: true}},
+                            private: true
                         },
                     });
 
@@ -4789,18 +4809,21 @@ export const updateMilestones = withOrganizationAuth(
                     let foundInstitutions = undefined
                     let foundCompanies = undefined
 
-                    // if (milestone.partners && milestone.partners.length > 0) {
-                    //     foundInstitution = await prisma.institution.findUnique({
-                    //         where: {
-                    //             id: milestone?.partners?.[0]?.value
-                    //         }
-                    //     })
-                    //     foundCompany = await prisma.company.findUnique({
-                    //         where: {
-                    //             id: milestone?.partners?.[0]?.value
-                    //         }
-                    //     })
-                    // }
+                    if (milestone.partners && milestone.partners.length > 0) {
+                        foundInstitutions = await prisma.institution.findMany({
+                            where: {
+                                id: {in: milestone?.partners?.map((partner: Option) => partner.value)}
+                            }
+                        })
+                        foundCompanies = await prisma.company.findMany({
+                            where: {
+                                id: {in: milestone?.partners?.map((partner: Option) => partner.value)}
+                            }
+                        })
+                    }
+
+                    console.log(`found companies`, milestone.companies)
+                    console.log(`found institutions`, milestone.institutions)
 
                     const m = await prisma.milestone.update({
                         where: {nodeId: milestone.nodeId},
@@ -4814,6 +4837,8 @@ export const updateMilestones = withOrganizationAuth(
                             diseaseModels: {include: {diseaseModel: true}},
                             tools: {include: {tool: true}},
                             rfps: {include: {rfp: true}},
+                            companies: {include: {company: true}},
+                            institutions: {include: {institution: true}},
                             createFacilityRequests: true,
                         },
                         data: {
@@ -4859,18 +4884,22 @@ export const updateMilestones = withOrganizationAuth(
                                     },
                                 })),
                             },
-                            // institutions: {
-                            //     deleteMany: {},
-                            //     create: (foundInstitutions || []).map((institution: any) => ({
-                            //         institution: {connect: {id: institution.institutionId || institution.institution.id}}
-                            //     }))
-                            // },
-                            // companies: {
-                            //     deleteMany: {},
-                            //     create: (foundCompanies || []).map((company: any) => ({
-                            //         company: {connect: {id: company.companyId || company.company.id}}
-                            //     }))
-                            // },
+                            institutions: {
+                                deleteMany: {},
+                                create: (foundInstitutions || []).map((institution: any) => ({
+                                    institution: {
+                                        connect: {id: institution.id}
+                                    }
+                                }))
+                            },
+                            companies: {
+                                deleteMany: {},
+                                create: (foundCompanies || []).map((company: any) => ({
+                                    company: {
+                                        connect: {id: company.id}
+                                    }
+                                }))
+                            },
                             timelineOrder: milestone.timelineOrder,
                             otherTypeDetails: milestone.otherTypeDetails,
                             description: milestone.description,

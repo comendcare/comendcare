@@ -53,6 +53,7 @@ import {
 } from "@comend/lib/types"
 import {
     Biosample,
+    Company,
     CreateFacilityRequest,
     DiseaseModel,
     MilestoneType,
@@ -84,7 +85,7 @@ import Loading from "@/loading";
 import {getMilestoneTypes} from "@comend/lib/fetchers"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
 import {Globe, Lock, Plus, X, Share, Trash} from "lucide-react"
-import {badgeVariants} from "@comend/components/ui/badge"
+import {Badge, badgeVariants} from "@comend/components/ui/badge"
 import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onbordaStore"
 import {mixpanelTrack} from "@comend/lib/mixpanel"
 import ShareDialog from "./share-dialog"
@@ -339,6 +340,16 @@ export function EditMilestoneForm({
             ],
             rfps: (milestoneData?.rfps || []).map((rfp: any) => rfp.rfp) || [],
             notes: JSON.parse(milestoneData?.notes || "[]") || [],
+            partners: [
+                ...((milestoneData?.companies || []).map(company => ({
+                    value: company.companyId || undefined, 
+                    label: company.company.title || undefined,
+                }))),
+                ...((milestoneData.institutions || []).map(institution => ({
+                    value: institution.institutionId || undefined,
+                    label: institution.institution.name || undefined,
+                })))
+            ].filter(partner => !!partner)
         }
     })
 
@@ -382,8 +393,11 @@ export function EditMilestoneForm({
             openTo,
             tools,
             rfps,
-            notes
+            notes,
+            partners
         } = values;
+
+        console.log(`partners`, partners)
 
         const updateData: any = {
             ...milestoneData,
@@ -448,7 +462,8 @@ export function EditMilestoneForm({
                     rfp: rfp
                 })
             }).filter((rfp) => rfp !== undefined),
-            ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)} : undefined)
+            ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)} : undefined),
+            partners: partners || null,
         }
 
         if (milestoneData?.nodeId) setMilestone(milestoneData.nodeId, updateData)
@@ -1016,7 +1031,7 @@ export function EditMilestoneForm({
                                             name="partners"
                                             render={({field}) => (
                                                 <FormItem className={cn("w-full flex gap-4 items-center")}>
-                                                    <FormLabel className="w-[100px]">Partners</FormLabel>
+                                                    <FormLabel className="w-[110px]">Partners</FormLabel>
                                                     <div className="w-full">
                                                         <FormControl className="w-full">
                                                             <MultipleSelector
@@ -1042,7 +1057,6 @@ export function EditMilestoneForm({
                                                                         }}
                                                                     />
                                                                 )}
-                                                                maxSelected={1}
                                                                 triggerSearchOnFocus={true}
                                                                 onSearch={handleStorageFacilityAsyncSearch}
                                                                 placeholder="Search..."
@@ -1058,6 +1072,12 @@ export function EditMilestoneForm({
                                                 </FormItem>
                                             )}
                                         />
+
+                                        <div className="flex flex-col gap-2">
+                                            {createRequests.map((request, index) => (
+                                                <Badge className="w-full text-sm font-normal" key={index}>{`Creation request for "${request?.name}" submitted.`}</Badge>
+                                            ))}
+                                        </div>
 
                                         {(formData?.contacts && formData?.contacts.length > 0) && (
                                             <ContactsFormField form={form}/>

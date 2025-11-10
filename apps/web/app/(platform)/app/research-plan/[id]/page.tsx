@@ -13,6 +13,7 @@ import {
     getRoadmapMilestones, 
     getRoadmapNodes
 } from "@/packages/lib/fetchers"
+import { createCreateFacilityRequest } from "@/packages/lib/actions"
 
 export default async function RoadmapPage({
                                               params,
@@ -90,6 +91,9 @@ export default async function RoadmapPage({
             diseaseModels: { include: { diseaseModel: true } },
             tools: { include: { tool: true } },
             rfps: { include: { rfp: true } },
+            companies: {include: {company: true}},
+            institutions: {include: {institution: true}},
+            createFacilityRequests: true
         }),
         getRoadmapNodes(orgId, params.id, {
             id: true,

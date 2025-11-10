@@ -220,6 +220,7 @@ export const removeEmailFromBlacklist = withAdminAuth(
 export const createInstitution = withAdminAuth(
     async (formData: z.infer<typeof institutionFormSchema>) => {
         const name = formData.name as string
+        const milestones = formData.milestones
         const biosamples = formData.tools?.filter(tool => tool.type === "Biosamples")
         const diseaseModels = formData.tools?.filter(tool => tool.type === "Disease models")
         const clinicalDatasets = formData.tools?.filter(tool => tool.type === "Clinical datasets")
@@ -228,6 +229,13 @@ export const createInstitution = withAdminAuth(
             const institution = await prisma.institution.create({
                 data: {
                     name,
+                    ...(milestones && milestones.length > 0 && ({
+                        milestones: {
+                            create: milestones.map(milestoneOption => ({
+                                milestone: {connect: {id: milestoneOption.value}}
+                            }))
+                        }
+                    })),
                     ...(biosamples && biosamples.length > 0 && ({
                         biosamples: {connect: biosamples.map(b => ({id: b.value}))}
                     })),
@@ -283,6 +291,7 @@ export const createCompany = withAdminAuth(
         const servicesRaw = (formData.services?.map((service) => service.label).join(",") || "") as string
         const certificationsRaw = (formData.certifications?.map((cert) => cert.label).join(",") || "") as string
         const tagsRaw = (formData.tags?.map((tag) => tag.label).join(",") || "") as string
+        const milestones = formData.milestones
         const biosamples = formData.tools?.filter(tool => tool.type === "Biosamples")
         const diseaseModels = formData.tools?.filter(tool => tool.type === "Disease models")
         const clinicalDatasets = formData.tools?.filter(tool => tool.type === "Clinical datasets")
@@ -298,6 +307,8 @@ export const createCompany = withAdminAuth(
             : []
 
         const {categories, milestoneTypes} = getCategoriesAndMilestones(parsedServices)
+
+        console.log(`milestones`, milestones)
 
         try {
             const company = await prisma.company.create({
@@ -328,6 +339,13 @@ export const createCompany = withAdminAuth(
                     tags: parsedTags,
                     categories,
                     milestoneTypes,
+                    ...(milestones && milestones.length > 0 && ({
+                        milestones: {
+                            create: milestones.map(milestoneOption => ({
+                                milestone: {connect: {id: milestoneOption.value}}
+                            }))
+                        }
+                    })),
                     ...(biosamples && biosamples.length > 0 && ({
                         biosamples: {connect: biosamples.map(b => ({id: b.value}))}
                     })),
