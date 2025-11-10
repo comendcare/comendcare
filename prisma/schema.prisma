@@ -373,6 +373,7 @@ model Biosample {
   metadata    Json?
   types       String[] // values (BiosampleType ids)
   genotype    String?
+  bsiId       String?
 
   genes               String[]
   gene                Gene?     @relation(fields: [geneId], references: [id])
