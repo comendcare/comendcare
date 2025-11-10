@@ -92,7 +92,7 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<z.infer
 
             return []
         })(),
-        description: diseaseModel.Description,
+        description: diseaseModel.Notes,
         contacts,
         attachments: links,
         genotype: diseaseModel['Genotype'] || undefined,
@@ -122,7 +122,7 @@ export function DiseaseModelBulkImportDialog() {
                         {key: 'Type', required: false, defaultValue: undefined, isValid: (entry) => DISEASE_MODEL_TYPE_OPTIONS.find(option => option.labal === entry.Type) !== undefined},
                         {key: 'Gene', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Storage Facility', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                        {key: 'Description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Notes', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Point of Contact Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Point of Contact Email', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Link Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
