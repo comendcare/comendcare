@@ -2645,7 +2645,7 @@ export const createDiseaseModel = withOrganizationAuth(
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
                     ...(diseaseModelData.company 
                         ? ({company: {connect: {id: diseaseModelData.company.id}}}) // if company exists in database, connect
-                        : ({institution: undefined})), // if company does not exist in database, don't connect
+                        : ({company: undefined})), // if company does not exist in database, don't connect
                     attachments: {
                         createMany: {
                             data: (diseaseModelData?.attachments || []).map((attachment: any) => ({
@@ -2803,7 +2803,7 @@ export const createClinicalDataset = withOrganizationAuth(
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
                     ...(dataToolData.company 
                         ? ({company: {connect: {id: dataToolData.company.id}}}) // if company exists in database, connect
-                        : ({institution: undefined})), // if company does not exist in database, don't connect
+                        : ({company: undefined})), // if company does not exist in database, don't connect
                 }
             })
 
@@ -3107,6 +3107,7 @@ export const createBiosample = withOrganizationAuth(
                 company: foundCompany,
                 genotype: data.genotype,
                 notes: data.notes,
+                bsiId: data.bsiId,
                 // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
                 // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
             }
@@ -3168,7 +3169,7 @@ export const createBiosample = withOrganizationAuth(
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
                     ...(biosampleData.company 
                         ? ({company: {connect: {id: biosampleData.company.id}}}) // if company exists in database, connect
-                        : ({institution: undefined})), // if company does not exist in database, don't connect
+                        : ({company: undefined})), // if company does not exist in database, don't connect
                     donor: {
                         connectOrCreate: {
                             where: {id: data.donorId || nanoid()},
@@ -3332,6 +3333,7 @@ export const updateBiosample = withOrganizationAuth(
                 company: foundCompany,
                 genotype: data.genotype,
                 notes: data.notes,
+                bsiId: data.bsiId,
             };
 
             const newBiosample = await prisma.biosample.update({

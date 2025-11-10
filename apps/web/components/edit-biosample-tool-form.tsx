@@ -25,7 +25,7 @@ import {
     DialogHeader,
     DialogTrigger,
 } from "@comend/components/ui/dialog"
-import { BIOSAMPLE_TYPE_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS } from "@comend/lib/types"
+import { BIOSAMPLE_TYPE_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, QUANTITY_OPTIONS } from "@comend/lib/types"
 import type {CreateFacilityRequest, Prisma} from "@prisma/client"
 import {getDonorData, getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
@@ -55,21 +55,6 @@ import { SubmitCreateRequest } from "./create-facility-request-button"
 import { badgeVariants } from "@/packages/components/ui/badge"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
-
-const QUANTITY_OPTIONS: Option[] = [
-    {
-        value: 'ml',
-        label: 'ml'
-    },
-    {
-        value: 'mg',
-        label: 'mg'
-    },
-    {
-        value: 'sqmm',
-        label: 'mm'
-    }
-]
 
 const PRICE_OPTIONS: Option[] = [
     {
@@ -158,6 +143,7 @@ export function EditBiosampleToolForm({
 
             quantity: toolData?.quantity?.toString() || undefined,
             quantityUnit: toolData?.quantityUnit || 'ml',
+            bsiId: toolData?.bsiId || undefined,
 
             price: toolData?.price?.toString() || undefined,
             priceUnit: toolData?.priceUnit || 'usd',
@@ -493,6 +479,27 @@ export function EditBiosampleToolForm({
                         )}
                     />
 
+                    <FormField 
+                        control={form.control}
+                        name="bsiId"
+                        render={({ field }) => (
+                            <FormItem className={cn("w-full flex gap-4 items-center")}>
+                                <FormLabel className="w-[100px]">{`BSI ID`}</FormLabel>
+                                <div className="w-full">
+                                    <FormControl className="w-full">
+                                        <Input
+                                            id="bsiId"
+                                            className="-mt-2 w-full min-h-[40px]"
+                                            placeholder={`Enter a BSI ID`}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+
                     <FormItem className={cn("w-full flex gap-4 items-center")}>
                         <FormLabel className="w-[100px]">{'Total available quantity'}</FormLabel>
                         <div className="w-full gap-2 flex">
@@ -531,7 +538,7 @@ export function EditBiosampleToolForm({
                                 name="quantityUnit"
                                 render={({ field }) => (
                                     <FormControl>
-                                        {/* <Select
+                                        <Select
                                             value={field.value} 
                                             onValueChange={(newVal) => form.setValue("quantityUnit", newVal)}
                                         >
@@ -543,8 +550,7 @@ export function EditBiosampleToolForm({
                                                     <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
                                                 ))}
                                             </SelectContent>
-                                        </Select> */}
-                                        <p className="tex-sm pl-2 h-full">ml</p>
+                                        </Select>
                                     </FormControl>
                                 )}
                             />
