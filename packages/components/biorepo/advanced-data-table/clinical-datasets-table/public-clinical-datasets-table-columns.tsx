@@ -13,6 +13,7 @@ import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Badge } from "./../../../ui/badge";
+import { MultipleGenesCell } from "./private-clinical-datasets-table-columns";
 
 type Preset = "default" | "profile";
 
@@ -168,13 +169,7 @@ export function useClinicalDatasetsTableColumns(
             />
         ),
         cell: ({row}) => (
-            <div className="flex gap-2 flex-wrap">
-                {row.original.genes?.map((gene: string, index: number) => (
-                    <Badge variant={"teal"} key={index}>
-                        {gene}
-                    </Badge>
-                ))}
-            </div>
+            <MultipleGenesCell row={row} />
         ),
         enableHiding,
         enableSorting: false,
@@ -314,7 +309,7 @@ export function useClinicalDatasetsTableColumns(
 
     const presets: Record<Preset, string[]> = {
         default: comendColumns.map((c) => c.id as string),
-        profile: ["types", "title", "title.title", "type.label", "gene.symbol", "cohortSize", "contacts", "links"],
+        profile: ["types", "title", "title.title", "type.label", "genes", "gene.symbol", "cohortSize", "links"],
     };
 
     const wanted = new Set(presets[preset]);

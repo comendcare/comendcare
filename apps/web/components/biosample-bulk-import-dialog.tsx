@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { createBiosample } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
 import { cn, parseCSV, validateImport } from "@comend/lib/utils";
-import { ANATOMICAL_SITE_OPTIONS, AVAILABILITY_OPTIONS, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, editBiosampleForm, QUANTITY_OPTIONS, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS } from "@/packages/lib/types";
+import { ANATOMICAL_SITE_OPTIONS, AVAILABILITY_OPTIONS, BIOSAMPLE_TYPE_OPTIONS, COUNTRY_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DONOR_ETHNICITY_OPTIONS, DONOR_GENDER_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, editBiosampleForm, QUANTITY_OPTIONS, SAMPLE_PRESERVATION_METHOD_OPTIONS, SAMPLE_TRANSPORT_METHOD_OPTIONS } from "@/packages/lib/types";
 import { revalidate } from "@/packages/lib/revalidate";
 import z from "zod";
 import { getOrganizationData, getOrganizationFromOrganizationId } from "@/packages/lib/fetchers";
@@ -27,7 +27,32 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
     const institutionsResponse = await fetch(`/api/institutions?search=${encodeURIComponent(biosample['Storage Facility']?.trim() || '')}`)
     const foundInstitutions = await institutionsResponse.json()
 
-    console.log(`found institution`, foundInstitutions)
+    const diagnoses = (biosample['Diagnoses'] || "").split(",")
+    const diagnosesSeverity = (biosample['Diagnoses Severity'] || "").split(",")
+
+    const diagnosesLength = Math.max(diagnoses.length, diagnosesSeverity.length)
+    const diagnosesList = []
+    for (let i = 0; i < diagnosesLength; i++) {
+        if (diagnoses[i] && diagnosesSeverity[i]) {
+            diagnosesList.push({
+                diagnosis: [{label: diagnoses[i], value: diagnoses[i].toUpperCase()?.replace(/[^0-9a-z]/gi, '')}],
+                severity: DIAGNOSIS_SEVERITY_OPTIONS.find(option => option.label === diagnosesSeverity[i])?.value || undefined, 
+                role: null
+            })
+        } else if (diagnoses[i]) {
+            diagnosesList.push({
+                diagnosis: [{label: diagnoses[i], value: diagnoses[i].toUpperCase()?.replace(/[^0-9a-z]/gi, '')}],
+                severity: "", 
+                role: null
+            })
+        } else if (diagnosesSeverity[i]) {
+            diagnosesList.push({
+                diagnosis: [], 
+                severity: DIAGNOSIS_SEVERITY_OPTIONS.find(option => option.label === diagnosesSeverity[i])?.value || undefined, 
+                role: null
+            })
+        }
+    }
 
     const data: z.infer<typeof editBiosampleForm> = {
         types: (() => {
@@ -35,10 +60,11 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
             if (foundOption) return [foundOption]
             return []
         })(),
-        diagnoses: (biosample["Diagnoses"]?.split(",") || []).map((diagnosis: string) => ({
-            severity: undefined,
-            diagnosis: [{label: diagnosis, value: diagnosis.toUpperCase()?.replace(/[^0-9a-z]/gi, '')}]
-        })),
+        // diagnoses: (biosample["Diagnoses"]?.split(",") || []).map((diagnosis: string) => ({
+        //     severity: undefined,
+        //     diagnosis: [{label: diagnosis, value: diagnosis.toUpperCase()?.replace(/[^0-9a-z]/gi, '')}]
+        // })),
+        diagnoses: diagnosesList || [],
         genes: (() => {
             if (foundGenes && foundGenes.length > 0 && biosample['Gene']) return [{label: biosample['Gene'], value: biosample['Gene']}]
             return []
@@ -47,7 +73,6 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
         availability: AVAILABILITY_OPTIONS.find(option => option.label === biosample['Availability'])?.value,
         quantity: biosample['Total Available Quantity'],
         quantityUnit: QUANTITY_OPTIONS.find(option => option.label === biosample['Quantity Unit'])?.value || 'ml',
-        sex: DONOR_SEX_OPTIONS.find(option => option.label === biosample['Sex'])?.value,
         description: biosample.Description,
         currentCountry: COUNTRY_OPTIONS.find(option => option.label === biosample['Current Location'])?.value,
         countryOfCollection: COUNTRY_OPTIONS.find(option => option.label === biosample['Location of Collection'])?.value,
@@ -67,6 +92,7 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
         age: biosample['Donor Age at Collection'],
         gender: DONOR_GENDER_OPTIONS.find(option => option.label === biosample['Donor Gender'])?.value,
         race: DONOR_RACE_OPTIONS.find(option => option.label === biosample['Race'])?.value,
+        sex: DONOR_SEX_OPTIONS.find(option => option.label === biosample['Sex'])?.value,
         ethnicity: DONOR_ETHNICITY_OPTIONS.find(option => option.label === biosample['Donor Ethnicity'])?.value,
         height: biosample['Donor Height'],
         weight: biosample['Donor Weight'],
@@ -110,11 +136,11 @@ export function BiosampleBulkImportDialog() {
                         {key: 'Gene', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Storage Facility', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Diagnoses', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Diagnoses Severity', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Variant', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Availability', required: false, defaultValue: undefined, isValid: (entry) => AVAILABILITY_OPTIONS.find(option => option.label === entry) !== undefined},
                         {key: 'Total Available Quantity (in ml)', required: false, defaultValue: undefined, isValid: (entry) => JSON.parse(entry) > 0},
                         {key: 'Quantity Unit', required: false, defaultValue: undefined, isValid: (entry) => QUANTITY_OPTIONS.find(option => option.label === entry) !== undefined},
-                        {key: 'Sex', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Current Location', required: false, defaultValue: undefined, isValid: (entry) => COUNTRY_OPTIONS.find(option => option.label === entry) !== undefined},
                         {key: 'Location of Collection', required: false, defaultValue: undefined, isValid: (entry) => COUNTRY_OPTIONS.find(option => option.label === entry) !== undefined},
@@ -124,9 +150,10 @@ export function BiosampleBulkImportDialog() {
                         {key: 'Method of Transport', required: false, defaultValue: undefined, isValid: (entry) => SAMPLE_TRANSPORT_METHOD_OPTIONS.find(option => option.label === entry) !== undefined},
                         {key: 'Donor Age at Collection', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Internal Donor ID', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                        {key: 'Donor Gender', required: false, defaultValue: undefined, isValid: (entry) => DONOR_GENDER_OPTIONS.find(option => option.label === entry) !== undefined},
-                        {key: 'Race', required: false, defaultValue: undefined, isValid: (entry) => DONOR_RACE_OPTIONS.find(option => option.label === entry) !== undefined},
-                        {key: 'Donor Ethnicity', required: false, defaultValue: undefined, isValid: (entry) => DONOR_ETHNICITY_OPTIONS.find(option => option.label === entry) !== undefined},
+                        {key: 'Donor Gender', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Sex', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Race', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                        {key: 'Donor Ethnicity', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Donor Height', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Donor Weight', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Donor BMI', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
@@ -229,7 +256,7 @@ export function BiosampleBulkImportDialog() {
                         Import biosamples
                     </DialogTitle>
                     <DialogDescription>
-                        Import multiple biosamples at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1O5NOlRhC-qagsIP_Zk_5_CEdMWAy5VEPoCCu3_2WJoE/edit?usp=sharing">Biosample input template</Link>, filling it out, downloading it as a CSV, and uploading it.
+                        Copy our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1O5NOlRhC-qagsIP_Zk_5_CEdMWAy5VEPoCCu3_2WJoE/edit?usp=sharing">Biosample input template</Link>, fill it out, download it as a CSV, and upload it back into the platform. Any optional details you include are stored securely and help us optimize the platform experience.
                     </DialogDescription>
                 </DialogHeader>
 

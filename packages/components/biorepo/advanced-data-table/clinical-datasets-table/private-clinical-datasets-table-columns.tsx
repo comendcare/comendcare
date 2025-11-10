@@ -1,6 +1,6 @@
 "use client";
 
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, Row } from "@tanstack/react-table";
 import {
   CircleDashed,
   FileText,
@@ -17,6 +17,7 @@ import { Checkbox } from "./../../../ui/checkbox";
 import { handleAsyncGeneSearch, handleAsyncInstitutionSearch } from "./../../../../../packages/lib/utils";
 import Link from "next/link";
 import { Badge } from "./../../../ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./../../../ui/tooltip";
 
 export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
   const columns: ColumnDef<any>[] = [
@@ -174,13 +175,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             <DataTableColumnHeader column={column} title="Genes"/>
         ),
         cell: ({row}) => (
-            <div className="flex gap-2 flex-wrap">
-                {row.original.genes?.map((gene: string, index: number) => (
-                    <Badge variant={"teal"} key={index}>
-                        {gene}
-                    </Badge>
-                ))}
-            </div>
+            <MultipleGenesCell row={row} />
         ),
         enableHiding: true,
         enableColumnFilter: true,
@@ -362,4 +357,78 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
   ]
 
   return columns
+}
+
+export const MultipleGenesCell = ({row}: {row: Row<any>}) => {
+    if (!row.original.genes) return <></>
+
+    if (row.original.genes.length <= 2) {
+        return (
+            <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                    {row.original.genes.map((gene: string, index: number) => (
+                        <Badge variant={"teal"} key={index} className="text-nowrap">
+                            {gene}
+                        </Badge>
+                    ))}
+                </div>
+            </div>
+        )
+    }
+
+    if (row.original.genes.length <= 4) {
+        return (
+            <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                    {row.original.genes.slice(0, 2).map((gene: string, index: number) => (
+                        <Badge variant={"teal"} key={index} className="text-nowrap">
+                            {gene}
+                        </Badge>
+                    ))}
+                </div>
+                <div className="flex gap-2">
+                    {row.original.genes.slice(2).map((gene: string, index: number) => (
+                        <Badge variant={"teal"} key={index} className="text-nowrap">
+                            {gene}
+                        </Badge>
+                    ))}
+                </div>
+            </div>
+        )
+    }
+
+    if (row.original.genes.length >= 5) {
+        return (
+            <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                    {row.original.genes.slice(0, 2).map((gene: string, index: number) => (
+                        <Badge variant={"teal"} key={index} className="text-nowrap">
+                            {gene}
+                        </Badge>
+                    ))}
+                </div>
+                <div className="flex gap-2">
+                    <Badge variant={"teal"} key={2} className="text-nowrap">
+                        {row.original.genes[2]}
+                    </Badge>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <Badge variant={"teal"} key={3} className="text-nowrap">
+                                {`+ ${row.original.genes.slice(3).length} more`}
+                            </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <div className="flex flex-col gap-2">
+                                {row.original.genes.slice(3).map((gene: string, index: number) => (
+                                    <Badge variant={"teal"} key={index} className="text-nowrap">
+                                        {gene}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
+            </div>
+        )
+    }
 }
