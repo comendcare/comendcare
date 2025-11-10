@@ -13,6 +13,7 @@ import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Badge } from "./../../../ui/badge";
+import { MultipleGenesCell } from "./private-clinical-datasets-table-columns";
 
 type Preset = "default" | "profile";
 
@@ -168,13 +169,7 @@ export function useClinicalDatasetsTableColumns(
             />
         ),
         cell: ({row}) => (
-            <div className="flex gap-2 flex-wrap">
-                {row.original.genes?.map((gene: string, index: number) => (
-                    <Badge variant={"teal"} key={index}>
-                        {gene}
-                    </Badge>
-                ))}
-            </div>
+            <MultipleGenesCell row={row} />
         ),
         enableHiding,
         enableSorting: false,
