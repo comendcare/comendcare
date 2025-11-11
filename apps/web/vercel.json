@@ -17,6 +17,10 @@
       "schedule": "0 */12 * * *"
     },
     {
+      "path": "/api/ingest/fetch/mixpanel-pageviews",
+      "schedule": "0 */12 * * *"
+    },
+    {
       "path": "/api/ingest/fetch/fda",
       "schedule": "0 */12 * * *"
     }
