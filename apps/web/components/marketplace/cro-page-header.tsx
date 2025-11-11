@@ -20,13 +20,14 @@ import {
 import Link from "next/link";
 import React from "react";
 import {ServiceProviderWebsiteButton} from "../service-provider-website-button";
-import {companyTypeMap, CompanyWithReviewsAndServices} from "@comend/lib/types";
+import {companyTypeMap, CompanyWithReviewsAndServices, StatusType} from "@comend/lib/types";
 import ContactCroDialog from "~web/components/contact-cro-dialog";
 import SaveCROButton from "~web/components/save-cro-button";
 import {Avatar, AvatarFallback, AvatarImage} from "@/packages/components/ui/avatar";
 import {HoverableAvatar} from "~web/components/hoverable-avatar";
 import {type Milestone, Organization} from "@prisma/client";
 import {nameToInitials} from "@/packages/lib/utils";
+import StatusButton from "~web/components/milestone-status-button";
 
 type WorkedWithItem = {
     organization: Partial<Organization>,
@@ -222,11 +223,15 @@ export default async function CROPageHeader({
                                             {organization?.name ?? "Organization"}
                                         </a>
 
-                                        <div className="text-xs">
+                                        <div className="text-xs flex flex-col space-y-2">
                                             <div className="font-medium">{milestone?.title}</div>
                                             {dateRange && (
                                                 <div className="text-muted-foreground">{dateRange}</div>
                                             )}
+                                            <StatusButton
+                                                status={milestone?.status as StatusType}
+                                                disabled
+                                            />
                                             <div className="text-muted-foreground">
                                                 Updated {formatDate(milestone?.updatedAt)}
                                             </div>
