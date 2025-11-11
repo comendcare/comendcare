@@ -39,7 +39,7 @@ function publicHostForOrg(org: {
 /** Highest milestone already emitted for an org (if any). */
 async function getMaxEmittedMilestone(orgId: string) {
     const items = await prisma.feedItem.findMany({
-        where: { orgId, type: "ORG_PROFILE_VIEWS_MILESTONE" as any },
+        where: { orgId, type: "ANALYTICS_GOAL_REACHED" as any },
         select: { content: true },
         orderBy: { occurredAt: "desc" },
         take: 50,
