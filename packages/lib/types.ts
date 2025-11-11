@@ -362,6 +362,15 @@ export const optionSchema = z.object({
     img: z.string().optional()
 })
 
+export type ImportSchemaEntry = {
+    spreadsheetKey: string,
+    databaseKey: string,
+    required: boolean,
+    defaultValue: any,
+    isValid: (entry: string) => boolean,
+    fetchDatabaseValue?: (entry: string) => any,
+}
+
 export type AssetTableData = Asset & {
     tool: Asset
 }
