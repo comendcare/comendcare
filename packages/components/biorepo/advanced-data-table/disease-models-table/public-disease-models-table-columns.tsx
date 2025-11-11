@@ -299,7 +299,7 @@ export function useDiseaseModelsTableColumns(
         profile: [
             "types", 
             "type.label", 
-            // "contacts",
+            "contacts",
             "links", 
             "gene.symbol", 
             "genotype.genotype", 
