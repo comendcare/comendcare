@@ -4938,24 +4938,24 @@ export const updateMilestones = withOrganizationAuth(
                         );
                     }
 
-                    let foundInstitutions = undefined
-                    let foundCompanies = undefined
+                    // let foundInstitutions = undefined
+                    // let foundCompanies = undefined
 
-                    if (milestone.partners && milestone.partners.length > 0) {
-                        foundInstitutions = await prisma.institution.findMany({
-                            where: {
-                                id: {in: milestone?.partners?.map((partner: Option) => partner.value)}
-                            }
-                        })
-                        foundCompanies = await prisma.company.findMany({
-                            where: {
-                                id: {in: milestone?.partners?.map((partner: Option) => partner.value)}
-                            }
-                        })
-                    }
+                    // if (milestone.partners && milestone.partners.length > 0) {
+                    //     foundInstitutions = await prisma.institution.findMany({
+                    //         where: {
+                    //             id: {in: milestone?.partners?.map((partner: Option) => partner.value)}
+                    //         }
+                    //     })
+                    //     foundCompanies = await prisma.company.findMany({
+                    //         where: {
+                    //             id: {in: milestone?.partners?.map((partner: Option) => partner.value)}
+                    //         }
+                    //     })
+                    // }
 
-                    console.log(`found companies`, milestone.companies)
-                    console.log(`found institutions`, milestone.institutions)
+                    // console.log(`found companies`, milestone.companies)
+                    // console.log(`found institutions`, milestone.institutions)
 
                     const m = await prisma.milestone.update({
                         where: {nodeId: milestone.nodeId},
@@ -5018,17 +5018,17 @@ export const updateMilestones = withOrganizationAuth(
                             },
                             institutions: {
                                 deleteMany: {},
-                                create: (foundInstitutions || []).map((institution: any) => ({
+                                create: (milestone.institutions || []).map((institution: any) => ({
                                     institution: {
-                                        connect: {id: institution.id}
+                                        connect: {id: institution?.institutionId || institution?.institution?.id}
                                     }
                                 }))
                             },
                             companies: {
                                 deleteMany: {},
-                                create: (foundCompanies || []).map((company: any) => ({
+                                create: (milestone.companies || []).map((company: any) => ({
                                     company: {
-                                        connect: {id: company.id}
+                                        connect: {id: company?.companyId || company?.company?.id}
                                     }
                                 }))
                             },
