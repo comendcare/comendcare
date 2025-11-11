@@ -24,6 +24,9 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
     const res = await fetch(`/api/genes?search=${encodeURIComponent(biosample['Gene'] || "")}`);
     const foundGenes = await res.json();
 
+    const companiesResponse = await fetch(`/api/companies?search=${encodeURIComponent(biosample['Storage Facility']?.trim() || '')}`)
+    const foundCompanies = await companiesResponse.json()
+
     const institutionsResponse = await fetch(`/api/institutions?search=${encodeURIComponent(biosample['Storage Facility']?.trim() || '')}`)
     const foundInstitutions = await institutionsResponse.json()
 
@@ -103,11 +106,12 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
         genotype: biosample['Genotype'] || undefined,
         // storage facility
         storageFacility: (() => {
-            if (foundInstitutions && foundInstitutions.length > 0 && biosample['Storage Facility']) {
-                return foundInstitutions
-            }
+            // if (foundInstitutions && foundInstitutions.length > 0 && biosample['Storage Facility']) {
+            //     return foundInstitutions
+            // }
 
-            return []
+            // return []
+            return foundCompanies.concat(foundInstitutions)
         })(),
         bsiId: biosample['BSI ID'],
         isPrivate: biosample['Visibility'] ? (biosample['Visibility'] === 'Published' ? false : true) : true
