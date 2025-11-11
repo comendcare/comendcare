@@ -9,6 +9,7 @@ import {StickyBanner} from "@/packages/components/ui/sticky-banner";
 import {Button} from "@/packages/components/ui/button";
 import Link from "next/link";
 import PublicPageBottomBanner from "~web/components/public-page-bottom-banner";
+import { cn } from "@/packages/lib/utils"
 
 export async function generateMetadata({
                                            params
@@ -85,7 +86,7 @@ export async function generateMetadata({
     const baseUrl = `https://${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
 
     return {
-        title,
+        title: data.subdomain ? `${data.subdomain.toLocaleUpperCase()} - Comend` : title,
         description,
         openGraph: {
             title,
@@ -193,6 +194,12 @@ export default async function SiteLayout({
     }
 
     return (
+        <>
+        <link 
+            rel="icon" 
+            href={data.image ? data.image :  "/icon.ico"}
+            sizes="any" 
+        />
         <div>
             <TooltipProvider>
                 {/* <StickyBanner className="bg-blue-light flex-row space-x-4">
@@ -217,5 +224,6 @@ export default async function SiteLayout({
                 <PublicPageFooter/>
             </TooltipProvider>
         </div>
+        </>
     )
 }
