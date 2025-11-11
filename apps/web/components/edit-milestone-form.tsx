@@ -82,7 +82,7 @@ import Image from "next/image"
 import {CROMarketplaceCard} from "./marketplace/marketplace-cro-card"
 import Link from "next/link"
 import Loading from "@/loading";
-import {getMilestoneTypes} from "@comend/lib/fetchers"
+import {fetchCreateRequests, findCompanies, findInstitutions, getMilestoneTypes} from "@comend/lib/fetchers"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
 import {Globe, Lock, Plus, X, Share, Trash} from "lucide-react"
 import {Badge, badgeVariants} from "@comend/components/ui/badge"
@@ -344,12 +344,14 @@ export function EditMilestoneForm({
                 ...((milestoneData?.companies || []).map(company => ({
                     value: company.companyId || undefined, 
                     label: company.company.title || undefined,
+                    company: company.company
                 }))),
                 ...((milestoneData.institutions || []).map(institution => ({
                     value: institution.institutionId || undefined,
                     label: institution.institution.name || undefined,
+                    institution: institution.institution
                 })))
-            ].filter(partner => !!partner)
+            ]
         }
     })
 
@@ -386,7 +388,6 @@ export function EditMilestoneForm({
             endDate,
             budget,
             attachments,
-            // tasks,
             status,
             isPrivate,
             contacts,
@@ -397,7 +398,27 @@ export function EditMilestoneForm({
             partners
         } = values;
 
-        console.log(`partners`, partners)
+        let foundInstitutions = undefined
+        let foundCompanies = undefined
+
+        if (partners && partners.length > 0) {
+            const institutionsResponse = await findInstitutions(
+                partners?.map((partner: Option) => partner.value) || [],
+                {
+                    id: true,
+                    name: true
+                }
+            )
+            if (institutionsResponse.success && institutionsResponse.data) foundInstitutions = institutionsResponse.data
+            const companiesResponse = await await findCompanies(
+                partners?.map((partner: Option) => partner.value) || [],
+                {
+                    id: true,
+                    title: true
+                }
+            )
+            if (companiesResponse.success && companiesResponse.data) foundCompanies = companiesResponse.data
+        }
 
         const updateData: any = {
             ...milestoneData,
@@ -463,18 +484,19 @@ export function EditMilestoneForm({
                 })
             }).filter((rfp) => rfp !== undefined),
             ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)} : undefined),
-            partners: partners || null,
+            companies: (foundCompanies || []).map(company => ({
+                milestoneId: milestoneData.id,
+                companyId: company.id,
+                company: company
+            })),
+            institutions: (foundInstitutions || []).map(institution => ({
+                milestoneId: milestoneData.id,
+                institutionId: institution.id,
+                institution: institution
+            }))
         }
 
         if (milestoneData?.nodeId) setMilestone(milestoneData.nodeId, updateData)
-
-        // update recommendations
-        // if (milestoneData) {
-        //     await setRecommendations([{
-        //         ...milestoneData,
-        //         ...updateData
-        //     } as Milestone], {limit: 3})
-        // }
 
         setIsMigrating(false)
     }
@@ -524,6 +546,25 @@ export function EditMilestoneForm({
     )
 
     const init = async () => {
+        // backup fetch create requests - double check if there are any
+        if (milestoneData?.id) {
+            const createRequestsResponse = await fetchCreateRequests(
+                milestoneData.id,
+                {
+                    id: true,
+                    name: true,
+                    milestoneId: true,
+                    milestone: true,
+                    createdAt: true,
+                    updatedAt: true,
+                }
+            )
+
+            if (createRequestsResponse.success && createRequestsResponse.data) {
+                setCreateRequests(createRequestsResponse.data)
+            }
+        }
+
         if (session?.user.organizationId) {
             const formattedBiosamples: Option[] = (biosampleOptions || []).map((biosample: Partial<Biosample>,) => {
                 return (
@@ -1174,8 +1215,9 @@ export function EditMilestoneForm({
                                                 variant={"cta"}
                                                 id="edit-milestone-scroll-area"
                                                 className="onborda-save-project"
-                                                onClick={() => {
-                                                    handleMilestoneFormSubmit(form.getValues())
+                                                type="submit"
+                                                onClick={async () => {
+                                                    // await handleMilestoneFormSubmit(form.getValues())
                                                     onClose()
                                                 }}
                                             >
