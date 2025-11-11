@@ -131,7 +131,7 @@ export default async function CROPageHeader({id}: { id: string }) {
                         {companyTypeMap[cro.companyType] || cro.companyType}
                     </div>
                 )}
-                <Link
+                {/* <Link
                     href={"?tab=reviews"}
                     className="flex items-center mb-2 hover:cursor-pointer"
                 >
@@ -147,7 +147,7 @@ export default async function CROPageHeader({id}: { id: string }) {
                                 : "No reviews yet"}
                         </div>
                     </div>
-                </Link>
+                </Link> */}
             </div>
             <div className="flex flex-wrap gap-2 w-5/6">
                 {filteredCertifications.map((certification, index) => (

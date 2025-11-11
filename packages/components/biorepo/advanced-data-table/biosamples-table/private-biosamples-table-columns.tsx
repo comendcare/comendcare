@@ -19,6 +19,7 @@ import {
     DONOR_RACE_OPTIONS,
     DONOR_SEX_OPTIONS,
     Milestone,
+    QUANTITY_OPTIONS,
 } from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
@@ -254,6 +255,21 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 label: "Genotype"
             }
         },
+        {
+            id: "bsiId",
+            accessorKey: "bsiId",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="BSI ID"
+                />
+            ),
+            enableHiding: true,
+            meta: {
+                label: "BSI ID"
+            }
+        },
         // {
         //     id: "variant",
         //     accessorKey: "variant",
@@ -417,7 +433,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                             row.original.quantityUnit && 
                             row.original.quantity >= 0 
                         )
-                            ? `${row.original.quantity}${row.original.quantityUnit}`
+                            ? `${row.original.quantity} ${QUANTITY_OPTIONS.find(option => option.value === row.original.quantityUnit)?.label || row.original.quantityUnit}`
                             : ``
                     }
                 </>

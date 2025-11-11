@@ -1240,6 +1240,21 @@ export const inviteUser = withOrganizationAuth(
                 return res
             })
 
+            await customerIOTrack({
+                userId: session.user.id,
+                event: 'organization_invitation_sent',
+                timestamp: new Date(),
+                // Keep org / invite-specific data on the EVENT, not person traits (users can have multiple invites)
+                properties: {
+                    invitation_id: invitation.id,
+                    organization_id: organization.id,
+                    organization_name: organization.name,
+                    invitee_email: lowerCaseEmail,
+                    role: role,
+                    inviter_user_id: session.user.id,
+                },
+            });
+
             // Upsert so that if it already is whitelisted, nothing changes, and if not, they are whitelisted
             await prisma.whitelist.upsert({
                 where: {email: lowerCaseEmail},
@@ -1458,11 +1473,31 @@ export const denyMemberRequest = withOrganizationAuth(
 
 export const deleteInvitation = withOrganizationAuth(
     async (_: Organization, invitation: Invitation): Promise<ApiResponse<any>> => {
+        const session = await getSession();
+
         if (!invitation) {
             throw new Error("Invalid invitation");
         }
 
         try {
+            try {
+                await customerIOTrack({
+                    userId: session?.user.id ? undefined : undefined, // keep person traits clean; attribution is optional here
+                    event: 'organization_invitation_revoked',
+                    timestamp: new Date(),
+                    properties: {
+                        invitation_id: invitation.id,           // 🔑 correlate to the sent event
+                        organization_id: invitation.organizationId,
+                        invitee_email: invitation.email,
+                        role: invitation.role,
+                        revoked_by_user_id: await session?.user.id, // the admin doing the delete
+                        reason: 'org_deleted_invitation',
+                    },
+                });
+            } catch (e) {
+                console.error('[CIO] track organization_invitation_revoked failed:', e);
+            }
+
             // Ensure the composite key is valid or fallback to another unique identifier like `id`
             const deletedInvitation = await prisma.invitation.delete({
                 where: {
@@ -1505,8 +1540,24 @@ export const declineAndDeleteInvitation = withAuth(
             if (invitation?.email !== session.user.email) {
                 return {
                     success: false,
-                    error: "Error accepting invitation: active user email does not match the invite email."
+                    error: "Error declining invitation: active user email does not match the invite email."
                 }
+            }
+
+            try {
+                await customerIOTrack({
+                    userId: session.user.id, // the person performing the decline
+                    event: 'organization_invitation_declined',
+                    timestamp: new Date(),
+                    properties: {
+                        invitation_id: invitation.id,
+                        organization_id: invitation.organizationId,
+                        invitee_email: invitation.email,
+                        role: invitation.role,
+                    },
+                });
+            } catch (e) {
+                console.error('[CIO] track organization_invitation_declined failed:', e);
             }
 
             // Ensure the composite key is valid or fallback to another unique identifier like `id`
@@ -2044,6 +2095,17 @@ export const acceptInvitation = withAuth(
                     data: {activeOrganizationId: invitation.organization.id},
                 })
             ]);
+
+            await customerIOTrack({
+                userId: session.user.id ?? undefined,   // if you have it
+                event: 'organization_invitation_accepted',
+                timestamp: new Date(),
+                properties: {
+                    invitation_id: invitation.id,        // 🔑 must match the “sent” event
+                    organization_id: invitation.organizationId,
+                    invitee_email: invitation.email,
+                },
+            });
 
             await writeRawEvent({
                 provider: "app",
@@ -2645,7 +2707,7 @@ export const createDiseaseModel = withOrganizationAuth(
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
                     ...(diseaseModelData.company 
                         ? ({company: {connect: {id: diseaseModelData.company.id}}}) // if company exists in database, connect
-                        : ({institution: undefined})), // if company does not exist in database, don't connect
+                        : ({company: undefined})), // if company does not exist in database, don't connect
                     attachments: {
                         createMany: {
                             data: (diseaseModelData?.attachments || []).map((attachment: any) => ({
@@ -2698,6 +2760,7 @@ function generateDonorNanoid() {
 
 export const createClinicalDataset = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editDataToolForm>) => {
+        const session = await getSession()
         try {
             if (!organization.id) {
                 throw new Error("No organization id provided.")
@@ -2803,9 +2866,31 @@ export const createClinicalDataset = withOrganizationAuth(
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
                     ...(dataToolData.company 
                         ? ({company: {connect: {id: dataToolData.company.id}}}) // if company exists in database, connect
-                        : ({institution: undefined})), // if company does not exist in database, don't connect
+                        : ({company: undefined})), // if company does not exist in database, don't connect
                 }
             })
+
+            try {
+                await customerIOTrack({
+                    userId: session?.user.id,
+                    event: 'org_toolkit_item_added',
+                    timestamp: new Date(),
+                    traits: {
+                        name: session?.user.name,
+                        organization_id: organization.id,
+                        organization_name: organization.name,
+                        organization_subdomain: organization.subdomain,
+                    },
+                    properties: {
+                        orgId: organization.id,
+                        itemId: dataToolData.id,
+                        itemType: dataToolData.type,       // e.g. "cell_line", "biosample"
+                        itemTitle: dataToolData.title,
+                    },
+                });
+            } catch (e) {
+                console.error('[CIO] track org_toolkit_item_added failed:', e);
+            }
 
             revalidatePath("/app/tools/data")
 
@@ -2984,6 +3069,7 @@ export const updateCreateFacilityRequest = withOrganizationAuth(
     async (organization: Organization, data: {
         id: string,
         name: string,
+        milestoneId?: string,
         biosampleId?: string,
         diseaseModelId?: string,
         clinicalDatasetId?: string
@@ -2994,12 +3080,16 @@ export const updateCreateFacilityRequest = withOrganizationAuth(
                 id: data.id
             },
             include: {
+                milestone: true,
                 biosample: true,
                 diseaseModel: true,
                 clinicalDataset: true,
             },
             data: {
                 name: data.name,
+                ...(data.milestoneId
+                    ? ({milestone: {connect: {id: data.milestoneId}}})
+                    : undefined),
                 ...(data.biosampleId
                     ? ({biosample: {connect: {id: data.biosampleId}}}) 
                     : undefined),
@@ -3019,6 +3109,7 @@ export const updateCreateFacilityRequest = withOrganizationAuth(
 export const createCreateFacilityRequest = withOrganizationAuth(
     async (organization: Organization, data: {
         name: string,
+        milestoneId?: string,
         biosampleId?: string,
         diseaseModelId?: string,
         clinicalDatasetId?: string
@@ -3026,12 +3117,16 @@ export const createCreateFacilityRequest = withOrganizationAuth(
         console.log(`create data`, data)
         const newRequest = await prisma.createFacilityRequest.create({
             include: {
+                milestone: true,
                 biosample: true,
                 diseaseModel: true,
                 clinicalDataset: true,
             },
             data: {
                 name: data.name,
+                ...(data.milestoneId
+                    ? ({milestone: {connect: {id: data.milestoneId}}})
+                    : undefined),
                 ...(data.biosampleId
                     ? ({biosample: {connect: {id: data.biosampleId}}}) 
                     : undefined),
@@ -3063,19 +3158,19 @@ export const createBiosample = withOrganizationAuth(
             if (data.storageFacility && data.storageFacility.length > 0) {
                 foundInstitution = await prisma.institution.findUnique({
                     where: {
-                        id: data?.storageFacility?.[0].value
+                        id: data?.storageFacility?.[0]?.value
                     }
                 })
                 foundCompany = await prisma.company.findUnique({
                     where: {
-                        id: data?.storageFacility?.[0].value
+                        id: data?.storageFacility?.[0]?.value
                     }
                 })
             }
 
             const biosampleData: any = {
                 id: data.id,
-                types: (data.types || []).map(type => type.value),
+                types: (data.types || []).map(type => type?.value),
                 metadata: {
                     // ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
                     otherTypeDetails: data.otherTypeDetails
@@ -3107,6 +3202,7 @@ export const createBiosample = withOrganizationAuth(
                 company: foundCompany,
                 genotype: data.genotype,
                 notes: data.notes,
+                bsiId: data.bsiId,
                 // yearOfExcision: typeof yearOfExcision === 'string' ? parseInt(yearOfExcision, 10) : yearOfExcision,
                 // ageAtExcision: typeof ageAtExcision === 'string' ? parseInt(ageAtExcision, 10) : ageAtExcision,
             }
@@ -3159,7 +3255,7 @@ export const createBiosample = withOrganizationAuth(
                     private: biosampleData.private || false,
                     organization: {connect: {id: organization.id}},
                     metadata: biosampleData.metadata as InputJsonObject,
-                    ...(biosampleData.gene
+                    ...(biosampleData.gene?.value
                         // transform symbol to uppercase because all genes are uppercase in our database
                         ? ({gene: {connect: {symbol: biosampleData.gene.value.toUpperCase() }}})
                         : undefined),
@@ -3168,10 +3264,13 @@ export const createBiosample = withOrganizationAuth(
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
                     ...(biosampleData.company 
                         ? ({company: {connect: {id: biosampleData.company.id}}}) // if company exists in database, connect
-                        : ({institution: undefined})), // if company does not exist in database, don't connect
+                        : ({company: undefined})), // if company does not exist in database, don't connect
                     donor: {
                         connectOrCreate: {
-                            where: {id: data.donorId || nanoid()},
+                            where: {
+                                id: data.donorId || nanoid(),
+                                organizationId: organization.id
+                            },
                             create: {
                                 id: data.donorId || generateDonorNanoid(),
                                 internalId: data.internalDonorId,
@@ -3231,6 +3330,28 @@ export const createBiosample = withOrganizationAuth(
                         userName: session?.user.name,
                     },
                 });
+
+                try {
+                    await customerIOTrack({
+                        userId: session?.user.id,
+                        event: 'org_toolkit_item_added',
+                        timestamp: new Date(),
+                        traits: {
+                            name: session?.user.name,
+                            organization_id: organization.id,
+                            organization_name: organization.name,
+                            organization_subdomain: organization.subdomain,
+                        },
+                        properties: {
+                            orgId: organization.id,
+                            itemId: biosampleData.id,
+                            itemType: biosampleData.types,
+                            itemTitle: biosampleData.title,
+                        },
+                    });
+                } catch (e) {
+                    console.error('[CIO] track org_toolkit_item_added failed:', e);
+                }
             }
 
             revalidatePath("/app/tools/biosample")
@@ -3332,6 +3453,7 @@ export const updateBiosample = withOrganizationAuth(
                 company: foundCompany,
                 genotype: data.genotype,
                 notes: data.notes,
+                bsiId: data.bsiId,
             };
 
             const newBiosample = await prisma.biosample.update({
@@ -3633,6 +3755,8 @@ export const createOrUpdateRFP = withOrganizationAuth(
         rfpData: Partial<RFP>,
         actor?: Actor
     ) => {
+        const session = await getSession()
+
         try {
             if (!organization.id) {
                 throw new Error("No organization id provided.");
@@ -3808,6 +3932,29 @@ export const createOrUpdateRFP = withOrganizationAuth(
                         userName: actor?.userName,
                     },
                 });
+
+                try {
+                    await customerIOTrack({
+                        userId: session?.user.id,
+                        event: 'org_rfp_created',
+                        timestamp: new Date(),
+                        traits: {
+                            name: actor?.userName,
+                            organization_id: organization.id,
+                            organization_name: organization.name,
+                            organization_subdomain: organization.subdomain,
+                        },
+                        properties: {
+                            orgId: organization.id,
+                            rfpId: rfpData.id,
+                            title: rfpData.title,
+                            fundingAmount: rfpData.budget,
+                            deadline: rfpData.endDate,
+                        },
+                    });
+                } catch (e) {
+                    console.error('[CIO] track org_rfp_created failed:', e);
+                }
             }
 
             // 3) RFP_CLOSED — endDate exists AND is now in the past
@@ -4315,7 +4462,10 @@ export const createMilestones = withOrganizationAuth(
                             biosamples: {include: {biosample: true}},
                             diseaseModels: {include: {diseaseModel: true}},
                             tools: {include: {tool: true}},
-                            rfps: {include: {rfp: true}}
+                            rfps: {include: {rfp: true}},
+                            companies: {include: {company: true}},
+                            institutions: {include: {institution: true}},
+                            createFacilityRequests: true,
                         },
                         data: {
                             id: milestone?.id,
@@ -4362,7 +4512,21 @@ export const createMilestones = withOrganizationAuth(
                             },
                             status: milestone?.status || "PLANNED",
                             private: milestone?.private || true,
-                            nodeType: milestone?.nodeType || "PROJECT"
+                            nodeType: milestone?.nodeType || "PROJECT",
+                            companies: {
+                                create: (milestone?.companies || []).map((company: any) => ({
+                                    company: {
+                                        connect: {id: company.companyId}
+                                    }
+                                }))
+                            },
+                            institutions: {
+                                create: (milestone?.institutions || []).map((institution: any) => ({
+                                    institution: {
+                                        connect: {id: institution.institutionId}
+                                    }
+                                }))
+                            },
 
                             // create associated node
                             // node: {
@@ -4767,13 +4931,7 @@ export const updateMilestones = withOrganizationAuth(
                         where: {nodeId: milestone.nodeId},
                         select: {
                             id: true,
-                            private: true,
-                            // node: true,
-                            // contacts: true,
-                            // attachments: true,
-                            // types: {include: {milestoneType: true}},
-                            // tools: {include: {tool: true}},
-                            // rfps: {include: {rfp: true}},
+                            private: true
                         },
                     });
 
@@ -4782,6 +4940,25 @@ export const updateMilestones = withOrganizationAuth(
                             `Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`,
                         );
                     }
+
+                    // let foundInstitutions = undefined
+                    // let foundCompanies = undefined
+
+                    // if (milestone.partners && milestone.partners.length > 0) {
+                    //     foundInstitutions = await prisma.institution.findMany({
+                    //         where: {
+                    //             id: {in: milestone?.partners?.map((partner: Option) => partner.value)}
+                    //         }
+                    //     })
+                    //     foundCompanies = await prisma.company.findMany({
+                    //         where: {
+                    //             id: {in: milestone?.partners?.map((partner: Option) => partner.value)}
+                    //         }
+                    //     })
+                    // }
+
+                    // console.log(`found companies`, milestone.companies)
+                    // console.log(`found institutions`, milestone.institutions)
 
                     const m = await prisma.milestone.update({
                         where: {nodeId: milestone.nodeId},
@@ -4795,6 +4972,9 @@ export const updateMilestones = withOrganizationAuth(
                             diseaseModels: {include: {diseaseModel: true}},
                             tools: {include: {tool: true}},
                             rfps: {include: {rfp: true}},
+                            companies: {include: {company: true}},
+                            institutions: {include: {institution: true}},
+                            createFacilityRequests: true,
                         },
                         data: {
                             title: milestone.title,
@@ -4838,6 +5018,22 @@ export const updateMilestones = withOrganizationAuth(
                                         connect: {id: rfp.rfpId || rfp.rfp.id},
                                     },
                                 })),
+                            },
+                            institutions: {
+                                deleteMany: {},
+                                create: (milestone.institutions || []).map((institution: any) => ({
+                                    institution: {
+                                        connect: {id: institution?.institutionId || institution?.institution?.id}
+                                    }
+                                }))
+                            },
+                            companies: {
+                                deleteMany: {},
+                                create: (milestone.companies || []).map((company: any) => ({
+                                    company: {
+                                        connect: {id: company?.companyId || company?.company?.id}
+                                    }
+                                }))
                             },
                             timelineOrder: milestone.timelineOrder,
                             otherTypeDetails: milestone.otherTypeDetails,

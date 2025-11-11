@@ -122,7 +122,7 @@ export default async function CROPageHeader({
                             {companyTypeMap[company.companyType] || company.companyType}
                         </div>
                     )}
-                    <Link
+                    {/* <Link
                         href={"?tab=reviews"}
                         className="flex items-center mb-2 hover:cursor-pointer"
                     >
@@ -138,7 +138,7 @@ export default async function CROPageHeader({
                                     : "No reviews yet"}
                             </div>
                         </div>
-                    </Link>
+                    </Link> */}
                 </div>
 
                 {company.tags && company.tags.length > 0 && (

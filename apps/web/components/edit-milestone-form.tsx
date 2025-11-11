@@ -49,9 +49,12 @@ import {
     Option,
     BIOSAMPLE_TYPE_OPTIONS,
     DISEASE_MODEL_TYPE_OPTIONS,
+    optionSchema,
 } from "@comend/lib/types"
 import {
     Biosample,
+    Company,
+    CreateFacilityRequest,
     DiseaseModel,
     MilestoneType,
     Organization,
@@ -70,7 +73,7 @@ import {format} from "date-fns"
 import {Calendar} from "@comend/components/ui/calendar"
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import MoneyInput from "@comend/components/money-input";
-import MultipleSelector from "@comend/components/ui/multiple-selector"
+import MultipleSelector, { MultipleSelectorRef } from "@comend/components/ui/multiple-selector"
 import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group"
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs"
 import {CROSearchState, Recommendation, useCROSearchStore} from "@/state/search/croSearchStore"
@@ -79,10 +82,10 @@ import Image from "next/image"
 import {CROMarketplaceCard} from "./marketplace/marketplace-cro-card"
 import Link from "next/link"
 import Loading from "@/loading";
-import {getMilestoneTypes} from "@comend/lib/fetchers"
+import {fetchCreateRequests, findCompanies, findInstitutions, getMilestoneTypes} from "@comend/lib/fetchers"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
 import {Globe, Lock, Plus, X, Share, Trash} from "lucide-react"
-import {badgeVariants} from "@comend/components/ui/badge"
+import {Badge, badgeVariants} from "@comend/components/ui/badge"
 import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onbordaStore"
 import {mixpanelTrack} from "@comend/lib/mixpanel"
 import ShareDialog from "./share-dialog"
@@ -100,6 +103,8 @@ import {EditClincalDatasetForm} from "./edit-clinical-dataset-form"
 import {MilestoneTypeBadge} from "@/packages/components/milestone-type-badge"
 import {Separator} from "@/packages/components/ui/separator"
 import dynamic from "next/dynamic";
+import { SubmitCreateRequest } from "./create-facility-request-button"
+import { createCreateFacilityRequest } from "@/packages/lib/actions"
 
 type PlateEditorProps = {
     value: any[];
@@ -184,7 +189,8 @@ const editMilestoneForm = z.object({
     openTo: z.array(z.string()).optional(),
     tools: z.array(z.custom<Option>()).optional(),
     rfps: z.array(z.custom<RFP>()).optional(),
-    notes: z.array(z.record(z.any()))
+    notes: z.array(z.record(z.any())),
+    partners: z.array(optionSchema).optional(),
 }).refine(
     (m) => m.startDate && m.endDate ? m.startDate?.getTime() <= m.endDate?.getTime() : true,
     {
@@ -249,6 +255,8 @@ export function EditMilestoneForm({
     const [createBiosampleIsOpen, setCreateBiosampleIsOpen] = useState(false)
     const [createDiseaseModelIsOpen, setCreateDiseaseModelIsOpen] = useState(false)
     const [createClincalDatasetIsOpen, setCreateClinicalDatasetIsOpen] = useState(false)
+    const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(milestoneData.createFacilityRequests || [])
+    const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
     // const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
     // const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
 
@@ -332,6 +340,18 @@ export function EditMilestoneForm({
             ],
             rfps: (milestoneData?.rfps || []).map((rfp: any) => rfp.rfp) || [],
             notes: JSON.parse(milestoneData?.notes || "[]") || [],
+            partners: [
+                ...((milestoneData?.companies || []).map(company => ({
+                    value: company.companyId || undefined, 
+                    label: company.company.title || undefined,
+                    company: company.company
+                }))),
+                ...((milestoneData.institutions || []).map(institution => ({
+                    value: institution.institutionId || undefined,
+                    label: institution.institution.name || undefined,
+                    institution: institution.institution
+                })))
+            ]
         }
     })
 
@@ -368,15 +388,37 @@ export function EditMilestoneForm({
             endDate,
             budget,
             attachments,
-            // tasks,
             status,
             isPrivate,
             contacts,
             openTo,
             tools,
             rfps,
-            notes
+            notes,
+            partners
         } = values;
+
+        let foundInstitutions = undefined
+        let foundCompanies = undefined
+
+        if (partners && partners.length > 0) {
+            const institutionsResponse = await findInstitutions(
+                partners?.map((partner: Option) => partner.value) || [],
+                {
+                    id: true,
+                    name: true
+                }
+            )
+            if (institutionsResponse.success && institutionsResponse.data) foundInstitutions = institutionsResponse.data
+            const companiesResponse = await await findCompanies(
+                partners?.map((partner: Option) => partner.value) || [],
+                {
+                    id: true,
+                    title: true
+                }
+            )
+            if (companiesResponse.success && companiesResponse.data) foundCompanies = companiesResponse.data
+        }
 
         const updateData: any = {
             ...milestoneData,
@@ -441,20 +483,32 @@ export function EditMilestoneForm({
                     rfp: rfp
                 })
             }).filter((rfp) => rfp !== undefined),
-            ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)} : undefined)
+            ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)} : undefined),
+            companies: (foundCompanies || []).map(company => ({
+                milestoneId: milestoneData.id,
+                companyId: company.id,
+                company: company
+            })),
+            institutions: (foundInstitutions || []).map(institution => ({
+                milestoneId: milestoneData.id,
+                institutionId: institution.id,
+                institution: institution
+            }))
         }
 
         if (milestoneData?.nodeId) setMilestone(milestoneData.nodeId, updateData)
 
-        // update recommendations
-        // if (milestoneData) {
-        //     await setRecommendations([{
-        //         ...milestoneData,
-        //         ...updateData
-        //     } as Milestone], {limit: 3})
-        // }
-
         setIsMigrating(false)
+    }
+
+    const handleStorageFacilityAsyncSearch = async (query: string): Promise<Option[]> => {
+        const institutionsResponse = await fetch(`/api/institutions?search=${query}`)
+        const institutionsData = await institutionsResponse.json()
+
+        const companiesResponse = await fetch(`/api/companies?search=${query}`)
+        const companiesData = await companiesResponse.json()
+
+        return companiesData.concat(institutionsData)
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
@@ -492,6 +546,25 @@ export function EditMilestoneForm({
     )
 
     const init = async () => {
+        // backup fetch create requests - double check if there are any
+        if (milestoneData?.id) {
+            const createRequestsResponse = await fetchCreateRequests(
+                milestoneData.id,
+                {
+                    id: true,
+                    name: true,
+                    milestoneId: true,
+                    milestone: true,
+                    createdAt: true,
+                    updatedAt: true,
+                }
+            )
+
+            if (createRequestsResponse.success && createRequestsResponse.data) {
+                setCreateRequests(createRequestsResponse.data)
+            }
+        }
+
         if (session?.user.organizationId) {
             const formattedBiosamples: Option[] = (biosampleOptions || []).map((biosample: Partial<Biosample>,) => {
                 return (
@@ -992,7 +1065,64 @@ export function EditMilestoneForm({
                                                     )}
                                                 />
                                             )}
+
+                                            <FormField
+                                                control={form.control}
+                                                name="partners"
+                                                render={({field}) => (
+                                                    <>
+                                                        <FormLabel>Partners</FormLabel>
+                                                        <span className="w-full flex gap-2">
+                                                            <FormControl className="w-full">
+                                                                <MultipleSelector
+                                                                    {...field}
+                                                                    ref={storageFacilityRef}
+                                                                    creatable={true}
+                                                                    createOnBlur={false}
+                                                                    creatableItemOverride={(props) => (
+                                                                        <SubmitCreateRequest
+                                                                            {...props}
+                                                                            parentRef={storageFacilityRef}
+                                                                            onClickCallback={async (e) => {
+                                                                                e.preventDefault()
+                                                                                e.stopPropagation()
+                                                                                const newRequest = await createCreateFacilityRequest(
+                                                                                    session?.user.organizationId,
+                                                                                    {
+                                                                                        name: props.inputValue,
+                                                                                        milestoneId: milestoneData.id
+                                                                                    }
+                                                                                )
+                                                                                setCreateRequests(prev => [...prev, newRequest])
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                    triggerSearchOnFocus={true}
+                                                                    onSearch={handleStorageFacilityAsyncSearch}
+                                                                    placeholder="Search..."
+                                                                    hidePlaceholderWhenSelected={true}
+                                                                    loadingIndicator={<p>Loading results...</p>}
+                                                                    emptyIndicator={<p>No results found. Try a different search.</p>}
+                                                                    showHoverCard={false}
+                                                                    className="w-full min-h-[40px]"
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage/>
+                                                        </span>
+                                                    </>
+                                                )}
+                                            />
+                                            
+                                            {/* spacer */}
+                                            <div></div> 
+
+                                            <div className="flex flex-col gap-2">
+                                                {createRequests.map((request, index) => (
+                                                    <Badge className="w-full text-sm font-normal" key={index}>{`Creation request for "${request?.name}" submitted.`}</Badge>
+                                                ))}
+                                            </div>
                                         </div>
+
                                         {(formData?.contacts && formData?.contacts.length > 0) && (
                                             <ContactsFormField form={form}/>
                                         )}
@@ -1085,8 +1215,9 @@ export function EditMilestoneForm({
                                                 variant={"cta"}
                                                 id="edit-milestone-scroll-area"
                                                 className="onborda-save-project"
-                                                onClick={() => {
-                                                    handleMilestoneFormSubmit(form.getValues())
+                                                type="submit"
+                                                onClick={async () => {
+                                                    // await handleMilestoneFormSubmit(form.getValues())
                                                     onClose()
                                                 }}
                                             >

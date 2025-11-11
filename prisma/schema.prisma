@@ -294,8 +294,11 @@ model Milestone {
   node           Node?        @relation(fields: [nodeId], references: [id], onDelete: Cascade)
   metadata       Json?
 
-  reviews        MilestoneToReview[]
-  savedCompanies SavedCompany[]
+  reviews                MilestoneToReview[]
+  companies              MilestoneToCompany[]
+  institutions           MilestoneToInstitution[]
+  createFacilityRequests CreateFacilityRequest[]
+  savedCompanies         SavedCompany[]
 }
 
 model Tool {
@@ -373,6 +376,7 @@ model Biosample {
   metadata    Json?
   types       String[] // values (BiosampleType ids)
   genotype    String?
+  bsiId       String?
 
   genes               String[]
   gene                Gene?     @relation(fields: [geneId], references: [id])
@@ -990,9 +994,36 @@ model Company {
   biosamples                      Biosample[]
   diseaseModel                    DiseaseModel[]
   tool                            Tool[]
+  milestones                      MilestoneToCompany[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+  metadata  Json?
+}
+
+model MilestoneToCompany {
+  id          String @id @default(uuid())
+  companyId   String
+  milestoneId String
+
+  company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  milestone Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  metadata  Json?
+}
+
+model MilestoneToInstitution {
+  id            String @id @default(uuid())
+  institutionId String
+  milestoneId   String
+
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  milestone   Milestone   @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
   metadata  Json?
 }
 
@@ -1243,6 +1274,7 @@ model Institution {
   institutionToRequests InstitutionToRequest[]
   diseaseModel          DiseaseModel[]
   tool                  Tool[]
+  milestones            MilestoneToInstitution[]
 }
 
 model InstitutionRelationship {
@@ -1322,6 +1354,8 @@ model CreateFacilityRequest {
 
   name String
 
+  milestoneId       String?
+  milestone         Milestone?    @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
   biosampleId       String?
   biosample         Biosample?    @relation(fields: [biosampleId], references: [id], onDelete: SetNull)
   diseaseModelId    String?

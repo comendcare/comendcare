@@ -48,6 +48,78 @@ import {notFound, redirect} from "next/navigation";
 import {switchOrganization} from "./actions";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
+export async function findInstitutions(
+    institutionIds: string[],
+    select: Prisma.InstitutionSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
+    try {
+        const institutions = await prisma.institution.findMany({
+            where: {
+                id: {in: institutionIds}
+            },
+            select,
+        })
+
+        return {success: true, data: institutions}
+    } catch (error) {
+        logError("Error fetching institutions", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function findCompanies(
+    companyIds: string[],
+    select: Prisma.CompanySelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+) {
+    try {
+        const companies = await prisma.company.findMany({
+            where: {
+                id: {in: companyIds}
+            },
+            select,
+        })
+
+        return {success: true, data: companies}
+    } catch (error) {
+        logError("Error fetching companies", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function fetchCreateRequests(
+    milestoneId: string,
+    select: Prisma.CreateFacilityRequestSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>
+) {
+    try {
+        const createRequests = await prisma.createFacilityRequest.findMany({
+            where: {
+                milestoneId
+            },
+            select
+        })
+        
+        return {success: true, data: createRequests}
+    } catch (error) {
+        logError("Error fetching create facility requests", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
 export async function getServicesOfCompany(
     companyId: string,
     select: Prisma.ServiceSelect<InternalArgs & {
