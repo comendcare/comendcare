@@ -338,7 +338,7 @@ export function useBiosamplesTableColumns(
         profile: [
             "types", 
             "type.label", 
-            // "contacts", 
+            "contacts", 
             "links", 
             "gene.symbol", 
             "genotype", 
