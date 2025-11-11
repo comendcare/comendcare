@@ -9,8 +9,14 @@ const MAX_LOGIN_PAGE_VISITS_RESET_TIME = 300    // per this many seconds
 
 export const config = {
     matcher: [
-        // exclude: API, Next internals, static files, and metadata routes (favicons, icons, etc.)
-        '/((?!api/|_next/|_static/|_vercel|[\\w-]+\\.\\w+$|favicon\\.ico$|icon$|apple-icon$|opengraph-image$|twitter-image$|manifest\\.json$|robots\\.txt$|sitemap\\.xml$).*)'
+        /*
+         * Match all paths except for:
+         * 1. /api routes
+         * 2. /_next (Next.js internals)
+         * 3. /_static (inside /public)
+         * 4. all root files inside /public (e.g. /favicon.ico)
+         */
+        "/((?!api/|_next/|_static/|_vercel|[\\w-]+\\.\\w+).*)"
     ]
 }
 

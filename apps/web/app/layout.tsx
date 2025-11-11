@@ -73,8 +73,7 @@ export async function generateMetadata(): Promise<Metadata> {
         robots: {
             index: true,
             follow: true
-        },
-        icons: { icon: '/favicon.ico?v=3' }, // cache-bust
+        }
     }
 }
 
