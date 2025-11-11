@@ -3158,19 +3158,19 @@ export const createBiosample = withOrganizationAuth(
             if (data.storageFacility && data.storageFacility.length > 0) {
                 foundInstitution = await prisma.institution.findUnique({
                     where: {
-                        id: data?.storageFacility?.[0].value
+                        id: data?.storageFacility?.[0]?.value
                     }
                 })
                 foundCompany = await prisma.company.findUnique({
                     where: {
-                        id: data?.storageFacility?.[0].value
+                        id: data?.storageFacility?.[0]?.value
                     }
                 })
             }
 
             const biosampleData: any = {
                 id: data.id,
-                types: (data.types || []).map(type => type.value),
+                types: (data.types || []).map(type => type?.value),
                 metadata: {
                     // ...(toolData?.metadata ? JSON.parse(JSON.stringify(toolData.metadata)) : undefined),
                     otherTypeDetails: data.otherTypeDetails
@@ -3255,7 +3255,7 @@ export const createBiosample = withOrganizationAuth(
                     private: biosampleData.private || false,
                     organization: {connect: {id: organization.id}},
                     metadata: biosampleData.metadata as InputJsonObject,
-                    ...(biosampleData.gene
+                    ...(biosampleData.gene?.value
                         // transform symbol to uppercase because all genes are uppercase in our database
                         ? ({gene: {connect: {symbol: biosampleData.gene.value.toUpperCase() }}})
                         : undefined),
@@ -3267,7 +3267,10 @@ export const createBiosample = withOrganizationAuth(
                         : ({company: undefined})), // if company does not exist in database, don't connect
                     donor: {
                         connectOrCreate: {
-                            where: {id: data.donorId || nanoid()},
+                            where: {
+                                id: data.donorId || nanoid(),
+                                organizationId: organization.id
+                            },
                             create: {
                                 id: data.donorId || generateDonorNanoid(),
                                 internalId: data.internalDonorId,

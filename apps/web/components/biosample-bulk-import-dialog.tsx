@@ -48,13 +48,14 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
                 severity: "", 
                 role: null
             })
-        } else if (diagnosesSeverity[i]) {
-            diagnosesList.push({
-                diagnosis: [], 
-                severity: DIAGNOSIS_SEVERITY_OPTIONS.find(option => option.label === diagnosesSeverity[i])?.value || undefined, 
-                role: null
-            })
-        }
+        } 
+        // else if (diagnosesSeverity[i]) {
+        //     diagnosesList.push({
+        //         diagnosis: [], 
+        //         severity: DIAGNOSIS_SEVERITY_OPTIONS.find(option => option.label === diagnosesSeverity[i])?.value || undefined, 
+        //         role: null
+        //     })
+        // }
     }
 
     const data: z.infer<typeof editBiosampleForm> = {
