@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@comend/lib/prisma";
 import crypto from "node:crypto";
+import {cioTrackServer} from "@/packages/lib/customer-io";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -116,32 +117,68 @@ async function runCheck() {
                 milestone,
             };
 
-            // IMPORTANT: include dedupeKey so Prisma create type is satisfied and idempotent.
             const dedupeKey = stableDedupeKey(org.id, milestone);
 
-            // Prefer upsert on dedupeKey (must be UNIQUE in your Prisma schema)
-            await prisma.rawIngestEvent.upsert({
-                where: { dedupeKey },
-                update: {
-                    occurredAt,
-                    payload: payload,
-                    status: "PENDING",
-                    error: null,
-                },
-                create: {
-                    provider: "app",
-                    eventType: "analytics_goal_reached",
-                    occurredAt,
-                    status: "PENDING",
-                    payload: payload,
-                    dedupeKey,
-                    externalId: `${org.id}:${milestone}`, // optional, helps debugging
-                },
-            });
+            // FIRST-WRITER-ONLY: create + catch unique => prevents duplicate fanout
+            try {
+                await prisma.rawIngestEvent.create({
+                    data: {
+                        provider: "app",
+                        eventType: "analytics_goal_reached",
+                        occurredAt,
+                        status: "PENDING",
+                        payload,
+                        dedupeKey,
+                        externalId: `${org.id}:${milestone}`,
+                    },
+                });
 
-            created++;
+                // Fan out notifications ONLY if we successfully created the event
+                const members = await prisma.member.findMany({
+                    where: { organizationId: org.id },
+                    select: { user: { select: { id: true } } },
+                });
+
+                const batchSize = 10;
+                for (let i = 0; i < members.length; i += batchSize) {
+                    const slice = members.slice(i, i + batchSize);
+                    await Promise.allSettled(
+                        slice.map(({ user }) =>
+                            cioTrackServer({
+                                userId: user.id,
+                                event: "org_profile_views_milestone_reached",
+                                timestamp: occurredAt,
+                                traits: {
+                                    organization_id: org.id,
+                                    organization_name: org.name,
+                                    organization_subdomain: org.subdomain,
+                                },
+                                properties: { orgId: org.id, host, totalViews, milestone },
+                            })
+                        )
+                    );
+                }
+
+                created++;
+            } catch (e: any) {
+                // Unique violation => someone else already wrote it; skip fanout
+                if (e?.code !== "P2002") {
+                    await prisma.rawIngestEvent.create({
+                        data: {
+                            provider: "app",
+                            eventType: "analytics_goal_reached",
+                            occurredAt: new Date(),
+                            status: "FAILED",
+                            error: String(e),
+                            payload: { orgId: org.id, orgName: org.name, orgSubdomain: org.subdomain, host },
+                            dedupeKey: stableDedupeKey(org.id, -1),
+                        },
+                    });
+                }
+                continue;
+            }
         } catch (err) {
-            // Log a failed raw event row for observability
+            // Outer failure while computing views, etc.
             await prisma.rawIngestEvent.create({
                 data: {
                     provider: "app",
@@ -149,13 +186,8 @@ async function runCheck() {
                     occurredAt: new Date(),
                     status: "FAILED",
                     error: String(err),
-                    payload: {
-                        orgId: org.id,
-                        orgName: org.name,
-                        orgSubdomain: org.subdomain,
-                        host,
-                    },
-                    dedupeKey: stableDedupeKey(org.id, -1), // harmless unique key for failure row
+                    payload: { orgId: org.id, orgName: org.name, orgSubdomain: org.subdomain, host },
+                    dedupeKey: stableDedupeKey(org.id, -1),
                 },
             });
         }
