@@ -60,29 +60,29 @@ export async function formatProjectData(project: any): Promise<{
     //     }
     // }
 
-    const linkNames = (project['Link Name'] || "").split(",")
-    const linkURLs = (project['Link URL'] || "").split(",")
+    // const linkNames = (project['Link Name'] || "").split(",")
+    // const linkURLs = (project['Link URL'] || "").split(",")
 
-    const linksLength = Math.max(linkNames.length, linkURLs.length)
-    const links = []
-    for (let i = 0; i < linksLength; i++) {
-        if (linkNames[i] && linkURLs[i]) {
-            links.push({
-                name: linkNames[i],
-                link: linkURLs[i]
-            })
-        } else if (linkNames[i]) {
-            links.push({
-                name: linkNames[i],
-                link: ""
-            })
-        } else if (linkURLs[i]) {
-            links.push({
-                name: "",
-                link: linkURLs[i]
-            })
-        }
-    }
+    // const linksLength = Math.max(linkNames.length, linkURLs.length)
+    // const links = []
+    // for (let i = 0; i < linksLength; i++) {
+    //     if (linkNames[i] && linkURLs[i]) {
+    //         links.push({
+    //             name: linkNames[i],
+    //             link: linkURLs[i]
+    //         })
+    //     } else if (linkNames[i]) {
+    //         links.push({
+    //             name: linkNames[i],
+    //             link: ""
+    //         })
+    //     } else if (linkURLs[i]) {
+    //         links.push({
+    //             name: "",
+    //             link: linkURLs[i]
+    //         })
+    //     }
+    // }
 
     // const data: z.infer<typeof editMilestoneForm> = {
     //     isPrivate: project['Visibility'] ? (project['Visibility'] === 'Published' ? false : true) : true,
@@ -191,10 +191,32 @@ export async function formatProjectData(project: any): Promise<{
             })
         }
     }
-    console.log(`contacts`, contacts)
-    console.log(`contact names`, data.contactNames)
 
     data.contacts = contacts
+
+
+    const linksLength = Math.max((data.linkNames || []).length, (data.linkURLs || []).length)
+    const links = []
+    for (let i = 0; i < linksLength; i++) {
+        if (data.linkNames [i] && data.linkURLs[i]) {
+            links.push({
+                name: data.linkNames [i],
+                link: data.linkURLs[i]
+            })
+        } else if (data.linkNames [i]) {
+            links.push({
+                name: data.linkNames [i],
+                link: ""
+            })
+        } else if (data.linkURLs[i]) {
+            links.push({
+                name: "",
+                link: data.linkURLs[i]
+            })
+        }
+    }
+
+    data.attachments = links
 
     return {data: data as z.infer<typeof editMilestoneForm>, errors}
 }
@@ -337,6 +359,29 @@ const projectImportSchema: ImportSchemaEntry[] = [
         defaultValue: undefined,
         isValid: (entry) => typeof entry === 'string',
         fetchDatabaseValue: (entry) => entry.split(","),
+    },
+    {
+        spreadsheetKey: 'Link Name',
+        databaseKey: 'linkNames', // hack to get links working, on the milestone this is 'attachments'
+        required: false,
+        defaultValue: undefined,
+        isValid: (entry) => typeof entry === 'string',
+        fetchDatabaseValue: (entry) => entry.split(","),
+    },
+    {
+        spreadsheetKey: 'Link URL',
+        databaseKey: 'linkURLs', // hack to get links working, on the milestone this is 'attachments'
+        required: false,
+        defaultValue: undefined,
+        isValid: (entry) => typeof entry === 'string',
+        fetchDatabaseValue: (entry) => entry.split(","),
+    },
+    {
+        spreadsheetKey: 'Internal Notes',
+        databaseKey: 'notes',
+        required: false,
+        defaultValue: undefined,
+        isValid: (entry) => typeof entry === 'string',
     },
 
     // {key: 'Contact Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
