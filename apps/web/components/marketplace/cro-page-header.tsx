@@ -209,7 +209,7 @@ export default async function CROPageHeader({
                                 return (
                                     <HoverableAvatar
                                         key={organization?.id}
-                                        src={organization?.logo ?? organization?.image ?? undefined}
+                                        src={organization?.image ?? undefined}
                                         alt={organization?.name ?? "Organization"}
                                         fallback={nameToInitials(organization?.name)}
                                         name={organization?.name ?? undefined}
@@ -221,7 +221,7 @@ export default async function CROPageHeader({
                                                     className="transition hover:grayscale-0"
                                                 >
                                                     <AvatarImage
-                                                        src={organization?.logo ?? organization?.image ?? undefined}
+                                                        src={organization?.image ?? undefined}
                                                         alt={organization?.name ?? "Organization"}/>
                                                     <AvatarFallback>
                                                         {nameToInitials(organization?.name)}
