@@ -1,5 +1,6 @@
 "use client";
 
+import React, {useEffect, useState} from "react";
 import {
     Dialog,
     DialogContent,
@@ -36,11 +37,11 @@ import {
     getUser,
     getResearcherFromUserId,
 } from "@comend/lib/fetchers";
-import React, {useEffect, useState} from "react";
 import {useSession} from "next-auth/react";
 import {Skeleton} from "@/packages/components/ui/skeleton";
 import {badgeVariants} from "@/packages/components/ui/badge";
 import LoadingDots from "@/packages/components/icons/loading-dots";
+import {EnrichedResearcher} from "~researcher/types/types";
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
     ...option,
@@ -66,7 +67,7 @@ const formSchema = z.object({
     consentSettings: z.boolean().default(false),
 });
 
-export default function EditResearcherProfileDialog() {
+export default function EditResearcherProfileDialog({ researcher }: { researcher: EnrichedResearcher["researcher"] }) {
     const {data: session} = useSession()
     const router = useRouter();
     const [initialData, setInitialData] = useState<z.infer<typeof formSchema>>();
@@ -84,21 +85,12 @@ export default function EditResearcherProfileDialog() {
                 notificationSettings: true,
                 consentSettings: true,
             });
-            const researcherRes = await getResearcherFromUserId(session?.user.id, {
-                title: true,
-                affiliations: {select: {institution: true}},
-                orcid: true,
-                researchInterests: true,
-                conditionsOfInterest: true,
-                genesOfInterest: true,
-            });
 
-            if (userRes.success && researcherRes.success) {
+            if (researcher && researcher.name) {
                 const user = userRes.data;
-                const researcher = researcherRes.data;
                 form.reset({
                     name: user.name || "",
-                    title: researcher.title || "",
+                    title: researcher.title || undefined,
                     affiliations: researcher.affiliations?.map((a: any) => ({
                         label: a.institution.name,
                         value: a.institution.id,
@@ -216,7 +208,7 @@ export default function EditResearcherProfileDialog() {
             <DialogContent className="max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Edit Researcher</DialogTitle>
-                    <DialogDescription>Update user profile information below.</DialogDescription>
+                    <DialogDescription>Update your researcher profile information below.</DialogDescription>
                 </DialogHeader>
 
                 <Form {...form}>
@@ -254,7 +246,7 @@ export default function EditResearcherProfileDialog() {
                                 <FormItem>
                                     <FormLabel>Your role</FormLabel>
                                     <FormDescription>Your primary title or role.</FormDescription>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined}>
                                         <FormControl>
                                             <SelectTrigger
                                                 aria-label="Select title or role"

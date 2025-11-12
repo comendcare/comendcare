@@ -51,6 +51,7 @@ import {
   ContextMenuTrigger,
 } from "@comend/components/ui/context-menu"
 import {initializeRoadmapState} from "@/packages/lib/initialize-client-state";
+import { ProjectBulkImportDialog } from "./project-bulk-import-dialog"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -815,6 +816,20 @@ const RoadmapHeader = ({
                         <p>{`Import projects from a .csv file`}</p>
                     </TooltipContent>
                 </Tooltip> */}
+
+                {/* <Button 
+                    variant={"ghost"}  
+                    // onClick={() => {
+                    //     setTab('projects')
+                    //     setNewMilestoneIsOpen(true)
+                    // }}
+                    size={isCollapsed ? "icon" : "default"}
+                >
+                    <LayoutTemplate />
+                    {!isCollapsed && <p>{`Templates`}</p>}
+                </Button> */}
+
+                {/*<ProjectBulkImportDialog />*/}
 
                 <Tooltip>
                     <TooltipTrigger asChild>
