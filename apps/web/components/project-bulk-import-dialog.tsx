@@ -9,16 +9,12 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
-import { cn, parseCSV } from "@comend/lib/utils";
-import { editMilestoneForm, ImportSchemaEntry, MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS, Option } from "@/packages/lib/types";
-import { revalidate } from "@/packages/lib/revalidate";
+import { cn } from "@comend/lib/utils";
+import { editMilestoneForm, ImportSchemaEntry, MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS } from "@/packages/lib/types";
 import z from "zod";
-import { getOrganizationFromOrganizationId } from "@/packages/lib/fetchers";
-import { Donor, Milestone, MilestoneTypeOnMilestone } from "@prisma/client";
 import { useShallow } from "zustand/react/shallow";
 import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore";
 import Papa from "papaparse";
-import { error } from "console";
 import { Badge } from "@/packages/components/ui/badge";
 
 const selector = (state: RoadmapState) => ({
@@ -326,114 +322,6 @@ export function ProjectBulkImportDialog() {
         if (file && file.name.endsWith(".csv")) {
             // parse CSV file
             try {
-                // const result = await parseCSV(
-                //     file,
-                //     // [
-                //     //     {key: 'Visibility', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                //     //     {key: 'Title', required: false, defaultValue: 'New project', isValid: (entry) => typeof entry === 'string'},
-                //     //     {key: 'Description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                //     //     {key: 'Project Status', required: false, defaultValue: 'PLANNED', isValid: (entry) => MILESTONE_STATUS_OPTIONS.find(option => option.label === entry['Project Status']) !== undefined},
-                //     //     {key: 'Type', required: false, defaultValue: undefined, isValid: (entry) => MILESTONE_TYPE_OPTIONS.find(option => option.labal === entry.Type) !== undefined},
-                //     //     {key: 'Budget', required: false, defaultValue: undefined, isValid: (entry) => {
-                //     //         try {
-                //     //             const type = typeof entry === 'string'
-                //     //             const val = parseInt(entry)
-
-                //     //             return type
-                //     //         } catch (e) {
-                //     //             return false
-                //     //         }
-                //     //     }},
-                //     //     {key: 'Start Date', required: false, defaultValue: undefined, isValid: (entry) => {try {const isDate = new Date(entry); return true} catch (e) {return false}}},
-                //     //     {key: 'End Date', required: false, defaultValue: undefined, isValid: (entry) => {try {const isDate = new Date(entry); return true} catch (e) {return false}}},
-                //     //     {key: 'Contact Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                //     //     {key: 'Contact Email', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                //     //     {key: 'Link Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                //     //     {key: 'Link URL', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                //     //     {key: 'Internal Notes', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                //     // ]
-                //     projectImportSchema
-                // )
-
-                // setTotalItems(result.values.length)
-                // setImportCount(0)
-    
-                // if (result.errors.length > 0) {
-                //     toast('Warning!', {
-                //         position: "bottom-left",
-                //         duration: 6000,
-                //         description: `Missing fields in import file: A title is required for each project. Edit the project to add title.`
-                //     })
-                //     console.error("Error: imported projects are missing required fields", result.errors)
-                // }
-
-                // let pagIDtoInternalID: {[key: string]: string} = {}
-
-                // const {data: organization} = await getOrganizationFromOrganizationId(session?.user.organizationId, {
-                //     donors: true
-                // })
-
-                // if (organization.donors && organization.donors.length > 0) {
-                //     organization.donors.map((d: Donor) => {
-                //         if (d.internalId && !pagIDtoInternalID[d.internalId]) {
-                //             pagIDtoInternalID[d.internalId] = d.id
-                //         }
-                //     })
-                // }
-
-                // let newNodes: any[] = []
-
-                // for (let i = 0; i < result.values.length; i++) {
-                //     const project = result.values[i]
-                //     let formattedProject = await formatProjectData(project)
-
-                //     // const newNode = await addMilestones([{
-                //     //     private: formattedProject.isPrivate,
-                //     //     nodeType: formattedProject.nodeType,
-                //     //     title: formattedProject.title,
-                //     //     description: formattedProject.description,
-                //     //     status: formattedProject.status,
-                //     //     budget: formattedProject.budget,
-                //     //     startDate: formattedProject.startDate,
-                //     //     endDate: formattedProject.endDate,
-                //     //     contacts: formattedProject.contacts,
-                //     //     attachments: formattedProject.attachments,
-                //     //     notes: JSON.stringify(formattedProject.notes),
-                //     //     types: (formattedProject.types || []).map((type: any) => type.id).map((type: string) => {
-                //     //         const milestoneType = MILESTONE_TYPE_OPTIONS.find(t => t.id === type)
-                //     //         if (!milestoneType) return // milestone type not found, don't add it to created milestone
-                //     //         return {milestoneTypeId: type}
-                //     //     }).filter((type: any) => type !== undefined) as {milestoneTypeId: string}[],
-                //     // }], "Project Import")
-
-                //     // setImportCount((prev) => prev + 1)
-                //     newNodes.push({
-                //         private: formattedProject.isPrivate,
-                //         nodeType: formattedProject.nodeType,
-                //         title: formattedProject.title,
-                //         description: formattedProject.description,
-                //         status: formattedProject.status,
-                //         budget: formattedProject.budget,
-                //         startDate: formattedProject.startDate,
-                //         endDate: formattedProject.endDate,
-                //         contacts: formattedProject.contacts,
-                //         attachments: formattedProject.attachments,
-                //         notes: JSON.stringify(formattedProject.notes),
-                //         types: (formattedProject.types || []).map((type: any) => type.id).map((type: string) => {
-                //             const milestoneType = MILESTONE_TYPE_OPTIONS.find(t => t.id === type)
-                //             if (!milestoneType) return // milestone type not found, don't add it to created milestone
-                //             return {
-                //                 milestoneTypeId: type,
-                //                 milestoneType: milestoneType
-                //             }
-                //         }).filter((type: any) => type !== undefined),
-                //     })
-                // }
-
-                // console.log(`new nodes`, newNodes)
-
-                // await addMilestones(newNodes)
-
                 const result = await ((): Promise<{values: any[], errors: {key: string, message: string, object: any}[]}> => {
                     return new Promise((resolve, reject) => {
                         Papa.parse(file, {
@@ -445,17 +333,7 @@ export function ProjectBulkImportDialog() {
 
                                 try {
                                     result.data.forEach((entry: any) => {
-                                        // const validate = validateImport(entry, expectedValues)
-                                        // if (validate.isValid && !validate.errors) {
-                                            newValues.push(entry)
-                                        // } else {
-                                        //     errors = errors.concat(validate.errors)
-
-                                        //     const attemptValue = Object.fromEntries(
-                                        //         expectedValues.map(({key, defaultValue}) => [key, entry[key] || defaultValue || undefined])
-                                        //     )
-                                        //     newValues.push(attemptValue)
-                                        // }
+                                        newValues.push(entry)
                                     })
                                 } catch (e) {
                                     console.error("Error: failed to import tools", e)
@@ -520,14 +398,7 @@ export function ProjectBulkImportDialog() {
             console.error("Please upload a valid CSV file.");
         }
 
-        // await revalidate(pathname)
         setImportState('finished')
-        // setIsOpen(false)
-        // setIsImporting(false)
-        // setImportCount(0)
-        // setTotalItems(0)
-
-        // router.refresh()
     }
     
     return (
@@ -616,39 +487,6 @@ export function ProjectBulkImportDialog() {
                 </div>
                 </>
             )}
-
-            {/* {isImporting ? (
-                <>
-                <DialogHeader>
-                    <DialogTitle className="text-2xl">
-                        Importing... please keep this tab open
-                    </DialogTitle>
-                    <DialogDescription>
-                        We’re processing your file. This can take a few minutes.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="h-[180px] w-full flex gap-4 justify-center items-center">
-                    <LoaderCircle className={cn("h-[40px] w-[40px] animate-spin")}/>
-                    <p>{importCount > 0 ? `${importCount} of ${totalItems} samples imported` : `Processing file...`}</p>
-                </div>
-                </>
-            ) : (
-                <>
-                <DialogHeader>
-                    <DialogTitle className="text-2xl">
-                        Import projects
-                    </DialogTitle>
-                    <DialogDescription>
-                        Import multiple projects at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1wHQ5TasGlQQF7OsvmK0VRaib8o2rFleZmL4NU5s4w8w/edit?usp=sharing">Project input template</Link>, filling it out, downloading it as a CSV, and uploading it.
-                    </DialogDescription>
-                </DialogHeader>
-
-                <FileUploadForm 
-                    accept=".csv" 
-                    onSubmit={handleImport}
-                />
-                </>
-            )} */}
             </DialogContent>
         </Dialog>
     )
