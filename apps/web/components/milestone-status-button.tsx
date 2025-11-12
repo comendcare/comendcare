@@ -64,19 +64,15 @@ export default function StatusButton({
     status?: StatusType
     disabled?: boolean | undefined
     minimal?: boolean | undefined,
-    onStatusChange: (status: StatusType) => void
+    onStatusChange?: (status: StatusType) => void
     className?: string | undefined
 }) {
     const handleClick = () => {
         if (disabled) return
-
-        if (status === "PLANNED") {
-            onStatusChange("INPROGRESS")
-        } else if (status === "INPROGRESS") {
-            onStatusChange("COMPLETED")
-        } else {
-            onStatusChange("PLANNED")
-        }
+        const next: StatusType =
+            status === "PLANNED" ? "INPROGRESS" :
+                status === "INPROGRESS" ? "COMPLETED" : "PLANNED"
+        onStatusChange?.(next)  // safely no-op if omitted
     }
 
     const getStatusIndex = (currentStatus: StatusType) => {
