@@ -150,7 +150,7 @@ export function useBiosamplesTableColumns(
                 </div>
             ),
             enableHiding,
-            enableSorting,
+            enableSorting: false, // cannot sort since the org can attatch multiple conditions
             enableColumnFilter: true,
             meta: { 
                 label: "Condition",
