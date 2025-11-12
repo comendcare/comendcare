@@ -1,8 +1,7 @@
 import React from "react";
 import ResearcherProfile from "~researcher/components/researcher-profile";
 import {getSession} from "@/packages/lib/auth";
-import {getResearcher, getResearcherFromOrcidApi, getResearcherWithMergedData} from "@comend/lib/fetchers";
-import {toast} from "sonner";
+import {getResearcherWithMergedDataAdvanced, getResearcherWithMergedData} from "@comend/lib/fetchers";
 
 export default async function ResearcherProfilePage({
                                                   params
@@ -38,7 +37,7 @@ export default async function ResearcherProfilePage({
 
     let researcherData
     if (session?.user?.id) {
-        const response = await getResearcherWithMergedData(session.user.id)
+        const response = await getResearcherWithMergedDataAdvanced(session.user.id)
         if (response.success) {
             researcherData = response.data
         } else {

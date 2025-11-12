@@ -6236,7 +6236,8 @@ export const updateResearcher = withAuth(
             const response = await prisma.researcher.update({
                 where: {userId: session.user.id},
                 data: {
-                    title: data.title,
+                    title: data.title ?? null,
+                    orcid: data.orcid,
                     researchInterests: {
                         set: data.researchInterests?.map((r: any) => r.value) || [],
                     },
