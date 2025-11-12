@@ -3,12 +3,14 @@
 import type {ColumnDef} from "@tanstack/react-table";
 import * as React from "react";
 import {DataTableColumnHeader} from "./../data-table/data-table-column-header";
-import {BIOSAMPLE_TYPE_OPTIONS} from "./../../../../../packages/lib/types";
+import {BIOSAMPLE_TYPE_OPTIONS, QUANTITY_OPTIONS} from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import { Badge } from "./../../../ui/badge";
+import { CircleDashed } from "lucide-react";
+import { handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils";
 
 type Preset = "default" | "profile";
 
@@ -124,17 +126,17 @@ export function useBiosamplesTableColumns(
             enableColumnFilter: true,
             meta: {
                 label: "Type",
-                // variant: "multiSelect",
-                // options: BIOSAMPLE_TYPE_OPTIONS,
-                // icon: CircleDashed,
+                variant: "multiSelect",
+                options: BIOSAMPLE_TYPE_OPTIONS,
+                icon: CircleDashed,
             },
         },
         {
             id: typesenseSearch
                 ? 'condition.name' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-                : 'condition',
+                : 'organization.conditions',
             // id: "condition.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-            accessorKey: "condition",
+            accessorKey: "organization.conditions",
             header: ({column}) => (
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
@@ -144,12 +146,19 @@ export function useBiosamplesTableColumns(
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 items-center">
-                    <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
+                    <p>{(row.original.organization?.conditions || []).map((condition: any) => condition?.condition?.name) || 'No Condition'}</p>
                 </div>
             ),
             enableHiding,
             enableSorting,
-            meta: { label: "Condition" }
+            enableColumnFilter: true,
+            meta: { 
+                label: "Condition",
+                variant: "multiSelect",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncConditionSearch
+            }
         },
         {
             id: "gene.symbol", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -172,7 +181,14 @@ export function useBiosamplesTableColumns(
             ),
             enableHiding,
             enableSorting,
-            meta: { label: "Gene" }
+            enableColumnFilter: true,
+            meta: {
+                label: "Gene",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncGeneSearch
+            }
         },
         {
             id: typesenseSearch
@@ -224,6 +240,14 @@ export function useBiosamplesTableColumns(
             ),
             enableHiding,
             enableSorting,
+            enableColumnFilter: true,
+            meta: { 
+                label: "Associated patient group",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncOrganizationSearch
+            }
         },
         {
             id: "quantity", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -244,14 +268,21 @@ export function useBiosamplesTableColumns(
                             row.original.quantityUnit && 
                             row.original.quantity >= 0 
                         )
-                            ? `${row.original.quantity}${row.original.quantityUnit}`
+                            ? `${row.original.quantity} ${QUANTITY_OPTIONS.find(option => option.value === row.original.quantityUnit)?.label || row.original.quantityUnit}`
                             : ``
                     }
                 </>
             ),
             enableHiding,
             enableSorting,
-            meta: { label: "Inventory" }
+            enableColumnFilter: true,
+            meta: {
+                label: "Total available quantity",
+                variant: "range",
+                range: [0, 1000],
+                unit: 'ml',
+                icon: CircleDashed,
+            },
         },
         {
             id: "institution.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -276,7 +307,14 @@ export function useBiosamplesTableColumns(
             },
             enableHiding,
             enableSorting,
-            meta: { label: "Stored with" }
+            enableColumnFilter: true,
+            meta: {
+                label: "Stored with",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncInstitutionSearch
+            }
         },
         {
             id: "contacts",
