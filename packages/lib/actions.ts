@@ -4510,6 +4510,14 @@ export const createMilestones = withOrganizationAuth(
                                     }))
                                 }
                             },
+                            contacts: {
+                                createMany: {
+                                    data: (milestone?.contacts || []).map((contact: any) => ({
+                                        email: contact.link,
+                                        name: contact.name
+                                    }))
+                                }
+                            },
                             status: milestone?.status || "PLANNED",
                             private: !!milestone?.private,
                             nodeType: milestone?.nodeType || "PROJECT",
@@ -4631,6 +4639,14 @@ export const createNodes = withOrganizationAuth(
                                             data: (node.data?.attachments || []).map((attachment: any) => ({
                                                 link: attachment.link,
                                                 ...(attachment.name ? {name: attachment.name} : undefined)
+                                            }))
+                                        }
+                                    },
+                                    contacts: {
+                                        createMany: {
+                                            data: (node.data?.contacts || []).map((contact: any) => ({
+                                                email: contact.email,
+                                                name: contact.name,
                                             }))
                                         }
                                     },
