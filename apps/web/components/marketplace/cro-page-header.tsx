@@ -197,63 +197,67 @@ export default async function CROPageHeader({
                     </div>
                 )}
 
-                <div className="flex flex-row space-x-4 justify-start items-center">
-                    <div className="text-lg">Worked with:</div>
-                    <div
-                        className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
-                        {workedWithOrgs?.map(({organization, milestone}) => {
-                            const dateRange = [formatDate(milestone?.startDate), formatDate(milestone?.endDate)]
-                                .filter(Boolean)
-                                .join(" – ");
-                            return (
-                                <HoverableAvatar
-                                    key={organization?.id}
-                                    src={organization?.logo ?? organization?.image ?? undefined}
-                                    alt={organization?.name ?? "Organization"}
-                                    fallback={nameToInitials(organization?.name)}
-                                    name={organization?.name ?? undefined}
-                                    description={milestone?.title}
-                                >
-                                    <div className="space-y-2">
-                                        <div className="flex flex-row items-center justify-start space-x-2">
-                                            <Avatar
-                                                className="transition hover:grayscale-0"
-                                            >
-                                                <AvatarImage src={organization?.logo ?? organization?.image ?? undefined} alt={organization?.name ?? "Organization"} />
-                                                <AvatarFallback>
-                                                    {nameToInitials(organization?.name)}
-                                                </AvatarFallback>
-                                            </Avatar>
+                {workedWithOrgs && workedWithOrgs.length > 0 && (
+                    <div className="flex flex-row space-x-4 justify-start items-center">
+                        <div className="text-lg">Worked with:</div>
+                        <div
+                            className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+                            {workedWithOrgs?.map(({organization, milestone}) => {
+                                const dateRange = [formatDate(milestone?.startDate), formatDate(milestone?.endDate)]
+                                    .filter(Boolean)
+                                    .join(" – ");
+                                return (
+                                    <HoverableAvatar
+                                        key={organization?.id}
+                                        src={organization?.logo ?? organization?.image ?? undefined}
+                                        alt={organization?.name ?? "Organization"}
+                                        fallback={nameToInitials(organization?.name)}
+                                        name={organization?.name ?? undefined}
+                                        description={milestone?.title}
+                                    >
+                                        <div className="space-y-2">
+                                            <div className="flex flex-row items-center justify-start space-x-2">
+                                                <Avatar
+                                                    className="transition hover:grayscale-0"
+                                                >
+                                                    <AvatarImage
+                                                        src={organization?.logo ?? organization?.image ?? undefined}
+                                                        alt={organization?.name ?? "Organization"}/>
+                                                    <AvatarFallback>
+                                                        {nameToInitials(organization?.name)}
+                                                    </AvatarFallback>
+                                                </Avatar>
 
-                                            <a
-                                                href={orgPublicUrl(organization)}
-                                                className="font-semibold text-sm underline underline-offset-2"
-                                                target="_blank"
-                                                rel="noreferrer"
-                                            >
-                                                {organization?.name ?? "Organization"}
-                                            </a>
-                                        </div>
+                                                <a
+                                                    href={orgPublicUrl(organization)}
+                                                    className="font-semibold text-sm underline underline-offset-2"
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                >
+                                                    {organization?.name ?? "Organization"}
+                                                </a>
+                                            </div>
 
-                                        <div className="text-xs flex flex-col space-y-2">
-                                            <div className="font-medium">{milestone?.title}</div>
-                                            {dateRange && (
-                                                <div className="text-muted-foreground">{dateRange}</div>
-                                            )}
-                                            <StatusButton
-                                                status={milestone?.status as StatusType}
-                                                disabled
-                                            />
-                                            <div className="text-muted-foreground">
-                                                Updated {formatDate(milestone?.updatedAt)}
+                                            <div className="text-xs flex flex-col space-y-2">
+                                                <div className="font-medium">{milestone?.title}</div>
+                                                {dateRange && (
+                                                    <div className="text-muted-foreground">{dateRange}</div>
+                                                )}
+                                                <StatusButton
+                                                    status={milestone?.status as StatusType}
+                                                    disabled
+                                                />
+                                                <div className="text-muted-foreground">
+                                                    Updated {formatDate(milestone?.updatedAt)}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </HoverableAvatar>
-                            );
-                        })}
+                                    </HoverableAvatar>
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {company.description && company.description.trim() && (
                     <div className="w-5/6">
