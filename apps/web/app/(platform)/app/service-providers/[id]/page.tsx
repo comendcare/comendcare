@@ -14,7 +14,12 @@ import type {CompanyWithReviewsAndServices} from "@/packages/lib/types";
 import {getSavedCompaniesFromOrganizationId} from "@/packages/lib/fetchers";
 import {getSession} from "@/packages/lib/auth";
 import NoOrganization from "~web/components/no-organization";
-import type {SavedCompany} from "@prisma/client";
+import type {SavedCompany, Organization, Milestone} from "@prisma/client";
+
+type WorkedWithItem = {
+    organization: Partial<Organization>,
+    milestone: Partial<Milestone>
+};
 
 export default async function CompanyHomePage({
                                                   params
@@ -77,6 +82,58 @@ export default async function CompanyHomePage({
         notFound();
     }
 
+    const links = await prisma.milestoneToCompany.findMany({
+        where: { companyId: id },
+        include: {
+            milestone: {
+                select: {
+                    id: true,
+                    title: true,
+                    status: true,
+                    startDate: true,
+                    endDate: true,
+                    updatedAt: true,
+                    // If you want the typed tags shown too:
+                    types: {
+                        select: { milestoneType: { select: { id: true, label: true } } },
+                    },
+                    organization: {
+                        select: {
+                            id: true,
+                            name: true,
+                            logo: true,
+                            image: true,
+                            subdomain: true,
+                            customDomain: true,
+                        },
+                    },
+                },
+            },
+        },
+        orderBy: [{ createdAt: "desc" }], // or milestone: { updatedAt: "desc" }
+        take: 25,
+    });
+
+    const seen = new Set<string>();
+    const workedWithItems: WorkedWithItem[] = [];
+    for (const l of links) {
+        const org = l.milestone.organization;
+        if (!org || seen.has(org.id)) continue;
+        seen.add(org.id);
+        workedWithItems.push({
+            organization: org,
+            milestone: {
+                id: l.milestone.id,
+                title: l.milestone.title,
+                status: l.milestone.status ?? null,
+                startDate: l.milestone.startDate ?? null,
+                endDate: l.milestone.endDate ?? null,
+                updatedAt: l.milestone.updatedAt,
+            },
+        });
+        if (workedWithItems.length === 5) break;
+    }
+
     return (
         <TooltipProvider>
             <div
@@ -98,6 +155,7 @@ export default async function CompanyHomePage({
                     <CROPageHeader
                         company={company as CompanyWithReviewsAndServices}
                         savedCompanyIds={savedCompanyIds}
+                        workedWithOrgs={workedWithItems}
                     />
                     <CROPageTabs company={company as CompanyWithReviewsAndServices}/>
                 </main>
