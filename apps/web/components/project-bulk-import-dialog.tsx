@@ -382,6 +382,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
         required: false,
         defaultValue: undefined,
         isValid: (entry) => typeof entry === 'string',
+        fetchDatabaseValue: (entry) => ([{"children":[{"text":entry}],"type":"p"}])
     },
 
     // {key: 'Contact Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
