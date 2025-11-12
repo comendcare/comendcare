@@ -40,13 +40,17 @@ export function DeleteMilestoneDialogContent({
 
     const handleDeleteMilestone = async (e: React.MouseEvent<HTMLElement>) => {
         console.log(`handle Milestone delete...`, milestoneData?.nodeId)
-        mixpanelTrack("Project Deleted", {
-            "ID": milestoneData?.id,
-            "Title": milestoneData?.title,
-            "Types": (milestoneData.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id),
-            "Status": milestoneData.status,
-            "Budget": milestoneData.budget
-        })
+        try {
+            mixpanelTrack("Project Deleted", {
+                "ID": milestoneData?.id,
+                "Title": milestoneData?.title,
+                "Types": (milestoneData.types || []).map((type: any) => type.milestoneType?.label || type.milestoneType?.id),
+                "Status": milestoneData.status,
+                "Budget": milestoneData.budget
+            })
+        } catch (e) {
+            console.error(`error tracking mixpanel event`)
+        }
 
         await setSelectedNodeIds([])
         await deleteNode(milestoneData?.nodeId)
