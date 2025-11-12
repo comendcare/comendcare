@@ -362,6 +362,15 @@ export const optionSchema = z.object({
     img: z.string().optional()
 })
 
+export type ImportSchemaEntry = {
+    spreadsheetKey: string,
+    databaseKey: string,
+    required: boolean,
+    defaultValue: any,
+    isValid: (entry: string) => boolean,
+    fetchDatabaseValue?: (entry: string) => any,
+}
+
 export type AssetTableData = Asset & {
     tool: Asset
 }
@@ -2198,3 +2207,39 @@ export const editDataToolForm = z.object({
     // institutions: z.array(optionSchema).optional(),
     storageFacility: z.array(optionSchema).optional(),
 })
+
+const nilOrEmptyToUndef = <T extends z.ZodTypeAny>(inner: T) =>
+    z.preprocess(v => (v === "" || v === null ? undefined : v), inner.optional());
+
+export const editMilestoneForm = z.object({
+    nodeType: z.string(),
+    title: z
+        .string({
+            required_error: "Please provide a title"
+        })
+        .min(1, "Title is required")
+        .max(200, "Title must be less than 200 characters"),
+    description: z
+        .string()
+        .max(1000, "Description must be less than 1000 characters")
+        .optional(),
+    types: z.array(z.custom<MilestoneType>()).optional(),
+    otherTypeDetails: z.string().optional(),
+    startDate: z.date().optional(),
+    endDate: z.date().optional(),
+    budget: nilOrEmptyToUndef(z.number().max(2147483647).min(0)),
+    attachments: z.array(z.custom<any>()).optional(),
+    status: z.string(),
+    isPrivate: z.boolean(),
+    contacts: z.array(z.custom<any>()).optional(),
+    openTo: z.array(z.string()).optional(),
+    tools: z.array(z.custom<Option>()).optional(),
+    rfps: z.array(z.custom<RFP>()).optional(),
+    notes: z.array(z.record(z.any()))
+}).refine(
+    (m) => m.startDate && m.endDate ? m.startDate?.getTime() <= m.endDate?.getTime() : true,
+    {
+        message: "Error: Please adjust the dates so the start date comes before the end date.",
+        path: ["endDate"]
+    }
+)

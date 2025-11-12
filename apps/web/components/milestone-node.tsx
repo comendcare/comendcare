@@ -208,7 +208,7 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                         </li>
                     )}
 
-                    {(props?.data?.budget) && (
+                    {(!!props?.data?.budget) && (
                         <li>
                             <Badge>
                                 <DollarSign size={16}/>
