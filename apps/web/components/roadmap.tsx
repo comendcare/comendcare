@@ -829,7 +829,7 @@ const RoadmapHeader = ({
                     {!isCollapsed && <p>{`Templates`}</p>}
                 </Button> */}
 
-                {/*<ProjectBulkImportDialog />*/}
+                <ProjectBulkImportDialog />
 
                 <Tooltip>
                     <TooltipTrigger asChild>
