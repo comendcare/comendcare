@@ -20,12 +20,37 @@ import {
 import Link from "next/link";
 import React from "react";
 import {ServiceProviderWebsiteButton} from "../service-provider-website-button";
-import {companyTypeMap, CompanyWithReviewsAndServices} from "@comend/lib/types";
+import {companyTypeMap, CompanyWithReviewsAndServices, StatusType} from "@comend/lib/types";
 import ContactCroDialog from "~web/components/contact-cro-dialog";
 import SaveCROButton from "~web/components/save-cro-button";
 import {Avatar, AvatarFallback, AvatarImage} from "@/packages/components/ui/avatar";
 import {HoverableAvatar} from "~web/components/hoverable-avatar";
+import {type Milestone, Organization} from "@prisma/client";
+import {nameToInitials} from "@/packages/lib/utils";
+import StatusButton from "~web/components/milestone-status-button";
 
+type WorkedWithItem = {
+    organization: Partial<Organization>,
+    milestone: Partial<Milestone>
+};
+
+function formatDate(d?: Date | null) {
+    return d ? new Date(d).toLocaleDateString() : undefined;
+}
+
+function orgPublicUrl(org: WorkedWithItem["organization"] | undefined) {
+    if (!org) {
+        return "#"
+    }
+
+    // Adapt to your routing; safe fallback to '#'
+    if (org.customDomain) return `https://${org.customDomain}`;
+    if (org.subdomain && process.env.NEXT_PUBLIC_ROOT_DOMAIN) {
+        return `https://${org.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`;
+    }
+
+    return "#";
+}
 
 const companyTypeIcons: Record<string, React.ReactElement | null> = {
     "Mid-Sized Business (10-100M TTM Revenue)": <Factory className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
@@ -39,11 +64,13 @@ const companyTypeIcons: Record<string, React.ReactElement | null> = {
 
 export default async function CROPageHeader({
                                                 company,
-                                                savedCompanyIds
+                                                savedCompanyIds,
+                                                workedWithOrgs
                                             }:
                                             {
                                                 company: CompanyWithReviewsAndServices,
                                                 savedCompanyIds?: Set<string>
+                                                workedWithOrgs?: Array<Partial<WorkedWithItem>>
                                             }
 ) {
 
@@ -170,30 +197,67 @@ export default async function CROPageHeader({
                     </div>
                 )}
 
-                {/*<div className="flex flex-row space-x-4 justify-start items-center">*/}
-                {/*    <div className="font-bold text-lg">*/}
-                {/*        Worked with:*/}
-                {/*    </div>*/}
-                {/*    <div*/}
-                {/*        className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale"*/}
-                {/*    >*/}
-                {/*        <HoverableAvatar*/}
-                {/*            src="https://github.com/shadcn.png"*/}
-                {/*            alt="@shadcn"*/}
-                {/*            fallback="CN"*/}
-                {/*        />*/}
-                {/*        <HoverableAvatar*/}
-                {/*            src="https://github.com/maxleiter.png"*/}
-                {/*            alt="@maxleiter"*/}
-                {/*            fallback="LR"*/}
-                {/*        />*/}
-                {/*        <HoverableAvatar*/}
-                {/*            src="https://github.com/evilrabbit.png"*/}
-                {/*            alt="@evilrabbit"*/}
-                {/*            fallback="ER"*/}
-                {/*        />*/}
-                {/*    </div>*/}
-                {/*</div>*/}
+                {workedWithOrgs && workedWithOrgs.length > 0 && (
+                    <div className="flex flex-row space-x-4 justify-start items-center">
+                        <div className="text-lg">Worked with:</div>
+                        <div
+                            className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+                            {workedWithOrgs?.map(({organization, milestone}) => {
+                                const dateRange = [formatDate(milestone?.startDate), formatDate(milestone?.endDate)]
+                                    .filter(Boolean)
+                                    .join(" – ");
+                                return (
+                                    <HoverableAvatar
+                                        key={organization?.id}
+                                        src={organization?.image ?? undefined}
+                                        alt={organization?.name ?? "Organization"}
+                                        fallback={nameToInitials(organization?.name)}
+                                        name={organization?.name ?? undefined}
+                                        description={milestone?.title}
+                                    >
+                                        <div className="space-y-2">
+                                            <div className="flex flex-row items-center justify-start space-x-2">
+                                                <Avatar
+                                                    className="transition hover:grayscale-0"
+                                                >
+                                                    <AvatarImage
+                                                        src={organization?.image ?? undefined}
+                                                        alt={organization?.name ?? "Organization"}/>
+                                                    <AvatarFallback>
+                                                        {nameToInitials(organization?.name)}
+                                                    </AvatarFallback>
+                                                </Avatar>
+
+                                                <a
+                                                    href={orgPublicUrl(organization)}
+                                                    className="font-semibold text-sm underline underline-offset-2"
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                >
+                                                    {organization?.name ?? "Organization"}
+                                                </a>
+                                            </div>
+
+                                            <div className="text-xs flex flex-col space-y-2">
+                                                <div className="font-medium">{milestone?.title}</div>
+                                                {dateRange && (
+                                                    <div className="text-muted-foreground">{dateRange}</div>
+                                                )}
+                                                <StatusButton
+                                                    status={milestone?.status as StatusType}
+                                                    disabled
+                                                />
+                                                <div className="text-muted-foreground">
+                                                    Updated {formatDate(milestone?.updatedAt)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </HoverableAvatar>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
 
                 {company.description && company.description.trim() && (
                     <div className="w-5/6">
