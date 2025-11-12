@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Button } from "@comend/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
-import { Import, LoaderCircle } from "lucide-react";
+import { CircleX, Import, LoaderCircle } from "lucide-react";
 import { FileUploadForm } from "~web/components/file-upload-form";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -18,6 +18,8 @@ import { Donor, Milestone, MilestoneTypeOnMilestone } from "@prisma/client";
 import { useShallow } from "zustand/react/shallow";
 import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore";
 import Papa from "papaparse";
+import { error } from "console";
+import { Badge } from "@/packages/components/ui/badge";
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones,
@@ -31,32 +33,32 @@ export async function formatProjectData(project: any): Promise<{
     data: z.infer<typeof editMilestoneForm>,
     errors: any[]
 }> {
-    const contactNames = (project['Contact Name'] || "").split(",")
-    const contactEmails = (project['Contact Email'] || "").split(",")
+    // const contactNames = (project['Contact Name'] || "").split(",")
+    // const contactEmails = (project['Contact Email'] || "").split(",")
 
-    const contactsLength = Math.max(contactNames.length, contactEmails.length)
-    const contacts = []
-    for (let i = 0; i < contactsLength; i++) {
-        if (contactNames[i] && contactEmails[i]) {
-            contacts.push({
-                name: contactNames[i] || "", 
-                email: contactEmails[i] || "", 
-                role: null
-            })
-        } else if (contactNames[i]) {
-            contacts.push({
-                name: contactNames[i] || "", 
-                email: "", 
-                role: null
-            })
-        } else if (contactEmails[i]) {
-            contacts.push({
-                name: "", 
-                email: contactEmails[i] || "", 
-                role: null
-            })
-        }
-    }
+    // const contactsLength = Math.max(contactNames.length, contactEmails.length)
+    // const contacts = []
+    // for (let i = 0; i < contactsLength; i++) {
+    //     if (contactNames[i] && contactEmails[i]) {
+    //         contacts.push({
+    //             name: contactNames[i] || "", 
+    //             email: contactEmails[i] || "", 
+    //             role: null
+    //         })
+    //     } else if (contactNames[i]) {
+    //         contacts.push({
+    //             name: contactNames[i] || "", 
+    //             email: "", 
+    //             role: null
+    //         })
+    //     } else if (contactEmails[i]) {
+    //         contacts.push({
+    //             name: "", 
+    //             email: contactEmails[i] || "", 
+    //             role: null
+    //         })
+    //     }
+    // }
 
     const linkNames = (project['Link Name'] || "").split(",")
     const linkURLs = (project['Link URL'] || "").split(",")
@@ -127,13 +129,21 @@ export async function formatProjectData(project: any): Promise<{
     // }
     const errors: {
         message: string,
+        value: any,
         milestoneTitle: string,
     }[] = []
 
-    const data: z.infer<typeof editMilestoneForm> = Object.fromEntries(projectImportSchema.map(option => {
-        if (!option.isValid(project[option.spreadsheetKey])) {
+    let data = Object.fromEntries(projectImportSchema.map((option: ImportSchemaEntry) => {
+        if (!project[option.spreadsheetKey] && option.required) {
+            errors.push({
+                message: `Field ${option.spreadsheetKey} is required, and is missing a value.`,
+                value: project[option.spreadsheetKey],
+                milestoneTitle: project['Title'] || 'New project'
+            })
+        } else if (project[option.spreadsheetKey] && !option.isValid(project[option.spreadsheetKey])) {
             errors.push({
                 message: `Field ${option.spreadsheetKey} is formatted incorrectly. This field may not import properly.`,
+                value: project[option.spreadsheetKey],
                 milestoneTitle: project['Title'] || 'New project'
             })
         }
@@ -149,14 +159,44 @@ export async function formatProjectData(project: any): Promise<{
         } catch (error) {
             errors.push({
                 message: `Field ${option.spreadsheetKey} encountered an error.`,
+                value: project[option.spreadsheetKey],
                 milestoneTitle: project['Title'] || 'New project'
             })
         }
 
         return [option.databaseKey, val]
-    })) as z.infer<typeof editMilestoneForm>
+    }))
 
-    return {data, errors}
+    const contactsLength = Math.max((data.contactNames || []).length, (data.contactEmails || []).length)
+    const contacts = []
+    console.log(`contacts length`, contactsLength)
+    for (let i = 0; i < contactsLength; i++) {
+        if (data.contactNames[i] && data.contactEmails[i]) {
+            contacts.push({
+                name: data.contactNames[i] || "", 
+                email: data.contactEmails[i] || "", 
+                role: null
+            })
+        } else if (data.contactNames[i]) {
+            contacts.push({
+                name: data.contactNames[i] || "", 
+                email: "", 
+                role: null
+            })
+        } else if (data.contactEmails[i]) {
+            contacts.push({
+                name: "", 
+                email: data.contactEmails[i] || "", 
+                role: null
+            })
+        }
+    }
+    console.log(`contacts`, contacts)
+    console.log(`contact names`, data.contactNames)
+
+    data.contacts = contacts
+
+    return {data: data as z.infer<typeof editMilestoneForm>, errors}
 }
 
 const projectImportSchema: ImportSchemaEntry[] = [
@@ -191,9 +231,9 @@ const projectImportSchema: ImportSchemaEntry[] = [
     {
         spreadsheetKey: 'Project Status',
         databaseKey: 'status',
-        required: false,
+        required: true,
         defaultValue: 'PLANNED',
-        isValid: (entry) => MILESTONE_TYPE_OPTIONS.find(option => option.labal === entry) !== undefined,
+        isValid: (entry) => !!MILESTONE_STATUS_OPTIONS.find(option => option.label === entry),
         fetchDatabaseValue: (entry) => {
             const foundOption = MILESTONE_STATUS_OPTIONS.find(option => option.label === entry)
             if (foundOption) return foundOption.value
@@ -203,9 +243,9 @@ const projectImportSchema: ImportSchemaEntry[] = [
     {
         spreadsheetKey: 'Type',
         databaseKey: 'types',
-        required: false,
+        required: true,
         defaultValue: [],
-        isValid: (entry) => MILESTONE_STATUS_OPTIONS.find(option => option.label === entry) !== undefined,
+        isValid: (entry) => !!MILESTONE_TYPE_OPTIONS.find(option => option.label === entry),
         fetchDatabaseValue: (entry) => {
             const foundOption = MILESTONE_TYPE_OPTIONS.find(option => option.label === entry)
             if (foundOption) return [foundOption]
@@ -228,32 +268,77 @@ const projectImportSchema: ImportSchemaEntry[] = [
             }
         },
         fetchDatabaseValue: (entry) => {
-            try {
-                const type = typeof entry === 'string'
-                const val = parseInt(entry)
-
-                return val
+            try { 
+                if (!entry) return undefined
+                return parseInt(entry)
             } catch (e) {
                 return undefined
             }
         }
-    }
+    },
+    {
+        spreadsheetKey: 'Start Date',
+        databaseKey: 'startDate',
+        required: false,
+        defaultValue: undefined,
+        isValid: (entry) => {
+            try {
+                const isDate = new Date(entry)
+                return true
+            } catch (e) {
+                return false
+            }
+        },
+        fetchDatabaseValue: (entry) => {
+            if (entry) {
+                const d = new Date(entry)
+                // strip time, only store date (midnight, EST is stored as time in DB)
+                return new Date(d.getFullYear(), d.getMonth(), d.getDate())
+            }
 
+            return undefined
+        }
+    },
+    {
+        spreadsheetKey: 'End Date',
+        databaseKey: 'endDate',
+        required: false,
+        defaultValue: undefined,
+        isValid: (entry) => {
+            try {
+                const isDate = new Date(entry)
+                return true
+            } catch (e) {
+                return false
+            }
+        },
+        fetchDatabaseValue: (entry) => {
+            if (entry) {
+                const d = new Date(entry)
+                // strip time, only store date (midnight, EST is stored as time in DB)
+                return new Date(d.getFullYear(), d.getMonth(), d.getDate())
+            }
 
-    // {key: 'Project Status', required: false, defaultValue: 'PLANNED', isValid: (entry) => MILESTONE_STATUS_OPTIONS.find(option => option.label === entry['Project Status']) !== undefined},
-    // {key: 'Type', required: false, defaultValue: undefined, isValid: (entry) => MILESTONE_TYPE_OPTIONS.find(option => option.labal === entry.Type) !== undefined},
-    // {key: 'Budget', required: false, defaultValue: undefined, isValid: (entry) => {
-    //     try {
-    //         const type = typeof entry === 'string'
-    //         const val = parseInt(entry)
+            return undefined
+        }
+    },
+    {
+        spreadsheetKey: 'Contact Name',
+        databaseKey: 'contactNames', // hack to get contacts working, on the milestone this is 'contacts'
+        required: false,
+        defaultValue: undefined,
+        isValid: (entry) => typeof entry === 'string',
+        fetchDatabaseValue: (entry) => entry.split(","),
+    },
+    {
+        spreadsheetKey: 'Contact Email',
+        databaseKey: 'contactEmails', // hack to get contacts working, on the milestone this is 'contacts'
+        required: false,
+        defaultValue: undefined,
+        isValid: (entry) => typeof entry === 'string',
+        fetchDatabaseValue: (entry) => entry.split(","),
+    },
 
-    //         return type
-    //     } catch (e) {
-    //         return false
-    //     }
-    // }},
-    // {key: 'Start Date', required: false, defaultValue: undefined, isValid: (entry) => {try {const isDate = new Date(entry); return true} catch (e) {return false}}},
-    // {key: 'End Date', required: false, defaultValue: undefined, isValid: (entry) => {try {const isDate = new Date(entry); return true} catch (e) {return false}}},
     // {key: 'Contact Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
     // {key: 'Contact Email', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
     // {key: 'Link Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
@@ -266,16 +351,18 @@ export function ProjectBulkImportDialog() {
     const pathname = usePathname()
     const {data: session} = useSession()
     const [isOpen, setIsOpen] = useState(false)
-    const [isImporting, setIsImporting] = useState(false)
+    // const [isImporting, setIsImporting] = useState(false)
+    const [importState, setImportState] = useState<'start' | 'importing' | 'finished'>('start')
     const [importCount, setImportCount] = useState(0)
     const [totalItems, setTotalItems] = useState(0)
+    const [totalErrors, setTotalErrors] = useState<any[]>([])
 
     const { 
         addMilestones,
     } = useRoadmapStore(useShallow(selector))
 
     const handleImport = async (file: File | undefined) => {
-        setIsImporting(true)
+        setImportState('importing')
         if (file && file.name.endsWith(".csv")) {
             // parse CSV file
             try {
@@ -422,6 +509,8 @@ export function ProjectBulkImportDialog() {
                     });
                 })()
 
+                setTotalItems(result.values.length)
+
                 let newNodes: any[] = []
                 let errors: any[] = []
 
@@ -449,12 +538,15 @@ export function ProjectBulkImportDialog() {
                             }
                         }).filter((type: any) => type !== undefined),
                     })
-                    errors.push(formattedErrors)
+                    if (formattedErrors.length > 0) errors.push(formattedErrors)
                 }
 
                 console.log(`new nodes`, newNodes)
                 console.log(`errors`, errors)
                 await addMilestones(newNodes)
+
+                setTotalErrors(errors)
+                setImportCount(newNodes.length)
 
             } catch (e) {
                 toast('Error!', {
@@ -468,13 +560,14 @@ export function ProjectBulkImportDialog() {
             console.error("Please upload a valid CSV file.");
         }
 
-        await revalidate(pathname)
-        setIsOpen(false)
-        setIsImporting(false)
-        setImportCount(0)
-        setTotalItems(0)
+        // await revalidate(pathname)
+        setImportState('finished')
+        // setIsOpen(false)
+        // setIsImporting(false)
+        // setImportCount(0)
+        // setTotalItems(0)
 
-        router.refresh()
+        // router.refresh()
     }
     
     return (
@@ -489,7 +582,82 @@ export function ProjectBulkImportDialog() {
                 </Button>
             </DialogTrigger>
             <DialogContent className="flex flex-col justify-start">
-            {isImporting ? (
+            {importState === 'start' && (
+                <>
+                <DialogHeader>
+                    <DialogTitle className="text-2xl">
+                        Import projects
+                    </DialogTitle>
+                    <DialogDescription>
+                        Import multiple projects at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1wHQ5TasGlQQF7OsvmK0VRaib8o2rFleZmL4NU5s4w8w/edit?usp=sharing">Project input template</Link>, filling it out, downloading it as a CSV, and uploading it.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <FileUploadForm 
+                    accept=".csv" 
+                    onSubmit={handleImport}
+                />
+                </>
+            )} 
+            {importState === 'importing' && (
+                <>
+                <DialogHeader>
+                    <DialogTitle className="text-2xl">
+                        Importing... please keep this tab open
+                    </DialogTitle>
+                    <DialogDescription>
+                        We’re processing your file. This can take a few minutes.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="h-[180px] w-full flex gap-4 justify-center items-center">
+                    <LoaderCircle className={cn("h-[40px] w-[40px] animate-spin")}/>
+                    <p>{importCount > 0 ? `${importCount} of ${totalItems} samples imported` : `Processing file...`}</p>
+                </div>
+                </>
+            )}
+            {importState === 'finished' && (
+                <>
+                <DialogHeader>
+                    <DialogTitle className="text-2xl">
+                        Finished importing
+                    </DialogTitle>
+                    <DialogDescription>
+                        We've finished processing your file, it is now safe to close this tab.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="w-full flex flex-col gap-4 justify-center items-center">
+                    <p>{`Finished importing ${importCount} of ${totalItems}.`}</p>
+                    {totalErrors.length > 0 
+                        ? (
+                            <>
+                            <p>Some fields on the following projects may not have imported as expected.</p>
+                            <ul className="w-full flex flex-col gap-2">
+                                {totalErrors.map((error, index) => (
+                                    <Badge variant={"red"} key={index} className="w-full">
+                                        <CircleX className="h-4 w-4 min-h-4 min-w-4"/>
+                                        {error?.[0]?.milestoneTitle}
+                                    </Badge>
+                                ))}
+                            </ul>
+                            </>
+                        ) 
+                        : (
+                            <p>Successfully imported all projects!</p>
+                        )
+                    }
+                    <Button variant="secondary" onClick={() => {
+                        setIsOpen(false)
+                        setImportState('start')
+                        setImportCount(0)
+                        setTotalItems(0)
+                    }}>
+                        Close dialog
+                    </Button>
+                </div>
+                </>
+            )}
+
+            {/* {isImporting ? (
                 <>
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
@@ -520,7 +688,7 @@ export function ProjectBulkImportDialog() {
                     onSubmit={handleImport}
                 />
                 </>
-            )}
+            )} */}
             </DialogContent>
         </Dialog>
     )
