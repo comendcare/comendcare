@@ -33,100 +33,6 @@ export async function formatProjectData(project: any): Promise<{
     data: z.infer<typeof editMilestoneForm>,
     errors: any[]
 }> {
-    // const contactNames = (project['Contact Name'] || "").split(",")
-    // const contactEmails = (project['Contact Email'] || "").split(",")
-
-    // const contactsLength = Math.max(contactNames.length, contactEmails.length)
-    // const contacts = []
-    // for (let i = 0; i < contactsLength; i++) {
-    //     if (contactNames[i] && contactEmails[i]) {
-    //         contacts.push({
-    //             name: contactNames[i] || "", 
-    //             email: contactEmails[i] || "", 
-    //             role: null
-    //         })
-    //     } else if (contactNames[i]) {
-    //         contacts.push({
-    //             name: contactNames[i] || "", 
-    //             email: "", 
-    //             role: null
-    //         })
-    //     } else if (contactEmails[i]) {
-    //         contacts.push({
-    //             name: "", 
-    //             email: contactEmails[i] || "", 
-    //             role: null
-    //         })
-    //     }
-    // }
-
-    // const linkNames = (project['Link Name'] || "").split(",")
-    // const linkURLs = (project['Link URL'] || "").split(",")
-
-    // const linksLength = Math.max(linkNames.length, linkURLs.length)
-    // const links = []
-    // for (let i = 0; i < linksLength; i++) {
-    //     if (linkNames[i] && linkURLs[i]) {
-    //         links.push({
-    //             name: linkNames[i],
-    //             link: linkURLs[i]
-    //         })
-    //     } else if (linkNames[i]) {
-    //         links.push({
-    //             name: linkNames[i],
-    //             link: ""
-    //         })
-    //     } else if (linkURLs[i]) {
-    //         links.push({
-    //             name: "",
-    //             link: linkURLs[i]
-    //         })
-    //     }
-    // }
-
-    // const data: z.infer<typeof editMilestoneForm> = {
-    //     isPrivate: project['Visibility'] ? (project['Visibility'] === 'Published' ? false : true) : true,
-    //     nodeType: 'PROJECT',
-    //     title: project['Title'],
-    //     description: project['Description'],
-    //     status: (() => {
-    //         const foundOption = MILESTONE_STATUS_OPTIONS.find(option => option.label === project['Project Status'])
-    //         if (foundOption) return foundOption.value
-    //         return 'PLANNED'
-    //     })(),
-    //     budget: (() => {
-    //         try {
-    //             const budget = parseInt(project.Budget)
-    //             return budget
-    //         } catch (e) {
-    //             return undefined
-    //         }
-    //     })(),
-    //     startDate:
-    //         project['Start Date'] 
-    //             ? (() => {
-    //                 const d = new Date(project["Start Date"])
-    //                 // strip time, only store date (midnight, EST is stored as time in DB)
-    //                 return new Date(d.getFullYear(), d.getMonth(), d.getDate())
-    //             })()
-    //             : undefined,
-    //     endDate:
-    //         project['End Date'] 
-    //             ? (() => {
-    //                 const d = new Date(project["End Date"])
-    //                 // strip time, only store date (midnight, EST is stored as time in DB)
-    //                 return new Date(d.getFullYear(), d.getMonth(), d.getDate())
-    //             })()
-    //             : undefined,
-    //     contacts,
-    //     attachments: links,
-    //     types: (() => {
-    //         const foundOption = MILESTONE_TYPE_OPTIONS.find(option => option.label === project.Type)
-    //         if (foundOption) return [foundOption]
-    //         return []
-    //     })(),
-    //     notes: project['Internal Notes'],
-    // }
     const errors: {
         message: string,
         value: any,
@@ -140,12 +46,16 @@ export async function formatProjectData(project: any): Promise<{
                 value: project[option.spreadsheetKey],
                 milestoneTitle: project['Title'] || 'New project'
             })
+
+            return [option.databaseKey, option.defaultValue]
         } else if (project[option.spreadsheetKey] && !option.isValid(project[option.spreadsheetKey])) {
             errors.push({
                 message: `Field ${option.spreadsheetKey} is formatted incorrectly. This field may not import properly.`,
                 value: project[option.spreadsheetKey],
                 milestoneTitle: project['Title'] || 'New project'
             })
+
+            return [option.databaseKey, option.defaultValue]
         }
 
         let val = option.defaultValue
@@ -162,6 +72,8 @@ export async function formatProjectData(project: any): Promise<{
                 value: project[option.spreadsheetKey],
                 milestoneTitle: project['Title'] || 'New project'
             })
+
+            return [option.databaseKey, option.defaultValue]
         }
 
         return [option.databaseKey, val]
@@ -169,7 +81,6 @@ export async function formatProjectData(project: any): Promise<{
 
     const contactsLength = Math.max((data.contactNames || []).length, (data.contactEmails || []).length)
     const contacts = []
-    console.log(`contacts length`, contactsLength)
     for (let i = 0; i < contactsLength; i++) {
         if (data.contactNames[i] && data.contactEmails[i]) {
             contacts.push({
@@ -193,7 +104,6 @@ export async function formatProjectData(project: any): Promise<{
     }
 
     data.contacts = contacts
-
 
     const linksLength = Math.max((data.linkNames || []).length, (data.linkURLs || []).length)
     const links = []
@@ -253,7 +163,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
     {
         spreadsheetKey: 'Project Status',
         databaseKey: 'status',
-        required: true,
+        required: false,
         defaultValue: 'PLANNED',
         isValid: (entry) => !!MILESTONE_STATUS_OPTIONS.find(option => option.label === entry),
         fetchDatabaseValue: (entry) => {
@@ -265,7 +175,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
     {
         spreadsheetKey: 'Type',
         databaseKey: 'types',
-        required: true,
+        required: false,
         defaultValue: [],
         isValid: (entry) => !!MILESTONE_TYPE_OPTIONS.find(option => option.label === entry),
         fetchDatabaseValue: (entry) => {
@@ -306,7 +216,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
         isValid: (entry) => {
             try {
                 const isDate = new Date(entry)
-                return true
+                return (isDate instanceof Date && !isNaN(isDate.getTime()))
             } catch (e) {
                 return false
             }
@@ -329,7 +239,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
         isValid: (entry) => {
             try {
                 const isDate = new Date(entry)
-                return true
+                return (isDate instanceof Date && !isNaN(isDate.getTime()))
             } catch (e) {
                 return false
             }
@@ -384,12 +294,6 @@ const projectImportSchema: ImportSchemaEntry[] = [
         isValid: (entry) => typeof entry === 'string',
         fetchDatabaseValue: (entry) => ([{"children":[{"text":entry}],"type":"p"}])
     },
-
-    // {key: 'Contact Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-    // {key: 'Contact Email', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-    // {key: 'Link Name', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-    // {key: 'Link URL', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-    // {key: 'Internal Notes', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
 ]
 
 export function ProjectBulkImportDialog() {
