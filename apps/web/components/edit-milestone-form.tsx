@@ -277,7 +277,7 @@ export function EditMilestoneForm({
     // }, [session, status]);
 
     // state for adding fields
-    const [hasBudget, setHasBudget] = useState(milestoneData?.budget || false)
+    const [hasBudget, setHasBudget] = useState(milestoneData?.budget !== undefined && milestoneData?.budget !== null)
     const [hasStartDate, setHasStartDate] = useState(milestoneData?.startDate || false)
     const [hasEndDate, setHasEndDate] = useState(milestoneData?.endDate || false)
 
@@ -297,7 +297,7 @@ export function EditMilestoneForm({
             })?.otherTypeDetails : undefined,
             startDate: milestoneData?.startDate || undefined,
             endDate: milestoneData?.endDate || undefined,
-            budget: milestoneData?.budget || undefined,
+            budget: milestoneData?.budget !== null && milestoneData?.budget !== undefined ? milestoneData.budget : undefined,
             attachments: milestoneData?.attachments || undefined,
             status: milestoneData?.status || "PLANNED",
             isPrivate: milestoneData?.private || false,
@@ -431,7 +431,7 @@ export function EditMilestoneForm({
             // ...(budget ? {budget} : undefined),
             startDate: startDate || null,
             endDate: endDate || null,
-            budget: budget || null,
+            budget: budget !== undefined && budget !== null ? budget : null,
             ...(attachments ? {attachments} : undefined),
             types: (types || []).map((type) => {
                 return ({

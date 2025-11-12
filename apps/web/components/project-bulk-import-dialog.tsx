@@ -128,6 +128,16 @@ export async function formatProjectData(project: any): Promise<{
 
     data.attachments = links
 
+    if (data.startDate && data.endDate && data.startDate.getTime() > data.endDate.getTime()) {
+        errors.push({
+            message: `Field Start Date must be on or before field End Date.`,
+            value: 'End Date',
+            milestoneTitle: project['Title'] || 'New project'
+        })
+
+        data.endDate = undefined
+    }
+
     return {data: data as z.infer<typeof editMilestoneForm>, errors}
 }
 
@@ -596,12 +606,12 @@ export function ProjectBulkImportDialog() {
                         )
                     }
                     <Button variant="secondary" onClick={() => {
-                        setIsOpen(false)
+                        // setIsOpen(false)
                         setImportState('start')
                         setImportCount(0)
                         setTotalItems(0)
                     }}>
-                        Close dialog
+                        Import more projects
                     </Button>
                 </div>
                 </>
