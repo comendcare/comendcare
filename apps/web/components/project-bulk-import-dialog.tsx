@@ -204,7 +204,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
                 const type = typeof entry === 'string'
                 const val = parseInt(entry)
 
-                return type
+                return type && !isNaN(val)
             } catch (e) {
                 return false
             }
