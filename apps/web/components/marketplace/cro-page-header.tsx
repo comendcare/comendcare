@@ -199,8 +199,9 @@ export default async function CROPageHeader({
 
                 <div className="flex flex-row space-x-4 justify-start items-center">
                     <div className="text-lg">Worked with:</div>
-                    <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
-                        {workedWithOrgs?.map(({ organization, milestone }) => {
+                    <div
+                        className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+                        {workedWithOrgs?.map(({organization, milestone}) => {
                             const dateRange = [formatDate(milestone?.startDate), formatDate(milestone?.endDate)]
                                 .filter(Boolean)
                                 .join(" – ");
@@ -214,14 +215,25 @@ export default async function CROPageHeader({
                                     description={milestone?.title}
                                 >
                                     <div className="space-y-2">
-                                        <a
-                                            href={orgPublicUrl(organization)}
-                                            className="font-semibold text-sm underline underline-offset-2"
-                                            target="_blank"
-                                            rel="noreferrer"
-                                        >
-                                            {organization?.name ?? "Organization"}
-                                        </a>
+                                        <div className="flex flex-row items-center justify-start space-x-2">
+                                            <Avatar
+                                                className="transition hover:grayscale-0"
+                                            >
+                                                <AvatarImage src={organization?.logo ?? organization?.image ?? undefined} alt={organization?.name ?? "Organization"} />
+                                                <AvatarFallback>
+                                                    {nameToInitials(organization?.name)}
+                                                </AvatarFallback>
+                                            </Avatar>
+
+                                            <a
+                                                href={orgPublicUrl(organization)}
+                                                className="font-semibold text-sm underline underline-offset-2"
+                                                target="_blank"
+                                                rel="noreferrer"
+                                            >
+                                                {organization?.name ?? "Organization"}
+                                            </a>
+                                        </div>
 
                                         <div className="text-xs flex flex-col space-y-2">
                                             <div className="font-medium">{milestone?.title}</div>
