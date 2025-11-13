@@ -101,12 +101,19 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                 form.reset({
                     name: user.name || "",
                     title: researcher.title || undefined,
+                    country: researcher.country || undefined,
+                    description: researcher.description || undefined,
+                    website: researcher.website || undefined,
                     affiliations: researcher.affiliations?.map((a: any) => ({
                         label: a.institution.name,
                         value: a.institution.id,
                     })) || [],
                     orcid: researcher.orcid || "",
                     researchInterests: researcher.researchInterests?.map((r: string) => ({
+                        label: r,
+                        value: r,
+                    })) || [],
+                    therapeuticsOfInterest: researcher.therapeuticsOfInterest?.map((r: string) => ({
                         label: r,
                         value: r,
                     })) || [],

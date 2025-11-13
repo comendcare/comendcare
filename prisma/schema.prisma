@@ -1314,10 +1314,14 @@ model Researcher {
   orcid                         String?                        @unique
   email                         String?                        @unique /// @encrypted
   emailHash                     String?                        @unique /// @encryption:hash(email)
+  website                       String?
+  description                   String?
+  country                       String?
   title                         String?
   role                          String?
   name                          String
   researchInterests             String[]
+  therapeuticsOfInterest        String[]
   conditionsOfInterest          String[]
   genesOfInterest               String[]
   affiliations                  Affiliation[]

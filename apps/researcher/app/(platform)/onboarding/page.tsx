@@ -36,6 +36,7 @@ import {Select, SelectContent, SelectTrigger, SelectValue, SelectItem} from "@co
 import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
 import {badgeVariants} from "@comend/components/ui/badge"
 import {Textarea} from "@/packages/components/ui/textarea";
+import {Separator} from "@/packages/components/ui/separator";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -95,6 +96,9 @@ export default function ResearcherOnboardingForm() {
                     id: true,
                     orcid: true,
                     email: true,
+                    country: true,
+                    description: true,
+                    website: true,
                     emailHash: true,
                     title: true,
                     name: true,
@@ -155,6 +159,10 @@ export default function ResearcherOnboardingForm() {
                         })) || [],
                         orcid: researcherData.orcid || "",
                         researchInterests: researcherData.researchInterests.map((interests: any) => ({
+                            label: interests,
+                            value: interests
+                        })) || [],
+                        therapeuticsOfInterest: researcherData.therapeuticsOfInterest.map((interests: any) => ({
                             label: interests,
                             value: interests
                         })) || [],
@@ -314,17 +322,17 @@ export default function ResearcherOnboardingForm() {
             <div
                 className="flex flex-col space-y-1.5 text-center sm:text-left"
             >
-                <div
-                    className="text-lg font-semibold leading-none tracking-tight"
-                >
-                    Welcome to Comend
-                </div>
-                <div
-                    className="text-sm text-muted-foreground"
-                >
-                    We have a few questions about you to get started.
+                <div>
+                    <h1 className="text-2xl font-semibold">
+                        Welcome to Comend
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        We just have a few questions for you to get started.
+                    </p>
                 </div>
             </div>
+
+            <Separator/>
 
             <Form {...form}>
                 <form

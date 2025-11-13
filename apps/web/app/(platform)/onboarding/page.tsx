@@ -275,6 +275,7 @@ export default function OnboardingPage() {
                     We just have a few questions for you to get started.
                 </p>
             </div>
+
             <Separator/>
 
             <Form {...form}>
