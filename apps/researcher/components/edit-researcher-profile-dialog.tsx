@@ -334,12 +334,13 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                                             badgeClassName={badgeVariants({variant: "lightBlue"})}
                                             defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
                                             hidePlaceholderWhenSelected={true}
-                                            placeholder="Select associated project types..."
+                                            placeholder="Select research interests..."
                                             emptyIndicator={
                                                 <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                     no results found.
                                                 </p>
                                             }
+                                            showHoverCard={false}
                                         />
                                     </FormControl>
                                     <FormMessage/>

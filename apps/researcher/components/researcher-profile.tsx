@@ -16,6 +16,8 @@ import {
 import {formatNumberWithCommas} from "@/packages/lib/utils";
 import EditResearcherProfileDialog from "~researcher/components/edit-researcher-profile-dialog";
 import ResearcherProfilePublicationsSection from "~researcher/components/researcher-profile-publications-section";
+import ResearcherProfileFrequentCollaboratorsCard
+    from "~researcher/components/researcher-profile-frequent-collaborators-card";
 
 function formatYearRanges(years: number[] | string[] = []): string {
     const nums = years
@@ -228,34 +230,7 @@ export default function ResearcherProfile({researcherData}: any) {
                         </Card>
 
                         {/* Top Co-authors */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Users className="w-5 h-5"/>
-                                    Frequent Collaborators
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                                {coAuthors.length > 0 ?
-                                    coAuthors.slice(0, 5).map((author: {
-                                        name: string,
-                                        affiliation: string,
-                                        collaborations: string
-                                    }, index: number) => (
-                                        <div key={index} className="flex items-center justify-between">
-                                            <div>
-                                                <div className="font-medium text-sm">{author.name}</div>
-                                                <div className="text-xs text-gray-600">{author.affiliation}</div>
-                                            </div>
-                                            <Badge variant="outline" className="text-xs">
-                                                {author.collaborations}
-                                            </Badge>
-                                        </div>
-                                    ))
-                                    : <div className="text-sm text-gray-600">No collaborator data available.</div>
-                                }
-                            </CardContent>
-                        </Card>
+                        {/*<ResearcherProfileFrequentCollaboratorsCard coAuthors={coAuthors} />*/}
                     </div>
 
                     {/* Main Content */}
