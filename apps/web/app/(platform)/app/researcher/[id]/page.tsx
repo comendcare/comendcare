@@ -1,7 +1,8 @@
 import React from "react";
-import ResearcherProfile from "@comend/components/researcher-profile";
+import ResearcherProfile from "@/apps/researcher/components/researcher-profile";
 import {getSession} from "@/packages/lib/auth";
 import {getResearcherWithMergedDataAdvanced, getResearcherWithMergedData} from "@comend/lib/fetchers";
+import {PublicResearcherProfile} from "~web/components/public-researcher-profile";
 
 export default async function ResearcherProfilePage({
                                                         params
@@ -46,9 +47,8 @@ export default async function ResearcherProfilePage({
     }
 
     return (
-        <ResearcherProfile
+        <PublicResearcherProfile
             researcherData={researcherData}
-            publicProfile
         />
     )
 }
