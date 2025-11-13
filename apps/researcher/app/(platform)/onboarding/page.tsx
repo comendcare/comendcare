@@ -19,7 +19,7 @@ import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {editUser, updateResearcher} from "@comend/lib/actions";
 import {Checkbox} from "@comend/components/ui/checkbox";
-import {AddressType, Option} from "@comend/lib/types";
+import {AddressType, COUNTRIES, MODALITIES, Option} from "@comend/lib/types";
 import React, {useEffect, useState} from "react";
 import {FileWithPreview} from "@comend/components/image-selector";
 import {
@@ -35,6 +35,7 @@ import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {Select, SelectContent, SelectTrigger, SelectValue, SelectItem} from "@comend/components/ui/select"
 import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
 import {badgeVariants} from "@comend/components/ui/badge"
+import {Textarea} from "@/packages/components/ui/textarea";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -50,11 +51,20 @@ const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => (
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
     title: z.string(),
+    website: z.string().optional(),
+    country: z.string().optional(),
+    description: z.string().min(2, {
+        message: "Your profile's description must be at least 2 characters long.",
+    }).max(500, {
+        message: "Your profile's description must less than 500 characters long.",
+    }).optional(),
     affiliations: z.array(optionSchema).optional(),
     orcid: z.string().regex(/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/, {
         message: "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
     }).optional(),
     researchInterests: z.array(optionSchema).optional(),
+    therapeuticsOfInterest: z.array(optionSchema).optional(),
+    otherTherapeuticsOfInterest: z.string().optional(),
     genesOfInterest: z.array(optionSchema).optional(),
     conditionsOfInterest: z.array(optionSchema).optional(),
     notificationSettings: z.boolean().default(false),
@@ -300,133 +310,189 @@ export default function ResearcherOnboardingForm() {
     }
 
     return (
-        <div className="w-screen h-screen overflow-auto p-8 flex flex-col items-center">
-            <div className="flex flex-col items-start space-y-4">
+        <div className="flex flex-col space-y-8 w-full max-w-5xl mx-auto">
+            <div
+                className="flex flex-col space-y-1.5 text-center sm:text-left"
+            >
                 <div
-                    className="flex flex-col space-y-1.5 text-center sm:text-left"
+                    className="text-lg font-semibold leading-none tracking-tight"
                 >
-                    <div
-                        className="text-lg font-semibold leading-none tracking-tight"
-                    >
-                        Welcome to Comend
-                    </div>
-                    <div
-                        className="text-sm text-muted-foreground"
-                    >
-                        We have a few questions about you to get started.
-                    </div>
+                    Welcome to Comend
                 </div>
-                <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(
-                            onSubmit,
-                            (errors) => {
-                                console.log("Validation errors:", errors);
-                                if (Object.keys(errors).length > 0) {
-                                    toast.error("Please correct the highlighted errors.");
-                                }
+                <div
+                    className="text-sm text-muted-foreground"
+                >
+                    We have a few questions about you to get started.
+                </div>
+            </div>
+
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(
+                        onSubmit,
+                        (errors) => {
+                            console.log("Validation errors:", errors);
+                            if (Object.keys(errors).length > 0) {
+                                toast.error("Please correct the highlighted errors.");
                             }
+                        }
+                    )}
+                    className="space-y-8"
+                >
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Your Full Name (required)</FormLabel>
+                                {/*<FormDescription>This is your public display name.</FormDescription>*/}
+                                <FormControl>
+                                    <Input type="text" {...field} />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
                         )}
-                        className="space-y-8"
-                    >
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Your Full Name (required)</FormLabel>
-                                    {/*<FormDescription>This is your public display name.</FormDescription>*/}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="title"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Your role</FormLabel>
+                                <FormDescription>Your primary title or role.</FormDescription>
+                                <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined}>
                                     <FormControl>
-                                        <Input type="text" {...field} />
+                                        <SelectTrigger
+                                            aria-label="Select title or role"
+                                        >
+                                            <SelectValue placeholder="Role"/>
+                                        </SelectTrigger>
                                     </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                                    <SelectContent className="rounded-xl">
+                                        <SelectItem value="researcher">Researcher</SelectItem>
+                                        <SelectItem value="pm">Project Manager</SelectItem>
+                                        <SelectItem value="pi">Principal Investigator</SelectItem>
+                                        <SelectItem value="student">Student</SelectItem>
+                                        <SelectItem value="other">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
-                        <FormField
-                            control={form.control}
-                            name="title"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Your role</FormLabel>
-                                    <FormDescription>Your primary title or role.</FormDescription>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger
-                                                aria-label="Select title or role"
-                                            >
-                                                <SelectValue placeholder="Role"/>
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent className="rounded-xl">
-                                            <SelectItem value="researcher">Researcher</SelectItem>
-                                            <SelectItem value="pm">Project Manager</SelectItem>
-                                            <SelectItem value="pi">Principal Investigator</SelectItem>
-                                            <SelectItem value="student">Student</SelectItem>
-                                            <SelectItem value="other">Other</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                    <FormField
+                        control={form.control}
+                        name="description"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Describe your research in a few sentences.</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        rows={4}
+                                        placeholder="Up to 500 characters"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
-                        <FormField
-                            control={form.control}
-                            name="affiliations"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Affiliations</FormLabel>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            creatable={true}
-                                            maxSelected={5}
-                                            onSearch={handleInstitutionAsyncSearch}
-                                            placeholder="Search for institutions..."
-                                            hidePlaceholderWhenSelected={true}
-                                            loadingIndicator={<p>Loading institutions...</p>}
-                                            emptyIndicator={<p>No institutions found.</p>}
-                                            showHoverCard={false}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                    <FormField
+                        control={form.control}
+                        name="website"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Website</FormLabel>
+                                <FormControl><Input {...field} /></FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
-                        <FormField
-                            control={form.control}
-                            name="orcid"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Your ORCID</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="text"
-                                            {...field}
-                                            onChange={(e) => {
-                                                // Remove all non-digit characters, EXCEPT allow X at the end
-                                                let raw = e.target.value.toUpperCase().replace(/[^0-9X]/g, "");
+                    <FormField
+                        control={form.control}
+                        name="conditionsOfInterest"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>
+                                    Country
+                                </FormLabel>
+                                <FormControl>
+                                    <MultipleSelector
+                                        {...field}
+                                        maxSelected={1}
+                                        defaultOptions={COUNTRIES}
+                                        placeholder="Search for countries..."
+                                        hidePlaceholderWhenSelected={true}
+                                        loadingIndicator={<p>Loading countries...</p>}
+                                        emptyIndicator={<p>No countries found.</p>}
+                                        showHoverCard={false}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
-                                                // Limit to 16 characters (15 digits + optional trailing X)
-                                                raw = raw.substring(0, 16);
+                    <FormField
+                        control={form.control}
+                        name="affiliations"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Affiliations</FormLabel>
+                                <FormControl>
+                                    <MultipleSelector
+                                        {...field}
+                                        creatable={true}
+                                        maxSelected={5}
+                                        onSearch={handleInstitutionAsyncSearch}
+                                        placeholder="Search for institutions..."
+                                        hidePlaceholderWhenSelected={true}
+                                        loadingIndicator={<p>Loading institutions...</p>}
+                                        emptyIndicator={<p>No institutions found.</p>}
+                                        showHoverCard={false}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
-                                                // Add dash every 4 characters
-                                                const formatted = raw.match(/.{1,4}/g)?.join("-") || "";
+                    <FormField
+                        control={form.control}
+                        name="orcid"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Your ORCID</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="text"
+                                        {...field}
+                                        onChange={(e) => {
+                                            // Remove all non-digit characters, EXCEPT allow X at the end
+                                            let raw = e.target.value.toUpperCase().replace(/[^0-9X]/g, "");
 
-                                                field.onChange(formatted);
-                                            }}
-                                            value={field.value}
-                                            placeholder="0000-0000-0000-0000"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                            // Limit to 16 characters (15 digits + optional trailing X)
+                                            raw = raw.substring(0, 16);
 
+                                            // Add dash every 4 characters
+                                            const formatted = raw.match(/.{1,4}/g)?.join("-") || "";
+
+                                            field.onChange(formatted);
+                                        }}
+                                        value={field.value}
+                                        placeholder="0000-0000-0000-0000"
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                             control={form.control}
                             name="researchInterests"
@@ -439,18 +505,71 @@ export default function ResearcherOnboardingForm() {
                                             badgeClassName={badgeVariants({variant: "lightBlue"})}
                                             defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
                                             hidePlaceholderWhenSelected={true}
-                                            placeholder="Select associated project types..."
+                                            placeholder="Select research interests..."
                                             emptyIndicator={
                                                 <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                     no results found.
                                                 </p>
                                             }
+                                            showHoverCard={false}
                                         />
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem>
                             )}
                         />
+
+                        <FormField
+                            control={form.control}
+                            name="therapeuticsOfInterest"
+                            render={({field}) => {
+                                const id = "ms-ther-interest";
+
+                                return (
+                                    <FormItem>
+                                        <FormLabel htmlFor={id} id={`${id}-label`}>
+                                            Therapeutics of interest
+                                        </FormLabel>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={MODALITIES}
+                                                placeholder="Select modalities..."
+                                                inputProps={{
+                                                    id,
+                                                    "aria-labelledby": `${id}-label`,
+                                                    "aria-label": "Therapeutics of Interest", // keep for a11y
+                                                    "data-testid": id,
+                                                }}
+                                                hidePlaceholderWhenSelected
+                                                emptyIndicator={<p
+                                                    className="text-center text-sm text-muted-foreground">no
+                                                    results found.</p>}
+                                                showHoverCard={false}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )
+                            }}
+                        />
+
+                        {form.watch("therapeuticsOfInterest")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
+                            <FormField
+                                control={form.control}
+                                name="otherTherapeuticsOfInterest"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormDescription>(Optional) Other details for internal improvement
+                                            only.</FormDescription>
+                                        <FormControl>
+                                            <Input {...field} />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+                        )}
 
                         <FormField
                             control={form.control}
@@ -482,9 +601,6 @@ export default function ResearcherOnboardingForm() {
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Genes of interest</FormLabel>
-                                    <FormDescription>
-                                        Select all that apply.
-                                    </FormDescription>
                                     <FormControl>
                                         <MultipleSelector
                                             {...field}
@@ -500,64 +616,52 @@ export default function ResearcherOnboardingForm() {
                                 </FormItem>
                             )}
                         />
+                    </div>
 
-                        <div className="space-y-2">
-                            <FormField
-                                control={form.control}
-                                name="notificationSettings"
-                                render={({field}) => (
-                                    <FormItem
-                                        className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                        <div className="space-y-1 leading-none">
-                                            <FormLabel>
-                                                {`Allow us to contact you regarding platform changes and notifications.`}
-                                            </FormLabel>
-                                            <FormDescription>
-                                                {`You can manage your notifications in your user settings page.`}
-                                            </FormDescription>
-                                        </div>
-                                    </FormItem>
-                                )}
-                            />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="notificationSettings"
+                            render={({field}) => (
+                                <FormItem
+                                    className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                    <FormControl>
+                                        <Checkbox checked={field.value} onCheckedChange={field.onChange}/>
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                        <FormLabel>Allow platform updates & notifications</FormLabel>
+                                        <FormDescription>You can change this later in
+                                            settings.</FormDescription>
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
 
-                            <FormField
-                                control={form.control}
-                                name="consentSettings"
-                                render={({field}) => (
-                                    <FormItem
-                                        className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                        <div className="space-y-1 leading-none">
-                                            <FormLabel>
-                                                {`I consent for Comend to collect data to help improve the platform.`}
-                                            </FormLabel>
-                                            <FormDescription>
-                                                {`You can change these settings in your user settings page.`}
-                                            </FormDescription>
-                                        </div>
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+                        <FormField
+                            control={form.control}
+                            name="consentSettings"
+                            render={({field}) => (
+                                <FormItem
+                                    className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                    <FormControl>
+                                        <Checkbox checked={field.value} onCheckedChange={field.onChange}/>
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                        <FormLabel>I consent to data collection to improve Comend</FormLabel>
+                                        <FormDescription>Analytics preferences can be updated
+                                            anytime.</FormDescription>
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
+                    </div>
 
-                        <Button type="submit" disabled={loading}>
-                            {loading ? <LoadingDots color="#808080"/> : "Next"}
-                        </Button>
-                    </form>
-                </Form>
+                    <Button type="submit" disabled={loading}>
+                        {loading ? <LoadingDots color="#808080"/> : "Save"}
+                    </Button>
+                </form>
+            </Form>
 
-            </div>
         </div>
     )
 }
