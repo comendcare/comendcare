@@ -6244,6 +6244,9 @@ export const updateResearcher = withAuth(
                     researchInterests: {
                         set: data.researchInterests?.map((r: any) => r.value) || [],
                     },
+                    therapeuticsOfInterest: {
+                        set: data.therapeuticsOfInterest?.map((r: any) => r.value) || [],
+                    },
                     genesOfInterest: {
                         set: data.genesOfInterest?.map((g: any) => g.value) || [],
                     },

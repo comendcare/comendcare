@@ -6,7 +6,11 @@ export interface EnrichedResearcher {
         title?: "researcher" | "pm" | "pi" | "student" | "other" | null;
         orcid?: string | null;
         email?: string | null;
+        description?: string | null;
+        website?: string | null;
+        country?: string | null;
         researchInterests?: string[];
+        therapeuticsOfInterest: string[];
         conditionsOfInterest?: string[];
         genesOfInterest?: string[];
         affiliations?: {
