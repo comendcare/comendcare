@@ -22,7 +22,7 @@ const OrcidProvider = (): OAuthConfig<any> => (    {
     authorization: {
         url: 'https://orcid.org/oauth/authorize',
         params: {
-            scope: 'openid profile',
+            scope: 'openid profile email',
             response_type: 'code',
         },
     },
@@ -33,14 +33,14 @@ const OrcidProvider = (): OAuthConfig<any> => (    {
     profile(profile) {
         const given = profile.given_name ?? '';
         const family = profile.family_name ?? '';
-        const fallbackEmail = `orcid-${profile.sub}@orcid.org`; // fallback to synthetic email
+        const email = profile.email ?? undefined;
 
         return {
             id: profile.sub,
             name: `${given} ${family}`.trim(),
-            email: profile.email ?? fallbackEmail, // ORCID doesn’t return real email
-            image: undefined, // ORCID usually doesn’t return profile image
-        };
+            email,          // 👈 no synthetic fallback here
+            image: undefined,
+        }
     },
 });
 
