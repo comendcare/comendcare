@@ -15,7 +15,7 @@ import ResearcherProfileFrequentCollaboratorsCard
     from "./researcher-profile-frequent-collaborators-card";
 import ResearcherProfileEducationCard from "./researcher-profile-education-card";
 
-export default function ResearcherProfile({researcherData}: any) {
+export default function ResearcherProfile({researcherData, publicProfile}: {researcherData: any, publicProfile: boolean}) {
     const openAlex = researcherData?.openAlex ?? {};
     const researcher = researcherData?.researcher ?? null;
     const mergedFields = researcherData?.mergedFields ?? {
@@ -91,13 +91,15 @@ export default function ResearcherProfile({researcherData}: any) {
                                     </div>
                                 </div>
 
-                                <div className="flex gap-2">
-                                    {/*<Button variant="outline" size="sm">*/}
-                                    {/*    <Mail className="w-4 h-4 mr-2" />*/}
-                                    {/*    Contact*/}
-                                    {/*</Button>*/}
-                                    <EditResearcherProfileDialog researcher={researcherData.researcher}/>
-                                </div>
+                                {!publicProfile &&
+                                    <div className="flex gap-2">
+                                        {/*<Button variant="outline" size="sm">*/}
+                                        {/*    <Mail className="w-4 h-4 mr-2" />*/}
+                                        {/*    Contact*/}
+                                        {/*</Button>*/}
+                                        <EditResearcherProfileDialog researcher={researcherData.researcher}/>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
