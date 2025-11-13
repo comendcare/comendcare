@@ -46,6 +46,9 @@ export default async function ResearcherProfilePage({
     }
 
     return (
-        <ResearcherProfile researcherData={researcherData}/>
+        <ResearcherProfile
+            researcherData={researcherData}
+            publicProfile={false}
+        />
     )
 }
