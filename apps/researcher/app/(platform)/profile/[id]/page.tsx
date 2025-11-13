@@ -1,5 +1,5 @@
 import React from "react";
-import ResearcherProfile from "@/packages/components/researcher-profile";
+import ResearcherProfile from "~researcher/components/researcher-profile";
 import {getSession} from "@/packages/lib/auth";
 import {getResearcherWithMergedDataAdvanced, getResearcherWithMergedData} from "@comend/lib/fetchers";
 
@@ -48,7 +48,6 @@ export default async function ResearcherProfilePage({
     return (
         <ResearcherProfile
             researcherData={researcherData}
-            publicProfile={false}
         />
     )
 }

@@ -1,6 +1,6 @@
-import {Avatar, AvatarFallback, AvatarImage} from "./ui/avatar"
-import {Badge} from "./ui/badge"
-import {Card, CardContent, CardHeader, CardTitle} from "./ui/card"
+import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar"
+import {Badge} from "@comend/components/ui/badge"
+import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card"
 import {
     Building2,
     Mail,
@@ -8,14 +8,15 @@ import {
     Star,
     TrendingUp,
 } from "lucide-react"
-import {formatNumberWithCommas} from "@comend/lib/utils";
-import EditResearcherProfileDialog from "comend-researcher-hub/components/edit-researcher-profile-dialog";
-import ResearcherProfilePublicationsSection from "./researcher-profile-publications-section";
+import {formatNumberWithCommas} from "@/packages/lib/utils";
+import EditResearcherProfileDialog from "~researcher/components/edit-researcher-profile-dialog";
+import ResearcherProfilePublicationsSection from "@comend/components/researcher-profile-publications-section";
 import ResearcherProfileFrequentCollaboratorsCard
-    from "./researcher-profile-frequent-collaborators-card";
-import ResearcherProfileEducationCard from "./researcher-profile-education-card";
+    from "@comend/components/researcher-profile-frequent-collaborators-card";
+import ResearcherProfileEducationCard from "@comend/components/researcher-profile-education-card";
 
-export default function ResearcherProfile({researcherData, publicProfile}: {researcherData: any, publicProfile: boolean}) {
+export default function ResearcherProfile({researcherData}: {researcherData: any})
+{
     const openAlex = researcherData?.openAlex ?? {};
     const researcher = researcherData?.researcher ?? null;
     const mergedFields = researcherData?.mergedFields ?? {
@@ -91,15 +92,13 @@ export default function ResearcherProfile({researcherData, publicProfile}: {rese
                                     </div>
                                 </div>
 
-                                {!publicProfile &&
-                                    <div className="flex gap-2">
-                                        {/*<Button variant="outline" size="sm">*/}
-                                        {/*    <Mail className="w-4 h-4 mr-2" />*/}
-                                        {/*    Contact*/}
-                                        {/*</Button>*/}
-                                        <EditResearcherProfileDialog researcher={researcherData.researcher}/>
-                                    </div>
-                                }
+                                <div className="flex gap-2">
+                                    {/*<Button variant="outline" size="sm">*/}
+                                    {/*    <Mail className="w-4 h-4 mr-2" />*/}
+                                    {/*    Contact*/}
+                                    {/*</Button>*/}
+                                    <EditResearcherProfileDialog researcher={researcherData.researcher}/>
+                                </div>
                             </div>
                         </div>
                     </div>
