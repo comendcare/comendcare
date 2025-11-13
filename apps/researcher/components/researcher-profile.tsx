@@ -1,17 +1,12 @@
 import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar"
 import {Badge} from "@comend/components/ui/badge"
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card"
-import {Separator} from "@comend/components/ui/separator"
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs"
 import {
     Building2,
-    Calendar,
-    GraduationCap,
     Mail,
     MapPin,
     Star,
     TrendingUp,
-    Users,
 } from "lucide-react"
 import {formatNumberWithCommas} from "@/packages/lib/utils";
 import EditResearcherProfileDialog from "~researcher/components/edit-researcher-profile-dialog";
@@ -190,7 +185,7 @@ export default function ResearcherProfile({researcherData}: any) {
                                 <CardTitle>About</CardTitle>
                             </CardHeader>
                             <CardContent className="prose max-w-none">
-                                {mergedFields ?? ""}
+                                {mergedFields.title ?? ""}
                             </CardContent>
                         </Card>
 

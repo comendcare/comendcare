@@ -32,7 +32,7 @@ import {z} from "zod";
 import {Ellipsis, Pencil} from "lucide-react";
 import {useRouter} from "next/navigation";
 import {editUser, updateResearcher} from "@comend/lib/actions";
-import {MILESTONE_TYPE_OPTIONS, Option, optionSchema} from "@comend/lib/types";
+import {MILESTONE_TYPE_OPTIONS, MODALITIES, Option, optionSchema} from "@comend/lib/types";
 import {
     getUser,
     getResearcherFromUserId,
@@ -61,6 +61,8 @@ const formSchema = z.object({
         message: "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
     }).optional(),
     researchInterests: z.array(optionSchema).optional(),
+    therapeuticsOfInterest: z.array(optionSchema).optional(),
+    otherTherapeuticsOfInterest: z.string().optional(),
     genesOfInterest: z.array(optionSchema).optional(),
     conditionsOfInterest: z.array(optionSchema).optional(),
     notificationSettings: z.boolean().default(false),
@@ -347,6 +349,58 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                                 </FormItem>
                             )}
                         />
+
+                        <FormField
+                            control={form.control}
+                            name="therapeuticsOfInterest"
+                            render={({field}) => {
+                                const id = "ms-ther-interest";
+
+                                return (
+                                    <FormItem>
+                                        <FormLabel htmlFor={id} id={`${id}-label`}>
+                                            Therapeutics of interest
+                                        </FormLabel>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={MODALITIES}
+                                                placeholder="Select modalities..."
+                                                inputProps={{
+                                                    id,
+                                                    "aria-labelledby": `${id}-label`,
+                                                    "aria-label": "Therapeutics of Interest", // keep for a11y
+                                                    "data-testid": id,
+                                                }}
+                                                hidePlaceholderWhenSelected
+                                                emptyIndicator={<p
+                                                    className="text-center text-sm text-muted-foreground">no
+                                                    results found.</p>}
+                                                showHoverCard={false}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )
+                            }}
+                        />
+
+                        {form.watch("therapeuticsOfInterest")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
+                            <FormField
+                                control={form.control}
+                                name="otherTherapeuticsOfInterest"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormDescription>(Optional) Other details for internal improvement
+                                            only.</FormDescription>
+                                        <FormControl>
+                                            <Input {...field} />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+                        )}
 
                         <FormField
                             control={form.control}

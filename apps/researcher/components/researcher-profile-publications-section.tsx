@@ -1,6 +1,5 @@
 "use client"
 
-import {TabsContent} from "@/packages/components/ui/tabs";
 import {Button} from "@/packages/components/ui/button";
 import {Card, CardContent} from "@/packages/components/ui/card";
 import {Badge} from "@/packages/components/ui/badge";
@@ -33,7 +32,7 @@ export default function ResearcherProfilePublicationsSection({researcherData}: {
     )
 
     return (
-        <TabsContent value="publications" className="space-y-4">
+        <>
             <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Recent Publications</h2>
                 <Button variant="outline" size="sm">
@@ -151,6 +150,6 @@ export default function ResearcherProfilePublicationsSection({researcherData}: {
                     </PaginationContent>
                 </Pagination>
             )}
-        </TabsContent>
+        </>
     )
 }
