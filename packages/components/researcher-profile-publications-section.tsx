@@ -1,8 +1,8 @@
 "use client"
 
-import {Button} from "@/packages/components/ui/button";
-import {Card, CardContent} from "@/packages/components/ui/card";
-import {Badge} from "@/packages/components/ui/badge";
+import {Button} from "./ui/button";
+import {Card, CardContent} from "./ui/card";
+import {Badge} from "./ui/badge";
 import {
     QuoteIcon as Citation,
     ExternalLink,
@@ -14,7 +14,7 @@ import {
     PaginationLink,
     PaginationPrevious,
     PaginationNext,
-} from "@comend/components/ui/pagination"
+} from "./ui/pagination"
 import {useState} from "react";
 
 
