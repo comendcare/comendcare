@@ -1,6 +1,6 @@
-import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar"
-import {Badge} from "@comend/components/ui/badge"
-import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card"
+import {Avatar, AvatarFallback, AvatarImage} from "./ui/avatar"
+import {Badge} from "./ui/badge"
+import {Card, CardContent, CardHeader, CardTitle} from "./ui/card"
 import {
     Building2,
     Mail,
@@ -8,12 +8,12 @@ import {
     Star,
     TrendingUp,
 } from "lucide-react"
-import {formatNumberWithCommas} from "@/packages/lib/utils";
-import EditResearcherProfileDialog from "~researcher/components/edit-researcher-profile-dialog";
-import ResearcherProfilePublicationsSection from "~researcher/components/researcher-profile-publications-section";
+import {formatNumberWithCommas} from "@comend/lib/utils";
+import EditResearcherProfileDialog from "comend-researcher-hub/components/edit-researcher-profile-dialog";
+import ResearcherProfilePublicationsSection from "./researcher-profile-publications-section";
 import ResearcherProfileFrequentCollaboratorsCard
-    from "~researcher/components/researcher-profile-frequent-collaborators-card";
-import ResearcherProfileEducationCard from "~researcher/components/researcher-profile-education-card";
+    from "./researcher-profile-frequent-collaborators-card";
+import ResearcherProfileEducationCard from "./researcher-profile-education-card";
 
 export default function ResearcherProfile({researcherData}: any) {
     const openAlex = researcherData?.openAlex ?? {};

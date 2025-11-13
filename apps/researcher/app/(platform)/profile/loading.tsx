@@ -2,7 +2,7 @@
 
 import { Skeleton } from "@comend/components/ui/skeleton";
 
-export default function Loading() {
+export default function ResearcherProfileLoading() {
     return (
         <div className="max-w-7xl mx-auto flex flex-col py-4 px-4">
             {/* Header */}
