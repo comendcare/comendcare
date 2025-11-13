@@ -58,6 +58,7 @@ import z from "zod"
 import {writeRawEvent} from "./raw-events";
 import crypto from "node:crypto";
 import {customerIOTrack} from "./customer-io-track";
+import {cioDeleteUser} from "./customer-io";
 
 const PATHS = [
     "/app",
@@ -1846,6 +1847,8 @@ export const deleteUser = withAuth(
             if (!user) {
                 return {success: false, error: "user not found"};
             }
+
+            void cioDeleteUser(user.id, { suppress: true });
 
             return {success: true, data: user};
         } catch (error: any) {
