@@ -6,8 +6,10 @@ import prisma from "@comend/lib/prisma"
 import {PrismaClient} from "@prisma/client";
 import {OAuthConfig} from "next-auth/providers/oauth";
 import {CustomPrismaAdapter} from "~researcher/lib/custom-prisma-adapter";
+import sgMail from "@sendgrid/mail";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
+sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
 
 const OrcidProvider = (): OAuthConfig<any> => (    {
     id: 'orcid',
@@ -20,7 +22,7 @@ const OrcidProvider = (): OAuthConfig<any> => (    {
     authorization: {
         url: 'https://orcid.org/oauth/authorize',
         params: {
-            scope: 'openid profile',
+            scope: 'openid profile email',
             response_type: 'code',
         },
     },
@@ -31,14 +33,14 @@ const OrcidProvider = (): OAuthConfig<any> => (    {
     profile(profile) {
         const given = profile.given_name ?? '';
         const family = profile.family_name ?? '';
-        const fallbackEmail = `orcid-${profile.sub}@orcid.org`; // fallback to synthetic email
+        const email = profile.email ?? undefined;
 
         return {
             id: profile.sub,
             name: `${given} ${family}`.trim(),
-            email: profile.email ?? fallbackEmail, // ORCID doesn’t return real email
-            image: undefined, // ORCID usually doesn’t return profile image
-        };
+            email,          // 👈 no synthetic fallback here
+            image: undefined,
+        }
     },
 });
 
@@ -53,7 +55,71 @@ export const researcherAuthOptions: NextAuthOptions = {
                     pass: process.env.EMAIL_SERVER_PASSWORD
                 }
             },
-            from: process.env.EMAIL_FROM
+            from: process.env.EMAIL_FROM,
+            async sendVerificationRequest({identifier, url, provider}) {
+                // Derive the correct origin from the callback NextAuth already generated.
+                // This works in prod (custom domain), Vercel preview, and local dev.
+                const origin = new URL(url).origin;
+
+                const preflightUrl = `${origin}/email-preflight?target=${encodeURIComponent(url)}`;
+
+                const subject = "Sign in to Comend";
+                const text = `Complete signing in: ${preflightUrl}`;
+                const html = `
+                    <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; line-height:1.5; color:#111;">
+                        <p>Click the button to complete signing in:</p>
+                        <p>
+                            <a
+                                href="${preflightUrl}"
+                                style="display:inline-block;padding:10px 16px;border-radius:8px;border:1px solid #d0d7de;text-decoration:none;"
+                            >
+                                Complete sign in
+                            </a>
+                        </p>
+
+                        <hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0;" />
+
+                        <p>Or copy & paste this link:</p>
+                        <!-- Show as selectable plain text AND as a link. The outer container prevents ugly wrapping. -->
+                        <p style="margin:8px 0;">
+                            <a href="${preflightUrl}" style="text-decoration:none;color:inherit;">
+                                <span style="display:inline-block; max-width:100%; word-break:break-all; overflow-wrap:anywhere; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; background:#f6f8fa; padding:8px 10px; border-radius:6px; border:1px solid #e5e7eb;">
+                                    ${preflightUrl}
+                                </span>
+                            </a>
+                        </p>
+                        
+                        
+                        <!-- SECURITY WARNING -->
+                        <div style="margin:16px 0; padding:12px 14px; border:1px solid #f59e0b; background:#fffbeb; border-radius:8px;">
+                            <strong style="display:block; margin-bottom:4px;">Security warning</strong>
+                            <div style="font-size:14px; color:#553c04;">
+                                • This link is for you only — do <em>not</em> share or forward this email.<br/>
+                                • Anyone with this link can access your account.<br/>
+                                • If you didn’t request this, please delete this email.
+                            </div>
+                        </div>
+
+                        <p style="color:#6b7280; font-size:12px; margin-top:12px;">
+                            If you didn’t request this, you can safely ignore this email.
+                        </p>
+                    </div>`;
+
+                await sgMail.send({
+                    to: identifier,
+                    from: {email: provider.from!, name: "Comend"},
+                    trackingSettings: {
+                        clickTracking: {enable: false, enableText: false},
+                        openTracking: {enable: false},
+                        subscriptionTracking: {enable: false},
+                    },
+                    subject,
+                    text,
+                    html,
+                    categories: ["auth-email"],
+                    headers: {"X-Entity-Ref-ID": crypto.randomUUID()},
+                });
+            },
         }),
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID as string,

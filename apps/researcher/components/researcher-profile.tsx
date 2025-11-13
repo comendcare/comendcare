@@ -1,58 +1,29 @@
 import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar"
 import {Badge} from "@comend/components/ui/badge"
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card"
-import {Separator} from "@comend/components/ui/separator"
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs"
 import {
     Building2,
-    Calendar,
-    GraduationCap,
     Mail,
     MapPin,
     Star,
     TrendingUp,
-    Users,
 } from "lucide-react"
 import {formatNumberWithCommas} from "@/packages/lib/utils";
 import EditResearcherProfileDialog from "~researcher/components/edit-researcher-profile-dialog";
 import ResearcherProfilePublicationsSection from "~researcher/components/researcher-profile-publications-section";
-
-function formatYearRanges(years: number[] | string[] = []): string {
-    const nums = years
-        .map((y) => parseInt(y as string))
-        .filter((y) => !isNaN(y))
-        .sort((a, b) => a - b);
-
-    if (nums.length === 0) return "";
-
-    const ranges: string[] = [];
-    let start = nums[0];
-    let prev = nums[0];
-
-    for (let i = 1; i <= nums.length; i++) {
-        const year = nums[i];
-        if (year === prev + 1) {
-            prev = year;
-            continue;
-        }
-
-        if (start === prev) {
-            ranges.push(`${start}`);
-        } else {
-            ranges.push(`${start}-${prev}`);
-        }
-
-        start = year;
-        prev = year;
-    }
-
-    return ranges.join(", ");
-}
+import ResearcherProfileFrequentCollaboratorsCard
+    from "~researcher/components/researcher-profile-frequent-collaborators-card";
+import ResearcherProfileEducationCard from "~researcher/components/researcher-profile-education-card";
 
 export default function ResearcherProfile({researcherData}: any) {
     const openAlex = researcherData?.openAlex ?? {};
     const researcher = researcherData?.researcher ?? null;
-    const mergedFields = researcherData?.mergedFields ?? { name: "Unknown Researcher", title: null, email: null, researchInterests: [] as string[] };
+    const mergedFields = researcherData?.mergedFields ?? {
+        name: "Unknown Researcher",
+        title: null,
+        email: null,
+        researchInterests: [] as string[]
+    };
 
     const institution =
         researcher?.affiliations?.[0]?.institution?.name ??
@@ -200,252 +171,30 @@ export default function ResearcherProfile({researcherData}: any) {
                         </Card>
 
                         {/* Education */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <GraduationCap className="w-5 h-5" />
-                                    Education
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                                {openAlex.affiliations?.filter((aff: any) => aff.institution?.type === "education").length > 0 ? (
-                                    openAlex.affiliations
-                                        .filter((aff: any) => aff.institution?.type === "education")
-                                        .map((aff: any, index: number) => (
-                                            <div key={index}>
-                                                <div className="font-semibold">{aff.institution.display_name}</div>
-                                                {aff.years && (
-                                                    <div className="text-sm text-gray-600">
-                                                        {formatYearRanges(aff.years)}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))
-                                ) : (
-                                    <div className="text-sm text-gray-600">No education data available.</div>
-                                )}
-                            </CardContent>
-                        </Card>
+                        {/*<ResearcherProfileEducationCard openAlex={openAlex} />*/}
 
                         {/* Top Co-authors */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Users className="w-5 h-5"/>
-                                    Frequent Collaborators
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                                {coAuthors.length > 0 ?
-                                    coAuthors.slice(0, 5).map((author: {
-                                        name: string,
-                                        affiliation: string,
-                                        collaborations: string
-                                    }, index: number) => (
-                                        <div key={index} className="flex items-center justify-between">
-                                            <div>
-                                                <div className="font-medium text-sm">{author.name}</div>
-                                                <div className="text-xs text-gray-600">{author.affiliation}</div>
-                                            </div>
-                                            <Badge variant="outline" className="text-xs">
-                                                {author.collaborations}
-                                            </Badge>
-                                        </div>
-                                    ))
-                                    : <div className="text-sm text-gray-600">No collaborator data available.</div>
-                                }
-                            </CardContent>
-                        </Card>
+                        {/*<ResearcherProfileFrequentCollaboratorsCard coAuthors={coAuthors} />*/}
                     </div>
 
                     {/* Main Content */}
                     <div className="lg:col-span-2">
-                        <Tabs defaultValue="publications" className="w-full">
-                            <TabsList className="grid w-full grid-cols-4">
-                                <TabsTrigger value="publications">Publications</TabsTrigger>
-                                <TabsTrigger value="about">About</TabsTrigger>
-                                <TabsTrigger value="projects">Projects</TabsTrigger>
-                                <TabsTrigger value="activity">Activity</TabsTrigger>
-                            </TabsList>
 
-                            <ResearcherProfilePublicationsSection
-                                researcherData={researcherData}
-                            />
-
-                            <TabsContent value="about" className="space-y-6">
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>About</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="prose max-w-none">
-                                        <p>
-                                            Dr. Sarah Chen is a leading researcher in molecular biology and cancer
-                                            research at the University
-                                            of California, San Francisco. Her work focuses on understanding the
-                                            molecular mechanisms
-                                            underlying cancer development and progression, with particular emphasis on
-                                            stem cell biology and
-                                            precision medicine approaches.
-                                        </p>
-                                        <p>
-                                            {`Dr. Chen's laboratory employs cutting-edge techniques including CRISPR gene editing, single-cell
-                                            genomics, and advanced computational methods to identify novel therapeutic targets and biomarkers
-                                            for cancer treatment. Her research has been published in top-tier journals and has contributed
-                                            significantly to the development of personalized cancer therapies.
-                                            `}
-                                        </p>
-                                        <p>
-                                            She is actively involved in mentoring the next generation of scientists and
-                                            has supervised over 20
-                                            graduate students and postdoctoral researchers. Dr. Chen serves on editorial
-                                            boards of several
-                                            prestigious journals and is a frequent speaker at international conferences.
-                                        </p>
-                                    </CardContent>
-                                </Card>
-
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Awards & Honors</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-3">
-                                        <div className="flex items-center gap-3">
-                                            <Calendar className="w-4 h-4 text-gray-500"/>
-                                            <div>
-                                                <div
-                                                    className="font-semibold">{`NIH Director's New Innovator Award`}</div>
-                                                <div className="text-sm text-gray-600">2023</div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <Calendar className="w-4 h-4 text-gray-500"/>
-                                            <div>
-                                                <div className="font-semibold">American Cancer Society Research Scholar
-                                                    Grant
-                                                </div>
-                                                <div className="text-sm text-gray-600">2021</div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <Calendar className="w-4 h-4 text-gray-500"/>
-                                            <div>
-                                                <div className="font-semibold">UCSF Excellence in Teaching Award</div>
-                                                <div className="text-sm text-gray-600">2020</div>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </TabsContent>
-
-                            <TabsContent value="projects" className="space-y-4">
-                                <div className="grid gap-4">
-                                    <Card>
-                                        <CardHeader>
-                                            <CardTitle className="text-lg">CRISPR-Based Cancer Therapeutics</CardTitle>
-                                            <Badge className="w-fit">Active</Badge>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <p className="text-sm text-gray-600 mb-3">
-                                                Developing novel CRISPR-Cas9 approaches for targeted cancer therapy,
-                                                focusing on precision
-                                                editing of oncogenes and tumor suppressor genes.
-                                            </p>
-                                            <div className="flex items-center gap-2 text-xs text-gray-500">
-                                                <span>Funding: NIH R01</span>
-                                                <Separator orientation="vertical" className="h-3"/>
-                                                <span>2022-2027</span>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-
-                                    <Card>
-                                        <CardHeader>
-                                            <CardTitle className="text-lg">Single-Cell Atlas of Pancreatic
-                                                Cancer</CardTitle>
-                                            <Badge variant="secondary" className="w-fit">
-                                                Completed
-                                            </Badge>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <p className="text-sm text-gray-600 mb-3">
-                                                Comprehensive single-cell RNA sequencing study to map cellular
-                                                heterogeneity in pancreatic
-                                                adenocarcinoma and identify therapeutic vulnerabilities.
-                                            </p>
-                                            <div className="flex items-center gap-2 text-xs text-gray-500">
-                                                <span>Funding: NSF</span>
-                                                <Separator orientation="vertical" className="h-3"/>
-                                                <span>2020-2023</span>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-
-                                    <Card>
-                                        <CardHeader>
-                                            <CardTitle className="text-lg">AI-Driven Drug Discovery Platform</CardTitle>
-                                            <Badge className="w-fit">Active</Badge>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <p className="text-sm text-gray-600 mb-3">
-                                                Machine learning approaches for predicting drug efficacy and resistance
-                                                patterns in
-                                                hematological malignancies.
-                                            </p>
-                                            <div className="flex items-center gap-2 text-xs text-gray-500">
-                                                <span>Funding: Industry Partnership</span>
-                                                <Separator orientation="vertical" className="h-3"/>
-                                                <span>2023-2025</span>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>About</CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex flex-col space-y-4">
+                                <div className="prose max-w-none">
+                                    {mergedFields.title ?? ""}
                                 </div>
-                            </TabsContent>
 
-                            <TabsContent value="activity" className="space-y-4">
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Recent Activity</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-4">
-                                        <div className="flex items-start gap-3">
-                                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                                            <div>
-                                                <div className="font-medium text-sm">Published new article in Nature
-                                                    Biotechnology
-                                                </div>
-                                                <div className="text-xs text-gray-500">2 days ago</div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-start gap-3">
-                                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                                            <div>
-                                                <div className="font-medium text-sm">Presented at AACR Annual Meeting
-                                                    2024
-                                                </div>
-                                                <div className="text-xs text-gray-500">1 week ago</div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-start gap-3">
-                                            <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
-                                            <div>
-                                                <div
-                                                    className="font-medium text-sm">{`Received NIH Director's New Innovator Award`}</div>
-                                                <div className="text-xs text-gray-500">2 weeks ago</div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-start gap-3">
-                                            <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
-                                            <div>
-                                                <div className="font-medium text-sm">Started collaboration with Stanford
-                                                    University
-                                                </div>
-                                                <div className="text-xs text-gray-500">3 weeks ago</div>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </TabsContent>
-                        </Tabs>
+                                <ResearcherProfilePublicationsSection
+                                    researcherData={researcherData}
+                                />
+                            </CardContent>
+                        </Card>
+
                     </div>
                 </div>
             </div>
