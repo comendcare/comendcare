@@ -184,14 +184,16 @@ export default function ResearcherProfile({researcherData}: any) {
                             <CardHeader>
                                 <CardTitle>About</CardTitle>
                             </CardHeader>
-                            <CardContent className="prose max-w-none">
-                                {mergedFields.title ?? ""}
+                            <CardContent className="flex flex-col space-y-4">
+                                <div className="prose max-w-none">
+                                    {mergedFields.title ?? ""}
+                                </div>
+
+                                <ResearcherProfilePublicationsSection
+                                    researcherData={researcherData}
+                                />
                             </CardContent>
                         </Card>
-
-                        <ResearcherProfilePublicationsSection
-                            researcherData={researcherData}
-                        />
 
                     </div>
                 </div>

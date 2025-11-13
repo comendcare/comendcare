@@ -32,7 +32,7 @@ import {z} from "zod";
 import {Ellipsis, Pencil} from "lucide-react";
 import {useRouter} from "next/navigation";
 import {editUser, updateResearcher} from "@comend/lib/actions";
-import {MILESTONE_TYPE_OPTIONS, MODALITIES, Option, optionSchema} from "@comend/lib/types";
+import {COUNTRIES, MILESTONE_TYPE_OPTIONS, MODALITIES, Option, optionSchema} from "@comend/lib/types";
 import {
     getUser,
     getResearcherFromUserId,
@@ -42,6 +42,7 @@ import {Skeleton} from "@/packages/components/ui/skeleton";
 import {badgeVariants} from "@/packages/components/ui/badge";
 import LoadingDots from "@/packages/components/icons/loading-dots";
 import {EnrichedResearcher} from "~researcher/types/types";
+import {Textarea} from "@/packages/components/ui/textarea";
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
     ...option,
@@ -56,6 +57,13 @@ const formSchema = z.object({
         (v) => (v === "" ? undefined : v),
         TitleEnum.optional()
     ),
+    website: z.string().optional(),
+    country: z.string().optional(),
+    description: z.string().min(2, {
+        message: "Your profile's description must be at least 2 characters long.",
+    }).max(500, {
+        message: "Your profile's description must less than 500 characters long.",
+    }).optional(),
     affiliations: z.array(optionSchema).optional(),
     orcid: z.string().regex(/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/, {
         message: "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
@@ -264,6 +272,61 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                                             <SelectItem value="other">Other</SelectItem>
                                         </SelectContent>
                                     </Select>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Describe your research in a few sentences.</FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            rows={4}
+                                            placeholder="Up to 500 characters"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="website"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Website</FormLabel>
+                                    <FormControl><Input {...field} /></FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="conditionsOfInterest"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Country
+                                    </FormLabel>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            maxSelected={1}
+                                            defaultOptions={COUNTRIES}
+                                            placeholder="Search for countries..."
+                                            hidePlaceholderWhenSelected={true}
+                                            loadingIndicator={<p>Loading countries...</p>}
+                                            emptyIndicator={<p>No countries found.</p>}
+                                            showHoverCard={false}
+                                        />
+                                    </FormControl>
                                     <FormMessage/>
                                 </FormItem>
                             )}
