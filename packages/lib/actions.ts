@@ -4522,7 +4522,7 @@ export const createMilestones = withOrganizationAuth(
                                 }
                             },
                             status: milestone?.status || "PLANNED",
-                            private: !!milestone?.private,
+                            private: (milestone?.private !== null && milestone?.private !== undefined) ? milestone?.private : true,
                             nodeType: milestone?.nodeType || "PROJECT",
                             companies: {
                                 create: (milestone?.companies || []).map((company: any) => ({
@@ -4654,7 +4654,7 @@ export const createNodes = withOrganizationAuth(
                                         }
                                     },
                                     status: node.data?.status || "PLANNED",
-                                    private: node.data?.private ?? true,
+                                    private: (node.data?.private !== null && node.data?.private !== null) ? node.data?.private : true,
                                     nodeType: node.data?.nodeType || "PROJECT"
                                 }
                             }

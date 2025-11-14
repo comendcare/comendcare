@@ -75,6 +75,8 @@ export async function formatProjectData(project: any): Promise<{
         return [option.databaseKey, val]
     }))
 
+    console.log(`data`, data)
+
     const contactsLength = Math.max((data.contactNames || []).length, (data.contactEmails || []).length)
     const contacts = []
     for (let i = 0; i < contactsLength; i++) {
@@ -134,22 +136,23 @@ export async function formatProjectData(project: any): Promise<{
         data.endDate = undefined
     }
 
+    // data.private = data.isPrivate
+
     return {data: data as z.infer<typeof editMilestoneForm>, errors}
 }
 
 const projectImportSchema: ImportSchemaEntry[] = [
     {
         spreadsheetKey: 'Visibility', 
-        databaseKey: 'visibility',
+        databaseKey: 'isPrivate',
         required: false, 
-        defaultValue: undefined, 
+        defaultValue: true, 
         isValid: (entry) => typeof entry === 'string',
         fetchDatabaseValue: (entry) => {
-            switch (entry) {
-                case 'Published': return false
-                case 'Private': return true
-                default: return true
-            }
+            if (entry == 'Published') return false
+            if (entry == 'Private') return true
+
+            return true
         }
     },
     {
@@ -357,6 +360,7 @@ export function ProjectBulkImportDialog() {
 
                     newNodes.push({
                         private: formattedProject.isPrivate,
+                        isPrivate: formattedProject.isPrivate,
                         nodeType: 'PROJECT',
                         title: formattedProject.title,
                         description: formattedProject.description,
@@ -381,6 +385,7 @@ export function ProjectBulkImportDialog() {
 
                 console.log(`new nodes`, newNodes)
                 console.log(`errors`, errors)
+                console.log(`new nodes`, newNodes)
                 await addMilestones(newNodes)
 
                 setTotalErrors(errors)
