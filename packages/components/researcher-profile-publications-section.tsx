@@ -35,9 +35,6 @@ export default function ResearcherProfilePublicationsSection({researcherData}: {
         <>
             <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Recent Publications</h2>
-                <Button variant="outline" size="sm">
-                    View All ({publications.length})
-                </Button>
             </div>
 
             <div className="space-y-4">
