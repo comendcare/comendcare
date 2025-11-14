@@ -16,6 +16,7 @@ import { useShallow } from "zustand/react/shallow";
 import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore";
 import Papa from "papaparse";
 import { Badge } from "@/packages/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones,
@@ -305,7 +306,11 @@ const projectImportSchema: ImportSchemaEntry[] = [
     },
 ]
 
-export function ProjectBulkImportDialog() {
+export function ProjectBulkImportDialog({
+    isCollapsed = false
+}: {
+    isCollapsed?: boolean
+}) {
     const router = useRouter()
     const pathname = usePathname()
     const {data: session} = useSession()
@@ -408,15 +413,24 @@ export function ProjectBulkImportDialog() {
     
     return (
         <Dialog open={isOpen} onOpenChange={(open: boolean) => setIsOpen(open)}>
-            <DialogTrigger asChild>
-                <Button 
-                    variant={"ghost"}
-                    onClick={() => setIsOpen(true)}
-                >
-                    <Import />
-                    <p>{`Import projects`}</p>
-                </Button>
-            </DialogTrigger>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <DialogTrigger asChild>
+                        <Button 
+                            variant={"ghost"}
+                            onClick={() => setIsOpen(true)}
+                        >
+                            <Import />
+                            {!isCollapsed && <p>{`Import projects`}</p>}
+                        </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                {isCollapsed && (
+                    <TooltipContent className="max-w-80">
+                        <p>{`Import projects`}</p>
+                    </TooltipContent>
+                )}
+            </Tooltip>
             <DialogContent className="flex flex-col justify-start">
             {importState === 'start' && (
                 <>
