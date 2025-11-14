@@ -14,8 +14,9 @@ import ResearcherProfilePublicationsSection from "@comend/components/researcher-
 import ResearcherProfileFrequentCollaboratorsCard
     from "@comend/components/researcher-profile-frequent-collaborators-card";
 import ResearcherProfileEducationCard from "@comend/components/researcher-profile-education-card";
+import {EnrichedResearcher} from "~researcher/types/types";
 
-export default function ResearcherProfile({researcherData}: {researcherData: any})
+export default function ResearcherProfile({researcherData}: {researcherData: EnrichedResearcher})
 {
     const openAlex = researcherData?.openAlex ?? {};
     const researcher = researcherData?.researcher ?? null;
@@ -23,6 +24,7 @@ export default function ResearcherProfile({researcherData}: {researcherData: any
         name: "Unknown Researcher",
         title: null,
         email: null,
+        description: null,
         researchInterests: [] as string[]
     };
 
@@ -33,7 +35,7 @@ export default function ResearcherProfile({researcherData}: {researcherData: any
 
     const displayName = openAlex.display_name || "Unknown Researcher";
     const email = researcherData?.researcher?.email || "Email not available";
-    const location = openAlex.last_known_institutions?.[0]?.country_code || "Country not available";
+    const location = openAlex.last_known_institutions?.[0]?.country_code || researcher?.country || "Country not available";
 
     const metrics = {
         citations: openAlex.cited_by_count ?? 0,
@@ -187,7 +189,7 @@ export default function ResearcherProfile({researcherData}: {researcherData: any
                             </CardHeader>
                             <CardContent className="flex flex-col space-y-4">
                                 <div className="prose max-w-none">
-                                    {mergedFields.title ?? ""}
+                                    {researcher.description ?? ""}
                                 </div>
 
                                 <ResearcherProfilePublicationsSection
