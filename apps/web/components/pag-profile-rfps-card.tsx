@@ -173,26 +173,13 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
         <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 mt-2"} type={"always"}>
             <Scrollbar />
             <DialogHeader>
-                <div className="flex gap-2 justify-center items-center flex-wrap">
-                    <DialogTitle className="text-2xl font-semibold">{rfp.title}</DialogTitle>
-                    {(rfp?.contacts && rfp?.contacts?.length > 0) && (
-                        <Button 
-                            variant="cta"
-                            className="ml-auto font-normal"
-                            asChild
-                        >
-                            <Link href={`mailto:${rfp.contacts[0].email}`}>
-                                <Mail className="h-4 w-4 min-h-4 min-w-4"/>
-                                Contact
-                            </Link>
-                        </Button>
-                    )}
-                </div>
+                <DialogTitle className="text-2xl font-semibold">{rfp.title}</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-4 pt-4 ">
                 <RFPStatusBadge status={status} />
                 
-                <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
+                <div className="flex gap-4">
+                <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words grow-2">
                     {Array.isArray(rfp.openTo) && rfp.openTo.length > 0 && (
                         <li>
                             <PropertyBadge>
@@ -237,6 +224,21 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                         </li>
                     )}
                 </ul>
+                    {(rfp?.contacts && rfp?.contacts?.length > 0) && (
+                        <div className="grow-1">
+                        <Button 
+                            variant="cta"
+                            className="ml-auto font-normal"
+                            asChild
+                        >
+                            <Link href={`mailto:${rfp.contacts[0].email}`}>
+                                <Mail className="h-4 w-4 min-h-4 min-w-4"/>
+                                Contact
+                            </Link>
+                        </Button>
+                        </div>
+                    )}
+                </div>
 
                 {(rfp.milestones && rfp.milestones.length > 0) && (
                     <div className="border-l-2 border-purple-200 pl-2 space-y-2">
