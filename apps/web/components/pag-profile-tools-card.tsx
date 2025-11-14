@@ -4,7 +4,7 @@ import { Database, Rat, TestTubeDiagonal } from "lucide-react";
 import { cn, sleep } from "@comend/lib/utils";
 import { useEffect, useState } from "react";
 import { Button } from "@/packages/components/ui/button";
-import { DatabaseBiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table";
+import { DatabaseBiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/database-biosamples-table";
 import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
 import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns";
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
