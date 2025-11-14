@@ -58,21 +58,21 @@ const formSchema = z.object({
         TitleEnum.optional()
     ),
     website: z.string().optional(),
-    country: z.string().optional(),
+    country: z.string(),
     description: z.string().min(2, {
         message: "Your profile's description must be at least 2 characters long.",
     }).max(500, {
         message: "Your profile's description must less than 500 characters long.",
     }).optional(),
-    affiliations: z.array(optionSchema).optional(),
+    affiliations: z.array(optionSchema),
     orcid: z.string().regex(/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/, {
         message: "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
     }).optional(),
-    researchInterests: z.array(optionSchema).optional(),
+    researchInterests: z.array(optionSchema),
     therapeuticsOfInterest: z.array(optionSchema).optional(),
     otherTherapeuticsOfInterest: z.string().optional(),
     genesOfInterest: z.array(optionSchema).optional(),
-    conditionsOfInterest: z.array(optionSchema).optional(),
+    conditionsOfInterest: z.array(optionSchema),
     notificationSettings: z.boolean().default(false),
     consentSettings: z.boolean().default(false),
 });
@@ -316,7 +316,7 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
 
                         <FormField
                             control={form.control}
-                            name="conditionsOfInterest"
+                            name="country"
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>
@@ -324,7 +324,6 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                                     </FormLabel>
                                     <FormControl>
                                         <MultipleSelector
-                                            {...field}
                                             maxSelected={1}
                                             defaultOptions={COUNTRIES}
                                             placeholder="Search for countries..."
@@ -332,6 +331,11 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                                             loadingIndicator={<p>Loading countries...</p>}
                                             emptyIndicator={<p>No countries found.</p>}
                                             showHoverCard={false}
+                                            value={field.value ? [{ label: field.value, value: field.value }] : []}
+                                            onChange={(items) => {
+                                                const selected = items?.[0]?.value ?? "";
+                                                field.onChange(selected);
+                                            }}
                                         />
                                     </FormControl>
                                     <FormMessage/>

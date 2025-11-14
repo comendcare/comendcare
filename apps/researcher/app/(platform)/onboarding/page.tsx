@@ -53,21 +53,21 @@ const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
     title: z.string(),
     website: z.string().optional(),
-    country: z.string().optional(),
+    country: z.string(),
     description: z.string().min(2, {
         message: "Your profile's description must be at least 2 characters long.",
     }).max(500, {
         message: "Your profile's description must less than 500 characters long.",
     }).optional(),
-    affiliations: z.array(optionSchema).optional(),
+    affiliations: z.array(optionSchema),
     orcid: z.string().regex(/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/, {
         message: "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
     }).optional(),
-    researchInterests: z.array(optionSchema).optional(),
+    researchInterests: z.array(optionSchema),
+    conditionsOfInterest: z.array(optionSchema),
     therapeuticsOfInterest: z.array(optionSchema).optional(),
     otherTherapeuticsOfInterest: z.string().optional(),
     genesOfInterest: z.array(optionSchema).optional(),
-    conditionsOfInterest: z.array(optionSchema).optional(),
     notificationSettings: z.boolean().default(false),
     consentSettings: z.boolean().default(false),
     image: z.string().nullable().optional(),
@@ -153,6 +153,7 @@ export default function ResearcherOnboardingForm() {
                     const fetchedValues = {
                         name: userData.name || "",
                         title: researcherData.title || "",
+                        country: researcherData.country || "",
                         affiliations: researcherData.affiliations.map((affiliation: any) => ({
                             label: affiliation.institution.name,
                             value: affiliation.id
