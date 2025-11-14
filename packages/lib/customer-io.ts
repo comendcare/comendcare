@@ -143,3 +143,42 @@ export async function cioTrackServer(input: {
         return { ok: false, error: err?.message };
     }
 }
+
+export async function cioDeleteUser(userId: string, { suppress = true } = {}) {
+    if (!isProd) {
+        console.log('[CIO] delete skipped (not prod)', { userId, suppress });
+        return { ok: true, skipped: true, reason: 'not prod' };
+    }
+
+    if (!userId) {
+        console.error('[CIO] delete skipped (no userId)');
+        return { ok: false, skipped: true, reason: 'no userId' };
+    }
+
+    const cio = getCio();
+    if (!cio) {
+        console.error('[CIO] delete skipped (CIO not configured)');
+        return { ok: false, skipped: true, reason: 'no cio' };
+    }
+
+    try {
+        if (suppress) {
+            // Deletes + suppresses profile, per docs
+            await cio.suppress(userId);
+            console.log('[CIO] suppress (delete) success', { userId });
+        } else {
+            // Just deletes profile; can be recreated later
+            await cio.destroy(userId);
+            console.log('[CIO] destroy success', { userId });
+        }
+
+        return { ok: true };
+    } catch (err: any) {
+        console.error('[CIO] delete/suppress failed', {
+            userId,
+            suppress,
+            error: err?.message,
+        });
+        return { ok: false, error: String(err?.message || err) };
+    }
+}

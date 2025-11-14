@@ -16,6 +16,7 @@ import { useShallow } from "zustand/react/shallow";
 import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore";
 import Papa from "papaparse";
 import { Badge } from "@/packages/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones,
@@ -74,6 +75,8 @@ export async function formatProjectData(project: any): Promise<{
 
         return [option.databaseKey, val]
     }))
+
+    console.log(`data`, data)
 
     const contactsLength = Math.max((data.contactNames || []).length, (data.contactEmails || []).length)
     const contacts = []
@@ -134,22 +137,23 @@ export async function formatProjectData(project: any): Promise<{
         data.endDate = undefined
     }
 
+    // data.private = data.isPrivate
+
     return {data: data as z.infer<typeof editMilestoneForm>, errors}
 }
 
 const projectImportSchema: ImportSchemaEntry[] = [
     {
         spreadsheetKey: 'Visibility', 
-        databaseKey: 'visibility',
+        databaseKey: 'isPrivate',
         required: false, 
-        defaultValue: undefined, 
+        defaultValue: true, 
         isValid: (entry) => typeof entry === 'string',
         fetchDatabaseValue: (entry) => {
-            switch (entry) {
-                case 'Published': return false
-                case 'Private': return true
-                default: return true
-            }
+            if (entry == 'Published') return false
+            if (entry == 'Private') return true
+
+            return true
         }
     },
     {
@@ -302,7 +306,11 @@ const projectImportSchema: ImportSchemaEntry[] = [
     },
 ]
 
-export function ProjectBulkImportDialog() {
+export function ProjectBulkImportDialog({
+    isCollapsed = false
+}: {
+    isCollapsed?: boolean
+}) {
     const router = useRouter()
     const pathname = usePathname()
     const {data: session} = useSession()
@@ -357,6 +365,7 @@ export function ProjectBulkImportDialog() {
 
                     newNodes.push({
                         private: formattedProject.isPrivate,
+                        isPrivate: formattedProject.isPrivate,
                         nodeType: 'PROJECT',
                         title: formattedProject.title,
                         description: formattedProject.description,
@@ -381,6 +390,7 @@ export function ProjectBulkImportDialog() {
 
                 console.log(`new nodes`, newNodes)
                 console.log(`errors`, errors)
+                console.log(`new nodes`, newNodes)
                 await addMilestones(newNodes)
 
                 setTotalErrors(errors)
@@ -403,15 +413,24 @@ export function ProjectBulkImportDialog() {
     
     return (
         <Dialog open={isOpen} onOpenChange={(open: boolean) => setIsOpen(open)}>
-            <DialogTrigger asChild>
-                <Button 
-                    variant={"ghost"}
-                    onClick={() => setIsOpen(true)}
-                >
-                    <Import />
-                    <p>{`Import projects`}</p>
-                </Button>
-            </DialogTrigger>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <DialogTrigger asChild>
+                        <Button 
+                            variant={"ghost"}
+                            onClick={() => setIsOpen(true)}
+                        >
+                            <Import />
+                            {!isCollapsed && <p>{`Import projects`}</p>}
+                        </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                {isCollapsed && (
+                    <TooltipContent className="max-w-80">
+                        <p>{`Import projects`}</p>
+                    </TooltipContent>
+                )}
+            </Tooltip>
             <DialogContent className="flex flex-col justify-start">
             {importState === 'start' && (
                 <>
