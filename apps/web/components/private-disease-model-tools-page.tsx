@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image"
-import {NewToolDialog} from "./edit-tool-dialog"
+import {EditAssetDialog, NewToolDialog} from "./edit-tool-dialog"
 import {DataTableSkeleton} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 import {DatabaseDiseaseModelsTable} from "@comend/components/biorepo/advanced-data-table/disease-models-table/database-disease-models-table"
 import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
@@ -20,6 +20,7 @@ import {Button} from "@/packages/components/ui/button";
 import {Lock, Globe} from "lucide-react"
 import {setDiseaseModelsVisibility} from "@/packages/lib/actions";
 import {DiseaseModelBulkImportDialog} from "./disease-model-bulk-import-dialog";
+import { Dialog, DialogPortal } from "@/packages/components/ui/dialog";
 
 export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
     data: DiseaseModel[],
@@ -31,6 +32,7 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
     const [rowSelection, setRowSelection] = useState<Object[]>([])
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1100)
+    const [editingTool, setEditingTool] = useState<DiseaseModel | undefined>(undefined)
     const parentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -129,6 +131,25 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                             columns={columns}
                             searchParams={searchParams}
                             onSelectionChange={setRowSelection}
+                            interactiveDialog={(
+                                <Dialog 
+                                    open={!!editingTool}
+                                    onOpenChange={(open) => !open && setEditingTool(undefined)}
+                                >
+                                    <DialogPortal>
+                                        <div onClick={(e) => e.stopPropagation()}>
+                                            {editingTool && (
+                                                <EditAssetDialog
+                                                    key={editingTool?.id}
+                                                    data={editingTool} 
+                                                    type={'biosample'}
+                                                    closeDialog={() => {setEditingTool(undefined)}}
+                                                />
+                                            )}
+                                        </div>
+                                    </DialogPortal>
+                                </Dialog>
+                            )}
                         />
                     </React.Suspense>
                 </FeatureFlagsProvider>

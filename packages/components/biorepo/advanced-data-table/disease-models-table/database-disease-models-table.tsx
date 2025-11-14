@@ -22,23 +22,24 @@ export function DatabaseDiseaseModelsTable({
     pageCount, 
     columns, 
     onSelectionChange, 
+    onRowClickCallback,
     searchParams,
     showFilters = true,
     showPagination = true,
-    interactive = true,
     noResultsOverride = true,
+    interactiveDialog,
 }: {
     data: DiseaseModel[],
     pageCount: number,
     columns: ColumnDef<any>[],
     onSelectionChange?: (selectedRows: Tool[]) => void,
+    onRowClickCallback?: (e: any, row: Row<any> | undefined) => void,
     searchParams: SearchParams,
     showFilters?: boolean,
     showPagination?: boolean,
-    interactive?: boolean,
     noResultsOverride?: boolean,
+    interactiveDialog?: React.ReactNode
 }) {
-    const [editingTool, setEditingTool] = useState<any | undefined>(undefined)
     const {enableAdvancedFilter, filterFlag} = useFeatureFlags()
     const {table, shallow, debounceMs, throttleMs} = useDataTable({
         data,
@@ -69,27 +70,26 @@ export function DatabaseDiseaseModelsTable({
                 noResults={
                     (noResultsOverride && data.length === 0 && Object.keys(searchParams).length === 0) 
                     ? (
-                        <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
-                            <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
-                                <h1 className="font-cal text-4xl">You do not have any Disease Model Tools</h1>
-                                <Image
-                                    alt="No Disease Model Tools"
-                                    src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                                    width={300}
-                                    height={300}
-                                />
-                                <p className="text-lg text-stone-500">
-                                    A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
-                                </p>
-                                {interactive && <NewToolDialog type={"diseaseModel"}/>}
-                            </div>
-                        </div>
+                        // <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
+                        //     <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
+                        //         <h1 className="font-cal text-4xl">You do not have any Disease Model Tools</h1>
+                        //         <Image
+                        //             alt="No Disease Model Tools"
+                        //             src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                        //             width={300}
+                        //             height={300}
+                        //         />
+                        //         <p className="text-lg text-stone-500">
+                        //             A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
+                        //         </p>
+                        //         {interactive && <NewToolDialog type={"diseaseModel"}/>}
+                        //     </div>
+                        // </div>
+                        <></>
                     )
                     : undefined
                 }
-                onRowClickCallback={(e: any, row: Row<any> | undefined) => 
-                    setEditingTool(row?.original)
-                }
+                onRowClickCallback={onRowClickCallback}
             >
                 {showFilters && (
                     enableAdvancedFilter ? (
@@ -108,7 +108,7 @@ export function DatabaseDiseaseModelsTable({
                 )}
             </DataTable>
 
-            {interactive && (
+            {/* {interactive && (
                 <Dialog 
                     open={!!editingTool}
                     onOpenChange={(open) => !open && setEditingTool(undefined)}
@@ -124,7 +124,9 @@ export function DatabaseDiseaseModelsTable({
                         </div>
                     </DialogPortal>
                 </Dialog>
-            )}
+            )} */}
+
+            {!!interactiveDialog && interactiveDialog}
         </>
     );
 }
