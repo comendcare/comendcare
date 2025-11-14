@@ -32,13 +32,14 @@ const pages = [
     {href: "/profile", label: "Profile", icon: <UserIcon size={16}/>},
     // {href: "/dashboard", label: "Dashboard", icon: <LayoutDashboardIcon size={16}/>},
     {
-        href: "/toolkit",
-        label: "Tools",
+        href: "/marketplace/biosamples",
+        label: "Marketplace",
         icon: <FlaskConicalIcon size={16}/>,
-        subpages: [
-            {href: "/toolkit/biosamples", label: "Biosamples", icon: <DnaIcon size={16}/>},
-            {href: "/toolkit/datasamples", label: "Data Samples", icon: <DatabaseIcon size={16}/>},
-        ],
+        // subpages: [
+        //     {href: "/toolkit/biosamples", label: "Biosamples", icon: <DnaIcon size={16}/>},
+        //     {href: "/toolkit/disease-models", label: "Disease Models", icon: <DnaIcon size={16}/>},
+        //     {href: "/toolkit/datasamples", label: "Clinical Datasets", icon: <DatabaseIcon size={16}/>},
+        // ],
     },
     {href: "/requests", label: "Requests", icon: <ClipboardListIcon size={16}/>},
     // {href: "/cohorts", label: "Cohorts", icon: <UsersIcon size={16}/>},
@@ -50,9 +51,9 @@ export function ResearcherNavbarMenu() {
     return (
         <NavigationMenu viewport={false} className="w-full">
             <NavigationMenuList>
-                {pages.map(({href, label, subpages, icon}) => (
+                {pages.map(({href, label,  icon}) => (
                     <NavigationMenuItem key={href}>
-                        {subpages ? (
+                        {/* {subpages ? (
                             <>
                                 <NavigationMenuTrigger
                                     className={`flex items-center gap-2 ${
@@ -92,7 +93,7 @@ export function ResearcherNavbarMenu() {
                                     </ul>
                                 </NavigationMenuContent>
                             </>
-                        ) : (
+                        ) : ( */}
                             <NavigationMenuLink
                                 asChild
                                 className={navigationMenuTriggerStyle({
@@ -112,7 +113,7 @@ export function ResearcherNavbarMenu() {
                                     </div>
                                 </Link>
                             </NavigationMenuLink>
-                        )}
+                        {/* )} */}
                     </NavigationMenuItem>
                 ))}
             </NavigationMenuList>

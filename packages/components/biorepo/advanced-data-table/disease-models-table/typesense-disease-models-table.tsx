@@ -1,15 +1,15 @@
 "use client";
 
 import * as React from "react";
-import {DataTable} from "./../data-table/data-table";
-import {useDataTable} from "./../../../../../packages/lib/hooks/use-data-table";
+import {DataTable} from "../data-table/data-table";
+import {useDataTable} from "@comend/lib/hooks/use-data-table";
 import {ColumnDef, Row} from "@tanstack/react-table";
 import type {DiseaseModel, Tool} from "@prisma/client";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 import { useDiseaseModelSearchStore } from "../../../../../state/search/diseaseModelSearchStore";
-import {DataTableToolbar} from "./../data-table/data-table-toolbar";
+import {DataTableToolbar} from "../data-table/data-table-toolbar";
 
-export function DiseaseModelsTable({
+export function TypesenseDiseaseModelsTable({
     data, 
     pageCount, 
     columns, 

@@ -4,9 +4,7 @@ import * as React from "react";
 import Image from "next/image"
 import {NewToolDialog} from "./edit-tool-dialog"
 import {DataTableSkeleton} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import {
-    DiseaseModelsTable
-} from "@comend/components/biorepo/advanced-data-table/disease-models-table/private-disease-models-table"
+import {DatabaseDiseaseModelsTable} from "@comend/components/biorepo/advanced-data-table/disease-models-table/database-disease-models-table"
 import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import {Shell} from "@/packages/components/biorepo/advanced-data-table/lib/shell";
 import {
@@ -125,7 +123,7 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                             />
                         }
                     >
-                        <DiseaseModelsTable
+                        <DatabaseDiseaseModelsTable
                             data={data}
                             pageCount={pageCount}
                             columns={columns}

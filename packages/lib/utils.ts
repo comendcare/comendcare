@@ -173,6 +173,36 @@ export function typesenseSortByFromColumnId(id: string, desc: boolean): string {
     return `${id}:${direction}`;
 }
 
+export const handleAsyncOrganizationSearch = async (query?: string | undefined): Promise<Option[]> => {
+    if (!query) return []; // Return empty if no input
+
+    try {
+        const response = await fetch(`/api/organizations?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data;
+    } catch (error) {
+        console.error("Failed to fetch organizations:", error);
+        return [];
+    }
+}
+
+export const handleAsyncConditionSearch = async (query?: string | undefined): Promise<Option[]> => {
+    if (!query) return []; // Return empty if no input
+
+    try {
+        const response = await fetch(`/api/conditions?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data;
+    } catch (error) {
+        console.error("Failed to fetch conditions:", error);
+        return [];
+    }
+}
+
 export const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
     if (!query) return []; // Return empty if no input
 
