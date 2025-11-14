@@ -332,7 +332,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                             ...defaultData,
                             id: milestoneId,
                             nodeId: id,
-                            private: true,
+                            private: defaultData?.private !== null && defaultData?.private !== undefined ? defaultData.private: true,
                             timelineOrder: get().milestones.length + index, // add in last position in timeline
                             nodeType: defaultData?.nodeType || "PROJECT",
                             title: defaultData?.title || 'New Milestone',
