@@ -1,5 +1,6 @@
 import {getSession} from "~researcher/lib/auth";
 import {redirect} from "next/navigation";
+import {ResearcherNavbar} from "~researcher/components/researcher-navbar";
 
 interface PlatformLayoutProps {
     children: React.ReactNode
@@ -18,6 +19,7 @@ export default async function PlatformLayout({children}: PlatformLayoutProps) {
 
     return (
         <>
+            <ResearcherNavbar/>
             {children}
         </>
     )
