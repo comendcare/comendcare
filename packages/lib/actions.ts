@@ -6189,82 +6189,128 @@ export const deletePharmaProject = withAuth(
 )
 
 export const updateResearcher = withAuth(
-    async (_id: unknown, data: { [key: string]: any }) => {
+    async (_id: unknown, formData: FormData) => {
         const session = await getSession();
         if (!session?.user.id) {
-            return {error: "Not authenticated"};
+            return { error: "Not authenticated" };
         }
 
         try {
             const researcher = await prisma.researcher.findUnique({
-                where: {userId: session.user.id},
-                select: {id: true},
+                where: { userId: session.user.id },
+                select: { id: true },
             });
 
-            if (!researcher) return {error: "Researcher not found"};
+            if (!researcher) return { error: "Researcher not found" };
 
-            // 1. Delete existing affiliations
-            await prisma.affiliation.deleteMany({
-                where: {researcherId: researcher.id},
+            const researcherData: Record<string, any> = {};
+            const userData: Record<string, any> = {};
+
+            // 👇 make this a normal string[] + flag
+            let affiliationIds: string[] = [];
+            let hasAffiliationsField = false;
+
+            formData.forEach((value, key) => {
+                const str = value.toString().trim();
+
+                // ARRAY FIELDS ON RESEARCHER
+                if (
+                    key === "researchInterests" ||
+                    key === "therapeuticsOfInterest" ||
+                    key === "conditionsOfInterest" ||
+                    key === "genesOfInterest"
+                ) {
+                    researcherData[key] = str ? str.split(",") : [];
+                    return;
+                }
+
+                // AFFILIATIONS (institution IDs)
+                if (key === "affiliations") {
+                    hasAffiliationsField = true;
+                    affiliationIds = str ? str.split(",") : [];
+                    return;
+                }
+
+                // USER FIELDS
+                if (key === "name") {
+                    userData.name = str === "" ? null : str;
+                    return;
+                }
+
+                if (key === "notificationSettings" || key === "consentSettings") {
+                    if (str === "") return; // don't touch if not sent
+                    userData[key] = str === "true";
+                    return;
+                }
+
+                // EVERYTHING ELSE → RESEARCHER SCALARS
+                // (title, country, website, description, orcid, etc.)
+                researcherData[key] = str === "" ? null : str;
             });
 
-            if (Array.isArray(data.affiliations)) {
-                const institutionIds = data.affiliations.map((a: any) => a.value);
-
-                // Validate institutionIds
-                const existingInstitutions = await prisma.institution.findMany({
-                    where: {
-                        id: {in: institutionIds},
-                    },
-                    select: {id: true},
+            // Handle affiliations via junction table
+            if (hasAffiliationsField) {
+                await prisma.affiliation.deleteMany({
+                    where: { researcherId: researcher.id },
                 });
 
-                const validInstitutionIds = new Set(existingInstitutions.map((i) => i.id));
-
-                const newAffiliations = data.affiliations
-                    .filter((a: any) => validInstitutionIds.has(a.value))
-                    .map((a: any) => ({
-                        researcherId: researcher.id,
-                        institutionId: a.value,
-                    }));
-
-                if (newAffiliations.length > 0) {
-                    await prisma.affiliation.createMany({
-                        data: newAffiliations,
+                if (affiliationIds.length > 0) {
+                    const existing = await prisma.institution.findMany({
+                        where: { id: { in: affiliationIds } },
+                        select: { id: true },
                     });
+
+                    if (existing.length) {
+                        await prisma.affiliation.createMany({
+                            data: existing.map((inst) => ({
+                                researcherId: researcher.id,
+                                institutionId: inst.id,
+                            })),
+                        });
+                    }
                 }
             }
 
-            // 3. Update researcher fields
+            // Update user if needed
+            if (Object.keys(userData).length > 0) {
+                await prisma.user.update({
+                    where: { id: session.user.id },
+                    data: userData,
+                });
+            }
+
+            // Update researcher
             const response = await prisma.researcher.update({
-                where: {userId: session.user.id},
+                where: { userId: session.user.id },
                 data: {
-                    title: data.title ?? null,
-                    orcid: data.orcid,
+                    ...researcherData,
                     researchInterests: {
-                        set: data.researchInterests?.map((r: any) => r.value) || [],
+                        set: Array.isArray(researcherData.researchInterests)
+                            ? researcherData.researchInterests
+                            : [],
                     },
                     therapeuticsOfInterest: {
-                        set: data.therapeuticsOfInterest?.map((r: any) => r.value) || [],
+                        set: Array.isArray(researcherData.therapeuticsOfInterest)
+                            ? researcherData.therapeuticsOfInterest
+                            : [],
                     },
                     genesOfInterest: {
-                        set: data.genesOfInterest?.map((g: any) => g.value) || [],
+                        set: Array.isArray(researcherData.genesOfInterest)
+                            ? researcherData.genesOfInterest
+                            : [],
                     },
                     conditionsOfInterest: {
-                        set: data.conditionsOfInterest?.map((c: any) => c.value) || [],
+                        set: Array.isArray(researcherData.conditionsOfInterest)
+                            ? researcherData.conditionsOfInterest
+                            : [],
                     },
                 },
             });
 
             return response;
         } catch (error: any) {
-            if (error.code === "P2002") {
-                const field = Object.keys(data)[0];
-                return {error: `This ${field} is already in use`};
-            } else {
-                console.error(error);
-                return {error: error.message};
-            }
+            console.error(error);
+            return { error: error.message };
         }
     }
 );
