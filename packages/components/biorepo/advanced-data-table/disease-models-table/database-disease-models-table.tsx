@@ -1,23 +1,23 @@
 "use client";
 
 import * as React from "react";
-import {DataTable} from "./../data-table/data-table";
+import {DataTable} from "../data-table/data-table";
 import {
     DataTableAdvancedToolbar
-} from "./../data-table/data-table-advanced-toolbar";
-import {DataTableFilterList} from "./../data-table/data-table-filter-list";
-import {DataTableToolbar} from "./../data-table/data-table-toolbar";
-import {useDataTable} from "./../../../../../packages/lib/hooks/use-data-table";
+} from "../data-table/data-table-advanced-toolbar";
+import {DataTableFilterList} from "../data-table/data-table-filter-list";
+import {DataTableToolbar} from "../data-table/data-table-toolbar";
+import {useDataTable} from "@comend/lib/hooks/use-data-table";
 import {ColumnDef, Row} from "@tanstack/react-table";
 import {useFeatureFlags} from "../lib/feature-flags-provider";
 import type {DiseaseModel, Tool} from "@prisma/client";
 import Image from "next/image";
 import { EditAssetDialog, NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
-import { Dialog, DialogPortal } from "./../../../ui/dialog";
+import { Dialog, DialogPortal } from "../../../ui/dialog";
 import { useState } from "react";
 
-export function DiseaseModelsTable({
+export function DatabaseDiseaseModelsTable({
     data, 
     pageCount, 
     columns, 
@@ -81,7 +81,7 @@ export function DiseaseModelsTable({
                                 <p className="text-lg text-stone-500">
                                     A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                                 </p>
-                                <NewToolDialog type={"diseaseModel"}/>
+                                {interactive && <NewToolDialog type={"diseaseModel"}/>}
                             </div>
                         </div>
                     )

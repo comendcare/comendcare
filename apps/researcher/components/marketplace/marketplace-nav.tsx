@@ -44,7 +44,7 @@ export function MarketplaceNav({className}: React.HTMLAttributes<HTMLDivElement>
     return (
         <TabNav 
             className={className}
-            baseLink={"/app"}
+            baseLink={""}
             links={links}
         />
     )
