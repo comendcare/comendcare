@@ -388,9 +388,6 @@ export function ProjectBulkImportDialog({
                     if (formattedErrors.length > 0) errors.push(formattedErrors)
                 }
 
-                console.log(`new nodes`, newNodes)
-                console.log(`errors`, errors)
-                console.log(`new nodes`, newNodes)
                 await addMilestones(newNodes)
 
                 setTotalErrors(errors)
@@ -475,12 +472,12 @@ export function ProjectBulkImportDialog({
                         We've finished processing your file, it is now safe to close this tab.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="w-full flex flex-col gap-4 justify-center items-center">
-                    <p>{`Finished importing ${importCount} of ${totalItems}.`}</p>
+                <div className="w-full flex flex-col gap-4 justify-center">
+                    <p className="w-full justify-start">{`Finished importing ${importCount} of ${totalItems}.`}</p>
                     {totalErrors.length > 0 
                         ? (
-                            <>
-                            <p>Some fields on the following projects may not have imported as expected.</p>
+                            <div className="w-full flex flex-col justify-start gap-4">
+                            <p>⚠️ A few details didn’t import for the projects below. Please review them and add any missing information.</p>
                             <ul className="w-full flex flex-col gap-2">
                                 {totalErrors.map((error, index) => (
                                     <Badge variant={"red"} key={index} className="w-full">
@@ -489,20 +486,25 @@ export function ProjectBulkImportDialog({
                                     </Badge>
                                 ))}
                             </ul>
-                            </>
+                            </div>
                         ) 
                         : (
                             <p>Successfully imported all projects!</p>
                         )
                     }
-                    <Button variant="secondary" onClick={() => {
-                        // setIsOpen(false)
-                        setImportState('start')
-                        setImportCount(0)
-                        setTotalItems(0)
-                    }}>
-                        Import more projects
-                    </Button>
+                    <div className="w-full flex justify-end">
+                        <Button 
+                            variant="secondary" 
+                            onClick={() => {
+                                // setIsOpen(false)
+                                setImportState('start')
+                                setImportCount(0)
+                                setTotalItems(0)
+                            }}
+                        >
+                            Import more projects
+                        </Button>
+                    </div>
                 </div>
                 </>
             )}
