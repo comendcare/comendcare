@@ -218,6 +218,13 @@ export const handleAsyncGeneSearch = async (query?: string | undefined): Promise
     }
 };
 
+export const handleAsyncCompanyAndInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
+    const companies = await handleAsyncCompanySearch(query)
+    const institutions = await handleAsyncInstitutionSearch(query)
+
+    return companies.concat(institutions)
+}
+
 export const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
     if (!query) return []; // Return empty if no input
 
@@ -229,6 +236,21 @@ export const handleAsyncInstitutionSearch = async (query?: string | undefined): 
         return data.map((institution: Option) => ({label: institution.label, value: institution.label}));
     } catch (error) {
         console.error("Failed to fetch institutions:", error);
+        return [];
+    }
+};
+
+export const handleAsyncCompanySearch = async (query?: string | undefined): Promise<Option[]> => {
+    if (!query) return []; // Return empty if no input
+
+    try {
+        const response = await fetch(`/api/companies?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data.map((company: Option) => ({label: company.label, value: company.label}));
+    } catch (error) {
+        console.error("Failed to fetch companies:", error);
         return [];
     }
 };

@@ -14,7 +14,7 @@ import { TOOL_TYPE_OPTIONS } from "./../../../../../packages/lib/types";
 import { MilestoneTypeBadge } from "./../../../milestone-type-badge";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
 import { Checkbox } from "./../../../ui/checkbox";
-import { handleAsyncGeneSearch, handleAsyncInstitutionSearch } from "./../../../../../packages/lib/utils";
+import { handleAsyncCompanyAndInstitutionSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch } from "./../../../../../packages/lib/utils";
 import Link from "next/link";
 import { Badge } from "./../../../ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./../../../ui/tooltip";
@@ -235,7 +235,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             variant: "select",
             icon: CircleDashed,
             showInAdvancedOnly: true,
-            onAsyncSearch: handleAsyncInstitutionSearch
+            onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
         }
     },
     {

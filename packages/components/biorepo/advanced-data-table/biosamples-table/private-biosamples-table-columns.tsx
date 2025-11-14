@@ -28,7 +28,7 @@ import { Checkbox } from "./../../../ui/checkbox";
 import { getDiagnosisTypes } from "./../../../../../packages/lib/fetchers";
 import { useEffect, useState } from "react";
 import { Option } from "./../../../../../packages/lib/types";
-import { handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch, handleGetAvailability } from "./../../../../../packages/lib/utils";
+import { handleAsyncCompanyAndInstitutionSearch, handleAsyncCompanySearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch, handleGetAvailability } from "./../../../../../packages/lib/utils";
 import { useSession } from "next-auth/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./../../../ui/tooltip";
 import Link from "next/link";
@@ -469,13 +469,13 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 )
             },
             enableHiding: true,
-            enableColumnFilter: true,
+        enableColumnFilter: true,
             meta: {
                 label: "Stored with",
                 variant: "select",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
-                onAsyncSearch: handleAsyncInstitutionSearch
+                onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
             }
         },
         {

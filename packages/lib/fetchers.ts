@@ -2502,18 +2502,6 @@ export const getDiseaseModels = async (
                 publicOnly
             )
         }
-        // if (!organizationId) return {data: [], pageCount: 0}
-        // const organization = await prisma.organization.findUnique({
-        //     where: {id: organizationId}
-        // })
-        // if (!organization) return {data: [], pageCount: 0}
-        
-        // return await fetchDiseaseModels(
-        //     organization,
-        //     select,
-        //     input,
-        //     publicOnly
-        // )
     }
 
     // only allow members of the organization to fetch private data
@@ -2585,6 +2573,7 @@ const fetchDiseaseModels = async (
             const preProcessedFilters: any = input.filters.map(filter => ({
                 ...filter,
                 ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
+                ...(filter.id === "organization.conditions" && Array.isArray(filter.value) ? {value: filter.value.map(conditionOption => ({condition: {name: conditionOption}}))} : undefined),
             }))
 
             where = filterColumns({
@@ -2635,6 +2624,8 @@ const fetchDiseaseModels = async (
                 { description: {contains: input.q, mode: "insensitive"}},
                 { genotype: {contains: input.q, mode: "insensitive"}},
                 { strain: {contains: input.q, mode: "insensitive"}},
+                { organization: {name: {contains: input.q, mode: "insensitive"}}},
+                { organization: {conditions: {contains: {condition: {name: {contains: input.q, mode: "insensitive"}}}}}},
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                 // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
@@ -2799,7 +2790,6 @@ const fetchBiosamples = async (
                 ...filter,
                 ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
                 ...(filter.id === "donor.diagnoses" && Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
-                ...(filter.id === "gene" && {value: {symbol: filter.value}}),
                 ...(filter.id === "institution" && {value: {name: filter.value}}),
                 ...(filter.id === "organization.conditions" && Array.isArray(filter.value) ? {value: filter.value.map(conditionOption => ({condition: {name: conditionOption}}))} : undefined),
                 ...(filter.id === "milestones" && Array.isArray(filter.value) ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} : undefined)
@@ -2871,7 +2861,15 @@ const fetchBiosamples = async (
                 { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
                 { genotype: {contains: input.q, mode: "insensitive"}},
                 { organization: {name: {contains: input.q, mode: "insensitive"}}},
-                { organization: {condition: {condition: {name: {contains: input.q, mode: "insensitive"}}}}},
+                { organization: {
+                    conditions: {
+                        some: {
+                            condition: {
+                                name: {contains: input.q, mode: "insensitive"}}
+                            }
+                        }
+                    }
+                },
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                 // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},

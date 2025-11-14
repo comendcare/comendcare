@@ -10,6 +10,7 @@ import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import { Badge } from "./../../../ui/badge";
+import { handleAsyncCompanyAndInstitutionSearch, handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils";
 
 type Preset = "default" | "profile";
 
@@ -85,7 +86,9 @@ export function useDiseaseModelsTableColumns(
             },
         },
         {
-            id: "strain.strain", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            id: typesenseSearch
+                ? 'strain.strain' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+                : 'strain',
             accessorKey: "strain",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -96,12 +99,12 @@ export function useDiseaseModelsTableColumns(
             ),
             enableHiding,
             enableSorting,
-            meta: {
-                label: "Strain"
-            }
+            meta: { label: "Strain" }
         },
         {
-            id: "condition.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
+            id: typesenseSearch
+                ? 'condition.name' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+                : 'organization.conditions',
             accessorKey: "condition",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -116,8 +119,15 @@ export function useDiseaseModelsTableColumns(
                 </div>
             ),
             enableHiding,
-            enableSorting,
-            meta: { label: "Condition" }
+            enableSorting: false, // cannot sort since the org can attatch multiple conditions
+            enableColumnFilter: true,
+            meta: { 
+                label: "Condition",
+                variant: "multiSelect",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncConditionSearch
+            }
         },
         {
             id: "gene.symbol", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -140,7 +150,14 @@ export function useDiseaseModelsTableColumns(
             ),
             enableHiding,
             enableSorting,
-            meta: { label: "Gene" }
+            enableColumnFilter: true,
+            meta: {
+                label: "Gene",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncGeneSearch
+            }
         },
         {
             id: typesenseSearch
@@ -157,9 +174,7 @@ export function useDiseaseModelsTableColumns(
             ),
             enableHiding,
             enableSorting,
-            meta: {
-                label: "Genotype"
-            }
+            meta: { label: "Genotype" }
         },
         {
             id: "organization.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -192,6 +207,14 @@ export function useDiseaseModelsTableColumns(
             ),
             enableHiding,
             enableSorting,
+            enableColumnFilter: true,
+            meta: { 
+                label: "Associated patient group",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncOrganizationSearch
+            }
         },
         {
             id: "institution.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -216,7 +239,14 @@ export function useDiseaseModelsTableColumns(
             },
             enableHiding,
             enableSorting,
-            meta: { label: "Stored with" }
+            enableColumnFilter: true,
+            meta: {
+                label: "Stored with",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
+            }
         },
         {
             id: "contacts",
@@ -239,9 +269,7 @@ export function useDiseaseModelsTableColumns(
             ),
             enableSorting: false,
             enableHiding,
-            meta: {
-                label: "Point of contact"
-            }
+            meta: { label: "Point of contact" }
         },
         {
             id: "links",

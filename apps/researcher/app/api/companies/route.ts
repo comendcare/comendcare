@@ -1,6 +1,37 @@
 import prisma from '@comend/lib/prisma';
 import { NextResponse } from 'next/server';
 
+export async function GET(req: Request) {
+    try {
+        // Extract and normalize the search query from the request URL
+        const url = new URL(req.url);
+        const searchQuery = url.searchParams.get("search")?.toLowerCase() || "";
+
+        // Query the Institution model with a case-insensitive search
+        const companies = await prisma.company.findMany({
+            where: {
+                title: {
+                    contains: searchQuery,
+                    mode: 'insensitive',
+                },
+            },
+            take: 50, // Limit results
+            orderBy: {title: 'asc'}
+        });
+
+        // Format for selector input (e.g., dropdown)
+        const formattedResults = companies.map((company) => ({
+            label: company.title,
+            value: company.id, // You could also use company.title if preferred
+        }));
+
+        return NextResponse.json(formattedResults);
+    } catch (error) {
+        console.error("Error fetching companies:", error);
+        return NextResponse.json({ error: "Failed to fetch companies." }, { status: 500 });
+    }
+}
+
 export async function POST(req: Request) {
     try {
         const { ids } = await req.json();

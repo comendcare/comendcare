@@ -14,6 +14,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Badge } from "./../../../ui/badge";
 import { MultipleGenesCell } from "./private-clinical-datasets-table-columns";
+import { handleAsyncCompanyAndInstitutionSearch } from "@comend/lib/utils";
 
 type Preset = "default" | "profile";
 
@@ -211,7 +212,7 @@ export function useClinicalDatasetsTableColumns(
     },
     {
         id: "institution.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
-        accessorKey: "institution",
+        accessorKey: "institution.name",
         header: ({column}) => (
             <DataTableColumnHeader 
                 className="min-w-fit text-nowrap"
@@ -233,7 +234,11 @@ export function useClinicalDatasetsTableColumns(
         enableHiding,
         enableSorting,
         meta: {
-            label: "Stored with"
+            label: "Stored with",
+            variant: "select",
+            icon: CircleDashed,
+            showInAdvancedOnly: true,
+            onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
         }
     },
     {

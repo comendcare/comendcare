@@ -10,7 +10,7 @@ import Link from "next/link";
 import {usePathname} from "next/navigation";
 import { Badge } from "./../../../ui/badge";
 import { CircleDashed } from "lucide-react";
-import { handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils";
+import { handleAsyncCompanyAndInstitutionSearch, handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils";
 
 type Preset = "default" | "profile";
 
@@ -135,7 +135,6 @@ export function useBiosamplesTableColumns(
             id: typesenseSearch
                 ? 'condition.name' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
                 : 'organization.conditions',
-            // id: "condition.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "organization.conditions",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -205,9 +204,7 @@ export function useBiosamplesTableColumns(
             ),
             enableHiding,
             enableSorting,
-            meta: {
-                label: "Genotype"
-            }
+            meta: { label: "Genotype" }
         },
         {
             id: "organization.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -285,7 +282,9 @@ export function useBiosamplesTableColumns(
             },
         },
         {
-            id: "institution.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            id: typesenseSearch
+                ? 'instituion.name' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+                : 'institution.name',
             accessorKey: "institution.name",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -313,7 +312,7 @@ export function useBiosamplesTableColumns(
                 variant: "select",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
-                onAsyncSearch: handleAsyncInstitutionSearch
+                onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
             }
         },
         {

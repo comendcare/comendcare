@@ -19,7 +19,7 @@ import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
 import {useSession} from "next-auth/react";
 import { Checkbox } from "./../../../ui/checkbox";
-import { handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch } from "./../../../../../packages/lib/utils";
+import { handleAsyncCompanyAndInstitutionSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch } from "./../../../../../packages/lib/utils";
 import Link from "next/link";
 import { Badge } from "./../../../ui/badge";
 
@@ -261,7 +261,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
         //     }
         // },
         {
-            id: "institution.name",
+            id: 'instituion.name',
             accessorKey: "institution.name",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -288,7 +288,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 variant: "select",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
-                onAsyncSearch: handleAsyncInstitutionSearch
+                onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
             }
         },
         {
