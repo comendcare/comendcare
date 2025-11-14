@@ -2407,18 +2407,38 @@ export const getDiseaseModels = async (
     publicOnly: boolean = false
 ): Promise<{data: DiseaseModel[], pageCount: number}> => {
     if (publicOnly) { // allow any requester to fetch public data
-        if (!organizationId) return {data: [], pageCount: 0}
-        const organization = await prisma.organization.findUnique({
-            where: {id: organizationId}
-        })
-        if (!organization) return {data: [], pageCount: 0}
+        if (organizationId) {
+            // if org ID is provided only fetch tools for organization
+            const organization = await prisma.organization.findUnique({
+                where: {id: organizationId}
+            })
+
+            return await fetchDiseaseModels(
+                organization,
+                select,
+                input,
+                publicOnly
+            )
+        } else {
+            return await fetchDiseaseModels(
+                undefined,
+                select,
+                input,
+                publicOnly
+            )
+        }
+        // if (!organizationId) return {data: [], pageCount: 0}
+        // const organization = await prisma.organization.findUnique({
+        //     where: {id: organizationId}
+        // })
+        // if (!organization) return {data: [], pageCount: 0}
         
-        return await fetchDiseaseModels(
-            organization,
-            select,
-            input,
-            publicOnly
-        )
+        // return await fetchDiseaseModels(
+        //     organization,
+        //     select,
+        //     input,
+        //     publicOnly
+        // )
     }
 
     // only allow members of the organization to fetch private data
@@ -2445,7 +2465,7 @@ export const getDiseaseModels = async (
 }
 
 const fetchDiseaseModels = async (
-    organization: Organization, 
+    organization: Organization | null | undefined, 
     select: Prisma.DiseaseModelSelect<InternalArgs & {
         result: {};
         model: {};
@@ -2463,21 +2483,18 @@ const fetchDiseaseModels = async (
             const [data, total] = await prisma.$transaction([
                 prisma.diseaseModel.findMany({
                     where: {
-                        organizationId: organization.id,
+                        ...(organization ? {organizationId: organization.id} : undefined),
                         ...(publicOnly ? {private: false} : undefined)
                     },
-                    // include: {
-                    //     attachments: true,
-                    //     contacts: true,
-                    //     organization: {include: {conditions: {include: {condition: true}}}},
-                    //     gene: true,
-                    //     institution: true,
-                    //     milestones: {include: {milestone: true}},
-                    // },
                     select,
                     orderBy: {createdAt: "asc"},
                 }),
-                prisma.diseaseModel.count({where: {organizationId: organization.id}}),
+                prisma.diseaseModel.count({
+                    where: {
+                        ...(organization ? {organizationId: organization.id} : undefined),
+                        ...(publicOnly ? {private: false} : undefined)
+                    }
+                }),
             ]);
 
             return {data, pageCount: 1};
@@ -2488,7 +2505,6 @@ const fetchDiseaseModels = async (
             input.filterFlag === "advancedFilters"
 
         let where: any = {};
-        console.log(`input`, input)
 
         if (advancedTable) {
             const preProcessedFilters: any = input.filters.map(filter => ({
@@ -2564,26 +2580,27 @@ const fetchDiseaseModels = async (
                 take: input.perPage,
                 where: {
                     ...where,
-                    organizationId: organization.id,
+                    ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 },
-                include: {
-                    attachments: true,
-                    contacts: true,
-                    organization: {include: {conditions: {include: {condition: true}}}},
-                    gene: true,
-                    // genes: true,
-                    institution: true,
-                    company: true,
-                    milestones: {include: {milestone: true}},
-                    createFacilityRequests: true,
-                },
+                // include: {
+                //     attachments: true,
+                //     contacts: true,
+                //     organization: {include: {conditions: {include: {condition: true}}}},
+                //     gene: true,
+                //     // genes: true,
+                //     institution: true,
+                //     company: true,
+                //     milestones: {include: {milestone: true}},
+                //     createFacilityRequests: true,
+                // },
+                select,
                 orderBy,
             }),
             prisma.diseaseModel.count({
                 where: {
                     ...where, 
-                    organizationId: organization.id,
+                    ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 }
             }),
@@ -2807,8 +2824,6 @@ const fetchBiosamples = async (
             ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
             : [{ createdAt: { sort: "asc" } }];
 
-        console.log(`WHERE OPTION`, JSON.stringify(where))
-
         const [data, total] = await prisma.$transaction([
             prisma.biosample.findMany({
                 skip: offset,
@@ -2818,20 +2833,6 @@ const fetchBiosamples = async (
                     ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 },
-                // include: {
-                //     milestones: {include: {milestone: true}},
-                //     contacts: true,
-                //     attachments: true,
-                //     gene: true,
-                //     // genes: true,
-                //     donor: {
-                //         include: {diagnoses: {include: {type: true}}}
-                //     },
-                //     institution: true,
-                //     company: true,
-                //     materialAndDataAccessRequests: true,
-                //     createFacilityRequests: true,
-                // },
                 select,
                 orderBy,
             }),

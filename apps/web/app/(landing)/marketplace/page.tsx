@@ -4,7 +4,7 @@ import { TypesenseBiosamplesTable } from "@/packages/components/biorepo/advanced
 import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns"
 import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table"
 import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
-import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table"
+import { TypesenseDiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/typesense-disease-models-table"
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
 import { Button } from "@/packages/components/ui/button"
 import { Card, CardContent, CardTitle } from "@/packages/components/ui/card"
@@ -271,7 +271,7 @@ export default function MarketplacePage() {
                             ? (
                                 <>
                                     <div className="max-w-7xl w-full overflow-auto">
-                                        <DiseaseModelsTable showPagination={false} data={diseaseModelStore.searchResults?.slice(0, 3)} pageCount={1} columns={diseaseModelColumns} searchParams={{}}/>
+                                        <TypesenseDiseaseModelsTable showPagination={false} data={diseaseModelStore.searchResults?.slice(0, 3)} pageCount={1} columns={diseaseModelColumns} searchParams={{}}/>
                                     </div>
                                 </>
                             )
