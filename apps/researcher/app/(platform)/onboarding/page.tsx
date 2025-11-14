@@ -232,7 +232,40 @@ export default function ResearcherOnboardingForm() {
 
             const {name, notificationSettings, consentSettings, ...researcherOnlyValues} = values;
 
-            const res: any = await updateResearcher(session?.user?.id, researcherOnlyValues);
+            const fd = new FormData();
+
+            fd.append("title", researcherOnlyValues.title ?? "");
+            fd.append("country", researcherOnlyValues.country ?? "");
+            fd.append("description", researcherOnlyValues.description ?? "");
+            fd.append("website", researcherOnlyValues.website ?? "");
+            fd.append("orcid", researcherOnlyValues.orcid ?? "");
+
+            fd.append(
+                "affiliations",
+                researcherOnlyValues.affiliations?.map(a => a.value).join(",") ?? ""
+            );
+
+            fd.append(
+                "researchInterests",
+                researcherOnlyValues.researchInterests?.map(r => r.label).join(",") ?? ""
+            );
+
+            fd.append(
+                "conditionsOfInterest",
+                researcherOnlyValues.conditionsOfInterest?.map(c => c.label).join(",") ?? ""
+            );
+
+            fd.append(
+                "therapeuticsOfInterest",
+                researcherOnlyValues.therapeuticsOfInterest?.map(t => t.label).join(",") ?? ""
+            );
+
+            fd.append(
+                "genesOfInterest",
+                researcherOnlyValues.genesOfInterest?.map(g => g.label).join(",") ?? ""
+            );
+
+            const res = await updateResearcher(session?.user?.id, fd);
             if (res?.error) {
                 toast.error(res.error);
                 return;
@@ -423,7 +456,7 @@ export default function ResearcherOnboardingForm() {
 
                     <FormField
                         control={form.control}
-                        name="conditionsOfInterest"
+                        name="country"
                         render={({field}) => (
                             <FormItem>
                                 <FormLabel>
@@ -431,7 +464,6 @@ export default function ResearcherOnboardingForm() {
                                 </FormLabel>
                                 <FormControl>
                                     <MultipleSelector
-                                        {...field}
                                         maxSelected={1}
                                         defaultOptions={COUNTRIES}
                                         placeholder="Search for countries..."
@@ -439,6 +471,11 @@ export default function ResearcherOnboardingForm() {
                                         loadingIndicator={<p>Loading countries...</p>}
                                         emptyIndicator={<p>No countries found.</p>}
                                         showHoverCard={false}
+                                        value={field.value ? [{ label: field.value, value: field.value }] : []}
+                                        onChange={(items) => {
+                                            const selected = items?.[0]?.value ?? "";
+                                            field.onChange(selected);
+                                        }}
                                     />
                                 </FormControl>
                                 <FormMessage/>

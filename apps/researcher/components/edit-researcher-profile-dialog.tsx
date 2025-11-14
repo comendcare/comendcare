@@ -135,19 +135,28 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
     }, [session?.user.id, form]);
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        const userUpdate = await editUser(session?.user.id, {
-            name: values.name,
-            notificationSettings: values.notificationSettings,
-            consentSettings: values.consentSettings,
-        });
+        const fd = new FormData();
 
-        if (userUpdate?.error) {
-            toast.error(userUpdate.error);
-            return;
-        }
+        fd.append(
+            "therapeuticsOfInterest",
+            values.therapeuticsOfInterest?.map(t => t.label).join(",") ?? ""
+        );
+        fd.append(
+            "genesOfInterest",
+            values.genesOfInterest?.map(g => g.label).join(",") ?? ""
+        );
+        fd.append(
+            "conditionsOfInterest",
+            values.conditionsOfInterest?.map(c => c.label).join(",") ?? ""
+        );
+        fd.append(
+            "researchInterests",
+            values.researchInterests?.map(r => r.label).join(",") ?? ""
+        );
 
-        const {name, notificationSettings, consentSettings, ...researcherValues} = values;
-        const res = await updateResearcher(session?.user.id, researcherValues);
+
+
+        const res = await updateResearcher(session?.user.id, fd);
         if (res?.error) {
             toast.error(res.error);
             return;
