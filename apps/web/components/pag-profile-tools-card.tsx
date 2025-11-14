@@ -199,7 +199,6 @@ export const PAGProfileToolsCard = ({
                                             pageCount={diseaseModelsPageCount}
                                             columns={diseaseModelColumns}
                                             searchParams={{}}
-                                            interactive={false}
                                             showPagination={toolCounts.diseaseModelCount > 10}
                                             noResultsOverride={false}
                                         />
