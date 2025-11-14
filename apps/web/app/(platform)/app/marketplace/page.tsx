@@ -2,7 +2,7 @@
 
 import { TypesenseBiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/typesense-biosamples-table"
 import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns"
-import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table"
+import { TypesenseClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/typesense-clinical-datasets-table"
 import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
 import { TypesenseDiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/typesense-disease-models-table"
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
@@ -427,7 +427,7 @@ export default function MarketplacePage() {
                             ? (
                                 <>
                                     <div className="max-w-7xl w-full overflow-auto">
-                                        <ClinicalDatasetsTable showPagination={false} data={clinicalDatasetStore.searchResults?.slice(0, 3)} pageCount={1} columns={clinicalDatasetColumns} searchParams={{}}/>
+                                        <TypesenseClinicalDatasetsTable showPagination={false} data={clinicalDatasetStore.searchResults?.slice(0, 3)} pageCount={1} columns={clinicalDatasetColumns} searchParams={{}}/>
                                     </div>
                                 </>
                             )

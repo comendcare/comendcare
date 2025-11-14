@@ -9,7 +9,7 @@ import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advance
 import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns";
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
 import { DatabaseDiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/database-disease-models-table";
-import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/private-clinical-datasets-table";
+import { DatabaseClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/database-clinical-datasets-table";
 import { SearchParams } from "@/packages/components/types";
 import type { Organization, Biosample, DiseaseModel, Tool } from "@prisma/client";
 import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
@@ -208,12 +208,11 @@ export const PAGProfileToolsCard = ({
                             {(section === 'clinical-datasets' && toolCounts.clinicalDatasetCount > 0) && (
                                 <div className="max-w-7xl w-full overflow-auto">
                                     <FeatureFlagsProvider showFilters={false}>
-                                        <ClinicalDatasetsTable
+                                        <DatabaseClinicalDatasetsTable
                                             data={clinicalDatasets || []}
                                             pageCount={clinicalDatasetsPageCount}
                                             columns={clinicalDatasetColumns}
                                             searchParams={{}}
-                                            interactive={false}
                                             showPagination={toolCounts.clinicalDatasetCount > 10}
                                             noResultsOverride={false}
                                         />
