@@ -101,7 +101,7 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                 const user = userRes.data;
                 form.reset({
                     name: user.name || "",
-                    title: mapTitleToValue(researcherData.title),
+                    title: mapTitleToValue(researcher.title),
                     country: researcher.country || undefined,
                     description: researcher.description || undefined,
                     website: researcher.website || undefined,
