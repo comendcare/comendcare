@@ -15,6 +15,20 @@ import ResearcherProfileFrequentCollaboratorsCard
     from "@comend/components/researcher-profile-frequent-collaborators-card";
 import ResearcherProfileEducationCard from "@comend/components/researcher-profile-education-card";
 import {EnrichedResearcher} from "~researcher/types/types";
+import {COUNTRIES} from "@/packages/lib/types";
+
+
+const resolveCountry = (countryCodeOrName?: string | null) => {
+    if (!countryCodeOrName) return null;
+
+    const match = COUNTRIES.find(
+        c =>
+            c.label.toLowerCase() === countryCodeOrName.toLowerCase() || // code -> name
+            c.value.toLowerCase() === countryCodeOrName.toLowerCase()    // already name
+    );
+
+    return match?.value ?? countryCodeOrName;
+};
 
 export default function ResearcherProfile({researcherData}: {researcherData: EnrichedResearcher})
 {
@@ -35,7 +49,10 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
 
     const displayName = openAlex.display_name || "Unknown Researcher";
     const email = researcherData?.researcher?.email || "Email not available";
-    const location = openAlex.last_known_institutions?.[0]?.country_code || researcher?.country || "Country not available";
+    const location =
+        resolveCountry(openAlex.last_known_institutions?.[0]?.country_code) ??
+        resolveCountry(researcher?.country) ??
+        "Country not available";
 
     const metrics = {
         citations: openAlex.cited_by_count ?? 0,
