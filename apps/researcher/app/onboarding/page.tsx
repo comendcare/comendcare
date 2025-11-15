@@ -33,10 +33,11 @@ import mixpanel from "mixpanel-browser";
 import {Skeleton} from "@comend/components/ui/skeleton";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {Select, SelectContent, SelectTrigger, SelectValue, SelectItem} from "@comend/components/ui/select"
-import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
+import {MILESTONE_TYPE_OPTIONS, ACADEMIC_ROLES} from "@comend/lib/types"
 import {badgeVariants} from "@comend/components/ui/badge"
 import {Textarea} from "@/packages/components/ui/textarea";
 import {Separator} from "@/packages/components/ui/separator";
+import {mapTitleToValue} from "~researcher/lib/utils";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -152,7 +153,7 @@ export default function ResearcherOnboardingForm() {
                 if (researcherData && userData) {
                     const fetchedValues = {
                         name: userData.name || "",
-                        title: researcherData.title || "",
+                        title: mapTitleToValue(researcherData.title),
                         country: researcherData.country || "",
                         affiliations: researcherData.affiliations.map((affiliation: any) => ({
                             label: affiliation.institution.name,
@@ -412,11 +413,11 @@ export default function ResearcherOnboardingForm() {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent className="rounded-xl">
-                                        <SelectItem value="researcher">Researcher</SelectItem>
-                                        <SelectItem value="pm">Project Manager</SelectItem>
-                                        <SelectItem value="pi">Principal Investigator</SelectItem>
-                                        <SelectItem value="student">Student</SelectItem>
-                                        <SelectItem value="other">Other</SelectItem>
+                                        {ACADEMIC_ROLES.map((role: any) => (
+                                            <SelectItem key={role.id} value={role.value}>
+                                                {role.label}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                                 <FormMessage/>

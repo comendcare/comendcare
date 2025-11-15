@@ -28,6 +28,29 @@ import type {
 import {Prisma} from "@prisma/client";
 import {z} from "zod";
 
+export const ACADEMIC_ROLES = [
+    {
+        id: "PI",
+        label: "Principal Investigator",
+        value: "pi",
+    },
+    {
+        id: "POSTDOC",
+        label: "Postdoc",
+        value: "postdoc",
+    },
+    {
+        id: "PHD_STUDENT",
+        label: "PhD Student",
+        value: "phd_student",
+    },
+    {
+        id: "OTHER",
+        label: "Other",
+        value: "other",
+    },
+];
+
 export const COUNTRIES: Option[] = [
     { id: "1", label: "AF", value: "Afghanistan" },
     { id: "2", label: "AL", value: "Albania" },

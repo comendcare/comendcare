@@ -1,3 +1,16 @@
+import {ACADEMIC_ROLES} from "@/packages/lib/types";
+
+export const mapTitleToValue = (title?: string | null) => {
+    if (!title) return "";
+    const match = ACADEMIC_ROLES.find(
+        (role) =>
+            role.value === title ||
+            role.label === title ||
+            role.id === title
+    );
+    return match?.value ?? "";
+};
+
 // Drop-in upgrade: now also merges Crossref, Europe PMC, and DataCite.
 // Signature remains backward-compatible via default params.
 export function mergeResearcherDataAdvanced(

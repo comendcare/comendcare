@@ -32,7 +32,7 @@ import {z} from "zod";
 import {Ellipsis, Pencil} from "lucide-react";
 import {useRouter} from "next/navigation";
 import {editUser, updateResearcher} from "@comend/lib/actions";
-import {COUNTRIES, MILESTONE_TYPE_OPTIONS, MODALITIES, Option, optionSchema} from "@comend/lib/types";
+import {ACADEMIC_ROLES, COUNTRIES, MILESTONE_TYPE_OPTIONS, MODALITIES, Option, optionSchema} from "@comend/lib/types";
 import {
     getUser,
     getResearcherFromUserId,
@@ -43,13 +43,14 @@ import {badgeVariants} from "@/packages/components/ui/badge";
 import LoadingDots from "@/packages/components/icons/loading-dots";
 import {EnrichedResearcher} from "~researcher/types/types";
 import {Textarea} from "@/packages/components/ui/textarea";
+import {mapTitleToValue} from "~researcher/lib/utils";
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
     ...option,
     value: option.id,
 }));
 
-const TitleEnum = z.enum(["researcher","pm","pi","student","other"]);
+const TitleEnum = z.enum(["researcher", "pm", "pi", "student", "other"]);
 
 const formSchema = z.object({
     name: z.string().min(2),
@@ -77,7 +78,7 @@ const formSchema = z.object({
     consentSettings: z.boolean().default(false),
 });
 
-export default function EditResearcherProfileDialog({ researcher }: { researcher: EnrichedResearcher["researcher"] }) {
+export default function EditResearcherProfileDialog({researcher}: { researcher: EnrichedResearcher["researcher"] }) {
     const {data: session} = useSession()
     const router = useRouter();
     const [initialData, setInitialData] = useState<z.infer<typeof formSchema>>();
@@ -100,7 +101,7 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                 const user = userRes.data;
                 form.reset({
                     name: user.name || "",
-                    title: researcher.title || undefined,
+                    title: mapTitleToValue(researcherData.title),
                     country: researcher.country || undefined,
                     description: researcher.description || undefined,
                     website: researcher.website || undefined,
@@ -290,11 +291,11 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent className="rounded-xl">
-                                            <SelectItem value="researcher">Researcher</SelectItem>
-                                            <SelectItem value="pm">Project Manager</SelectItem>
-                                            <SelectItem value="pi">Principal Investigator</SelectItem>
-                                            <SelectItem value="student">Student</SelectItem>
-                                            <SelectItem value="other">Other</SelectItem>
+                                            {ACADEMIC_ROLES.map((role: any) => (
+                                                <SelectItem key={role.id} value={role.value}>
+                                                    {role.label}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                     <FormMessage/>
@@ -349,7 +350,7 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                                             loadingIndicator={<p>Loading countries...</p>}
                                             emptyIndicator={<p>No countries found.</p>}
                                             showHoverCard={false}
-                                            value={field.value ? [{ label: field.value, value: field.value }] : []}
+                                            value={field.value ? [{label: field.value, value: field.value}] : []}
                                             onChange={(items) => {
                                                 const selected = items?.[0]?.value ?? "";
                                                 field.onChange(selected);
@@ -388,7 +389,7 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                         <FormField
                             control={form.control}
                             name="orcid"
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Your ORCID</FormLabel>
                                     <FormControl>
@@ -411,7 +412,7 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                                             placeholder="0000-0000-0000-0000"
                                         />
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />
