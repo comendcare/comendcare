@@ -137,6 +137,12 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         const fd = new FormData();
 
+        fd.append("title", values.title ?? "");
+        fd.append("country", values.country ?? "");
+        fd.append("description", values.description ?? "");
+        fd.append("website", values.website ?? "");
+        fd.append("orcid", values.orcid ?? "");
+
         fd.append(
             "therapeuticsOfInterest",
             values.therapeuticsOfInterest?.map(t => t.label).join(",") ?? ""
@@ -154,7 +160,10 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
             values.researchInterests?.map(r => r.label).join(",") ?? ""
         );
 
-
+        fd.append(
+            "orcid",
+            values.orcid?.trim() || ""
+        );
 
         const res = await updateResearcher(session?.user.id, fd);
         if (res?.error) {
