@@ -632,28 +632,67 @@ const syncToTypesense = async (env: {
             ]
         }
 
+        /* UPDATE ORGANIZATION ---------------------------------------------------------------------------------------- */
         console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
-        console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
-        console.log('CRO Schema:', JSON.stringify(companySchema, null, 2));
-        console.log('Biosample Schema:', JSON.stringify(biosampleSchema, null, 2));
-        console.log('Disease Model:', JSON.stringify(diseaseModelSchema, null, 2));
-        console.log('Clinical Dataset:', JSON.stringify(clinicalDatasetSchema, null, 2));
-        console.log(`RFPs`, JSON.stringify(rfpSchema, null, 2));
-
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizationSchema);
-        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
-        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companySchema);
-        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', biosampleSchema);
-        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', diseaseModelSchema);
-        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', clinicalDatasetSchema);
-        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'rfps', rfpSchema);
-
         const organizations = await prisma.organization.findMany({
             where: {
                 verified: true,
                 published: true
             }
         });
+        console.log('Raw organizations data:', organizations);
+
+        if (organizations.length > 0) {
+            console.log('Validating organization data...');
+
+            // map orgs to include all required data
+            const uploadOrgs = await Promise.all(organizations.map(async (org, index) => {
+                console.log(`Org ${index + 1}:`, org)
+                const organization = await prisma.organization.findUnique({
+                    where: { id: org.id },
+                    include: { 
+                        conditions: {include: {condition: true}},
+                        roadmaps: true,
+                        milestones: true,
+                        tools: true,
+                        rfps: true
+                    }
+                })
+
+                if (!organization) return null;
+
+                // Special case made for sortable condition attributes
+                // This is temporary until we find a better way to handle the organization condition relationship
+                const firstConditionPatientsEngaged = organization.conditions?.[0]?.condition?.numberOfPatientsEngaged ?? 0;
+
+                // combine, org updates, research plan updates, project updates, tool updates, and RFP updates. Then find
+                // the most recently updated time (this will be used in the Recently Updates sortBy in the marketplace)
+                const orgUpdatedAt = Math.max(...[organization.updatedAt.valueOf()].concat(
+                    organization.roadmaps.map(roadmap => roadmap.updatedAt.valueOf()),
+                    organization.milestones.map(milestone => milestone.updatedAt.valueOf()),
+                    organization.tools.map(tool => tool.updatedAt.valueOf()),
+                    organization.rfps.map(rfp => rfp.updatedAt.valueOf())
+                ))
+
+                return {
+                    ...organization,
+                    updatedAt: orgUpdatedAt,
+                    createdAt: organization.createdAt.valueOf(),
+                    firstConditionPatientsEngaged,
+                }
+            }))
+
+            const validOrganizations = uploadOrgs.filter(Boolean);
+
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', validOrganizations);
+        } else {
+            console.log('No organizations to import.');
+        }
+
+        /* UPDATE MILESTONES ---------------------------------------------------------------------------------------- */
+        console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
         const milestones = await prisma.milestone.findMany({
             where: {
                 organization: {
@@ -662,6 +701,39 @@ const syncToTypesense = async (env: {
                 }
             }
         });
+        console.log('Raw milestones data:', milestones);
+        if (milestones.length > 0) {
+            console.log('Validating milestone data...');
+
+            const uploadMilestones = await Promise.all(milestones.map(async (ms, index) => {
+                console.log(`Milestone ${index + 1}:`, ms)
+                const milestone = await prisma.milestone.findUnique({
+                    where: { id: ms.id },
+                    include: { node: true }
+                })
+
+                // don't upload milestone data to typesense if
+                // 1. milestone doesn't exist
+                // 2. milestone is private
+                if (!milestone || milestone.private) return null;
+
+                return {
+                    ...milestone,
+                    nodeType: milestone.nodeType,
+                    updatedAt: new Date(milestone.updatedAt).getTime(), // Convert to int64
+                }
+            }))
+
+            const validMilestones = uploadMilestones.filter(Boolean);
+
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', validMilestones);
+        } else {
+            console.log('No milestones to import.');
+        }
+
+        /* UPDATE CROS/COMPANIES ---------------------------------------------------------------------------------- */
+        console.log('CRO Schema:', JSON.stringify(companySchema, null, 2));
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companySchema);
         const companies = await prisma.company.findMany({
             select: {
                 id: true,
@@ -679,6 +751,16 @@ const syncToTypesense = async (env: {
                 milestoneTypes: true,
             }
         });
+        console.log('Raw companies data:', companies);
+        if (companies.length > 0) {
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companies);
+        } else {
+            console.log('No companies to import.');
+        }
+
+        /* UPDATE BIOSAMPLES ---------------------------------------------------------------------------------------- */
+        console.log('Biosample Schema:', JSON.stringify(biosampleSchema, null, 2));
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', biosampleSchema);
         const biosamples = await prisma.biosample.findMany({
             where: {
                 private: false // only sync public biosamples
@@ -717,6 +799,30 @@ const syncToTypesense = async (env: {
                 createFacilityRequests: true,
             }
         })
+        console.log('Raw biosamples data:', biosamples)
+        if (biosamples.length > 0) {
+            const uploadBiosamples = biosamples.map(biosample => ({
+                ...biosample,
+                id_sort: stringToSortableInt(biosample.id),
+                createdAt: biosample.createdAt.getTime(), // special case for created at to enable sorting
+                // special case to allow typesense sorting on the id string
+                sortId: {id: biosample.id},
+                availability: handleGetAvailability(biosample),
+                // special case for types to enable searching by label & sorting include all info, and only include one type
+                type: BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample.types.includes(option.value))[0],
+                // special case for conditions to enable sorting include only one condition
+                condition: biosample.organization?.conditions && biosample.organization.conditions.length > 0 && biosample.organization.conditions[0].condition,
+                genotype: {genotype: biosample.genotype},
+            }))
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
+        } else {
+            console.log('No biosamples to import.');
+        }
+
+
+        /* UPDATE DISEASE MODELS ---------------------------------------------------------------------------------------- */
+        console.log('Disease Model:', JSON.stringify(diseaseModelSchema, null, 2));
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', diseaseModelSchema);
         const diseaseModels = await prisma.diseaseModel.findMany({
             where: {
                 private: false
@@ -733,7 +839,9 @@ const syncToTypesense = async (env: {
                             select: {
                                 condition: {
                                     select: {
-                                        name: true
+                                        name: true,
+                                        causalGenes: true,
+                                        associatedGenes: true,
                                     }
                                 }
                             }
@@ -752,6 +860,30 @@ const syncToTypesense = async (env: {
                 createFacilityRequests: true,
             }
         })
+        console.log('Raw disease models data:', diseaseModels)
+        if (diseaseModels.length > 0) {
+            const uploadDiseaseModels = diseaseModels.map(diseaseModel => ({
+                ...diseaseModel,
+                id_sort: stringToSortableInt(diseaseModel.id),
+                createdAt: diseaseModel.createdAt.getTime(), // special case for created at to enable sorting
+                // special case to allow typesense sorting on the id string
+                sortId: {id: diseaseModel.id},
+                availability: handleGetAvailability(diseaseModel),
+                // special case for types to enable searching by label & sorting include all info, and only include one type
+                type: DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel.types.includes(option.value))[0],
+                // special case for conditions to enable sorting include only one condition
+                condition: diseaseModel.organization?.conditions && diseaseModel.organization.conditions.length > 0 && diseaseModel.organization.conditions[0].condition,
+                genotype: {genotype: diseaseModel.genotype},
+                strain: {strain: diseaseModel.strain},
+            }))
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', uploadDiseaseModels);
+        } else {
+            console.log('No disease models to import.');
+        }
+
+        /* UPDATE CLINICAL DATASETS ---------------------------------------------------------------------------------- */
+        console.log('Clinical Dataset:', JSON.stringify(clinicalDatasetSchema, null, 2));
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', clinicalDatasetSchema);
         const clinicalDatasets = await prisma.tool.findMany({
             where: {
                 private: false
@@ -787,6 +919,39 @@ const syncToTypesense = async (env: {
                 createFacilityRequests: true,
             }
         })
+        console.log('Raw clinical datasets data:', clinicalDatasets)
+        if (clinicalDatasets.length > 0) {
+            const uploadClinicalDatasets = clinicalDatasets.map(dataset => ({
+                // id: dataset.id,
+                // title: dataset.title,
+                // description: dataset.description,
+                // // types: dataset.types,
+                // types: TOOL_TYPE_OPTIONS.filter(option => dataset.types.includes(option.value)),
+                // gene: dataset.gene?.symbol,
+                // conditions: dataset.organization?.conditions?.map(condition => condition.condition?.name) || [],
+                // organization: dataset.organization
+
+                ...dataset,
+                id_sort: stringToSortableInt(dataset.id),
+                createdAt: dataset.createdAt.getTime(), // special case for created at to enable sorting
+                // special case to allow typesense sorting on the id string
+                sortId: {id: dataset.id},
+                // special case to allow typesense sorting on the title string
+                title: {title: dataset.title},
+                availability: handleGetAvailability(dataset),
+                // special case for types to enable searching by label & sorting include all info, and only include one type
+                type: TOOL_TYPE_OPTIONS.filter(option => dataset.types.includes(option.value))[0],
+                // special case for conditions to enable sorting include only one condition
+                condition: dataset.organization?.conditions && dataset.organization.conditions.length > 0 && dataset.organization.conditions[0].condition
+            }))
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', uploadClinicalDatasets);
+        } else {
+            console.log('No clinical datasets to import.');
+        }
+
+        /* UPDATE RFPS ---------------------------------------------------------------------------------- */
+        console.log(`RFPs`, JSON.stringify(rfpSchema, null, 2))
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'rfps', rfpSchema);
         const rfps = await prisma.rFP.findMany({
             where: {
                 private: false // only sync public biosamples
@@ -822,166 +987,7 @@ const syncToTypesense = async (env: {
                 endDate: true
             }
         })
-
-        console.log('Raw organizations data:', organizations);
-        console.log('Raw milestones data:', milestones);
-        console.log('Raw companies data:', companies);
-        console.log('Raw biosamples data:', biosamples)
-        console.log('Raw disease models data:', diseaseModels)
-        console.log('Raw clinical datasets data:', clinicalDatasets)
         console.log('Raw rfp data:', rfps)
-
-        if (organizations.length > 0) {
-            console.log('Validating organization data...');
-
-            // map orgs to include all required data
-            const uploadOrgs = await Promise.all(organizations.map(async (org, index) => {
-                console.log(`Org ${index + 1}:`, org)
-                const organization = await prisma.organization.findUnique({
-                    where: { id: org.id },
-                    include: { 
-                        conditions: {include: {condition: true}},
-                        roadmaps: true,
-                        milestones: true,
-                        tools: true,
-                        rfps: true
-                    }
-                })
-
-                if (!organization) return null;
-
-                // Special case made for sortable condition attributes
-                // This is temporary until we find a better way to handle the organization condition relationship
-                const firstConditionPatientsEngaged = organization.conditions?.[0]?.condition?.numberOfPatientsEngaged ?? 0;
-
-                // combine, org updates, research plan updates, project updates, tool updates, and RFP updates. Then find
-                // the most recently updated time (this will be used in the Recently Updates sortBy in the marketplace)
-                const orgUpdatedAt = Math.max(...[organization.updatedAt.valueOf()].concat(
-                    organization.roadmaps.map(roadmap => roadmap.updatedAt.valueOf()),
-                    organization.milestones.map(milestone => milestone.updatedAt.valueOf()),
-                    organization.tools.map(tool => tool.updatedAt.valueOf()),
-                    organization.rfps.map(rfp => rfp.updatedAt.valueOf())
-                ))
-
-                return {
-                    ...organization,
-                    updatedAt: orgUpdatedAt,
-                    createdAt: organization.createdAt.valueOf(),
-                    firstConditionPatientsEngaged
-                }
-            }))
-
-            const validOrganizations = uploadOrgs.filter(Boolean);
-
-            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', validOrganizations);
-        } else {
-            console.log('No organizations to import.');
-        }
-
-        if (milestones.length > 0) {
-            console.log('Validating milestone data...');
-
-            const uploadMilestones = await Promise.all(milestones.map(async (ms, index) => {
-                console.log(`Milestone ${index + 1}:`, ms)
-                const milestone = await prisma.milestone.findUnique({
-                    where: { id: ms.id },
-                    include: { node: true }
-                })
-
-                // don't upload milestone data to typesense if
-                // 1. milestone doesn't exist
-                // 2. milestone is private
-                if (!milestone || milestone.private) return null;
-
-                return {
-                    ...milestone,
-                    nodeType: milestone.nodeType,
-                    updatedAt: new Date(milestone.updatedAt).getTime(), // Convert to int64
-                }
-            }))
-
-
-            const validMilestones = uploadMilestones.filter(Boolean);
-
-            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', validMilestones);
-        } else {
-            console.log('No milestones to import.');
-        }
-
-        if (companies.length > 0) {
-            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companies);
-        } else {
-            console.log('No companies to import.');
-        }
-
-        if (biosamples.length > 0) {
-            const uploadBiosamples = biosamples.map(biosample => ({
-                ...biosample,
-                id_sort: stringToSortableInt(biosample.id),
-                createdAt: biosample.createdAt.getTime(), // special case for created at to enable sorting
-                // special case to allow typesense sorting on the id string
-                sortId: {id: biosample.id},
-                availability: handleGetAvailability(biosample),
-                // special case for types to enable searching by label & sorting include all info, and only include one type
-                type: BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample.types.includes(option.value))[0],
-                // special case for conditions to enable sorting include only one condition
-                condition: biosample.organization?.conditions && biosample.organization.conditions.length > 0 && biosample.organization.conditions[0].condition,
-                genotype: {genotype: biosample.genotype},
-            }))
-            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
-        } else {
-            console.log('No biosamples to import.');
-        }
-
-        if (diseaseModels.length > 0) {
-            const uploadDiseaseModels = diseaseModels.map(diseaseModel => ({
-                ...diseaseModel,
-                id_sort: stringToSortableInt(diseaseModel.id),
-                createdAt: diseaseModel.createdAt.getTime(), // special case for created at to enable sorting
-                // special case to allow typesense sorting on the id string
-                sortId: {id: diseaseModel.id},
-                availability: handleGetAvailability(diseaseModel),
-                // special case for types to enable searching by label & sorting include all info, and only include one type
-                type: DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel.types.includes(option.value))[0],
-                // special case for conditions to enable sorting include only one condition
-                condition: diseaseModel.organization?.conditions && diseaseModel.organization.conditions.length > 0 && diseaseModel.organization.conditions[0].condition,
-                genotype: {genotype: diseaseModel.genotype},
-                strain: {strain: diseaseModel.strain},
-            }))
-            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', uploadDiseaseModels);
-        } else {
-            console.log('No disease models to import.');
-        }
-
-        if (clinicalDatasets.length > 0) {
-            const uploadClinicalDatasets = clinicalDatasets.map(dataset => ({
-                // id: dataset.id,
-                // title: dataset.title,
-                // description: dataset.description,
-                // // types: dataset.types,
-                // types: TOOL_TYPE_OPTIONS.filter(option => dataset.types.includes(option.value)),
-                // gene: dataset.gene?.symbol,
-                // conditions: dataset.organization?.conditions?.map(condition => condition.condition?.name) || [],
-                // organization: dataset.organization
-
-                ...dataset,
-                id_sort: stringToSortableInt(dataset.id),
-                createdAt: dataset.createdAt.getTime(), // special case for created at to enable sorting
-                // special case to allow typesense sorting on the id string
-                sortId: {id: dataset.id},
-                // special case to allow typesense sorting on the title string
-                title: {title: dataset.title},
-                availability: handleGetAvailability(dataset),
-                // special case for types to enable searching by label & sorting include all info, and only include one type
-                type: TOOL_TYPE_OPTIONS.filter(option => dataset.types.includes(option.value))[0],
-                // special case for conditions to enable sorting include only one condition
-                condition: dataset.organization?.conditions && dataset.organization.conditions.length > 0 && dataset.organization.conditions[0].condition
-            }))
-            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', uploadClinicalDatasets);
-        } else {
-            console.log('No clinical datasets to import.');
-        }
-
         if (rfps.length > 0) {
             const uploadRFPs = rfps.map(rfp => ({
                 ...rfp,
