@@ -25,7 +25,6 @@ import { EditAssetDialog } from "../edit-tool-dialog"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { Pin } from "lucide-react"
 import { AssetActionsMenu } from "../tool-actions-menu"
-import { ExtendedColumnFilter } from "@/packages/lib/types/data-table"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
