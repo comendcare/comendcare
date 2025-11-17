@@ -46,6 +46,9 @@ import {
 } from "./validations";
 import {notFound, redirect} from "next/navigation";
 import {switchOrganization} from "./actions";
+import { ExtendedColumnFilter } from "types/data-table";
+import {generateId} from "./../../packages/lib/id"
+import { ColumnDef } from "@tanstack/react-table";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function findInstitutions(
@@ -2697,7 +2700,8 @@ export const getBiosamples = async (
         client: {};
     }>,
     input?: GetBiosamplesSchema,
-    publicOnly: boolean = false
+    publicOnly: boolean = false,
+    columns?: ColumnDef<any>[],
 ): Promise<{data: Biosample[], pageCount: number}> => {
     if (publicOnly) { // allow any requester to fetch public data
         if (organizationId) {
@@ -2709,6 +2713,7 @@ export const getBiosamples = async (
             return await fetchBiosamples(
                 organization,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -2717,6 +2722,7 @@ export const getBiosamples = async (
             return await fetchBiosamples(
                 undefined,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -2739,6 +2745,7 @@ export const getBiosamples = async (
             return await fetchBiosamples(
                 organization,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -2754,6 +2761,7 @@ const fetchBiosamples = async (
         query: {};
         client: {};
     }>,
+    columns?: ColumnDef<any>[] | undefined, 
     input?: GetBiosamplesSchema,
     publicOnly: boolean = false
 ) => {
@@ -2790,14 +2798,17 @@ const fetchBiosamples = async (
                 ...filter,
                 ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
                 ...(filter.id === "donor.diagnoses" && Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
-                ...(filter.id === "organization.conditions" && Array.isArray(filter.value) ? {value: filter.value.map(conditionOption => ({condition: {name: conditionOption}}))} : undefined),
+                // ...(filter.id === "organization.conditions" && Array.isArray(filter.value) ? {value: filter.value.map(conditionOption => ({condition: {name: conditionOption}}))} : undefined),
                 ...(filter.id === "milestones" && Array.isArray(filter.value) ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} : undefined)
             }))
 
             where = filterColumns({
                 filters: preProcessedFilters,
                 joinOperator: input.joinOperator,
+                schemaColumns: columns
             })
+
+            console.log(`WHERE input`, where)
         } else {
             const filters: any[] = []
             if (input.title) {
@@ -2858,6 +2869,7 @@ const fetchBiosamples = async (
                 { id: { contains: input.q, mode: "insensitive" } },
                 { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
                 { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                { company: {name: {contains: input.q, mode: "insensitive"} } },
                 { genotype: {contains: input.q, mode: "insensitive"}},
                 { organization: {name: {contains: input.q, mode: "insensitive"}}},
                 { organization: {

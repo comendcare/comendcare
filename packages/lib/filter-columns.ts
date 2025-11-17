@@ -1,6 +1,7 @@
 import { addDays, endOfDay, startOfDay } from "date-fns";
 import { Prisma } from "@prisma/client";
 import type { ExtendedColumnFilter, JoinOperator } from "./types/data-table";
+import { ColumnDef } from "@tanstack/react-table";
 
 /**
  * Construct Prisma conditions based on the provided filters for a specific table.
@@ -22,9 +23,11 @@ import type { ExtendedColumnFilter, JoinOperator } from "./types/data-table";
 export function filterColumns<TWhere extends object>({
                                                        filters,
                                                        joinOperator,
+                                                       schemaColumns,
                                                      }: {
   filters: ExtendedColumnFilter<any>[];
   joinOperator: JoinOperator;
+  schemaColumns?: ColumnDef<any>[] | undefined,
 }): TWhere | undefined {
   const joinFn = joinOperator === "and" ? "AND" : "OR";
 
@@ -34,8 +37,12 @@ export function filterColumns<TWhere extends object>({
   }
 
   const conditions = filters.map((filter) => {
-    const column = filter.id;
     const columns = filter.id.split(".")
+    const dbAccessor = schemaColumns?.find(col => col.id === filter.id)?.dbAccessor
+
+    // if schema has provided an overried for accessing the database use the dbOverride
+    // instead of the filter ID to generate the WHERE object
+    if (dbAccessor) return dbAccessor(filter)
 
     switch (filter.operator) {
       case "eq":

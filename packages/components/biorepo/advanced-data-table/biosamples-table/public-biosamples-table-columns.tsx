@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import type {ColumnDef} from "@tanstack/react-table";
 import * as React from "react";
@@ -7,19 +7,22 @@ import {BIOSAMPLE_TYPE_OPTIONS, QUANTITY_OPTIONS} from "./../../../../../package
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
-import {usePathname} from "next/navigation";
+// import {usePathname} from "next/navigation";
 import { Badge } from "./../../../ui/badge";
 import { CircleDashed } from "lucide-react";
 import { handleAsyncCompanyAndInstitutionSearch, handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils";
+import { ExtendedColumnFilter } from "@comend/lib/types/data-table";
+import { filterColumns } from "@comend/lib/filter-columns";
+import { generateId } from "@comend/lib/id";
 
 type Preset = "default" | "profile";
 
-function useColumnsPreset(explicit?: Preset) {
-    const pathname = usePathname();
-    if (explicit) return explicit;
-    if (pathname?.startsWith("/app/profile")) return "profile";
-    return "default";
-}
+// function useColumnsPreset(explicit?: Preset) {
+//     const pathname = usePathname();
+//     if (explicit) return explicit;
+//     if (pathname?.startsWith("/app/profile")) return "profile";
+//     return "default";
+// }
 
 export function useBiosamplesTableColumns(
     enableSorting: boolean = true, 
@@ -27,7 +30,8 @@ export function useBiosamplesTableColumns(
     typesenseSearch: boolean = true,
     presetName?: Preset,
 ): ColumnDef<any>[] {
-    const preset = useColumnsPreset(presetName);
+    // const preset = useColumnsPreset(presetName);
+    const preset = presetName || 'default'
 
     const columns: ColumnDef<any>[] = [
         {
@@ -151,6 +155,21 @@ export function useBiosamplesTableColumns(
             enableHiding,
             enableSorting: false, // cannot sort since the org can attatch multiple conditions
             enableColumnFilter: true,
+            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                const filters = [
+                    {
+                        ...filter,
+                        ...(Array.isArray(filter.value) ? {value: filter.value.map(conditionOption => ({condition: {name: conditionOption}}))} : undefined),
+                    } as any
+                ]
+                const results = filterColumns({
+                    filters,
+                    // join operator doesn't matter in this case because there will only be one entry in the list
+                    joinOperator: 'or'
+                })
+
+                return results
+            },
             meta: { 
                 label: "Condition",
                 variant: "multiSelect",
@@ -305,8 +324,24 @@ export function useBiosamplesTableColumns(
                 )
             },
             enableHiding,
-            enableSorting,
+            enableSorting: false,
             enableColumnFilter: true,
+            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                const filters = [
+                    filter,
+                    {
+                        ...filter,
+                        id: 'company.title',
+                        filterId: generateId({length: 8})
+                    }
+                ]
+                const results = filterColumns({
+                    filters,
+                    joinOperator: 'or'
+                })
+
+                return results
+            },
             meta: {
                 label: "Stored with",
                 variant: "select",

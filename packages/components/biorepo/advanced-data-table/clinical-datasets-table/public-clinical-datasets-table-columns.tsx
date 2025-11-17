@@ -69,15 +69,10 @@ export function useClinicalDatasetsTableColumns(
                 title="Title" 
             />
         ),
-        meta: {
-            label: "Title",
-            // placeholder: "Search titles...",
-            // variant: "text",
-            // icon: Text,
-        },
+        meta: { label: "Title" },
         enableColumnFilter: true,
-            enableHiding,
-            enableSorting,
+        enableHiding,
+        enableSorting,
     },
     {
         id: typesenseSearch
@@ -154,10 +149,8 @@ export function useClinicalDatasetsTableColumns(
             </div>
         ),
         enableHiding,
-        enableSorting,
-        meta: {
-            label: "Condition"
-        }
+        enableSorting: false,
+        meta: { label: "Condition" }
     },
     {
         id: "genes", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
