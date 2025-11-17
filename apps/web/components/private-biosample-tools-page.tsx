@@ -28,8 +28,8 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     pageCount: number,
     searchParams: SearchParams
 }) => {
-    const columns = useBiosamplesTableColumns()
     const {data: session} = useSession()
+    const columns = useBiosamplesTableColumns({session})
     const [rowSelection, setRowSelection] = useState<Object[]>([])
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1100)

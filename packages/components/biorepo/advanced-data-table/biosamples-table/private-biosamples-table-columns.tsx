@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import type {ColumnDef} from "@tanstack/react-table";
 import {
@@ -28,25 +28,29 @@ import { Checkbox } from "./../../../ui/checkbox";
 import { getDiagnosisTypes } from "./../../../../../packages/lib/fetchers";
 import { useEffect, useState } from "react";
 import { Option } from "./../../../../../packages/lib/types";
-import { handleAsyncCompanyAndInstitutionSearch, handleAsyncCompanySearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch, handleGetAvailability } from "./../../../../../packages/lib/utils";
-import { useSession } from "next-auth/react";
+import { handleAsyncCompanyAndInstitutionSearch, handleAsyncCompanySearch, handleAsyncDiagnosesSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch, handleGetAvailability } from "./../../../../../packages/lib/utils";
+import { getSession, useSession } from "next-auth/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./../../../ui/tooltip";
 import Link from "next/link";
+import { filterColumns } from "@comend/lib/filter-columns";
+import { generateId } from "@comend/lib/id";
+import { ExtendedColumnFilter } from "@comend/lib/types/data-table";
+import { Session } from "next-auth";
 
-export function useBiosamplesTableColumns(): ColumnDef<any>[] {
-    const {data: session} = useSession()
-    const [diagnosesOptions, setDiagnosesOptions] = useState<Option[]>([])
+export function useBiosamplesTableColumns({session}: {session: Session | null}): ColumnDef<any>[] {
+    // const {data: session} = useSession()
+    // const [diagnosesOptions, setDiagnosesOptions] = useState<Option[]>([])
 
-    useEffect(() => {
-        const init = async () => {
-            const response = await getDiagnosisTypes()
-            if (response.success && response.data) {
-                setDiagnosesOptions(response.data.map((diagnosisType: any) => ({label: diagnosisType.label, value: diagnosisType.id})))
-            }
-        }
+    // useEffect(() => {
+    //     const init = async () => {
+    //         const response = await getDiagnosisTypes()
+    //         if (response.success && response.data) {
+    //             setDiagnosesOptions(response.data.map((diagnosisType: any) => ({label: diagnosisType.label, value: diagnosisType.id})))
+    //         }
+    //     }
 
-        init()
-    }, [])
+    //     init()
+    // }, [])
 
     const columns: ColumnDef<any>[] = [
         {
@@ -112,6 +116,21 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             ),
             enableHiding: true,
             enableColumnFilter: true,
+            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                const filters = [
+                    {
+                        ...filter,
+                        ...({value: filter.value === "true" ? true : false}),
+                    } as any
+                ]
+                const results = filterColumns({
+                    filters,
+                    // join operator doesn't matter in this case because there will only be one entry in the list
+                    joinOperator: 'or'
+                })
+
+                return results
+            },
             meta: {
                 label: "Visibility",
                 variant: "select",
@@ -381,12 +400,28 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableSorting: false,
             enableHiding: true,
             enableColumnFilter: true,
+            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                const filters = [
+                    {
+                        ...filter,
+                        ...(Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
+                    } as any
+                ]
+                const results = filterColumns({
+                    filters,
+                    // join operator doesn't matter in this case because there will only be one entry in the list
+                    joinOperator: 'or'
+                })
+
+                return results
+            },
             meta: {
                 label: "Diagnoses",
                 variant: "multiSelect",
-                options: diagnosesOptions,
+                // options: diagnosesOptions,
                 showInAdvancedOnly: true,
                 icon: CircleDashed,
+                onAsyncSearch: handleAsyncDiagnosesSearch
             }
         },
         // {
@@ -448,7 +483,7 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             },
         },
         {
-            id: "institution.name",
+            id: 'institution.name',
             accessorKey: "institution.name",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -469,7 +504,24 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
                 )
             },
             enableHiding: true,
-        enableColumnFilter: true,
+            enableSorting: false,
+            enableColumnFilter: true,
+            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                const filters = [
+                    filter,
+                    {
+                        ...filter,
+                        id: 'company.title',
+                        filterId: generateId({length: 8})
+                    }
+                ]
+                const results = filterColumns({
+                    filters,
+                    joinOperator: 'or'
+                })
+
+                return results
+            },
             meta: {
                 label: "Stored with",
                 variant: "select",
@@ -808,6 +860,23 @@ export function useBiosamplesTableColumns(): ColumnDef<any>[] {
             enableSorting: false,
             enableHiding: true,
             enableColumnFilter: true,
+            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                const filters = [
+                    {
+                        ...filter,
+                        ...(Array.isArray(filter.value) 
+                                ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} 
+                                : undefined)
+                    } as any
+                ]
+                const results = filterColumns({
+                    filters,
+                    // join operator doesn't matter in this case because there will only be one entry in the list
+                    joinOperator: 'or'
+                })
+
+                return results
+            },
             meta: {
                 label: "Linked projects",
                 variant: "multiSelect",

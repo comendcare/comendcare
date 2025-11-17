@@ -203,6 +203,21 @@ export const handleAsyncConditionSearch = async (query?: string | undefined): Pr
     }
 }
 
+export const handleAsyncDiagnosesSearch = async (query?: string | undefined): Promise<Option[]> => {
+    if (!query) return []; // Return empty if no input
+
+    try {
+        const response = await fetch(`/api/diagnoses?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data;
+    } catch (error) {
+        console.error("Failed to fetch diagnoses:", error);
+        return [];
+    }
+};
+
 export const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
     if (!query) return []; // Return empty if no input
 

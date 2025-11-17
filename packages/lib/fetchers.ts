@@ -2794,16 +2794,9 @@ const fetchBiosamples = async (
         let where: any = {};
 
         if (advancedTable) {
-            const preProcessedFilters: any = input.filters.map(filter => ({
-                ...filter,
-                ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
-                ...(filter.id === "donor.diagnoses" && Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
-                // ...(filter.id === "organization.conditions" && Array.isArray(filter.value) ? {value: filter.value.map(conditionOption => ({condition: {name: conditionOption}}))} : undefined),
-                ...(filter.id === "milestones" && Array.isArray(filter.value) ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} : undefined)
-            }))
-
+            console.log(`filters input`, input.filters)
             where = filterColumns({
-                filters: preProcessedFilters,
+                filters: input.filters,
                 joinOperator: input.joinOperator,
                 schemaColumns: columns
             })
