@@ -98,7 +98,7 @@ export function EditablePAGBannerPhoto({
                         variant="ghost"
                         className="absolute top-2 right-2 p-2 bg-white shadow-md rounded-full"
                         data-testid="edit-banner-btn"
-                        disabled={session?.user?.membership?.role !== "owner"}
+                        disabled={session?.user?.membership?.role !== "owner" && session?.user?.membership?.role !== "support"}
                     >
                         <Pencil className="w-4 h-4"/>
                     </Button>
