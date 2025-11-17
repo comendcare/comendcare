@@ -116,21 +116,6 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
             ),
             enableHiding: true,
             enableColumnFilter: true,
-            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
-                const filters = [
-                    {
-                        ...filter,
-                        ...({value: filter.value === "true" ? true : false}),
-                    } as any
-                ]
-                const results = filterColumns({
-                    filters,
-                    // join operator doesn't matter in this case because there will only be one entry in the list
-                    joinOperator: 'or'
-                })
-
-                return results
-            },
             meta: {
                 label: "Visibility",
                 variant: "select",
@@ -144,6 +129,21 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     }
                 ],
                 icon: CircleDashed,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        {
+                            ...filter,
+                            ...({value: filter.value === "true" ? true : false}),
+                        } as any
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        // join operator doesn't matter in this case because there will only be one entry in the list
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
             },
         },
         {
@@ -400,27 +400,27 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
             enableSorting: false,
             enableHiding: true,
             enableColumnFilter: true,
-            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
-                const filters = [
-                    {
-                        ...filter,
-                        ...(Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
-                    } as any
-                ]
-                const results = filterColumns({
-                    filters,
-                    // join operator doesn't matter in this case because there will only be one entry in the list
-                    joinOperator: 'or'
-                })
-
-                return results
-            },
             meta: {
                 label: "Diagnoses",
                 variant: "multiSelect",
                 // options: diagnosesOptions,
                 showInAdvancedOnly: true,
                 icon: CircleDashed,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        {
+                            ...filter,
+                            ...(Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
+                        } as any
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        // join operator doesn't matter in this case because there will only be one entry in the list
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
                 onAsyncSearch: handleAsyncDiagnosesSearch
             }
         },
@@ -506,27 +506,27 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
             enableHiding: true,
             enableSorting: false,
             enableColumnFilter: true,
-            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
-                const filters = [
-                    filter,
-                    {
-                        ...filter,
-                        id: 'company.title',
-                        filterId: generateId({length: 8})
-                    }
-                ]
-                const results = filterColumns({
-                    filters,
-                    joinOperator: 'or'
-                })
-
-                return results
-            },
             meta: {
                 label: "Stored with",
                 variant: "select",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        filter,
+                        {
+                            ...filter,
+                            id: 'company.title',
+                            filterId: generateId({length: 8})
+                        }
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
                 onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
             }
         },
@@ -860,28 +860,28 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
             enableSorting: false,
             enableHiding: true,
             enableColumnFilter: true,
-            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
-                const filters = [
-                    {
-                        ...filter,
-                        ...(Array.isArray(filter.value) 
-                                ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} 
-                                : undefined)
-                    } as any
-                ]
-                const results = filterColumns({
-                    filters,
-                    // join operator doesn't matter in this case because there will only be one entry in the list
-                    joinOperator: 'or'
-                })
-
-                return results
-            },
             meta: {
                 label: "Linked projects",
                 variant: "multiSelect",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        {
+                            ...filter,
+                            ...(Array.isArray(filter.value) 
+                                    ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} 
+                                    : undefined)
+                        } as any
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        // join operator doesn't matter in this case because there will only be one entry in the list
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
                 onAsyncSearch: (query) => handleAsyncMilestoneSearch(session?.user?.organizationId, query)
             }
         },

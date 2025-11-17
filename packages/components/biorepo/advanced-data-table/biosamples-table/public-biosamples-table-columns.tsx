@@ -155,26 +155,26 @@ export function useBiosamplesTableColumns(
             enableHiding,
             enableSorting: false, // cannot sort since the org can attatch multiple conditions
             enableColumnFilter: true,
-            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
-                const filters = [
-                    {
-                        ...filter,
-                        ...(Array.isArray(filter.value) ? {value: filter.value.map(conditionOption => ({condition: {name: conditionOption}}))} : undefined),
-                    } as any
-                ]
-                const results = filterColumns({
-                    filters,
-                    // join operator doesn't matter in this case because there will only be one entry in the list
-                    joinOperator: 'or'
-                })
-
-                return results
-            },
             meta: { 
                 label: "Condition",
                 variant: "multiSelect",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        {
+                            ...filter,
+                            ...(Array.isArray(filter.value) ? {value: filter.value.map(conditionOption => ({condition: {name: conditionOption}}))} : undefined),
+                        } as any
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        // join operator doesn't matter in this case because there will only be one entry in the list
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
                 onAsyncSearch: handleAsyncConditionSearch
             }
         },
@@ -326,27 +326,27 @@ export function useBiosamplesTableColumns(
             enableHiding,
             enableSorting: false,
             enableColumnFilter: true,
-            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
-                const filters = [
-                    filter,
-                    {
-                        ...filter,
-                        id: 'company.title',
-                        filterId: generateId({length: 8})
-                    }
-                ]
-                const results = filterColumns({
-                    filters,
-                    joinOperator: 'or'
-                })
-
-                return results
-            },
             meta: {
                 label: "Stored with",
                 variant: "select",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        filter,
+                        {
+                            ...filter,
+                            id: 'company.title',
+                            filterId: generateId({length: 8})
+                        }
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
                 onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
             }
         },

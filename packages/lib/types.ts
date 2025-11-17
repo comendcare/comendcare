@@ -26,6 +26,8 @@ import type {
     Tool
 } from "@prisma/client";
 import {Prisma} from "@prisma/client";
+import { ColumnDef } from "@tanstack/react-table";
+import { ExtendedColumnFilter } from "types/data-table";
 import {z} from "zod";
 
 export const ACADEMIC_ROLES = [
