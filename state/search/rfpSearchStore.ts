@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { ASSOCIATED_CATEGORIES, Milestone } from '@comend/lib/types'
-import { getExclusiveToFirstGroup } from '@comend/lib/utils';
+import { getExclusiveToFirstGroup, sleep } from '@comend/lib/utils';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { SearchResponse } from 'typesense/lib/Typesense/Documents';
 
@@ -101,16 +101,33 @@ const sortByFilters: { [key: string]: string } = {
     "default": "sort_rank:asc",
 }
 
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  attempts = 2,          // usually 2 extra attempts
+  waitMs = 150           // small backoff
+): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    if (attempts <= 0) throw err;
+    await new Promise(r => setTimeout(r, waitMs));
+    return withRetry(fn, attempts - 1, waitMs * 2);
+  }
+}
+
 const getUpdatedSearchResults = async (
     state: any,
     isNewSearch: boolean = true
 ): Promise<{results: any[], total: number, totalPages: number}> => {
-    try {
+    const getResults = async (
+        state: any,
+        isNewSearch: boolean = true
+    ) => {
         const filtersString = generateFiltersString(state.filters)
         const searchParameters = {
             q: state.searchTerm,
             query_by: "title,description,eligibility,evaluationProcess",
-            per_page: 10,
+            per_page: 12,
             page: Math.min(state.lastFetchedPage, state.totalPages), // don't fetch any pages out of range
             ...(filtersString ? { filter_by: filtersString } : undefined),
             sort_by: sortByFilters[state.sortBy],
@@ -129,7 +146,7 @@ const getUpdatedSearchResults = async (
             return {
                 results: isNewSearch ? [] : state.searchResults,
                 total: results.found || 0,
-                totalPages: Math.ceil(results.out_of/10)
+                totalPages: Math.ceil(results.out_of/12)
             }
         }
 
@@ -151,17 +168,11 @@ const getUpdatedSearchResults = async (
         return {
             results: isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults],
             total: results.found || 0,
-            totalPages: Math.ceil(results.out_of/10)
-        };
-
-    } catch (error) {
-        console.error("Search error:", error);
-        return {
-            results: state.results || [],
-            total: state.total || 0,
-            totalPages: state.totalPages || 1,
+            totalPages: Math.ceil(results.out_of/12)
         };
     }
+
+    return await withRetry(() => getResults(state, isNewSearch))
 };
 
 export interface RFPSearchState {
