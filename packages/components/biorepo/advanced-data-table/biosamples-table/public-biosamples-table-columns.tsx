@@ -262,7 +262,7 @@ export function useBiosamplesTableColumns(
         },
         {
             id: typesenseSearch
-                ? 'instituion.name' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+                ? 'institution.name' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
                 : 'institution.name',
             accessorKey: "institution.name",
             header: ({column}) => (

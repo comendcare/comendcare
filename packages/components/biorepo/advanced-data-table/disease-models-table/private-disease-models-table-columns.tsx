@@ -1,5 +1,3 @@
-"use client";
-
 import type {ColumnDef} from "@tanstack/react-table";
 import {
     CircleDashed,
@@ -223,7 +221,7 @@ export function useDiseaseModelsTableColumns({session}: {session: Session | null
             meta: { label: "Genotype" }
         },
         {
-            id: 'instituion.name',
+            id: 'institution.name',
             accessorKey: "institution.name",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -358,7 +356,7 @@ export function useDiseaseModelsTableColumns({session}: {session: Session | null
                         {
                             ...filter,
                             ...(Array.isArray(filter.value) 
-                                    ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} 
+                                    ? {value: filter.value.map(projectOption => ({milestone: {id: projectOption}}))} 
                                     : undefined)
                         } as any
                     ]

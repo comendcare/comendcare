@@ -280,7 +280,7 @@ export const handleAsyncMilestoneSearch = async (organizationId: string | null |
         // Return the fetched options
         return data
     } catch (error) {
-        console.error("Failed to fetch institutions:", error);
+        console.error("Failed to fetch projects:", error);
         return [];
     }
 }

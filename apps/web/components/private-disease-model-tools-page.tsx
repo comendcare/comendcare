@@ -21,6 +21,7 @@ import {Lock, Globe} from "lucide-react"
 import {setDiseaseModelsVisibility} from "@/packages/lib/actions";
 import {DiseaseModelBulkImportDialog} from "./disease-model-bulk-import-dialog";
 import { Dialog, DialogPortal } from "@/packages/components/ui/dialog";
+import { Row } from "@tanstack/react-table";
 
 export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
     data: DiseaseModel[],
@@ -131,6 +132,8 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                             columns={columns}
                             searchParams={searchParams}
                             onSelectionChange={setRowSelection}
+                            onRowClickCallback={(e: any, row: Row<any> | undefined) => setEditingTool(row?.original)}
+                            showPagination={true}
                             interactiveDialog={(
                                 <Dialog 
                                     open={!!editingTool}
@@ -142,7 +145,7 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                                                 <EditAssetDialog
                                                     key={editingTool?.id}
                                                     data={editingTool} 
-                                                    type={'biosample'}
+                                                    type={'diseaseModel'}
                                                     closeDialog={() => {setEditingTool(undefined)}}
                                                 />
                                             )}

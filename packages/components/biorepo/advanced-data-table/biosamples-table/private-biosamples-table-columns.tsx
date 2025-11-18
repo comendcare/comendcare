@@ -550,7 +550,7 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                         {
                             ...filter,
                             ...(Array.isArray(filter.value) 
-                                    ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} 
+                                    ? {value: filter.value.map(projectOption => ({milestone: {id: projectOption}}))} 
                                     : undefined)
                         } as any
                     ]
