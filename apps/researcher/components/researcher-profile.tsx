@@ -116,7 +116,7 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
                                     {/*    <Mail className="w-4 h-4 mr-2" />*/}
                                     {/*    Contact*/}
                                     {/*</Button>*/}
-                                    <EditResearcherProfileDialog researcher={researcherData.researcher}/>
+                                    {researcherData?.researcher && <EditResearcherProfileDialog researcher={researcherData.researcher}/>}
                                 </div>
                             </div>
                         </div>
@@ -206,7 +206,7 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
                             </CardHeader>
                             <CardContent className="flex flex-col space-y-4">
                                 <div className="prose max-w-none">
-                                    {researcher.description ?? ""}
+                                    {researcher?.description ?? ""}
                                 </div>
 
                                 <ResearcherProfilePublicationsSection
