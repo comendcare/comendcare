@@ -2480,7 +2480,8 @@ export const getDiseaseModels = async (
         client: {};
     }>,
     input?: GetDiseaseModelSchema,
-    publicOnly: boolean = false
+    publicOnly: boolean = false,
+    columns?: ColumnDef<any>[],
 ): Promise<{data: DiseaseModel[], pageCount: number}> => {
     if (publicOnly) { // allow any requester to fetch public data
         if (organizationId) {
@@ -2492,6 +2493,7 @@ export const getDiseaseModels = async (
             return await fetchDiseaseModels(
                 organization,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -2499,6 +2501,7 @@ export const getDiseaseModels = async (
             return await fetchDiseaseModels(
                 undefined,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -2521,6 +2524,7 @@ export const getDiseaseModels = async (
             return await fetchDiseaseModels(
                 organization,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -2536,6 +2540,7 @@ const fetchDiseaseModels = async (
         query: {};
         client: {};
     }>,
+    columns?: ColumnDef<any>[] | undefined, 
     input?: GetDiseaseModelSchema,
     publicOnly: boolean = false
 ): Promise<{
@@ -2571,15 +2576,10 @@ const fetchDiseaseModels = async (
         let where: any = {};
 
         if (advancedTable) {
-            const preProcessedFilters: any = input.filters.map(filter => ({
-                ...filter,
-                ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
-                ...(filter.id === "organization.conditions" && Array.isArray(filter.value) ? {value: filter.value.map(conditionOption => ({condition: {name: conditionOption}}))} : undefined),
-            }))
-
             where = filterColumns({
-                filters: preProcessedFilters,
+                filters: input.filters,
                 joinOperator: input.joinOperator,
+                schemaColumns: columns
             })
         } else {
             const filters: any[] = []
@@ -2622,11 +2622,20 @@ const fetchDiseaseModels = async (
                 { id: { contains: input.q, mode: "insensitive" } },
                 { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
                 { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
-                { description: {contains: input.q, mode: "insensitive"}},
+                { company: {title: {contains: input.q, mode: "insensitive"} } },
                 { genotype: {contains: input.q, mode: "insensitive"}},
-                { strain: {contains: input.q, mode: "insensitive"}},
                 { organization: {name: {contains: input.q, mode: "insensitive"}}},
-                { organization: {conditions: {contains: {condition: {name: {contains: input.q, mode: "insensitive"}}}}}},
+                { organization: {
+                    conditions: {
+                        some: {
+                            condition: {
+                                name: {contains: input.q, mode: "insensitive"}}
+                            }
+                        }
+                    }
+                },
+                { description: {contains: input.q, mode: "insensitive"}},
+                { strain: {contains: input.q, mode: "insensitive"}},
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                 // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
@@ -2650,17 +2659,6 @@ const fetchDiseaseModels = async (
                     ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 },
-                // include: {
-                //     attachments: true,
-                //     contacts: true,
-                //     organization: {include: {conditions: {include: {condition: true}}}},
-                //     gene: true,
-                //     // genes: true,
-                //     institution: true,
-                //     company: true,
-                //     milestones: {include: {milestone: true}},
-                //     createFacilityRequests: true,
-                // },
                 select,
                 orderBy,
             }),
@@ -2792,14 +2790,11 @@ const fetchBiosamples = async (
         let where: any = {};
 
         if (advancedTable) {
-            console.log(`filters input`, input.filters)
             where = filterColumns({
                 filters: input.filters,
                 joinOperator: input.joinOperator,
                 schemaColumns: columns
             })
-
-            console.log(`WHERE input`, where)
         } else {
             const filters: any[] = []
             if (input.title) {
@@ -2860,7 +2855,7 @@ const fetchBiosamples = async (
                 { id: { contains: input.q, mode: "insensitive" } },
                 { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
                 { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
-                { company: {name: {contains: input.q, mode: "insensitive"} } },
+                { company: {title: {contains: input.q, mode: "insensitive"} } },
                 { genotype: {contains: input.q, mode: "insensitive"}},
                 { organization: {name: {contains: input.q, mode: "insensitive"}}},
                 { organization: {

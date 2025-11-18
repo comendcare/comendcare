@@ -1,5 +1,3 @@
-// "use client";
-
 import type {ColumnDef} from "@tanstack/react-table";
 import * as React from "react";
 import {DataTableColumnHeader} from "./../data-table/data-table-column-header";
@@ -7,7 +5,6 @@ import {BIOSAMPLE_TYPE_OPTIONS, QUANTITY_OPTIONS} from "./../../../../../package
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
-// import {usePathname} from "next/navigation";
 import { Badge } from "./../../../ui/badge";
 import { CircleDashed } from "lucide-react";
 import { handleAsyncCompanyAndInstitutionSearch, handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils";
@@ -17,20 +14,12 @@ import { generateId } from "@comend/lib/id";
 
 type Preset = "default" | "profile";
 
-// function useColumnsPreset(explicit?: Preset) {
-//     const pathname = usePathname();
-//     if (explicit) return explicit;
-//     if (pathname?.startsWith("/app/profile")) return "profile";
-//     return "default";
-// }
-
 export function useBiosamplesTableColumns(
     enableSorting: boolean = true, 
     enableHiding: boolean = true, 
     typesenseSearch: boolean = true,
     presetName?: Preset,
 ): ColumnDef<any>[] {
-    // const preset = useColumnsPreset(presetName);
     const preset = presetName || 'default'
 
     const columns: ColumnDef<any>[] = [
@@ -38,7 +27,6 @@ export function useBiosamplesTableColumns(
             id: typesenseSearch
                 ? 'sortId.id' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
                 : 'id',
-            // id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "id",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -76,38 +64,10 @@ export function useBiosamplesTableColumns(
             enableSorting,
             meta: { label: "Donor ID" },
         },
-        // {
-        //     // id: presetName === "profile" 
-        //     //     ? "types" // profile sort id
-        //     //     : "type.label", // typesense sort id: must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-        //     id: "type.label",
-        //     accessorKey: "types",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader 
-        //             className="min-w-fit text-nowrap"
-        //             column={column} 
-        //             title="Type"
-        //         />
-        //     ),
-        //     cell: ({row}) => (
-        //         <>
-        //             {(row.original.types || []).map((type: string, index: number) => {
-        //                 const typeOption = BIOSAMPLE_TYPE_OPTIONS.find(t => t.value === type)
-        //                 return (
-        //                     <MilestoneTypeBadge label={typeOption?.label} key={index}/>
-        //                 )
-        //             })}
-        //         </>
-        //     ),
-        //     enableHiding,
-        //     enableSorting,
-        //     meta: { label: "Type" }
-        // },
         {
             id: typesenseSearch
                 ? 'type.label' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
                 : 'types',
-            // id: "type.label",
             accessorKey: "types",
             header: ({column}) => (
                 <DataTableColumnHeader 

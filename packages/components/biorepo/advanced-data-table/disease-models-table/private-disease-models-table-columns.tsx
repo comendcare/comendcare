@@ -13,31 +13,18 @@ import {
 } from "./../data-table/data-table-column-header";
 import {
     DISEASE_MODEL_TYPE_OPTIONS,
-    Milestone,
 } from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
-import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
-import {useSession} from "next-auth/react";
 import { Checkbox } from "./../../../ui/checkbox";
-import { handleAsyncCompanyAndInstitutionSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch } from "./../../../../../packages/lib/utils";
+import { handleAsyncCompanyAndInstitutionSearch, handleAsyncGeneSearch, handleAsyncMilestoneSearch } from "./../../../../../packages/lib/utils";
 import Link from "next/link";
 import { Badge } from "./../../../ui/badge";
+import { Session } from "next-auth";
+import { ExtendedColumnFilter } from "@comend/lib/types/data-table";
+import { filterColumns } from "@comend/lib/filter-columns";
+import { generateId } from "@comend/lib/id";
 
-export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
-    const {data: session} = useSession()
-    // const [diagnosesOptions, setDiagnosesOptions] = useState<Option[]>([])
-
-    // useEffect(() => {
-    //     const init = async () => {
-    //         const response = await getDiagnosisTypes()
-    //         if (response.success && response.data) {
-    //             setDiagnosesOptions(response.data.map((diagnosisType: any) => ({label: diagnosisType.label, value: diagnosisType.id})))
-    //         }
-    //     }
-
-    //     init()
-    // }, [])
-
+export function useDiseaseModelsTableColumns({session}: {session: Session | null}): ColumnDef<any>[] {
     const columns: ColumnDef<any>[] = [
         {
             id: "select",
@@ -115,6 +102,21 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     }
                 ],
                 icon: CircleDashed,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        {
+                            ...filter,
+                            ...({value: filter.value === "true" ? true : false}),
+                        } as any
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        // join operator doesn't matter in this case because there will only be one entry in the list
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
             },
         },
         {
@@ -134,9 +136,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 </div>
             ),
             enableHiding: true,
-            meta: {
-                label: "Model ID"
-            }
+            meta: { label: "Model ID" }
         },
         {
             id: "types",
@@ -178,9 +178,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 />
             ),
             enableHiding: true,
-            meta: {
-                label: "Strain"
-            }
+            meta: { label: "Strain" }
         },
         {
             id: "gene.symbol",
@@ -222,44 +220,8 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 />
             ),
             enableHiding: true,
-            meta: {
-                label: "Genotype"
-            }
+            meta: { label: "Genotype" }
         },
-        // {
-        //     id: "phenotype",
-        //     accessorKey: "phenotype",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Phenotype"/>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Phenotype",
-        //     }
-        // },
-        // {
-        //     id: "patientId",
-        //     accessorKey: "patientId",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Linked Patient ID"/>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Linked Patient ID",
-        //     }
-        // },
-        // {
-        //     id: "availability",
-        //     accessorKey: "availability",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Availability"/>
-        //     ),
-        //     enableHiding: true,
-        //     enableColumnFilter: true,
-        //     meta: {
-        //         label: "Availability",
-        //     }
-        // },
         {
             id: 'instituion.name',
             accessorKey: "institution.name",
@@ -282,12 +244,29 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 )
             },
             enableHiding: true,
+            enableSorting: false,
             enableColumnFilter: true,
             meta: {
                 label: "Stored with",
                 variant: "select",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        filter,
+                        {
+                            ...filter,
+                            id: 'company.title',
+                            filterId: generateId({length: 8})
+                        }
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
                 onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
             }
         },
@@ -312,9 +291,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             ),
             enableSorting: false,
             enableHiding: true,
-            meta: {
-                label: "Point of contact"
-            }
+            meta: { label: "Point of contact" }
         },
         {
             id: "links",
@@ -344,27 +321,8 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
             ),
             enableSorting: false,
             enableHiding: true,
-            meta: {
-                label: "Links"
-            }
+            meta: { label: "Links" }
         },
-
-        // {
-        //     id: "condition",
-        //     accessorKey: "condition",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader column={column} title="Condition"/>
-        //     ),
-        //     cell: ({row}) => (
-        //         <div className="flex gap-2 items-center">
-        //             <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
-        //         </div>
-        //     ),
-        //     enableHiding: true,
-        //     meta: {
-        //         label: "Condition"
-        //     }
-        // },
         {
             id: "milestones",
             accessorKey: "milestones",
@@ -395,6 +353,23 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                 variant: "multiSelect",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        {
+                            ...filter,
+                            ...(Array.isArray(filter.value) 
+                                    ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} 
+                                    : undefined)
+                        } as any
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        // join operator doesn't matter in this case because there will only be one entry in the list
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
                 onAsyncSearch: (query) => handleAsyncMilestoneSearch(session?.user?.organizationId, query)
             }
         },
@@ -413,9 +388,7 @@ export function useDiseaseModelsTableColumns(): ColumnDef<any>[] {
                     {row.original.description}
                 </div>
             ),
-            meta: {
-                label: "Notes"
-            },
+            meta: { label: "Notes" },
             enableHiding: true,
         },
         {

@@ -1,5 +1,3 @@
-"use client";
-
 import type {ColumnDef} from "@tanstack/react-table";
 import {CircleDashed} from "lucide-react";
 import * as React from "react";
@@ -8,18 +6,13 @@ import {DISEASE_MODEL_TYPE_OPTIONS} from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
-import {usePathname} from "next/navigation";
 import { Badge } from "./../../../ui/badge";
 import { handleAsyncCompanyAndInstitutionSearch, handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils";
+import { ExtendedColumnFilter } from "@comend/lib/types/data-table";
+import { filterColumns } from "@comend/lib/filter-columns";
+import { generateId } from "@comend/lib/id";
 
 type Preset = "default" | "profile";
-
-function useColumnsPreset(explicit?: Preset) {
-    const pathname = usePathname();
-    if (explicit) return explicit;
-    if (pathname?.startsWith("/app/profile")) return "profile";
-    return "default";
-}
 
 export function useDiseaseModelsTableColumns(
     enableSorting: boolean = true, 
@@ -27,14 +20,13 @@ export function useDiseaseModelsTableColumns(
     typesenseSearch: boolean = true,
     presetName?: Preset,
 ): ColumnDef<any>[] {
-    const preset = useColumnsPreset(presetName);
+     const preset = presetName || 'default'
 
     const columns: ColumnDef<any>[] = [
         {
             id: typesenseSearch
                 ? 'sortId.id' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
                 : 'id',
-            // id: "sortId.id", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "id",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -56,7 +48,6 @@ export function useDiseaseModelsTableColumns(
             id: typesenseSearch
                 ? 'type.label' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
                 : 'types',
-            // id: "type.label", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "types",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -105,7 +96,7 @@ export function useDiseaseModelsTableColumns(
             id: typesenseSearch
                 ? 'condition.name' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
                 : 'organization.conditions',
-            accessorKey: "condition",
+            accessorKey: "organization.conditions",
             header: ({column}) => (
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
@@ -126,6 +117,21 @@ export function useDiseaseModelsTableColumns(
                 variant: "multiSelect",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        {
+                            ...filter,
+                            ...(Array.isArray(filter.value) ? {value: filter.value.map(conditionOption => ({condition: {name: conditionOption}}))} : undefined),
+                        } as any
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        // join operator doesn't matter in this case because there will only be one entry in the list
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
                 onAsyncSearch: handleAsyncConditionSearch
             }
         },
@@ -178,7 +184,7 @@ export function useDiseaseModelsTableColumns(
         },
         {
             id: "organization.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
-            accessorKey: "organization",
+            accessorKey: "organization.name",
             header: ({column}) => (
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
@@ -217,8 +223,10 @@ export function useDiseaseModelsTableColumns(
             }
         },
         {
-            id: "institution.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
-            accessorKey: "institution",
+            id: typesenseSearch
+                ? 'instituion.name' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+                : 'institution.name',
+            accessorKey: "institution.name",
             header: ({column}) => (
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
@@ -238,13 +246,29 @@ export function useDiseaseModelsTableColumns(
                 )
             },
             enableHiding,
-            enableSorting,
+            enableSorting: false,
             enableColumnFilter: true,
             meta: {
                 label: "Stored with",
                 variant: "select",
                 icon: CircleDashed,
                 showInAdvancedOnly: true,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        filter,
+                        {
+                            ...filter,
+                            id: 'company.title',
+                            filterId: generateId({length: 8})
+                        }
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
                 onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
             }
         },

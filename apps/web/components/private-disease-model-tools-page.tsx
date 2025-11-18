@@ -27,8 +27,8 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
     pageCount: number,
     searchParams: SearchParams
 }) => {
-    const columns = useDiseaseModelsTableColumns()
     const {data: session} = useSession()
+    const columns = useDiseaseModelsTableColumns({session})
     const [rowSelection, setRowSelection] = useState<Object[]>([])
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1100)
