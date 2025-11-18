@@ -3220,16 +3220,20 @@ const fetchClinicalDatsets = async (
             // custom filtering for types - if any of the type labels include the query, include biosamples
             // with these types
             const queriedTypes = TOOL_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+            const queriedGenes = await prisma.gene.findMany({
+                where: {
+                    symbol: {contains: input.q, mode: "insensitive"}
+                }
+            })
+            const geneSymbols = queriedGenes?.map(gene => gene.symbol)
 
             where.OR = [
                 { id: { contains: input.q, mode: "insensitive" } },
                 { title: {contains: input.q, mode: "insensitive"}},
                 { description: {contains: input.q, mode: "insensitive"}},
-                // { 
-                //     genes: {
-                //         symbol: {contains: input.q, mode: "insensitive"}
-                //     }
-                // },
+                { genes: {
+                    hasSome: geneSymbols // matches any symbol in the array
+                }},
                 { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
                 { company: {title: {contains: input.q, mode: "insensitive"} } },
                 { organization: {name: {contains: input.q, mode: "insensitive"}}},
@@ -3242,7 +3246,6 @@ const fetchClinicalDatsets = async (
                         }
                     }
                 },
-
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                 // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
@@ -3277,13 +3280,6 @@ const fetchClinicalDatsets = async (
                 }
             }),
         ]);
-
-        // Filter for genes after fetching
-        // if (input.q) {
-        //     const filteredTools = data.filter(tool =>
-        //         tool.genes.some(gene => gene.toLowerCase().includes(input.q.toLowerCase()))
-        //     );
-        // }
 
         const pageCount = Math.ceil(total / input.perPage);
         return {data, pageCount};
