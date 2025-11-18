@@ -7,6 +7,7 @@ import { getBiosamples, getClinicalDatasets } from "@/packages/lib/fetchers"
 import { biosampleSearchParamsCache } from "@/packages/lib/validations"
 import { BiosampleMarketplacePage } from "~researcher/components/marketplace/biosample-tools-page"
 import { ClinicalDatasetMarketplacePage } from "~researcher/components/marketplace/clinical-dataset-tools-page"
+import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,8 @@ export default async function ClinicalDatasetsToolsPage(props: IndexPageProps) {
     const search = biosampleSearchParamsCache.parse(searchParams);
     const validFilters = getValidFilters(search.filters);
     const globalFilter = search.q ?? "";
+
+    const columns = useClinicalDatasetsTableColumns(true, true, false)
 
     const {data, pageCount} = await getClinicalDatasets(
         undefined,
@@ -49,7 +52,8 @@ export default async function ClinicalDatasetsToolsPage(props: IndexPageProps) {
             milestones: {include: {milestone: true}},
         },
         {...search, q: globalFilter, filters: validFilters},
-        true // public only
+        true, // public only
+        columns
     )
 
     return (

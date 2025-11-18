@@ -3075,7 +3075,8 @@ export const getClinicalDatasets = async (
         client: {};
     }>,
     input?: GetClinicalDatasetsSchema,
-    publicOnly: boolean = false
+    publicOnly: boolean = false,
+    columns?: ColumnDef<any>[],
 ): Promise<{data: Tool[], pageCount: number}> => {
     if (publicOnly) { // allow any requester to fetch public data
         if (organizationId) {
@@ -3086,6 +3087,7 @@ export const getClinicalDatasets = async (
             return await fetchClinicalDatsets(
                 organization,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -3093,6 +3095,7 @@ export const getClinicalDatasets = async (
             return await fetchClinicalDatsets(
                 undefined,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -3115,6 +3118,7 @@ export const getClinicalDatasets = async (
             return await fetchClinicalDatsets(
                 organization,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -3130,6 +3134,7 @@ const fetchClinicalDatsets = async (
         query: {};
         client: {};
     }>,
+    columns?: ColumnDef<any>[] | undefined,
     input?: GetClinicalDatasetsSchema,
     publicOnly: boolean = false
 ): Promise<{
@@ -3165,14 +3170,10 @@ const fetchClinicalDatsets = async (
         let where: any = {};
 
         if (advancedTable) {
-            const preProcessedFilters: any = input.filters.map(filter => ({
-                ...filter,
-                ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
-            }))
-
             where = filterColumns({
-                filters: preProcessedFilters,
+                filters: input.filters,
                 joinOperator: input.joinOperator,
+                schemaColumns: columns
             })
         } else {
             const filters: any[] = []
@@ -3223,9 +3224,25 @@ const fetchClinicalDatsets = async (
             where.OR = [
                 { id: { contains: input.q, mode: "insensitive" } },
                 { title: {contains: input.q, mode: "insensitive"}},
-                { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
-                { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
                 { description: {contains: input.q, mode: "insensitive"}},
+                // { 
+                //     genes: {
+                //         symbol: {contains: input.q, mode: "insensitive"}
+                //     }
+                // },
+                { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                { company: {title: {contains: input.q, mode: "insensitive"} } },
+                { organization: {name: {contains: input.q, mode: "insensitive"}}},
+                { organization: {
+                    conditions: {
+                        some: {
+                            condition: {
+                                name: {contains: input.q, mode: "insensitive"}}
+                            }
+                        }
+                    }
+                },
+
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                 // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
@@ -3260,6 +3277,13 @@ const fetchClinicalDatsets = async (
                 }
             }),
         ]);
+
+        // Filter for genes after fetching
+        // if (input.q) {
+        //     const filteredTools = data.filter(tool =>
+        //         tool.genes.some(gene => gene.toLowerCase().includes(input.q.toLowerCase()))
+        //     );
+        // }
 
         const pageCount = Math.ceil(total / input.perPage);
         return {data, pageCount};
