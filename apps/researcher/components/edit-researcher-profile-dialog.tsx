@@ -43,7 +43,7 @@ import {badgeVariants} from "@/packages/components/ui/badge";
 import LoadingDots from "@/packages/components/icons/loading-dots";
 import {EnrichedResearcher} from "~researcher/types/types";
 import {Textarea} from "@/packages/components/ui/textarea";
-import {mapTitleToValue} from "~researcher/lib/utils";
+import {mapTitleToValue, TitleEnum} from "~researcher/lib/utils";
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
     ...option,
