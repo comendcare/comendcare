@@ -1,6 +1,7 @@
 import {ACADEMIC_ROLES} from "@/packages/lib/types";
 import z from "zod";
-import { TitleEnum } from "~researcher/components/edit-researcher-profile-dialog";
+
+export const TitleEnum = z.enum(["researcher", "pm", "pi", "student", "other"]);
 
 export const mapTitleToValue = (title?: string | null): z.infer<typeof TitleEnum> | undefined => {
     if (!title) return undefined;

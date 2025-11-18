@@ -50,8 +50,6 @@ export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(opti
     value: option.id,
 }));
 
-export const TitleEnum = z.enum(["researcher", "pm", "pi", "student", "other"]);
-
 const formSchema = z.object({
     name: z.string().min(2),
     title: z.preprocess(
