@@ -1,13 +1,13 @@
 "use client";
 
 import * as React from "react";
-import {DataTable} from "./../data-table/data-table";
-import {useDataTable} from "./../../../../../packages/lib/hooks/use-data-table";
+import {DataTable} from "../data-table/data-table";
+import {useDataTable} from "@comend/lib/hooks/use-data-table";
 import {ColumnDef, Row} from "@tanstack/react-table";
 import type {Biosample, Tool} from "@prisma/client";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 import { useBiosampleSearchStore } from "../../../../../state/search/biosampleSearchStore";
-import {DataTableToolbar} from "./../data-table/data-table-toolbar";
+import {DataTableToolbar} from "../data-table/data-table-toolbar";
 
 export function TypesenseBiosamplesTable({
     data, 

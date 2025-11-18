@@ -4,12 +4,12 @@ import { Database, Rat, TestTubeDiagonal } from "lucide-react";
 import { cn, sleep } from "@comend/lib/utils";
 import { useEffect, useState } from "react";
 import { Button } from "@/packages/components/ui/button";
-import { DatabaseBiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table";
+import { DatabaseBiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/database-biosamples-table";
 import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
 import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns";
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
-import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/private-disease-models-table";
-import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/private-clinical-datasets-table";
+import { DatabaseDiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/database-disease-models-table";
+import { DatabaseClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/database-clinical-datasets-table";
 import { SearchParams } from "@/packages/components/types";
 import type { Organization, Biosample, DiseaseModel, Tool } from "@prisma/client";
 import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
@@ -185,7 +185,6 @@ export const PAGProfileToolsCard = ({
                                             pageCount={biosamplesPageCount}
                                             columns={biosampleColumns}
                                             searchParams={{}}
-                                            interactive={false}
                                             showPagination={toolCounts.biosampleCount > 10}
                                             noResultsOverride={false}
                                         />
@@ -195,12 +194,11 @@ export const PAGProfileToolsCard = ({
                             {(section === 'disease-models' && toolCounts.diseaseModelCount > 0) && (
                                 <div className="max-w-7xl w-full overflow-auto">
                                     <FeatureFlagsProvider showFilters={false}>
-                                        <DiseaseModelsTable
+                                        <DatabaseDiseaseModelsTable
                                             data={diseaseModels as any[] || []}
                                             pageCount={diseaseModelsPageCount}
                                             columns={diseaseModelColumns}
                                             searchParams={{}}
-                                            interactive={false}
                                             showPagination={toolCounts.diseaseModelCount > 10}
                                             noResultsOverride={false}
                                         />
@@ -210,12 +208,11 @@ export const PAGProfileToolsCard = ({
                             {(section === 'clinical-datasets' && toolCounts.clinicalDatasetCount > 0) && (
                                 <div className="max-w-7xl w-full overflow-auto">
                                     <FeatureFlagsProvider showFilters={false}>
-                                        <ClinicalDatasetsTable
+                                        <DatabaseClinicalDatasetsTable
                                             data={clinicalDatasets || []}
                                             pageCount={clinicalDatasetsPageCount}
                                             columns={clinicalDatasetColumns}
                                             searchParams={{}}
-                                            interactive={false}
                                             showPagination={toolCounts.clinicalDatasetCount > 10}
                                             noResultsOverride={false}
                                         />
