@@ -1,5 +1,3 @@
-"use client";
-
 import type { ColumnDef, Row } from "@tanstack/react-table";
 import {
   CircleDashed,
@@ -14,12 +12,16 @@ import { TOOL_TYPE_OPTIONS } from "./../../../../../packages/lib/types";
 import { MilestoneTypeBadge } from "./../../../milestone-type-badge";
 import { AssetActionsMenu } from "comend-pag-platform/components/tool-actions-menu";
 import { Checkbox } from "./../../../ui/checkbox";
-import { handleAsyncCompanyAndInstitutionSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch } from "./../../../../../packages/lib/utils";
+import { handleAsyncCompanyAndInstitutionSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch } from "./../../../../../packages/lib/utils";
 import Link from "next/link";
 import { Badge } from "./../../../ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./../../../ui/tooltip";
+import { Session } from "next-auth";
+import { ExtendedColumnFilter } from "@comend/lib/types/data-table";
+import { filterColumns } from "@comend/lib/filter-columns";
+import { generateId } from "@comend/lib/id";
 
-export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
+export function getClinicalDatasetsTableColumns({session}: {session: Session | null}): ColumnDef<any>[] {
   const columns: ColumnDef<any>[] = [
     {
         id: "select",
@@ -93,6 +95,21 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 }
             ],
             icon: CircleDashed,
+            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                const filters = [
+                    {
+                        ...filter,
+                        ...({value: filter.value === "true" ? true : false}),
+                    } as any
+                ]
+                const results = filterColumns({
+                    filters,
+                    // join operator doesn't matter in this case because there will only be one entry in the list
+                    joinOperator: 'or'
+                })
+
+                return results
+            },
         },
     },
     {
@@ -111,19 +128,16 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             </div>
         ),
         enableHiding: true,
-        meta: {
-            label: "Dataset ID"
-        }
+        meta: { label: "Dataset ID" }
     },
     {
-      id: "title",
-      accessorKey: "title",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Title" />
-      ),
-      meta: {
-        label: "Title",
-      },
+        id: "title",
+        accessorKey: "title",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Title" />
+        ),
+        meta: { label: "Title" },
+        enableColumnFilter: false,
     },
     {
         id: "types",
@@ -164,9 +178,7 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             }</>
         ),
         enableHiding: true,
-        meta: {
-            label: "Cohort size"
-        }
+        meta: { label: "Cohort size" }
     },
     {
         id: "genes",
@@ -182,35 +194,12 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         enableSorting: false,
         meta: {
             label: "Genes",
-            variant: "select",
+            variant: "multiSelect",
             icon: CircleDashed,
             showInAdvancedOnly: true,
             onAsyncSearch: handleAsyncGeneSearch
         }
     },
-    // {
-    //     id: "patientId",
-    //     accessorKey: "patientId",
-    //     header: ({column}) => (
-    //         <DataTableColumnHeader column={column} title="Linked Patient ID"/>
-    //     ),
-    //     enableHiding: true,
-    //     meta: {
-    //         label: "Linked Patient ID",
-    //     }
-    // },
-    // {
-    //     id: "availability",
-    //     accessorKey: "availability",
-    //     header: ({column}) => (
-    //         <DataTableColumnHeader column={column} title="Availability"/>
-    //     ),
-    //     enableHiding: true,
-    //     enableColumnFilter: true,
-    //     meta: {
-    //         label: "Availability",
-    //     }
-    // },
     {
         id: "institution.name",
         accessorKey: "institution.name",
@@ -229,12 +218,29 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
             )
         },
         enableHiding: true,
+        enableSorting: false,
         enableColumnFilter: true,
         meta: {
             label: "Stored with",
             variant: "select",
             icon: CircleDashed,
             showInAdvancedOnly: true,
+            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                const filters = [
+                    filter,
+                    {
+                        ...filter,
+                        id: 'company.title',
+                        filterId: generateId({length: 8})
+                    }
+                ]
+                const results = filterColumns({
+                    filters,
+                    joinOperator: 'or'
+                })
+
+                return results
+            },
             onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
         }
     },
@@ -253,9 +259,9 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 ))}
             </ul>
         ),
-        meta: { label: "Point of contact" },
         enableSorting: false,
         enableHiding: true,
+        meta: { label: "Point of contact" }
     },
     {
         id: "links",
@@ -283,23 +289,6 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         enableSorting: false,
         enableHiding: true,
     },
-
-    // {
-    //     id: "condition",
-    //     accessorKey: "condition",
-    //     header: ({column}) => (
-    //         <DataTableColumnHeader column={column} title="Condition"/>
-    //     ),
-    //     cell: ({row}) => (
-    //         <div className="flex gap-2 items-center">
-    //             <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
-    //         </div>
-    //     ),
-    //     enableHiding: true,
-    //     meta: {
-    //         label: "Condition"
-    //     }
-    // },
     {
         accessorKey: "milestones",
         header: ({ column }) => (
@@ -317,17 +306,45 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
                 ))}
             </ul>
         ),
-        meta: { label: "Linked projects" },
         enableSorting: false,
         enableHiding: true,
+        enableColumnFilter: true,
+        meta: {
+            label: "Linked projects",
+            variant: "multiSelect",
+            icon: CircleDashed,
+            showInAdvancedOnly: true,
+            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                const filters = [
+                    {
+                        ...filter,
+                        ...(Array.isArray(filter.value) 
+                                ? {value: filter.value.map(projectOption => ({milestone: {id: projectOption}}))} 
+                                : undefined)
+                    } as any
+                ]
+                const results = filterColumns({
+                    filters,
+                    // join operator doesn't matter in this case because there will only be one entry in the list
+                    joinOperator: 'or'
+                })
+
+                return results
+            },
+            onAsyncSearch: (query) => handleAsyncMilestoneSearch(session?.user?.organizationId, query)
+        }
     },
     {
         id: "description",
         accessorKey: "description",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Notes" />
+        header: ({column}) => (
+            <DataTableColumnHeader 
+                className="min-w-fit text-nowrap"
+                column={column} 
+                title="Notes"
+            />
         ),
-        cell: ({ row }) => (
+        cell: ({row}) => (
             <div className="line-clamp-3">
                 {row.original.description}
             </div>
@@ -339,7 +356,11 @@ export function getClinicalDatasetsTableColumns(): ColumnDef<any>[] {
         id: "notes",
         accessorKey: "notes",
         header: ({column}) => (
-            <DataTableColumnHeader column={column} title="Internal notes"/>
+            <DataTableColumnHeader 
+                className="min-w-fit text-nowrap"
+                column={column} 
+                title="Internal notes"
+            />
         ),
         cell: ({row}) => (
             <div className="line-clamp-3">

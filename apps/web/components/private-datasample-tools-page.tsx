@@ -22,8 +22,8 @@ import { Asset } from "@/packages/lib/types";
 import { Row } from "@tanstack/react-table";
 
 export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
-    const columns = getClinicalDatasetsTableColumns()
     const {data: session} = useSession()
+    const columns = getClinicalDatasetsTableColumns({session})
     const [rowSelection, setRowSelection] = useState<Object[]>([])
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1100)

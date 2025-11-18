@@ -52,7 +52,6 @@ export function useClinicalDatasetsTableColumns(
         id: typesenseSearch
             ? 'title.title' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             : 'title',
-        // id: "title.title", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "title",
         header: ({ column }) => (
             <DataTableColumnHeader 
