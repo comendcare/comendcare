@@ -32,7 +32,7 @@ export function DatabaseBiosamplesTable({
     showFilters?: boolean,
     showPagination?: boolean,
     interactive?: boolean,
-    noResultsOverride?: boolean,
+    noResultsOverride?: React.ReactNode,
     interactiveDialog?: React.ReactNode
 }) {
     const {enableAdvancedFilter, filterFlag} = useFeatureFlags()
@@ -64,7 +64,7 @@ export function DatabaseBiosamplesTable({
                 table={table}
                 showPagination={showPagination}
                 noResults={
-                    (noResultsOverride && data.length === 0 && Object.keys(searchParams).length === 0) 
+                    (data.length === 0 && Object.keys(searchParams).length === 0) 
                     ? (
                         // <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
                         //     <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
@@ -81,7 +81,7 @@ export function DatabaseBiosamplesTable({
                         //         {interactive && <NewToolDialog type={"biosample"}/>}
                         //     </div>
                         // </div>
-                        <></>
+                        <>{!!noResultsOverride && noResultsOverride}</>
                     )
                     : undefined
                 }

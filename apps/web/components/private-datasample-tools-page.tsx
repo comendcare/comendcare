@@ -20,6 +20,7 @@ import { Dialog } from "@comend/components/ui/dialog";
 import { DialogPortal } from "@comend/components/plate-ui/dialog";
 import { Asset } from "@comend/lib/types";
 import { Row } from "@tanstack/react-table";
+import Image from "next/image";
 
 export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
     const {data: session} = useSession()
@@ -127,6 +128,23 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                         searchParams={searchParams}
                         onSelectionChange={setRowSelection}
                         onRowClickCallback={(e: any, row: Row<any> | undefined) => setEditingTool(row?.original)}
+                        noResultsOverride={(
+                            <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
+                                <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
+                                    <h1 className="font-cal text-4xl">You do not have any Data Tools</h1>
+                                    <Image
+                                        alt="No Data Tools"
+                                        src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                                        width={300}
+                                        height={300}
+                                    />
+                                    <p className="text-lg text-stone-500">
+                                        A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
+                                    </p>
+                                    <NewToolDialog type={"data"}/>
+                                </div>
+                            </div>
+                        )}
                         interactiveDialog={(
                             <Dialog 
                                 open={!!editingTool}

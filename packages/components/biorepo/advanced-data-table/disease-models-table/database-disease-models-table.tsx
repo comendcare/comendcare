@@ -37,7 +37,7 @@ export function DatabaseDiseaseModelsTable({
     searchParams: SearchParams,
     showFilters?: boolean,
     showPagination?: boolean,
-    noResultsOverride?: boolean,
+    noResultsOverride?: React.ReactNode,
     interactiveDialog?: React.ReactNode
 }) {
     const {enableAdvancedFilter, filterFlag} = useFeatureFlags()
@@ -68,24 +68,9 @@ export function DatabaseDiseaseModelsTable({
                 table={table}
                 showPagination={showPagination}
                 noResults={
-                    (noResultsOverride && data.length === 0 && Object.keys(searchParams).length === 0) 
+                    (data.length === 0 && Object.keys(searchParams).length === 0) 
                     ? (
-                        // <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
-                        //     <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
-                        //         <h1 className="font-cal text-4xl">You do not have any Disease Model Tools</h1>
-                        //         <Image
-                        //             alt="No Disease Model Tools"
-                        //             src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                        //             width={300}
-                        //             height={300}
-                        //         />
-                        //         <p className="text-lg text-stone-500">
-                        //             A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
-                        //         </p>
-                        //         {interactive && <NewToolDialog type={"diseaseModel"}/>}
-                        //     </div>
-                        // </div>
-                        <></>
+                        <>{!!noResultsOverride && noResultsOverride}</>
                     )
                     : undefined
                 }
