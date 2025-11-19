@@ -61,7 +61,22 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
         yearsActive: openAlex.counts_by_year ? openAlex.counts_by_year.length : 0
     };
 
-    const researchInterests = openAlex?.topics?.map((topic: any) => topic.display_name) || [];
+    const researchInterests: string[] = Array.from(
+        new Set(
+            [
+                // OpenAlex topics
+                ...(openAlex?.topics?.map((topic: any) => topic.display_name) ?? []),
+
+                // Merged researchInterests (keeps your fallback behavior)
+                ...(mergedFields.researchInterests ?? []),
+
+                // Extra arrays from your Prisma Researcher
+                ...(researcher?.therapeuticsOfInterest ?? []),
+                ...(researcher?.conditionsOfInterest ?? []),
+                ...(researcher?.genesOfInterest ?? []),
+            ].filter(Boolean)
+        )
+    );
 
     const coAuthors = (openAlex?.display_name_alternatives || []).slice(0, 5).map((name: string, index: number) => ({
         name,

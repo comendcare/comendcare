@@ -55,8 +55,8 @@ const userFormSchema = z.object({
     title: z.string().optional(),
     website: z.string().optional(),
     country: z.string(),
-    description: z.string().min(2, {
-        message: "Your profile's description must be at least 2 characters long.",
+    description: z.string().min(50, {
+        message: "Your profile's description must be at least 50 characters long.",
     }).max(500, {
         message: "Your profile's description must less than 500 characters long.",
     }).optional(),
@@ -430,7 +430,9 @@ export default function ResearcherOnboardingForm() {
                         name="description"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>Describe your research in a few sentences.</FormLabel>
+                                <FormLabel>
+                                    Describe your research in a few sentences.
+                                </FormLabel>
                                 <FormControl>
                                     <Textarea
                                         rows={4}
