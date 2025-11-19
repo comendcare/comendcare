@@ -18,7 +18,7 @@ import {PAGProfileConditionsCard} from "~web/components/pag-profile-conditions-c
 import {FloatingDock} from "~web/components/floating-dock";
 import ShareDialog from "~web/components/share-dialog";
 import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
-import {PAGProfileRFPsHoverableCard} from "~web/components/pag-profile-rfps-card";
+import {PAGProfileRFPsHoverableCard} from "@comend/components/pag-profile-rfps-card";
 import React from "react";
 import UnpublishedOrganizationPage from "~web/components/unpublished-organization-page";
 import {Mail, Share} from "lucide-react";

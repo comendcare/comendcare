@@ -16,7 +16,7 @@ import {
     HeartHandshake
 } from "lucide-react";
 import {Milestone} from "@comend/lib/types";
-import {PropertyBadge} from "comend-pag-platform/components/property-badge";
+import {PropertyBadge} from "@comend/components/property-badge";
 import AdminCROCardDropdownMenu from "./admin-cro-card-dropdown-menu";
 import ImageWithFallback from "@comend/components/image-with-fallback";
 import type {Company} from "@prisma/client";

@@ -18,14 +18,14 @@ import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
-import { CROMarketplaceCard } from "~web/components/marketplace/marketplace-cro-card"
-import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card"
+import { CROMarketplaceCard } from "@comend/components/marketplace/marketplace-cro-card"
+import { OrganizationMarketplaceCard } from "@comend/components/marketplace/marketplace-pag-card"
 import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeRFPSearch } from "@comend/lib/initialize-client-state"
-import { RFPCard } from "~web/components/rfp-card"
+import { RFPCard } from "@comend/components/rfp-card"
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
 import { Dialog, DialogContent, DialogTrigger } from "@comend/components/ui/dialog"
 import { mixpanelTrack } from "@comend/lib/mixpanel"
-import { RFPDetails } from "~web/components/pag-profile-rfps-card"
+import { RFPDetails } from "@comend/components/pag-profile-rfps-card"
 
 const croSelector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,

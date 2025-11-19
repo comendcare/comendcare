@@ -1,54 +1,53 @@
 "use client"
 
 import React, {useEffect, useState} from "react"
-import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card";
-import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
+import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore";
 import { useShallow } from "zustand/react/shallow";
-import { OrganizationMarketplaceListElement } from "../marketplace-pag-list-element";
 import InfiniteScroll from "@comend/components/ui/infinite-scroll";
+import {CROMarketplaceCard} from "@comend/components/marketplace/marketplace-cro-card";
+import {CROMarketplaceListElement} from "@comend/components/marketplace-cro-list-element";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
-import {getSavedOrganizationsFromOrganizationId} from "@comend/lib/fetchers";
-import {SavedOrganization} from "@prisma/client";
 import {useSession} from "next-auth/react";
+import {getSavedCompaniesFromOrganizationId} from "@comend/lib/fetchers";
+import {SavedCompany} from "@prisma/client";
 import { LoaderCircle } from "lucide-react";
 import { cn } from "@comend/lib/utils";
 
-const selector = (state: OrganizationSearchState) => ({
+const selector = (state: CROSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
     setLastFetchedPage: state.setLastFetchedPage,
     view: state.view,
     searchResults: state.searchResults,
-    totalResults: state.totalResults,
+    totalResults: state.totalResults
 })
 
-export function OrganizationSearchResults({isPublic}: {isPublic: boolean}) {
+export function CROSearchResults() {
     const {data: session, status} = useSession()
-    const { lastFetchedPage, setLastFetchedPage, view, searchResults, totalResults } = useOrganizationSearchStore(useShallow(selector))
-    const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
+    const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
+    const {
+        lastFetchedPage, 
+        setLastFetchedPage, 
+        view, 
+        searchResults,
+        totalResults
+    } = useCROSearchStore(useShallow(selector))
 
     useEffect(() => {
-        async function fetchData() {
-            const savedOrganizationsResponse = await getSavedOrganizationsFromOrganizationId(session?.user?.organizationId || undefined, {
-                id: true,
-                organizationId: true,
-                organization: true,
-                savedOrganizationId: true,
-                savedOrganization: true,
-                updatedAt: true,
-                createdAt: true,
-                metadata: true
+        async function fetchSavedCompanies() {
+            if (status === "authenticated" && !session?.user?.organizationId) return;
+
+            const res = await getSavedCompaniesFromOrganizationId(session?.user.organizationId, {
+                companyId: true,
             });
-            if (savedOrganizationsResponse.success) {
-                const savedOrganizationData = savedOrganizationsResponse.data as SavedOrganization[];
-                setSavedOrganizationIds(new Set(savedOrganizationData.map((c: SavedOrganization) => c.savedOrganizationId)));
-            } else {
-                console.error(savedOrganizationsResponse.error);
+
+            if (res.success && res.data) {
+                setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
             }
         }
 
-        fetchData();
-    }, [session, status])
+        fetchSavedCompanies();
+    }, [session?.user.organizationId, status]);
 
     if (!searchResults) {
         return (
@@ -69,8 +68,8 @@ export function OrganizationSearchResults({isPublic}: {isPublic: boolean}) {
         if (view === "list") {
             return (
                 <ol className="w-full flex flex-col gap-4">
-                    {searchResults.map((organization, index) => (
-                        <OrganizationMarketplaceListElement organization={organization} key={index} isPublic={isPublic} />
+                    {searchResults.map((cro, index) => (
+                        <CROMarketplaceListElement cro={cro} key={index}/>
                     ))}
                 </ol>
             )
@@ -83,12 +82,12 @@ export function OrganizationSearchResults({isPublic}: {isPublic: boolean}) {
                     <NoResultsView />
                 ): (
                     <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
-                        {searchResults.map((organization, index) => (
-                            <OrganizationMarketplaceCard
-                                organization={organization}
+                        {searchResults.map((cro, index) => (
+                            <CROMarketplaceCard
+                                cro={cro}
                                 key={index}
-                                isPublic={isPublic}
-                                savedOrganizationIds={savedOrganizationIds}
+                                location={"Marketplace"}
+                                savedCompanyIds={savedCompanyIds}
                             />
                         ))}
                     </div>

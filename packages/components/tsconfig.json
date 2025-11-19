@@ -11,7 +11,7 @@
         // "@comend/lib/*": ["lib/*"],
         // "@/components/*": ["components/*"],
         // "@/*": ["packages/*"],
-        "@/state/*": ["state/*"],
+        "@/state/*": ["../../state/*"],
         "@/public/*": ["../../public/*"]
         // "@/data/*": ["data/*"],
         // "@/public/*": ["public/*"],

@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@come
 import Link from "next/link";
 import { Badge } from "@comend/components/ui/badge";
 import { ProfilePhoto } from "@comend/components/profile-photo";
-import { Building2, HandCoins, Calendar, CircleDollarSign } from "lucide-react";
+import { Building2, CircleDollarSign } from "lucide-react";
 
 export function OrganizationMarketplaceListElement({ organization, isPublic = false }: { organization: any, isPublic?: boolean }) {
     return (

@@ -2,7 +2,7 @@ import {PagProfileAboutCard} from "~web/components/pag-profile-about-card";
 import {formatMoney, standardizeYear} from "@comend/lib/utils";
 import {Card} from "@comend/components/ui/card";
 import {PAGProfileConditionsCard} from "~web/components/pag-profile-conditions-card";
-import {PAGProfileRFPsHoverableCard} from "~web/components/pag-profile-rfps-card";
+import {PAGProfileRFPsHoverableCard} from "@comend/components/pag-profile-rfps-card";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
 import Link from "next/link";
 import { Badge } from "@comend/components/ui/badge";
-import { DateView } from "../miletone-date-view";
+import { DateView } from "@comend/components/milestone-date-view";
 
 export function MilestoneMarketplaceListElement({ milestone }: { milestone: any }) {
     const startDate = milestone.startDate ? new Date(milestone.startDate) : undefined

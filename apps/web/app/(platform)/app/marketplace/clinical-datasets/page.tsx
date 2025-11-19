@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { ClinicalDatasetSearchResults } from "~web/components/marketplace/clinical-datasets/clinical-dataset-results";
-import { ClinicalDatasetMarketplaceIntegratedSearchAndFilter } from "~web/components/marketplace/clinical-datasets/clinical-dataset-marketplace-integrated-search-and-filter";
+import { ClinicalDatasetSearchResults } from "@comend/components/marketplace/clinical-datasets/clinical-dataset-results";
+import { ClinicalDatasetMarketplaceIntegratedSearchAndFilter } from "@comend/components/marketplace/clinical-datasets/clinical-dataset-marketplace-integrated-search-and-filter";
 import { SearchParams } from "@comend/components/types";
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
 import { useShallow } from "zustand/react/shallow";

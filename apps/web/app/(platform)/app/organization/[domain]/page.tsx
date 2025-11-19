@@ -2,8 +2,7 @@ import prisma from "@comend/lib/prisma"
 import {notFound} from "next/navigation"
 import {
     getOrganizationData, 
-    getConditionsDataFromOrgId, 
-    getPublicClinicalDatasetsForOrganization, 
+    getConditionsDataFromOrgId,  
     getPublicRFPsForOrganization, 
     getPublicRoadmapsForOrganization, 
     getPublicToolCountsForOrganization, 
@@ -16,10 +15,10 @@ import {RoadmapsCard} from "~web/components/public-roadmap-card";
 import {PagProfileAboutCard} from "~web/components/pag-profile-about-card";
 import {PAGProfileConditionsCard} from "~web/components/pag-profile-conditions-card";
 import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
-import {PAGProfileRFPsHoverableCard} from "~web/components/pag-profile-rfps-card";
+import {PAGProfileRFPsHoverableCard} from "@comend/components/pag-profile-rfps-card";
 import UnpublishedOrganizationPage from "~web/components/unpublished-organization-page";
-import MarketplaceBreadcrumb from "~web/components/marketplace/marketplace-breadcrumb";
-import {IconEdit, IconFlag, IconShare} from "@tabler/icons-react";
+import MarketplaceBreadcrumb from "@comend/components/marketplace/marketplace-breadcrumb";
+import {IconShare} from "@tabler/icons-react";
 import ShareDialog from "~web/components/share-dialog";
 import {FloatingDock} from "~web/components/floating-dock";
 import React from "react";

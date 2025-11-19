@@ -3,7 +3,7 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from "react"
 import {Funnel, X} from "lucide-react"
 import {useShallow} from "zustand/react/shallow"
-import {MILESTONE_TYPE_OPTIONS_WITH_VALUE} from "~web/components/marketplace/service-providers/cro-filters";
+import {MILESTONE_TYPE_OPTIONS_WITH_VALUE} from "@comend/components/marketplace/service-providers/cro-filters";
 import {Button} from "@comend/components/ui/button"
 import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"

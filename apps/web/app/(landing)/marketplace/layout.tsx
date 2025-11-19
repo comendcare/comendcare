@@ -1,6 +1,6 @@
 "use client"
 
-import {PublicMarketplaceNav} from "~web/components/marketplace/marketplace-nav"
+import {PublicMarketplaceNav} from "@comend/components/marketplace/marketplace-nav"
 import { TooltipProvider } from "@comend/components/ui/tooltip"
 import { Separator } from "@comend/components/ui/separator"
 

@@ -12,14 +12,14 @@ import {
     HeartHandshake,
 } from "lucide-react";
 import React from "react";
-import {ServiceProviderWebsiteButton} from "../service-provider-website-button";
+import {ServiceProviderWebsiteButton} from "@comend/components/service-provider-website-button";
 import {companyTypeMap, CompanyWithReviewsAndServices, StatusType} from "@comend/lib/types";
-import ContactCroDialog from "~web/components/contact-cro-dialog";
+import ContactCroDialog from "@comend/components/contact-cro-dialog";
 import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
-import {HoverableAvatar} from "~web/components/hoverable-avatar";
+import {HoverableAvatar} from "@comend/components/hoverable-avatar";
 import {type Milestone, Organization} from "@prisma/client";
 import {nameToInitials} from "@comend/lib/utils";
-import StatusButton from "~web/components/milestone-status-button";
+import StatusButton from "@comend/components/milestone-status-button";
 
 type WorkedWithItem = {
     organization: Partial<Organization>,

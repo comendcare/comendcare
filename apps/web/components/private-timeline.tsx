@@ -7,7 +7,7 @@ import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { ScrollArea } from "@comend/components/ui/scroll-area"
 import { Milestone, StatusType } from "@comend/lib/types"
-import StatusButton from "./milestone-status-button"
+import StatusButton from "@comend/components/milestone-status-button"
 import {
     SortableContext,
     useSortable,
@@ -17,7 +17,7 @@ import {Microscope, User, DollarSign} from "lucide-react"
 import { ProjectActionsMenu } from "./project-actions-menu";
 import { Badge } from "@comend/components/ui/badge";
 import { Organization } from "@prisma/client";
-import { PublicPrivateButton } from "./public-private-button";
+import { PublicPrivateButton } from "@comend/components/public-private-button";
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV !== "production"
 

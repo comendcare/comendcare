@@ -12,12 +12,12 @@ import {
 import {Calendar, DollarSign, FileText, Link as LinkIcon, School, User, Clock, ChevronDown, ChevronRight, Mail, Workflow, ExternalLink} from "lucide-react";
 import Link from "next/link";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
-import {PropertyBadge} from "./property-badge";
+import {PropertyBadge} from "@comend/components/property-badge";
 import {checkDateRangeUTC, cn, formatDateUTC, formatMoney, RFPSort} from "@comend/lib/utils";
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {useSearchParams} from "next/navigation";
-import {NoRFPs} from "./no-rfps";
-import {RFPCard, RFPStatusBadge} from "./rfp-card";
+import {NoRFPs} from "@comend/components/no-rfps";
+import {RFPCard, RFPStatusBadge} from "@comend/components/rfp-card";
 import {
     Carousel,
     CarouselContent,

@@ -17,17 +17,11 @@ import {Button} from "@comend/components/ui/button";
 import {
     Select,
     SelectContent,
-    SelectLabel,
     SelectGroup,
     SelectTrigger,
     SelectValue,
     SelectItem
 } from "@comend/components/ui/select"
-import {
-    HoverCard,
-    HoverCardContent,
-    HoverCardTrigger,
-} from "@comend/components/ui/hover-card"
 import {
     Form,
     FormControl,
@@ -36,14 +30,13 @@ import {
     FormItem,
     FormMessage,
 } from "@comend/components/ui/form";
-import {Input} from "@comend/components/ui/input";
 import {Textarea} from "@comend/components/ui/textarea";
 import {createReview} from "@comend/lib/actions";
 import type {Company, Milestone} from "@prisma/client";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
-import {StarRatingSelector} from "~web/components/star-rating-selector";
+import {StarRatingSelector} from "@comend/components/star-rating-selector";
 import {getMilestones} from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react";
 import {Link2Off, PencilLine} from "lucide-react";

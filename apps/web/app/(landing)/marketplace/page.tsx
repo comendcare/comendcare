@@ -17,13 +17,13 @@ import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
-import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card"
+import { OrganizationMarketplaceCard } from "@comend/components/marketplace/marketplace-pag-card"
 import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeRFPSearch } from "@comend/lib/initialize-client-state"
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
-import { RFPCard } from "~web/components/rfp-card"
+import { RFPCard } from "@comend/components/rfp-card"
 import { mixpanelTrack } from "@comend/lib/mixpanel"
 import { Dialog, DialogContent, DialogTrigger } from "@comend/components/ui/dialog"
-import { RFPDetails } from "~web/components/pag-profile-rfps-card"
+import { RFPDetails } from "@comend/components/pag-profile-rfps-card"
 
 const organizationSelector = (state: OrganizationSearchState) => ({
     featuredOrgs: state.featuredOrgs,

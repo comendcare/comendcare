@@ -1,10 +1,8 @@
 "use client"
 
 import React, { useEffect } from "react"
-import { ScrollArea } from "@comend/components/ui/scroll-area";
-import {CROSearchResults} from "~web/components/marketplace/service-providers/cro-search-results";
-import CROSearchBar from "~web/components/marketplace/service-providers/cro-searchbar";
-import {ProviderMarketplaceIntegratedSearchAndFilter} from "~web/components/marketplace/service-providers/provider-marketplace-integrated-search-and-filter";
+import {CROSearchResults} from "@comend/components/marketplace/service-providers/cro-search-results";
+import {ProviderMarketplaceIntegratedSearchAndFilter} from "@comend/components/marketplace/service-providers/provider-marketplace-integrated-search-and-filter";
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore";
 import { useShallow } from "zustand/react/shallow";
 import { initializeCROSearch } from "@comend/lib/initialize-client-state";

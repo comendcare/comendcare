@@ -2,7 +2,7 @@
 
 import React from "react"
 import { ScrollArea } from "@comend/components/ui/scroll-area"
-import StatusButton from "./milestone-status-button"
+import StatusButton from "@comend/components/milestone-status-button"
 import { Label } from "@comend/components/ui/label"
 import { Checkbox } from "@comend/components/ui/checkbox"
 

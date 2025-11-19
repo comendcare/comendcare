@@ -16,7 +16,7 @@ import {PrivateNoResearchPlansColumn, PrivateNoResearchPlansRow, PublicNoResearc
 import {NoProjects} from "./no-projects";
 import {FunctionComponent, ReactElement, useState} from "react";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import { PropertyBadge } from "./property-badge";
+import { PropertyBadge } from "@comend/components/property-badge";
 
 export const RoadmapsCard = ({
                                  roadmaps,
