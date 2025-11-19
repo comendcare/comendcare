@@ -45,7 +45,7 @@ import {redirect, usePathname} from "next/navigation";
 import {getAllMembershipsFromUserId} from "@/packages/lib/fetchers";
 import {toast} from "sonner";
 import {useOnborda} from "~web/components/onborda/OnbordaContext";
-import {RoadmapState, useRoadmapStore} from "~web/state/roadmap/roadmapStore";
+import {RoadmapState, useRoadmapStore} from "./../state/roadmap/roadmapStore";
 import {useShallow} from "zustand/react/shallow";
 import {useSession} from "next-auth/react";
 import {Separator} from "@/packages/components/ui/separator"

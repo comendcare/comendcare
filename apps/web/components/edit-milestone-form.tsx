@@ -18,7 +18,7 @@ import {AutosizeTextarea, Textarea} from "@comend/components/ui/textarea"
 import {Button} from "@comend/components/ui/button"
 import {ScrollArea} from "@comend/components/ui/scroll-area"
 import StatusButton from "./milestone-status-button"
-import {RoadmapState, useRoadmapStore} from "~web/state/roadmap/roadmapStore"
+import {RoadmapState, useRoadmapStore} from "./../state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import {
     Select,

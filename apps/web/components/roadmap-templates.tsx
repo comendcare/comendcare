@@ -5,7 +5,7 @@ import {useRouter} from "next/navigation";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {SetStateAction, useEffect, useState} from "react";
 import {templateMilestones, templateResearchPlans} from '@comend/lib/templates'
-import {RoadmapState, useRoadmapStore} from "~web/state/roadmap/roadmapStore";
+import {RoadmapState, useRoadmapStore} from "./../state/roadmap/roadmapStore";
 import {useShallow} from "zustand/react/shallow";
 import ComendLoadingSpinner from "../../../packages/components/comend-loading-spinner";
 import {
