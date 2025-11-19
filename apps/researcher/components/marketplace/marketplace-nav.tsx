@@ -1,17 +1,15 @@
 "use client"
-import { Button } from "@comend/components/ui/button";
 import { TabNav } from "@comend/components/tab-nav";
-import { ArrowLeft, Building2, Database, Megaphone, Rat, Search, SearchIcon, TestTubeDiagonal, Users } from "lucide-react";
-import Link from "next/link";
+import { Database, Megaphone, Rat, TestTubeDiagonal, Users } from "lucide-react";
 import React from "react";
 
 const links = [
-    // {
-    //     name: "Patient groups",
-    //     href: "/marketplace/patient-groups",
-    //     icon: Users,
-    //     comingSoon: false
-    // },
+    {
+        name: "Patient groups",
+        href: "/marketplace/patient-groups",
+        icon: Users,
+        comingSoon: false
+    },
     {
         name: "Patient biosamples",
         href: "/marketplace/biosamples",
@@ -31,7 +29,6 @@ const links = [
         comingSoon: false
     },
     {
-        // name: "Requests for Proposals",
         name: "RFPs",
         href: "/marketplace/rfps",
         icon: Megaphone,
