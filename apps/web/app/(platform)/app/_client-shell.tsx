@@ -8,7 +8,7 @@ import {
     InvitationWithOrganization,
     MemberRequestWithUserAndOrganization,
     MembershipWithOrganization
-} from "@/packages/lib/types";
+} from "@comend/lib/types";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
@@ -20,9 +20,9 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle
-} from "@/packages/components/ui/dialog";
-import {Button} from "@/packages/components/ui/button";
-import {cn} from "@/packages/lib/utils";
+} from "@comend/components/ui/dialog";
+import {Button} from "@comend/components/ui/button";
+import {cn} from "@comend/lib/utils";
 import {
     Carousel,
     CarouselApi,
@@ -30,14 +30,14 @@ import {
     CarouselItem,
     CarouselNext,
     CarouselPrevious
-} from "@/packages/components/ui/carousel";
+} from "@comend/components/ui/carousel";
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle
-} from "@/packages/components/ui/card";
+} from "@comend/components/ui/card";
 import researchPlanner from "@/public/screenshots/research-planner.png";
 import Image from "next/image"
 import type {User} from "@prisma/client";

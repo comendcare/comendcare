@@ -3,8 +3,8 @@ import {useSession} from "next-auth/react"
 import { ProfilePhoto } from "@comend/components/profile-photo"
 import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organization-button"
 import MembersDropdown from "~web/components/members-dropdown"
-import {getSession} from "@/packages/lib/auth";
-import {MemberWithUser} from "@/packages/lib/types";
+import {getSession} from "@comend/lib/auth";
+import {MemberWithUser} from "@comend/lib/types";
 
 export default async function PAGSettingsMembersTab({members}: {members: MemberWithUser[]}) {
     const session = await getSession()

@@ -44,7 +44,7 @@ import {
     MemberRequestWithUserAndOrganization,
 } from "@comend/lib/types";
 import {mixpanelReset, mixpanelTrack} from "@comend/lib/mixpanel";
-import Spinner from "@/packages/components/ui/spinner";
+import Spinner from "@comend/components/ui/spinner";
 import type {User} from "@prisma/client";
 
 type NavUserProps = {

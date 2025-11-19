@@ -1,5 +1,5 @@
 import * as React from "react"
-import {cn} from "@comend/lib/utils";
+import {cn, getStatusColor, getStatusText} from "@comend/lib/utils";
 import {EllipsisVertical} from "lucide-react";
 import {InfiniteMovingCards} from "@comend/components/ui/infinite-moving-cards";
 import Balancer from "react-wrap-balancer";
@@ -8,8 +8,6 @@ import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group"
 import {Label} from "@comend/components/ui/label"
 import {Input} from "@comend/components/ui/input"
 import {Textarea} from "@comend/components/ui/textarea"
-import {getStatusText, getStatusColor} from "@/apps/researcher/lib/utils";
-
 
 export default function ResearcherMainFeatures() {
     const words = "Biosamples galore".split(" ");

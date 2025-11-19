@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/packages/components/ui/card"
+import { Card, CardContent } from "@comend/components/ui/card"
 import Image from "next/image"
 
 export const NoResultsView = () => {

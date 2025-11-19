@@ -1,4 +1,4 @@
-import { cn } from "@/packages/lib/utils"
+import { cn } from "@comend/lib/utils"
 import { LucideProps } from "lucide-react"
 import { ReactNode } from "react"
 

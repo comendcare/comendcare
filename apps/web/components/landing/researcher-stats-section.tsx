@@ -1,4 +1,4 @@
-import {NumberTicker} from "@/packages/components/ui/number-ticker";
+import {NumberTicker} from "@comend/components/ui/number-ticker";
 
 export default function ResearcherStatsSection() {
     return (

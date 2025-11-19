@@ -59,7 +59,7 @@ import {
     DialogTrigger,
 } from "@comend/components/ui/dialog"
 import z from "zod"
-import { Option, BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS } from "@/packages/lib/types"
+import { Option, BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS } from "@comend/lib/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {useForm} from "react-hook-form"
 import {
@@ -71,11 +71,11 @@ import {
     FormMessage,
     FormDescription,
 } from "@comend/components/ui/form"
-import MultipleSelector from "@/packages/components/ui/multiple-selector"
+import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { FacilityType, institutionFormSchema } from "~admin/lib/types"
 import { useState } from "react"
 import { CreateCompanyForm } from "../create-company-dialog"
-import { ScrollArea, ScrollBar } from "@/packages/components/ui/scroll-area"
+import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area"
 
 interface DataTablePaginationProps<TData> {
     table: TanstackTable<TData>

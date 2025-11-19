@@ -6,7 +6,7 @@ import {useSession} from "next-auth/react";
 import {useEffect, useRef} from "react";
 import {useState} from "react";
 import {redirect, usePathname, useSearchParams} from "next/navigation";
-import Loading from "@/loading";
+import Loading from "./../../../loading";
 import {
     getAllNotifications,
     getAssets,

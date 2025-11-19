@@ -5,11 +5,7 @@ import {Metadata} from "next"
 import PublicPageFooter from "~web/components/public-page-footer"
 import {TooltipProvider} from "@radix-ui/react-tooltip"
 import {PublicPageNavbarLoginOnly} from "~web/components/public-page-navbar-login-only";
-import {StickyBanner} from "@/packages/components/ui/sticky-banner";
-import {Button} from "@/packages/components/ui/button";
-import Link from "next/link";
 import PublicPageBottomBanner from "~web/components/public-page-bottom-banner";
-import { cn } from "@/packages/lib/utils"
 
 export async function generateMetadata({
                                            params

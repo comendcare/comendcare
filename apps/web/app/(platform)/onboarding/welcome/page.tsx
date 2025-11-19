@@ -4,7 +4,7 @@ import { Separator } from "@comend/components/ui/separator";
 import { Button } from "@comend/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import Loading from "@/loading";
+import Loading from "./../../../../../../loading";
 
 export default function OnboardingWelcomePage() {
     const { data: session, status } = useSession();

@@ -3,7 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".", // makes paths relative to `apps/web`
     "paths": {
-      "@/*": ["../../*"],
+      // "@/*": ["../../*"],
+      "@/state/*": ["../../state/*"],
+      "@/public/*": ["../../public/*"],
       "~web/*": ["./*"]
     }
   },

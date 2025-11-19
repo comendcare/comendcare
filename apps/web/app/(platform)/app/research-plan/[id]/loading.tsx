@@ -4,7 +4,7 @@ import * as React from "react";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {Skeleton} from "@comend/components/ui/skeleton";
 import {useLoadingTimeout} from "~web/hooks/useLoadingTimeout";
-import {Separator} from "@/packages/components/ui/separator";
+import {Separator} from "@comend/components/ui/separator";
 
 // function TimelineItemSkeleton() {
 //     return (

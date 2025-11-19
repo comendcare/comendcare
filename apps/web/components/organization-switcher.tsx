@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {useRouter, usePathname} from "next/navigation";
+import {useRouter} from "next/navigation";
 import {
     DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
     DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator,
@@ -9,11 +9,9 @@ import {
 import {SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar} from "@comend/components/ui/sidebar";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Check, ChevronsUpDown, Plus} from "lucide-react";
-import Link from "next/link";
-import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import {Skeleton} from "@comend/components/ui/skeleton";
-import {MembershipWithOrganization} from "@/packages/lib/types";
+import {MembershipWithOrganization} from "@comend/lib/types";
 
 export function OrganizationSwitcher({memberships}: { memberships: MembershipWithOrganization[] }) {
     const {data: session, update} = useSession();

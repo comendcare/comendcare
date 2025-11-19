@@ -11,7 +11,7 @@ import {
 } from "@comend/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, Label, Pie, PieChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { DollarSign } from "lucide-react";
-import { StatusType } from "@/packages/lib/types";
+import { StatusType } from "@comend/lib/types";
 
 interface AnalyticsData {
     totalResearchPlans: number,

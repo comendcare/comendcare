@@ -8,7 +8,7 @@ import {
     Star,
     TrendingUp,
 } from "lucide-react"
-import {formatNumberWithCommas} from "@/packages/lib/utils";
+import {formatNumberWithCommas} from "@comend/lib/utils";
 import ResearcherProfilePublicationsSection from "@comend/components/researcher-profile-publications-section";
 
 export default function PublicResearcherProfile({researcherData}: {researcherData: any})

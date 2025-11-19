@@ -3,8 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { Badge } from "@comend/components/ui/badge"
-import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
-import {getMilestonesForService} from "@/packages/lib/utils";
+import {getMilestonesForService} from "@comend/lib/utils"
 
 export type ServicesData = {
     name: string | null

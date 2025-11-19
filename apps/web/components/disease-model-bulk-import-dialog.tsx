@@ -11,10 +11,10 @@ import { toast } from "sonner";
 import { createDiseaseModel } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
 import { cn, parseCSV } from "@comend/lib/utils";
-import { DISEASE_MODEL_TYPE_OPTIONS, editDiseaseModelForm } from "@/packages/lib/types";
-import { revalidate } from "@/packages/lib/revalidate";
+import { DISEASE_MODEL_TYPE_OPTIONS, editDiseaseModelForm } from "@comend/lib/types";
+import { revalidate } from "@comend/lib/revalidate";
 import z from "zod";
-import { getOrganizationFromOrganizationId } from "@/packages/lib/fetchers";
+import { getOrganizationFromOrganizationId } from "@comend/lib/fetchers";
 
 export async function formatDiseaseModelData(diseaseModel: any): Promise<z.infer<typeof editDiseaseModelForm>> {
     const genesResponse = await fetch(`/api/genes?search=${encodeURIComponent(diseaseModel['Gene'] || '')}`)

@@ -1,5 +1,5 @@
-import LoadingDots from "@/packages/components/icons/loading-dots"
-import { Button } from "@/packages/components/ui/button"
+import LoadingDots from "@comend/components/icons/loading-dots"
+import { Button } from "@comend/components/ui/button"
 import { Globe, Lock } from "lucide-react"
 import { useEffect, useState } from "react"
 

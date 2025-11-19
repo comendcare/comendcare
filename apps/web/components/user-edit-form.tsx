@@ -29,7 +29,7 @@ import {handleImageDelete, handleImageUpload} from "@comend/lib/upload";
 import {FormImageSelector} from "@comend/components/form-image-selector";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import mixpanel from "mixpanel-browser";
-import {Skeleton} from "@/packages/components/ui/skeleton";
+import {Skeleton} from "@comend/components/ui/skeleton";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),

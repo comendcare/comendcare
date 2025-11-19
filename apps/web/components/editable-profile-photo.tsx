@@ -24,7 +24,7 @@ import {useRouter} from "next/navigation";
 import {Button} from "@comend/components/ui/button";
 import {Pencil} from "lucide-react";
 import { ProfilePhoto } from "@comend/components/profile-photo";
-import LoadingDots from "@/packages/components/icons/loading-dots";
+import LoadingDots from "@comend/components/icons/loading-dots";
 
 const editOrgProfileImageSchema = z.object({
     image: z.string().nullable().optional(),

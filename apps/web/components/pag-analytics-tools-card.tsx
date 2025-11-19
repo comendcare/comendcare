@@ -1,5 +1,5 @@
 import {Database, Microscope, TestTubeDiagonal, Rat, ExternalLink, Info} from "lucide-react"
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/packages/components/ui/card";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {Button, buttonVariants} from "@comend/components/ui/button";
 import {
     Tooltip,
@@ -7,7 +7,7 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from "@comend/components/ui/tooltip"
-import {OrganizationForAnalytics} from "@/packages/lib/types";
+import {OrganizationForAnalytics} from "@comend/lib/types";
 import Link from "next/link";
 
 export default function PAGAnalyticsToolsCard({organization}: { organization: OrganizationForAnalytics }) {

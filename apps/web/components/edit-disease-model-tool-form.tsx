@@ -34,16 +34,16 @@ import MultipleSelector, { MultipleSelectorRef } from "@comend/components/ui/mul
 import { Option } from "@comend/lib/types"
 import { useRouter } from "next/navigation"
 import { revalidate } from "@comend/lib/revalidate"
-import { Separator } from "@/packages/components/ui/separator"
-import { mixpanelTrack } from "@/packages/lib/mixpanel"
-import { createCreateFacilityRequest, createDiseaseModel, updateCreateFacilityRequest, updateDiseaseModel } from "@/packages/lib/actions"
-import { cn } from "@/packages/lib/utils"
-import LoadingDots from "@/packages/components/icons/loading-dots"
+import { Separator } from "@comend/components/ui/separator"
+import { mixpanelTrack } from "@comend/lib/mixpanel"
+import { createCreateFacilityRequest, createDiseaseModel, updateCreateFacilityRequest, updateDiseaseModel } from "@comend/lib/actions"
+import { cn } from "@comend/lib/utils"
+import LoadingDots from "@comend/components/icons/loading-dots"
 import ProjectMultipleSelector from "./project-multiple-selector"
 import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog"
 import { SubmitCreateRequest } from "./create-facility-request-button"
-import { Badge } from "@/packages/components/ui/badge"
-import { badgeVariants } from "@/packages/components/ui/badge"
+import { Badge } from "@comend/components/ui/badge"
+import { badgeVariants } from "@comend/components/ui/badge"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 

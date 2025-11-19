@@ -3,8 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
-import { Checkbox } from "@comend/components/ui/checkbox"
-import { SavedOrganizationData } from "@/packages/lib/types"
+import { SavedOrganizationData } from "@comend/lib/types"
 
 interface CustomColumnMeta {
     name?: string;

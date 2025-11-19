@@ -10,7 +10,7 @@ import Link from "next/link"
 import React, {useRef, useState} from "react"
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
-import {Button, buttonVariants} from "@/packages/components/ui/button";
+import {Button, buttonVariants} from "@comend/components/ui/button";
 import Image from "next/image";
 import { X, Menu as MenuIcon } from "lucide-react"
 import logo from "@/public/logos/comend-full-logo.png"

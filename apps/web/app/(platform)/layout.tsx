@@ -1,4 +1,4 @@
-import {getSession} from "@/packages/lib/auth";
+import {getSession} from "@comend/lib/auth";
 import { unstable_noStore as noStore } from "next/cache";
 import {redirect} from "next/navigation";
 import prisma from "@comend/lib/prisma";

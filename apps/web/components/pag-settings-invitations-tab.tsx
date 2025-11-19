@@ -4,7 +4,7 @@ import CreateOrJoinOrganizationButton from "~web/components/create-or-join-organ
 import { ProfilePhoto } from "@comend/components/profile-photo"
 import InvitationsDropdown from "~web/components/invitations-dropdown"
 import {Invitation, Prisma} from "@prisma/client";
-import {getSession} from "@/packages/lib/auth";
+import {getSession} from "@comend/lib/auth";
 
 export default async function PAGSettingsInvitationsTab({organization}: {organization: Prisma.OrganizationGetPayload<{
         include: { invitations: true };

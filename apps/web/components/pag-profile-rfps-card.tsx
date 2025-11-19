@@ -25,14 +25,14 @@ import {
     CarouselPrevious,
     CarouselNext,
     CarouselApi
-} from "@/packages/components/ui/carousel";
-import {Badge} from "@/packages/components/ui/badge";
+} from "@comend/components/ui/carousel";
+import {Badge} from "@comend/components/ui/badge";
 import { ExternalAttachment, ExternalContact, Milestone } from "@prisma/client";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
-import { Button } from "@/packages/components/ui/button";
+import { Button } from "@comend/components/ui/button";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import { ProfilePhoto } from "@/packages/components/profile-photo";
-import { Separator } from "@/packages/components/ui/separator";
+import { ProfilePhoto } from "@comend/components/profile-photo";
+import { Separator } from "@comend/components/ui/separator";
 
 export const PAGProfileRFPsHoverableCard = ({rfps, isPrivate}: { rfps: any[], isPrivate: boolean }) => {
     const searchParams = useSearchParams()

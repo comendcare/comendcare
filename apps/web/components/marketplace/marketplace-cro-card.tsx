@@ -1,13 +1,11 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import Link from "next/link";
-import {truncate} from "@comend/lib/utils";
 import React from "react";
 import type {Company} from "@prisma/client";
 import {Separator} from "@comend/components/ui/separator";
 import {Badge} from "@comend/components/ui/badge";
 import { Popover, PopoverTrigger, PopoverContent } from "@comend/components/ui/popover"
 import { ScrollArea } from "@comend/components/ui/scroll-area"
-import SaveCRODialog from "~web/components/save-cro-dialog";
 import {
     Briefcase,
     Building,
@@ -23,10 +21,8 @@ import {
 import {companyTypeMap, CompanyWithReviewsAndServices, Milestone} from "@comend/lib/types";
 import {PropertyBadge} from "../property-badge";
 import {TypeBadge} from "../type-badge";
-import Image from "next/image"
-import ImageWithFallback from "@/packages/components/image-with-fallback";
+import ImageWithFallback from "@comend/components/image-with-fallback";
 import {getMilestonesForService} from "@comend/lib/utils";
-import SaveCROButton from "~web/components/save-cro-button";
 
 type NodeTypeCount = Record<string, number>;
 

@@ -3,7 +3,7 @@ import {createLucideIcon, Facebook, Instagram, Linkedin, Twitter} from "lucide-r
 import Image from "next/image"
 import Link from "next/link"
 import {LinkPreview} from "~web/components/link-preview";
-import {Separator} from "@/packages/components/ui/separator";
+import {Separator} from "@comend/components/ui/separator";
 import React from "react";
 
 export const XIcon = createLucideIcon("X", [

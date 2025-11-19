@@ -16,9 +16,8 @@ import { EditMilestoneForm } from "./edit-milestone-form"
 import {useEffect, useMemo, useRef, useState} from "react"
 import { usePathname } from "next/navigation"
 import { TimelineView } from "./private-timeline"
-import { Button, buttonVariants } from "@comend/components/ui/button"
-import { cn, parseCSV } from "@comend/lib/utils"
-import Link from "next/link"
+import { Button } from "@comend/components/ui/button"
+import { cn } from "@comend/lib/utils"
 import {
     Dialog,
     DialogClose,
@@ -27,22 +26,18 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@comend/components/ui/dialog"
-import { AlertCircle, ArrowLeft, Ellipsis, ExternalLink, Globe, Import, Info, LayoutTemplate, Lock, Pencil, Plus, Redo2, Share, TriangleAlert, Undo2, Wand2, Workflow } from "lucide-react"
-import { FileUploadForm } from "./file-upload-form"
-import { toast } from "sonner"
+import { Globe, Info, LayoutTemplate, Lock, Pencil, Plus, Redo2, Share, Undo2, Wand2 } from "lucide-react"
 import Image from "next/image"
 import { NewMilestoneDialogForm, TabType } from "./new-milestone-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@comend/components/ui/select"
 import { Milestone } from "@comend/lib/types"
-import Loading from "@/loading";
+import Loading from "./../../../loading";
 import { Biosample, DiseaseModel, MilestoneType, Organization, RFP, Roadmap as RoadmapType, Tool } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { EditResearchPlanForm } from "./edit-research-plan-form"
 import { StageOfActivityBadge } from "./public-roadmap-card"
 import { Separator } from "@comend/components/ui/separator"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@comend/components/ui/dropdown-menu"
 import ShareDialog from "./share-dialog"
 import {
   ContextMenu,
@@ -50,7 +45,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@comend/components/ui/context-menu"
-import {initializeRoadmapState} from "@/packages/lib/initialize-client-state";
+import {initializeRoadmapState} from "@comend/lib/initialize-client-state";
 import { ProjectBulkImportDialog } from "./project-bulk-import-dialog"
 
 const selector = (state: RoadmapState) => ({

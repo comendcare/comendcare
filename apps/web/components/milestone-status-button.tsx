@@ -3,7 +3,6 @@
 import React, { memo, useState } from "react"
 import { StatusType } from "@comend/lib/types"
 import { cn } from "@comend/lib/utils"
-import { Badge } from "@comend/components/ui/badge"
 
 // export default function StatusButton({
 //     status = "PLANNED",

@@ -8,11 +8,9 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@comend/components/ui/sheet"
-import { Button } from "@comend/components/ui/button"
 import FeedbackForm from "~web/components/feedback-form";
 import { MessageCircle } from "lucide-react"
-import { cn } from "@/packages/lib/utils";
-import { SidebarMenuButton, useSidebar } from "@/packages/components/ui/sidebar";
+import { SidebarMenuButton, useSidebar } from "@comend/components/ui/sidebar";
 import { NavNotificationCollapsedIcon, NavNotificationExpandedIcon } from "./nav-main";
 
 interface FeedbackProps {

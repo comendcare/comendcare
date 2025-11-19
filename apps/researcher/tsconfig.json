@@ -6,7 +6,7 @@
       // enabling this causes issues on vercel builds, it tries to import /web, which 
       // causes issues with the ~web/ import alias
       // "@/*": ["../../*"],
-      "~researcher/*": ["./*"]
+      "~researcher/*": ["./*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

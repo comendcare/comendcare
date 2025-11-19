@@ -1,26 +1,24 @@
 "use client"
 
 import * as React from "react";
-import Image from "next/image"
 import {EditAssetDialog, NewToolDialog} from "./edit-tool-dialog"
 import {DataTableSkeleton} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 import {DatabaseDiseaseModelsTable} from "@comend/components/biorepo/advanced-data-table/disease-models-table/database-disease-models-table"
-import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
-import {Shell} from "@/packages/components/biorepo/advanced-data-table/lib/shell";
+import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
+import {Shell} from "@comend/components/biorepo/advanced-data-table/lib/shell";
 import {
     useDiseaseModelsTableColumns
-} from "@/packages/components/biorepo/advanced-data-table/disease-models-table/private-disease-models-table-columns";
+} from "@comend/components/biorepo/advanced-data-table/disease-models-table/private-disease-models-table-columns";
 import type {DiseaseModel, Tool} from "@prisma/client";
 import {SearchParams} from "typesense/lib/Typesense/Documents";
 import {useEffect, useRef, useState} from "react";
-import {revalidate} from "@/packages/lib/revalidate";
 import {useSession} from "next-auth/react";
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/packages/components/ui/tooltip";
-import {Button} from "@/packages/components/ui/button";
+import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
+import {Button} from "@comend/components/ui/button";
 import {Lock, Globe} from "lucide-react"
-import {setDiseaseModelsVisibility} from "@/packages/lib/actions";
+import {setDiseaseModelsVisibility} from "@comend/lib/actions";
 import {DiseaseModelBulkImportDialog} from "./disease-model-bulk-import-dialog";
-import { Dialog, DialogPortal } from "@/packages/components/ui/dialog";
+import { Dialog, DialogPortal } from "@comend/components/ui/dialog";
 import { Row } from "@tanstack/react-table";
 
 export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {

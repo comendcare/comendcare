@@ -3,8 +3,6 @@
 import {useState} from "react";
 import {
     AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
     AlertDialogFooter,
@@ -16,9 +14,9 @@ import {toast} from "sonner";
 import {acceptInvitation, declineAndDeleteInvitation} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import type {Organization} from "@prisma/client";
-import {Avatar, AvatarFallback, AvatarImage} from "@/packages/components/ui/avatar";
+import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
 import {useSession} from "next-auth/react";
-import LoadingDots from "@/packages/components/icons/loading-dots";
+import LoadingDots from "@comend/components/icons/loading-dots";
 
 export default function InvitationBlocker({
                                               invitations,

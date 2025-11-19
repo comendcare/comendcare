@@ -1,11 +1,11 @@
-import {getSession} from "@/packages/lib/auth";
+import {getSession} from "@comend/lib/auth";
 import {fetchFeedPage, getOrganizationFromOrganizationId, getPosts} from "@comend/lib/fetchers";
 import UnverifiedOrganizationPage from "~web/components/unverified-organization-page";
 import NoOrganization from "~web/components/no-organization";
 import Image from "next/image";
 import {toast} from "sonner";
 import {FeedList} from "~web/components/feed/feed-list";
-import {FeedPageDTO} from "@/packages/lib/types";
+import {FeedPageDTO} from "@comend/lib/types";
 import {Separator} from "@comend/components/ui/separator"
 
 export default async function FeedPage() {

@@ -1,15 +1,13 @@
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@comend/components/ui/card";
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@comend/components/ui/card";
 import Link from "next/link";
-import {formatMoney, getStage, truncate} from "@comend/lib/utils";
+import {formatMoney, getStage} from "@comend/lib/utils";
 import {Badge} from "@comend/components/ui/badge";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Separator} from "@comend/components/ui/separator";
-import {CircleDollarSign, FileText, HandCoins, Megaphone, MegaphoneIcon, Microscope, MicroscopeIcon, Users, Workflow} from "lucide-react";
+import {CircleDollarSign, FileText, MegaphoneIcon, MicroscopeIcon, Users} from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import {PropertyBadge} from "../property-badge";
-import SaveOrganizationDialog from "../save-organization-dialog";
-import SaveOrganizationButton from "~web/components/save-organization-button";
-import { milestoneCategories, MODALITIES, Option } from "@/packages/lib/types";
+import { milestoneCategories, MODALITIES, Option } from "@comend/lib/types";
 
 type NodeTypeCount = Record<string, number>;
 

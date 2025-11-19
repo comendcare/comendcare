@@ -3,18 +3,17 @@
 import { useEffect } from "react"
 import {SessionProvider} from "next-auth/react"
 import {Toaster} from "sonner"
-import {ModalProvider} from "@/packages/components/modal/provider"
+import {ModalProvider} from "@comend/components/modal/provider"
 import {ReactFlowProvider} from "@xyflow/react"
-import {MixpanelProvider} from "@/packages/lib/mixpanel"
-import {SettingsProvider} from "@/packages/components/editor/settings"
+import {MixpanelProvider} from "@comend/lib/mixpanel"
+import {SettingsProvider} from "@comend/components/editor/settings"
 import {NuqsAdapter} from 'nuqs/adapters/next/app'
 import {OnbordaProvider} from "../components/onborda/OnbordaContext"
-import {useDrainWriteQueue} from "~web/hooks/useDrainWriteQueue"
 import {useWriteQueue} from "~web/state/writeQueue"
 import {beaconFlush} from "~web/lib/flushOps"
 import {usePathname} from "next/navigation"
 import {Session} from "next-auth";
-import { TooltipProvider } from "@/packages/components/ui/tooltip"
+import { TooltipProvider } from "@comend/components/ui/tooltip"
 
 
 export function Providers({children, session}: { children: React.ReactNode, session: Session | null }) {

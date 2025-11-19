@@ -22,7 +22,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/ta
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {getPharmaProjectData} from "@comend/lib/fetchers";
 import PharmaProjectBiorepositoryTab from "comend-pag-platform/components/pharma-project-biorepository-tab";
-import Loading from "@/loading";
+import Loading from "./../../../../../loading";
 import {
     Tooltip,
     TooltipContent,

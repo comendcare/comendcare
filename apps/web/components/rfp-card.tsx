@@ -7,15 +7,15 @@ import {Calendar, Clock, DollarSign, FileText, School} from "lucide-react";
 import {PropertyBadge} from "./property-badge";
 import {checkDateRangeUTC, DateStatus, formatDateUTC, formatMoney} from "@comend/lib/utils";
 import {RFPActionsMenu} from "./rfp-actions-menu";
-import {Badge} from "@/packages/components/ui/badge";
+import {Badge} from "@comend/components/ui/badge";
 import {Skeleton} from "@comend/components/ui/skeleton";
-import { Separator } from "@/packages/components/ui/separator";
-import { ProfilePhoto } from "@/packages/components/profile-photo";
+import { Separator } from "@comend/components/ui/separator";
+import { ProfilePhoto } from "@comend/components/profile-photo";
 import { Organization } from "@prisma/client";
 import { PublicPrivateButton } from "./public-private-button";
 import { RFPState, useRFPStore } from "@/state/rfp/rfpStore";
 import { useShallow } from "zustand/react/shallow";
-import { revalidate } from "@/packages/lib/revalidate";
+import { revalidate } from "@comend/lib/revalidate";
 
 /** Header skeleton that matches the header’s layout/height to prevent reflow */
 function HeaderSkeleton() {

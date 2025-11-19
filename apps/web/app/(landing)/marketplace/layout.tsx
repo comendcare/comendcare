@@ -1,8 +1,8 @@
 "use client"
 
 import {PublicMarketplaceNav} from "~web/components/marketplace/marketplace-nav"
-import { TooltipProvider } from "@/packages/components/ui/tooltip"
-import { Separator } from "@/packages/components/ui/separator"
+import { TooltipProvider } from "@comend/components/ui/tooltip"
+import { Separator } from "@comend/components/ui/separator"
 
 // export const metadata: Metadata = {
 //     title: "Comend",

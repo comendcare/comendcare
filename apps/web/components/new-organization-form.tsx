@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {z} from "zod";
@@ -23,7 +23,7 @@ import {Separator} from "@comend/components/ui/separator";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import MoneyInput from "@comend/components/money-input";
 import type {FileWithPreview} from "@comend/components/image-selector";
-import {acceptedFiletypes, years, getPublicFile, toKebabCase} from "@comend/lib/utils";
+import {years, toKebabCase} from "@comend/lib/utils";
 import {Option, optionSchema, MODALITIES, MOLECULAR_MECHANISMS} from "@comend/lib/types";
 import {useDebounce} from "use-debounce";
 import {toast} from "sonner";
@@ -39,8 +39,8 @@ import {
 } from "@comend/lib/fetchers";
 import {handleImageUpload} from "@comend/lib/upload";
 import {mixpanelTrack} from "@comend/lib/mixpanel";
-import {Textarea} from "@/packages/components/ui/textarea";
-import {FormImageSelector} from "@/packages/components/form-image-selector";
+import {Textarea} from "@comend/components/ui/textarea";
+import {FormImageSelector} from "@comend/components/form-image-selector";
 import {Invitation} from "@prisma/client";
 
 /**************************************

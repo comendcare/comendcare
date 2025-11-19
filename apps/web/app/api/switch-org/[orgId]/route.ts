@@ -1,8 +1,8 @@
 // app/switch-org/[orgId]/route.ts
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/packages/lib/auth";
-import prisma from "@/packages/lib/prisma";
+import { authOptions } from "@comend/lib/auth";
+import prisma from "@comend/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 // If you want to whitelist allowed paths, do it here

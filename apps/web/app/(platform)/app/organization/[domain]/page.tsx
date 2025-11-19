@@ -25,11 +25,10 @@ import {FloatingDock} from "~web/components/floating-dock";
 import React from "react";
 import {Mail} from "lucide-react";
 import { PAGProfileToolsCard } from "~web/components/pag-profile-tools-card";
-import { SearchParams } from "@/packages/components/types";
-import { Organization } from "@prisma/client";
-import { biosampleSearchParamsCache } from "@/packages/lib/validations";
-import { getValidFilters } from "@/packages/lib/data-table";
-import { RFPSort } from "@/packages/lib/utils";
+import { SearchParams } from "@comend/components/types";
+import { biosampleSearchParamsCache } from "@comend/lib/validations";
+import { getValidFilters } from "@comend/lib/data-table";
+import { RFPSort } from "@comend/lib/utils";
 
 interface IndexPageProps {
     params: {domain: string},

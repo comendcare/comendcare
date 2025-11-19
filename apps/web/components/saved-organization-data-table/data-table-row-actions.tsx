@@ -19,7 +19,7 @@ import {unsaveOrganization} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import {Milestone, MILESTONE_TYPE_OPTIONS} from "@comend/lib/types";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
-import { revalidate } from "@/packages/lib/revalidate";
+import { revalidate } from "@comend/lib/revalidate";
 import Link from "next/link";
 import {BookmarkMinus, Mail} from "lucide-react";
 
