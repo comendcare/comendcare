@@ -4,8 +4,8 @@ import React, { useEffect } from "react"
 import { useShallow } from "zustand/react/shallow";
 import { initializeRFPSearch } from "@comend/lib/initialize-client-state";
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore";
-import { RFPMarketplaceIntegratedSearchAndFilter } from "~web/components/marketplace/rfps/rfp-marketplace-integrated-search-and-filter";
-import { RFPSearchResults } from "~web/components/marketplace/rfps/rfp-search-results";
+import { RFPMarketplaceIntegratedSearchAndFilter } from "@comend/components/marketplace/rfps/rfp-marketplace-integrated-search-and-filter";
+import { RFPSearchResults } from "@comend/components/marketplace/rfps/rfp-search-results";
 
 const selector = (state: RFPSearchState) => ({
     initialized: state.initialized

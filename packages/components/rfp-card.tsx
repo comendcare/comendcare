@@ -2,17 +2,16 @@
 
 import React, {useEffect, useMemo, useState} from "react";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
-import {PrivateBadge} from "~web/components/private-badge";
-import {Calendar, Clock, DollarSign, FileText, School} from "lucide-react";
-import {PropertyBadge} from "./property-badge";
+import {Clock} from "lucide-react";
+import {PropertyBadge} from "@comend/components/property-badge";
 import {checkDateRangeUTC, DateStatus, formatDateUTC, formatMoney} from "@comend/lib/utils";
-import {RFPActionsMenu} from "./rfp-actions-menu";
+// import {RFPActionsMenu} from "./rfp-actions-menu";
 import {Badge} from "@comend/components/ui/badge";
 import {Skeleton} from "@comend/components/ui/skeleton";
 import { Separator } from "@comend/components/ui/separator";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 import { Organization } from "@prisma/client";
-import { PublicPrivateButton } from "./public-private-button";
+import { PublicPrivateButton } from "@comend/components/public-private-button";
 import { RFPState, useRFPStore } from "@/state/rfp/rfpStore";
 import { useShallow } from "zustand/react/shallow";
 import { revalidate } from "@comend/lib/revalidate";
@@ -63,7 +62,17 @@ export const RFPStatusBadge = ({status}: {status: DateStatus}) => {
     )
 }
 
-export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rfp: any; showOrganization?: boolean; isPrivate?: boolean }) => {
+export const RFPCard = ({
+    rfp, 
+    showOrganization = false, 
+    isPrivate = false,
+    actionsMenu
+}: { 
+    rfp: any; 
+    showOrganization?: boolean; 
+    isPrivate?: boolean ;
+    actionsMenu?: React.ReactNode | undefined
+}) => {
     // Gate the header (and actions menu) until after hydration
     const [mounted, setMounted] = useState(false);
     const { updateRFP } = useRFPStore(useShallow(rfpSelector))
@@ -75,9 +84,10 @@ export const RFPCard = ({rfp, showOrganization = false, isPrivate = false}: { rf
         <Card className="h-full w-full text-left flex flex-col">
             <CardHeader className="gap-2 relative pb-2">
                 {/* Actions menu only after mount to avoid portal jank */}
-                {isPrivate && mounted && (
+                {!!actionsMenu && mounted && (
                     <div className="absolute top-1 right-1">
-                        <RFPActionsMenu rfp={rfp}/>
+                        {/* <RFPActionsMenu rfp={rfp}/> */}
+                        {actionsMenu}
                     </div>
                 )}
 

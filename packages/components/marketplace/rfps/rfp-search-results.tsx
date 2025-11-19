@@ -6,11 +6,11 @@ import InfiniteScroll from "@comend/components/ui/infinite-scroll";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore";
-import { RFPCard } from "~web/components/rfp-card";
+import { RFPCard } from "@comend/components/rfp-card";
 import { Dialog, DialogTrigger } from "@comend/components/plate-ui/dialog";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { DialogContent } from "@comend/components/ui/dialog";
-import { RFPDetails } from "~web/components/pag-profile-rfps-card";
+import { RFPDetails } from "@comend/components/pag-profile-rfps-card";
 import { LoaderCircle } from "lucide-react";
 import { cn } from "@udecode/cn";
 

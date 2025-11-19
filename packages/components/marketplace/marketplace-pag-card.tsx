@@ -6,7 +6,7 @@ import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Separator} from "@comend/components/ui/separator";
 import {CircleDollarSign, FileText, MegaphoneIcon, MicroscopeIcon, Users} from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-import {PropertyBadge} from "../property-badge";
+import {PropertyBadge} from "@comend/components/property-badge";
 import { milestoneCategories, MODALITIES, Option } from "@comend/lib/types";
 
 type NodeTypeCount = Record<string, number>;

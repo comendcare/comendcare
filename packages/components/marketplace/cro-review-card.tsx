@@ -2,7 +2,7 @@
 
 import React, {useEffect, useRef, useState} from "react";
 import {Milestone, Company} from "@prisma/client";
-import {StarRatingIndicator} from "~web/components/star-rating-indicator";
+import {StarRatingIndicator} from "@comend/components/star-rating-indicator";
 import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
 import {
     Form,
@@ -36,9 +36,8 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@comend/components/ui/dialog";
-import {Input} from "@comend/components/ui/input";
 import {Textarea} from "@comend/components/ui/textarea";
-import {StarRatingSelector} from "~web/components/star-rating-selector";
+import {StarRatingSelector} from "@comend/components/star-rating-selector";
 import {useSession} from "next-auth/react";
 import {editReview, deleteReview, submitFeedback} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";

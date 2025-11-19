@@ -30,13 +30,13 @@ const links = [
         icon: Database,
         comingSoon: false
     },
-    // {
-    //     // name: "Requests for Proposals",
-    //     name: "RFPs",
-    //     href: "/marketplace/rfps",
-    //     icon: Megaphone,
-    //     comingSoon: false
-    // },
+    {
+        // name: "Requests for Proposals",
+        name: "RFPs",
+        href: "/marketplace/rfps",
+        icon: Megaphone,
+        comingSoon: false
+    },
 ]
 
 export function MarketplaceNav({className}: React.HTMLAttributes<HTMLDivElement>) {

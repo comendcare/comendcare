@@ -16,9 +16,9 @@ import {
     CardHeader,
     CardTitle
 } from "@comend/components/ui/card"
-import StatusButton from "./milestone-status-button"
+import StatusButton from "@comend/components/milestone-status-button"
 import {cn, formatMoney} from "@comend/lib/utils"
-import {DateView} from "./miletone-date-view"
+import {DateView} from "@comend/components/milestone-date-view"
 import {Badge, badgeVariants} from "@comend/components/ui/badge"
 import {Milestone, StatusType} from "@comend/lib/types"
 import {RoadmapState, useRoadmapStore} from "./../state/roadmap/roadmapStore"
@@ -26,7 +26,7 @@ import {useShallow} from "zustand/react/shallow"
 import { ExternalLink, Microscope, Plus, Trash, User, DollarSign } from "lucide-react"
 import { ProjectActionsMenu } from "./project-actions-menu"
 import { Organization } from "@prisma/client"
-import { PublicPrivateButton } from "./public-private-button"
+import { PublicPrivateButton } from "@comend/components/public-private-button"
 
 export type MilestoneNodeType = Node<
     Milestone & {

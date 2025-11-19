@@ -1,6 +1,6 @@
-import {CROReviewCard} from "~web/components/marketplace/cro-review-card";
-import CROReviewDialog from "~web/components/marketplace/cro-review-dialog";
-import CRORatingSection from "~web/components/marketplace/cro-rating-section";
+import {CROReviewCard} from "@comend/components/marketplace/cro-review-card";
+import CROReviewDialog from "@comend/components/marketplace/cro-review-dialog";
+import CRORatingSection from "@comend/components/marketplace/cro-rating-section";
 import {Card, CardContent} from "@comend/components/ui/card";
 import Image from "next/image";
 import type {CompanyWithReviewsAndServices} from "@comend/lib/types";

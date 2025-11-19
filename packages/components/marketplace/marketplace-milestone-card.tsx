@@ -6,7 +6,7 @@ import {cn, formatMoney, truncate} from "@comend/lib/utils";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Separator} from "@comend/components/ui/separator";
 import {Banknote, ExternalLink} from "lucide-react";
-import { TypeBadge } from "../type-badge";
+import { TypeBadge } from "@comend/components/type-badge";
 
 const StatusData: Record<"PLANNED" | "INPROGRESS" | "COMPLETED", { text: string; styling: string }> = {
     PLANNED: {

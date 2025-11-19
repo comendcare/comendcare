@@ -31,9 +31,9 @@ import { useShallow } from "zustand/react/shallow";
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@comend/components/ui/button";
 import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area";
-import StatusButton from "./milestone-status-button";
+import StatusButton from "@comend/components/milestone-status-button";
 import { truncate } from "@comend/lib/utils";
-import { DateView } from "./miletone-date-view";
+import { DateView } from "@comend/components/milestone-date-view";
 
 const chartConfig: ChartConfig = {
     item: {

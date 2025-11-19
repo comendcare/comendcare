@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { BiosampleSearchResults } from "~web/components/marketplace/biosamples/biosample-results";
-import { BiosampleMarketplaceIntegratedSearchAndFilter } from "~web/components/marketplace/biosamples/biosample-marketplace-integrated-search-and-filter";
+import { BiosampleSearchResults } from "@comend/components/marketplace/biosamples/biosample-results";
+import { BiosampleMarketplaceIntegratedSearchAndFilter } from "@comend/components/marketplace/biosamples/biosample-marketplace-integrated-search-and-filter";
 import { SearchParams } from "@comend/components/types";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
 import { useShallow } from "zustand/react/shallow";

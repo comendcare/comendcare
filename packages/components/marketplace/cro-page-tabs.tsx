@@ -8,9 +8,8 @@ import {
     TabsList,
     TabsTrigger,
 } from "@comend/components/ui/tabs"
-import { Briefcase, Users } from "lucide-react";
+import { Briefcase } from "lucide-react";
 import CROMarketplaceProfileServicesTab from "@comend/components/cro-marketplace-profile-services-tab";
-import CROMarketplaceProfileReviewsTab from "~web/components/marketplace/cro-marketplace-profile-reviews-tab";
 import type {CompanyWithReviewsAndServices} from "@comend/lib/types";
 import { Skeleton } from "@comend/components/ui/skeleton";
 
