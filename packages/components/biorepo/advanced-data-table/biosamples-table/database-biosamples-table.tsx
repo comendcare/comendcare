@@ -2,55 +2,39 @@
 
 import * as React from "react";
 import {DataTable} from "../data-table/data-table";
-import {
-    DataTableAdvancedToolbar
-} from "../data-table/data-table-advanced-toolbar";
+import {DataTableAdvancedToolbar} from "../data-table/data-table-advanced-toolbar";
 import {DataTableFilterList} from "../data-table/data-table-filter-list";
 import {DataTableToolbar} from "../data-table/data-table-toolbar";
 import {useDataTable} from "@comend/lib/hooks/use-data-table";
 import {ColumnDef, Row} from "@tanstack/react-table";
 import {useFeatureFlags} from "../lib/feature-flags-provider";
 import type {Biosample, Tool} from "@prisma/client";
-import Image from "next/image";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
-import { useState } from "react";
-import { Dialog, DialogPortal } from "../../../ui/dialog";
-// import { EditAssetDialog, NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
-
-const globalFilterFn = (row: any, columnIds: string[], filterValue: any) => {
-    // normalize search term
-    const search = String(filterValue ?? "").toLowerCase();
-
-    // get values from both columns
-    const sampleId = String(row.original.id ?? "").toLowerCase();
-    const donorId = String(row.original.donor?.internalId ?? "").toLowerCase();
-
-    // return true if either matches
-    return sampleId.includes(search) || donorId.includes(search);
-}
 
 export function DatabaseBiosamplesTable({
     data, 
     pageCount, 
     columns, 
     onSelectionChange, 
+    onRowClickCallback,
     searchParams,
     showFilters = true,
     showPagination = true,
-    interactive = false,
     noResultsOverride = true,
+    interactiveDialog,
 }: {
     data: Biosample[],
     pageCount: number,
     columns: ColumnDef<any>[],
     onSelectionChange?: (selectedRows: Tool[]) => void,
+    onRowClickCallback?: (e: any, row: Row<any> | undefined) => void,
     searchParams: SearchParams,
     showFilters?: boolean,
     showPagination?: boolean,
     interactive?: boolean,
     noResultsOverride?: boolean,
+    interactiveDialog?: React.ReactNode
 }) {
-    const [editingTool, setEditingTool] = useState<any | undefined>(undefined)
     const {enableAdvancedFilter, filterFlag} = useFeatureFlags()
     const {table, shallow, debounceMs, throttleMs} = useDataTable({
         data,
@@ -82,7 +66,6 @@ export function DatabaseBiosamplesTable({
                 noResults={
                     (noResultsOverride && data.length === 0 && Object.keys(searchParams).length === 0) 
                     ? (
-                        <></>
                         // <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
                         //     <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
                         //         <h1 className="font-cal text-4xl">You do not have any Biosample Tools</h1>
@@ -98,12 +81,11 @@ export function DatabaseBiosamplesTable({
                         //         {interactive && <NewToolDialog type={"biosample"}/>}
                         //     </div>
                         // </div>
+                        <></>
                     )
                     : undefined
                 }
-                onRowClickCallback={(e: any, row: Row<any> | undefined) => 
-                    setEditingTool(row?.original)
-                }
+                onRowClickCallback={onRowClickCallback}
             >
                 {showFilters && (
                     enableAdvancedFilter ? (
@@ -122,23 +104,7 @@ export function DatabaseBiosamplesTable({
                 )}
             </DataTable>
 
-            {/* {interactive && (
-                <Dialog 
-                    open={!!editingTool}
-                    onOpenChange={(open) => !open && setEditingTool(undefined)}
-                >
-                    <DialogPortal>
-                        <div onClick={(e) => e.stopPropagation()}>
-                            <EditAssetDialog
-                                key={editingTool?.id}
-                                data={editingTool} 
-                                type={'biosample'}
-                                closeDialog={() => {setEditingTool(undefined)}}
-                            />
-                        </div>
-                    </DialogPortal>
-                </Dialog>
-            )} */}
+            {!!interactiveDialog && interactiveDialog}
         </>
     );
 }

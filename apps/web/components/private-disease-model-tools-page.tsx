@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image"
-import {NewToolDialog} from "./edit-tool-dialog"
+import {EditAssetDialog, NewToolDialog} from "./edit-tool-dialog"
 import {DataTableSkeleton} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 import {DatabaseDiseaseModelsTable} from "@comend/components/biorepo/advanced-data-table/disease-models-table/database-disease-models-table"
 import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
@@ -20,17 +20,20 @@ import {Button} from "@/packages/components/ui/button";
 import {Lock, Globe} from "lucide-react"
 import {setDiseaseModelsVisibility} from "@/packages/lib/actions";
 import {DiseaseModelBulkImportDialog} from "./disease-model-bulk-import-dialog";
+import { Dialog, DialogPortal } from "@/packages/components/ui/dialog";
+import { Row } from "@tanstack/react-table";
 
 export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
     data: DiseaseModel[],
     pageCount: number,
     searchParams: SearchParams
 }) => {
-    const columns = useDiseaseModelsTableColumns()
     const {data: session} = useSession()
+    const columns = useDiseaseModelsTableColumns({session})
     const [rowSelection, setRowSelection] = useState<Object[]>([])
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1100)
+    const [editingTool, setEditingTool] = useState<DiseaseModel | undefined>(undefined)
     const parentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -129,6 +132,27 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                             columns={columns}
                             searchParams={searchParams}
                             onSelectionChange={setRowSelection}
+                            onRowClickCallback={(e: any, row: Row<any> | undefined) => setEditingTool(row?.original)}
+                            showPagination={true}
+                            interactiveDialog={(
+                                <Dialog 
+                                    open={!!editingTool}
+                                    onOpenChange={(open) => !open && setEditingTool(undefined)}
+                                >
+                                    <DialogPortal>
+                                        <div onClick={(e) => e.stopPropagation()}>
+                                            {editingTool && (
+                                                <EditAssetDialog
+                                                    key={editingTool?.id}
+                                                    data={editingTool} 
+                                                    type={'diseaseModel'}
+                                                    closeDialog={() => {setEditingTool(undefined)}}
+                                                />
+                                            )}
+                                        </div>
+                                    </DialogPortal>
+                                </Dialog>
+                            )}
                         />
                     </React.Suspense>
                 </FeatureFlagsProvider>

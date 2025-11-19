@@ -8,6 +8,8 @@ import { getValidFilters } from "@/packages/lib/data-table"
 import { PrivateBiosampleToolsPage } from "~web/components/private-biosample-tools-page"
 import { NewToolDialog } from "~web/components/edit-tool-dialog"
 import { getBiosamples } from "@/packages/lib/fetchers"
+import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table-columns"
+import { Session } from "next-auth"
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +24,8 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
     const search = biosampleSearchParamsCache.parse(searchParams);
     const validFilters = getValidFilters(search.filters);
     const globalFilter = search.q ?? "";
+
+    const columns = useBiosamplesTableColumns({session: session as any})
 
     const {data, pageCount} = await getBiosamples(
         session?.user.organizationId,
@@ -66,6 +70,8 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
             materialAndDataAccessRequests: true
         },
         {...search, q: globalFilter, filters: validFilters},
+        false,
+        columns
     )
 
     // not part of an org

@@ -203,6 +203,21 @@ export const handleAsyncConditionSearch = async (query?: string | undefined): Pr
     }
 }
 
+export const handleAsyncDiagnosesSearch = async (query?: string | undefined): Promise<Option[]> => {
+    if (!query) return []; // Return empty if no input
+
+    try {
+        const response = await fetch(`/api/diagnoses?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data;
+    } catch (error) {
+        console.error("Failed to fetch diagnoses:", error);
+        return [];
+    }
+};
+
 export const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
     if (!query) return []; // Return empty if no input
 
@@ -217,6 +232,13 @@ export const handleAsyncGeneSearch = async (query?: string | undefined): Promise
         return [];
     }
 };
+
+export const handleAsyncCompanyAndInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
+    const companies = await handleAsyncCompanySearch(query)
+    const institutions = await handleAsyncInstitutionSearch(query)
+
+    return companies.concat(institutions)
+}
 
 export const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
     if (!query) return []; // Return empty if no input
@@ -233,6 +255,21 @@ export const handleAsyncInstitutionSearch = async (query?: string | undefined): 
     }
 };
 
+export const handleAsyncCompanySearch = async (query?: string | undefined): Promise<Option[]> => {
+    if (!query) return []; // Return empty if no input
+
+    try {
+        const response = await fetch(`/api/companies?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data.map((company: Option) => ({label: company.label, value: company.label}));
+    } catch (error) {
+        console.error("Failed to fetch companies:", error);
+        return [];
+    }
+};
+
 export const handleAsyncMilestoneSearch = async (organizationId: string | null | undefined, query?: string | undefined): Promise<Option[]> => {
     if (!query || !organizationId) return []
 
@@ -243,7 +280,7 @@ export const handleAsyncMilestoneSearch = async (organizationId: string | null |
         // Return the fetched options
         return data
     } catch (error) {
-        console.error("Failed to fetch institutions:", error);
+        console.error("Failed to fetch projects:", error);
         return [];
     }
 }

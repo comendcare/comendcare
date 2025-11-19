@@ -4,6 +4,7 @@ import {getValidFilters} from "@/packages/lib/data-table"
 import { getDiseaseModels } from "@/packages/lib/fetchers"
 import { biosampleSearchParamsCache } from "@/packages/lib/validations"
 import { DiseaseModelMarketplacePage } from "~researcher/components/marketplace/disease-model-tools-page"
+import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
 
 export const dynamic = "force-dynamic";
 
@@ -17,24 +18,22 @@ export default async function DiseaseModelToolsPage(props: IndexPageProps) {
     const validFilters = getValidFilters(search.filters);
     const globalFilter = search.q ?? "";
 
+    const columns = useDiseaseModelsTableColumns(true, true, false)
+
     const {data, pageCount} = await getDiseaseModels(
         undefined,
         {
             id: true,
             createdAt: true,
             updatedAt: true,
-
             description: true,
             contacts: true,
             attachments: true,
             private: true,
-            // pinned: true,
-            // metadata: true,
             types: true,
             genotype: true,
             strain: true,
             notes: true,
-
             institutionId: true,
             institution: true,
             company: true,
@@ -46,47 +45,10 @@ export default async function DiseaseModelToolsPage(props: IndexPageProps) {
             organizationId: true,
             organization: {include: {conditions: {include: {condition: true}}}},
             milestones: {include: {milestone: true}},
-            // id: true,
-            // createdAt: true,
-            // updatedAt: true,
-            // description: true,
-            // contacts: true,
-            // attachments: true,
-            // private: true,
-            // types: true,
-            // genotype: true,
-            // variant: true,
-            // availability: true,
-            // quantity: true,
-            // quantityUnit: true,
-            // currentCountry: true,
-            // countryOfCollection: true,
-            // preservationMethod: true,
-            // anatomicalSite: true,
-            // methodOfTransport: true,
-            // collectionDate: true,
-            // ageAtCollection: true,
-            // price: true,
-            // priceUnit: true,
-            // notes: true,
-
-            // milestones: {include: {milestone: true}},
-            // donorId: true,
-            // donor: {
-            //     include: {diagnoses: {include: {type: true}}}
-            // },
-            // institutionId: true,
-            // institution: true,
-            // company: true,
-            // geneId: true,
-            // gene: true,
-            // genes: true,
-            // organizationId: true,
-            // organization: {include: {conditions: {include: {condition: true}}}},
-            // materialAndDataAccessRequests: true
         },
         {...search, q: globalFilter, filters: validFilters},
-        true // public only
+        true, // public only
+        columns
     )
 
     return (

@@ -648,206 +648,16 @@ export const syncToTypesense = async (env: {
             ]
         }
 
+        /* UPDATE ORGANIZATION ---------------------------------------------------------------------------------------- */
         console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
-        console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
-        console.log('CRO Schema:', JSON.stringify(companySchema, null, 2));
-        console.log('Biosample Schema:', JSON.stringify(biosampleSchema, null, 2));
-        console.log('Disease Model:', JSON.stringify(diseaseModelSchema, null, 2));
-        console.log('Clinical Dataset:', JSON.stringify(clinicalDatasetSchema, null, 2));
-        console.log(`RFPs`, JSON.stringify(rfpSchema, null, 2))
-
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizationSchema);
-        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
-        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companySchema);
-        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', biosampleSchema);
-        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', diseaseModelSchema);
-        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', clinicalDatasetSchema);
-        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'rfps', rfpSchema);
-
         const organizations = await prisma.organization.findMany({
             where: {
                 verified: true,
                 published: true
             }
         });
-        const milestones = await prisma.milestone.findMany({
-            where: {
-                organization: {
-                    published: true,
-                    verified: true
-                }
-            }
-        });
-        const companies = await prisma.company.findMany({
-            select: {
-                id: true,
-                title: true,
-                description: true,
-                url: true,
-                yearEstablished: true,
-                website: true,
-                headquarters: true,
-                companyType: true,
-                categories: true,
-                avgRating: true,
-                simplifiedCertifications: true,
-                tags: true,
-                milestoneTypes: true,
-            }
-        });
-        const biosamples = await prisma.biosample.findMany({
-            where: {
-                private: false // only sync public biosamples
-            },
-            select: {
-                createdAt: true,
-                // this list must include ALL items that allow sorting in the table
-                // otherwise the sorting will not function
-                organization: {
-                    select: {
-                        id: true,
-                        name: true,
-                        conditions: {
-                            select: {
-                                condition: {
-                                    select: {
-                                        name: true
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                id: true,
-                // only include public donor ID (no other donor information should be uploaded to typesense)
-                donor: {select: {id: true}},
-                types: true,
-                gene: true,
-                genes: true,
-                availability: true,
-                quantity: true,
-                institution: true,
-                company: true,
-                description: true,
-                genotype: true,
-                createFacilityRequests: true,
-            }
-        })
-        const diseaseModels = await prisma.diseaseModel.findMany({
-            where: {
-                private: false
-            },
-            select: {
-                createdAt: true,
-                // this list must include ALL items that allow sorting in the table
-                // otherwise the sorting will not function
-                organization: {
-                    select: {
-                        id: true,
-                        name: true,
-                        conditions: {
-                            select: {
-                                condition: {
-                                    select: {
-                                        name: true,
-                                        causalGenes: true,
-                                        associatedGenes: true,
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                id: true,
-                description: true,
-                institution: true,
-                company: true,
-                gene: true,
-                genes: true,
-                types: true,
-                genotype: true,
-                strain: true,
-                createFacilityRequests: true,
-            }
-        })
-        const clinicalDatasets = await prisma.tool.findMany({
-            where: {
-                private: false
-            },
-            select: {
-                createdAt: true,
-                // this list must include ALL items that allow sorting in the table
-                // otherwise the sorting will not function
-                organization: {
-                    select: {
-                        id: true,
-                        name: true,
-                        conditions: {
-                            select: {
-                                condition: {
-                                    select: {
-                                        name: true
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                id: true,
-                title: true,
-                description: true,
-                institution: true,
-                company: true,
-                gene: true,
-                genes: true,
-                types: true,
-                cohortSize: true,
-                createFacilityRequests: true,
-            }
-        })
-        const rfps = await prisma.rFP.findMany({
-            where: {
-                private: false // only sync public biosamples
-            },
-            select: {
-                createdAt: true,
-                // this list must include ALL items that allow sorting in the table
-                // otherwise the sorting will not function
-                organization: {
-                    select: {
-                        id: true,
-                        name: true,
-                        conditions: {
-                            select: {
-                                condition: {
-                                    select: {
-                                        name: true,
-                                        causalGenes: true,
-                                        associatedGenes: true,
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                id: true,
-                title: true,
-                description: true,
-                eligibility: true,
-                evaluationProcess: true,
-                openTo: true,
-                startDate: true,
-                endDate: true
-            }
-        })
-
         console.log('Raw organizations data:', organizations);
-        console.log('Raw milestones data:', milestones);
-        console.log('Raw companies data:', companies);
-        console.log('Raw biosamples data:', biosamples)
-        console.log('Raw disease models data:', diseaseModels)
-        console.log('Raw clinical datasets data:', clinicalDatasets)
-        console.log('Raw rfp data:', rfps)
 
         if (organizations.length > 0) {
             console.log('Validating organization data...');
@@ -896,6 +706,18 @@ export const syncToTypesense = async (env: {
             console.log('No organizations to import.');
         }
 
+        /* UPDATE MILESTONES ---------------------------------------------------------------------------------------- */
+        console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
+        const milestones = await prisma.milestone.findMany({
+            where: {
+                organization: {
+                    published: true,
+                    verified: true
+                }
+            }
+        });
+        console.log('Raw milestones data:', milestones);
         if (milestones.length > 0) {
             console.log('Validating milestone data...');
 
@@ -925,12 +747,75 @@ export const syncToTypesense = async (env: {
             console.log('No milestones to import.');
         }
 
+        /* UPDATE CROS/COMPANIES ---------------------------------------------------------------------------------- */
+        console.log('CRO Schema:', JSON.stringify(companySchema, null, 2));
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companySchema);
+        const companies = await prisma.company.findMany({
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                url: true,
+                yearEstablished: true,
+                website: true,
+                headquarters: true,
+                companyType: true,
+                categories: true,
+                avgRating: true,
+                simplifiedCertifications: true,
+                tags: true,
+                milestoneTypes: true,
+            }
+        });
+        console.log('Raw companies data:', companies);
         if (companies.length > 0) {
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companies);
         } else {
             console.log('No companies to import.');
         }
 
+        /* UPDATE BIOSAMPLES ---------------------------------------------------------------------------------------- */
+        console.log('Biosample Schema:', JSON.stringify(biosampleSchema, null, 2));
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', biosampleSchema);
+        const biosamples = await prisma.biosample.findMany({
+            where: {
+                private: false // only sync public biosamples
+            },
+            select: {
+                createdAt: true,
+                // this list must include ALL items that allow sorting in the table
+                // otherwise the sorting will not function
+                organization: {
+                    select: {
+                        id: true,
+                        name: true,
+                        conditions: {
+                            select: {
+                                condition: {
+                                    select: {
+                                        name: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                id: true,
+                // only include public donor ID (no other donor information should be uploaded to typesense)
+                donor: {select: {id: true}},
+                types: true,
+                gene: true,
+                genes: true,
+                availability: true,
+                quantity: true,
+                institution: true,
+                company: true,
+                description: true,
+                genotype: true,
+                createFacilityRequests: true,
+            }
+        })
+        console.log('Raw biosamples data:', biosamples)
         if (biosamples.length > 0) {
             const uploadBiosamples = biosamples.map(biosample => ({
                 ...biosample,
@@ -950,6 +835,48 @@ export const syncToTypesense = async (env: {
             console.log('No biosamples to import.');
         }
 
+
+        /* UPDATE DISEASE MODELS ---------------------------------------------------------------------------------------- */
+        console.log('Disease Model:', JSON.stringify(diseaseModelSchema, null, 2));
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', diseaseModelSchema);
+        const diseaseModels = await prisma.diseaseModel.findMany({
+            where: {
+                private: false
+            },
+            select: {
+                createdAt: true,
+                // this list must include ALL items that allow sorting in the table
+                // otherwise the sorting will not function
+                organization: {
+                    select: {
+                        id: true,
+                        name: true,
+                        conditions: {
+                            select: {
+                                condition: {
+                                    select: {
+                                        name: true,
+                                        causalGenes: true,
+                                        associatedGenes: true,
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                id: true,
+                description: true,
+                institution: true,
+                company: true,
+                gene: true,
+                genes: true,
+                types: true,
+                genotype: true,
+                strain: true,
+                createFacilityRequests: true,
+            }
+        })
+        console.log('Raw disease models data:', diseaseModels)
         if (diseaseModels.length > 0) {
             const uploadDiseaseModels = diseaseModels.map(diseaseModel => ({
                 ...diseaseModel,
@@ -970,6 +897,45 @@ export const syncToTypesense = async (env: {
             console.log('No disease models to import.');
         }
 
+        /* UPDATE CLINICAL DATASETS ---------------------------------------------------------------------------------- */
+        console.log('Clinical Dataset:', JSON.stringify(clinicalDatasetSchema, null, 2));
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', clinicalDatasetSchema);
+        const clinicalDatasets = await prisma.tool.findMany({
+            where: {
+                private: false
+            },
+            select: {
+                createdAt: true,
+                // this list must include ALL items that allow sorting in the table
+                // otherwise the sorting will not function
+                organization: {
+                    select: {
+                        id: true,
+                        name: true,
+                        conditions: {
+                            select: {
+                                condition: {
+                                    select: {
+                                        name: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                id: true,
+                title: true,
+                description: true,
+                institution: true,
+                company: true,
+                gene: true,
+                genes: true,
+                types: true,
+                cohortSize: true,
+                createFacilityRequests: true,
+            }
+        })
+        console.log('Raw clinical datasets data:', clinicalDatasets)
         if (clinicalDatasets.length > 0) {
             const uploadClinicalDatasets = clinicalDatasets.map(dataset => ({
                 // id: dataset.id,
@@ -999,6 +965,45 @@ export const syncToTypesense = async (env: {
             console.log('No clinical datasets to import.');
         }
 
+        /* UPDATE RFPS ---------------------------------------------------------------------------------- */
+        console.log(`RFPs`, JSON.stringify(rfpSchema, null, 2))
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'rfps', rfpSchema);
+        const rfps = await prisma.rFP.findMany({
+            where: {
+                private: false // only sync public biosamples
+            },
+            select: {
+                createdAt: true,
+                // this list must include ALL items that allow sorting in the table
+                // otherwise the sorting will not function
+                organization: {
+                    select: {
+                        id: true,
+                        name: true,
+                        conditions: {
+                            select: {
+                                condition: {
+                                    select: {
+                                        name: true,
+                                        causalGenes: true,
+                                        associatedGenes: true,
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                id: true,
+                title: true,
+                description: true,
+                eligibility: true,
+                evaluationProcess: true,
+                openTo: true,
+                startDate: true,
+                endDate: true
+            }
+        })
+        console.log('Raw rfp data:', rfps)
         if (rfps.length > 0) {
             const uploadRFPs = rfps.map(rfp => ({
                 ...rfp,

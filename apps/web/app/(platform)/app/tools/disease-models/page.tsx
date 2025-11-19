@@ -8,6 +8,7 @@ import { getValidFilters } from "@/packages/lib/data-table"
 import { NewToolDialog } from "~web/components/edit-tool-dialog"
 import { getDiseaseModels } from "@/packages/lib/fetchers"
 import { PrivateDiseaseModelToolsPage } from "~web/components/private-disease-model-tools-page"
+import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/private-disease-models-table-columns"
 
 export const dynamic = "force-dynamic";
 
@@ -23,24 +24,22 @@ export default async function DiseaseModelToolsPage(props: IndexPageProps) {
     const validFilters = getValidFilters(search.filters);
     const globalFilter = search.q ?? "";
 
+    const columns = useDiseaseModelsTableColumns({session: session as any})
+
     const {data, pageCount} = await getDiseaseModels(
         session?.user.organizationId,
         {
             id: true,
             createdAt: true,
             updatedAt: true,
-
             description: true,
             contacts: true,
             attachments: true,
             private: true,
-            // pinned: true,
-            // metadata: true,
             types: true,
             genotype: true,
             strain: true,
             notes: true,
-
             institutionId: true,
             institution: true,
             company: true,
@@ -54,6 +53,8 @@ export default async function DiseaseModelToolsPage(props: IndexPageProps) {
             milestones: {include: {milestone: true}},
         },
         {...search, q: globalFilter, filters: validFilters},
+        false, // public & private disease models
+        columns,
     )
 
     // not part of an org

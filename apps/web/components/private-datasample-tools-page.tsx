@@ -1,29 +1,33 @@
 "use client"
 
 import * as React from "react";
-import { NewToolDialog } from "./edit-tool-dialog"
+import { EditAssetDialog, NewToolDialog } from "./edit-tool-dialog"
 import { AssetBulkImportDialog } from "./asset-bulk-import-dialog"
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/shell";
 import { getClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/private-clinical-datasets-table-columns";
-import { ClinicalDatasetsTable } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/private-clinical-datasets-table"
+import { DatabaseClinicalDatasetsTable } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/database-clinical-datasets-table"
 import type { Tool } from "@prisma/client";
 import { SearchParams } from "@/packages/components/types";
-import { revalidate } from "@/packages/lib/revalidate";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
 import { Button } from "@/packages/components/ui/button";
 import { Globe, Lock } from "lucide-react";
 import { setDataToolsVisibility } from "@/packages/lib/actions";
+import { Dialog } from "@/packages/components/ui/dialog";
+import { DialogPortal } from "@/packages/components/plate-ui/dialog";
+import { Asset } from "@/packages/lib/types";
+import { Row } from "@tanstack/react-table";
 
 export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
-    const columns = getClinicalDatasetsTableColumns()
     const {data: session} = useSession()
+    const columns = getClinicalDatasetsTableColumns({session})
     const [rowSelection, setRowSelection] = useState<Object[]>([])
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1100)
+    const [editingTool, setEditingTool] = useState<Partial<Asset> | undefined>(undefined)
     const parentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -116,12 +120,32 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                         />
                     }
                 >
-                    <ClinicalDatasetsTable 
+                    <DatabaseClinicalDatasetsTable 
                         data={data} 
                         pageCount={pageCount} 
                         columns={columns} 
                         searchParams={searchParams}
                         onSelectionChange={setRowSelection}
+                        onRowClickCallback={(e: any, row: Row<any> | undefined) => setEditingTool(row?.original)}
+                        interactiveDialog={(
+                            <Dialog 
+                                open={!!editingTool}
+                                onOpenChange={(open) => !open && setEditingTool(undefined)}
+                            >
+                                <DialogPortal>
+                                    <div onClick={(e) => e.stopPropagation()}>
+                                        {editingTool && (
+                                            <EditAssetDialog
+                                                key={editingTool?.id}
+                                                data={editingTool} 
+                                                type={'data'}
+                                                closeDialog={() => {setEditingTool(undefined)}}
+                                            />
+                                        )}
+                                    </div>
+                                </DialogPortal>
+                            </Dialog>
+                        )}
                     />
                 </React.Suspense>
             </FeatureFlagsProvider>

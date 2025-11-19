@@ -1,5 +1,3 @@
-"use client";
-
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   CircleDashed,
@@ -11,18 +9,14 @@ import { TOOL_TYPE_OPTIONS } from "./../../../../../packages/lib/types";
 import { MilestoneTypeBadge } from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Badge } from "./../../../ui/badge";
 import { MultipleGenesCell } from "./private-clinical-datasets-table-columns";
+import { handleAsyncCompanyAndInstitutionSearch, handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils";
+import { ExtendedColumnFilter } from "@comend/lib/types/data-table";
+import { filterColumns } from "@comend/lib/filter-columns";
+import { generateId } from "@comend/lib/id";
 
 type Preset = "default" | "profile";
-
-function useColumnsPreset(explicit?: Preset) {
-    const pathname = usePathname();
-    if (explicit) return explicit;
-    if (pathname?.startsWith("/app/profile")) return "profile";
-    return "default";
-}
 
 export function useClinicalDatasetsTableColumns(
     enableSorting: boolean = true, 
@@ -30,14 +24,13 @@ export function useClinicalDatasetsTableColumns(
     typesenseSearch: boolean = true,
     presetName?: Preset,
 ): ColumnDef<any>[] {
-    const preset = useColumnsPreset(presetName);
+    const preset = presetName || 'default';
 
     const comendColumns: ColumnDef<any>[] = [
     {
         id: typesenseSearch
             ? 'sortId.id' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             : 'id',
-        // id: "sortId.id", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "id",
         header: ({column}) => (
             <DataTableColumnHeader 
@@ -59,7 +52,6 @@ export function useClinicalDatasetsTableColumns(
         id: typesenseSearch
             ? 'title.title' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             : 'title',
-        // id: "title.title", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "title",
         header: ({ column }) => (
             <DataTableColumnHeader 
@@ -68,21 +60,15 @@ export function useClinicalDatasetsTableColumns(
                 title="Title" 
             />
         ),
-        meta: {
-            label: "Title",
-            // placeholder: "Search titles...",
-            // variant: "text",
-            // icon: Text,
-        },
-        enableColumnFilter: true,
-            enableHiding,
-            enableSorting,
+        meta: { label: "Title" },
+        enableColumnFilter: false,
+        enableHiding,
+        enableSorting,
     },
     {
         id: typesenseSearch
             ? 'type.label' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             : 'types',
-        // id: "type.label", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
         accessorKey: "types",
         header: ({ column }) => (
             <DataTableColumnHeader 
@@ -130,16 +116,13 @@ export function useClinicalDatasetsTableColumns(
         ),
         enableHiding,
         enableSorting,
-        meta: {
-            label: "Cohort size"
-        }
+        meta: {label: "Cohort size"}
     },
     {
         id: typesenseSearch
             ? 'condition.name' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-            : 'condition',
-        // id: "condition.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
-        accessorKey: "condition",
+            : 'organization.conditions',
+        accessorKey: "organization.conditions",
         header: ({column}) => (
             <DataTableColumnHeader 
                 className="min-w-fit text-nowrap"
@@ -153,9 +136,29 @@ export function useClinicalDatasetsTableColumns(
             </div>
         ),
         enableHiding,
-        enableSorting,
-        meta: {
-            label: "Condition"
+        enableSorting: false, // cannot sort since the org can attatch multiple conditions
+        enableColumnFilter: true,
+        meta: { 
+            label: "Condition",
+            variant: "multiSelect",
+            icon: CircleDashed,
+            showInAdvancedOnly: true,
+            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                const filters = [
+                    {
+                        ...filter,
+                        ...(Array.isArray(filter.value) ? {value: filter.value.map(conditionOption => ({condition: {name: conditionOption}}))} : undefined),
+                    } as any
+                ]
+                const results = filterColumns({
+                    filters,
+                    // join operator doesn't matter in this case because there will only be one entry in the list
+                    joinOperator: 'or'
+                })
+
+                return results
+            },
+            onAsyncSearch: handleAsyncConditionSearch
         }
     },
     {
@@ -172,14 +175,19 @@ export function useClinicalDatasetsTableColumns(
             <MultipleGenesCell row={row} />
         ),
         enableHiding,
-        enableSorting: false,
+        enableSorting,
+        enableColumnFilter: true,
         meta: {
-            label: "Gene"
+            label: "Gene",
+            variant: "multiSelect",
+            icon: CircleDashed,
+            showInAdvancedOnly: true,
+            onAsyncSearch: handleAsyncGeneSearch
         }
     },
     {
-        id: "organization.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
-        accessorKey: "organization",
+        id: "organization.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+        accessorKey: "organization.name",
         header: ({column}) => (
             <DataTableColumnHeader 
                 className="min-w-fit text-nowrap"
@@ -208,10 +216,20 @@ export function useClinicalDatasetsTableColumns(
         ),
         enableHiding,
         enableSorting,
+        enableColumnFilter: true,
+        meta: { 
+            label: "Associated patient group",
+            variant: "select",
+            icon: CircleDashed,
+            showInAdvancedOnly: true,
+            onAsyncSearch: handleAsyncOrganizationSearch
+        }
     },
     {
-        id: "institution.name", // must match typesense accessor key (see diseaseModelSchema in sync.ts and /apps/web/api/sync/route.ts)
-        accessorKey: "institution",
+        id: typesenseSearch
+            ? 'institution.name' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            : 'institution.name',
+        accessorKey: "institution.name",
         header: ({column}) => (
             <DataTableColumnHeader 
                 className="min-w-fit text-nowrap"
@@ -231,9 +249,30 @@ export function useClinicalDatasetsTableColumns(
             )
         },
         enableHiding,
-        enableSorting,
+        enableSorting: false,
+        enableColumnFilter: true,
         meta: {
-            label: "Stored with"
+            label: "Stored with",
+            variant: "select",
+            icon: CircleDashed,
+            showInAdvancedOnly: true,
+            dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                const filters = [
+                    filter,
+                    {
+                        ...filter,
+                        id: 'company.title',
+                        filterId: generateId({length: 8})
+                    }
+                ]
+                const results = filterColumns({
+                    filters,
+                    joinOperator: 'or'
+                })
+
+                return results
+            },
+            onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
         }
     },
     {
@@ -255,8 +294,9 @@ export function useClinicalDatasetsTableColumns(
                 ))}
             </ul>
         ),
-        enableSorting: false,
         enableHiding,
+        enableSorting: false,
+        meta: { label: "Point of contact" }
     },
     {
         id: "links",
@@ -286,6 +326,7 @@ export function useClinicalDatasetsTableColumns(
         ),
         enableSorting: false,
         enableHiding,
+        meta: { label: "Links" }
     },
     {
         id: "description",
@@ -304,6 +345,7 @@ export function useClinicalDatasetsTableColumns(
         ),
         enableSorting: false,
         enableHiding,
+        meta: { label: "Notes" }
     },
   ]
 

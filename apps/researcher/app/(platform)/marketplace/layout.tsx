@@ -1,5 +1,6 @@
 import {ReactNode} from "react";
 import { MarketplaceNav } from "~researcher/components/marketplace/marketplace-nav";
+import * as React from "react";
 
 export default async function ResearcherLayout({children}: { children: ReactNode }) {
     return (

@@ -6,6 +6,7 @@ import {getValidFilters} from "@/packages/lib/data-table"
 import { getBiosamples } from "@/packages/lib/fetchers"
 import { biosampleSearchParamsCache } from "@/packages/lib/validations"
 import { BiosampleMarketplacePage } from "~researcher/components/marketplace/biosample-tools-page"
+import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns"
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,8 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
     const search = biosampleSearchParamsCache.parse(searchParams);
     const validFilters = getValidFilters(search.filters);
     const globalFilter = search.q ?? "";
+
+    const columns = useBiosamplesTableColumns(true, true, false)
 
     const {data, pageCount} = await getBiosamples(
         undefined,
@@ -62,7 +65,8 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
             materialAndDataAccessRequests: true
         },
         {...search, q: globalFilter, filters: validFilters},
-        true // public only
+        true, // public only
+        columns,
     )
 
     return (

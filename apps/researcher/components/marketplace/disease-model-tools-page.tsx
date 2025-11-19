@@ -51,7 +51,6 @@ export const DiseaseModelMarketplacePage = ({data, pageCount, searchParams}: {
                             searchParams={searchParams}
                             onSelectionChange={setRowSelection}
                             showPagination={true}
-                            interactive={false}
                         />
                     </React.Suspense>
                 </FeatureFlagsProvider>

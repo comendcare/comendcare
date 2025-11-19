@@ -52,7 +52,7 @@ const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => (
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
-    title: z.string(),
+    title: z.string().optional(),
     website: z.string().optional(),
     country: z.string(),
     description: z.string().min(2, {
@@ -151,7 +151,7 @@ export default function ResearcherOnboardingForm() {
                 }
 
                 if (researcherData && userData) {
-                    const fetchedValues = {
+                    const fetchedValues: z.infer<typeof userFormSchema> = {
                         name: userData.name || "",
                         title: mapTitleToValue(researcherData.title),
                         country: researcherData.country || "",

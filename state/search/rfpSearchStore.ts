@@ -3,8 +3,9 @@ import { nanoid } from 'nanoid';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { ASSOCIATED_CATEGORIES, Milestone } from '@comend/lib/types'
-import { getExclusiveToFirstGroup } from '@comend/lib/utils';
+import { getExclusiveToFirstGroup, sleep } from '@comend/lib/utils';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
+import { SearchResponse } from 'typesense/lib/Typesense/Documents';
 
 export type ViewType = 'grid' | 'list'
 
@@ -100,22 +101,39 @@ const sortByFilters: { [key: string]: string } = {
     "default": "sort_rank:asc",
 }
 
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  attempts = 2,          // usually 2 extra attempts
+  waitMs = 150           // small backoff
+): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    if (attempts <= 0) throw err;
+    await new Promise(r => setTimeout(r, waitMs));
+    return withRetry(fn, attempts - 1, waitMs * 2);
+  }
+}
+
 const getUpdatedSearchResults = async (
     state: any,
     isNewSearch: boolean = true
-): Promise<{results: any[], total: number}> => {
-    try {
+): Promise<{results: any[], total: number, totalPages: number}> => {
+    const getResults = async (
+        state: any,
+        isNewSearch: boolean = true
+    ) => {
         const filtersString = generateFiltersString(state.filters)
         const searchParameters = {
             q: state.searchTerm,
             query_by: "title,description,eligibility,evaluationProcess",
-            per_page: 10,
-            page: state.lastFetchedPage,
+            per_page: 12,
+            page: Math.min(state.lastFetchedPage, state.totalPages), // don't fetch any pages out of range
             ...(filtersString ? { filter_by: filtersString } : undefined),
             sort_by: sortByFilters[state.sortBy],
         };
 
-        const results = await typesense
+        const results: SearchResponse<Object> = await typesense
             .collections("rfps")
             .documents()
             .search(searchParameters);
@@ -127,7 +145,8 @@ const getUpdatedSearchResults = async (
         if (ids.length === 0) {
             return {
                 results: isNewSearch ? [] : state.searchResults,
-                total: results.found || 0
+                total: results.found || 0,
+                totalPages: Math.ceil(results.out_of/12)
             }
         }
 
@@ -149,15 +168,11 @@ const getUpdatedSearchResults = async (
         return {
             results: isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults],
             total: results.found || 0,
-        };
-
-    } catch (error) {
-        console.error("Search error:", error);
-        return {
-            results: [],
-            total: 0
+            totalPages: Math.ceil(results.out_of/12)
         };
     }
+
+    return await withRetry(() => getResults(state, isNewSearch))
 };
 
 export interface RFPSearchState {
@@ -167,6 +182,8 @@ export interface RFPSearchState {
     setSearchTerm: (newSearch: string) => void,
     sortBy: string,
     setSortBy: (sortBy: string | undefined) => void,
+    totalPages: number,
+    setTotalPages: (page: number) => void,
     lastFetchedPage: number,
     setLastFetchedPage: (page: number) => void,
     view: ViewType,
@@ -192,7 +209,7 @@ export const useRFPSearchStore = create<RFPSearchState>()(
                     sortBy: "default" ,
                 })
 
-                const { results, total } = await getUpdatedSearchResults({
+                const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     sortBy: "default",
                     lastFetchedPage: 1,
@@ -203,12 +220,13 @@ export const useRFPSearchStore = create<RFPSearchState>()(
                     sortBy: "default", 
                     searchResults: results, 
                     lastFetchedPage: 1, 
-                    totalResults: total 
+                    totalResults: total,
+                    totalPages: totalPages
                 })
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
-                const { results, total } = await getUpdatedSearchResults({
+                const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     searchTerm: newSearch,
                     lastFetchedPage: 1,
@@ -235,24 +253,32 @@ export const useRFPSearchStore = create<RFPSearchState>()(
                     searchResults: results,
                     lastFetchedPage: 1,
                     totalResults: total,
+                    totalPages: totalPages
                 })
             },
             sortBy: "default",
             setSortBy: async (sortBy: string | undefined) => {
-                const { results, total } = await getUpdatedSearchResults({
+                const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     sortBy,
                     lastFetchedPage: 1,
                 }, true)
-                set({ sortBy, searchResults: results, lastFetchedPage: 1, totalResults: total })
+                set({ sortBy, searchResults: results, lastFetchedPage: 1, totalResults: total, totalPages })
+            },
+            totalPages: 1,
+            setTotalPages: (page: number) => {
+                set({totalPages: page})
             },
             lastFetchedPage: 1, // page numbers in TypeSense start at 1
             setLastFetchedPage: async (page: number) => {
-                const {results: updateSearchResults} = await getUpdatedSearchResults({
+                // don't search if we've already gotten to the last page
+                if (page > get().totalPages) return
+
+                const {results: updateSearchResults, totalPages} = await getUpdatedSearchResults({
                     ...get(),
                     lastFetchedPage: page
                 }, false)
-                set({ lastFetchedPage: page, searchResults: updateSearchResults })
+                set({ lastFetchedPage: Math.min(page, totalPages), searchResults: updateSearchResults, totalPages })
             },
             view: 'grid',
             setView: (view: ViewType) => set({ view }),
@@ -266,7 +292,7 @@ export const useRFPSearchStore = create<RFPSearchState>()(
                     ...get().filters,
                     ...updatedFilters
                 }
-                const { results, total } = await getUpdatedSearchResults({
+                const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     filters: newFilters,
                     lastFetchedPage: 1,
@@ -321,6 +347,7 @@ export const useRFPSearchStore = create<RFPSearchState>()(
                     lastFetchedPage: 1,
                     searchResults: results,
                     totalResults: total,
+                    totalPages: totalPages
                 })
             },
             totalResults: undefined,
