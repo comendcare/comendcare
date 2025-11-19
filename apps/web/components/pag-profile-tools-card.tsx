@@ -185,7 +185,6 @@ export const PAGProfileToolsCard = ({
                                             columns={biosampleColumns}
                                             searchParams={{}}
                                             showPagination={toolCounts.biosampleCount > 10}
-                                            noResultsOverride={false}
                                         />
                                     </FeatureFlagsProvider>
                                 </div>
@@ -199,7 +198,6 @@ export const PAGProfileToolsCard = ({
                                             columns={diseaseModelColumns}
                                             searchParams={{}}
                                             showPagination={toolCounts.diseaseModelCount > 10}
-                                            noResultsOverride={false}
                                         />
                                     </FeatureFlagsProvider>
                                 </div>
@@ -213,7 +211,6 @@ export const PAGProfileToolsCard = ({
                                             columns={clinicalDatasetColumns}
                                             searchParams={{}}
                                             showPagination={toolCounts.clinicalDatasetCount > 10}
-                                            noResultsOverride={false}
                                         />
                                     </FeatureFlagsProvider>
                                 </div>
