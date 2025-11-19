@@ -12,6 +12,20 @@ import { createClinicalDataset } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
 import { cn, parseCSV } from "@comend/lib/utils";
 import { revalidate } from "@comend/lib/revalidate";
+import { editDataToolForm } from "@comend/lib/types";
+import z from "zod";
+
+export async function formatClinicalDatasetData(biosample: any): Promise<z.infer<typeof editDataToolForm>> {
+
+    const data: z.infer<typeof editDataToolForm> = {
+        title: biosample['Title'],
+        description: biosample['Description'],
+        isPrivate: true,
+        types: []
+        // isPrivate: biosample['Visibility'] ? (biosample['Visibility'] === 'Published' ? false : true) : true
+    }
+    return data
+}
 
 export function AssetBulkImportDialog() {
     const router = useRouter()
@@ -30,7 +44,7 @@ export function AssetBulkImportDialog() {
                 const result = await parseCSV(
                     file,
                     [
-                        {key: 'Title', required: true, defaultValue: 'Untitled Tool', isValid: (entry) => typeof entry === 'string' && entry.length > 0},
+                        {key: 'Title', required: false, defaultValue: 'Untitled Tool', isValid: (entry) => typeof entry === 'string' && entry.length > 0},
                         {key: 'Description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'}
                     ]
                 )
@@ -46,11 +60,16 @@ export function AssetBulkImportDialog() {
                     })
                     console.error("Error: imported tools are missing required fields", result.errors)
                 }
-    
-                await Promise.all(result.values.map(async (tool) => {
-                    await createClinicalDataset(session?.user.organizationId, tool)
+
+                for (let i = 0; i < result.values.length; i++) {
+                    const clinicalDataset = result.values[i]
+
+                    let formattedClinicalDataset = await formatClinicalDatasetData(clinicalDataset)
+                    console.log(`create clinical dataset with data`, formattedClinicalDataset)
+
+                    const newDataset = await createClinicalDataset(session?.user.organizationId, formattedClinicalDataset)
                     setImportCount((prev) => prev + 1)
-                }))
+                }
             } catch (e) {
                 toast('Error!', {
                     position: "bottom-left",

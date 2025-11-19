@@ -145,12 +145,6 @@ export function DiseaseModelBulkImportDialog() {
                     console.error("Error: imported disease models are missing required fields", result.errors)
                 }
 
-                let pagIDtoInternalID: {[key: string]: string} = {}
-
-                const {data: organization} = await getOrganizationFromOrganizationId(session?.user.organizationId, {
-                    donors: true
-                })
-
                 for (let i = 0; i < result.values.length; i++) {
                     const diseaseModel = result.values[i]
 
