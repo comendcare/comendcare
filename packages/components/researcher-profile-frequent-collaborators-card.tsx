@@ -1,5 +1,5 @@
-import {Badge} from "@comend/components/ui/badge"
-import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card"
+import {Badge} from "./ui/badge"
+import {Card, CardContent, CardHeader, CardTitle} from "./ui/card"
 import {
     Users,
 } from "lucide-react"

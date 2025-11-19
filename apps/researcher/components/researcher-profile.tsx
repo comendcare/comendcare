@@ -10,18 +10,35 @@ import {
 } from "lucide-react"
 import {formatNumberWithCommas} from "@/packages/lib/utils";
 import EditResearcherProfileDialog from "~researcher/components/edit-researcher-profile-dialog";
-import ResearcherProfilePublicationsSection from "~researcher/components/researcher-profile-publications-section";
+import ResearcherProfilePublicationsSection from "@comend/components/researcher-profile-publications-section";
 import ResearcherProfileFrequentCollaboratorsCard
-    from "~researcher/components/researcher-profile-frequent-collaborators-card";
-import ResearcherProfileEducationCard from "~researcher/components/researcher-profile-education-card";
+    from "@comend/components/researcher-profile-frequent-collaborators-card";
+import ResearcherProfileEducationCard from "@comend/components/researcher-profile-education-card";
+import {EnrichedResearcher} from "~researcher/types/types";
+import {COUNTRIES} from "@/packages/lib/types";
 
-export default function ResearcherProfile({researcherData}: any) {
+
+const resolveCountry = (countryCodeOrName?: string | null) => {
+    if (!countryCodeOrName) return null;
+
+    const match = COUNTRIES.find(
+        c =>
+            c.label.toLowerCase() === countryCodeOrName.toLowerCase() || // code -> name
+            c.value.toLowerCase() === countryCodeOrName.toLowerCase()    // already name
+    );
+
+    return match?.value ?? countryCodeOrName;
+};
+
+export default function ResearcherProfile({researcherData}: {researcherData: EnrichedResearcher})
+{
     const openAlex = researcherData?.openAlex ?? {};
     const researcher = researcherData?.researcher ?? null;
     const mergedFields = researcherData?.mergedFields ?? {
         name: "Unknown Researcher",
         title: null,
         email: null,
+        description: null,
         researchInterests: [] as string[]
     };
 
@@ -32,7 +49,10 @@ export default function ResearcherProfile({researcherData}: any) {
 
     const displayName = openAlex.display_name || "Unknown Researcher";
     const email = researcherData?.researcher?.email || "Email not available";
-    const location = openAlex.last_known_institutions?.[0]?.country_code || "Country not available";
+    const location =
+        resolveCountry(openAlex.last_known_institutions?.[0]?.country_code) ??
+        resolveCountry(researcher?.country) ??
+        "Country not available";
 
     const metrics = {
         citations: openAlex.cited_by_count ?? 0,
@@ -41,7 +61,22 @@ export default function ResearcherProfile({researcherData}: any) {
         yearsActive: openAlex.counts_by_year ? openAlex.counts_by_year.length : 0
     };
 
-    const researchInterests = openAlex?.topics?.map((topic: any) => topic.display_name) || [];
+    const researchInterests: string[] = Array.from(
+        new Set(
+            [
+                // OpenAlex topics
+                ...(openAlex?.topics?.map((topic: any) => topic.display_name) ?? []),
+
+                // Merged researchInterests (keeps your fallback behavior)
+                ...(mergedFields.researchInterests ?? []),
+
+                // Extra arrays from your Prisma Researcher
+                ...(researcher?.therapeuticsOfInterest ?? []),
+                ...(researcher?.conditionsOfInterest ?? []),
+                ...(researcher?.genesOfInterest ?? []),
+            ].filter(Boolean)
+        )
+    );
 
     const coAuthors = (openAlex?.display_name_alternatives || []).slice(0, 5).map((name: string, index: number) => ({
         name,
@@ -96,7 +131,7 @@ export default function ResearcherProfile({researcherData}: any) {
                                     {/*    <Mail className="w-4 h-4 mr-2" />*/}
                                     {/*    Contact*/}
                                     {/*</Button>*/}
-                                    <EditResearcherProfileDialog researcher={researcherData.researcher}/>
+                                    {researcherData?.researcher && <EditResearcherProfileDialog researcher={researcherData.researcher}/>}
                                 </div>
                             </div>
                         </div>
@@ -186,7 +221,7 @@ export default function ResearcherProfile({researcherData}: any) {
                             </CardHeader>
                             <CardContent className="flex flex-col space-y-4">
                                 <div className="prose max-w-none">
-                                    {mergedFields.title ?? ""}
+                                    {researcher?.description ?? ""}
                                 </div>
 
                                 <ResearcherProfilePublicationsSection

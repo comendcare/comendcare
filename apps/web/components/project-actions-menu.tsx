@@ -9,7 +9,7 @@ import {
 import {Button} from "@comend/components/ui/button"
 import {useEffect, useRef, useState} from "react"
 import {Milestone} from "@comend/lib/types"
-import {RoadmapState, useRoadmapStore} from "~web/state/roadmap/roadmapStore"
+import {RoadmapState, useRoadmapStore} from "./../state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import {Dialog, DialogContent, DialogPortal} from "@comend/components/ui/dialog"
 import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"

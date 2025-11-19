@@ -1,0 +1,60 @@
+"use client"
+
+import * as React from "react";
+import {DataTableSkeleton} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
+import {DatabaseClinicalDatasetsTable} from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/database-clinical-datasets-table"
+import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
+import {Shell} from "@/packages/components/biorepo/advanced-data-table/lib/shell";
+import {useClinicalDatasetsTableColumns} from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
+import type {Biosample, Tool} from "@prisma/client";
+import {SearchParams} from "@/packages/components/types";
+import {useRef, useState} from "react";
+
+export const ClinicalDatasetMarketplacePage = ({data, pageCount, searchParams}: {
+    data: Tool[],
+    pageCount: number,
+    searchParams: SearchParams
+}) => {
+    const columns = useClinicalDatasetsTableColumns(true, true, false)
+    const [rowSelection, setRowSelection] = useState<Object[]>([])
+    const parentRef = useRef<HTMLDivElement>(null)
+
+    return (
+        <main 
+            className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto px-4" 
+            ref={parentRef}
+        >
+            <Shell className="gap-2">
+                <FeatureFlagsProvider>
+                    <React.Suspense
+                        fallback={
+                            <DataTableSkeleton
+                                columnCount={7}
+                                filterCount={2}
+                                cellWidths={[
+                                    "10rem",
+                                    "30rem",
+                                    "10rem",
+                                    "10rem",
+                                    "6rem",
+                                    "6rem",
+                                    "6rem",
+                                ]}
+                                shrinkZero
+                            />
+                        }
+                    >
+                        <DatabaseClinicalDatasetsTable 
+                            data={data} 
+                            pageCount={pageCount} 
+                            columns={columns}
+                            searchParams={searchParams}
+                            onSelectionChange={setRowSelection}
+                            showPagination={true}
+                        />
+                    </React.Suspense>
+                </FeatureFlagsProvider>
+            </Shell>
+        </main>
+    )
+}

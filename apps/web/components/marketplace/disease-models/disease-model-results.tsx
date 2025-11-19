@@ -6,7 +6,7 @@ import { useShallow } from "zustand/react/shallow";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
 import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
-import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table";
+import { TypesenseDiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/typesense-disease-models-table";
 
 const selector = (state: DiseaseModelSearchState) => ({
     searchResults: state.searchResults,
@@ -43,7 +43,7 @@ export function DiseaseModelSearchResults({
                 <NoResultsView />
             ): (
                 <div className="max-w-7xl w-full overflow-auto">
-                    <DiseaseModelsTable data={searchResults} pageCount={1} columns={columns} searchParams={{}}/>
+                    <TypesenseDiseaseModelsTable data={searchResults} pageCount={1} columns={columns} searchParams={{}}/>
                 </div>
             )}
         </div>

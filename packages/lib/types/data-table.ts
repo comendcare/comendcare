@@ -15,6 +15,7 @@ declare module "@tanstack/react-table" {
         icon?: React.FC<React.SVGProps<SVGSVGElement>>;
         showInAdvancedOnly?: boolean;
         onAsyncSearch?: (query?: string | undefined) => Promise<Option[]>
+        dbAccessor?: (filter: ExtendedColumnFilter<unknown>) => Object | undefined;
     }
 }
 

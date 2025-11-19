@@ -46,6 +46,7 @@ import {
 } from "./validations";
 import {notFound, redirect} from "next/navigation";
 import {switchOrganization} from "./actions";
+import { ColumnDef } from "@tanstack/react-table";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function findInstitutions(
@@ -2479,21 +2480,32 @@ export const getDiseaseModels = async (
         client: {};
     }>,
     input?: GetDiseaseModelSchema,
-    publicOnly: boolean = false
+    publicOnly: boolean = false,
+    columns?: ColumnDef<any>[],
 ): Promise<{data: DiseaseModel[], pageCount: number}> => {
     if (publicOnly) { // allow any requester to fetch public data
-        if (!organizationId) return {data: [], pageCount: 0}
-        const organization = await prisma.organization.findUnique({
-            where: {id: organizationId}
-        })
-        if (!organization) return {data: [], pageCount: 0}
-        
-        return await fetchDiseaseModels(
-            organization,
-            select,
-            input,
-            publicOnly
-        )
+        if (organizationId) {
+            // if org ID is provided only fetch tools for organization
+            const organization = await prisma.organization.findUnique({
+                where: {id: organizationId}
+            })
+
+            return await fetchDiseaseModels(
+                organization,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        } else {
+            return await fetchDiseaseModels(
+                undefined,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        }
     }
 
     // only allow members of the organization to fetch private data
@@ -2512,6 +2524,7 @@ export const getDiseaseModels = async (
             return await fetchDiseaseModels(
                 organization,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -2520,13 +2533,14 @@ export const getDiseaseModels = async (
 }
 
 const fetchDiseaseModels = async (
-    organization: Organization, 
+    organization: Organization | null | undefined, 
     select: Prisma.DiseaseModelSelect<InternalArgs & {
         result: {};
         model: {};
         query: {};
         client: {};
     }>,
+    columns?: ColumnDef<any>[] | undefined, 
     input?: GetDiseaseModelSchema,
     publicOnly: boolean = false
 ): Promise<{
@@ -2538,21 +2552,18 @@ const fetchDiseaseModels = async (
             const [data, total] = await prisma.$transaction([
                 prisma.diseaseModel.findMany({
                     where: {
-                        organizationId: organization.id,
+                        ...(organization ? {organizationId: organization.id} : undefined),
                         ...(publicOnly ? {private: false} : undefined)
                     },
-                    // include: {
-                    //     attachments: true,
-                    //     contacts: true,
-                    //     organization: {include: {conditions: {include: {condition: true}}}},
-                    //     gene: true,
-                    //     institution: true,
-                    //     milestones: {include: {milestone: true}},
-                    // },
                     select,
                     orderBy: {createdAt: "asc"},
                 }),
-                prisma.diseaseModel.count({where: {organizationId: organization.id}}),
+                prisma.diseaseModel.count({
+                    where: {
+                        ...(organization ? {organizationId: organization.id} : undefined),
+                        ...(publicOnly ? {private: false} : undefined)
+                    }
+                }),
             ]);
 
             return {data, pageCount: 1};
@@ -2563,17 +2574,12 @@ const fetchDiseaseModels = async (
             input.filterFlag === "advancedFilters"
 
         let where: any = {};
-        console.log(`input`, input)
 
         if (advancedTable) {
-            const preProcessedFilters: any = input.filters.map(filter => ({
-                ...filter,
-                ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
-            }))
-
             where = filterColumns({
-                filters: preProcessedFilters,
+                filters: input.filters,
                 joinOperator: input.joinOperator,
+                schemaColumns: columns
             })
         } else {
             const filters: any[] = []
@@ -2616,8 +2622,19 @@ const fetchDiseaseModels = async (
                 { id: { contains: input.q, mode: "insensitive" } },
                 { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
                 { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
-                { description: {contains: input.q, mode: "insensitive"}},
+                { company: {title: {contains: input.q, mode: "insensitive"} } },
                 { genotype: {contains: input.q, mode: "insensitive"}},
+                { organization: {name: {contains: input.q, mode: "insensitive"}}},
+                { organization: {
+                    conditions: {
+                        some: {
+                            condition: {
+                                name: {contains: input.q, mode: "insensitive"}}
+                            }
+                        }
+                    }
+                },
+                { description: {contains: input.q, mode: "insensitive"}},
                 { strain: {contains: input.q, mode: "insensitive"}},
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
@@ -2639,26 +2656,16 @@ const fetchDiseaseModels = async (
                 take: input.perPage,
                 where: {
                     ...where,
-                    organizationId: organization.id,
+                    ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 },
-                include: {
-                    attachments: true,
-                    contacts: true,
-                    organization: {include: {conditions: {include: {condition: true}}}},
-                    gene: true,
-                    // genes: true,
-                    institution: true,
-                    company: true,
-                    milestones: {include: {milestone: true}},
-                    createFacilityRequests: true,
-                },
+                select,
                 orderBy,
             }),
             prisma.diseaseModel.count({
                 where: {
                     ...where, 
-                    organizationId: organization.id,
+                    ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 }
             }),
@@ -2689,21 +2696,33 @@ export const getBiosamples = async (
         client: {};
     }>,
     input?: GetBiosamplesSchema,
-    publicOnly: boolean = false
+    publicOnly: boolean = false,
+    columns?: ColumnDef<any>[],
 ): Promise<{data: Biosample[], pageCount: number}> => {
     if (publicOnly) { // allow any requester to fetch public data
-        if (!organizationId) return {data: [], pageCount: 0}
-        const organization = await prisma.organization.findUnique({
-            where: {id: organizationId}
-        })
-        if (!organization) return {data: [], pageCount: 0}
-        
-        return await fetchBiosamples(
-            organization,
-            select,
-            input,
-            publicOnly
-        )
+        if (organizationId) {
+            // if org ID is provided only fetch tools for organization
+            const organization = await prisma.organization.findUnique({
+                where: {id: organizationId}
+            })
+
+            return await fetchBiosamples(
+                organization,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        } else {
+            // if org ID is not provided fetch all public tools
+            return await fetchBiosamples(
+                undefined,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        }
     }
 
     // only allow members of the organization to fetch private data
@@ -2722,6 +2741,7 @@ export const getBiosamples = async (
             return await fetchBiosamples(
                 organization,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -2730,13 +2750,14 @@ export const getBiosamples = async (
 }
 
 const fetchBiosamples = async (
-    organization: Organization, 
+    organization: Organization | null | undefined, 
     select: Prisma.BiosampleSelect<InternalArgs & {
         result: {};
         model: {};
         query: {};
         client: {};
     }>,
+    columns?: ColumnDef<any>[] | undefined, 
     input?: GetBiosamplesSchema,
     publicOnly: boolean = false
 ) => {
@@ -2745,13 +2766,18 @@ const fetchBiosamples = async (
             const [data, total] = await prisma.$transaction([
                 prisma.biosample.findMany({
                     where: {
-                        organizationId: organization.id,
+                        ...(organization ? {organizationId: organization.id} : undefined),
                         ...(publicOnly ? {private: false} : undefined)
                     },
                     select,
                     orderBy: {createdAt: "asc"},
                 }),
-                prisma.biosample.count({where: {organizationId: organization.id}}),
+                prisma.biosample.count({
+                    where: {
+                        ...(organization ? {organizationId: organization.id} : undefined),
+                        ...(publicOnly ? {private: false} : undefined)
+                    }
+                }),
             ]);
 
             return {data, pageCount: 1};
@@ -2764,18 +2790,10 @@ const fetchBiosamples = async (
         let where: any = {};
 
         if (advancedTable) {
-            const preProcessedFilters: any = input.filters.map(filter => ({
-                ...filter,
-                ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
-                ...(filter.id === "donor.diagnoses" && Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
-                ...(filter.id === "gene" && {value: {symbol: filter.value}}),
-                ...(filter.id === "institution" && {value: {name: filter.value}}),
-                ...(filter.id === "milestones" && Array.isArray(filter.value) ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} : undefined)
-            }))
-
             where = filterColumns({
-                filters: preProcessedFilters,
+                filters: input.filters,
                 joinOperator: input.joinOperator,
+                schemaColumns: columns
             })
         } else {
             const filters: any[] = []
@@ -2837,7 +2855,18 @@ const fetchBiosamples = async (
                 { id: { contains: input.q, mode: "insensitive" } },
                 { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
                 { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                { company: {title: {contains: input.q, mode: "insensitive"} } },
                 { genotype: {contains: input.q, mode: "insensitive"}},
+                { organization: {name: {contains: input.q, mode: "insensitive"}}},
+                { organization: {
+                    conditions: {
+                        some: {
+                            condition: {
+                                name: {contains: input.q, mode: "insensitive"}}
+                            }
+                        }
+                    }
+                },
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                 // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
@@ -2871,29 +2900,16 @@ const fetchBiosamples = async (
                 take: input.perPage,
                 where: {
                     ...where,
-                    organizationId: organization.id,
+                    ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 },
-                include: {
-                    milestones: {include: {milestone: true}},
-                    contacts: true,
-                    attachments: true,
-                    gene: true,
-                    // genes: true,
-                    donor: {
-                        include: {diagnoses: {include: {type: true}}}
-                    },
-                    institution: true,
-                    company: true,
-                    materialAndDataAccessRequests: true,
-                    createFacilityRequests: true,
-                },
+                select,
                 orderBy,
             }),
             prisma.biosample.count({
                 where: {
                     ...where, 
-                    organizationId: organization.id, 
+                    ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 }
             }),
@@ -3059,21 +3075,31 @@ export const getClinicalDatasets = async (
         client: {};
     }>,
     input?: GetClinicalDatasetsSchema,
-    publicOnly: boolean = false
+    publicOnly: boolean = false,
+    columns?: ColumnDef<any>[],
 ): Promise<{data: Tool[], pageCount: number}> => {
     if (publicOnly) { // allow any requester to fetch public data
-        if (!organizationId) return {data: [], pageCount: 0}
-        const organization = await prisma.organization.findUnique({
-            where: {id: organizationId}
-        })
-        if (!organization) return {data: [], pageCount: 0}
-        
-        return await fetchClinicalDatsets(
-            organization,
-            select,
-            input,
-            publicOnly
-        )
+        if (organizationId) {
+            const organization = await prisma.organization.findUnique({
+                where: {id: organizationId}
+            })
+
+            return await fetchClinicalDatsets(
+                organization,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        } else {
+            return await fetchClinicalDatsets(
+                undefined,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        }
     }
 
     // only allow members of the organization to fetch private data
@@ -3092,6 +3118,7 @@ export const getClinicalDatasets = async (
             return await fetchClinicalDatsets(
                 organization,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -3100,13 +3127,14 @@ export const getClinicalDatasets = async (
 }
 
 const fetchClinicalDatsets = async (
-    organization: Organization, 
+    organization: Organization | null | undefined, 
     select: Prisma.ToolSelect<InternalArgs & {
         result: {};
         model: {};
         query: {};
         client: {};
     }>,
+    columns?: ColumnDef<any>[] | undefined,
     input?: GetClinicalDatasetsSchema,
     publicOnly: boolean = false
 ): Promise<{
@@ -3118,21 +3146,18 @@ const fetchClinicalDatsets = async (
             const [data, total] = await prisma.$transaction([
                 prisma.tool.findMany({
                     where: {
-                        organizationId: organization.id,
+                        ...(organization ? {organizationId: organization.id} : undefined),
                         ...(publicOnly ? {private: false} : undefined)
                     },
-                    // include: {
-                    //     organization: {include: {conditions: {include: {condition: true}}}},
-                    //     milestones: {include: {milestone: true}},
-                    //     contacts: true,
-                    //     attachments: true,
-                    //     institution: true,
-                    //     gene: true,
-                    // },
                     select,
                     orderBy: {createdAt: "asc"},
                 }),
-                prisma.tool.count({where: {organizationId: organization.id}}),
+                prisma.tool.count({
+                    where: {
+                        ...(organization ? {organizationId: organization.id} : undefined),
+                        ...(publicOnly ? {private: false} : undefined)
+                    }
+                }),
             ]);
 
             return {data, pageCount: 1};
@@ -3145,14 +3170,10 @@ const fetchClinicalDatsets = async (
         let where: any = {};
 
         if (advancedTable) {
-            const preProcessedFilters: any = input.filters.map(filter => ({
-                ...filter,
-                ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
-            }))
-
             where = filterColumns({
-                filters: preProcessedFilters,
+                filters: input.filters,
                 joinOperator: input.joinOperator,
+                schemaColumns: columns
             })
         } else {
             const filters: any[] = []
@@ -3199,13 +3220,32 @@ const fetchClinicalDatsets = async (
             // custom filtering for types - if any of the type labels include the query, include biosamples
             // with these types
             const queriedTypes = TOOL_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+            const queriedGenes = await prisma.gene.findMany({
+                where: {
+                    symbol: {contains: input.q, mode: "insensitive"}
+                }
+            })
+            const geneSymbols = queriedGenes?.map(gene => gene.symbol)
 
             where.OR = [
                 { id: { contains: input.q, mode: "insensitive" } },
                 { title: {contains: input.q, mode: "insensitive"}},
-                { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
-                { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
                 { description: {contains: input.q, mode: "insensitive"}},
+                { genes: {
+                    hasSome: geneSymbols // matches any symbol in the array
+                }},
+                { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                { company: {title: {contains: input.q, mode: "insensitive"} } },
+                { organization: {name: {contains: input.q, mode: "insensitive"}}},
+                { organization: {
+                    conditions: {
+                        some: {
+                            condition: {
+                                name: {contains: input.q, mode: "insensitive"}}
+                            }
+                        }
+                    }
+                },
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                 // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
@@ -3226,26 +3266,16 @@ const fetchClinicalDatsets = async (
                 take: input.perPage,
                 where: {
                     ...where,
-                    organizationId: organization.id,
+                    ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 },
-                include: {
-                    organization: {include: {conditions: {include: {condition: true}}}},
-                    milestones: {include: {milestone: true}},
-                    contacts: true,
-                    attachments: true,
-                    institution: true,
-                    company: true,
-                    gene: true,
-                    // genes: true,
-                    createFacilityRequests: true,
-                },
+                select,
                 orderBy,
             }),
             prisma.tool.count({
                 where: {
                     ...where, 
-                    organizationId: organization.id, 
+                    ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 }
             }),

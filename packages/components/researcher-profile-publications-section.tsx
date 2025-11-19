@@ -1,8 +1,8 @@
 "use client"
 
-import {Button} from "@/packages/components/ui/button";
-import {Card, CardContent} from "@/packages/components/ui/card";
-import {Badge} from "@/packages/components/ui/badge";
+import {Button} from "./ui/button";
+import {Card, CardContent} from "./ui/card";
+import {Badge} from "./ui/badge";
 import {
     QuoteIcon as Citation,
     ExternalLink,
@@ -14,7 +14,7 @@ import {
     PaginationLink,
     PaginationPrevious,
     PaginationNext,
-} from "@comend/components/ui/pagination"
+} from "./ui/pagination"
 import {useState} from "react";
 
 
@@ -35,9 +35,6 @@ export default function ResearcherProfilePublicationsSection({researcherData}: {
         <>
             <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Recent Publications</h2>
-                <Button variant="outline" size="sm">
-                    View All ({publications.length})
-                </Button>
             </div>
 
             <div className="space-y-4">
