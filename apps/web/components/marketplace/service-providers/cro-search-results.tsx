@@ -4,18 +4,15 @@ import React, {useEffect, useState} from "react"
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore";
 import { useShallow } from "zustand/react/shallow";
 import InfiniteScroll from "@comend/components/ui/infinite-scroll";
-import Image from "next/image";
 import {CROMarketplaceCard} from "~web/components/marketplace/marketplace-cro-card";
 import {CROMarketplaceListElement} from "@comend/components/marketplace-cro-list-element";
-import { Card, CardContent } from "@comend/components/ui/card";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
 import {useSession} from "next-auth/react";
-import {getSavedCompaniesFromOrganizationId} from "@/packages/lib/fetchers";
+import {getSavedCompaniesFromOrganizationId} from "@comend/lib/fetchers";
 import {SavedCompany} from "@prisma/client";
 import { LoaderCircle } from "lucide-react";
-import { cn } from "@/packages/lib/utils";
-import { search } from "@notionhq/client/build/src/api-endpoints";
+import { cn } from "@comend/lib/utils";
 
 const selector = (state: CROSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,

@@ -1,15 +1,9 @@
-import {getCROData} from "@comend/lib/fetchers";
-import {notFound} from "next/navigation";
-// import {Star} from "@comend/components/cro-rating-section";
 import {CertificationBadge} from "@comend/components/certification-badge";
-import SaveCRODialog from "~web/components/save-cro-dialog";
 import {
     BriefcaseBusiness,
     Building,
-    Star,
     Building2,
     Calendar,
-    ExternalLink,
     Factory,
     MapPin,
     Rocket,
@@ -17,16 +11,14 @@ import {
     Dna,
     HeartHandshake,
 } from "lucide-react";
-import Link from "next/link";
 import React from "react";
 import {ServiceProviderWebsiteButton} from "../service-provider-website-button";
 import {companyTypeMap, CompanyWithReviewsAndServices, StatusType} from "@comend/lib/types";
 import ContactCroDialog from "~web/components/contact-cro-dialog";
-import SaveCROButton from "~web/components/save-cro-button";
-import {Avatar, AvatarFallback, AvatarImage} from "@/packages/components/ui/avatar";
+import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
 import {HoverableAvatar} from "~web/components/hoverable-avatar";
 import {type Milestone, Organization} from "@prisma/client";
-import {nameToInitials} from "@/packages/lib/utils";
+import {nameToInitials} from "@comend/lib/utils";
 import StatusButton from "~web/components/milestone-status-button";
 
 type WorkedWithItem = {

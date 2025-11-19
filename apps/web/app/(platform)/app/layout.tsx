@@ -1,13 +1,12 @@
 // app/app/layout.tsx  (Server Component)
 import {getServerSession} from "next-auth";
-import {authOptions} from "@/packages/lib/auth";
-import prisma from "@/packages/lib/prisma";
+import {authOptions} from "@comend/lib/auth";
+import prisma from "@comend/lib/prisma";
 import AppClientShell from "./_client-shell";
 import InvitationGate from "~web/components/invitation-gate";
 import type {Organization} from "@prisma/client";
-import {Button} from "@/packages/components/ui/button";
+import {Button} from "@comend/components/ui/button";
 import Link from "next/link";
-import {SidebarTrigger} from "@/packages/components/ui/sidebar";
 import * as React from "react";
 import dynamic from "next/dynamic";
 

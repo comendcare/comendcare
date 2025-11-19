@@ -1,10 +1,10 @@
 import React from "react"
-import {SearchParams} from "@/packages/components/types"
-import {getValidFilters} from "@/packages/lib/data-table"
-import { getDiseaseModels } from "@/packages/lib/fetchers"
-import { biosampleSearchParamsCache } from "@/packages/lib/validations"
+import {SearchParams} from "@comend/components/types"
+import {getValidFilters} from "@comend/lib/data-table"
+import { getDiseaseModels } from "@comend/lib/fetchers"
+import { biosampleSearchParamsCache } from "@comend/lib/validations"
 import { DiseaseModelMarketplacePage } from "~researcher/components/marketplace/disease-model-tools-page"
-import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
+import { useDiseaseModelsTableColumns } from "@comend/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
 
 export const dynamic = "force-dynamic";
 

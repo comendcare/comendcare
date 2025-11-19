@@ -8,14 +8,14 @@ import {
     Star,
     TrendingUp,
 } from "lucide-react"
-import {formatNumberWithCommas} from "@/packages/lib/utils";
+import {formatNumberWithCommas} from "@comend/lib/utils";
 import EditResearcherProfileDialog from "~researcher/components/edit-researcher-profile-dialog";
 import ResearcherProfilePublicationsSection from "@comend/components/researcher-profile-publications-section";
 import ResearcherProfileFrequentCollaboratorsCard
     from "@comend/components/researcher-profile-frequent-collaborators-card";
 import ResearcherProfileEducationCard from "@comend/components/researcher-profile-education-card";
 import {EnrichedResearcher} from "~researcher/types/types";
-import {COUNTRIES} from "@/packages/lib/types";
+import {COUNTRIES} from "@comend/lib/types";
 
 
 const resolveCountry = (countryCodeOrName?: string | null) => {

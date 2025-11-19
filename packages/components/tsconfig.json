@@ -12,6 +12,7 @@
         // "@/components/*": ["components/*"],
         // "@/*": ["packages/*"],
         "@/state/*": ["state/*"],
+        "@/public/*": ["../../public/*"]
         // "@/data/*": ["data/*"],
         // "@/public/*": ["public/*"],
         // "@/loading": ["loading.tsx"],

@@ -1,5 +1,5 @@
 import React from "react";
-import {getSession} from "@/packages/lib/auth";
+import {getSession} from "@comend/lib/auth";
 import {getResearcherWithMergedDataAdvanced, getResearcherWithMergedData} from "@comend/lib/fetchers";
 import PublicResearcherProfile from "~web/components/public-researcher-profile";
 

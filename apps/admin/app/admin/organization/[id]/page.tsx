@@ -1,4 +1,4 @@
-import { getSession } from "@/packages/lib/auth"
+import { getSession } from "@comend/lib/auth"
 import prisma from "@comend/lib/prisma"
 import { notFound, redirect } from "next/navigation"
 import {VerifyOrganizationSwitch} from "~admin/components/verify-organization-switch";
@@ -8,10 +8,6 @@ import {toast} from "sonner";
 import { mixpanelTrack } from "@comend/lib/mixpanel"
 import {DeleteOrganizationAlertDialog} from "@comend/components/delete-organization-alert-dialog";
 import EditPAGProfileDialog from "~admin/components/edit-pag-profile-dialog";
-import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/dialog";
-import { Button } from "@/packages/components/ui/button";
-import { Plus } from "lucide-react";
-import InviteUserToOrgDialog from "~admin/components/invite-user-to-org-dialog";
 
 export default async function AdminOrganizationPage({
     params

@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from "react"
 import { DiseaseModelSearchResults } from "~web/components/marketplace/disease-models/disease-model-results";
 import { DiseaseModelMarketplaceIntegratedSearchAndFilter } from "~web/components/marketplace/disease-models/disease-model-marketplace-integrated-search-and-filter";
-import { SearchParams } from "@/packages/components/types";
+import { SearchParams } from "@comend/components/types";
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore";
 import { useShallow } from "zustand/react/shallow";
-import { initializeDiseaseModelSearch } from "@/packages/lib/initialize-client-state";
+import { initializeDiseaseModelSearch } from "@comend/lib/initialize-client-state";
 
 interface IndexPageProps {
     searchParams: Promise<SearchParams>

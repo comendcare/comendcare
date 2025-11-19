@@ -12,12 +12,11 @@ import MultipleSelector from "@comend/components/ui/multiple-selector"
 import {DISEASE_MODEL_TYPE_OPTIONS} from "@comend/lib/types"
 import {debounce} from "lodash";
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/packages/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import type { Option } from "@comend/lib/types"
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
-import { initializeDiseaseModelSearch } from "@/packages/lib/initialize-client-state"
 
 export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, setSearchTerm, filters, setFilters, totalResults} = useDiseaseModelSearchStore(

@@ -38,11 +38,11 @@ import {
     getResearcherFromUserId,
 } from "@comend/lib/fetchers";
 import {useSession} from "next-auth/react";
-import {Skeleton} from "@/packages/components/ui/skeleton";
-import {badgeVariants} from "@/packages/components/ui/badge";
-import LoadingDots from "@/packages/components/icons/loading-dots";
+import {Skeleton} from "@comend/components/ui/skeleton";
+import {badgeVariants} from "@comend/components/ui/badge";
+import LoadingDots from "@comend/components/icons/loading-dots";
 import {EnrichedResearcher} from "~researcher/types/types";
-import {Textarea} from "@/packages/components/ui/textarea";
+import {Textarea} from "@comend/components/ui/textarea";
 import {mapTitleToValue, TitleEnum} from "~researcher/lib/utils";
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({

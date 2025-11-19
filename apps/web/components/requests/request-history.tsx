@@ -4,8 +4,8 @@ import {useRequestSearchStore} from "@/state/search/requestSearchStore";
 import {MaterialAndDataAccessRequest} from "@prisma/client";
 import {useEffect, useState} from "react";
 import { Skeleton } from "@comend/components/ui/skeleton";
-import { getOrganizationRequests } from "@/packages/lib/fetchers";
-import RequestCard from "@/packages/components/requests/request-card";
+import { getOrganizationRequests } from "@comend/lib/fetchers";
+import RequestCard from "@comend/components/requests/request-card";
 import { useSession } from "next-auth/react";
 import {
     Pagination,
@@ -13,8 +13,7 @@ import {
     PaginationItem,
     PaginationLink, PaginationNext,
     PaginationPrevious
-} from "@/packages/components/ui/pagination";
-import Image from "next/image";
+} from "@comend/components/ui/pagination";
 
 const ITEMS_PER_PAGE = 5;
 

@@ -1,13 +1,12 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React from "react"
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { useShallow } from "zustand/react/shallow";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
-import { TypesenseBiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/typesense-biosamples-table";
-import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
-import { SearchParams } from "@/packages/components/types";
+import { TypesenseBiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/typesense-biosamples-table";
+import { useBiosamplesTableColumns } from "@comend/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
 
 const selector = (state: BiosampleSearchState) => ({
     searchResults: state.searchResults,

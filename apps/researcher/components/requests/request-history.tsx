@@ -1,13 +1,13 @@
 "use client"
 
-import {useRequestSearchStore} from "@/state/search/requestSearchStore";
+import {useRequestSearchStore} from "./../../../../state/search/requestSearchStore";
 import {MaterialAndDataAccessRequest} from "@prisma/client";
 import {useEffect, useState} from "react";
 import {Skeleton} from "@comend/components/ui/skeleton";
-import {getResearcherRequests} from "@/packages/lib/fetchers";
-import RequestCard from "@/packages/components/requests/request-card";
+import {getResearcherRequests} from "@comend/lib/fetchers";
+import RequestCard from "@comend/components/requests/request-card";
 import {useSession} from "next-auth/react";
-import {Button} from "@/packages/components/ui/button";
+import {Button} from "@comend/components/ui/button";
 import {useRouter} from "next/navigation";
 import {
     Pagination,

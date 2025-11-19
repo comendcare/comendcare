@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import {buttonVariants} from "@/packages/components/ui/button";
+import {buttonVariants} from "@comend/components/ui/button";
 
 export default function NotFound() {
     return (

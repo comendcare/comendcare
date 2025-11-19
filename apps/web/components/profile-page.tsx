@@ -15,9 +15,9 @@ import {EditableProfilePhoto} from "./editable-profile-photo";
 import {EditablePAGBannerPhoto} from "./editable-pag-banner-photo";
 import {PAGProfileToolsCard} from "./pag-profile-tools-card";
 import Link from "next/link";
-import { SearchParams } from "@/packages/components/types";
+import { SearchParams } from "@comend/components/types";
 import dynamic from "next/dynamic";
-import LoadingDots from "@/packages/components/icons/loading-dots";
+import LoadingDots from "@comend/components/icons/loading-dots";
 import type { Biosample, DiseaseModel, Tool } from "@prisma/client";
 
 export type ToolCounts = {

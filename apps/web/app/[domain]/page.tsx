@@ -5,7 +5,6 @@ import {
     getOrganizationData,
     getConditionsDataFromOrgId,
     getPublicRFPsForOrganization,
-    getPublicClinicalDatasetsForOrganization,
     getPublicRoadmapsForOrganization,
     getPublicToolCountsForOrganization,
     getBiosamples,
@@ -24,10 +23,10 @@ import React from "react";
 import UnpublishedOrganizationPage from "~web/components/unpublished-organization-page";
 import {Mail, Share} from "lucide-react";
 import { PAGProfileToolsCard } from "~web/components/pag-profile-tools-card";
-import { SearchParams } from "@/packages/components/types";
-import { biosampleSearchParamsCache } from "@/packages/lib/validations";
-import { getValidFilters } from "@/packages/lib/data-table";
-import { RFPSort } from "@/packages/lib/utils";
+import { SearchParams } from "@comend/components/types";
+import { biosampleSearchParamsCache } from "@comend/lib/validations";
+import { getValidFilters } from "@comend/lib/data-table";
+import { RFPSort } from "@comend/lib/utils";
 
 interface IndexPageProps {
     params: {domain: string},

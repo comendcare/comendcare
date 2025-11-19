@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react"
 import { DiseaseModelSearchResults } from "~web/components/marketplace/disease-models/disease-model-results";
 import { DiseaseModelMarketplaceIntegratedSearchAndFilter } from "~web/components/marketplace/disease-models/disease-model-marketplace-integrated-search-and-filter";
-import { initializeDiseaseModelSearch } from "@/packages/lib/initialize-client-state";
+import { initializeDiseaseModelSearch } from "@comend/lib/initialize-client-state";
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore";
-import { SearchParams } from "@/packages/components/types";
+import { SearchParams } from "@comend/components/types";
 import { useShallow } from "zustand/react/shallow";
 
 interface IndexPageProps {

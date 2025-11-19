@@ -10,13 +10,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { cn } from "@comend/lib/utils";
-import { editMilestoneForm, ImportSchemaEntry, MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS } from "@/packages/lib/types";
+import { editMilestoneForm, ImportSchemaEntry, MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS } from "@comend/lib/types";
 import z from "zod";
 import { useShallow } from "zustand/react/shallow";
 import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore";
 import Papa from "papaparse";
-import { Badge } from "@/packages/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
+import { Badge } from "@comend/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones,

@@ -1,4 +1,4 @@
-import { getSession } from "@/packages/lib/auth"
+import { getSession } from "@comend/lib/auth"
 import { Roadmap } from "~web/components/roadmap"
 import NoOrganization from "~web/components/no-organization"
 import {
@@ -12,8 +12,7 @@ import {
     getRoadmapEdges, 
     getRoadmapMilestones, 
     getRoadmapNodes
-} from "@/packages/lib/fetchers"
-import { createCreateFacilityRequest } from "@/packages/lib/actions"
+} from "@comend/lib/fetchers"
 
 export default async function RoadmapPage({
                                               params,

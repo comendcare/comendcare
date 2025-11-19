@@ -8,12 +8,11 @@ import { OrganizationMarketplaceListElement } from "../marketplace-pag-list-elem
 import InfiniteScroll from "@comend/components/ui/infinite-scroll";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
-import {getSavedCompaniesFromOrganizationId, getSavedOrganizationsFromOrganizationId} from "@/packages/lib/fetchers";
-import {SavedCompany, SavedOrganization} from "@prisma/client";
+import {getSavedOrganizationsFromOrganizationId} from "@comend/lib/fetchers";
+import {SavedOrganization} from "@prisma/client";
 import {useSession} from "next-auth/react";
-import {SavedOrganizationData} from "@/packages/lib/types";
 import { LoaderCircle } from "lucide-react";
-import { cn } from "@/packages/lib/utils";
+import { cn } from "@comend/lib/utils";
 
 const selector = (state: OrganizationSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,

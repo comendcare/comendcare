@@ -8,11 +8,8 @@ import React, {useEffect, useRef, useState} from "react"
 import {LinkPreview} from "~web/components/link-preview"
 import Image from "next/image"
 import librareyLogo from "@/public/logos/librarey-logo.svg"
-import {PulsatingButton} from "@comend/components/ui/pulsating-button";
-import {useRouter} from "next/navigation";
 import Link from "next/link"
-import {Button} from "@/packages/components/ui/button"
-import {cn} from "@/packages/lib/utils"
+import {Button} from "@comend/components/ui/button"
 
 const bubbles = [
     {title: "Biosamples", href: "#"},

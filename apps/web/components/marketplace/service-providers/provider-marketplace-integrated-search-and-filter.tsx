@@ -1,8 +1,7 @@
 "use client"
 
 import {useCallback, useEffect, useMemo, useRef, useState} from "react"
-import {Funnel, SearchIcon, X} from "lucide-react"
-import {cn} from "@comend/lib/utils"
+import {Funnel, X} from "lucide-react"
 import {useShallow} from "zustand/react/shallow"
 import {MILESTONE_TYPE_OPTIONS_WITH_VALUE} from "~web/components/marketplace/service-providers/cro-filters";
 import {Button} from "@comend/components/ui/button"
@@ -18,11 +17,9 @@ import {
     BUSINESS_TYPES,
     CRO_CERTIFICATIONS,
     CRO_TAGS,
-    MILESTONE_TYPE_OPTIONS,
 } from "@comend/lib/types"
 import {debounce} from "lodash";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/packages/components/ui/dialog";
-import { initializeCROSearch } from "@/packages/lib/initialize-client-state"
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 
 export function ProviderMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, sortBy, setSortBy, setSearchTerm, filters, setFilters, totalResults} = useCROSearchStore(

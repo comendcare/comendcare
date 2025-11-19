@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { createClinicalDataset } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
 import { cn, parseCSV } from "@comend/lib/utils";
-import { revalidate } from "@/packages/lib/revalidate";
+import { revalidate } from "@comend/lib/revalidate";
 
 export function AssetBulkImportDialog() {
     const router = useRouter()

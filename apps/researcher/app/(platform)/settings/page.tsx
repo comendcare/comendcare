@@ -14,11 +14,11 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@comend/components/ui/alert-dialog";
-import {mixpanelTrack} from "@/packages/lib/mixpanel";
+import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {revalidatePath} from "next/cache";
 import {toast} from "sonner";
 import {deleteResearcher} from "~researcher/lib/actions";
-import {getResearcherFromUserId} from "@/packages/lib/fetchers";
+import {getResearcherFromUserId} from "@comend/lib/fetchers";
 
 
 export default function ResearcherSettingsPage() {

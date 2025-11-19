@@ -3,7 +3,7 @@ import {columns} from "~web/components/saved-cro-data-table/saved-cros-data-colu
 import {SavedCROsDataTable} from "~web/components/saved-cro-data-table/saved-cros-data-table";
 import {SavedCompanyData} from "@comend/lib/types";
 import NoOrganization from "~web/components/no-organization";
-import {getSession} from "@/packages/lib/auth";
+import {getSession} from "@comend/lib/auth";
 
 export default async function ServiceProviderSavesPage() {
     const session = await getSession()

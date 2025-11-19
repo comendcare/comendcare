@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from "react"
 import { ClinicalDatasetSearchResults } from "~web/components/marketplace/clinical-datasets/clinical-dataset-results";
 import { ClinicalDatasetMarketplaceIntegratedSearchAndFilter } from "~web/components/marketplace/clinical-datasets/clinical-dataset-marketplace-integrated-search-and-filter";
-import { SearchParams } from "@/packages/components/types";
+import { SearchParams } from "@comend/components/types";
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
 import { useShallow } from "zustand/react/shallow";
-import { initializeClinicalDatasetSearch } from "@/packages/lib/initialize-client-state";
+import { initializeClinicalDatasetSearch } from "@comend/lib/initialize-client-state";
 
 interface IndexPageProps {
     searchParams: Promise<SearchParams>

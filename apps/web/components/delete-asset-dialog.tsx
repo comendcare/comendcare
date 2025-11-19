@@ -7,7 +7,7 @@ import { useShallow } from "zustand/react/shallow"
 import { Button } from "@comend/components/ui/button"
 import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogTitle } from "@comend/components/ui/dialog"
 import { usePathname } from "next/navigation"
-import { revalidate } from "@/packages/lib/revalidate"
+import { revalidate } from "@comend/lib/revalidate"
 
 const toolSelector = (state: ToolState) => ({
     createTool: state.createTool,

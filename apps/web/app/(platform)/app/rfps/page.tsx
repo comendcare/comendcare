@@ -1,9 +1,9 @@
 import React from "react"
 import NoOrganization from "~web/components/no-organization"
-import {getSession} from "@/packages/lib/auth"
+import {getSession} from "@comend/lib/auth"
 import { PrivateRFPsPage } from "~web/components/private-rfps-page"
 import prisma from "@comend/lib/prisma"
-import { RFPSort } from "@/packages/lib/utils"
+import { RFPSort } from "@comend/lib/utils"
 
 export default async function RFPsPage() {
     const session = await getSession()

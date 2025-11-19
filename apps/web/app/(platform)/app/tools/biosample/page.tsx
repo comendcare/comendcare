@@ -1,15 +1,12 @@
 import React from "react"
-import Image from "next/image"
-import { getSession } from "@/packages/lib/auth"
+import { getSession } from "@comend/lib/auth"
 import NoOrganization from "~web/components/no-organization"
-import { SearchParams } from "@/packages/components/types"
-import { biosampleSearchParamsCache } from "@/packages/lib/validations"
-import { getValidFilters } from "@/packages/lib/data-table"
+import { SearchParams } from "@comend/components/types"
+import { biosampleSearchParamsCache } from "@comend/lib/validations"
+import { getValidFilters } from "@comend/lib/data-table"
 import { PrivateBiosampleToolsPage } from "~web/components/private-biosample-tools-page"
-import { NewToolDialog } from "~web/components/edit-tool-dialog"
-import { getBiosamples } from "@/packages/lib/fetchers"
-import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table-columns"
-import { Session } from "next-auth"
+import { getBiosamples } from "@comend/lib/fetchers"
+import { useBiosamplesTableColumns } from "@comend/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table-columns"
 
 export const dynamic = "force-dynamic";
 

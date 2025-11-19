@@ -1,7 +1,6 @@
 "use client"
 
 import {Suspense, useEffect, useRef, useState} from "react";
-// import logo from "@/public/logos/comend-logo.png"
 import {useRouter, useSearchParams} from "next/navigation";
 import ReCAPTCHA from "react-google-recaptcha";
 import {useSession} from "next-auth/react";

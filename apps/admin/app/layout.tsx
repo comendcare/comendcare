@@ -1,4 +1,4 @@
-import "@/globals.css"
+import "./../../../globals.css"
 import {ThemeProvider} from "~admin/theme-provider"
 import type {Metadata, ResolvingMetadata} from "next"
 import {Analytics} from '@vercel/analytics/next';
@@ -7,7 +7,7 @@ import {Analytics} from '@vercel/analytics/next';
 import {Poppins, Source_Sans_3} from "next/font/google"
 import {Providers} from "~admin/providers"
 import {Suspense} from "react"
-import Loading from "@/loading";
+import Loading from "./../../../loading";
 import { CookieyesScripts } from "@comend/lib/cookie-yes-scripts";
 
 // Set up Playfair Display and Source Sans 3 fonts

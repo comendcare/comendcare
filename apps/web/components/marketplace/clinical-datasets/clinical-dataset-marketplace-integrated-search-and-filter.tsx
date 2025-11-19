@@ -11,13 +11,12 @@ import {Separator} from "@comend/components/ui/separator"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import {TOOL_TYPE_OPTIONS} from "@comend/lib/types"
 import {debounce} from "lodash";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/packages/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import type { Option } from "@comend/lib/types"
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
-import { initializeClinicalDatasetSearch } from "@/packages/lib/initialize-client-state"
 
 export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, setSearchTerm, filters, setFilters, totalResults} = useClinicalDatasetSearchStore(

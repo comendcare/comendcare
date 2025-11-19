@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import type { Organization, Roadmap } from "@prisma/client";
 import { ResearchPlanTemplatesCard } from "./roadmap-templates";
-import Loading from "@/loading";
+import Loading from "./../../../loading";
 import { initializeRoadmapState } from "@comend/lib/initialize-client-state";
 import { useRouter } from "next/navigation";
 import { RoadmapsTable } from "./public-roadmap-card";

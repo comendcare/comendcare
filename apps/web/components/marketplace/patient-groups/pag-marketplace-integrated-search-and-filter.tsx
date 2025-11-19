@@ -26,13 +26,12 @@ import { useOrganizationSearchStore } from "@/state/search/organizationSearchSto
 // Options
 import {mechanisms} from "@comend/lib/types";
 import { ASSOCIATED_SYSTEMS, MODALITIES } from "@comend/lib/types";
-import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@comend/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import type { Option } from "@comend/lib/types";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore";
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
-import { initializeOrganizationSearch } from "@/packages/lib/initialize-client-state";
 
 // Helpers to normalize options
 const MECHANISM_OPTIONS = mechanisms.map((m: any) => ({

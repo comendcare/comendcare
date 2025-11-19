@@ -7,7 +7,7 @@ import CROSearchBar from "~web/components/marketplace/service-providers/cro-sear
 import {ProviderMarketplaceIntegratedSearchAndFilter} from "~web/components/marketplace/service-providers/provider-marketplace-integrated-search-and-filter";
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore";
 import { useShallow } from "zustand/react/shallow";
-import { initializeCROSearch } from "@/packages/lib/initialize-client-state";
+import { initializeCROSearch } from "@comend/lib/initialize-client-state";
 
 const selector = (state: CROSearchState) => ({
     initialized: state.initialized

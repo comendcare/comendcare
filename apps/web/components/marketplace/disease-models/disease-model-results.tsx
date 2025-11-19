@@ -5,8 +5,8 @@ import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/sea
 import { useShallow } from "zustand/react/shallow";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
-import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
-import { TypesenseDiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/typesense-disease-models-table";
+import { useDiseaseModelsTableColumns } from "@comend/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
+import { TypesenseDiseaseModelsTable } from "@comend/components/biorepo/advanced-data-table/disease-models-table/typesense-disease-models-table";
 
 const selector = (state: DiseaseModelSearchState) => ({
     searchResults: state.searchResults,

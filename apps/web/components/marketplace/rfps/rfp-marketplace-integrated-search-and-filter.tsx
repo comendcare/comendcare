@@ -8,11 +8,11 @@ import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"
 import {Separator} from "@comend/components/ui/separator"
 import {debounce, filter} from "lodash";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/packages/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
-import MultipleSelector from "@/packages/components/ui/multiple-selector"
+import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { RFP_OPEN_TO_TYPE_OPTIONS, Option, RFP_STATUS_TYPE_OPTIONS } from "@comend/lib/types"
-import { Badge } from "@/packages/components/ui/badge"
+import { Badge } from "@comend/components/ui/badge"
 
 export function RFPMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, sortBy, setSortBy, setSearchTerm, filters, setFilters, totalResults} = useRFPSearchStore(

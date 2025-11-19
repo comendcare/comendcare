@@ -1,7 +1,7 @@
 import NoOrganization from "~web/components/no-organization";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/packages/lib/auth";
-import prisma from "@/packages/lib/prisma";
+import { authOptions } from "@comend/lib/auth";
+import prisma from "@comend/lib/prisma";
 import PAGProfilePage from "~web/components/profile-page";
 import {
     getBiosamples,
@@ -12,9 +12,9 @@ import {
     getPublicRoadmapsForOrganization,
     getPublicToolCountsForOrganization
 } from "@comend/lib/fetchers";
-import { biosampleSearchParamsCache } from "@/packages/lib/validations"
-import { getValidFilters } from "@/packages/lib/data-table";
-import { RFPSort } from "@/packages/lib/utils";
+import { biosampleSearchParamsCache } from "@comend/lib/validations"
+import { getValidFilters } from "@comend/lib/data-table";
+import { RFPSort } from "@comend/lib/utils";
 
 export const dynamic = "force-dynamic";
 

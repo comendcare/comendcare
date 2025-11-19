@@ -39,7 +39,7 @@ import {badgeVariants} from "@comend/components/ui/badge";
 import { createCompany } from "~admin/lib/actions"
 import { CreateFacilityForm, FacilityCreateRequest } from "./facility-create-request-data-table/facility-create-request-data-table"
 import { companyFormSchema } from "~admin/lib/types"
-import { Option } from "@/packages/lib/types"
+import { Option } from "@comend/lib/types"
 
 export function CreateCompanyDialog() {
     const [open, setOpen] = useState(false)

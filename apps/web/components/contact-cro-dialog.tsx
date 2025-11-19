@@ -28,7 +28,6 @@ import {contactCRO} from "@comend/lib/actions";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {Handshake} from "lucide-react";
 import {getRFPs, getServicesOfCompany} from "@comend/lib/fetchers";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/packages/components/ui/select";
 
 export interface CompanyWithServices extends Company {
     services: Service[]

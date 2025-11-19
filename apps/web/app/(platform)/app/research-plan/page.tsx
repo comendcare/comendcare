@@ -1,7 +1,7 @@
-import {getSession} from "@/packages/lib/auth"
+import {getSession} from "@comend/lib/auth"
 import NoOrganization from "~web/components/no-organization";
 import RoadmapsPage from "~web/components/roadmaps-page";
-import prisma from "@/packages/lib/prisma";
+import prisma from "@comend/lib/prisma";
 
 export default async function RoadmapPage() {
     const session = await getSession();

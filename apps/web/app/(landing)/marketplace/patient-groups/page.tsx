@@ -5,7 +5,7 @@ import { OrganizationSearchResults } from "~web/components/marketplace/patient-g
 import PAGMarketplaceIntegratedSearchAndFilter from "~web/components/marketplace/patient-groups/pag-marketplace-integrated-search-and-filter";
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
 import { useShallow } from "zustand/react/shallow";
-import { initializeOrganizationSearch } from "@/packages/lib/initialize-client-state";
+import { initializeOrganizationSearch } from "@comend/lib/initialize-client-state";
 
 const selector = (state: OrganizationSearchState) => ({
     initialized: state.initialized

@@ -42,7 +42,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@comend/components/ui/alert-dialog"
-import { revalidate } from "@/packages/lib/revalidate"
+import { revalidate } from "@comend/lib/revalidate"
 
 const editResearchPlanForm = z.object({
     title: z

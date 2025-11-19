@@ -2,8 +2,7 @@ import {getSession} from "~researcher/lib/auth";
 import {redirect} from "next/navigation";
 import {ResearcherNavbar} from "~researcher/components/researcher-navbar";
 import {getServerSession} from "next-auth";
-import {authOptions} from "@/packages/lib/auth";
-import prisma from "@/packages/lib/prisma";
+import prisma from "@comend/lib/prisma";
 import * as React from "react";
 
 interface PlatformLayoutProps {
