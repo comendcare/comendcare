@@ -1,6 +1,6 @@
 import React from "react";
 import ResearcherProfile from "~researcher/components/researcher-profile";
-import {getSession} from "@/packages/lib/auth";
+import {getSession} from "@comend/lib/auth";
 import {getResearcherWithMergedDataAdvanced, getResearcherWithMergedData} from "@comend/lib/fetchers";
 
 export default async function ResearcherProfilePage({

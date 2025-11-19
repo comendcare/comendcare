@@ -1,4 +1,4 @@
-import {ACADEMIC_ROLES} from "@/packages/lib/types";
+import {ACADEMIC_ROLES} from "@comend/lib/types";
 import z from "zod";
 
 export const TitleEnum = z.enum(["researcher", "pm", "pi", "student", "other"]);

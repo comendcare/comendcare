@@ -35,8 +35,8 @@ import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {Select, SelectContent, SelectTrigger, SelectValue, SelectItem} from "@comend/components/ui/select"
 import {MILESTONE_TYPE_OPTIONS, ACADEMIC_ROLES} from "@comend/lib/types"
 import {badgeVariants} from "@comend/components/ui/badge"
-import {Textarea} from "@/packages/components/ui/textarea";
-import {Separator} from "@/packages/components/ui/separator";
+import {Textarea} from "@comend/components/ui/textarea";
+import {Separator} from "@comend/components/ui/separator";
 import {mapTitleToValue} from "~researcher/lib/utils";
 
 const optionSchema = z.object({

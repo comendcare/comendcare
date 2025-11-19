@@ -3,11 +3,11 @@
 import * as React from "react";
 import {DataTableSkeleton} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 import {DatabaseDiseaseModelsTable} from "@comend/components/biorepo/advanced-data-table/disease-models-table/database-disease-models-table"
-import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
-import {Shell} from "@/packages/components/biorepo/advanced-data-table/lib/shell";
-import {useDiseaseModelsTableColumns} from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
+import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
+import {Shell} from "@comend/components/biorepo/advanced-data-table/lib/shell";
+import {useDiseaseModelsTableColumns} from "@comend/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
 import type {DiseaseModel} from "@prisma/client";
-import {SearchParams} from "@/packages/components/types";
+import {SearchParams} from "@comend/components/types";
 import {useRef, useState} from "react";
 
 export const DiseaseModelMarketplacePage = ({data, pageCount, searchParams}: {

@@ -3,11 +3,11 @@
 import * as React from "react";
 import {DataTableSkeleton} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 import {DatabaseClinicalDatasetsTable} from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/database-clinical-datasets-table"
-import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
-import {Shell} from "@/packages/components/biorepo/advanced-data-table/lib/shell";
-import {useClinicalDatasetsTableColumns} from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
+import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
+import {Shell} from "@comend/components/biorepo/advanced-data-table/lib/shell";
+import {useClinicalDatasetsTableColumns} from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
 import type {Biosample, Tool} from "@prisma/client";
-import {SearchParams} from "@/packages/components/types";
+import {SearchParams} from "@comend/components/types";
 import {useRef, useState} from "react";
 
 export const ClinicalDatasetMarketplacePage = ({data, pageCount, searchParams}: {

@@ -1,5 +1,5 @@
 "use client"
-import { Button } from "@/packages/components/ui/button";
+import { Button } from "@comend/components/ui/button";
 import { TabNav } from "@comend/components/tab-nav";
 import { ArrowLeft, Building2, Database, Megaphone, Rat, Search, SearchIcon, TestTubeDiagonal, Users } from "lucide-react";
 import Link from "next/link";

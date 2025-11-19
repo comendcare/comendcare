@@ -1,8 +1,8 @@
 "use server"
 
-import {getSession, withAuth, withResearcherAuth} from "@/packages/lib/auth";
-import prisma from "@/packages/lib/prisma";
-import {logError} from "@/packages/lib/utils";
+import {getSession, withAuth, withResearcherAuth} from "@comend/lib/auth";
+import prisma from "@comend/lib/prisma";
+import {logError} from "@comend/lib/utils";
 
 
 export const deleteResearcher = withResearcherAuth(

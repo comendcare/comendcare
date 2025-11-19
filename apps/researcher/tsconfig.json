@@ -3,7 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".", // makes paths relative to `apps/admin`
     "paths": {
-      "@/*": ["../../*"],
+      // enabling this causes issues on vercel builds, it tries to import /web, which 
+      // causes issues with the ~web/ import alias
+      // "@/*": ["../../*"],
       "~researcher/*": ["./*"]
     }
   },
