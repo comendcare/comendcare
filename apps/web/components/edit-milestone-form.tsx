@@ -18,7 +18,7 @@ import {AutosizeTextarea, Textarea} from "@comend/components/ui/textarea"
 import {Button} from "@comend/components/ui/button"
 import {ScrollArea} from "@comend/components/ui/scroll-area"
 import StatusButton from "./milestone-status-button"
-import {RoadmapState, useRoadmapStore} from "~web/state/roadmap/roadmapStore"
+import {RoadmapState, useRoadmapStore} from "./../state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import {
     Select,
@@ -91,7 +91,6 @@ import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onborda
 import {mixpanelTrack} from "@comend/lib/mixpanel"
 import ShareDialog from "./share-dialog"
 import {JsonObject} from "@prisma/client/runtime/library"
-import EditMilestoneDetailsPublicationsTab from "~web/components/edit-milestone-details-publications-tab";
 import {Skeleton} from "@comend/components/ui/skeleton"
 import {useOnborda} from "./onborda/OnbordaContext"
 import {EditRFPForm} from "./edit-rfp-form"

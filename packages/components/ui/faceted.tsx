@@ -246,6 +246,7 @@ function FacetedItem(props: FacetedItemProps) {
 
   return (
     <CommandItem
+      value={value}
       aria-selected={isSelected}
       data-selected={isSelected}
       className={cn("gap-2", className)}

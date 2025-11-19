@@ -1,3 +1,19 @@
+import {ACADEMIC_ROLES} from "@/packages/lib/types";
+import z from "zod";
+
+export const TitleEnum = z.enum(["researcher", "pm", "pi", "student", "other"]);
+
+export const mapTitleToValue = (title?: string | null): z.infer<typeof TitleEnum> | undefined => {
+    if (!title) return undefined;
+    const match = ACADEMIC_ROLES.find(
+        (role) =>
+            role.value === title ||
+            role.label === title ||
+            role.id === title
+    );
+    return match?.value as z.infer<typeof TitleEnum> ?? undefined;
+};
+
 // Drop-in upgrade: now also merges Crossref, Europe PMC, and DataCite.
 // Signature remains backward-compatible via default params.
 export function mergeResearcherDataAdvanced(

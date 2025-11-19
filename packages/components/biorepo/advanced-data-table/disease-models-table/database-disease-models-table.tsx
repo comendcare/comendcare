@@ -1,44 +1,45 @@
 "use client";
 
 import * as React from "react";
-import {DataTable} from "./../data-table/data-table";
+import {DataTable} from "../data-table/data-table";
 import {
     DataTableAdvancedToolbar
-} from "./../data-table/data-table-advanced-toolbar";
-import {DataTableFilterList} from "./../data-table/data-table-filter-list";
-import {DataTableToolbar} from "./../data-table/data-table-toolbar";
-import {useDataTable} from "./../../../../../packages/lib/hooks/use-data-table";
+} from "../data-table/data-table-advanced-toolbar";
+import {DataTableFilterList} from "../data-table/data-table-filter-list";
+import {DataTableToolbar} from "../data-table/data-table-toolbar";
+import {useDataTable} from "@comend/lib/hooks/use-data-table";
 import {ColumnDef, Row} from "@tanstack/react-table";
 import {useFeatureFlags} from "../lib/feature-flags-provider";
 import type {DiseaseModel, Tool} from "@prisma/client";
 import Image from "next/image";
 import { EditAssetDialog, NewToolDialog } from "comend-pag-platform/components/edit-tool-dialog";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
-import { Dialog, DialogPortal } from "./../../../ui/dialog";
+import { Dialog, DialogPortal } from "../../../ui/dialog";
 import { useState } from "react";
 
-export function DiseaseModelsTable({
+export function DatabaseDiseaseModelsTable({
     data, 
     pageCount, 
     columns, 
     onSelectionChange, 
+    onRowClickCallback,
     searchParams,
     showFilters = true,
     showPagination = true,
-    interactive = true,
     noResultsOverride = true,
+    interactiveDialog,
 }: {
     data: DiseaseModel[],
     pageCount: number,
     columns: ColumnDef<any>[],
     onSelectionChange?: (selectedRows: Tool[]) => void,
+    onRowClickCallback?: (e: any, row: Row<any> | undefined) => void,
     searchParams: SearchParams,
     showFilters?: boolean,
     showPagination?: boolean,
-    interactive?: boolean,
     noResultsOverride?: boolean,
+    interactiveDialog?: React.ReactNode
 }) {
-    const [editingTool, setEditingTool] = useState<any | undefined>(undefined)
     const {enableAdvancedFilter, filterFlag} = useFeatureFlags()
     const {table, shallow, debounceMs, throttleMs} = useDataTable({
         data,
@@ -69,27 +70,26 @@ export function DiseaseModelsTable({
                 noResults={
                     (noResultsOverride && data.length === 0 && Object.keys(searchParams).length === 0) 
                     ? (
-                        <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
-                            <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
-                                <h1 className="font-cal text-4xl">You do not have any Disease Model Tools</h1>
-                                <Image
-                                    alt="No Disease Model Tools"
-                                    src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                                    width={300}
-                                    height={300}
-                                />
-                                <p className="text-lg text-stone-500">
-                                    A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
-                                </p>
-                                <NewToolDialog type={"diseaseModel"}/>
-                            </div>
-                        </div>
+                        // <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
+                        //     <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
+                        //         <h1 className="font-cal text-4xl">You do not have any Disease Model Tools</h1>
+                        //         <Image
+                        //             alt="No Disease Model Tools"
+                        //             src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                        //             width={300}
+                        //             height={300}
+                        //         />
+                        //         <p className="text-lg text-stone-500">
+                        //             A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
+                        //         </p>
+                        //         {interactive && <NewToolDialog type={"diseaseModel"}/>}
+                        //     </div>
+                        // </div>
+                        <></>
                     )
                     : undefined
                 }
-                onRowClickCallback={(e: any, row: Row<any> | undefined) => 
-                    setEditingTool(row?.original)
-                }
+                onRowClickCallback={onRowClickCallback}
             >
                 {showFilters && (
                     enableAdvancedFilter ? (
@@ -108,7 +108,7 @@ export function DiseaseModelsTable({
                 )}
             </DataTable>
 
-            {interactive && (
+            {/* {interactive && (
                 <Dialog 
                     open={!!editingTool}
                     onOpenChange={(open) => !open && setEditingTool(undefined)}
@@ -124,7 +124,9 @@ export function DiseaseModelsTable({
                         </div>
                     </DialogPortal>
                 </Dialog>
-            )}
+            )} */}
+
+            {!!interactiveDialog && interactiveDialog}
         </>
     );
 }
