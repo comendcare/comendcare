@@ -65,24 +65,7 @@ export function DatabaseBiosamplesTable({
                 showPagination={showPagination}
                 noResults={
                     (data.length === 0 && Object.keys(searchParams).length === 0) 
-                    ? (
-                        // <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
-                        //     <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
-                        //         <h1 className="font-cal text-4xl">You do not have any Biosample Tools</h1>
-                        //         <Image
-                        //             alt="No Biosample Tools"
-                        //             src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                        //             width={300}
-                        //             height={300}
-                        //         />
-                        //         <p className="text-lg text-stone-500">
-                        //             A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
-                        //         </p>
-                        //         {interactive && <NewToolDialog type={"biosample"}/>}
-                        //     </div>
-                        // </div>
-                        <>{!!noResultsOverride && noResultsOverride}</>
-                    )
+                    ? (<>{!!noResultsOverride && noResultsOverride}</>)
                     : undefined
                 }
                 onRowClickCallback={onRowClickCallback}

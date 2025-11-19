@@ -65,9 +65,7 @@ export function DatabaseClinicalDatasetsTable({
         showPagination={showPagination}
         noResults={
             (data.length === 0 && Object.keys(searchParams).length === 0) 
-            ? (
-              <>{!!noResultsOverride && noResultsOverride}</>
-            )
+            ? (<>{!!noResultsOverride && noResultsOverride}</>)
             : undefined
         }
         onRowClickCallback={onRowClickCallback}

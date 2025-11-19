@@ -69,9 +69,7 @@ export function DatabaseDiseaseModelsTable({
                 showPagination={showPagination}
                 noResults={
                     (data.length === 0 && Object.keys(searchParams).length === 0) 
-                    ? (
-                        <>{!!noResultsOverride && noResultsOverride}</>
-                    )
+                    ? (<>{!!noResultsOverride && noResultsOverride}</>)
                     : undefined
                 }
                 onRowClickCallback={onRowClickCallback}
@@ -92,24 +90,6 @@ export function DatabaseDiseaseModelsTable({
                     )
                 )}
             </DataTable>
-
-            {/* {interactive && (
-                <Dialog 
-                    open={!!editingTool}
-                    onOpenChange={(open) => !open && setEditingTool(undefined)}
-                >
-                    <DialogPortal>
-                        <div onClick={(e) => e.stopPropagation()}>
-                            <EditAssetDialog
-                                key={editingTool?.id}
-                                data={editingTool} 
-                                type={'diseaseModel'}
-                                closeDialog={() => {setEditingTool(undefined)}}
-                            />
-                        </div>
-                    </DialogPortal>
-                </Dialog>
-            )} */}
 
             {!!interactiveDialog && interactiveDialog}
         </>
