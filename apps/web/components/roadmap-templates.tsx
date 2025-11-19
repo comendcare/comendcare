@@ -9,21 +9,18 @@ import {RoadmapState, useRoadmapStore} from "./../state/roadmap/roadmapStore";
 import {useShallow} from "zustand/react/shallow";
 import ComendLoadingSpinner from "../../../packages/components/comend-loading-spinner";
 import {
-    EmptyResearchPlanCard,
     MilestoneTemplateCardMultiSelect,
     ResearchPlanTemplateCardSelect
 } from "./milestone-template-card";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {DialogClose} from "@comend/components/ui/dialog";
-import {Plus, Router, X} from "lucide-react";
-import {cn, getCookie} from "@comend/lib/utils";
+import {Plus, X} from "lucide-react";
+import {cn} from "@comend/lib/utils";
 import {ASSOCIATED_CATEGORIES} from "@comend/lib/types";
 import {createRoadmap} from "@comend/lib/actions";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
-import CreateResearchPlanDialog from "~web/components/create-research-plan-dialog"
+import CreateResearchPlanDialog from "./../components/create-research-plan-dialog"
 import {useSession} from "next-auth/react";
-// import { consentedLocalStorage } from "@comend/lib/consent-scripts/functionalConsent";
-
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,

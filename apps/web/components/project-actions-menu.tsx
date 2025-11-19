@@ -1,5 +1,5 @@
 "use client"
-import {Copy, Ellipsis, Pencil, Share, Trash} from "lucide-react"
+import {Ellipsis, Pencil, Share, Trash} from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -7,21 +7,17 @@ import {
     DropdownMenuTrigger,
 } from "@comend/components/ui/dropdown-menu"
 import {Button} from "@comend/components/ui/button"
-import {useEffect, useRef, useState} from "react"
+import {useRef, useState} from "react"
 import {Milestone} from "@comend/lib/types"
 import {RoadmapState, useRoadmapStore} from "./../state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import {Dialog, DialogContent, DialogPortal} from "@comend/components/ui/dialog"
 import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
-import ShareDialog from "~web/components/share-dialog";
-import {toast} from "sonner";
-import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
-import {useSession} from "next-auth/react";
+import ShareDialog from "./../components/share-dialog";
 import type {Organization} from "@prisma/client";
 import {
     Tooltip,
     TooltipContent,
-    TooltipProvider,
     TooltipTrigger,
 } from "@comend/components/ui/tooltip"
 
