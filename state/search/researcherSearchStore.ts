@@ -116,7 +116,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "name,description",
+            query_by: "name",
             per_page: 12,
             page: state.lastFetchedPage,
             ...(filtersString ? { filter_by: filtersString } : undefined),
@@ -147,9 +147,14 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
             body: JSON.stringify({ids}),
         });
 
+        if (!prismaResponse.ok) {
+            const text = await prismaResponse.text() // may be empty or HTML on 405
+            throw new Error(`POST /api/researchers failed: ${prismaResponse.status} ${text}`)
+        }
+
         const prismaResults = await prismaResponse.json();
 
-        const enrichedResults = ids.map((id: string) => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
+        const enrichedResults = ids.map((id: string) => prismaResults.find((researcher: any) => researcher.id === id) || null).filter(Boolean);
 
         return {
             results: isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults],

@@ -655,6 +655,12 @@ export const syncToTypesense = async (env: {
                     name: ".*",
                     type: "auto",
                 },
+                {
+                    name: "name",
+                    type: "string",
+                    sort: true,
+                    optional: true
+                },
             ],
         };
 
@@ -1039,8 +1045,17 @@ export const syncToTypesense = async (env: {
             // map orgs to include all required data
             const uploadResearchers = await Promise.all(researchers.map(async (researcher, index) => {
                 console.log(`Researcher ${index + 1}:`, researcher)
-                const fetchedResearcher = await prisma.organization.findUnique({
+                const fetchedResearcher = await prisma.researcher.findUnique({
                     where: { id: researcher.id },
+                    // include: {
+                    //     user: {
+                    //         select: {
+                    //             id: true,
+                    //             name: true,
+                    //             email: true,
+                    //         }
+                    //     }
+                    // }
                 })
 
                 // const orgUpdatedAt = Math.max(...[organization.updatedAt.valueOf()].concat(

@@ -6,13 +6,14 @@ import InfiniteScroll from "@comend/components/ui/infinite-scroll";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
 import { ResearcherSearchState, useResearcherSearchStore } from "@/state/search/researcherSearchStore";
-import { RFPCard } from "@comend/components/rfp-card";
-import { Dialog, DialogTrigger } from "@comend/components/plate-ui/dialog";
-import { mixpanelTrack } from "@comend/lib/mixpanel";
-import { DialogContent } from "@comend/components/ui/dialog";
-import { RFPDetails } from "@comend/components/pag-profile-rfps-card";
+// import { RFPCard } from "@comend/components/rfp-card";
+// import { Dialog, DialogTrigger } from "@comend/components/plate-ui/dialog";
+// import { mixpanelTrack } from "@comend/lib/mixpanel";
+// import { DialogContent } from "@comend/components/ui/dialog";
+// import { RFPDetails } from "@comend/components/pag-profile-rfps-card";
 import { LoaderCircle } from "lucide-react";
 import { cn } from "@udecode/cn";
+import { ResearcherCard } from "@comend/components/researcher-card";
 
 const selector = (state: ResearcherSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -53,7 +54,7 @@ export function ResearcherSearchResults() {
                 ): (
                     <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                         {searchResults.map((researcher) => (
-                            <></>
+                            <ResearcherCard researcher={researcher}/>
                             // <Dialog>
                             //     <DialogTrigger
                             //         className="w-full max-w-full h-full"
