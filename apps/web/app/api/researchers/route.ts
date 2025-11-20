@@ -10,6 +10,18 @@ export async function POST(req: Request) {
             where: {
                 id: { in: ids },
             },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                        createdAt: true,
+                        updatedAt: true,
+                    }
+                }
+            }
         });
 
         return NextResponse.json(results, { status: 200 });
