@@ -24,20 +24,31 @@ export async function GET(req: Request) {
     try {
         const url = new URL(req.url);
         const rawQuery = (url.searchParams.get("search") || "").trim();
+        // Prefer prefix matches (startsWith) to feel snappy, then broader AND contains
+        const limit = 50;
 
-        // Short-circuit empty input
-        if (!rawQuery) return NextResponse.json([]);
+        // Short-circuit empty input, return default response (first 50 results)
+        if (!rawQuery) {
+            const results = await prisma.condition.findMany({
+                take: limit 
+            })
+            const formatted = results.map(c => ({ label: c.name, value: c.name }))
+
+            return new NextResponse(JSON.stringify(formatted), {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Cache-Control": "public, max-age=30, stale-while-revalidate=60",
+                },
+            });
+        }
 
         const tokens = normalizeQuery(rawQuery);
-
+        
         // If the user typed only stopwords like "the", "and", etc.,
         // don't run a noisy DB query—return empty and let the UI say "keep typing"
         if (tokens.length === 0) {
             return NextResponse.json([]);
         }
-
-        // Prefer prefix matches (startsWith) to feel snappy, then broader AND contains
-        const limit = 50;
 
         // 1) Prefix hits (any token as a prefix)
         const startsWithHits = await prisma.condition.findMany({

@@ -12,6 +12,7 @@ declare module "@tanstack/react-table" {
         options?: Option[];
         range?: [number, number];
         unit?: string;
+        unitOptions?: Option[];
         icon?: React.FC<React.SVGProps<SVGSVGElement>>;
         showInAdvancedOnly?: boolean;
         onAsyncSearch?: (query?: string | undefined) => Promise<Option[]>

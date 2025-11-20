@@ -208,8 +208,6 @@ export function typesenseSortByFromColumnId(id: string, desc: boolean): string {
 }
 
 export const handleAsyncOrganizationSearch = async (query?: string | undefined): Promise<Option[]> => {
-    if (!query) return []; // Return empty if no input
-
     try {
         const response = await fetch(`/api/organizations?search=${query}`);
         const data = await response.json();
@@ -223,7 +221,7 @@ export const handleAsyncOrganizationSearch = async (query?: string | undefined):
 }
 
 export const handleAsyncConditionSearch = async (query?: string | undefined): Promise<Option[]> => {
-    if (!query) return []; // Return empty if no input
+    // if (!query) return []; // Return empty if no input
 
     try {
         const response = await fetch(`/api/conditions?search=${query}`);
@@ -238,7 +236,7 @@ export const handleAsyncConditionSearch = async (query?: string | undefined): Pr
 }
 
 export const handleAsyncDiagnosesSearch = async (query?: string | undefined): Promise<Option[]> => {
-    if (!query) return []; // Return empty if no input
+    // if (!query) return []; // Return empty if no input
 
     try {
         const response = await fetch(`/api/diagnoses?search=${query}`);
@@ -253,7 +251,7 @@ export const handleAsyncDiagnosesSearch = async (query?: string | undefined): Pr
 };
 
 export const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
-    if (!query) return []; // Return empty if no input
+    // if (!query) return []; // Return empty if no input
 
     try {
         const response = await fetch(`/api/genes?search=${query}`);
@@ -275,7 +273,7 @@ export const handleAsyncCompanyAndInstitutionSearch = async (query?: string | un
 }
 
 export const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
-    if (!query) return []; // Return empty if no input
+    // if (!query) return []; // Return empty if no input
 
     try {
         const response = await fetch(`/api/institutions?search=${query}`);
@@ -290,7 +288,7 @@ export const handleAsyncInstitutionSearch = async (query?: string | undefined): 
 };
 
 export const handleAsyncCompanySearch = async (query?: string | undefined): Promise<Option[]> => {
-    if (!query) return []; // Return empty if no input
+    // if (!query) return []; // Return empty if no input
 
     try {
         const response = await fetch(`/api/companies?search=${query}`);
@@ -305,7 +303,8 @@ export const handleAsyncCompanySearch = async (query?: string | undefined): Prom
 };
 
 export const handleAsyncMilestoneSearch = async (organizationId: string | null | undefined, query?: string | undefined): Promise<Option[]> => {
-    if (!query || !organizationId) return []
+    // if (!query || !organizationId) return []
+    if (!organizationId) return []
 
     try {
         const response = await fetch(`/api/milestones?search=${query}&orgId=${organizationId}`);
