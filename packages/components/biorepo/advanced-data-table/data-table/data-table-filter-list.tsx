@@ -458,7 +458,7 @@ function DataTableFilterItem<TData>({
           <PopoverContent
             id={fieldListboxId}
             align="start"
-            className="w-40 origin-[var(--radix-popover-content-transform-origin)] p-0"
+            className="w-200 origin-[var(--radix-popover-content-transform-origin)] p-0"
           >
             <Command>
               <CommandInput placeholder="Search fields..." />
