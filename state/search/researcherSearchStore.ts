@@ -124,7 +124,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
         };
 
         const results = await typesense
-            .collections("organizations")
+            .collections("researchers")
             .documents()
             .search(searchParameters);
 
@@ -141,7 +141,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
             }
         }
 
-        const prismaResponse = await fetch('/api/organizations', {
+        const prismaResponse = await fetch('/api/researchers', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ids}),
@@ -165,7 +165,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
     }
 };
 
-export interface OrganizationSearchState {
+export interface ResearcherSearchState {
     initialized: boolean,
     initState: (filters: FiltersType) => Promise<void>,
     searchTerm: string,
@@ -186,7 +186,7 @@ export interface OrganizationSearchState {
     setTotalResults: (total: number) => void,
 }
 
-export const useOrganizationSearchStore = create<OrganizationSearchState>()(
+export const useResearcherSearchStore = create<ResearcherSearchState>()(
     temporal((set, get) => ({
             initialized: false,
             initState: async (filters: FiltersType) => {
@@ -222,7 +222,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                 if (newSearch.length > 0) {
                     // only track searches if the user has entered text in the searchbar
                     const filters = get().filters
-                    // mixpanelTrack("Search Organizations", {
+                    // mixpanelTrack("Search Researchers", {
                     //     "Search Term": newSearch,
                     //     "Results": total,
                     //     "Filters": {
@@ -290,7 +290,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
 
                 // if (Object.values(recentlySelected).flatMap(value => value).length > 0 || Object.values(recentlyRemoved).flatMap(value => value).length > 0) {
                 //     // only track in mixpanel if something in the filters has been updated
-                //     mixpanelTrack("Marketplace Organization Filters Selected", {
+                //     mixpanelTrack("Marketplace Researchers Filters Selected", {
                 //         "Results": total,
                 //         "Filters": {
                 //             "Mechanisms of Action": newFilters.mechanisms.map(filter => filter.label),
