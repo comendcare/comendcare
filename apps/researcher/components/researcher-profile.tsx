@@ -15,7 +15,7 @@ import ResearcherProfileFrequentCollaboratorsCard
     from "@comend/components/researcher-profile-frequent-collaborators-card";
 import ResearcherProfileEducationCard from "@comend/components/researcher-profile-education-card";
 import {EnrichedResearcher} from "~researcher/types/types";
-import {COUNTRIES} from "@/packages/lib/types";
+import {COUNTRIES, ACADEMIC_ROLES} from "@/packages/lib/types";
 
 
 const resolveCountry = (countryCodeOrName?: string | null) => {
@@ -42,16 +42,31 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
         researchInterests: [] as string[]
     };
 
+    const profileImage =
+        researcher?.user?.image ||   // if you included user.image in your query
+        (researcher as any)?.image || // fallback in case image is on researcher
+        undefined;
+
+    const displayName = openAlex.display_name || mergedFields.name || "Unknown Researcher";
+
+    const initials =
+        displayName
+            .split(" ")
+            .filter(Boolean)
+            .map((n) => n[0])
+            .slice(0, 2)
+            .join("")
+            .toUpperCase() || "??";
+
     const institution =
         researcher?.affiliations?.[0]?.institution?.name ??
         openAlex?.last_known_institutions?.[0]?.display_name ??
         "Institution not available";
 
-    const displayName = openAlex.display_name || "Unknown Researcher";
     const email = researcherData?.researcher?.email || "Email not available";
     const location =
-        resolveCountry(openAlex.last_known_institutions?.[0]?.country_code) ??
         resolveCountry(researcher?.country) ??
+        resolveCountry(openAlex.last_known_institutions?.[0]?.country_code) ??
         "Country not available";
 
     const metrics = {
@@ -84,14 +99,33 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
         collaborations: Math.floor(Math.random() * 10) + 1
     }));
 
+    const rawTitle = researcher?.title ?? mergedFields.title ?? null;
+
+    const resolvedTitle =
+        rawTitle
+            ? (
+                ACADEMIC_ROLES.find(
+                    (role) =>
+                        role.value === rawTitle ||
+                        role.id === rawTitle ||
+                        role.label === rawTitle
+                )?.label ?? rawTitle
+            )
+            : "Title not available";
+
     return (
         <div className="max-w-7xl mx-auto flex flex-col py-4">
             <div className="bg-white border-b">
                 <div className="px-4 py-8">
                     <div className="flex flex-col md:flex-row gap-6">
                         <Avatar className="w-32 h-32">
-                            <AvatarImage src="/placeholder.svg?height=128&width=128" alt="Dr. Sarah Chen"/>
-                            <AvatarFallback className="text-2xl">SC</AvatarFallback>
+                            <AvatarImage
+                                src={profileImage || "/placeholder.svg?height=128&width=128"}
+                                alt={displayName}
+                            />
+                            <AvatarFallback className="text-2xl">
+                                {initials}
+                            </AvatarFallback>
                         </Avatar>
 
                         <div className="flex-1">
@@ -101,7 +135,7 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
                                         {displayName}
                                     </h1>
                                     <p className="capitalize text-xl text-gray-600 mt-1">
-                                        {mergedFields.title || "Title not available"}
+                                        {resolvedTitle}
                                     </p>
 
                                     <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600">

@@ -44,6 +44,11 @@ import LoadingDots from "@/packages/components/icons/loading-dots";
 import {EnrichedResearcher} from "~researcher/types/types";
 import {Textarea} from "@/packages/components/ui/textarea";
 import {mapTitleToValue, TitleEnum} from "~researcher/lib/utils";
+import type {FileWithPreview} from "@comend/components/image-selector";
+import {getPublicFile} from "@comend/lib/utils";
+import {handleImageUpload} from "@comend/lib/upload";
+import {FormImageSelector} from "@/packages/components/form-image-selector";
+
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
     ...option,
@@ -74,6 +79,7 @@ const formSchema = z.object({
     conditionsOfInterest: z.array(optionSchema),
     notificationSettings: z.boolean().default(false),
     consentSettings: z.boolean().default(false),
+    userImage: z.string().optional(),
 });
 
 export default function EditResearcherProfileDialog({researcher}: { researcher: EnrichedResearcher["researcher"] }) {
@@ -81,6 +87,9 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
     const router = useRouter();
     const [initialData, setInitialData] = useState<z.infer<typeof formSchema>>();
     const [loading, setLoading] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
+    const [isCropping, setIsCropping] = useState(false);
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: initialData,
@@ -93,6 +102,7 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                 name: true,
                 notificationSettings: true,
                 consentSettings: true,
+                image: true,
             });
 
             if (researcher && researcher.name) {
@@ -126,6 +136,7 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                     })) || [],
                     notificationSettings: user.notificationSettings ?? false,
                     consentSettings: user.consentSettings ?? false,
+                    userImage: user.image || "",
                 });
             }
         }
@@ -134,6 +145,35 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
     }, [session?.user.id, form]);
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        // 🔹 1) Upload image if changed
+        if (
+            selectedFile &&
+            values.userImage &&
+            values.userImage !== (form.formState.defaultValues as any)?.userImage
+        ) {
+            const imgUrl = await handleImageUpload(selectedFile as File, values.userImage);
+            if (imgUrl) {
+                values.userImage = imgUrl;
+            }
+        }
+
+        // 🔹 2) Update user fields (name, notification/consent, image)
+        if (session?.user?.id) {
+            const userPayload: Record<string, any> = {
+                name: values.name,
+                notificationSettings: values.notificationSettings,
+                consentSettings: values.consentSettings,
+                image: values.userImage,
+            };
+
+            const userRes: any = await editUser(session.user.id as string, userPayload);
+            if (userRes?.error) {
+                toast.error(userRes.error);
+                return;
+            }
+        }
+
+        // 🔹 3) Existing researcher update logic (unchanged)
         const fd = new FormData();
 
         fd.append("title", values.title ?? "");
@@ -271,6 +311,18 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                                     <FormMessage/>
                                 </FormItem>
                             )}
+                        />
+
+                        <FormImageSelector
+                            form={form}
+                            name="userImage"
+                            title="Profile Image"
+                            description="PNG/JPG only (no SVG)."
+                            aspect={1}
+                            img={form.watch("userImage") || undefined}
+                            selectedFile={selectedFile}
+                            setSelectedFile={setSelectedFile}
+                            setIsCropping={setIsCropping}
                         />
 
                         <FormField
@@ -592,7 +644,7 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                             />
                         </div>
 
-                        <Button type="submit" disabled={loading}>
+                        <Button type="submit" disabled={loading || isCropping}>
                             {loading ? <LoadingDots color="#808080"/> : "Save"}
                         </Button>
                     </form>

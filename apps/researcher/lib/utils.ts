@@ -1,21 +1,42 @@
 import {ACADEMIC_ROLES} from "@/packages/lib/types";
 import z from "zod";
 
-export const TitleEnum = z.enum(["researcher", "pm", "pi", "student", "other"]);
+// enum values aligned with ACADEMIC_ROLES.value in types.ts
+export const TitleEnum = z.enum(["pi", "postdoc", "phd_student", "other"]);
 
-export const mapTitleToValue = (title?: string | null): z.infer<typeof TitleEnum> | undefined => {
+export const mapTitleToValue = (
+    title?: string | null
+): z.infer<typeof TitleEnum> | undefined => {
     if (!title) return undefined;
+
+    const normalized = title.toLowerCase();
+
+    // 2) Match against current ACADEMIC_ROLES by value / label / id
     const match = ACADEMIC_ROLES.find(
         (role) =>
-            role.value === title ||
-            role.label === title ||
-            role.id === title
+            role.value === normalized ||
+            role.label.toLowerCase() === normalized ||
+            role.id.toLowerCase() === normalized
     );
-    return match?.value as z.infer<typeof TitleEnum> ?? undefined;
+
+    return match?.value as z.infer<typeof TitleEnum> | undefined;
 };
 
-// Drop-in upgrade: now also merges Crossref, Europe PMC, and DataCite.
-// Signature remains backward-compatible via default params.
+// (optional but handy)
+export const mapTitleValueToLabel = (value?: string | null): string | undefined => {
+    if (!value) return undefined;
+    const normalized = value.toLowerCase();
+
+    const match = ACADEMIC_ROLES.find(
+        (role) =>
+            role.value === normalized ||
+            role.id.toLowerCase() === normalized ||
+            role.label.toLowerCase() === normalized
+    );
+
+    return match?.label;
+};
+
 export function mergeResearcherDataAdvanced(
     dbResearcher: any,
     openAlex: any,

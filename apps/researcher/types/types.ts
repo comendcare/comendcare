@@ -1,8 +1,12 @@
+import type {User} from "@prisma/client"
+
 export interface EnrichedResearcher {
     researcher: {
         id: string;
         userId?: string;
+        user: User,
         name?: string | null;
+        image?: string | null;
         title?: "researcher" | "pm" | "pi" | "student" | "other" | null;
         orcid?: string | null;
         email?: string | null;

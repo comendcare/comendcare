@@ -2367,6 +2367,7 @@ export const getResearcherWithMergedDataAdvanced = withUserAuth(async () => {
     const dbResearcher = await prisma.researcher.findUnique({
         where: { userId: session.user.id },
         include: {
+            user: true,
             affiliations: {
                 include: { institution: true },
             },
