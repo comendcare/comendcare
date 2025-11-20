@@ -117,7 +117,7 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
                     <Label className="text-base font-semibold text-gray-900">Search</Label>
                     <Input
                         type="text"
-                        placeholder="Title, scope, eligibility, evaluation process..."
+                        placeholder="Title, scope, condition, gene..."
                         value={query}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             const search: string = e.target.value
