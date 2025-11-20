@@ -58,29 +58,6 @@ export const biosampleRequestsSearchParamsCache = createSearchParamsCache({
   joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and"),
 });
 
-export const diseaseModelSearchParamsCache = createSearchParamsCache({
-  q: parseAsString.withDefault(""),
-  filterFlag: parseAsStringEnum(
-      flagConfig.featureFlags.map((flag) => flag.value),
-  ),
-  page: parseAsInteger.withDefault(1),
-  perPage: parseAsInteger.withDefault(10),
-  sort: getSortingStateParser<Tool>().withDefault([
-    { id: "createdAt", desc: true },
-  ]),
-  title: parseAsString.withDefault(""),
-  types: parseAsArrayOf(z.string()).withDefault([]),
-  availability: parseAsArrayOf(z.string()).withDefault([]),
-  currentCountry: parseAsString.withDefault(""),
-  countryOfCollection: parseAsString.withDefault(""),
-  quantity: parseAsArrayOf(z.coerce.number()).withDefault([]),
-  private: parseAsArrayOf(z.string().toLowerCase().transform((x) => x === 'true').pipe(z.boolean())).withDefault([]),
-  createdAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
-  // advanced filter
-  filters: getFiltersStateParser().withDefault([]),
-  joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and"),
-});
-
 export const biosampleSearchParamsCache = createSearchParamsCache({
   q: parseAsString.withDefault(""),
   filterFlag: parseAsStringEnum(
@@ -104,6 +81,29 @@ export const biosampleSearchParamsCache = createSearchParamsCache({
   joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and"),
 });
 
+export const diseaseModelSearchParamsCache = createSearchParamsCache({
+  q: parseAsString.withDefault(""),
+  filterFlag: parseAsStringEnum(
+      flagConfig.featureFlags.map((flag) => flag.value),
+  ),
+  page: parseAsInteger.withDefault(1),
+  perPage: parseAsInteger.withDefault(10),
+  sort: getSortingStateParser<Tool>().withDefault([
+    { id: "createdAt", desc: true },
+  ]),
+  title: parseAsString.withDefault(""),
+  types: parseAsArrayOf(z.string()).withDefault([]),
+  availability: parseAsArrayOf(z.string()).withDefault([]),
+  currentCountry: parseAsString.withDefault(""),
+  countryOfCollection: parseAsString.withDefault(""),
+  // quantity: parseAsArrayOf(z.coerce.number()).withDefault([]),
+  private: parseAsArrayOf(z.string().toLowerCase().transform((x) => x === 'true').pipe(z.boolean())).withDefault([]),
+  createdAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
+  // advanced filter
+  filters: getFiltersStateParser().withDefault([]),
+  joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and"),
+});
+
 export const clinicalDatasetSearchParamsCache = createSearchParamsCache({
   q: parseAsString.withDefault(""),
   filterFlag: parseAsStringEnum(
@@ -119,7 +119,7 @@ export const clinicalDatasetSearchParamsCache = createSearchParamsCache({
   availability: parseAsArrayOf(z.string()).withDefault([]),
   currentCountry: parseAsString.withDefault(""),
   countryOfCollection: parseAsString.withDefault(""),
-  quantity: parseAsArrayOf(z.coerce.number()).withDefault([]),
+  // quantity: parseAsArrayOf(z.coerce.number()).withDefault([]),
   private: parseAsArrayOf(z.string().toLowerCase().transform((x) => x === 'true').pipe(z.boolean())).withDefault([]),
   createdAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
   // advanced filter
