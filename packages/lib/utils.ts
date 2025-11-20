@@ -208,8 +208,6 @@ export function typesenseSortByFromColumnId(id: string, desc: boolean): string {
 }
 
 export const handleAsyncOrganizationSearch = async (query?: string | undefined): Promise<Option[]> => {
-    // if (!query) return []; // Return empty if no input
-
     try {
         const response = await fetch(`/api/organizations?search=${query}`);
         const data = await response.json();

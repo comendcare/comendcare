@@ -17,6 +17,7 @@ import type { Option } from "@comend/lib/types"
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
+import { handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils"
 
 export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, setSearchTerm, filters, setFilters, totalResults} = useDiseaseModelSearchStore(
@@ -137,53 +138,6 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
         (filters.types?.length || 0) +
         (filters.organizations?.length || 0)
 
-    const handleAsyncGeneSearch = async (query: string): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
-        
-        try {
-            const response = await fetch(`/api/genes?search=${query}`);
-            const data = await response.json();
-
-            // Return the fetched options
-            return data;
-        } catch (error) {
-            console.error("Failed to fetch genes:", error);
-            return [];
-        }
-    };
-
-    const handleAsyncConditionSearch = async (query: string): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
-        
-        try {
-            const response = await fetch(`/api/conditions?search=${query}`);
-            const data = await response.json();
-
-            // Return the fetched options
-            return data;
-        } catch (error) {
-            console.error("Failed to fetch genes:", error);
-            return [];
-        }
-    };
-
-    const handleAsyncOrganizationSearch = async (query: string): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
-        
-        try {
-            const response = await fetch(`/api/organizations?search=${query}`, {
-                method: 'GET'
-            });
-            const data = await response.json();
-
-            // Return the fetched options
-            return data;
-        } catch (error) {
-            console.error("Failed to fetch genes:", error);
-            return [];
-        }
-    };
-
     return (
         <div className="w-full mx-auto flex flex-col gap-y-2">
             <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm">
@@ -281,6 +235,7 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
                                 emptyIndicator={
                                     <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
                                 }
+                                triggerSearchOnFocus={true}
                                 showHoverCard={false}
                             />
                         </div>
@@ -299,6 +254,7 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
                                 emptyIndicator={
                                     <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
                                 }
+                                triggerSearchOnFocus={true}
                                 showHoverCard={false}
                             />
                         </div>
@@ -334,6 +290,7 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
                                 emptyIndicator={
                                     <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
                                 }
+                                triggerSearchOnFocus={true}
                                 showHoverCard={false}
                             />
                         </div>
