@@ -2829,12 +2829,21 @@ const fetchBiosamples = async (
                 })
             }
 
+            console.log(`input quantity`, input.quantity)
+
             if (input.quantity) {
                 filters.push({
                     id: 'quantity',
-                    value: input.quantity,
+                    value: input.quantity.slice(0, 2),
                     variant: 'range',
                     operator: 'isBetween',
+                    filterId: nanoid()
+                }),
+                filters.push({
+                    id: 'quantityUnit',
+                    value: input.quantity[2],
+                    variant: 'select',
+                    operator: 'eq',
                     filterId: nanoid()
                 })
             }
@@ -2843,6 +2852,8 @@ const fetchBiosamples = async (
                 filters,
                 joinOperator: "and"
             }) || {}
+
+            console.log(`where filter`, where)
         }
 
         // add global filter

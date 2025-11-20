@@ -409,7 +409,26 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                 label: "Total available quantity",
                 variant: "range",
                 range: [0, 1000],
-                unit: 'ml',
+                unitOptions: QUANTITY_OPTIONS,
+                icon: CircleDashed,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        filter,
+                        {
+                            id: 'quantityUnit',
+                            value: filter.value[2],
+                            variant: 'select' as any,
+                            operator: 'eq' as any,
+                            filterId: generateId({length: 8})
+                        }
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        joinOperator: 'and' // we want both of these itms to be true at the same time
+                    })
+
+                    return results
+                },
             },
         },
         {
