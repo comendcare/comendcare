@@ -2829,8 +2829,6 @@ const fetchBiosamples = async (
                 })
             }
 
-            console.log(`input quantity`, input.quantity)
-
             if (input.quantity) {
                 filters.push({
                     id: 'quantity',
