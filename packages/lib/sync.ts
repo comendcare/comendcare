@@ -647,6 +647,16 @@ export const syncToTypesense = async (env: {
                 // }
             ]
         }
+        const researcherSchema = {
+            name: 'researchers',
+            enable_nested_fields: true,
+            fields: [
+                {
+                    name: ".*",
+                    type: "auto",
+                },
+            ],
+        };
 
         /* UPDATE ORGANIZATION ---------------------------------------------------------------------------------------- */
         console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
@@ -1015,6 +1025,43 @@ export const syncToTypesense = async (env: {
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'rfps', uploadRFPs);
         } else {
             console.log('No rfps to import.');
+        }
+
+        /* UPDATE RESEARCHERS --------------------------------------------------------------------------- */
+        console.log('Researcher Schema:', JSON.stringify(researcherSchema, null, 2));
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'researchers', researcherSchema);
+        const researchers = await prisma.researcher.findMany({});
+        console.log('Raw researchers data:', researchers);
+
+        if (researchers.length > 0) {
+            console.log('Validating researcher data...');
+
+            // map orgs to include all required data
+            const uploadResearchers = await Promise.all(researchers.map(async (researcher, index) => {
+                console.log(`Researcher ${index + 1}:`, researcher)
+                const fetchedResearcher = await prisma.organization.findUnique({
+                    where: { id: researcher.id },
+                })
+
+                // const orgUpdatedAt = Math.max(...[organization.updatedAt.valueOf()].concat(
+                //     organization.roadmaps.map(roadmap => roadmap.updatedAt.valueOf()),
+                //     organization.milestones.map(milestone => milestone.updatedAt.valueOf()),
+                //     organization.tools.map(tool => tool.updatedAt.valueOf()),
+                //     organization.rfps.map(rfp => rfp.updatedAt.valueOf())
+                // ))
+
+                return {
+                    ...fetchedResearcher,
+                    // updatedAt: orgUpdatedAt,
+                    createdAt: researcher.createdAt.valueOf(),
+                }
+            }))
+
+            const validResearchers = uploadResearchers.filter(Boolean);
+
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'researchers', validResearchers);
+        } else {
+            console.log('No researchers to import.');
         }
 
         console.log('Sync job completed successfully.');
