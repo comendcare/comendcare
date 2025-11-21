@@ -265,6 +265,7 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
                             <Label>Disease model types</Label>
                             <MultipleSelector
                                 value={filters.types ?? []}
+                                badgeClassName={badgeVariants({variant: "lightBlue"})}
                                 onChange={(vals) => setFilterKey("types", vals)}
                                 defaultOptions={DISEASE_MODEL_TYPE_OPTIONS}
                                 placeholder="Select types..."
@@ -320,7 +321,7 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
 
                         {/* genes */}
                         {(filters.genes || []).map((item) => (
-                            <Badge key={`genes-${item.value}`} variant="secondary" className="text-xs">
+                            <Badge key={`genes-${item.value}`} variant="teal" className="text-xs">
                                 {item.value}
                                 <button
                                     onClick={() => removeFilterItem("genes", item.value)}
@@ -334,7 +335,7 @@ export function DiseaseModelMarketplaceIntegratedSearchAndFilter() {
 
                         {/* disease model types */}
                         {(filters.types || []).map((item) => (
-                            <Badge key={`types-${item.value}`} variant="secondary" className="text-xs">
+                            <Badge key={`types-${item.value}`} variant="lightBlue" className="text-xs">
                                 {DISEASE_MODEL_TYPE_OPTIONS.find((o) => o.value === item.value)?.label || item.value}
                                 <button
                                     onClick={() => removeFilterItem("types", item.value)}

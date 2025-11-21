@@ -7,7 +7,7 @@ import {MILESTONE_TYPE_OPTIONS_WITH_VALUE} from "@comend/components/marketplace/
 import {Button} from "@comend/components/ui/button"
 import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"
-import {Badge} from "@comend/components/ui/badge"
+import {Badge, badgeVariants} from "@comend/components/ui/badge"
 import {Separator} from "@comend/components/ui/separator"
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
 
@@ -183,6 +183,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                                 <Label>Project types</Label>
                                 <MultipleSelector
                                     value={filters.milestoneTypes}
+                                    badgeClassName={badgeVariants({variant: "lightBlue"})}
                                     onChange={(vals) => setFilterKey("milestoneTypes", vals)}
                                     defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
                                     placeholder="Select project types..."
@@ -265,7 +266,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                             .flatMap(({key, options}) =>
                                 // @ts-ignore — keys align with FiltersType
                                 (filters[key] || []).map((item: { value: string }) => (
-                                    <Badge key={`${key}-${item.value}`} variant="secondary" className="text-xs">
+                                    <Badge key={`${key}-${item.value}`} variant={key === 'milestoneTypes' ? 'lightBlue' : 'secondary'} className="text-xs">
                                         {options.find((opt) => opt.value === item.value)?.label || item.value}
                                         <button
                                             onClick={() => removeFilterItem(key as any, item.value)}
