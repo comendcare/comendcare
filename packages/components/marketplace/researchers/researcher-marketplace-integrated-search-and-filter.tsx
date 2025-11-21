@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/compo
 import { ResearcherSearchState, useResearcherSearchStore } from "@/state/search/researcherSearchStore"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { MILESTONE_TYPE_OPTIONS, MODALITIES } from "@comend/lib/types"
-import { Badge } from "@comend/components/ui/badge"
+import { Badge, badgeVariants } from "@comend/components/ui/badge"
 import { handleAsyncConditionSearch, handleAsyncGeneSearch } from "@comend/lib/utils"
 
 export function ResearcherMarketplaceIntegratedSearchAndFilter() {
@@ -159,6 +159,7 @@ export function ResearcherMarketplaceIntegratedSearchAndFilter() {
                                 <Label>Gene of interest</Label>
                                 <MultipleSelector
                                     value={filters.genes ?? []}
+                                    badgeClassName={badgeVariants({variant: "teal"})}
                                     onChange={(vals) => setFilterKey("genes", vals)}
                                     onSearch={handleAsyncGeneSearch}
                                     placeholder="Select genes..."

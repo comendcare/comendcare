@@ -42,6 +42,7 @@ import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {Textarea} from "@comend/components/ui/textarea";
 import {FormImageSelector} from "@comend/components/form-image-selector";
 import {Invitation} from "@prisma/client";
+import { badgeVariants } from "@comend/components/ui/badge";
 
 /**************************************
  * Zod schema (ALL FIELDS IN ONE)
@@ -792,6 +793,7 @@ export default function NewOrganizationForm({invitations, organizations}: {
                                         <FormControl>
                                             <MultipleSelector
                                                 {...field}
+                                                badgeClassName={badgeVariants({variant: "teal"})}
                                                 onSearch={handleGeneSearch}
                                                 placeholder="Search for genes..."
                                                 inputProps={{
@@ -827,6 +829,7 @@ export default function NewOrganizationForm({invitations, organizations}: {
                                         <FormControl>
                                             <MultipleSelector
                                                 {...field}
+                                                badgeClassName={badgeVariants({variant: "teal"})}
                                                 onSearch={handleGeneSearch}
                                                 placeholder="Search for genes..."
                                                 inputProps={{

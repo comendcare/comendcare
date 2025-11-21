@@ -6,7 +6,7 @@ import {useShallow} from "zustand/react/shallow"
 import {Button} from "@comend/components/ui/button"
 import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"
-import {Badge} from "@comend/components/ui/badge"
+import {Badge, badgeVariants} from "@comend/components/ui/badge"
 import {Separator} from "@comend/components/ui/separator"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import {TOOL_TYPE_OPTIONS} from "@comend/lib/types"
@@ -245,6 +245,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
                             <Label>Gene</Label>
                             <MultipleSelector
                                 value={filters.genes ?? []}
+                                badgeClassName={badgeVariants({variant: "teal"})}
                                 onChange={(vals) => setFilterKey("genes", vals)}
                                 onSearch={handleAsyncGeneSearch}
                                 placeholder="Any gene"

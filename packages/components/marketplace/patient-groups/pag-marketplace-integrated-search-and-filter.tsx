@@ -8,7 +8,7 @@ import { debounce } from "lodash";
 import { Button } from "@comend/components/ui/button";
 import { Input } from "@comend/components/ui/input";
 import { Label } from "@comend/components/ui/label";
-import { Badge } from "@comend/components/ui/badge";
+import { Badge, badgeVariants } from "@comend/components/ui/badge";
 import { Separator } from "@comend/components/ui/separator";
 import {
     Select,
@@ -297,6 +297,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                                 <Label>Gene</Label>
                                 <MultipleSelector
                                     value={filters.genes ?? []}
+                                    badgeClassName={badgeVariants({variant: "teal"})}
                                     onChange={(vals) => setFilterKey("genes", vals)}
                                     onSearch={handleAsyncGeneSearch}
                                     placeholder="Any gene"

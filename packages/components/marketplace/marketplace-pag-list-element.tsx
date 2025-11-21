@@ -29,7 +29,7 @@ export function OrganizationMarketplaceListElement({ organization, isPublic = fa
                 {organization?.associatedGenes && organization.associatedGenes.length > 0 && (
                     <span className="flex flex-row gap-2 flex-wrap">
                         {organization?.associatedGenes.map((gene: string, index: number) => (
-                            <Badge key={index} className="flex text-sm">
+                            <Badge key={index} className="flex text-sm" variant={'teal'}>
                                 {gene}
                             </Badge>
                         ))}

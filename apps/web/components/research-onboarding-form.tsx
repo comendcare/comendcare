@@ -18,6 +18,7 @@ import LoadingDots from "@comend/components/icons/loading-dots";
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
 import type {Organization} from "@prisma/client";
 import {MOLECULAR_MECHANISMS, Option, optionSchema} from "@comend/lib/types";
+import { badgeVariants } from "@comend/components/ui/badge";
 
 export const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
     z.preprocess(
@@ -283,6 +284,7 @@ export default function ResearchOnboardingForm(
                                         <FormControl>
                                             <MultipleSelector
                                                 {...field}
+                                                badgeClassName={badgeVariants({variant: "teal"})}
                                                 onSearch={handleAsyncSearch}
                                                 placeholder="Search for genes..."
                                                 triggerSearchOnFocus={true}

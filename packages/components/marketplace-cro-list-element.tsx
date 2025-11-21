@@ -29,7 +29,7 @@ export function CROMarketplaceListElement({ cro }: { cro: any }) {
                 {cro?.associatedGenes && cro.associatedGenes.length > 0 && (
                     <div className="flex flex-row gap-2 flex-wrap">
                         {cro?.associatedGenes.map((gene: string, index: number) => (
-                            <Badge key={index} className="flex text-sm">
+                            <Badge key={index} className="flex text-sm" variant={'teal'}>
                                 {gene}
                             </Badge>
                         ))}
