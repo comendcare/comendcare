@@ -104,7 +104,7 @@ export function OrganizationMarketplaceCard({
                     </div>
                     <div className="w-full flex flex-row gap-2 min-h-[24px]">
                         <TruncatedList 
-                            badgeProps={{variant: 'lightBlue'}}
+                            items={Array.from(therapeuticStrategiesList)}
                         />
                     </div>
                     <div className="flex flex-wrap w-full gap-4 min-h-[20px]">
