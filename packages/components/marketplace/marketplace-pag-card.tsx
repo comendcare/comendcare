@@ -1,13 +1,14 @@
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@comend/components/ui/card";
 import Link from "next/link";
 import {formatMoney, getStage} from "@comend/lib/utils";
-import {Badge} from "@comend/components/ui/badge";
+import {Badge, BadgeProps, badgeVariants} from "@comend/components/ui/badge";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Separator} from "@comend/components/ui/separator";
 import {CircleDollarSign, FileText, MegaphoneIcon, MicroscopeIcon, Users} from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import {PropertyBadge} from "@comend/components/property-badge";
 import { milestoneCategories, MODALITIES, Option } from "@comend/lib/types";
+import { VariantProps } from "class-variance-authority";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -102,11 +103,16 @@ export function OrganizationMarketplaceCard({
                         )}
                     </div>
                     <div className="w-full flex flex-row gap-2 min-h-[24px]">
-                        <TruncatedList items={Array.from(therapeuticStrategiesList)}/>
+                        <TruncatedList 
+                            items={Array.from(therapeuticStrategiesList)}
+                        />
                     </div>
                     <div className="flex flex-wrap w-full gap-4 min-h-[20px]">
                         {numProjects > 0 && (
-                            <PropertyBadge icon={FileText}>
+                            <PropertyBadge 
+                                icon={FileText}
+                                className="border-purple-200 text-purple-900 font-semibold" 
+                            >
                                 <span className="flex flex-row items-center gap-x-1 whitespace-nowrap">
                                     <div className="text-sm">{numProjects}</div>
                                     {numProjects > 1 ? "Projects" : "Project"}
@@ -114,7 +120,10 @@ export function OrganizationMarketplaceCard({
                             </PropertyBadge>
                         )}
                         {numTools > 0 && (
-                            <PropertyBadge icon={MicroscopeIcon}>
+                            <PropertyBadge 
+                                icon={MicroscopeIcon}
+                                className="border-green-200 text-green-900 font-semibold"
+                            >
                                 <span className="flex flex-row items-center gap-x-1 whitespace-nowrap">
                                     <div className="text-sm">{numTools}</div>
                                     {numTools > 1 ? "Tools" : "Tool"}
@@ -122,7 +131,10 @@ export function OrganizationMarketplaceCard({
                             </PropertyBadge>
                         )}
                         {numRFPs > 0 && (
-                            <PropertyBadge icon={MegaphoneIcon}>
+                            <PropertyBadge 
+                                icon={MegaphoneIcon}
+                                className="border-orange-200 text-orange-900 font-semibold"
+                            >
                                 <span className="flex flex-row items-center gap-x-1 whitespace-nowrap">
                                     <div className="text-sm">{numRFPs}</div>
                                     {numRFPs > 1 ? "RFPs" : "RFP"}
@@ -138,7 +150,10 @@ export function OrganizationMarketplaceCard({
                             {orgCondition.name}
                         </h2>
                         <span className="w-full flex flex-row gap-2 min-h-[24px]">
-                            <TruncatedList items={(causalGenes || []).concat((associatedGenes || []))} />
+                            <TruncatedList 
+                                items={(causalGenes || []).concat((associatedGenes || []))} 
+                                badgeProps={{variant: 'teal'}}
+                            />
                         </span>
                     </CardFooter>
                 </div>
@@ -147,7 +162,13 @@ export function OrganizationMarketplaceCard({
     );
 }
 
-export default function TruncatedList({ items }: { items: string[] }) {
+export default function TruncatedList({ 
+    items, 
+    badgeProps
+}: { 
+    items: string[], 
+    badgeProps?: BadgeProps
+}) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [visibleCount, setVisibleCount] = useState(items.length);
 
@@ -162,7 +183,7 @@ export default function TruncatedList({ items }: { items: string[] }) {
                 (el) => !el.dataset.moreIndicator
             );
 
-            let totalWidth = 0;
+            let totalWidth = 10;
             let count = 0;
 
             for (let i = 0; i < itemEls.length; i++) {
@@ -199,7 +220,7 @@ export default function TruncatedList({ items }: { items: string[] }) {
             style={{ width: "100%" }}
         >
         {items.slice(0, visibleCount).map((item) => (
-            <Badge key={item} className="text-xs flex">
+            <Badge key={item} className="text-xs flex" {...badgeProps}>
                 {item}
             </Badge>
         ))}

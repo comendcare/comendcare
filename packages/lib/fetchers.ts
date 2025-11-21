@@ -47,6 +47,7 @@ import {
 import {notFound, redirect} from "next/navigation";
 import {switchOrganization} from "./actions";
 import { ColumnDef } from "@tanstack/react-table";
+import { ExtendedColumnSort } from "@comend/lib/types/data-table";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function findInstitutions(
@@ -2647,7 +2648,7 @@ const fetchDiseaseModels = async (
         }
 
         const orderBy = input.sort.length
-            ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+            ? input.sort.map(s => prismaOrderByFromColumnId(s))
             : [{ createdAt: { sort: "asc" } }];
 
         const [data, total] = await prisma.$transaction([
@@ -2678,12 +2679,17 @@ const fetchDiseaseModels = async (
     }
 }
 
-function prismaOrderByFromColumnId(id: string, desc: boolean): any {
-    const parts = id.split(".")
+function prismaOrderByFromColumnId(sort: ExtendedColumnSort<any>, schemaColumns?: ColumnDef<any>[] | undefined): any {
+    const parts = sort.id.split(".")
+    const sortAccessor = schemaColumns?.find(col => col.id === sort.id)?.meta?.sortAccessor
+
+    // if schema has provided an overried for accessing the database use the dbOverride
+    // instead of the filter ID to generate the WHERE object
+    if (sortAccessor) return sortAccessor(sort)
 
     // build nested object dynamically
     return parts.reduceRight((acc, key) => {
-        return { [key]: Object.keys(acc).length ? acc : (desc ? "desc" : "asc") }
+        return { [key]: Object.keys(acc).length ? acc : (sort.desc ? "desc" : "asc") }
     }, {})
 }
 
@@ -2900,7 +2906,7 @@ const fetchBiosamples = async (
         }
 
         const orderBy = input.sort.length
-            ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+            ? input.sort.map(s => prismaOrderByFromColumnId(s, columns))
             : [{ createdAt: { sort: "asc" } }];
 
         const [data, total] = await prisma.$transaction([
@@ -3024,7 +3030,7 @@ export const getAllBiosamples = withResearcherAuth(
             }
 
             const orderBy = input.sort.length
-                ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+                ? input.sort.map(s => prismaOrderByFromColumnId(s))
                 : [{ createdAt: { sort: "asc" } }];
 
             const biosampleTypes = BIOSAMPLE_TYPE_OPTIONS
@@ -3266,7 +3272,7 @@ const fetchClinicalDatsets = async (
         }
 
         const orderBy = input.sort.length
-            ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+            ? input.sort.map(s => prismaOrderByFromColumnId(s))
             : [{ createdAt: { sort: "asc" } }];
 
         const [data, total] = await prisma.$transaction([

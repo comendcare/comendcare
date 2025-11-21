@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Badge } from "./../../../ui/badge";
 import { CircleDashed } from "lucide-react";
 import { handleAsyncCompanyAndInstitutionSearch, handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils";
-import { ExtendedColumnFilter } from "@comend/lib/types/data-table";
+import { ExtendedColumnFilter, ExtendedColumnSort } from "@comend/lib/types/data-table";
 import { filterColumns } from "@comend/lib/filter-columns";
 import { generateId } from "@comend/lib/id";
 
@@ -113,7 +113,7 @@ export function useBiosamplesTableColumns(
                 </div>
             ),
             enableHiding,
-            enableSorting: true,
+            enableSorting: false,
             enableColumnFilter: true,
             meta: { 
                 label: "Condition",
@@ -134,6 +134,63 @@ export function useBiosamplesTableColumns(
                     })
 
                     return results
+                },
+                // sortAccessor: (sort: ExtendedColumnSort<unknown>) => {
+                //     const sortBy = {
+                //         organization: {
+                //             conditions: {
+                //                 // where: { isPrimary: true },      // only consider primary condition
+                //                 condition: { name: sort.desc ? "desc" : "asc" },
+                //                 take: 1
+                //             }
+                //         }
+                //     }
+                //     return sortBy
+                // },
+                onAsyncSearch: handleAsyncConditionSearch
+            }
+        },
+        {
+            id: typesenseSearch
+                ? 'associatedConditions' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+                : 'associatedConditions',
+            accessorKey: "organization.conditions",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Associated conditions"
+                />
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{(row.original.organization?.conditions?.slice(1) || []).map((condition: any) => condition?.condition?.name)?.join(", ") || 'No Condition'}</p>
+                </div>
+            ),
+            enableHiding,
+            enableSorting: false,
+            enableColumnFilter: true,
+            meta: { 
+                label: "Associated conditions",
+                variant: "multiSelect",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        {
+                            ...filter,
+                            id: "organization.conditions",
+                            ...(Array.isArray(filter.value) ? {value: filter.value.map(conditionOption => ({condition: {name: conditionOption}}))} : undefined),
+                        } as any
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        // join operator doesn't matter in this case because there will only be one entry in the list
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                    return []
                 },
                 onAsyncSearch: handleAsyncConditionSearch
             }

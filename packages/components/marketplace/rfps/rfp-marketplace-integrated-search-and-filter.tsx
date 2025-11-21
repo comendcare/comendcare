@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/compo
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { RFP_OPEN_TO_TYPE_OPTIONS, Option, RFP_STATUS_TYPE_OPTIONS } from "@comend/lib/types"
-import { Badge } from "@comend/components/ui/badge"
+import { Badge, badgeVariants } from "@comend/components/ui/badge"
 import { handleAsyncConditionSearch, handleAsyncGeneSearch } from "@comend/lib/utils"
 
 export function RFPMarketplaceIntegratedSearchAndFilter() {
@@ -124,6 +124,7 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
                                 <Label>Gene</Label>
                                 <MultipleSelector
                                     value={filters.genes ?? []}
+                                    badgeClassName={badgeVariants({variant: "teal"})}
                                     onChange={(vals) => setFilterKey("genes", vals)}
                                     onSearch={handleAsyncGeneSearch}
                                     placeholder="Select genes..."

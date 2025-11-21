@@ -44,6 +44,7 @@ export function DatabaseBiosamplesTable({
         initialState: {
             sorting: [],
             columnPinning: {right: ["actions"], left: ["select"]},
+            columnVisibility: {'associatedConditions': false},
         },
         getRowId: (originalRow) => originalRow.id,
         shallow: false,

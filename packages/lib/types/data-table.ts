@@ -17,6 +17,7 @@ declare module "@tanstack/react-table" {
         showInAdvancedOnly?: boolean;
         onAsyncSearch?: (query?: string | undefined) => Promise<Option[]>
         dbAccessor?: (filter: ExtendedColumnFilter<unknown>) => Object | undefined;
+        sortAccessor?: (sort: ExtendedColumnSort<unknown>) => Object | undefined;
     }
 }
 

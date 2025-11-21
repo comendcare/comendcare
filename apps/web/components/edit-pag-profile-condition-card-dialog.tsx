@@ -35,6 +35,7 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/
 import type {Organization} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
 import {researchFormSchema} from "./research-onboarding-form";
+import { badgeVariants } from "@comend/components/ui/badge";
 
 export default function EditPAGProfileConditionCardDialog({organization}: { organization: Partial<Organization> }) {
     const {data: session, status} = useSession()
@@ -413,6 +414,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                             <MultipleSelector
                                                 {...field}
                                                 creatable={true}
+                                                badgeClassName={badgeVariants({variant: "teal"})}
                                                 onSearch={handleGeneAsyncSearch}
                                                 placeholder="Search for genes..."
                                                 hidePlaceholderWhenSelected={true}
@@ -439,6 +441,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                             <MultipleSelector
                                                 {...field}
                                                 creatable={true}
+                                                badgeClassName={badgeVariants({variant: "teal"})}
                                                 onSearch={handleGeneAsyncSearch}
                                                 placeholder="Search for genes..."
                                                 hidePlaceholderWhenSelected={true}

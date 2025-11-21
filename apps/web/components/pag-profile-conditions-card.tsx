@@ -222,7 +222,7 @@ export const PAGProfileConditionsCard = ({
                                 </div>
                                 <div className="flex flex-wrap gap-1 sm:gap-2">
                                     {causalGenes.map((item, index) => (
-                                        <Badge key={`${item}-${index}`} className="text-sm" data-testid="causal-gene-badge">
+                                        <Badge key={`${item}-${index}`} className="text-sm" data-testid="causal-gene-badge" variant={'teal'}>
                                             {item.charAt(0).toUpperCase() + item.slice(1)}
                                         </Badge>
                                     ))}
@@ -239,7 +239,7 @@ export const PAGProfileConditionsCard = ({
                                 </div>
                                 <div className="flex flex-wrap gap-1 sm:gap-2">
                                     {associatedGenes.map((item, index) => (
-                                        <Badge key={`${item}-${index}`} className="text-sm" data-testid="associated-gene-badge">
+                                        <Badge key={`${item}-${index}`} className="text-sm" data-testid="associated-gene-badge" variant={'teal'}>
                                             {item.charAt(0).toUpperCase() + item.slice(1)}
                                         </Badge>
                                     ))}
