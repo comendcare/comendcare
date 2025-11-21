@@ -19,7 +19,8 @@ export default function ResearcherPage() {
         if (!initialized) {
             const parsedResearcherFilters = {
                 // conditions: [],
-                // genes: [],
+                researchInterests: [],
+                genes: [],
                 // openTo: [],
                 // status: [],
                 // organizations: []

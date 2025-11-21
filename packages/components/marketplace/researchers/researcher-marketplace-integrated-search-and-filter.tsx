@@ -7,11 +7,11 @@ import {Button} from "@comend/components/ui/button"
 import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"
 import {Separator} from "@comend/components/ui/separator"
-import {debounce, filter} from "lodash";
+import {debounce} from "lodash";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import { ResearcherSearchState, useResearcherSearchStore } from "@/state/search/researcherSearchStore"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
-import { RFP_OPEN_TO_TYPE_OPTIONS, Option, RFP_STATUS_TYPE_OPTIONS } from "@comend/lib/types"
+import { MILESTONE_TYPE_OPTIONS, MODALITIES } from "@comend/lib/types"
 import { Badge } from "@comend/components/ui/badge"
 import { handleAsyncConditionSearch, handleAsyncGeneSearch } from "@comend/lib/utils"
 
@@ -32,15 +32,15 @@ export function ResearcherMarketplaceIntegratedSearchAndFilter() {
     const [query, setQuery] = useState(searchTerm)
 
     const clearAll = () => {
-        setFilters({ ...filters, conditions: [], genes: [], openTo: [], status: [], organizations: [] });
+        setFilters({ ...filters, researchInterests: [], therapeuticsOfInterest: [], conditionsOfInterest: [], genes: [] });
     }
 
     // helper to update a single filter key from MultipleSelector
-    // const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) =>
-    //     setFilters({...filters, [key]: value})
+    const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) =>
+        setFilters({...filters, [key]: value})
 
-    // const removeFilterItem = (key: keyof typeof filters, value: string) =>
-    //     setFilters({...filters, [key]: (filters[key] || []).filter((i) => i.value !== value)})
+    const removeFilterItem = (key: keyof typeof filters, value: string) =>
+        setFilters({...filters, [key]: (filters[key] || []).filter((i) => i.value !== value)})
 
     // keep searchTerm input in sync if the store changes elsewhere
     useEffect(() => setQuery(searchTerm), [searchTerm])
@@ -57,12 +57,11 @@ export function ResearcherMarketplaceIntegratedSearchAndFilter() {
         []
     )
 
-    // const activeCount =
-    //     (filters.conditions?.length || 0) +
-    //     (filters.genes?.length || 0) + 
-    //     (filters.openTo?.length || 0) +
-    //     (filters.status?.length || 0)
-    const activeCount = 0
+    const activeCount =
+        filters.researchInterests?.length || 0 +
+        filters.therapeuticsOfInterest?.length || 0 +
+        filters.conditionsOfInterest?.length || 0 +
+        filters.genes?.length || 0
 
     return (
         <div className="w-full mx-auto flex flex-col gap-y-2">
@@ -101,12 +100,47 @@ export function ResearcherMarketplaceIntegratedSearchAndFilter() {
                         }}
                     >
                         <DialogTitle>Researcher Filters</DialogTitle>
-                            {/* Conditions */}
-                            {/* <div>
-                                <Label>Condition</Label>
+                            {/* Research Interests */}
+                            <div>
+                                <Label>Research interests</Label>
                                 <MultipleSelector
-                                    value={filters.conditions ?? []}
-                                    onChange={(vals) => setFilterKey("conditions", vals)}
+                                    value={filters.researchInterests ?? []}
+                                    onChange={(vals) => setFilterKey("researchInterests", vals)}
+                                    options={MILESTONE_TYPE_OPTIONS}
+                                    placeholder="Select option..."
+                                    hidePlaceholderWhenSelected
+                                    commandProps={{className: "bg-transparent"}}
+                                    emptyIndicator={
+                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                    }
+                                    triggerSearchOnFocus={true}
+                                    showHoverCard={false}
+                                />
+                            </div>
+
+                            {/* Therapeutis of interest */}
+                            <div>
+                                <Label>Therapeutics of interest</Label>
+                                <MultipleSelector
+                                    value={filters.therapeuticsOfInterest ?? []}
+                                    onChange={(vals) => setFilterKey("therapeuticsOfInterest", vals)}
+                                    defaultOptions={MODALITIES}
+                                    placeholder="Select option..."
+                                    hidePlaceholderWhenSelected
+                                    commandProps={{className: "bg-transparent"}}
+                                    emptyIndicator={
+                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                    }
+                                    showHoverCard={false}
+                                />
+                            </div>
+
+                            {/* Conditions of Interest */}
+                            <div>
+                                <Label>Conditions of interest</Label>
+                                <MultipleSelector
+                                    value={filters.conditionsOfInterest ?? []}
+                                    onChange={(vals) => setFilterKey("conditionsOfInterest", vals)}
                                     onSearch={handleAsyncConditionSearch}
                                     placeholder="Select conditions..."
                                     hidePlaceholderWhenSelected
@@ -118,11 +152,11 @@ export function ResearcherMarketplaceIntegratedSearchAndFilter() {
                                     triggerSearchOnFocus={true}
                                     showHoverCard={false}
                                 />
-                            </div> */}
+                            </div>
 
                             {/* Genes */}
-                            {/* <div>
-                                <Label>Gene</Label>
+                            <div>
+                                <Label>Gene of interest</Label>
                                 <MultipleSelector
                                     value={filters.genes ?? []}
                                     onChange={(vals) => setFilterKey("genes", vals)}
@@ -137,41 +171,7 @@ export function ResearcherMarketplaceIntegratedSearchAndFilter() {
                                     triggerSearchOnFocus={true}
                                     showHoverCard={false}
                                 />
-                            </div> */}
-
-                            {/* Open to */}
-                            {/* <div>
-                                <Label>Open to</Label>
-                                <MultipleSelector
-                                    value={filters.openTo ?? []}
-                                    onChange={(vals) => setFilterKey("openTo", vals)}
-                                    defaultOptions={RFP_OPEN_TO_TYPE_OPTIONS}
-                                    placeholder="Select option..."
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{className: "bg-transparent"}}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                    }
-                                    showHoverCard={false}
-                                />
-                            </div> */}
-
-                            {/* Status */}
-                            {/* <div>
-                                <Label>Status</Label>
-                                <MultipleSelector
-                                    value={filters.status ?? []}
-                                    onChange={(vals) => setFilterKey("status", vals)}
-                                    defaultOptions={RFP_STATUS_TYPE_OPTIONS}
-                                    placeholder="Select status..."
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{className: "bg-transparent"}}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                    }
-                                    showHoverCard={false}
-                                />
-                            </div> */}
+                            </div>
                     </DialogContent>
                 </Dialog>
             </div>
@@ -180,21 +180,47 @@ export function ResearcherMarketplaceIntegratedSearchAndFilter() {
             <div className="flex flex-row gap-2 items-center">
                 {activeCount > 0 && (
                     <div className="flex flex-wrap gap-2 items-center">
-                        {/* conditions */}
-                        {/* {(filters.conditions || []).map((item) => (
-                            <Badge key={`conditions-${item.value}`} variant="secondary" className="text-xs">
-                                {item.value}
+                        {/* researchInterests */}
+                        {(filters.researchInterests || []).map((item) => (
+                            <Badge key={`research-${item.value}`} variant="secondary" className="text-xs">
+                                {item.label}
                                 <button
-                                    onClick={() => removeFilterItem("conditions", item.value)}
+                                    onClick={() => removeFilterItem("researchInterests", item.value)}
                                     className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
                                 >
                                     <X className="h-3 w-3" />
                                 </button>
                             </Badge>
-                        ))} */}
+                        ))}
+
+                        {/* therapeutics of interest */}
+                        {(filters.therapeuticsOfInterest || []).map((item) => (
+                            <Badge key={`therapeutics-${item.value}`} variant="secondary" className="text-xs">
+                                {item.label}
+                                <button
+                                    onClick={() => removeFilterItem("therapeuticsOfInterest", item.value)}
+                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+
+                        {/* conditions of interest */}
+                        {(filters.conditionsOfInterest || []).map((item) => (
+                            <Badge key={`conditions-${item.value}`} variant="secondary" className="text-xs">
+                                {item.label}
+                                <button
+                                    onClick={() => removeFilterItem("conditionsOfInterest", item.value)}
+                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
 
                         {/* genes */}
-                        {/* {(filters.genes || []).map((item) => (
+                        {(filters.genes || []).map((item) => (
                             <Badge key={`genes-${item.value}`} variant="secondary" className="text-xs">
                                 {item.value}
                                 <button
@@ -204,31 +230,7 @@ export function ResearcherMarketplaceIntegratedSearchAndFilter() {
                                     <X className="h-3 w-3" />
                                 </button>
                             </Badge>
-                        ))} */}
-
-                        {/* {(filters.openTo || []).map((item) => (
-                            <Badge key={`openTo-${item.value}`} variant="secondary" className="text-xs">
-                                {item.label}
-                                <button
-                                    onClick={() => removeFilterItem("openTo", item.value)}
-                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
-                                >
-                                    <X className="h-3 w-3" />
-                                </button>
-                            </Badge>
-                        ))} */}
-
-                        {/* {(filters.status || []).map((item) => (
-                            <Badge key={`status-${item.value}`} variant="secondary" className="text-xs">
-                                {item.label}
-                                <button
-                                    onClick={() => removeFilterItem("status", item.value)}
-                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
-                                >
-                                    <X className="h-3 w-3" />
-                                </button>
-                            </Badge>
-                        ))} */}
+                        ))}
 
                         <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs">
                             Clear all
