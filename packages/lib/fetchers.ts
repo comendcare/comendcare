@@ -47,7 +47,7 @@ import {
 import {notFound, redirect} from "next/navigation";
 import {switchOrganization} from "./actions";
 import { ColumnDef } from "@tanstack/react-table";
-import { ExtendedColumnSort } from "types/data-table";
+import { ExtendedColumnSort } from "@comend/lib/types/data-table";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function findInstitutions(
