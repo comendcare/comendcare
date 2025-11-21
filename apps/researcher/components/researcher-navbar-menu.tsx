@@ -22,6 +22,7 @@ import {
     DatabaseIcon,
     ClipboardListIcon,
     UsersIcon,
+    Store,
 } from "lucide-react"
 
 function isActive(pathname: string, href: string): boolean {
@@ -34,7 +35,7 @@ const pages = [
     {
         href: "/marketplace/biosamples",
         label: "Marketplace",
-        icon: <FlaskConicalIcon size={16}/>,
+        icon: <Store size={16} />
         // subpages: [
         //     {href: "/toolkit/biosamples", label: "Biosamples", icon: <DnaIcon size={16}/>},
         //     {href: "/toolkit/disease-models", label: "Disease Models", icon: <DnaIcon size={16}/>},

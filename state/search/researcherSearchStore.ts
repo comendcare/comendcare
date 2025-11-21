@@ -9,39 +9,33 @@ import { isEqual } from 'lodash';
 export type ViewType = 'grid' | 'list'
 
 export type FiltersType = {
-    // conditions: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
-    // genes: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
-    // mechanisms: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
-    // systems: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
-    // modalities: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
+    researchInterests: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    therapeuticsOfInterest: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    conditionsOfInterest: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    genes: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
 }
 
-export const defaultFilters = {
-    // conditions: [],
-    // genes: [],
-    // mechanisms: [],
-    // systems: [],
-    // modalities: [],
+export const defaultFilters: FiltersType = {
+    researchInterests: [],
+    therapeuticsOfInterest: [],
+    conditionsOfInterest: [],
+    genes: [],
 }
 
 function generateFiltersString(filters: FiltersType) {
@@ -49,43 +43,33 @@ function generateFiltersString(filters: FiltersType) {
 
     const escapeValue = (value: string) => `\`${value}\``;
 
-    // if (filters?.conditions && filters.conditions.length > 0) {
-    //     const conditionFilter = filters.conditions
-    //         .map(condition => `conditions.condition.name:=${escapeValue(condition.value)}`)
-    //         .join(" || ");
-    //     filtersList.push(`(${conditionFilter})`);
-    // }
+    if (filters?.researchInterests && filters.researchInterests.length > 0) {
+        const researchInterestsFilter = filters.researchInterests
+            .map(interest => `researchInterests:=${escapeValue(interest.label)}`)
+            .join(" || ");
+        filtersList.push(`(${researchInterestsFilter})`);
+    }
 
-    // if (filters?.genes && filters.genes.length > 0) {
-    //     const geneFilter = filters.genes
-    //         .map(gene => `conditions.condition.causalGenes:=${escapeValue(gene.value)} || conditions.condition.associatedGenes:=${escapeValue(gene.value)}`)
-    //         .join(" || ");
-    //     filtersList.push(`(${geneFilter})`);
-    // }
+    if (filters?.therapeuticsOfInterest && filters.therapeuticsOfInterest.length > 0) {
+        const therapeuticInterestsFilter = filters.therapeuticsOfInterest
+            .map(interest => `therapeuticsOfInterest:=${escapeValue(interest.label)}`)
+            .join(" || ");
+        filtersList.push(`(${therapeuticInterestsFilter})`);
+    }
 
-    // if (filters?.systems && filters.systems.length > 0) {
-    //     const systemFilters = filters.systems
-    //         .map(system => `conditions.condition.associatedSystems:="${escapeValue(system.value)}"`)
-    //         .join(" || ");
+    if (filters?.conditionsOfInterest && filters.conditionsOfInterest.length > 0) {
+        const conditionInterestsFilter = filters.conditionsOfInterest
+            .map(interest => `conditionsOfInterest:=${escapeValue(interest.label)}`)
+            .join(" || ");
+        filtersList.push(`(${conditionInterestsFilter})`);
+    }
 
-    //     filtersList.push(`(${systemFilters})`);
-    // }
-
-    // if (filters?.mechanisms && filters.mechanisms.length > 0) {
-    //     const mechanismFilters = filters.mechanisms
-    //         .map(system => `conditions.condition.relevantDiseaseMechanisms:="${escapeValue(system.value)}"`)
-    //         .join(" || ");
-
-    //     filtersList.push(`(${mechanismFilters})`);
-    // }
-
-    // if (filters?.modalities && filters.modalities.length > 0) {
-    //     const modalityFilters = filters.modalities
-    //         .map(modality => `therapeuticsOfInterest:="${escapeValue(modality.label)}"`)
-    //         .join(" || ");
-
-    //     filtersList.push(`(${modalityFilters})`);
-    // }
+    if (filters?.genes && filters.genes.length > 0) {
+        const geneFilter = filters.genes
+            .map(gene => `genesOfInterest:=${escapeValue(gene.value)}`)
+            .join(" || ");
+        filtersList.push(`(${geneFilter})`);
+    }
 
     const typesenseFilters = filtersList.length > 0 ? filtersList.join(" && ") : "";
 
@@ -96,10 +80,6 @@ function generateFiltersString(filters: FiltersType) {
 const sortByFilters: { [key: string]: string } = {
     "recently-updated": "updatedAt:desc",
     "alphabetical": "name:asc",
-    // "money-deployed-low-high": "moneyDeployed:asc",
-    // "money-deployed-high-low": "moneyDeployed:desc",
-    // "patients-engaged-low-high": "firstConditionPatientsEngaged:asc",
-    // "patients-engaged-high-low": "firstConditionPatientsEngaged:desc"
 }
 
 const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true): Promise<{results: any[], total: number}> => {
@@ -116,7 +96,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "name",
+            query_by: "name,description,researchInterests,therapeuticsOfInterest,conditionsOfInterest,genesOfInterest,affiliations.institution.name",
             per_page: 12,
             page: state.lastFetchedPage,
             ...(filtersString ? { filter_by: filtersString } : undefined),

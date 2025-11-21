@@ -9,6 +9,7 @@ import { ResearcherSearchState, useResearcherSearchStore } from "@/state/search/
 import { LoaderCircle } from "lucide-react";
 import { cn } from "@udecode/cn";
 import { ResearcherCard } from "@comend/components/researcher-card";
+import Link from "next/link";
 
 const selector = (state: ResearcherSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -49,7 +50,16 @@ export function ResearcherSearchResults() {
                 ): (
                     <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                         {searchResults.map((researcher) => (
-                            <ResearcherCard researcher={researcher}/>
+                            <Link
+                                href={
+                                    process.env.NEXT_PUBLIC_VERCEL_ENV
+                                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/researcher/${researcher.id}`
+                                        : `http://localhost:3000/app/researcher/${researcher.id}`
+                                }
+                                className="flex flex-row gap-4 items-center"
+                            >
+                                <ResearcherCard researcher={researcher}/>
+                            </Link>
                         ))}
                     </div>
                 )}

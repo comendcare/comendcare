@@ -20,8 +20,10 @@ export const ResearcherCard = ({researcher}: {researcher: any}) => {
             .concat(researcher.genesOfInterest)
 
 
-    const researchInterests: string[] = MILESTONE_TYPE_OPTIONS_WITH_VALUE.filter((option: any) => researcher.researchInterests.includes(option.value)).map((option: any) => option.label)
-    const therapeuticsOfInterest: string[] = MODALITIES.filter((option: any) => researcher.therapeuticsOfInterest.includes(option.value)).map((option: any) => option.label)
+    // const researchInterests: string[] = MILESTONE_TYPE_OPTIONS_WITH_VALUE.filter((option: any) => researcher.researchInterests.includes(option.value)).map((option: any) => option.label)
+    // const therapeuticsOfInterest: string[] = MODALITIES.filter((option: any) => researcher.therapeuticsOfInterest.includes(option.value)).map((option: any) => option.label)
+    const researchInterests: string[] = researcher.researchInterests
+    const therapeuticsOfInterest: string[] = researcher.therapeuticsOfInterest
     const conditionsOfInterest: string[] = researcher.conditionsOfInterest
     const genesOfInterest: string[] = researcher.genesOfInterest
 

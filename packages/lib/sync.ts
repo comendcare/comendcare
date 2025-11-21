@@ -1047,15 +1047,9 @@ export const syncToTypesense = async (env: {
                 console.log(`Researcher ${index + 1}:`, researcher)
                 const fetchedResearcher = await prisma.researcher.findUnique({
                     where: { id: researcher.id },
-                    // include: {
-                    //     user: {
-                    //         select: {
-                    //             id: true,
-                    //             name: true,
-                    //             email: true,
-                    //         }
-                    //     }
-                    // }
+                    include: {
+                        affiliations: {include: {institution: true}}
+                    }
                 })
 
                 // const orgUpdatedAt = Math.max(...[organization.updatedAt.valueOf()].concat(
