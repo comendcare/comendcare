@@ -18,12 +18,10 @@ export default function ResearcherPage() {
     useEffect(() => {
         if (!initialized) {
             const parsedResearcherFilters = {
-                // conditions: [],
                 researchInterests: [],
+                therapeuticsOfInterest: [],
+                conditionsOfInterest: [],
                 genes: [],
-                // openTo: [],
-                // status: [],
-                // organizations: []
             }
             initializeResearcherSearch(parsedResearcherFilters)
             console.log(`Researcher search initialized...`)
