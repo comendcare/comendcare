@@ -116,7 +116,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "name,description",
+            query_by: "name",
             per_page: 12,
             page: state.lastFetchedPage,
             ...(filtersString ? { filter_by: filtersString } : undefined),
@@ -124,7 +124,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
         };
 
         const results = await typesense
-            .collections("organizations")
+            .collections("researchers")
             .documents()
             .search(searchParameters);
 
@@ -141,15 +141,20 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
             }
         }
 
-        const prismaResponse = await fetch('/api/organizations', {
+        const prismaResponse = await fetch('/api/researchers', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ids}),
         });
 
+        if (!prismaResponse.ok) {
+            const text = await prismaResponse.text() // may be empty or HTML on 405
+            throw new Error(`POST /api/researchers failed: ${prismaResponse.status} ${text}`)
+        }
+
         const prismaResults = await prismaResponse.json();
 
-        const enrichedResults = ids.map((id: string) => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
+        const enrichedResults = ids.map((id: string) => prismaResults.find((researcher: any) => researcher.id === id) || null).filter(Boolean);
 
         return {
             results: isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults],
@@ -165,7 +170,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
     }
 };
 
-export interface OrganizationSearchState {
+export interface ResearcherSearchState {
     initialized: boolean,
     initState: (filters: FiltersType) => Promise<void>,
     searchTerm: string,
@@ -186,7 +191,7 @@ export interface OrganizationSearchState {
     setTotalResults: (total: number) => void,
 }
 
-export const useOrganizationSearchStore = create<OrganizationSearchState>()(
+export const useResearcherSearchStore = create<ResearcherSearchState>()(
     temporal((set, get) => ({
             initialized: false,
             initState: async (filters: FiltersType) => {
@@ -222,7 +227,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                 if (newSearch.length > 0) {
                     // only track searches if the user has entered text in the searchbar
                     const filters = get().filters
-                    // mixpanelTrack("Search Organizations", {
+                    // mixpanelTrack("Search Researchers", {
                     //     "Search Term": newSearch,
                     //     "Results": total,
                     //     "Filters": {
@@ -290,7 +295,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
 
                 // if (Object.values(recentlySelected).flatMap(value => value).length > 0 || Object.values(recentlyRemoved).flatMap(value => value).length > 0) {
                 //     // only track in mixpanel if something in the filters has been updated
-                //     mixpanelTrack("Marketplace Organization Filters Selected", {
+                //     mixpanelTrack("Marketplace Researchers Filters Selected", {
                 //         "Results": total,
                 //         "Filters": {
                 //             "Mechanisms of Action": newFilters.mechanisms.map(filter => filter.label),

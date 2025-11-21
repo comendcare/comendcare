@@ -10,6 +10,7 @@ import { FiltersType as BiosampleMarketplaceFiltersType, useBiosampleSearchStore
 import { FiltersType as DiseaseModelMarketplaceFiltersType, useDiseaseModelSearchStore} from "../../state/search/diseaseModelSearchStore";
 import { FiltersType as ClinicalDatasetMarketplaceFiltersType, useClinicalDatasetSearchStore} from "../../state/search/clinicalDatasetSearchStore";
 import { FiltersType as RFPMarketplaceFiltersType, useRFPSearchStore} from "../../state/search/rfpSearchStore";
+import { FiltersType as ResearcherMarketplaceFiltersType, useResearcherSearchStore} from "../../state/search/researcherSearchStore";
 import { Asset, RFP, Roadmap } from './types';
 import { useToolStore } from "../../state/tool/toolStore";
 import { useRFPStore } from "../../state/rfp/rfpStore";
@@ -29,6 +30,15 @@ export async function initializeRFPSearch(filters: RFPMarketplaceFiltersType) {
 
         // Call Zustand's initState directly
         await initRFPSearchState(filters)
+    }
+}
+
+export async function initializeResearcherSearch(filters: ResearcherMarketplaceFiltersType) {
+    if (typeof window !== "undefined") {
+        const initResearcherSearchState = useResearcherSearchStore.getState().initState;
+
+        // Call Zustand's initState directly
+        await initResearcherSearchState(filters)
     }
 }
 
