@@ -126,7 +126,7 @@ const getUpdatedSearchResults = async (
         const filtersString = generateFiltersString(state.filters)
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "title,description,condition.name,condition.causalGenes,condition.associatedGenes",
+            query_by: "title,description,organization.name,condition.name,condition.causalGenes,condition.associatedGenes",
             per_page: 12,
             page: Math.min(state.lastFetchedPage, state.totalPages), // don't fetch any pages out of range
             ...(filtersString ? { filter_by: filtersString } : undefined),
