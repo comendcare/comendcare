@@ -20,8 +20,11 @@ export async function POST(req: Request) {
                         createdAt: true,
                         updatedAt: true,
                     }
+                },
+                affiliations: {
+                    include: {institution: true}
                 }
-            }
+            },
         });
 
         return NextResponse.json(results, { status: 200 });

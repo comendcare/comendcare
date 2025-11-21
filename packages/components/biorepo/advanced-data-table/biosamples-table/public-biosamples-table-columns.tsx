@@ -109,11 +109,11 @@ export function useBiosamplesTableColumns(
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 items-center">
-                    <p>{(row.original.organization?.conditions || []).map((condition: any) => condition?.condition?.name) || 'No Condition'}</p>
+                    <p>{(row.original.organization?.conditions?.slice(0, 1) || []).map((condition: any) => condition?.condition?.name) || 'No Condition'}</p>
                 </div>
             ),
             enableHiding,
-            enableSorting: false, // cannot sort since the org can attatch multiple conditions
+            enableSorting: true,
             enableColumnFilter: true,
             meta: { 
                 label: "Condition",
