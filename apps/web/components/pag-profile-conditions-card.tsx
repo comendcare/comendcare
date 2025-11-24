@@ -1,13 +1,11 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {Condition, Organization} from "@prisma/client";
 import {Badge} from "@comend/components/ui/badge";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import React from "react";
-import {Info, Pencil} from "lucide-react";
-import {formatNumberWithCommas} from "@/packages/lib/utils";
+import {formatNumberWithCommas} from "@comend/lib/utils";
 import type {Prisma} from "@prisma/client";
 import dynamic from "next/dynamic";
-import {Button} from "@/packages/components/ui/button"; // type-only; erased at build
+import {Button} from "@comend/components/ui/button"; // type-only; erased at build
 import LoadingDots from "@comend/components/icons/loading-dots"
 
 const EditPAGProfileConditionCardDialog = dynamic(
@@ -38,28 +36,10 @@ type ConditionForCard = Prisma.ConditionGetPayload<{
         associatedSystems: true;
         causalGenes: true;
         associatedGenes: true;
-        associatedConditions: { select: { id: true; name: true; slug: true } };
-        associatedWith: { select: { id: true; name: true; slug: true } };
+        associatedConditions: true; // string[]
     };
 }>;
 
-function getAssociatedSet(
-    c: Pick<ConditionForCard, "slug" | "associatedConditions" | "associatedWith">
-): AssocMini[] {
-    const all = [...(c?.associatedConditions ?? []), ...(c?.associatedWith ?? [])];
-    const seen = new Set<string>();
-    const selfSlug = c?.slug;
-    const out: AssocMini[] = [];
-    for (const x of all) {
-        if (!x) continue;
-        if (x.slug === selfSlug) continue; // safety: no self
-        if (seen.has(x.id)) continue; // dedupe
-        seen.add(x.id);
-        out.push(x);
-    }
-    out.sort((a, b) => a.name.localeCompare(b.name));
-    return out;
-}
 
 // NEW: clean + normalize badge arrays
 const cleanBadges = (arr?: (string | null | undefined)[] | null) =>
@@ -224,7 +204,7 @@ export const PAGProfileConditionsCard = ({
                                 </div>
                                 <div className="flex flex-wrap gap-1 sm:gap-2">
                                     {causalGenes.map((item, index) => (
-                                        <Badge key={`${item}-${index}`} className="text-sm" data-testid="causal-gene-badge">
+                                        <Badge key={`${item}-${index}`} className="text-sm" data-testid="causal-gene-badge" variant={'teal'}>
                                             {item.charAt(0).toUpperCase() + item.slice(1)}
                                         </Badge>
                                     ))}
@@ -241,7 +221,7 @@ export const PAGProfileConditionsCard = ({
                                 </div>
                                 <div className="flex flex-wrap gap-1 sm:gap-2">
                                     {associatedGenes.map((item, index) => (
-                                        <Badge key={`${item}-${index}`} className="text-sm" data-testid="associated-gene-badge">
+                                        <Badge key={`${item}-${index}`} className="text-sm" data-testid="associated-gene-badge" variant={'teal'}>
                                             {item.charAt(0).toUpperCase() + item.slice(1)}
                                         </Badge>
                                     ))}

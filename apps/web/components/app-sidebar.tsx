@@ -4,52 +4,32 @@ import * as React from "react"
 import {
     Cog,
     Store, User, Workflow,
-    Bookmark,
     Megaphone,
     Bell,
-    TestTube,
-    Book, Wand2, BookOpen, Cookie,
-    Microscope, LayoutDashboard, Building2,
+    Microscope, 
+    LayoutDashboard,
     Users,
-    TestTubeDiagonal,
-    Rat,
-    FileText,
-    Database, Newspaper
 } from "lucide-react"
-import {NavMain, NavNotificationCollapsedIcon, NavNotificationExpandedIcon} from "~web/components/nav-main"
-import {OrganizationSwitcher} from "~web/components/organization-switcher"
+import {NavMain} from "./../components/nav-main"
+import {OrganizationSwitcher} from "./../components/organization-switcher"
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
-    SidebarRail, SidebarTrigger,
+    SidebarRail,
     useSidebar,
 } from "@comend/components/ui/sidebar"
 import {MembershipWithOrganization} from "@comend/lib/types";
-import Image from "next/image"
-import {Button, buttonVariants} from "@comend/components/ui/button";
-import logo from "@/public/logo-square.png"
-import {cn} from "@/packages/lib/utils";
+import {Button} from "@comend/components/ui/button";
 import Link from "next/link";
-import {FeedbackSheet} from "~web/components/feedback";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/packages/components/ui/tooltip";
-import {useEffect, useRef, useState} from "react";
-import {redirect, usePathname} from "next/navigation";
-import {getAllMembershipsFromUserId} from "@/packages/lib/fetchers";
-import {toast} from "sonner";
-import {useOnborda} from "~web/components/onborda/OnbordaContext";
-import {RoadmapState, useRoadmapStore} from "./../state/roadmap/roadmapStore";
-import {useShallow} from "zustand/react/shallow";
-import {useSession} from "next-auth/react";
-import {Separator} from "@/packages/components/ui/separator"
-import path from "path"
+import {FeedbackSheet} from "./../components/feedback";
+import {usePathname} from "next/navigation";
+import {RoadmapState} from "./../state/roadmap/roadmapStore";
+import {Separator} from "@comend/components/ui/separator"
 
 // This is sample data.
 const data = {

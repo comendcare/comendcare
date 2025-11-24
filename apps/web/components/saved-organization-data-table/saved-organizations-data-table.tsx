@@ -17,12 +17,11 @@ import {
 } from "@tanstack/react-table"
 
 import { DataTablePagination } from "./data-table-pagination"
-import { DataTableToolbar } from "./data-table-toolbar"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@comend/components/ui/table";
-import { SavedOrganizationData } from "@/packages/lib/types"
+import { SavedOrganizationData } from "@comend/lib/types"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
-import { PulsatingButton } from "@/packages/components/ui/pulsating-button"
+import { PulsatingButton } from "@comend/components/ui/pulsating-button"
 import Image from "next/image"
 
 interface DataTableProps<TValue> {

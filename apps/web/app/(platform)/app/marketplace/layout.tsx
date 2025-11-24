@@ -1,5 +1,5 @@
 "use client"
-import {MarketplaceNav} from "~web/components/marketplace/marketplace-nav"
+import {MarketplaceNav} from "@comend/components/marketplace/marketplace-nav"
 
 // export const metadata: Metadata = {
 //     title: "Comend",

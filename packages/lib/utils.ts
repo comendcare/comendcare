@@ -19,6 +19,40 @@ import {
 import Papa from "papaparse";
 import type { RFP } from "@prisma/client";
 
+export const getStatusColor = (status: string) => {
+    switch (status) {
+        case "APPROVED":
+            return "bg-green-100 text-green-800 border-green-200 hover:bg-green-100"
+        case "PENDING":
+            return "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100"
+        case "IN-PROGRESS":
+            return "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100"
+        case "REJECTED":
+            return "bg-red-100 text-red-800 border-red-200 hover:bg-red-100"
+        case "COMPLETED":
+            return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-100"
+        default:
+            return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-100"
+    }
+}
+
+export const getStatusText = (status: string) => {
+    switch (status) {
+        case "APPROVED":
+            return "Approved"
+        case "PENDING":
+            return "Under Review"
+        case "IN-PROGRESS":
+            return "In Progress"
+        case "REJECTED":
+            return "Rejected"
+        case "COMPLETED":
+            return "Completed"
+        default:
+            return status
+    }
+}
+
 const STATUS_PRIORITY = {
   'OPEN': 1,
   'ROLLING': 2,
@@ -174,8 +208,6 @@ export function typesenseSortByFromColumnId(id: string, desc: boolean): string {
 }
 
 export const handleAsyncOrganizationSearch = async (query?: string | undefined): Promise<Option[]> => {
-    if (!query) return []; // Return empty if no input
-
     try {
         const response = await fetch(`/api/organizations?search=${query}`);
         const data = await response.json();
@@ -189,7 +221,7 @@ export const handleAsyncOrganizationSearch = async (query?: string | undefined):
 }
 
 export const handleAsyncConditionSearch = async (query?: string | undefined): Promise<Option[]> => {
-    if (!query) return []; // Return empty if no input
+    // if (!query) return []; // Return empty if no input
 
     try {
         const response = await fetch(`/api/conditions?search=${query}`);
@@ -204,7 +236,7 @@ export const handleAsyncConditionSearch = async (query?: string | undefined): Pr
 }
 
 export const handleAsyncDiagnosesSearch = async (query?: string | undefined): Promise<Option[]> => {
-    if (!query) return []; // Return empty if no input
+    // if (!query) return []; // Return empty if no input
 
     try {
         const response = await fetch(`/api/diagnoses?search=${query}`);
@@ -219,7 +251,7 @@ export const handleAsyncDiagnosesSearch = async (query?: string | undefined): Pr
 };
 
 export const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
-    if (!query) return []; // Return empty if no input
+    // if (!query) return []; // Return empty if no input
 
     try {
         const response = await fetch(`/api/genes?search=${query}`);
@@ -241,7 +273,7 @@ export const handleAsyncCompanyAndInstitutionSearch = async (query?: string | un
 }
 
 export const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
-    if (!query) return []; // Return empty if no input
+    // if (!query) return []; // Return empty if no input
 
     try {
         const response = await fetch(`/api/institutions?search=${query}`);
@@ -256,7 +288,7 @@ export const handleAsyncInstitutionSearch = async (query?: string | undefined): 
 };
 
 export const handleAsyncCompanySearch = async (query?: string | undefined): Promise<Option[]> => {
-    if (!query) return []; // Return empty if no input
+    // if (!query) return []; // Return empty if no input
 
     try {
         const response = await fetch(`/api/companies?search=${query}`);
@@ -271,7 +303,8 @@ export const handleAsyncCompanySearch = async (query?: string | undefined): Prom
 };
 
 export const handleAsyncMilestoneSearch = async (organizationId: string | null | undefined, query?: string | undefined): Promise<Option[]> => {
-    if (!query || !organizationId) return []
+    // if (!query || !organizationId) return []
+    if (!organizationId) return []
 
     try {
         const response = await fetch(`/api/milestones?search=${query}&orgId=${organizationId}`);

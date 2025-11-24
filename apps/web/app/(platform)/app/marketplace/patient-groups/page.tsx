@@ -1,11 +1,9 @@
 "use client"
 
 import React, { useEffect } from "react"
-import { ScrollArea } from "@comend/components/ui/scroll-area";
-import { OrganizationSearchResults } from "~web/components/marketplace/patient-groups/organization-search-results";
-import OrganizationSearchBar from "~web/components/marketplace/patient-groups/organization-searchbar";
-import PAGMarketplaceIntegratedSearchAndFilter from "~web/components/marketplace/patient-groups/pag-marketplace-integrated-search-and-filter";
-import { initializeOrganizationSearch } from "@/packages/lib/initialize-client-state";
+import { OrganizationSearchResults } from "@comend/components/marketplace/patient-groups/organization-search-results";
+import PAGMarketplaceIntegratedSearchAndFilter from "@comend/components/marketplace/patient-groups/pag-marketplace-integrated-search-and-filter";
+import { initializeOrganizationSearch } from "@comend/lib/initialize-client-state";
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
 import { useShallow } from "zustand/react/shallow";
 

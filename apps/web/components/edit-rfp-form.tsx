@@ -29,31 +29,24 @@ import {
 } from "@comend/components/ui/dialog"
 import {RFP} from "@comend/lib/types"
 import type {Prisma} from "@prisma/client"
-import {getMilestones, getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
+import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import {Popover, PopoverContent, PopoverTrigger} from "@comend/components/ui/popover"
 import {cn} from "@comend/lib/utils"
 import {format} from "date-fns"
 import {Calendar} from "@comend/components/ui/calendar"
-import { Calendar as CalendarIcon, Lock, Pencil, Pin } from "lucide-react"
+import { Calendar as CalendarIcon, Lock } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { AttachmentsFormField, BudgetFormField, ContactsFormField, OpenToFormField, PrivatePublicFormField } from "./edit-milestone-form"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
-    DropdownMenuTrigger,
-  } from "@comend/components/ui/dropdown-menu"
+import { AttachmentsFormField, ContactsFormField, OpenToFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { RFPState, useRFPStore } from "@/state/rfp/rfpStore"
 import { useShallow } from "zustand/react/shallow"
 import MoneyInput from "@comend/components/money-input"
 import ProjectMultipleSelector from "./project-multiple-selector"
-import { revalidate } from "@/packages/lib/revalidate"
-import { Separator } from "@/packages/components/ui/separator"
-import { Checkbox } from "@/packages/components/ui/checkbox"
+import { revalidate } from "@comend/lib/revalidate"
+import { Separator } from "@comend/components/ui/separator"
+import { Checkbox } from "@comend/components/ui/checkbox"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>

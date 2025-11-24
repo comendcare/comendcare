@@ -2,7 +2,7 @@ import {PagProfileAboutCard} from "~web/components/pag-profile-about-card";
 import {formatMoney, standardizeYear} from "@comend/lib/utils";
 import {Card} from "@comend/components/ui/card";
 import {PAGProfileConditionsCard} from "~web/components/pag-profile-conditions-card";
-import {PAGProfileRFPsHoverableCard} from "~web/components/pag-profile-rfps-card";
+import {PAGProfileRFPsHoverableCard} from "@comend/components/pag-profile-rfps-card";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
@@ -15,9 +15,9 @@ import {EditableProfilePhoto} from "./editable-profile-photo";
 import {EditablePAGBannerPhoto} from "./editable-pag-banner-photo";
 import {PAGProfileToolsCard} from "./pag-profile-tools-card";
 import Link from "next/link";
-import { SearchParams } from "@/packages/components/types";
+import { SearchParams } from "@comend/components/types";
 import dynamic from "next/dynamic";
-import LoadingDots from "@/packages/components/icons/loading-dots";
+import LoadingDots from "@comend/components/icons/loading-dots";
 import type { Biosample, DiseaseModel, Tool } from "@prisma/client";
 
 export type ToolCounts = {

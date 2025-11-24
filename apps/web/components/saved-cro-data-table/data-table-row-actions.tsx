@@ -32,7 +32,7 @@ import {useRouter} from "next/navigation";
 import {Milestone, MILESTONE_TYPE_OPTIONS, SavedCompanyData} from "@comend/lib/types";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import ProjectMultipleSelector from "../project-multiple-selector";
-import { CompanyWithServices, ContactCroDialogContent } from "../contact-cro-dialog";
+import { ContactCroDialogContent } from "@comend/components/contact-cro-dialog";
 import {BookmarkMinus, Handshake, Pencil} from "lucide-react";
 
 const formSchema = z.object({

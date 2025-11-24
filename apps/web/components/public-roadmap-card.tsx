@@ -15,8 +15,8 @@ import type {Organization} from "@prisma/client";
 import {PrivateNoResearchPlansColumn, PrivateNoResearchPlansRow, PublicNoResearchPlans} from "./no-research-plans";
 import {NoProjects} from "./no-projects";
 import {FunctionComponent, ReactElement, useState} from "react";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/packages/components/ui/tooltip";
-import { PropertyBadge } from "./property-badge";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
+import { PropertyBadge } from "@comend/components/property-badge";
 
 export const RoadmapsCard = ({
                                  roadmaps,

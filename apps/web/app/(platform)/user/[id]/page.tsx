@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import {Organization, User, Invitation} from "@prisma/client";
 import {cn} from "@comend/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
-import Loading from "@/loading";
+import Loading from "./../../../../../../loading";
 import Link from "next/link";
 import UserEditSettingsDialog from "~web/components/user-edit-settings-dialog";
 import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";

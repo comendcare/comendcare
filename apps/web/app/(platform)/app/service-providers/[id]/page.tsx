@@ -6,13 +6,13 @@ import {
     TooltipTrigger,
 } from "@comend/components/ui/tooltip"
 import { ArrowLeft, Store } from "lucide-react";
-import CROPageTabs from "~web/components/marketplace/cro-page-tabs";
-import CROPageHeader from "~web/components/marketplace/cro-page-header";
+import CROPageTabs from "@comend/components/marketplace/cro-page-tabs";
+import CROPageHeader from "@comend/components/marketplace/cro-page-header";
 import {notFound} from "next/navigation";
-import prisma from "@/packages/lib/prisma";
-import type {CompanyWithReviewsAndServices} from "@/packages/lib/types";
-import {getSavedCompaniesFromOrganizationId} from "@/packages/lib/fetchers";
-import {getSession} from "@/packages/lib/auth";
+import prisma from "@comend/lib/prisma";
+import type {CompanyWithReviewsAndServices} from "@comend/lib/types";
+import {getSavedCompaniesFromOrganizationId} from "@comend/lib/fetchers";
+import {getSession} from "@comend/lib/auth";
 import NoOrganization from "~web/components/no-organization";
 import type {SavedCompany, Organization, Milestone} from "@prisma/client";
 

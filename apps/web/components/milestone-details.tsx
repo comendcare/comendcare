@@ -1,5 +1,5 @@
 import React from "react"
-import StatusButton from "./milestone-status-button"
+import StatusButton from "@comend/components/milestone-status-button"
 import {
     Card,
     CardContent,
@@ -8,13 +8,11 @@ import {
     CardTitle
 } from "@comend/components/ui/card"
 import {BIOSAMPLE_TYPE_OPTIONS, NODE_TYPE_OPTIONS} from "@comend/lib/types"
-import {DateView} from "./miletone-date-view"
 import Link from "next/link"
 import {Button} from "@comend/components/ui/button"
-import {MilestoneTypeBadge} from "@comend/components/milestone-type-badge"
-import {ExternalLink, Megaphone, Microscope, User, DollarSign, Lock, Calendar} from "lucide-react"
+import {ExternalLink, Megaphone, User, DollarSign, Lock, Calendar} from "lucide-react"
 import {Dialog, DialogContent, DialogTrigger} from "@comend/components/ui/dialog"
-import {RFPCard} from "./rfp-card"
+import {RFPCard} from "@comend/components/rfp-card"
 import {
     Table,
     TableBody,
@@ -24,8 +22,7 @@ import {
     TableRow,
 } from "@comend/components/ui/table"
 import {PrivateBadge} from "./private-badge"
-import {AssetDetails, RFPDetails} from "./pag-profile-rfps-card"
-import {TypeBadge} from "./type-badge"
+import {AssetDetails, RFPDetails} from "@comend/components/pag-profile-rfps-card"
 import {Separator} from "@comend/components/ui/separator"
 import {Badge, badgeVariants} from "@comend/components/ui/badge"
 import {cn, formatMoney, RFPSort, truncate} from "@comend/lib/utils"

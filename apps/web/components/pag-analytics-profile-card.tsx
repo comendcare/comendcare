@@ -1,8 +1,8 @@
 import {Users, UserCircle, CircleDollarSign, Earth, ExternalLink} from "lucide-react"
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/packages/components/ui/card";
-import {formatMoney, formatNumberWithCommas} from "@/packages/lib/utils";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
+import {formatMoney, formatNumberWithCommas} from "@comend/lib/utils";
 import {Button, buttonVariants} from "@comend/components/ui/button";
-import {OrganizationForAnalytics} from "@/packages/lib/types";
+import {OrganizationForAnalytics} from "@comend/lib/types";
 import Link from "next/link";
 
 export default function PAGAnalyticsProfileCard({organization}: { organization: OrganizationForAnalytics }) {

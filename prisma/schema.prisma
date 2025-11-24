@@ -822,8 +822,7 @@ model Condition {
   organizations               ConditionToOrganization[]
   metadata                    Json?
   diseaseModel                DiseaseModel[]
-  associatedConditions        Condition[]               @relation("AssociatedConditions")
-  associatedWith              Condition[]               @relation("AssociatedConditions")
+  associatedConditions        String[]
 }
 
 model ConditionToOrganization {

@@ -16,13 +16,13 @@ import {
     HeartHandshake
 } from "lucide-react";
 import {Milestone} from "@comend/lib/types";
-import {PropertyBadge} from "comend-pag-platform/components/property-badge";
+import {PropertyBadge} from "@comend/components/property-badge";
 import AdminCROCardDropdownMenu from "./admin-cro-card-dropdown-menu";
-import ImageWithFallback from "@/packages/components/image-with-fallback";
+import ImageWithFallback from "@comend/components/image-with-fallback";
 import type {Company} from "@prisma/client";
-import {Badge} from "@/packages/components/ui/badge";
-import {Popover, PopoverContent, PopoverTrigger} from "@/packages/components/ui/popover";
-import {ScrollArea} from "@/packages/components/ui/scroll-area";
+import {Badge} from "@comend/components/ui/badge";
+import {Popover, PopoverContent, PopoverTrigger} from "@comend/components/ui/popover";
+import {ScrollArea} from "@comend/components/ui/scroll-area";
 
 type NodeTypeCount = Record<string, number>;
 

@@ -39,7 +39,7 @@ import {years} from "@comend/lib/utils";
 import {Pencil} from "lucide-react";
 import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import {BiopharmaConsentSwitch} from "~web/components/biopharma-consent-switch";
-import {checkSubdomainAvailability} from "@/packages/lib/fetchers";
+import {checkSubdomainAvailability} from "@comend/lib/fetchers";
 import {useDebounce} from "use-debounce";
 
 const moneyField = z.preprocess(

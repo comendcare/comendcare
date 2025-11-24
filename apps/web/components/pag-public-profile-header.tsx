@@ -3,7 +3,7 @@ import type {Organization} from "@prisma/client";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Building2, Calendar, CircleDollarSign, HandCoins} from "lucide-react";
 import {PAGBannerPhoto} from "@comend/components/pag-banner-photo";
-import {Card} from "@/packages/components/ui/card";
+import {Card} from "@comend/components/ui/card";
 
 export default function PAGPublicProfileHeader({organization, showBackButton}: {
     organization: Partial<Organization>,

@@ -35,6 +35,7 @@ import MoneyInput from "@comend/components/money-input";
 import { checkSubdomainAvailability, getConditionsFromOrganizationId } from "@comend/lib/fetchers";
 import { EditableProfilePhoto } from "./editable-profile-photo";
 import { EditablePAGBannerPhoto } from "./editable-pag-banner-photo";
+import { badgeVariants } from "@comend/components/ui/badge";
 
 export const financesFormSchema = z.object({
     // raising: z.enum(["yes", "no-but", "no"]).optional(),
@@ -1049,6 +1050,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                             <FormControl>
                                                 <MultipleSelector
                                                     {...field}
+                                                    badgeClassName={badgeVariants({variant: "teal"})}
                                                     onSearch={handleAsyncSearch}
                                                     placeholder="Search for genes..."
                                                     hidePlaceholderWhenSelected={true}
@@ -1074,6 +1076,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                             <FormControl>
                                                 <MultipleSelector
                                                     {...field}
+                                                    badgeClassName={badgeVariants({variant: "teal"})}
                                                     onSearch={handleAsyncSearch}
                                                     placeholder="Search for genes..."
                                                     hidePlaceholderWhenSelected={true}

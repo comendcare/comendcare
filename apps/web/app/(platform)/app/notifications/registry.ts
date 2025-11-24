@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CanonicalFeed } from "@/packages/lib/types";
+import { CanonicalFeed } from "@comend/lib/types";
 
 export type RawMapper = (raw: {
     provider: string;    // e.g. "rss:fda:medwatch"

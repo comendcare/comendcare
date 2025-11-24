@@ -35,6 +35,7 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/
 import type {Organization} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
 import {researchFormSchema} from "./research-onboarding-form";
+import { badgeVariants } from "@comend/components/ui/badge";
 
 export default function EditPAGProfileConditionCardDialog({organization}: { organization: Partial<Organization> }) {
     const {data: session, status} = useSession()
@@ -95,9 +96,9 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                         const fetchedValues = conditions.map((condition: any) => ({
                             disorder: condition.name ? [{label: condition.name, value: condition.name}] : [],
                             associatedConditions:
-                                (condition.associatedConditions ?? []).map((c: any) => ({
-                                    label: c.name,
-                                    value: c.slug,
+                                (condition.associatedConditions ?? []).map((name: string) => ({
+                                    label: name,
+                                    value: name,
                                 })),
                             summary: condition.summary || "",
                             categories: condition.diseaseCategories.map((cat: any) => ({label: cat, value: cat})) || [],
@@ -160,7 +161,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                 name: values.disorder?.[0]?.label || "",
                 // Normalize to slugs even for creatable values
                 associatedConditions: (values.associatedConditions ?? []).map(o =>
-                    toKebabCase(String(o.value || o.label || "").trim())
+                    String(o.label || o.value || "").trim()
                 ),
                 summary: values.summary ?? "",
                 diseaseCategories: (values.categories ?? []).map(i => i.label),
@@ -413,6 +414,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                             <MultipleSelector
                                                 {...field}
                                                 creatable={true}
+                                                badgeClassName={badgeVariants({variant: "teal"})}
                                                 onSearch={handleGeneAsyncSearch}
                                                 placeholder="Search for genes..."
                                                 hidePlaceholderWhenSelected={true}
@@ -439,6 +441,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                             <MultipleSelector
                                                 {...field}
                                                 creatable={true}
+                                                badgeClassName={badgeVariants({variant: "teal"})}
                                                 onSearch={handleGeneAsyncSearch}
                                                 placeholder="Search for genes..."
                                                 hidePlaceholderWhenSelected={true}

@@ -4,22 +4,23 @@ import * as React from "react";
 import { EditAssetDialog, NewToolDialog } from "./edit-tool-dialog"
 import { AssetBulkImportDialog } from "./asset-bulk-import-dialog"
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
-import { Shell } from "@/packages/components/biorepo/advanced-data-table/lib/shell";
-import { getClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/private-clinical-datasets-table-columns";
+import { FeatureFlagsProvider } from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
+import { Shell } from "@comend/components/biorepo/advanced-data-table/lib/shell";
+import { getClinicalDatasetsTableColumns } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/private-clinical-datasets-table-columns";
 import { DatabaseClinicalDatasetsTable } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/database-clinical-datasets-table"
 import type { Tool } from "@prisma/client";
-import { SearchParams } from "@/packages/components/types";
+import { SearchParams } from "@comend/components/types";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
-import { Button } from "@/packages/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
+import { Button } from "@comend/components/ui/button";
 import { Globe, Lock } from "lucide-react";
-import { setDataToolsVisibility } from "@/packages/lib/actions";
-import { Dialog } from "@/packages/components/ui/dialog";
-import { DialogPortal } from "@/packages/components/plate-ui/dialog";
-import { Asset } from "@/packages/lib/types";
+import { setDataToolsVisibility } from "@comend/lib/actions";
+import { Dialog } from "@comend/components/ui/dialog";
+import { DialogPortal } from "@comend/components/plate-ui/dialog";
+import { Asset } from "@comend/lib/types";
 import { Row } from "@tanstack/react-table";
+import Image from "next/image";
 
 export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
     const {data: session} = useSession()
@@ -127,6 +128,23 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                         searchParams={searchParams}
                         onSelectionChange={setRowSelection}
                         onRowClickCallback={(e: any, row: Row<any> | undefined) => setEditingTool(row?.original)}
+                        noResultsOverride={(
+                            <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
+                                <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
+                                    <h1 className="font-cal text-4xl">You do not have any Data Tools</h1>
+                                    <Image
+                                        alt="No Data Tools"
+                                        src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                                        width={300}
+                                        height={300}
+                                    />
+                                    <p className="text-lg text-stone-500">
+                                        A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
+                                    </p>
+                                    <NewToolDialog type={"data"}/>
+                                </div>
+                            </div>
+                        )}
                         interactiveDialog={(
                             <Dialog 
                                 open={!!editingTool}

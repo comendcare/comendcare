@@ -17,7 +17,7 @@ import {Input} from "@comend/components/ui/input"
 import {AutosizeTextarea, Textarea} from "@comend/components/ui/textarea"
 import {Button} from "@comend/components/ui/button"
 import {ScrollArea} from "@comend/components/ui/scroll-area"
-import StatusButton from "./milestone-status-button"
+import StatusButton from "@comend/components/milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "./../state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import {
@@ -54,14 +54,11 @@ import {
 } from "@comend/lib/types"
 import {
     Biosample,
-    Company,
     CreateFacilityRequest,
     DiseaseModel,
     MilestoneType,
     Organization,
-    PlatformNotification,
     Prisma,
-    SavedCompany,
     Tool
 } from "@prisma/client"
 import {useSession} from "next-auth/react"
@@ -77,35 +74,24 @@ import MoneyInput from "@comend/components/money-input";
 import MultipleSelector, { MultipleSelectorRef } from "@comend/components/ui/multiple-selector"
 import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group"
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs"
-import {CROSearchState, Recommendation, useCROSearchStore} from "@/state/search/croSearchStore"
-import {Card, CardContent} from "@comend/components/ui/card"
-import Image from "next/image"
-import {CROMarketplaceCard} from "./marketplace/marketplace-cro-card"
-import Link from "next/link"
-import Loading from "@/loading";
-import {fetchCreateRequests, findCompanies, findInstitutions, getMilestoneTypes} from "@comend/lib/fetchers"
-import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
+import Loading from "./../../../loading";
+import {fetchCreateRequests, findCompanies, findInstitutions} from "@comend/lib/fetchers"
 import {Globe, Lock, Plus, X, Share, Trash} from "lucide-react"
 import {Badge, badgeVariants} from "@comend/components/ui/badge"
-import {ResearchPlanOnbordaState, useOnbordaStore} from "@/state/onborda/onbordaStore"
 import {mixpanelTrack} from "@comend/lib/mixpanel"
 import ShareDialog from "./share-dialog"
 import {JsonObject} from "@prisma/client/runtime/library"
-import EditMilestoneDetailsPublicationsTab from "~web/components/edit-milestone-details-publications-tab";
 import {Skeleton} from "@comend/components/ui/skeleton"
-import {useOnborda} from "./onborda/OnbordaContext"
 import {EditRFPForm} from "./edit-rfp-form"
-import {CommandItem} from "@/packages/components/ui/command"
 import {usePathname} from "next/navigation"
 import {nanoid} from "nanoid"
 import {EditBiosampleToolForm} from "./edit-biosample-tool-form"
 import {EditDiseaseModelToolForm} from "./edit-disease-model-tool-form"
 import {EditClincalDatasetForm} from "./edit-clinical-dataset-form"
-import {MilestoneTypeBadge} from "@/packages/components/milestone-type-badge"
-import {Separator} from "@/packages/components/ui/separator"
+import {Separator} from "@comend/components/ui/separator"
 import dynamic from "next/dynamic";
 import { SubmitCreateRequest } from "./create-facility-request-button"
-import { createCreateFacilityRequest } from "@/packages/lib/actions"
+import { createCreateFacilityRequest } from "@comend/lib/actions"
 
 type PlateEditorProps = {
     value: any[];

@@ -5,7 +5,7 @@ import {Button} from "@comend/components/ui/button"
 import {Input} from "@comend/components/ui/input"
 import {Form, FormField, FormItem, FormControl} from "@comend/components/ui/form"
 import {useForm} from "react-hook-form"
-import {subscribeToOrganization} from "@/packages/lib/actions";
+import {subscribeToOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
 
 export default function PublicPageBottomBanner() {

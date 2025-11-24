@@ -6,6 +6,7 @@ import * as React from "react";
 import { Input } from "./../../../ui/input";
 import { cn } from "./../../../../../packages/lib/utils";
 import type { ExtendedColumnFilter } from "@comend/lib/types/data-table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./../../../ui/select";
 
 interface DataTableRangeFilterProps<TData> extends React.ComponentProps<"div"> {
   filter: ExtendedColumnFilter<TData>;
@@ -37,6 +38,13 @@ export function DataTableRangeFilter<TData>({
     return [values[0], values[1]];
   }, [column]);
 
+  const unitOptions = React.useMemo(() => {
+    const unitOptions = column.columnDef.meta?.unitOptions;
+    if (unitOptions) return unitOptions;
+
+    return unitOptions;
+  }, [column]);
+
   const formatValue = React.useCallback(
     (value: string | number | undefined) => {
       if (value === undefined || value === "") return "";
@@ -51,7 +59,13 @@ export function DataTableRangeFilter<TData>({
   );
 
   const value = React.useMemo(() => {
-    if (Array.isArray(filter.value)) return filter.value.map(formatValue);
+    if (Array.isArray(filter.value)) {
+      return [
+        formatValue(filter.value[0]), // lower limit
+        formatValue(filter.value[1]), // upper limit
+        filter.value[2] // units
+      ]
+    }
     return [formatValue(filter.value), ""];
   }, [filter.value, formatValue]);
 
@@ -77,8 +91,20 @@ export function DataTableRangeFilter<TData>({
         });
       }
     },
-    [filter.filterId, filter.value, min, max, onFilterUpdate],
+    [filter.filterId, filter.value, min, max, unitOptions, onFilterUpdate],
   );
+
+  const onUnitValueChange = React.useCallback(
+    (value: string) => {
+      const currentValues = Array.isArray(filter.value)
+        ? filter.value
+        : ["", "", ""];
+      onFilterUpdate(filter.filterId, {
+        value: [currentValues[0], currentValues[1], value]
+      })
+    },
+    [filter.filterId, filter.value, min, max, unitOptions, onFilterUpdate]
+  )
 
   return (
     <div
@@ -117,6 +143,31 @@ export function DataTableRangeFilter<TData>({
         defaultValue={value[1]}
         onChange={(event) => onRangeValueChange(event.target.value)}
       />
+
+      {unitOptions && (
+        <div className="relative">
+          <Select 
+            defaultValue={value[2]}
+            onValueChange={onUnitValueChange}
+          >
+            <SelectTrigger className="h-8">
+              <SelectValue placeholder="Select a unit">
+                {unitOptions.find(option => option.value === value[2])?.label || 'All units'}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {unitOptions.map(option => (
+                <SelectItem
+                  value={option.value}
+                  key={option.value}
+                >
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
     </div>
   );
 }

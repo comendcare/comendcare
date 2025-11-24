@@ -47,6 +47,7 @@ import {
 import {notFound, redirect} from "next/navigation";
 import {switchOrganization} from "./actions";
 import { ColumnDef } from "@tanstack/react-table";
+import { ExtendedColumnSort } from "@comend/lib/types/data-table";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function findInstitutions(
@@ -1588,14 +1589,9 @@ export const getConditionsFromOrganizationId = withOrganizationAuth(
                     },
                 },
                 select: {
-                    ...select, // your existing scalar selections
-                    associatedConditions: {
-                        select: {
-                            id: true,
-                            name: true,
-                            slug: true,
-                        },
-                    },
+                    ...select,
+                    // ensure we don't try to nest-select on a scalar
+                    ...(select.associatedConditions ? {} : { associatedConditions: true }),
                 },
             });
 
@@ -2367,7 +2363,6 @@ export const getResearcherWithMergedDataAdvanced = withUserAuth(async () => {
     const dbResearcher = await prisma.researcher.findUnique({
         where: { userId: session.user.id },
         include: {
-            user: true,
             affiliations: {
                 include: { institution: true },
             },
@@ -2648,7 +2643,7 @@ const fetchDiseaseModels = async (
         }
 
         const orderBy = input.sort.length
-            ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+            ? input.sort.map(s => prismaOrderByFromColumnId(s))
             : [{ createdAt: { sort: "asc" } }];
 
         const [data, total] = await prisma.$transaction([
@@ -2679,12 +2674,17 @@ const fetchDiseaseModels = async (
     }
 }
 
-function prismaOrderByFromColumnId(id: string, desc: boolean): any {
-    const parts = id.split(".")
+function prismaOrderByFromColumnId(sort: ExtendedColumnSort<any>, schemaColumns?: ColumnDef<any>[] | undefined): any {
+    const parts = sort.id.split(".")
+    const sortAccessor = schemaColumns?.find(col => col.id === sort.id)?.meta?.sortAccessor
+
+    // if schema has provided an overried for accessing the database use the dbOverride
+    // instead of the filter ID to generate the WHERE object
+    if (sortAccessor) return sortAccessor(sort)
 
     // build nested object dynamically
     return parts.reduceRight((acc, key) => {
-        return { [key]: Object.keys(acc).length ? acc : (desc ? "desc" : "asc") }
+        return { [key]: Object.keys(acc).length ? acc : (sort.desc ? "desc" : "asc") }
     }, {})
 }
 
@@ -2833,9 +2833,16 @@ const fetchBiosamples = async (
             if (input.quantity) {
                 filters.push({
                     id: 'quantity',
-                    value: input.quantity,
+                    value: input.quantity.slice(0, 2),
                     variant: 'range',
                     operator: 'isBetween',
+                    filterId: nanoid()
+                }),
+                filters.push({
+                    id: 'quantityUnit',
+                    value: input.quantity[2],
+                    variant: 'select',
+                    operator: 'eq',
                     filterId: nanoid()
                 })
             }
@@ -2844,6 +2851,8 @@ const fetchBiosamples = async (
                 filters,
                 joinOperator: "and"
             }) || {}
+
+            console.log(`where filter`, where)
         }
 
         // add global filter
@@ -2859,15 +2868,15 @@ const fetchBiosamples = async (
                 { company: {title: {contains: input.q, mode: "insensitive"} } },
                 { genotype: {contains: input.q, mode: "insensitive"}},
                 { organization: {name: {contains: input.q, mode: "insensitive"}}},
-                { organization: {
-                    conditions: {
-                        some: {
-                            condition: {
-                                name: {contains: input.q, mode: "insensitive"}}
-                            }
-                        }
-                    }
-                },
+                // { organization: {
+                //     conditions: {
+                //         some: {
+                //             condition: {
+                //                 name: {contains: input.q, mode: "insensitive"}}
+                //             }
+                //         }
+                //     }
+                // },
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                 // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
@@ -2892,7 +2901,7 @@ const fetchBiosamples = async (
         }
 
         const orderBy = input.sort.length
-            ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+            ? input.sort.map(s => prismaOrderByFromColumnId(s, columns))
             : [{ createdAt: { sort: "asc" } }];
 
         const [data, total] = await prisma.$transaction([
@@ -3016,7 +3025,7 @@ export const getAllBiosamples = withResearcherAuth(
             }
 
             const orderBy = input.sort.length
-                ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+                ? input.sort.map(s => prismaOrderByFromColumnId(s))
                 : [{ createdAt: { sort: "asc" } }];
 
             const biosampleTypes = BIOSAMPLE_TYPE_OPTIONS
@@ -3258,7 +3267,7 @@ const fetchClinicalDatsets = async (
         }
 
         const orderBy = input.sort.length
-            ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+            ? input.sort.map(s => prismaOrderByFromColumnId(s))
             : [{ createdAt: { sort: "asc" } }];
 
         const [data, total] = await prisma.$transaction([

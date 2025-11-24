@@ -1,14 +1,13 @@
 import React from "react"
 import Image from "next/image"
-import { getSession } from "@/packages/lib/auth"
+import { getSession } from "@comend/lib/auth"
 import NoOrganization from "~web/components/no-organization"
-import { SearchParams } from "@/packages/components/types"
-import { diseaseModelSearchParamsCache } from "@/packages/lib/validations"
-import { getValidFilters } from "@/packages/lib/data-table"
-import { NewToolDialog } from "~web/components/edit-tool-dialog"
-import { getDiseaseModels } from "@/packages/lib/fetchers"
+import { SearchParams } from "@comend/components/types"
+import { diseaseModelSearchParamsCache } from "@comend/lib/validations"
+import { getValidFilters } from "@comend/lib/data-table"
+import { getDiseaseModels } from "@comend/lib/fetchers"
 import { PrivateDiseaseModelToolsPage } from "~web/components/private-disease-model-tools-page"
-import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/private-disease-models-table-columns"
+import { useDiseaseModelsTableColumns } from "@comend/components/biorepo/advanced-data-table/disease-models-table/private-disease-models-table-columns"
 
 export const dynamic = "force-dynamic";
 

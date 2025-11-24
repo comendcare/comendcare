@@ -14,7 +14,7 @@ import {
     DropdownMenuSeparator,
 } from "@comend/components/ui/dropdown-menu"
 import {REQUEST_TYPE_OPTIONS, REQUEST_STATUS_TYPE_OPTIONS} from "@comend/lib/types"
-import {useRequestSearchStore} from "@/state/search/requestSearchStore"
+import {useRequestSearchStore} from "./../../../../state/search/requestSearchStore"
 import { useCallback, useMemo, useState } from "react"
 import { debounce } from "lodash"
 
@@ -30,18 +30,18 @@ export default function RequestToolbar() {
     const [query, setQuery] = useState("")
 
     const toggleType = (typeValue: string) => {
-        const isActive = filters.types.some(t => t.value === typeValue)
+        const isActive = filters.types.some((t: any) => t.value === typeValue)
         const updatedTypes = isActive
-            ? filters.types.filter(t => t.value !== typeValue)
+            ? filters.types.filter((t: any) => t.value !== typeValue)
             : [...filters.types, REQUEST_TYPE_OPTIONS.find(t => t.value === typeValue)!]
 
         setFilters({types: updatedTypes})
     }
 
     const toggleStatus = (statusValue: string) => {
-        const isActive = filters.statuses.some(s => s.value === statusValue)
+        const isActive = filters.statuses.some((s: any) => s.value === statusValue)
         const updatedStatuses = isActive
-            ? filters.statuses.filter(s => s.value !== statusValue)
+            ? filters.statuses.filter((s: any) => s.value !== statusValue)
             : [...filters.statuses, REQUEST_STATUS_TYPE_OPTIONS.find(s => s.value === statusValue)!]
 
         setFilters({statuses: updatedStatuses})
@@ -94,7 +94,7 @@ export default function RequestToolbar() {
                         {REQUEST_TYPE_OPTIONS.map(option => (
                             <DropdownMenuCheckboxItem
                                 key={option.id}
-                                checked={filters.types.some(t => t.value === option.value)}
+                                checked={filters.types.some((t: any) => t.value === option.value)}
                                 onCheckedChange={() => toggleType(option.value)}
                             >
                                 {option.label}
@@ -105,7 +105,7 @@ export default function RequestToolbar() {
                         {REQUEST_STATUS_TYPE_OPTIONS.map(option => (
                             <DropdownMenuCheckboxItem
                                 key={option.id}
-                                checked={filters.statuses.some(s => s.value === option.value)}
+                                checked={filters.statuses.some((s: any) => s.value === option.value)}
                                 onCheckedChange={() => toggleStatus(option.value)}
                             >
                                 {option.label}

@@ -1,42 +1,21 @@
-import {ACADEMIC_ROLES} from "@/packages/lib/types";
+import {ACADEMIC_ROLES} from "@comend/lib/types";
 import z from "zod";
 
-// enum values aligned with ACADEMIC_ROLES.value in types.ts
-export const TitleEnum = z.enum(["pi", "postdoc", "phd_student", "other"]);
+export const TitleEnum = z.enum(["researcher", "pm", "pi", "student", "other"]);
 
-export const mapTitleToValue = (
-    title?: string | null
-): z.infer<typeof TitleEnum> | undefined => {
+export const mapTitleToValue = (title?: string | null): z.infer<typeof TitleEnum> | undefined => {
     if (!title) return undefined;
-
-    const normalized = title.toLowerCase();
-
-    // 2) Match against current ACADEMIC_ROLES by value / label / id
     const match = ACADEMIC_ROLES.find(
         (role) =>
-            role.value === normalized ||
-            role.label.toLowerCase() === normalized ||
-            role.id.toLowerCase() === normalized
+            role.value === title ||
+            role.label === title ||
+            role.id === title
     );
-
-    return match?.value as z.infer<typeof TitleEnum> | undefined;
+    return match?.value as z.infer<typeof TitleEnum> ?? undefined;
 };
 
-// (optional but handy)
-export const mapTitleValueToLabel = (value?: string | null): string | undefined => {
-    if (!value) return undefined;
-    const normalized = value.toLowerCase();
-
-    const match = ACADEMIC_ROLES.find(
-        (role) =>
-            role.value === normalized ||
-            role.id.toLowerCase() === normalized ||
-            role.label.toLowerCase() === normalized
-    );
-
-    return match?.label;
-};
-
+// Drop-in upgrade: now also merges Crossref, Europe PMC, and DataCite.
+// Signature remains backward-compatible via default params.
 export function mergeResearcherDataAdvanced(
     dbResearcher: any,
     openAlex: any,
@@ -366,38 +345,4 @@ export function mergeResearcherData(dbResearcher: any, openAlex: any, publicatio
             researchInterests: dbResearcher.researchInterests?.length ? dbResearcher.researchInterests : (openAlex?.topics?.map((t: any) => t.display_name) ?? []),
         }
     };
-}
-
-export const getStatusColor = (status: string) => {
-    switch (status) {
-        case "APPROVED":
-            return "bg-green-100 text-green-800 border-green-200 hover:bg-green-100"
-        case "PENDING":
-            return "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100"
-        case "IN-PROGRESS":
-            return "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100"
-        case "REJECTED":
-            return "bg-red-100 text-red-800 border-red-200 hover:bg-red-100"
-        case "COMPLETED":
-            return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-100"
-        default:
-            return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-100"
-    }
-}
-
-export const getStatusText = (status: string) => {
-    switch (status) {
-        case "APPROVED":
-            return "Approved"
-        case "PENDING":
-            return "Under Review"
-        case "IN-PROGRESS":
-            return "In Progress"
-        case "REJECTED":
-            return "Rejected"
-        case "COMPLETED":
-            return "Completed"
-        default:
-            return status
-    }
 }

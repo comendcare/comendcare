@@ -1,5 +1,5 @@
 import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header";
-import { RFPCard } from "~web/components/rfp-card";
+import { RFPCard } from "@comend/components/rfp-card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@comend/components/ui/breadcrumb";
 import { getOrganizationData, getPublicRFP, getPublicRoadmapsForOrganization } from "@comend/lib/fetchers";
 import Link from "next/link";

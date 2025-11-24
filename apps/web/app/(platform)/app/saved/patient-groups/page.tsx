@@ -2,8 +2,8 @@ import NoOrganization from "~web/components/no-organization";
 import { getSavedOrganizationsFromOrganizationId } from "@comend/lib/fetchers";
 import { SavedOrganizationsDataTable } from "~web/components/saved-organization-data-table/saved-organizations-data-table";
 import { columns } from "~web/components/saved-organization-data-table/saved-organizations-data-columns";
-import { SavedOrganizationData } from "@/packages/lib/types";
-import {getSession} from "@/packages/lib/auth";
+import { SavedOrganizationData } from "@comend/lib/types";
+import {getSession} from "@comend/lib/auth";
 
 export default async function OrganizationSavesPage() {
     const session = await getSession()

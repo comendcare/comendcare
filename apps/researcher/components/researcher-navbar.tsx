@@ -1,9 +1,9 @@
 import {ResearcherNavbarMenu} from "~researcher/components/researcher-navbar-menu";
-import ComendLogo from "@/public/logos/comend-logo.png"
+import ComendLogo from "./../../../public/logos/comend-logo.png"
 import Image from "next/image";
 import UserNavbarProfile from "~researcher/components/user-navbar-profile";
 import {Suspense} from "react";
-import {Skeleton} from "@/packages/components/ui/skeleton";
+import {Skeleton} from "@comend/components/ui/skeleton";
 import type {User} from "@prisma/client";
 
 

@@ -3,11 +3,11 @@
 import * as React from "react";
 import {DataTableSkeleton} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 import {DatabaseBiosamplesTable} from "@comend/components/biorepo/advanced-data-table/biosamples-table/database-biosamples-table"
-import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
-import {Shell} from "@/packages/components/biorepo/advanced-data-table/lib/shell";
-import {useBiosamplesTableColumns} from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
+import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
+import {Shell} from "@comend/components/biorepo/advanced-data-table/lib/shell";
+import {useBiosamplesTableColumns} from "@comend/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
 import type {Biosample} from "@prisma/client";
-import {SearchParams} from "@/packages/components/types";
+import {SearchParams} from "@comend/components/types";
 import {useRef, useState} from "react";
 
 export const BiosampleMarketplacePage = ({data, pageCount, searchParams}: {

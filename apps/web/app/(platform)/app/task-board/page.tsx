@@ -1,4 +1,4 @@
-import {getSession} from "@/packages/lib/auth";
+import {getSession} from "@comend/lib/auth";
 import {getKanbanFromOrganizationId} from "@comend/lib/fetchers";
 import NewKanbanForm from "~web/components/new-kanban";
 import {createKanban} from "@comend/lib/actions";

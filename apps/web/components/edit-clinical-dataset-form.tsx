@@ -20,36 +20,28 @@ import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
     DialogClose,
-    DialogContent,
-    DialogDescription,
     DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
 } from "@comend/components/ui/dialog"
-import {Asset, optionSchema, TOOL_TYPE_OPTIONS} from "@comend/lib/types"
-import {CreateFacilityRequest, MilestoneType, Prisma} from "@prisma/client"
+import {TOOL_TYPE_OPTIONS} from "@comend/lib/types"
+import {CreateFacilityRequest, Prisma} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers"
 import {useSession} from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
-import { Delete, Info, Pin, Lock } from "lucide-react"
+import { Info, Lock } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
-import { ToolState, useToolStore } from "@/state/tool/toolStore"
-import { useShallow } from "zustand/react/shallow"
 import ProjectMultipleSelector from "./project-multiple-selector"
 import { DeleteAssetDialog } from "./delete-asset-dialog"
 import { Badge, badgeVariants } from "@comend/components/ui/badge"
 import MultipleSelector, { MultipleSelectorRef } from "@comend/components/ui/multiple-selector"
-import { JsonObject } from "@prisma/client/runtime/library"
 import { editDataToolForm, Option } from "@comend/lib/types"
-import { revalidate } from "@/packages/lib/revalidate"
+import { revalidate } from "@comend/lib/revalidate"
 import { useRouter } from "next/navigation"
-import { createClinicalDataset, createCreateFacilityRequest, updateClinicalDataset, updateCreateFacilityRequest } from "@/packages/lib/actions"
-import { Separator } from "@/packages/components/ui/separator"
-import { cn } from "@/packages/lib/utils"
-import LoadingDots from "@/packages/components/icons/loading-dots"
-import { mixpanelTrack } from "@/packages/lib/mixpanel"
+import { createClinicalDataset, createCreateFacilityRequest, updateClinicalDataset, updateCreateFacilityRequest } from "@comend/lib/actions"
+import { Separator } from "@comend/components/ui/separator"
+import { cn } from "@comend/lib/utils"
+import LoadingDots from "@comend/components/icons/loading-dots"
+import { mixpanelTrack } from "@comend/lib/mixpanel"
 import { SubmitCreateRequest } from "./create-facility-request-button"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>

@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import prisma from "@comend/lib/prisma"
 import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, RFP, TOOL_TYPE_OPTIONS } from '@comend/lib/types';
-import { checkDateRangeUTC, getSortRank, handleGetAvailability, stringToSortableInt } from '@/packages/lib/utils';
+import { checkDateRangeUTC, getSortRank, handleGetAvailability, stringToSortableInt } from '@comend/lib/utils';
 
 const sendTypeSenseRequest = async (
     url: string,

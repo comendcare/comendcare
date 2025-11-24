@@ -1,9 +1,10 @@
-import { RFPCard } from "./rfp-card"
+import { RFPCard } from "@comend/components/rfp-card"
 import { EditRFPDialog } from "./edit-rfp-dialog"
 import Image from "next/image"
 import dynamic from "next/dynamic";
-import {Button} from "@/packages/components/ui/button";
-import LoadingDots from "@/packages/components/icons/loading-dots";
+import {Button} from "@comend/components/ui/button";
+import LoadingDots from "@comend/components/icons/loading-dots";
+import { RFPActionsMenu } from "./rfp-actions-menu";
 
 type Props = {
     initialRFPs: any[] // or RFP[] if you have the type locally
@@ -55,7 +56,11 @@ export function PrivateRFPsPage({ initialRFPs }: Props) {
                 <div className="w-full gap-4 flex flex-col">
                     {renderRfps.map((rfp) => (
                         <EditRFPDialog key={rfp.id} data={rfp}>
-                            <RFPCard rfp={rfp} isPrivate />
+                            <RFPCard 
+                                rfp={rfp} 
+                                isPrivate 
+                                actionsMenu={<RFPActionsMenu rfp={rfp}/>} 
+                            />
                         </EditRFPDialog>
                     ))}
                 </div>

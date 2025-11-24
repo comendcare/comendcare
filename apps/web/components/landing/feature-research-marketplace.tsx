@@ -3,10 +3,9 @@ import {Bookmark, Star} from "lucide-react";
 import Image from "next/image";
 import marketplace from "@/public/screenshots/marketplace.png"
 import {motion} from "framer-motion"
-import {NumberTicker} from "@/packages/components/ui/number-ticker";
-import {cn} from "@/packages/lib/utils";
+import {NumberTicker} from "@comend/components/ui/number-ticker";
+import {cn} from "@comend/lib/utils";
 import {useRouter} from "next/navigation";
-import {PulsatingButton} from "@comend/components/ui/pulsating-button";
 
 const features = [
     {

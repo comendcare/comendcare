@@ -1,5 +1,5 @@
-import { Button } from "@/packages/components/ui/button";
-import { GroupOption, isOptionsExist, MultipleSelectorRef, Option } from "@/packages/components/ui/multiple-selector";
+import { Button } from "@comend/components/ui/button";
+import { GroupOption, isOptionsExist, MultipleSelectorRef, Option } from "@comend/components/ui/multiple-selector";
 
 export const SubmitCreateRequest = ({
     options, 

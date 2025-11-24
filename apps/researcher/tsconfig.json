@@ -3,8 +3,12 @@
   "compilerOptions": {
     "baseUrl": ".", // makes paths relative to `apps/admin`
     "paths": {
-      "@/*": ["../../*"],
-      "~researcher/*": ["./*"]
+      // enabling this causes issues on vercel builds, it tries to import /web, which 
+      // causes issues with the ~web/ import alias
+      // "@/*": ["../../*"],
+      "~researcher/*": ["./*"],
+      "@/state/*": ["../../state/*"],
+      "@/public/*": ["../../public/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

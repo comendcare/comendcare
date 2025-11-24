@@ -1,5 +1,5 @@
 import z from "zod"
-import { Option, optionSchema } from "@/packages/lib/types"
+import { Option, optionSchema } from "@comend/lib/types"
 
 export type FacilityType = 'cro' | 'institution'
 

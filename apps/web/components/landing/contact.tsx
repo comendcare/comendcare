@@ -1,6 +1,5 @@
 import React from "react"
-import {SimpleContactForm} from "~web/components/simple-contact-form";
-import {Button} from "@/packages/components/ui/button";
+import {Button} from "@comend/components/ui/button";
 import Link from "next/link";
 
 export default function ContactSection() {

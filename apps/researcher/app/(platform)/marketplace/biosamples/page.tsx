@@ -1,12 +1,12 @@
 import React from "react"
 import Image from "next/image"
-import {getSession} from "@/packages/lib/auth"
-import {SearchParams} from "@/packages/components/types"
-import {getValidFilters} from "@/packages/lib/data-table"
-import { getBiosamples } from "@/packages/lib/fetchers"
-import { biosampleSearchParamsCache } from "@/packages/lib/validations"
+import {getSession} from "@comend/lib/auth"
+import {SearchParams} from "@comend//components/types"
+import {getValidFilters} from "@comend/lib/data-table"
+import { getBiosamples } from "@comend/lib/fetchers"
+import { biosampleSearchParamsCache } from "@comend/lib/validations"
 import { BiosampleMarketplacePage } from "~researcher/components/marketplace/biosample-tools-page"
-import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns"
+import { useBiosamplesTableColumns } from "@comend/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns"
 
 export const dynamic = "force-dynamic";
 
@@ -52,7 +52,11 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
             milestones: {include: {milestone: true}},
             donorId: true,
             donor: {
-                include: {diagnoses: {include: {type: true}}}
+                include: {
+                    diagnoses: {
+                        include: {type: true}
+                    }
+                }
             },
             institutionId: true,
             institution: true,

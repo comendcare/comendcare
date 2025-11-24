@@ -1,7 +1,9 @@
 import React from "react";
-import {getSession} from "@/packages/lib/auth";
+import {getSession} from "@comend/lib/auth";
 import {getResearcherWithMergedDataAdvanced, getResearcherWithMergedData} from "@comend/lib/fetchers";
 import PublicResearcherProfile from "~web/components/public-researcher-profile";
+import Link from "next/link";
+import { ArrowLeft, Store } from "lucide-react";
 
 export default async function ResearcherProfilePage({
                                                         params
@@ -36,8 +38,8 @@ export default async function ResearcherProfilePage({
     // }
 
     let researcherData
-    if (session?.user?.id) {
-        const response = await getResearcherWithMergedDataAdvanced(session.user.id)
+    if (params?.id) {
+        const response = await getResearcherWithMergedDataAdvanced(params.id)
         if (response.success) {
             researcherData = response.data
         } else {
@@ -46,8 +48,24 @@ export default async function ResearcherProfilePage({
     }
 
     return (
-        <PublicResearcherProfile
-            researcherData={researcherData}
-        />
+        <div
+            className="flex flex-col w-full max-w-7xl mx-auto p-8 gap-4"
+        >
+            <Link
+                href={
+                    process.env.NEXT_PUBLIC_VERCEL_ENV
+                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/researchers`
+                        : `http://localhost:3000/app/marketplace/researchers`
+                }
+                className="inline-flex items-center gap-x-2 hover:underline"
+            >
+                <ArrowLeft />
+                <Store className="h-4 w-4"/>
+                Return to marketplace
+            </Link>
+            <PublicResearcherProfile
+                researcherData={researcherData}
+            />
+        </div>
     )
 }

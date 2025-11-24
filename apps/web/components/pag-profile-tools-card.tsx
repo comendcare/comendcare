@@ -3,16 +3,15 @@ import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/ca
 import { Database, Rat, TestTubeDiagonal } from "lucide-react";
 import { cn, sleep } from "@comend/lib/utils";
 import { useEffect, useState } from "react";
-import { Button } from "@/packages/components/ui/button";
-import { DatabaseBiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/database-biosamples-table";
-import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
-import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns";
-import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
-import { DatabaseDiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/database-disease-models-table";
-import { DatabaseClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/database-clinical-datasets-table";
-import { SearchParams } from "@/packages/components/types";
+import { DatabaseBiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/database-biosamples-table";
+import { useBiosamplesTableColumns } from "@comend/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
+import { useClinicalDatasetsTableColumns } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns";
+import { useDiseaseModelsTableColumns } from "@comend/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
+import { DatabaseDiseaseModelsTable } from "@comend/components/biorepo/advanced-data-table/disease-models-table/database-disease-models-table";
+import { DatabaseClinicalDatasetsTable } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/database-clinical-datasets-table";
+import { SearchParams } from "@comend/components/types";
 import type { Organization, Biosample, DiseaseModel, Tool } from "@prisma/client";
-import { FeatureFlagsProvider } from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
+import { FeatureFlagsProvider } from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import { ToolCounts } from "./profile-page";
 import { useRouter } from "next/navigation";
 import Image from "next/image"
@@ -186,7 +185,6 @@ export const PAGProfileToolsCard = ({
                                             columns={biosampleColumns}
                                             searchParams={{}}
                                             showPagination={toolCounts.biosampleCount > 10}
-                                            noResultsOverride={false}
                                         />
                                     </FeatureFlagsProvider>
                                 </div>
@@ -200,7 +198,6 @@ export const PAGProfileToolsCard = ({
                                             columns={diseaseModelColumns}
                                             searchParams={{}}
                                             showPagination={toolCounts.diseaseModelCount > 10}
-                                            noResultsOverride={false}
                                         />
                                     </FeatureFlagsProvider>
                                 </div>
@@ -214,7 +211,6 @@ export const PAGProfileToolsCard = ({
                                             columns={clinicalDatasetColumns}
                                             searchParams={{}}
                                             showPagination={toolCounts.clinicalDatasetCount > 10}
-                                            noResultsOverride={false}
                                         />
                                     </FeatureFlagsProvider>
                                 </div>

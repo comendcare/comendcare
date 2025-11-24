@@ -4,10 +4,9 @@ import { Button } from "@comend/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import { Plus } from "lucide-react";
 import { ReactNode, useState } from "react";
-import { EditRFPForm } from "./edit-rfp-form";
 import { RFP } from "@comend/lib/types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
-import {Skeleton} from "@/packages/components/ui/skeleton";
+import {Skeleton} from "@comend/components/ui/skeleton";
 import dynamic from "next/dynamic";
 
 const EditRFPFormLazy = dynamic(
