@@ -36,28 +36,10 @@ type ConditionForCard = Prisma.ConditionGetPayload<{
         associatedSystems: true;
         causalGenes: true;
         associatedGenes: true;
-        associatedConditions: { select: { id: true; name: true; slug: true } };
-        associatedWith: { select: { id: true; name: true; slug: true } };
+        associatedConditions: true; // string[]
     };
 }>;
 
-function getAssociatedSet(
-    c: Pick<ConditionForCard, "slug" | "associatedConditions" | "associatedWith">
-): AssocMini[] {
-    const all = [...(c?.associatedConditions ?? []), ...(c?.associatedWith ?? [])];
-    const seen = new Set<string>();
-    const selfSlug = c?.slug;
-    const out: AssocMini[] = [];
-    for (const x of all) {
-        if (!x) continue;
-        if (x.slug === selfSlug) continue; // safety: no self
-        if (seen.has(x.id)) continue; // dedupe
-        seen.add(x.id);
-        out.push(x);
-    }
-    out.sort((a, b) => a.name.localeCompare(b.name));
-    return out;
-}
 
 // NEW: clean + normalize badge arrays
 const cleanBadges = (arr?: (string | null | undefined)[] | null) =>

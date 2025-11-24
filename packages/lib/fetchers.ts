@@ -1589,14 +1589,9 @@ export const getConditionsFromOrganizationId = withOrganizationAuth(
                     },
                 },
                 select: {
-                    ...select, // your existing scalar selections
-                    associatedConditions: {
-                        select: {
-                            id: true,
-                            name: true,
-                            slug: true,
-                        },
-                    },
+                    ...select,
+                    // ensure we don't try to nest-select on a scalar
+                    ...(select.associatedConditions ? {} : { associatedConditions: true }),
                 },
             });
 
