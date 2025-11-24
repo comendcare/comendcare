@@ -2868,15 +2868,15 @@ const fetchBiosamples = async (
                 { company: {title: {contains: input.q, mode: "insensitive"} } },
                 { genotype: {contains: input.q, mode: "insensitive"}},
                 { organization: {name: {contains: input.q, mode: "insensitive"}}},
-                { organization: {
-                    conditions: {
-                        some: {
-                            condition: {
-                                name: {contains: input.q, mode: "insensitive"}}
-                            }
-                        }
-                    }
-                },
+                // { organization: {
+                //     conditions: {
+                //         some: {
+                //             condition: {
+                //                 name: {contains: input.q, mode: "insensitive"}}
+                //             }
+                //         }
+                //     }
+                // },
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                 // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
