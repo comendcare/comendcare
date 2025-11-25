@@ -28,7 +28,7 @@ import {
 } from "@comend/lib/fetchers";
 import {handleImageUpload} from "@comend/lib/upload";
 import LoadingDots from "@comend/components/icons/loading-dots";
-import {getPublicFile} from "@comend/lib/utils";
+import {getPublicFile, mapTitleToValue} from "@comend/lib/utils";
 import mixpanel from "mixpanel-browser";
 import {Skeleton} from "@comend/components/ui/skeleton";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
@@ -37,7 +37,6 @@ import {MILESTONE_TYPE_OPTIONS, ACADEMIC_ROLES} from "@comend/lib/types"
 import {badgeVariants} from "@comend/components/ui/badge"
 import {Textarea} from "@comend/components/ui/textarea";
 import {Separator} from "@comend/components/ui/separator";
-import {mapTitleToValue} from "~researcher/lib/utils";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -61,9 +60,21 @@ const userFormSchema = z.object({
         message: "Your profile's description must less than 500 characters long.",
     }).optional(),
     affiliations: z.array(optionSchema),
-    orcid: z.string().regex(/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/, {
-        message: "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
-    }).optional(),
+    orcid: z.preprocess(
+        (val) => {
+            if (typeof val !== "string") return val;
+            const trimmed = val.trim();
+            // treat empty string as "not provided"
+            return trimmed === "" ? undefined : trimmed;
+        },
+        z
+            .string()
+            .regex(/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/, {
+                message:
+                    "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
+            })
+            .optional()
+    ),
     researchInterests: z.array(optionSchema),
     conditionsOfInterest: z.array(optionSchema),
     therapeuticsOfInterest: z.array(optionSchema).optional(),
@@ -96,13 +107,10 @@ export default function ResearcherOnboardingForm() {
                 const researcherResponse = await getResearcherFromUserId(session.user.id, {
                     id: true,
                     orcid: true,
-                    email: true,
                     country: true,
                     description: true,
                     website: true,
-                    emailHash: true,
                     title: true,
-                    name: true,
                     researchInterests: true,
                     conditionsOfInterest: true,
                     genesOfInterest: true,
@@ -160,14 +168,26 @@ export default function ResearcherOnboardingForm() {
                             value: affiliation.id
                         })) || [],
                         orcid: researcherData.orcid || "",
-                        researchInterests: researcherData.researchInterests.map((interests: any) => ({
-                            label: interests,
-                            value: interests
-                        })) || [],
-                        therapeuticsOfInterest: researcherData.therapeuticsOfInterest.map((interests: any) => ({
-                            label: interests,
-                            value: interests
-                        })) || [],
+                        researchInterests:
+                            (researcherData.researchInterests || []).map((stored: string) => {
+                                const option = MILESTONE_TYPE_OPTIONS_WITH_VALUE.find(
+                                    o => o.value === stored || o.label === stored
+                                );
+
+                                return {
+                                    label: option?.label ?? stored,
+                                    value: option?.value ?? stored,
+                                };
+                            }),
+                        therapeuticsOfInterest:
+                            (researcherData.therapeuticsOfInterest || []).map((stored: string) => {
+                                const option = MODALITIES.find(m => m.value === stored || m.label === stored);
+
+                                return {
+                                    label: option?.label ?? stored, // what user sees
+                                    value: option?.value ?? stored, // what we store
+                                };
+                            }),
                         conditionsOfInterest: researcherData.conditionsOfInterest.map((condition: any) => ({
                             label: condition,
                             value: condition
@@ -248,7 +268,7 @@ export default function ResearcherOnboardingForm() {
 
             fd.append(
                 "researchInterests",
-                researcherOnlyValues.researchInterests?.map(r => r.label).join(",") ?? ""
+                researcherOnlyValues.researchInterests?.map(r => r.value).join(",") ?? ""
             );
 
             fd.append(
@@ -258,7 +278,7 @@ export default function ResearcherOnboardingForm() {
 
             fd.append(
                 "therapeuticsOfInterest",
-                researcherOnlyValues.therapeuticsOfInterest?.map(t => t.label).join(",") ?? ""
+                researcherOnlyValues.therapeuticsOfInterest?.map(t => t.value).join(",") ?? ""
             );
 
             fd.append(
@@ -460,11 +480,9 @@ export default function ResearcherOnboardingForm() {
                     <FormField
                         control={form.control}
                         name="country"
-                        render={({field}) => (
+                        render={({ field }) => (
                             <FormItem>
-                                <FormLabel>
-                                    Country
-                                </FormLabel>
+                                <FormLabel>Country</FormLabel>
                                 <FormControl>
                                     <MultipleSelector
                                         maxSelected={1}
@@ -474,14 +492,28 @@ export default function ResearcherOnboardingForm() {
                                         loadingIndicator={<p>Loading countries...</p>}
                                         emptyIndicator={<p>No countries found.</p>}
                                         showHoverCard={false}
-                                        value={field.value ? [{ label: field.value, value: field.value }] : []}
+                                        value={
+                                            field.value
+                                                ? [{
+                                                    // handle both existing stored code *or* name
+                                                    label:
+                                                        COUNTRIES.find(
+                                                            c => c.value === field.value || c.label === field.value
+                                                        )?.label ?? field.value,
+                                                    value:
+                                                        COUNTRIES.find(
+                                                            c => c.value === field.value || c.label === field.value
+                                                        )?.value ?? field.value,
+                                                }]
+                                                : []
+                                        }
                                         onChange={(items) => {
-                                            const selected = items?.[0]?.value ?? "";
-                                            field.onChange(selected);
+                                            const selectedCode = items?.[0]?.value ?? "";
+                                            field.onChange(selectedCode); // store code in form state
                                         }}
                                     />
                                 </FormControl>
-                                <FormMessage/>
+                                <FormMessage />
                             </FormItem>
                         )}
                     />
@@ -609,8 +641,9 @@ export default function ResearcherOnboardingForm() {
                                 name="otherTherapeuticsOfInterest"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormDescription>(Optional) Other details for internal improvement
-                                            only.</FormDescription>
+                                        <FormDescription>
+                                            (Optional) Other details for internal improvement only.
+                                        </FormDescription>
                                         <FormControl>
                                             <Input {...field} />
                                         </FormControl>

@@ -265,6 +265,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                             <Label>Biosample types</Label>
                             <MultipleSelector
                                 value={filters.types ?? []}
+                                badgeClassName={badgeVariants({variant: "lightBlue"})}
                                 onChange={(vals) => setFilterKey("types", vals)}
                                 defaultOptions={BIOSAMPLE_TYPE_OPTIONS}
                                 placeholder="Select types..."
@@ -321,7 +322,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
 
                         {/* genes */}
                         {(filters.genes || []).map((item) => (
-                            <Badge key={`genes-${item.value}`} variant="secondary" className="text-xs">
+                            <Badge key={`genes-${item.value}`} variant="teal" className="text-xs">
                                 {item.value}
                                 <button
                                     onClick={() => removeFilterItem("genes", item.value)}
@@ -335,7 +336,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
 
                         {/* biosample types */}
                         {(filters.types || []).map((item) => (
-                            <Badge key={`types-${item.value}`} variant="secondary" className="text-xs">
+                            <Badge key={`types-${item.value}`} variant="lightBlue" className="text-xs">
                                 {BIOSAMPLE_TYPE_OPTIONS.find((o) => o.value === item.value)?.label || item.value}
                                 <button
                                     onClick={() => removeFilterItem("types", item.value)}

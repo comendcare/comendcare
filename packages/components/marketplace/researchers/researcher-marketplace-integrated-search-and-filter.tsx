@@ -222,7 +222,7 @@ export function ResearcherMarketplaceIntegratedSearchAndFilter() {
 
                         {/* genes */}
                         {(filters.genes || []).map((item) => (
-                            <Badge key={`genes-${item.value}`} variant="secondary" className="text-xs">
+                            <Badge key={`genes-${item.value}`} variant="teal" className="text-xs">
                                 {item.value}
                                 <button
                                     onClick={() => removeFilterItem("genes", item.value)}

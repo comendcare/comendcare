@@ -265,6 +265,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
                             <Label>Clinical dataset types</Label>
                             <MultipleSelector
                                 value={filters.types ?? []}
+                                badgeClassName={badgeVariants({variant: "lightBlue"})}
                                 onChange={(vals) => setFilterKey("types", vals)}
                                 defaultOptions={TOOL_TYPE_OPTIONS}
                                 placeholder="Any"
@@ -320,7 +321,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
 
                         {/* genes */}
                         {(filters.genes || []).map((item) => (
-                            <Badge key={`genes-${item.value}`} variant="secondary" className="text-xs">
+                            <Badge key={`genes-${item.value}`} variant="teal" className="text-xs">
                                 {item.value}
                                 <button
                                     onClick={() => removeFilterItem("genes", item.value)}
@@ -334,7 +335,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
 
                         {/* biosample types */}
                         {(filters.types || []).map((item) => (
-                            <Badge key={`types-${item.value}`} variant="secondary" className="text-xs">
+                            <Badge key={`types-${item.value}`} variant="lightBlue" className="text-xs">
                                 {TOOL_TYPE_OPTIONS.find((o) => o.value === item.value)?.label || item.value}
                                 <button
                                     onClick={() => removeFilterItem("types", item.value)}

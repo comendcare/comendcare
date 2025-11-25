@@ -16,17 +16,25 @@ import {
     PaginationNext,
 } from "./ui/pagination"
 import {useState} from "react";
+import {RawPublication} from "@comend/lib/fetchers";
+import {formatNumberWithCommas} from "@comend/lib/utils";
 
 
-export default function ResearcherProfilePublicationsSection({researcherData}: {researcherData: any}) {
-    const publications: any[] = Array.isArray(researcherData?.publications) ? researcherData!.publications : [];
+export default function ResearcherProfilePublicationsSection({
+                                                                 publications,
+                                                                 orcid,
+                                                             }: {
+    publications: any[];
+    orcid?: string;
+}) {
+    const safePublications: RawPublication[] = Array.isArray(publications) ? publications : [];
 
     const ITEMS_PER_PAGE = 5
     const [currentPage, setCurrentPage] = useState(1)
 
-    const totalPages = Math.ceil(publications.length / ITEMS_PER_PAGE)
+    const totalPages = Math.ceil(safePublications.length / ITEMS_PER_PAGE)
 
-    const paginatedPublications = publications.slice(
+    const paginatedPublications = safePublications.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
     )
@@ -38,40 +46,48 @@ export default function ResearcherProfilePublicationsSection({researcherData}: {
             </div>
 
             <div className="space-y-4">
-                {publications.length > 0 ?
+                {safePublications.length > 0 ?
                     paginatedPublications.map((pub: any, index: number) => (
                         <Card key={index} className="hover:shadow-md transition-shadow">
                             <CardContent className="pt-4">
                                 <div className="flex items-start justify-between gap-4">
                                     <div className="flex-1">
                                         <a
-                                            href={pub.doi ? `https://doi.org/${pub.doi}` : pub.id || "#"}
+                                            href={pub.doi ? `https://doi.org/${pub.doi}` : pub.raw?.id || "#"}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="font-semibold text-blue-700 hover:text-blue-800 cursor-pointer leading-tight"
                                         >
-                                            {pub.title}
+                                            {pub.title ?? pub.raw?.display_name ?? "Untitled"}
                                         </a>
+
                                         <p className="text-sm text-gray-600 mt-1">
-                                            {pub.authorships?.map((a: any) => a.author.display_name).join(", ")}
+                                            {(pub.authors && pub.authors.length > 0
+                                                    ? pub.authors
+                                                    : pub.raw?.authorships?.map((a: any) => a.author?.display_name) ?? []
+                                            ).join(", ")}
                                         </p>
-                                        <div
-                                            className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                                            <span
-                                                className="font-medium"
-                                            >
-                                                {pub.host_venue?.display_name || "Unknown Journal"}
+
+                                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                                            <span className="font-medium">
+                                                {pub.venue ?? pub.raw?.host_venue?.display_name ?? "Unknown Journal"}
                                             </span>
-                                            <span>{pub.publication_year}</span>
+                                            <span>{pub.year ?? pub.raw?.publication_year ?? "n.d."}</span>
                                             <Badge variant="outline" className="capitalize text-xs">
-                                                {pub.type}
+                                                {pub.type ?? pub.raw?.type ?? "Unknown"}
                                             </Badge>
                                         </div>
+
                                         <div className="flex items-center gap-4 mt-2">
-                                            <div
-                                                className="flex items-center gap-1 text-sm text-gray-600">
-                                                <Citation className="w-4 h-4"/>
-                                                <span>{pub.cited_by_count ?? 0} citations</span>
+                                            <div className="flex items-center gap-1 text-sm text-gray-600">
+                                                <Citation className="w-4 h-4" />
+                                                <span>
+                                                    {formatNumberWithCommas(
+                                                        pub.citations ??
+                                                        pub.raw?.cited_by_count ??
+                                                        0
+                                                    )} citations
+                                                </span>
                                             </div>
                                             {pub.doi && (
                                                 <Button
@@ -80,7 +96,7 @@ export default function ResearcherProfilePublicationsSection({researcherData}: {
                                                     className="h-6 px-2 text-xs"
                                                     onClick={() => window.open(`https://doi.org/${pub.doi}`, "_blank")}
                                                 >
-                                                    <ExternalLink className="w-3 h-3 mr-1"/>
+                                                    <ExternalLink className="w-3 h-3 mr-1" />
                                                     DOI
                                                 </Button>
                                             )}
@@ -94,7 +110,7 @@ export default function ResearcherProfilePublicationsSection({researcherData}: {
                         className="w-full h-full flex flex-col space-y-4 justify-center items-center mx-auto text-center text-gray-500 p-8">
                         <div>
                             <p>No publications found.</p>
-                            {researcherData?.orcid ?
+                            {orcid ?
                                 <p>
                                     Try adjusting your filters or search terms.
                                 </p>

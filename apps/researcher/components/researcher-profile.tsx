@@ -8,7 +8,7 @@ import {
     Star,
     TrendingUp,
 } from "lucide-react"
-import {formatNumberWithCommas} from "@comend/lib/utils";
+import {formatNumberWithCommas, mapModalityValueToLabel, mapTitleToValue} from "@comend/lib/utils";
 import EditResearcherProfileDialog from "~researcher/components/edit-researcher-profile-dialog";
 import ResearcherProfilePublicationsSection from "@comend/components/researcher-profile-publications-section";
 import ResearcherProfileFrequentCollaboratorsCard
@@ -16,7 +16,21 @@ import ResearcherProfileFrequentCollaboratorsCard
 import ResearcherProfileEducationCard from "@comend/components/researcher-profile-education-card";
 import {EnrichedResearcher} from "~researcher/types/types";
 import {COUNTRIES} from "@comend/lib/types";
+import {Researcher} from "@prisma/client";
 
+type ResearchMetrics = {
+    citations: number;
+    hIndex: number;
+    publications: number;
+    yearsActive: number;
+};
+
+const defaultMetrics: ResearchMetrics = {
+    citations: 0,
+    hIndex: 0,
+    publications: 0,
+    yearsActive: 0,
+};
 
 const resolveCountry = (countryCodeOrName?: string | null) => {
     if (!countryCodeOrName) return null;
@@ -30,59 +44,25 @@ const resolveCountry = (countryCodeOrName?: string | null) => {
     return match?.value ?? countryCodeOrName;
 };
 
-export default function ResearcherProfile({researcherData}: {researcherData: EnrichedResearcher})
-{
-    const openAlex = researcherData?.openAlex ?? {};
-    const researcher = researcherData?.researcher ?? null;
-    const mergedFields = researcherData?.mergedFields ?? {
-        name: "Unknown Researcher",
-        title: null,
-        email: null,
-        description: null,
-        researchInterests: [] as string[]
-    };
-
-    const institution =
-        researcher?.affiliations?.[0]?.institution?.name ??
-        openAlex?.last_known_institutions?.[0]?.display_name ??
-        "Institution not available";
-
-    const displayName = openAlex.display_name || "Unknown Researcher";
-    const email = researcherData?.researcher?.email || "Email not available";
-    const location =
-        resolveCountry(openAlex.last_known_institutions?.[0]?.country_code) ??
-        resolveCountry(researcher?.country) ??
-        "Country not available";
-
-    const metrics = {
-        citations: openAlex.cited_by_count ?? 0,
-        hIndex: openAlex.summary_stats?.h_index ?? 0,
-        publications: openAlex.works_count ?? 0,
-        yearsActive: openAlex.counts_by_year ? openAlex.counts_by_year.length : 0
-    };
+export default function ResearcherProfile({
+                                              researcherData,
+                                              publications = [],
+                                              metrics = defaultMetrics,
+                                          }: {
+    researcherData: any;        // or EnrichedResearcher
+    publications?: any[];
+    metrics?: ResearchMetrics;
+}) {
 
     const researchInterests: string[] = Array.from(
         new Set(
             [
-                // OpenAlex topics
-                ...(openAlex?.topics?.map((topic: any) => topic.display_name) ?? []),
-
-                // Merged researchInterests (keeps your fallback behavior)
-                ...(mergedFields.researchInterests ?? []),
-
-                // Extra arrays from your Prisma Researcher
-                ...(researcher?.therapeuticsOfInterest ?? []),
-                ...(researcher?.conditionsOfInterest ?? []),
-                ...(researcher?.genesOfInterest ?? []),
+                ...(researcherData?.therapeuticsOfInterest?.map(mapModalityValueToLabel) ?? []),
+                ...(researcherData?.conditionsOfInterest ?? []),
+                ...(researcherData?.genesOfInterest ?? []),
             ].filter(Boolean)
         )
     );
-
-    const coAuthors = (openAlex?.display_name_alternatives || []).slice(0, 5).map((name: string, index: number) => ({
-        name,
-        affiliation: institution,
-        collaborations: Math.floor(Math.random() * 10) + 1
-    }));
 
     return (
         <div className="max-w-7xl mx-auto flex flex-col py-4">
@@ -90,48 +70,59 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
                 <div className="px-4 py-8">
                     <div className="flex flex-col md:flex-row gap-6">
                         <Avatar className="w-32 h-32">
-                            <AvatarImage src="/placeholder.svg?height=128&width=128" alt="Dr. Sarah Chen"/>
-                            <AvatarFallback className="text-2xl">SC</AvatarFallback>
+                            <AvatarImage
+                                src={researcherData?.user?.image}
+                                alt={researcherData?.user?.name}
+                            />
+                            <AvatarFallback className="text-2xl">
+                                {researcherData?.user?.name?.[0]}
+                            </AvatarFallback>
                         </Avatar>
 
                         <div className="flex-1">
                             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                 <div>
                                     <h1 className="text-3xl font-bold text-gray-900">
-                                        {displayName}
+                                        {researcherData?.user?.name}
                                     </h1>
-                                    <p className="capitalize text-xl text-gray-600 mt-1">
-                                        {mergedFields.title || "Title not available"}
-                                    </p>
+                                    {mapTitleToValue(researcherData?.title) && (
+                                        <p className="text-xl text-gray-600 mt-1">
+                                            {mapTitleToValue(researcherData?.title)}
+                                        </p>
+                                    )}
 
                                     <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600">
-                                        <div className="flex items-center gap-1">
-                                            <Building2 className="w-4 h-4"/>
-                                            <span>
-                                                {institution}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <MapPin className="w-4 h-4"/>
-                                            <span>
-                                                {location}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <Mail className="w-4 h-4"/>
-                                            <span>
-                                                {email}
-                                            </span>
-                                        </div>
+
+                                        {researcherData?.institution && (
+                                            <div className="flex items-center gap-1">
+                                                <Building2 className="w-4 h-4" />
+                                                <span>{researcherData.institution}</span>
+                                            </div>
+                                        )}
+
+                                        {researcherData?.country && (
+                                            <div className="flex items-center gap-1">
+                                                <MapPin className="w-4 h-4" />
+                                                <span>{resolveCountry(researcherData.country)}</span>
+                                            </div>
+                                        )}
+
+                                        {researcherData?.user?.email && (
+                                            <div className="flex items-center gap-1">
+                                                <Mail className="w-4 h-4" />
+                                                <span>{researcherData.user.email}</span>
+                                            </div>
+                                        )}
+
                                     </div>
+
                                 </div>
 
                                 <div className="flex gap-2">
-                                    {/*<Button variant="outline" size="sm">*/}
-                                    {/*    <Mail className="w-4 h-4 mr-2" />*/}
-                                    {/*    Contact*/}
-                                    {/*</Button>*/}
-                                    {researcherData?.researcher && <EditResearcherProfileDialog researcher={researcherData.researcher}/>}
+                                    {researcherData &&
+                                        <EditResearcherProfileDialog
+                                            researcher={researcherData}
+                                        />}
                                 </div>
                             </div>
                         </div>
@@ -151,35 +142,46 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
                                     Research Metrics
                                 </CardTitle>
                             </CardHeader>
+
                             <CardContent className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="text-center">
-                                        <div className="text-2xl font-bold text-blue-600">
-                                            {formatNumberWithCommas(metrics.citations)}
-                                        </div>
-                                        <div className="text-sm text-gray-600">Citations</div>
+                                {!researcherData?.orcid ? (
+                                    <div className="text-sm text-gray-600">
+                                        Add your ORCID to see your citation metrics.
                                     </div>
-                                    <div className="text-center">
-                                        <div className="text-2xl font-bold text-green-600">
-                                            {metrics.hIndex}
+                                ) : (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="text-center">
+                                            <div className="text-2xl font-bold text-blue-600">
+                                                {formatNumberWithCommas(metrics.citations)}
+                                            </div>
+                                            <div className="text-sm text-gray-600">Citations</div>
                                         </div>
-                                        <div className="text-sm text-gray-600">h-index</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="text-2xl font-bold text-purple-600">
-                                            {metrics.publications}
+
+                                        <div className="text-center">
+                                            <div className="text-2xl font-bold text-green-600">
+                                                {metrics.hIndex}
+                                            </div>
+                                            <div className="text-sm text-gray-600">h-index</div>
                                         </div>
-                                        <div className="text-sm text-gray-600">Publications</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="text-2xl font-bold text-orange-600">
-                                            {metrics.yearsActive}
+
+                                        <div className="text-center">
+                                            <div className="text-2xl font-bold text-purple-600">
+                                                {metrics.publications}
+                                            </div>
+                                            <div className="text-sm text-gray-600">Publications</div>
                                         </div>
-                                        <div className="text-sm text-gray-600">Years Active</div>
+
+                                        <div className="text-center">
+                                            <div className="text-2xl font-bold text-orange-600">
+                                                {metrics.yearsActive}
+                                            </div>
+                                            <div className="text-sm text-gray-600">Years Active</div>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </CardContent>
                         </Card>
+
 
                         {/* Research Interests */}
                         <Card>
@@ -198,8 +200,9 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
                                             </Badge>
                                         ))
                                         :
-                                        <div className="text-sm text-gray-600">No research interests data
-                                            available.</div>
+                                        <div className="text-sm text-gray-600">
+                                            No research interests data available.
+                                        </div>
                                     }
                                 </div>
                             </CardContent>
@@ -214,22 +217,44 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
 
                     {/* Main Content */}
                     <div className="lg:col-span-2">
-
                         <Card>
-                            <CardHeader>
-                                <CardTitle>About</CardTitle>
-                            </CardHeader>
-                            <CardContent className="flex flex-col space-y-4">
-                                <div className="prose max-w-none">
-                                    {researcher?.description ?? ""}
-                                </div>
+                            {researcherData?.description ?
+                                <>
+                                    <CardHeader>
+                                        <CardTitle>
+                                            About
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="flex flex-col space-y-4">
+                                        <div className="prose max-w-none">
+                                            {researcherData?.description ?? ""}
+                                        </div>
 
-                                <ResearcherProfilePublicationsSection
-                                    researcherData={researcherData}
-                                />
-                            </CardContent>
+                                        <ResearcherProfilePublicationsSection
+                                            publications={publications}
+                                            orcid={researcherData?.orcid}
+                                        />
+                                    </CardContent>
+                                </>
+                                :
+                                <CardContent className="flex flex-col space-y-4">
+                                    {!researcherData?.orcid ? (
+                                        <div className="text-sm text-gray-600">
+                                            Add your ORCID to display your publications.
+                                        </div>
+                                    ) : publications.length > 0 ? (
+                                        <ResearcherProfilePublicationsSection
+                                            publications={publications}
+                                            orcid={researcherData?.orcid}
+                                        />
+                                    ) : (
+                                        <div className="text-sm text-gray-600">
+                                            No publications available.
+                                        </div>
+                                    )}
+                                </CardContent>
+                            }
                         </Card>
-
                     </div>
                 </div>
             </div>

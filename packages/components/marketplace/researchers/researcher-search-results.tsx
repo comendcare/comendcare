@@ -19,7 +19,11 @@ const selector = (state: ResearcherSearchState) => ({
     totalResults: state.totalResults
 })
 
-export function ResearcherSearchResults() {
+export function ResearcherSearchResults({
+    linkBasePath
+}: {
+    linkBasePath: string
+}) {
     const {
         lastFetchedPage, 
         setLastFetchedPage, 
@@ -51,11 +55,12 @@ export function ResearcherSearchResults() {
                     <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                         {searchResults.map((researcher) => (
                             <Link
-                                href={
-                                    process.env.NEXT_PUBLIC_VERCEL_ENV
-                                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/researcher/${researcher.id}`
-                                        : `http://localhost:3000/app/researcher/${researcher.id}`
-                                }
+                                // href={
+                                //     process.env.NEXT_PUBLIC_VERCEL_ENV
+                                //         ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/researcher/${researcher.id}`
+                                //         : `http://localhost:3000/app/researcher/${researcher.id}`
+                                // }
+                                href={`${linkBasePath}${researcher.id}`}
                                 className="flex flex-row gap-4 items-center"
                             >
                                 <ResearcherCard researcher={researcher}/>
