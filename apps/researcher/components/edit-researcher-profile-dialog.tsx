@@ -117,14 +117,14 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
         async function fetchData() {
             if (researcher && researcher.user) {
                 const fetchedValues: z.infer<typeof formSchema> = {
-                    name: researcher.user.name || "",
+                    name: researcher.user?.name || "",
                     title: researcher.title as any,
                     country: researcher.country || "",
                     description: researcher.description || undefined,
                     website: researcher.website || undefined,
                     affiliations: researcher.affiliations?.map((a: any) => ({
-                        label: a.institution.name,
-                        value: a.institution.id,
+                        label: a.institution?.name,
+                        value: a.institution?.id,
                     })) || [],
                     orcid: researcher.orcid || "",
                     researchInterests:
@@ -155,9 +155,9 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                         label: g,
                         value: g,
                     })) || [],
-                    notificationSettings: researcher.user.notificationSettings ?? false,
-                    consentSettings: researcher.user.consentSettings ?? false,
-                    image: researcher.user.image || undefined,
+                    notificationSettings: researcher.user?.notificationSettings ?? false,
+                    consentSettings: researcher.user?.consentSettings ?? false,
+                    image: researcher.user?.image || undefined,
                     otherTherapeuticsOfInterest: undefined,
                 };
 
@@ -264,9 +264,13 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                 values.researchInterests?.map(r => r.value).join(",") ?? ""
             );
             fd.append(
-                "otherTherapeuticsOfInterest",
-                values.otherTherapeuticsOfInterest ?? ""
+                "metadata",
+                JSON.stringify({
+                    otherTherapeuticsOfInterest: values.otherTherapeuticsOfInterest
+                })
             );
+
+            console.log(`update data`, fd)
 
             const res = await updateResearcher(session?.user?.id, fd);
             if (res?.error) {
