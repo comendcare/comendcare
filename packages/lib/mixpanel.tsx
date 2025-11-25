@@ -152,7 +152,11 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                     
                     if (!mixpanelPublicToken) {
                         console.error(`Error: cannot identify user, mixpanel public token is missing.`)
-                        mixpanel.opt_out_tracking() // opt out for safety
+                        try {
+                            mixpanel.opt_out_tracking()
+                        } catch (e) {
+                            console.error(`Failed to opt-out of mixpanel tracking:`, e)
+                        }
                         return
                     }
  
@@ -161,7 +165,11 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                         // set the user's 'opt-in' flag
                         if (window.analyticsConsentedLocalStorage?.get(`__mp_opt_in_out_${mixpanelPublicToken}`) === null || window.analyticsConsentedLocalStorage?.get(`__mp_opt_in_out_${mixpanelPublicToken}`) === '0') {
                             console.log(`mixpanel opt-in`)
-                            mixpanel.opt_in_tracking()
+                            try {
+                                mixpanel.opt_in_tracking()
+                            } catch (e) {
+                                console.error(`Failed to opt-in to mixpanel tracking:`, e)
+                            }
                         }
 
                         // user has consented to data tracking, opt into mixpanel tracking
@@ -262,7 +270,11 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
                     } else {
                         // if the user has not consented, make sure they are opted out of mixpanel tracking
                         console.log(`mixpanel opt-out`)
-                        mixpanel.opt_out_tracking()
+                        try {
+                            mixpanel.opt_out_tracking()
+                        } catch (e) {
+                            console.error(`Failed to opt-out of mixpanel tracking:`, e)
+                        }
                     }
                 }
             }
