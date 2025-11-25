@@ -44,6 +44,7 @@ import LoadingDots from "@comend/components/icons/loading-dots";
 import {EnrichedResearcher} from "~researcher/types/types";
 import {Textarea} from "@comend/components/ui/textarea";
 import {mapTitleToValue, TitleEnum} from "~researcher/lib/utils";
+import type {Prisma} from "@prisma/client";
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
     ...option,
@@ -76,7 +77,19 @@ const formSchema = z.object({
     consentSettings: z.boolean().default(false),
 });
 
-export default function EditResearcherProfileDialog({researcher}: { researcher: EnrichedResearcher["researcher"] }) {
+type ResearcherWithRelations = Prisma.ResearcherGetPayload<{
+    include: {
+        user: true;
+        affiliations: {
+            include: {
+                institution: true;
+            };
+        };
+    };
+}>;
+
+export default function EditResearcherProfileDialog({researcher}: { researcher: ResearcherWithRelations }) {
+    console.log("shit", researcher)
     const {data: session} = useSession()
     const router = useRouter();
     const [initialData, setInitialData] = useState<z.infer<typeof formSchema>>();
@@ -88,18 +101,10 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
 
     useEffect(() => {
         async function fetchData() {
-            const userRes = await getUser(session?.user.id, {
-                id: true,
-                name: true,
-                notificationSettings: true,
-                consentSettings: true,
-            });
-
-            if (researcher && researcher.name) {
-                const user = userRes.data;
+            if (researcher && researcher.user) {
                 form.reset({
-                    name: user.name || "",
-                    title: mapTitleToValue(researcher.title),
+                    name: researcher.user.name || "",
+                    title: researcher.title as any,
                     country: researcher.country || undefined,
                     description: researcher.description || undefined,
                     website: researcher.website || undefined,
@@ -124,8 +129,8 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                         label: g,
                         value: g,
                     })) || [],
-                    notificationSettings: user.notificationSettings ?? false,
-                    consentSettings: user.consentSettings ?? false,
+                    notificationSettings: researcher.user.notificationSettings ?? false,
+                    consentSettings: researcher.user.consentSettings ?? false,
                 });
             }
         }

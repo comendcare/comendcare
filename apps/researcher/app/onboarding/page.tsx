@@ -96,13 +96,10 @@ export default function ResearcherOnboardingForm() {
                 const researcherResponse = await getResearcherFromUserId(session.user.id, {
                     id: true,
                     orcid: true,
-                    email: true,
                     country: true,
                     description: true,
                     website: true,
-                    emailHash: true,
                     title: true,
-                    name: true,
                     researchInterests: true,
                     conditionsOfInterest: true,
                     genesOfInterest: true,
@@ -460,11 +457,9 @@ export default function ResearcherOnboardingForm() {
                     <FormField
                         control={form.control}
                         name="country"
-                        render={({field}) => (
+                        render={({ field }) => (
                             <FormItem>
-                                <FormLabel>
-                                    Country
-                                </FormLabel>
+                                <FormLabel>Country</FormLabel>
                                 <FormControl>
                                     <MultipleSelector
                                         maxSelected={1}
@@ -474,14 +469,28 @@ export default function ResearcherOnboardingForm() {
                                         loadingIndicator={<p>Loading countries...</p>}
                                         emptyIndicator={<p>No countries found.</p>}
                                         showHoverCard={false}
-                                        value={field.value ? [{ label: field.value, value: field.value }] : []}
+                                        value={
+                                            field.value
+                                                ? [{
+                                                    // handle both existing stored code *or* name
+                                                    label:
+                                                        COUNTRIES.find(
+                                                            c => c.value === field.value || c.label === field.value
+                                                        )?.label ?? field.value,
+                                                    value:
+                                                        COUNTRIES.find(
+                                                            c => c.value === field.value || c.label === field.value
+                                                        )?.value ?? field.value,
+                                                }]
+                                                : []
+                                        }
                                         onChange={(items) => {
-                                            const selected = items?.[0]?.value ?? "";
-                                            field.onChange(selected);
+                                            const selectedCode = items?.[0]?.value ?? "";
+                                            field.onChange(selectedCode); // store code in form state
                                         }}
                                     />
                                 </FormControl>
-                                <FormMessage/>
+                                <FormMessage />
                             </FormItem>
                         )}
                     />

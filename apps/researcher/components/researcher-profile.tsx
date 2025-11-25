@@ -16,6 +16,8 @@ import ResearcherProfileFrequentCollaboratorsCard
 import ResearcherProfileEducationCard from "@comend/components/researcher-profile-education-card";
 import {EnrichedResearcher} from "~researcher/types/types";
 import {COUNTRIES} from "@comend/lib/types";
+import {Researcher} from "@prisma/client";
+import {mapTitleToValue} from "~researcher/lib/utils";
 
 
 const resolveCountry = (countryCodeOrName?: string | null) => {
@@ -30,29 +32,14 @@ const resolveCountry = (countryCodeOrName?: string | null) => {
     return match?.value ?? countryCodeOrName;
 };
 
-export default function ResearcherProfile({researcherData}: {researcherData: EnrichedResearcher})
-{
+export default function ResearcherProfile({
+                                              researcherData,
+                                              publications = [],
+                                          }: {
+    researcherData: any;        // or your EnrichedResearcher type
+    publications?: any[];
+}) {
     const openAlex = researcherData?.openAlex ?? {};
-    const researcher = researcherData?.researcher ?? null;
-    const mergedFields = researcherData?.mergedFields ?? {
-        name: "Unknown Researcher",
-        title: null,
-        email: null,
-        description: null,
-        researchInterests: [] as string[]
-    };
-
-    const institution =
-        researcher?.affiliations?.[0]?.institution?.name ??
-        openAlex?.last_known_institutions?.[0]?.display_name ??
-        "Institution not available";
-
-    const displayName = openAlex.display_name || "Unknown Researcher";
-    const email = researcherData?.researcher?.email || "Email not available";
-    const location =
-        resolveCountry(openAlex.last_known_institutions?.[0]?.country_code) ??
-        resolveCountry(researcher?.country) ??
-        "Country not available";
 
     const metrics = {
         citations: openAlex.cited_by_count ?? 0,
@@ -64,25 +51,12 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
     const researchInterests: string[] = Array.from(
         new Set(
             [
-                // OpenAlex topics
-                ...(openAlex?.topics?.map((topic: any) => topic.display_name) ?? []),
-
-                // Merged researchInterests (keeps your fallback behavior)
-                ...(mergedFields.researchInterests ?? []),
-
-                // Extra arrays from your Prisma Researcher
-                ...(researcher?.therapeuticsOfInterest ?? []),
-                ...(researcher?.conditionsOfInterest ?? []),
-                ...(researcher?.genesOfInterest ?? []),
+                ...(researcherData?.therapeuticsOfInterest ?? []),
+                ...(researcherData?.conditionsOfInterest ?? []),
+                ...(researcherData?.genesOfInterest ?? []),
             ].filter(Boolean)
         )
     );
-
-    const coAuthors = (openAlex?.display_name_alternatives || []).slice(0, 5).map((name: string, index: number) => ({
-        name,
-        affiliation: institution,
-        collaborations: Math.floor(Math.random() * 10) + 1
-    }));
 
     return (
         <div className="max-w-7xl mx-auto flex flex-col py-4">
@@ -90,37 +64,42 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
                 <div className="px-4 py-8">
                     <div className="flex flex-col md:flex-row gap-6">
                         <Avatar className="w-32 h-32">
-                            <AvatarImage src="/placeholder.svg?height=128&width=128" alt="Dr. Sarah Chen"/>
-                            <AvatarFallback className="text-2xl">SC</AvatarFallback>
+                            <AvatarImage
+                                src={researcherData.user.image}
+                                alt={researcherData.user.name}
+                            />
+                            <AvatarFallback className="text-2xl">
+                                {researcherData.user.name?.[0]}
+                            </AvatarFallback>
                         </Avatar>
 
                         <div className="flex-1">
                             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                 <div>
                                     <h1 className="text-3xl font-bold text-gray-900">
-                                        {displayName}
+                                        {researcherData.user.name}
                                     </h1>
-                                    <p className="capitalize text-xl text-gray-600 mt-1">
-                                        {mergedFields.title || "Title not available"}
+                                    <p className="text-xl text-gray-600 mt-1">
+                                        {mapTitleToValue(researcherData.title)}
                                     </p>
 
                                     <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600">
                                         <div className="flex items-center gap-1">
                                             <Building2 className="w-4 h-4"/>
                                             <span>
-                                                {institution}
+                                                {researcherData.institution}
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-1">
                                             <MapPin className="w-4 h-4"/>
                                             <span>
-                                                {location}
+                                                {resolveCountry(researcherData.country)}
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-1">
                                             <Mail className="w-4 h-4"/>
                                             <span>
-                                                {email}
+                                                {researcherData.user.email}
                                             </span>
                                         </div>
                                     </div>
@@ -131,7 +110,10 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
                                     {/*    <Mail className="w-4 h-4 mr-2" />*/}
                                     {/*    Contact*/}
                                     {/*</Button>*/}
-                                    {researcherData?.researcher && <EditResearcherProfileDialog researcher={researcherData.researcher}/>}
+                                    {researcherData &&
+                                        <EditResearcherProfileDialog
+                                            researcher={researcherData}
+                                        />}
                                 </div>
                             </div>
                         </div>
@@ -217,15 +199,18 @@ export default function ResearcherProfile({researcherData}: {researcherData: Enr
 
                         <Card>
                             <CardHeader>
-                                <CardTitle>About</CardTitle>
+                                <CardTitle>
+                                    About
+                                </CardTitle>
                             </CardHeader>
                             <CardContent className="flex flex-col space-y-4">
                                 <div className="prose max-w-none">
-                                    {researcher?.description ?? ""}
+                                    {researcherData?.description ?? ""}
                                 </div>
 
                                 <ResearcherProfilePublicationsSection
-                                    researcherData={researcherData}
+                                    publications={publications}
+                                    orcid={researcherData?.orcid}
                                 />
                             </CardContent>
                         </Card>

@@ -2127,10 +2127,12 @@ export const getResearcher = withUserAuth(
             client: {};
         }>
     ) => {
+        const session = await getSession();
+        if (!session?.user?.id) return { success: false, error: "No session or user id" };
+
         try {
             const fetchedResearcher = await prisma.researcher.findUnique({
-                where: {id: researcher.id},
-                // include: {organizations: true},
+                where: {userId: session?.user.id},
                 select
             })
 
@@ -2353,6 +2355,197 @@ export const getResearcherFromOrcidApi = withUserAuth(
             logError("Error fetching researcher", error);
             return {success: false, error: "Internal server error"};
         }
+    }
+);
+
+type RawPublication = {
+    source: "openalex" | "crossref" | "europe_pmc" | "datacite";
+    doi?: string | null;
+    title?: string | null;
+    year?: number | null;
+    raw: any;
+};
+
+function normalizeKey(p: RawPublication): string | null {
+    const doi = p.doi?.trim().toLowerCase();
+    if (doi) return `doi:${doi}`;
+
+    const title = p.title?.trim().toLowerCase();
+    const year = p.year ?? "";
+    if (title) return `title:${title}|year:${year}`;
+
+    return null;
+}
+
+export const getResearcherPublications = withUserAuth(
+    async (userId?: string) => {
+        const session = await getSession();
+        if (!session?.user?.id) return { success: false, error: "No session or user id" };
+
+        const dbResearcher = await prisma.researcher.findUnique({
+            where: { userId: session?.user?.id },
+        });
+
+        if (!dbResearcher) {
+            return { success: false, error: "Researcher not found" };
+        }
+
+        const hasOrcid = !!dbResearcher.orcid;
+        if (!hasOrcid) {
+            return { success: true, data: [] as RawPublication[] };
+        }
+
+        const orcid = dbResearcher.orcid as string;
+
+        // ---- OpenAlex author + works ----
+        let openAlexPublications: any[] = [];
+        try {
+            const authorRes = await fetch(
+                `https://api.openalex.org/authors?filter=orcid:${encodeURIComponent(
+                    orcid
+                )}`
+            );
+            if (authorRes.ok) {
+                const authorJson = await authorRes.json();
+                const openAlexAuthor = authorJson.results?.[0];
+                if (openAlexAuthor?.works_api_url) {
+                    const worksRes = await fetch(
+                        `${openAlexAuthor.works_api_url}&per-page=25`
+                    );
+                    if (worksRes.ok) {
+                        const worksJson = await worksRes.json();
+                        openAlexPublications = worksJson.results || [];
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("OpenAlex fetch error", e);
+        }
+
+        // ---- Crossref, Europe PMC, DataCite in parallel ----
+        let crossrefItems: any[] = [];
+        let europePmcResults: any[] = [];
+        let dataciteItems: any[] = [];
+
+        try {
+            const [crRes, epmcRes, dcRes] = await Promise.all([
+                fetch(
+                    `https://api.crossref.org/works?filter=orcid:${encodeURIComponent(
+                        orcid
+                    )}&rows=25`
+                ),
+                fetch(
+                    `https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=ORCID:${encodeURIComponent(
+                        orcid
+                    )}&format=json&pageSize=25`
+                ),
+                fetch(
+                    `https://api.datacite.org/dois?query=creators.nameIdentifiers.nameIdentifier:${encodeURIComponent(
+                        orcid
+                    )}&page[size]=25`
+                ),
+            ]);
+
+            const [crossref, epmc, datacite] = await Promise.all([
+                crRes.ok ? crRes.json() : Promise.resolve(null),
+                epmcRes.ok ? epmcRes.json() : Promise.resolve(null),
+                dcRes.ok ? dcRes.json() : Promise.resolve(null),
+            ]);
+
+            crossrefItems = crossref?.message?.items ?? [];
+            europePmcResults = epmc?.resultList?.result ?? [];
+            dataciteItems = datacite?.data ?? [];
+        } catch (e) {
+            console.error("Secondary sources fetch error", e);
+        }
+
+        // ---- Normalize into RawPublication[] ----
+        const all: RawPublication[] = [];
+
+        // OpenAlex
+        for (const w of openAlexPublications) {
+            all.push({
+                source: "openalex",
+                doi: w.doi ?? w.doi_url ?? null,
+                title: w.display_name ?? null,
+                year: w.publication_year ?? null,
+                raw: w,
+            });
+        }
+
+        // Crossref
+        for (const item of crossrefItems) {
+            const doi = item.DOI ?? null;
+            const titleArr: string[] | undefined = item.title;
+            const title = Array.isArray(titleArr) ? titleArr[0] : titleArr;
+            const issuedYear =
+                item["published-print"]?.["date-parts"]?.[0]?.[0] ??
+                item["published-online"]?.["date-parts"]?.[0]?.[0] ??
+                item.issued?.["date-parts"]?.[0]?.[0] ??
+                null;
+
+            all.push({
+                source: "crossref",
+                doi,
+                title: title ?? null,
+                year: issuedYear,
+                raw: item,
+            });
+        }
+
+        // Europe PMC
+        for (const r of europePmcResults) {
+            const doi = r.doi ?? null;
+            const year = r.pubYear ? Number(r.pubYear) : null;
+
+            all.push({
+                source: "europe_pmc",
+                doi,
+                title: r.title ?? null,
+                year,
+                raw: r,
+            });
+        }
+
+        // DataCite
+        for (const d of dataciteItems) {
+            const doi = d.id ?? d.attributes?.doi ?? null;
+            const titleArr: any[] | undefined = d.attributes?.titles;
+            const title =
+                Array.isArray(titleArr) && titleArr.length > 0
+                    ? titleArr[0].title
+                    : null;
+            const pubYear =
+                d.attributes?.published ??
+                d.attributes?.publicationYear ??
+                null;
+
+            all.push({
+                source: "datacite",
+                doi,
+                title,
+                year: pubYear ? Number(pubYear) : null,
+                raw: d,
+            });
+        }
+
+        // ---- Dedupe (by DOI if present, else title+year) ----
+        const seen = new Set<string>();
+        const deduped: RawPublication[] = [];
+
+        for (const p of all) {
+            const key = normalizeKey(p);
+            if (!key) {
+                // if truly no key, just push it
+                deduped.push(p);
+                continue;
+            }
+            if (seen.has(key)) continue;
+            seen.add(key);
+            deduped.push(p);
+        }
+
+        return { success: true, data: deduped };
     }
 );
 

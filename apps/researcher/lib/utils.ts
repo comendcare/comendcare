@@ -3,15 +3,19 @@ import z from "zod";
 
 export const TitleEnum = z.enum(["researcher", "pm", "pi", "student", "other"]);
 
-export const mapTitleToValue = (title?: string | null): z.infer<typeof TitleEnum> | undefined => {
+export const mapTitleToValue = (
+    title?: string | null
+): string | undefined => {
     if (!title) return undefined;
+
     const match = ACADEMIC_ROLES.find(
         (role) =>
+            role.id === title ||
             role.value === title ||
-            role.label === title ||
-            role.id === title
+            role.label === title
     );
-    return match?.value as z.infer<typeof TitleEnum> ?? undefined;
+
+    return match?.label;
 };
 
 // Drop-in upgrade: now also merges Crossref, Europe PMC, and DataCite.

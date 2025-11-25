@@ -18,15 +18,21 @@ import {
 import {useState} from "react";
 
 
-export default function ResearcherProfilePublicationsSection({researcherData}: {researcherData: any}) {
-    const publications: any[] = Array.isArray(researcherData?.publications) ? researcherData!.publications : [];
+export default function ResearcherProfilePublicationsSection({
+                                                                 publications,
+                                                                 orcid,
+                                                             }: {
+    publications: any[];
+    orcid?: string;
+}) {
+    const safePublications: any[] = Array.isArray(publications) ? publications : [];
 
     const ITEMS_PER_PAGE = 5
     const [currentPage, setCurrentPage] = useState(1)
 
-    const totalPages = Math.ceil(publications.length / ITEMS_PER_PAGE)
+    const totalPages = Math.ceil(safePublications.length / ITEMS_PER_PAGE)
 
-    const paginatedPublications = publications.slice(
+    const paginatedPublications = safePublications.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
     )
@@ -38,7 +44,7 @@ export default function ResearcherProfilePublicationsSection({researcherData}: {
             </div>
 
             <div className="space-y-4">
-                {publications.length > 0 ?
+                {safePublications.length > 0 ?
                     paginatedPublications.map((pub: any, index: number) => (
                         <Card key={index} className="hover:shadow-md transition-shadow">
                             <CardContent className="pt-4">
@@ -94,7 +100,7 @@ export default function ResearcherProfilePublicationsSection({researcherData}: {
                         className="w-full h-full flex flex-col space-y-4 justify-center items-center mx-auto text-center text-gray-500 p-8">
                         <div>
                             <p>No publications found.</p>
-                            {researcherData?.orcid ?
+                            {orcid ?
                                 <p>
                                     Try adjusting your filters or search terms.
                                 </p>

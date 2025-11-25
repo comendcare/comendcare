@@ -1311,14 +1311,10 @@ model Researcher {
   userId                        String                         @unique
   user                          User?                          @relation(fields: [userId], references: [id], onDelete: Cascade)
   orcid                         String?                        @unique
-  email                         String?                        @unique /// @encrypted
-  emailHash                     String?                        @unique /// @encryption:hash(email)
   website                       String?
   description                   String?
   country                       String?
   title                         String?
-  role                          String?
-  name                          String
   researchInterests             String[]
   therapeuticsOfInterest        String[]
   conditionsOfInterest          String[]
