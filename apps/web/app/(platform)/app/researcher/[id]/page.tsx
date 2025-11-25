@@ -1,7 +1,7 @@
 import React from "react";
 import {getSession} from "@comend/lib/auth";
 import {getResearcherWithMergedDataAdvanced, getResearcherWithMergedData} from "@comend/lib/fetchers";
-import PublicResearcherProfile from "~web/components/public-researcher-profile";
+import PublicResearcherProfile from "@comend/components/public-researcher-profile";
 import Link from "next/link";
 import { ArrowLeft, Store } from "lucide-react";
 
