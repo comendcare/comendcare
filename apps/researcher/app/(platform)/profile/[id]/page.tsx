@@ -5,7 +5,7 @@ import {
     getResearcherWithMergedDataAdvanced,
     getResearcherWithMergedData,
     getResearcher,
-    getResearcherPublications
+    getResearcherPublications, getResearcherMetrics
 } from "@comend/lib/fetchers";
 
 export default async function ResearcherProfilePage({
@@ -51,10 +51,21 @@ export default async function ResearcherProfilePage({
         }
     }
 
+    let metrics
+    if (session?.user?.id) {
+        const response = await getResearcherMetrics(session.user.id)
+        if (response.success) {
+            metrics = response.data
+        } else {
+            console.error(response.error)
+        }
+    }
+
     return (
         <ResearcherProfile
             researcherData={researcherData}
             publications={publications}
+            metrics={metrics}
         />
     )
 }

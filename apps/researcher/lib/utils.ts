@@ -1,7 +1,9 @@
 import {ACADEMIC_ROLES} from "@comend/lib/types";
 import z from "zod";
 
-export const TitleEnum = z.enum(["researcher", "pm", "pi", "student", "other"]);
+export const TitleEnum = z.enum(
+    ACADEMIC_ROLES.map(r => r.value) as [string, ...string[]]
+);
 
 export const mapTitleToValue = (
     title?: string | null

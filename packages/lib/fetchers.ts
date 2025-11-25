@@ -2358,13 +2358,17 @@ export const getResearcherFromOrcidApi = withUserAuth(
     }
 );
 
-type RawPublication = {
+export interface RawPublication {
     source: "openalex" | "crossref" | "europe_pmc" | "datacite";
-    doi?: string | null;
-    title?: string | null;
-    year?: number | null;
+    doi: string | null;
+    title: string | null;
+    year: number | null;
+    type?: string | null;
+    venue?: string | null;
+    citations?: number | null;
+    authors?: string[];
     raw: any;
-};
+}
 
 function normalizeKey(p: RawPublication): string | null {
     const doi = p.doi?.trim().toLowerCase();
@@ -2376,6 +2380,51 @@ function normalizeKey(p: RawPublication): string | null {
 
     return null;
 }
+
+export const getResearcherMetrics = withUserAuth(async () => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "No session found" };
+
+    const researcher = await prisma.researcher.findUnique({
+        where: { userId: session.user.id },
+        select: { orcid: true },
+    });
+
+    if (!researcher) return { success: false, error: "Researcher not found" };
+    if (!researcher.orcid) return { success: false, error: "No ORCID available" };
+
+    let openAlex: any = null;
+
+    const res = await fetch(
+        `https://api.openalex.org/authors?filter=orcid:${encodeURIComponent(researcher.orcid)}`
+    );
+
+    if (res.ok) {
+        const json = await res.json();
+        openAlex = json.results?.[0] ?? null;
+    }
+
+    if (!openAlex) {
+        return {
+            success: true,
+            data: {
+                citations: 0,
+                hIndex: 0,
+                publications: 0,
+                yearsActive: 0,
+            },
+        };
+    }
+
+    const metrics = {
+        citations: openAlex.cited_by_count ?? 0,
+        hIndex: openAlex.summary_stats?.h_index ?? 0,
+        publications: openAlex.works_count ?? 0,
+        yearsActive: openAlex.counts_by_year ? openAlex.counts_by_year.length : 0,
+    };
+
+    return { success: true, data: metrics };
+});
 
 export const getResearcherPublications = withUserAuth(
     async (userId?: string) => {
@@ -2462,18 +2511,26 @@ export const getResearcherPublications = withUserAuth(
         // ---- Normalize into RawPublication[] ----
         const all: RawPublication[] = [];
 
-        // OpenAlex
+// OpenAlex
         for (const w of openAlexPublications) {
             all.push({
                 source: "openalex",
                 doi: w.doi ?? w.doi_url ?? null,
                 title: w.display_name ?? null,
                 year: w.publication_year ?? null,
+                type: w.type ?? null,
+                venue: w.host_venue?.display_name ?? null,
+                citations: w.cited_by_count ?? null,
+                authors: Array.isArray(w.authorships)
+                    ? w.authorships
+                        .map((a: any) => a.author?.display_name)
+                        .filter(Boolean)
+                    : [],
                 raw: w,
             });
         }
 
-        // Crossref
+// Crossref
         for (const item of crossrefItems) {
             const doi = item.DOI ?? null;
             const titleArr: string[] | undefined = item.title;
@@ -2489,11 +2546,23 @@ export const getResearcherPublications = withUserAuth(
                 doi,
                 title: title ?? null,
                 year: issuedYear,
+                type: item.type ?? null,
+                venue: Array.isArray(item["container-title"])
+                    ? item["container-title"][0]
+                    : item["container-title"] ?? null,
+                citations: null,
+                authors: Array.isArray(item.author)
+                    ? item.author
+                        .map((a: any) =>
+                            [a.given, a.family].filter(Boolean).join(" ")
+                        )
+                        .filter(Boolean)
+                    : [],
                 raw: item,
             });
         }
 
-        // Europe PMC
+// Europe PMC
         for (const r of europePmcResults) {
             const doi = r.doi ?? null;
             const year = r.pubYear ? Number(r.pubYear) : null;
@@ -2503,11 +2572,17 @@ export const getResearcherPublications = withUserAuth(
                 doi,
                 title: r.title ?? null,
                 year,
+                type: r.pubType ?? null,
+                venue: r.journalTitle ?? null,
+                citations: r.citedByCount ? Number(r.citedByCount) : null,
+                authors: r.authorString
+                    ? r.authorString.split(",").map((s: string) => s.trim())
+                    : [],
                 raw: r,
             });
         }
 
-        // DataCite
+// DataCite
         for (const d of dataciteItems) {
             const doi = d.id ?? d.attributes?.doi ?? null;
             const titleArr: any[] | undefined = d.attributes?.titles;
@@ -2516,15 +2591,21 @@ export const getResearcherPublications = withUserAuth(
                     ? titleArr[0].title
                     : null;
             const pubYear =
-                d.attributes?.published ??
-                d.attributes?.publicationYear ??
-                null;
+                d.attributes?.published ?? d.attributes?.publicationYear ?? null;
 
             all.push({
                 source: "datacite",
                 doi,
                 title,
                 year: pubYear ? Number(pubYear) : null,
+                type: d.attributes?.types?.resourceTypeGeneral ?? null,
+                venue: d.attributes?.publisher ?? null,
+                citations: null,
+                authors: Array.isArray(d.attributes?.creators)
+                    ? d.attributes.creators
+                        .map((c: any) => c.name)
+                        .filter(Boolean)
+                    : [],
                 raw: d,
             });
         }
