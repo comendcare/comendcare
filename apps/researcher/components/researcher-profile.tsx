@@ -37,11 +37,11 @@ const resolveCountry = (countryCodeOrName?: string | null) => {
 
     const match = COUNTRIES.find(
         c =>
-            c.label.toLowerCase() === countryCodeOrName.toLowerCase() || // code -> name
-            c.value.toLowerCase() === countryCodeOrName.toLowerCase()    // already name
+            c.label.toLowerCase() === countryCodeOrName.toLowerCase() ||
+            c.value.toLowerCase() === countryCodeOrName.toLowerCase()
     );
 
-    return match?.value ?? countryCodeOrName;
+    return match?.label ?? countryCodeOrName;
 };
 
 export default function ResearcherProfile({
