@@ -43,7 +43,7 @@ import {badgeVariants} from "@comend/components/ui/badge";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import {EnrichedResearcher} from "~researcher/types/types";
 import {Textarea} from "@comend/components/ui/textarea";
-import {mapTitleToValue, TitleEnum} from "~researcher/lib/utils";
+import {TitleEnum} from "~researcher/lib/utils";
 import type {Prisma} from "@prisma/client";
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
@@ -65,9 +65,21 @@ const formSchema = z.object({
         message: "Your profile's description must less than 500 characters long.",
     }).optional(),
     affiliations: z.array(optionSchema),
-    orcid: z.string().regex(/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/, {
-        message: "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
-    }).optional(),
+    orcid: z.preprocess(
+        (val) => {
+            if (typeof val !== "string") return val;
+            const trimmed = val.trim();
+            // treat empty string as "not provided"
+            return trimmed === "" ? undefined : trimmed;
+        },
+        z
+            .string()
+            .regex(/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/, {
+                message:
+                    "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
+            })
+            .optional()
+    ),
     researchInterests: z.array(optionSchema),
     therapeuticsOfInterest: z.array(optionSchema).optional(),
     otherTherapeuticsOfInterest: z.string().optional(),

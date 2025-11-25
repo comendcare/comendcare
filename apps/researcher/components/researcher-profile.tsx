@@ -8,7 +8,7 @@ import {
     Star,
     TrendingUp,
 } from "lucide-react"
-import {formatNumberWithCommas} from "@comend/lib/utils";
+import {formatNumberWithCommas, mapTitleToValue} from "@comend/lib/utils";
 import EditResearcherProfileDialog from "~researcher/components/edit-researcher-profile-dialog";
 import ResearcherProfilePublicationsSection from "@comend/components/researcher-profile-publications-section";
 import ResearcherProfileFrequentCollaboratorsCard
@@ -17,7 +17,6 @@ import ResearcherProfileEducationCard from "@comend/components/researcher-profil
 import {EnrichedResearcher} from "~researcher/types/types";
 import {COUNTRIES} from "@comend/lib/types";
 import {Researcher} from "@prisma/client";
-import {mapTitleToValue} from "~researcher/lib/utils";
 
 type ResearchMetrics = {
     citations: number;

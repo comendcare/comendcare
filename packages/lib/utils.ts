@@ -1,23 +1,25 @@
 import {type ClassValue, clsx} from "clsx"
 import {twMerge} from "tailwind-merge"
 import {Active, DataRef, Over} from "@dnd-kit/core";
-import {ColumnDragData, TaskDragData} from "./types";
-import {identicon, personas} from "@dicebear/collection";
-import {createAvatar} from "@dicebear/core";
-import {formatDistanceToNowStrict} from "date-fns";
 import {
+    ACADEMIC_ROLES,
+    ColumnDragData,
     Condition,
     CustomOrganization,
     ImportField,
+    Milestone,
     MILESTONE_TYPE_OPTIONS,
     milestoneCategories,
     MilestoneKey,
-    Milestone, 
     Option,
-    Task
+    Task,
+    TaskDragData
 } from "./types";
+import {identicon, personas} from "@dicebear/collection";
+import {createAvatar} from "@dicebear/core";
+import {formatDistanceToNowStrict} from "date-fns";
 import Papa from "papaparse";
-import type { RFP } from "@prisma/client";
+import type {RFP} from "@prisma/client";
 
 export const getStatusColor = (status: string) => {
     switch (status) {
@@ -905,3 +907,18 @@ export function getCategoriesAndMilestones(services: string[]) {
         milestoneTypes: Array.from(milestoneSet),
     };
 }
+
+export const mapTitleToValue = (
+    title?: string | null
+): string | undefined => {
+    if (!title) return undefined;
+
+    const match = ACADEMIC_ROLES.find(
+        (role) =>
+            role.id === title ||
+            role.value === title ||
+            role.label === title
+    );
+
+    return match?.label;
+};

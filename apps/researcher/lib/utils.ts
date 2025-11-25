@@ -5,21 +5,6 @@ export const TitleEnum = z.enum(
     ACADEMIC_ROLES.map(r => r.value) as [string, ...string[]]
 );
 
-export const mapTitleToValue = (
-    title?: string | null
-): string | undefined => {
-    if (!title) return undefined;
-
-    const match = ACADEMIC_ROLES.find(
-        (role) =>
-            role.id === title ||
-            role.value === title ||
-            role.label === title
-    );
-
-    return match?.label;
-};
-
 // Drop-in upgrade: now also merges Crossref, Europe PMC, and DataCite.
 // Signature remains backward-compatible via default params.
 export function mergeResearcherDataAdvanced(
