@@ -288,6 +288,7 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
             ),
             enableHiding: true,
             enableColumnFilter: true,
+            enableSorting: false,
             meta: {
                 label: "Sex",
                 variant: "select",
@@ -317,6 +318,7 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
             ),
             enableHiding: true,
             enableColumnFilter: true,
+            enableSorting: false,
             meta: {
                 label: "Race",
                 variant: "select",
