@@ -10,7 +10,7 @@ import {
     Milestone,
     MILESTONE_TYPE_OPTIONS,
     milestoneCategories,
-    MilestoneKey,
+    MilestoneKey, MODALITIES,
     Option,
     Task,
     TaskDragData
@@ -921,4 +921,8 @@ export const mapTitleToValue = (
     );
 
     return match?.label;
+};
+
+export const mapModalityValueToLabel = (value: string) => {
+    return MODALITIES.find(m => m.value === value)?.label ?? value;
 };

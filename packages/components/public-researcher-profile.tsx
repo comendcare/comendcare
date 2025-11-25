@@ -8,7 +8,7 @@ import {
     Star,
     TrendingUp,
 } from "lucide-react"
-import {formatNumberWithCommas} from "@comend/lib/utils";
+import {formatNumberWithCommas, mapModalityValueToLabel} from "@comend/lib/utils";
 import ResearcherProfilePublicationsSection from "@comend/components/researcher-profile-publications-section";
 import ResearcherProfileFrequentCollaboratorsCard
     from "@comend/components/researcher-profile-frequent-collaborators-card";
@@ -56,7 +56,7 @@ export default function PublicResearcherProfile({
     const researchInterests: string[] = Array.from(
         new Set(
             [
-                ...(researcherData?.therapeuticsOfInterest ?? []),
+                ...(researcherData?.therapeuticsOfInterest?.map(mapModalityValueToLabel) ?? []),
                 ...(researcherData?.conditionsOfInterest ?? []),
                 ...(researcherData?.genesOfInterest ?? []),
             ].filter(Boolean)
