@@ -16,6 +16,7 @@ import ResearcherProfileEducationCard from "@comend/components/researcher-profil
 import {COUNTRIES} from "@comend/lib/types";
 import {Researcher} from "@prisma/client";
 import {mapTitleToValue} from "@comend/lib/utils";
+import {ProfilePhoto} from "./profile-photo";
 
 type ResearchMetrics = {
     citations: number;
@@ -68,15 +69,12 @@ export default function PublicResearcherProfile({
             <div className="bg-white border-b">
                 <div className="px-4 py-8">
                     <div className="flex flex-col md:flex-row gap-6">
-                        <Avatar className="w-32 h-32">
-                            <AvatarImage
-                                src={researcherData?.user?.image}
-                                alt={researcherData?.user?.name}
-                            />
-                            <AvatarFallback className="text-2xl">
-                                {researcherData?.user?.name?.[0]}
-                            </AvatarFallback>
-                        </Avatar>
+                        <ProfilePhoto
+                            img={researcherData.user.image}
+                            name={researcherData.user.name ?? "No researcher name"}
+                            className="h-32 w-32 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                            textSize="large"
+                        />
 
                         <div className="flex-1">
                             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
