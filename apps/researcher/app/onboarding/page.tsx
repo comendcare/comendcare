@@ -215,20 +215,24 @@ export default function ResearcherOnboardingForm() {
 
         try {
             // handle mixpanel opt-in/opt-out
-            if (values.consentSettings) {
-                console.log(`mixpanel opt-in`)
-                mixpanel.opt_in_tracking()
+            try {
+                if (values.consentSettings) {
+                    console.log(`mixpanel opt-in`)
+                    mixpanel.opt_in_tracking()
 
-                if (session?.user?.id && session?.user?.email && !(mixpanel as any)._disabled) {
-                    // identify the user if we can, to ensure we have the proper distinct ID
-                    if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") mixpanel.identify(session.user.email) // development & preview use email as distinct id
-                    else mixpanel.identify(session.user.id) // production uses userID from DB (fetched from session)
-                } else {
-                    console.warn("Tried to call identify while Mixpanel is disabled.");
+                    if (session?.user?.id && session?.user?.email && !(mixpanel as any)._disabled) {
+                        // identify the user if we can, to ensure we have the proper distinct ID
+                        if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") mixpanel.identify(session.user.email) // development & preview use email as distinct id
+                        else mixpanel.identify(session.user.id) // production uses userID from DB (fetched from session)
+                    } else {
+                        console.warn("Tried to call identify while Mixpanel is disabled.");
+                    }
+                } else if (!values.consentSettings) {
+                    console.log(`mixpanel opt-out`)
+                    mixpanel.opt_out_tracking()
                 }
-            } else if (!values.consentSettings) {
-                console.log(`mixpanel opt-out`)
-                mixpanel.opt_out_tracking()
+            } catch (e) {
+                console.error(`Failed to update mixpanel status`, e)
             }
 
             // handle image upload, only upload if the current image is not the same as the previous image
