@@ -4,11 +4,11 @@ import * as React from "react";
 import Image from "next/image"
 import {DataTableSkeleton} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
 // import {BiosamplesTable} from "@comend/components/biorepo/advanced-data-table/biosamples-table/biosamples-table"
-import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
-import {Shell} from "@/packages/components/biorepo/advanced-data-table/lib/shell";
+import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
+import {Shell} from "@comend/components/biorepo/advanced-data-table/lib/shell";
 import {
     useBiosamplesTableColumns
-} from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
+} from "@comend/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
 import {Tool} from "@prisma/client";
 import {Button} from "@comend/components/ui/button";
 import {useRouter} from "next/navigation";

@@ -3,8 +3,8 @@ import {temporal} from 'zundo';
 import {create} from 'zustand';
 import { getExclusiveToFirstGroup } from '@comend/lib/utils';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
-import { RequestFiltersType } from '@/packages/lib/types';
-import { getOrganizationRequests, getResearcherRequests } from '@/packages/lib/fetchers';
+import { RequestFiltersType } from '@comend/lib/types';
+import { getOrganizationRequests, getResearcherRequests } from '@comend/lib/fetchers';
 import { getSession } from 'next-auth/react';
 
 export type ViewType = 'grid' | 'list'

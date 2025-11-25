@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card";
 import {getOrganizationToolsAnalytics, getToolsAnalytics} from "~admin/lib/fetchers"
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/packages/components/ui/chart";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@comend/components/ui/chart";
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
 interface AnalyticsData {

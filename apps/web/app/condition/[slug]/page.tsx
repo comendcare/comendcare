@@ -335,7 +335,7 @@ export default async function ConditionPage({
                                 </h3>
                                 <div className="space-y-1 space-x-1 text-center">
                                     {data.associatedGenes.map((gene, index) =>
-                                        <Badge size="large" key={index}>
+                                        <Badge size="large" key={index} variant={'teal'}>
                                             {gene}
                                         </Badge>
                                     )}

@@ -190,26 +190,57 @@ export const researcherAuthOptions: NextAuthOptions = {
         },
     },
 
+    // events: {
+    //     async signIn({ user, account }) {
+    //         if (!user?.id) return;
+    //
+    //         const existingResearcher = await prisma.researcher.findUnique({
+    //             where: { id: user.id },
+    //         });
+    //
+    //         if (!existingResearcher) {
+    //             await prisma.researcher.create({
+    //                 data: {
+    //                     userId: user.id,
+    //                     email: user.email ?? undefined,
+    //                     name: user.name ?? "",
+    //                     ...(account?.provider === "orcid" && {
+    //                         orcid: account.providerAccountId,
+    //                     }),
+    //                 },
+    //             });
+    //         }
+    //     },
+    // },
+
     events: {
         async signIn({ user, account }) {
-            if (!user?.id) return;
+            if (!user?.id) return; // NextAuth expects a boolean
 
+            const orcid =
+                account?.provider === "orcid" ? account.providerAccountId : undefined;
+
+            // Researcher is uniquely keyed by userId, not by id
             const existingResearcher = await prisma.researcher.findUnique({
-                where: { id: user.id },
+                where: { userId: user.id },
             });
 
             if (!existingResearcher) {
                 await prisma.researcher.create({
                     data: {
                         userId: user.id,
-                        email: user.email ?? undefined,
-                        name: user.name ?? "",
-                        ...(account?.provider === "orcid" && {
-                            orcid: account.providerAccountId,
-                        }),
+                        ...(orcid && { orcid }),
                     },
                 });
+            } else if (orcid && !existingResearcher.orcid) {
+                // Optionally update ORCID on later ORCID logins
+                await prisma.researcher.update({
+                    where: { id: existingResearcher.id },
+                    data: { orcid },
+                });
             }
+
+            return;
         },
     },
 

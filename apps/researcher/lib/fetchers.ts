@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@comend/lib/prisma"
-import {withResearcherAuth} from "@/packages/lib/auth";
+import {withResearcherAuth} from "@comend/lib/auth";
 import {Organization, Tool} from "@prisma/client";
 
 export const getAllBiosamples = withResearcherAuth(

@@ -1,12 +1,13 @@
 import {ResearcherNavbarMenu} from "~researcher/components/researcher-navbar-menu";
-import ComendLogo from "@/public/logos/comend-logo.png"
+import ComendLogo from "./../../../public/logos/comend-logo.png"
 import Image from "next/image";
 import UserNavbarProfile from "~researcher/components/user-navbar-profile";
 import {Suspense} from "react";
-import {Skeleton} from "@/packages/components/ui/skeleton";
+import {Skeleton} from "@comend/components/ui/skeleton";
+import type {User} from "@prisma/client";
 
 
-export function ResearcherNavbar() {
+export function ResearcherNavbar({user}: {user: Partial<User>}) {
     return (
         <div className="w-full sticky top-0 z-50 border-b p-4 bg-white">
             <Suspense fallback={
@@ -34,7 +35,7 @@ export function ResearcherNavbar() {
 
                         <ResearcherNavbarMenu/>
                     </div>
-                    <UserNavbarProfile/>
+                    <UserNavbarProfile user={user}/>
                 </nav>
             </Suspense>
         </div>

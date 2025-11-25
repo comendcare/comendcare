@@ -1,6 +1,6 @@
 // apps/web/tests/e2e/create-organization.spec.ts
 import { test, expect, Page } from "@playwright/test";
-import {formatNumberWithCommas} from "@/packages/lib/utils";
+import {formatNumberWithCommas} from "@comend/lib/utils";
 
 const rand = () => Math.random().toString(36).slice(2, 8);
 

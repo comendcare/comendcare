@@ -22,26 +22,32 @@ import {
     DatabaseIcon,
     ClipboardListIcon,
     UsersIcon,
+    Store,
 } from "lucide-react"
+import { cn } from "@comend/lib/utils"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 
 function isActive(pathname: string, href: string): boolean {
     return pathname === href || pathname.startsWith(href + "/")
 }
 
 const pages = [
-    {href: "/profile", label: "Profile", icon: <UserIcon size={16}/>},
-    // {href: "/dashboard", label: "Dashboard", icon: <LayoutDashboardIcon size={16}/>},
     {
-        href: "/toolkit",
-        label: "Tools",
-        icon: <FlaskConicalIcon size={16}/>,
-        subpages: [
-            {href: "/toolkit/biosamples", label: "Biosamples", icon: <DnaIcon size={16}/>},
-            {href: "/toolkit/datasamples", label: "Data Samples", icon: <DatabaseIcon size={16}/>},
-        ],
+        href: "/profile", 
+        label: "Profile", 
+        icon: <UserIcon size={16}/>
     },
-    {href: "/requests", label: "Requests", icon: <ClipboardListIcon size={16}/>},
-    // {href: "/cohorts", label: "Cohorts", icon: <UsersIcon size={16}/>},
+    {
+        href: "/marketplace/biosamples",
+        label: "Marketplace",
+        icon: <Store size={16} />
+    },
+    {
+        href: "/requests", 
+        label: "Requests", 
+        icon: <ClipboardListIcon size={16}/>,
+        comingSoon: true
+    },
 ]
 
 export function ResearcherNavbarMenu() {
@@ -50,69 +56,50 @@ export function ResearcherNavbarMenu() {
     return (
         <NavigationMenu viewport={false} className="w-full">
             <NavigationMenuList>
-                {pages.map(({href, label, subpages, icon}) => (
+                {pages.map(({href, label,  icon, comingSoon}) => (
                     <NavigationMenuItem key={href}>
-                        {subpages ? (
-                            <>
-                                <NavigationMenuTrigger
-                                    className={`flex items-center gap-2 ${
-                                        isActive(pathname, href) ? "bg-muted text-foreground" : ""
-                                    }`}
+                        <NavigationMenuLink
+                            asChild
+                            className={navigationMenuTriggerStyle({
+                                className: `${isActive(pathname, href) ? "bg-muted text-foreground" : ""}`,
+                            })}
+                        >
+                            {comingSoon ? (
+                                <Tooltip key={href}>
+                                    <TooltipTrigger asChild>
+                                        <div
+                                            // href={""}
+                                            className={cn(
+                                                navigationMenuTriggerStyle({
+                                                    className: `${isActive(pathname, href) ? "bg-muted text-foreground" : ""}`,
+                                                }),
+                                                comingSoon ? "opacity-60" : "" // Disable click and add opacity
+                                            )}
+                                        >
+                                            <div className="flex flex-row items-center gap-2">
+                                                <div>{icon}</div>
+                                                <div>{label}</div>
+                                            </div>
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Coming soon!</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            ) : (
+                                <Link 
+                                    href={href}
+                                    className={cn(
+                                        comingSoon ? "pointer-events-none opacity-60" : "" // Disable click and add opacity
+                                    )}
                                 >
-                                    {icon}
-                                    {label}
-                                </NavigationMenuTrigger>
-                                <NavigationMenuContent>
-                                    <ul className="grid w-[200px] gap-2">
-                                        {subpages.map(({href: subHref, label: subLabel, icon: subIcon}) => (
-                                            <li key={subHref}>
-                                                <NavigationMenuLink asChild>
-                                                    <Link
-                                                        href={subHref}
-                                                        className={`${
-                                                            isActive(pathname, subHref)
-                                                                ? "text-foreground"
-                                                                : "text-muted-foreground"
-                                                        }`}
-                                                    >
-                                                        <div
-                                                            className={`flex flex-row items-center gap-2 text-sm font-medium`}
-                                                        >
-                                                            <div>
-                                                                {subIcon}
-                                                            </div>
-                                                            <div>
-                                                                {subLabel}
-                                                            </div>
-                                                        </div>
-                                                    </Link>
-                                                </NavigationMenuLink>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </NavigationMenuContent>
-                            </>
-                        ) : (
-                            <NavigationMenuLink
-                                asChild
-                                className={navigationMenuTriggerStyle({
-                                    className: `${
-                                        isActive(pathname, href) ? "bg-muted text-foreground" : ""
-                                    }`,
-                                })}
-                            >
-                                <Link href={href}>
                                     <div className="flex flex-row items-center gap-2">
-                                        <div>
-                                            {icon}
-                                        </div>
-                                        <div>
-                                            {label}
-                                        </div>
+                                        <div>{icon}</div>
+                                        <div>{label}</div>
                                     </div>
                                 </Link>
-                            </NavigationMenuLink>
-                        )}
+                            )}
+                        </NavigationMenuLink>
                     </NavigationMenuItem>
                 ))}
             </NavigationMenuList>

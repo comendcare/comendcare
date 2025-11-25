@@ -12,22 +12,22 @@ import {
   PopoverTrigger,
 } from "./../../../ui/popover";
 import { Separator } from "./../../../ui/separator";
-import { Slider } from "./../../../ui/slider";
+// import { Slider } from "./../../../ui/slider";
 import { cn } from "./../../../../../packages/lib/utils";
+import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "./../../../ui/select";
 
 interface Range {
   min: number;
   max: number;
 }
 
-type RangeValue = [number, number];
+type RangeValue = [number, number, string | undefined];
 
 function getIsValidRange(value: unknown): value is RangeValue {
   return (
     Array.isArray(value) &&
-    value.length === 2 &&
-    typeof value[0] === "number" &&
-    typeof value[1] === "number"
+    ((value.length === 2 && typeof value[0] === "number" && typeof value[1] === "number") ||
+    (value.length === 3 && typeof value[0] === "number" && typeof value[1] === "number" && typeof value[2] === "string"))
   );
 }
 
@@ -47,9 +47,10 @@ export function DataTableSliderFilter<TData>({
     : undefined;
 
   const defaultRange = column.columnDef.meta?.range;
-  const unit = column.columnDef.meta?.unit;
+  const defaultUnit = column.columnDef.meta?.unit;
+  const unitOptions = column.columnDef.meta?.unitOptions;
 
-  const { min, max, step } = React.useMemo<Range & { step: number }>(() => {
+  const { min, max, step, unit } = React.useMemo<Range & { step: number, unit: string | undefined }>(() => {
     let minValue = 0;
     let maxValue = 100;
 
@@ -77,12 +78,12 @@ export function DataTableSliderFilter<TData>({
           ? Math.ceil(rangeSize / 20)
           : Math.ceil(rangeSize / 50);
 
-    return { min: minValue, max: maxValue, step };
-  }, [column, defaultRange]);
+    return { min: minValue, max: maxValue, step, unit: defaultUnit };
+  }, [column, defaultRange, defaultUnit]);
 
   const range = React.useMemo((): RangeValue => {
-    return columnFilterValue ?? [min, max];
-  }, [columnFilterValue, min, max]);
+    return columnFilterValue ?? [min, max, unit];
+  }, [columnFilterValue, min, max, unit]);
 
   const formatValue = React.useCallback((value: number) => {
     return value.toLocaleString(undefined, { maximumFractionDigits: 0 });
@@ -92,7 +93,11 @@ export function DataTableSliderFilter<TData>({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const numValue = Number(event.target.value);
       if (!Number.isNaN(numValue) && numValue >= min && numValue <= range[1]) {
-        column.setFilterValue([numValue, range[1]]);
+        range[2] ? (
+          column.setFilterValue([numValue, range[1], range[2]])
+        ) : (
+          column.setFilterValue([numValue, range[1]])
+        )
       }
     },
     [column, min, range],
@@ -102,20 +107,31 @@ export function DataTableSliderFilter<TData>({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const numValue = Number(event.target.value);
       if (!Number.isNaN(numValue) && numValue <= max && numValue >= range[0]) {
-        column.setFilterValue([range[0], numValue]);
+        range[2] ? (
+          column.setFilterValue([range[0], numValue, range[2]])
+        ) : (
+          column.setFilterValue([range[0], numValue])
+        )
       }
     },
     [column, max, range],
   );
 
-  const onSliderValueChange = React.useCallback(
-    (value: RangeValue) => {
-      if (Array.isArray(value) && value.length === 2) {
-        column.setFilterValue(value);
-      }
+  const onUnitInputChange = React.useCallback(
+    (event: string) => {
+      column.setFilterValue([range[0], range[1], event])
     },
-    [column],
-  );
+    [column, unit, range],
+  )
+
+  // const onSliderValueChange = React.useCallback(
+  //   (value: RangeValue) => {
+  //     if (Array.isArray(value) && value.length === 2) {
+  //       column.setFilterValue(value);
+  //     }
+  //   },
+  //   [column],
+  // );
 
   const onReset = React.useCallback(
     (event: React.MouseEvent) => {
@@ -163,7 +179,7 @@ export function DataTableSliderFilter<TData>({
           <p className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             {title}
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <Label htmlFor={`${id}-from`} className="sr-only">
               From
             </Label>
@@ -180,13 +196,14 @@ export function DataTableSliderFilter<TData>({
                 max={max}
                 value={range[0]?.toString()}
                 onChange={onFromInputChange}
-                className={cn("h-8 w-24", unit && "pr-8")}
+                // className={cn("h-8 w-24", unit && "pr-8")}
+                className={cn("h-8 w-24")}
               />
-              {unit && (
+              {/* {unit && (
                 <span className="absolute top-0 right-0 bottom-0 flex items-center rounded-r-md bg-accent px-2 text-muted-foreground text-sm">
                   {unit}
                 </span>
-              )}
+              )} */}
             </div>
             <Label htmlFor={`${id}-to`} className="sr-only">
               to
@@ -204,16 +221,42 @@ export function DataTableSliderFilter<TData>({
                 max={max}
                 value={range[1]?.toString()}
                 onChange={onToInputChange}
-                className={cn("h-8 w-24", unit && "pr-8")}
+                // className={cn("h-8 w-24", unit && "pr-8")}
+                className={cn("h-8 w-24")}
               />
-              {unit && (
+              {/* {unit && (
                 <span className="absolute top-0 right-0 bottom-0 flex items-center rounded-r-md bg-accent px-2 text-muted-foreground text-sm">
                   {unit}
                 </span>
-              )}
+              )} */}
             </div>
+            {unitOptions && (
+              <div className="relative">
+                <Select 
+                  defaultValue={unit}
+                  value={range[2]}
+                  onValueChange={onUnitInputChange}
+                >
+                  <SelectTrigger className="h-8">
+                    <SelectValue placeholder="Select a unit">
+                      {unitOptions.find(option => option.value === range[2])?.label || 'All units'}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {unitOptions.map(option => (
+                      <SelectItem
+                        value={option.value}
+                        key={option.value}
+                      >
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
-          <Label htmlFor={`${id}-slider`} className="sr-only">
+          {/* <Label htmlFor={`${id}-slider`} className="sr-only">
             {title} slider
           </Label>
           <Slider
@@ -223,7 +266,7 @@ export function DataTableSliderFilter<TData>({
             step={step}
             value={range}
             onValueChange={onSliderValueChange}
-          />
+          /> */}
         </div>
         <Button
           aria-label={`Clear ${title} filter`}

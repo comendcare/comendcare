@@ -6,7 +6,7 @@ import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { useEffect, useState } from "react"
 import { getMilestones } from "@comend/lib/fetchers"
 import { useSession } from "next-auth/react"
-import { badgeVariants } from "@/packages/components/ui/badge"
+import { badgeVariants } from "@comend/components/ui/badge"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 

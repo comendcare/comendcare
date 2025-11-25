@@ -1,13 +1,12 @@
 import React from "react"
-import Image from "next/image"
-import { getSession } from "@/packages/lib/auth"
+import { getSession } from "@comend/lib/auth"
 import NoOrganization from "~web/components/no-organization"
-import { SearchParams } from "@/packages/components/types"
-import { biosampleSearchParamsCache } from "@/packages/lib/validations"
-import { getValidFilters } from "@/packages/lib/data-table"
+import { SearchParams } from "@comend/components/types"
+import { biosampleSearchParamsCache } from "@comend/lib/validations"
+import { getValidFilters } from "@comend/lib/data-table"
 import { PrivateDatasampleToolsPage } from "~web/components/private-datasample-tools-page"
-import { NewToolDialog } from "~web/components/edit-tool-dialog"
-import { getClinicalDatasets } from "@/packages/lib/fetchers"
+import { getClinicalDatasets } from "@comend/lib/fetchers"
+import { getClinicalDatasetsTableColumns } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/private-clinical-datasets-table-columns"
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +21,8 @@ export default async function DataToolsPage(props: IndexPageProps) {
     const search = biosampleSearchParamsCache.parse(searchParams);
     const validFilters = getValidFilters(search.filters);
     const globalFilter = search.q ?? "";
+
+    const columns = getClinicalDatasetsTableColumns({session: session as any})
 
     const {data, pageCount} = await getClinicalDatasets(
         session?.user.organizationId,
@@ -51,7 +52,9 @@ export default async function DataToolsPage(props: IndexPageProps) {
             organization: {include: {conditions: {include: {condition: true}}}},
             milestones: {include: {milestone: true}},
         },
-        {...search, q: globalFilter, filters: validFilters}
+        {...search, q: globalFilter, filters: validFilters},
+        false,
+        columns
     )
 
     // not part of an org

@@ -1,23 +1,18 @@
-"use client";
-
 import type {ColumnDef} from "@tanstack/react-table";
 import * as React from "react";
 import {DataTableColumnHeader} from "./../data-table/data-table-column-header";
-import {BIOSAMPLE_TYPE_OPTIONS} from "./../../../../../packages/lib/types";
+import {BIOSAMPLE_TYPE_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, QUANTITY_OPTIONS} from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
-import {usePathname} from "next/navigation";
 import { Badge } from "./../../../ui/badge";
+import { CircleDashed } from "lucide-react";
+import { handleAsyncCompanyAndInstitutionSearch, handleAsyncConditionSearch, handleAsyncDiagnosesSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils";
+import { ExtendedColumnFilter, ExtendedColumnSort } from "@comend/lib/types/data-table";
+import { filterColumns } from "@comend/lib/filter-columns";
+import { generateId } from "@comend/lib/id";
 
 type Preset = "default" | "profile";
-
-function useColumnsPreset(explicit?: Preset) {
-    const pathname = usePathname();
-    if (explicit) return explicit;
-    if (pathname?.startsWith("/app/profile")) return "profile";
-    return "default";
-}
 
 export function useBiosamplesTableColumns(
     enableSorting: boolean = true, 
@@ -25,14 +20,13 @@ export function useBiosamplesTableColumns(
     typesenseSearch: boolean = true,
     presetName?: Preset,
 ): ColumnDef<any>[] {
-    const preset = useColumnsPreset(presetName);
+    const preset = presetName || 'default'
 
     const columns: ColumnDef<any>[] = [
         {
             id: typesenseSearch
                 ? 'sortId.id' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
                 : 'id',
-            // id: "sortId.id", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "id",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -70,38 +64,10 @@ export function useBiosamplesTableColumns(
             enableSorting,
             meta: { label: "Donor ID" },
         },
-        // {
-        //     // id: presetName === "profile" 
-        //     //     ? "types" // profile sort id
-        //     //     : "type.label", // typesense sort id: must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-        //     id: "type.label",
-        //     accessorKey: "types",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader 
-        //             className="min-w-fit text-nowrap"
-        //             column={column} 
-        //             title="Type"
-        //         />
-        //     ),
-        //     cell: ({row}) => (
-        //         <>
-        //             {(row.original.types || []).map((type: string, index: number) => {
-        //                 const typeOption = BIOSAMPLE_TYPE_OPTIONS.find(t => t.value === type)
-        //                 return (
-        //                     <MilestoneTypeBadge label={typeOption?.label} key={index}/>
-        //                 )
-        //             })}
-        //         </>
-        //     ),
-        //     enableHiding,
-        //     enableSorting,
-        //     meta: { label: "Type" }
-        // },
         {
             id: typesenseSearch
                 ? 'type.label' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
                 : 'types',
-            // id: "type.label",
             accessorKey: "types",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -124,32 +90,117 @@ export function useBiosamplesTableColumns(
             enableColumnFilter: true,
             meta: {
                 label: "Type",
-                // variant: "multiSelect",
-                // options: BIOSAMPLE_TYPE_OPTIONS,
-                // icon: CircleDashed,
+                variant: "multiSelect",
+                options: BIOSAMPLE_TYPE_OPTIONS,
+                icon: CircleDashed,
             },
         },
+        // {
+        //     id: typesenseSearch
+        //         ? 'condition.name' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+        //         : 'organization.conditions',
+        //     accessorKey: "organization.conditions",
+        //     header: ({column}) => (
+        //         <DataTableColumnHeader 
+        //             className="min-w-fit text-nowrap"
+        //             column={column} 
+        //             title="Condition"
+        //         />
+        //     ),
+        //     cell: ({row}) => (
+        //         <div className="flex gap-2 items-center">
+        //             <p>{(row.original.organization?.conditions?.slice(0, 1) || []).map((condition: any) => condition?.condition?.name) || 'No Condition'}</p>
+        //         </div>
+        //     ),
+        //     enableHiding,
+        //     enableSorting: false,
+        //     enableColumnFilter: true,
+        //     meta: { 
+        //         label: "Condition",
+        //         variant: "multiSelect",
+        //         icon: CircleDashed,
+        //         showInAdvancedOnly: true,
+        //         dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+        //             const filters = [
+        //                 {
+        //                     ...filter,
+        //                     ...(Array.isArray(filter.value) ? {value: filter.value.map(conditionOption => ({condition: {name: conditionOption}}))} : undefined),
+        //                 } as any
+        //             ]
+        //             const results = filterColumns({
+        //                 filters,
+        //                 // join operator doesn't matter in this case because there will only be one entry in the list
+        //                 joinOperator: 'or'
+        //             })
+
+        //             return results
+        //         },
+        //         // sortAccessor: (sort: ExtendedColumnSort<unknown>) => {
+        //         //     const sortBy = {
+        //         //         organization: {
+        //         //             conditions: {
+        //         //                 // where: { isPrimary: true },      // only consider primary condition
+        //         //                 condition: { name: sort.desc ? "desc" : "asc" },
+        //         //                 take: 1
+        //         //             }
+        //         //         }
+        //         //     }
+        //         //     return sortBy
+        //         // },
+        //         onAsyncSearch: handleAsyncConditionSearch
+        //     }
+        // },
         {
-            id: typesenseSearch
-                ? 'condition.name' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-                : 'condition',
-            // id: "condition.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
-            accessorKey: "condition",
+            id: "donor.diagnoses",
+            accessorKey: "donor.diagnoses",
             header: ({column}) => (
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Condition"
+                    title="Diagnoses"
                 />
             ),
             cell: ({row}) => (
-                <div className="flex gap-2 items-center">
-                    <p>{(row.original.organization?.conditions || []).map((condition: any) => condition.condition.name) || 'No Condition'}</p>
-                </div>
+                <ul className="flex flex-col gap-2">
+                    {row.original.donor?.diagnoses?.map((diagnosis: any, index: number) => {
+                        const severityOption = DIAGNOSIS_SEVERITY_OPTIONS.find(option => option.value === diagnosis.severity)
+                        return (
+                            <li key={index} className="flex gap-2 items-center">
+                                <Badge>
+                                    {diagnosis?.type?.label} 
+                                </Badge>
+                                {severityOption && <Badge>{severityOption.label}</Badge>}
+                            </li>
+                        )
+                    })}
+                </ul>
             ),
-            enableHiding,
-            enableSorting,
-            meta: { label: "Condition" }
+            enableSorting: false,
+            enableHiding: true,
+            enableColumnFilter: true,
+            meta: {
+                label: "Diagnoses",
+                variant: "multiSelect",
+                // options: diagnosesOptions,
+                showInAdvancedOnly: true,
+                icon: CircleDashed,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        {
+                            ...filter,
+                            ...(Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
+                        } as any
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        // join operator doesn't matter in this case because there will only be one entry in the list
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
+                onAsyncSearch: handleAsyncDiagnosesSearch
+            }
         },
         {
             id: "gene.symbol", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -172,7 +223,14 @@ export function useBiosamplesTableColumns(
             ),
             enableHiding,
             enableSorting,
-            meta: { label: "Gene" }
+            enableColumnFilter: true,
+            meta: {
+                label: "Gene",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncGeneSearch
+            }
         },
         {
             id: typesenseSearch
@@ -189,9 +247,7 @@ export function useBiosamplesTableColumns(
             ),
             enableHiding,
             enableSorting,
-            meta: {
-                label: "Genotype"
-            }
+            meta: { label: "Genotype" }
         },
         {
             id: "organization.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -224,6 +280,14 @@ export function useBiosamplesTableColumns(
             ),
             enableHiding,
             enableSorting,
+            enableColumnFilter: true,
+            meta: { 
+                label: "Associated patient group",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                onAsyncSearch: handleAsyncOrganizationSearch
+            }
         },
         {
             id: "quantity", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
@@ -244,17 +308,44 @@ export function useBiosamplesTableColumns(
                             row.original.quantityUnit && 
                             row.original.quantity >= 0 
                         )
-                            ? `${row.original.quantity}${row.original.quantityUnit}`
+                            ? `${row.original.quantity} ${QUANTITY_OPTIONS.find(option => option.value === row.original.quantityUnit)?.label || row.original.quantityUnit}`
                             : ``
                     }
                 </>
             ),
             enableHiding,
             enableSorting,
-            meta: { label: "Inventory" }
+            enableColumnFilter: true,
+            meta: {
+                label: "Total available quantity",
+                variant: "range",
+                range: [0, 1000],
+                unitOptions: QUANTITY_OPTIONS,
+                icon: CircleDashed,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        filter,
+                        {
+                            id: 'quantityUnit',
+                            value: filter.value[2],
+                            variant: 'select' as any,
+                            operator: 'eq' as any,
+                            filterId: generateId({length: 8})
+                        }
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        joinOperator: 'and' // we want both of these itms to be true at the same time
+                    })
+
+                    return results
+                },
+            },
         },
         {
-            id: "institution.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+            id: typesenseSearch
+                ? 'institution.name' // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
+                : 'institution.name',
             accessorKey: "institution.name",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -275,8 +366,31 @@ export function useBiosamplesTableColumns(
                 )
             },
             enableHiding,
-            enableSorting,
-            meta: { label: "Stored with" }
+            enableSorting: false,
+            enableColumnFilter: true,
+            meta: {
+                label: "Stored with",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        filter,
+                        {
+                            ...filter,
+                            id: 'company.title',
+                            filterId: generateId({length: 8})
+                        }
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
+                onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
+            }
         },
         {
             id: "contacts",

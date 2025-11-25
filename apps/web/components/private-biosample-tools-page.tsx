@@ -1,35 +1,39 @@
 "use client"
 
 import * as React from "react";
-import {NewToolDialog} from "./edit-tool-dialog"
+import {EditAssetDialog, NewToolDialog} from "./edit-tool-dialog"
 import {DataTableSkeleton} from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import {DatabaseBiosamplesTable} from "@comend/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table"
-import {FeatureFlagsProvider} from "@/packages/components/biorepo/advanced-data-table/lib/feature-flags-provider";
-import {Shell} from "@/packages/components/biorepo/advanced-data-table/lib/shell";
+import {DatabaseBiosamplesTable} from "@comend/components/biorepo/advanced-data-table/biosamples-table/database-biosamples-table"
+import {FeatureFlagsProvider} from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
+import {Shell} from "@comend/components/biorepo/advanced-data-table/lib/shell";
 import {
     useBiosamplesTableColumns
-} from "@/packages/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table-columns";
+} from "@comend/components/biorepo/advanced-data-table/biosamples-table/private-biosamples-table-columns";
 import type {Biosample} from "@prisma/client";
 import {BiosampleBulkImportDialog} from "./biosample-bulk-import-dialog";
-import {SearchParams} from "@/packages/components/types";
+import {SearchParams} from "@comend/components/types";
 import {useEffect, useRef, useState} from "react";
-import {revalidate} from "@/packages/lib/revalidate";
-import { Button } from "@/packages/components/ui/button";
+import { Button } from "@comend/components/ui/button";
 import { Globe, Lock } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/packages/components/ui/tooltip";
-import { setBiosamplesVisibility } from "@/packages/lib/actions";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
+import { setBiosamplesVisibility } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
+import { Dialog, DialogPortal } from "@comend/components/ui/dialog";
+import { Row } from "@tanstack/react-table";
+import { Asset } from "@comend/lib/types";
+import Image from "next/image";
 
 export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     data: Biosample[],
     pageCount: number,
     searchParams: SearchParams
 }) => {
-    const columns = useBiosamplesTableColumns()
     const {data: session} = useSession()
+    const columns = useBiosamplesTableColumns({session})
     const [rowSelection, setRowSelection] = useState<Object[]>([])
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1100)
+    const [editingTool, setEditingTool] = useState<Partial<Asset> | undefined>(undefined)
     const parentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -128,8 +132,44 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                             columns={columns}
                             searchParams={searchParams}
                             onSelectionChange={setRowSelection}
+                            onRowClickCallback={(e: any, row: Row<any> | undefined) => setEditingTool(row?.original)}
                             showPagination={true}
-                            interactive={true}
+                            noResultsOverride={(
+                                <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
+                                    <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
+                                        <h1 className="font-cal text-4xl">You do not have any Biosample Tools</h1>
+                                        <Image
+                                            alt="No Biosample Tools"
+                                            src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                                            width={300}
+                                            height={300}
+                                        />
+                                        <p className="text-lg text-stone-500">
+                                            A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
+                                        </p>
+                                        {<NewToolDialog type={"biosample"}/>}
+                                    </div>
+                                </div>
+                            )}
+                            interactiveDialog={(
+                                <Dialog 
+                                    open={!!editingTool}
+                                    onOpenChange={(open) => !open && setEditingTool(undefined)}
+                                >
+                                    <DialogPortal>
+                                        <div onClick={(e) => e.stopPropagation()}>
+                                            {editingTool && (
+                                                <EditAssetDialog
+                                                    key={editingTool?.id}
+                                                    data={editingTool} 
+                                                    type={'biosample'}
+                                                    closeDialog={() => {setEditingTool(undefined)}}
+                                                />
+                                            )}
+                                        </div>
+                                    </DialogPortal>
+                                </Dialog>
+                            )}
                         />
                     </React.Suspense>
                 </FeatureFlagsProvider>

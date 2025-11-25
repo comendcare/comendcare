@@ -1,14 +1,14 @@
 "use client"
 
-import { TypesenseBiosamplesTable } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table"
-import { useBiosamplesTableColumns } from "@/packages/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns"
-import { ClinicalDatasetsTable } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table"
-import { useClinicalDatasetsTableColumns } from "@/packages/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
-import { DiseaseModelsTable } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table"
-import { useDiseaseModelsTableColumns } from "@/packages/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
-import { Button } from "@/packages/components/ui/button"
-import { Card, CardContent, CardTitle } from "@/packages/components/ui/card"
-import { Skeleton } from "@/packages/components/ui/skeleton"
+import { TypesenseBiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/typesense-biosamples-table"
+import { useBiosamplesTableColumns } from "@comend/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns"
+import { TypesenseClinicalDatasetsTable } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/typesense-clinical-datasets-table"
+import { useClinicalDatasetsTableColumns } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
+import { TypesenseDiseaseModelsTable } from "@comend/components/biorepo/advanced-data-table/disease-models-table/typesense-disease-models-table"
+import { useDiseaseModelsTableColumns } from "@comend/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
+import { Button } from "@comend/components/ui/button"
+import { Card, CardContent, CardTitle } from "@comend/components/ui/card"
+import { Skeleton } from "@comend/components/ui/skeleton"
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
@@ -18,19 +18,14 @@ import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
-import { CROMarketplaceCard } from "~web/components/marketplace/marketplace-cro-card"
-import { OrganizationMarketplaceCard } from "~web/components/marketplace/marketplace-pag-card"
-// import { OrganizationMarketplaceListElement } from "~web/components/marketplace/marketplace-pag-list-element"
-// import {getSavedCompaniesFromOrganizationId, getSavedOrganizationsFromOrganizationId} from "@/packages/lib/fetchers";
-// import {SavedCompany, SavedOrganization} from "@prisma/client";
-// import {useSession} from "next-auth/react";
-import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeRFPSearch } from "@/packages/lib/initialize-client-state"
-import { truncate } from "@/packages/lib/utils"
-import { RFPCard } from "~web/components/rfp-card"
+import { CROMarketplaceCard } from "@comend/components/marketplace/marketplace-cro-card"
+import { OrganizationMarketplaceCard } from "@comend/components/marketplace/marketplace-pag-card"
+import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeRFPSearch } from "@comend/lib/initialize-client-state"
+import { RFPCard } from "@comend/components/rfp-card"
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
-import { Dialog, DialogContent, DialogTrigger } from "@/packages/components/ui/dialog"
-import { mixpanelTrack } from "@/packages/lib/mixpanel"
-import { RFPDetails } from "~web/components/pag-profile-rfps-card"
+import { Dialog, DialogContent, DialogTrigger } from "@comend/components/ui/dialog"
+import { mixpanelTrack } from "@comend/lib/mixpanel"
+import { RFPDetails } from "@comend/components/pag-profile-rfps-card"
 
 const croSelector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -376,7 +371,7 @@ export default function MarketplacePage() {
                             ? (
                                 <>
                                     <div className="max-w-7xl w-full overflow-auto">
-                                        <DiseaseModelsTable showPagination={false} data={diseaseModelStore.searchResults?.slice(0, 3)} pageCount={1} columns={diseaseModelColumns} searchParams={{}}/>
+                                        <TypesenseDiseaseModelsTable showPagination={false} data={diseaseModelStore.searchResults?.slice(0, 3)} pageCount={1} columns={diseaseModelColumns} searchParams={{}}/>
                                     </div>
                                 </>
                             )
@@ -427,7 +422,7 @@ export default function MarketplacePage() {
                             ? (
                                 <>
                                     <div className="max-w-7xl w-full overflow-auto">
-                                        <ClinicalDatasetsTable showPagination={false} data={clinicalDatasetStore.searchResults?.slice(0, 3)} pageCount={1} columns={clinicalDatasetColumns} searchParams={{}}/>
+                                        <TypesenseClinicalDatasetsTable showPagination={false} data={clinicalDatasetStore.searchResults?.slice(0, 3)} pageCount={1} columns={clinicalDatasetColumns} searchParams={{}}/>
                                     </div>
                                 </>
                             )

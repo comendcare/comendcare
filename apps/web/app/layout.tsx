@@ -1,4 +1,4 @@
-import "@/globals.css"
+import "./../../../globals.css"
 import {ThemeProvider} from "~web/app/theme-provider"
 import type {Metadata, ResolvingMetadata} from "next"
 import {Analytics} from '@vercel/analytics/next';
@@ -7,13 +7,13 @@ import {Analytics} from '@vercel/analytics/next';
 import {Poppins, Source_Sans_3} from "next/font/google"
 import {Providers} from "~web/app/providers"
 import {Suspense} from "react"
-import Loading from "@/loading";
+import Loading from "./../../../loading";
 import {onbordaTours} from "@/state/onborda/onbordaStore";
 import Onborda from "~web/components/onborda/Onborda";
 import OnboardingCard from "~web/components/onboarding-card";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/packages/lib/auth";
-import CustomerIOSnippet from "@/packages/components/customerio";
+import { authOptions } from "@comend/lib/auth";
+import CustomerIOSnippet from "@comend/components/customerio";
 import { headers } from 'next/headers';
 import { CookieyesScripts } from "@comend/lib/cookie-yes-scripts";
 

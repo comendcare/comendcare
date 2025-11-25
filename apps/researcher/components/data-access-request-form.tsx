@@ -18,9 +18,9 @@ import LoadingDots from "@comend/components/icons/loading-dots"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comend/components/ui/card"
 import {ArrowLeft, FileText} from "lucide-react";
 import { createMaterialAndDataAccessRequest } from "@comend/lib/actions"
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/packages/components/ui/select";
-import type {Option} from "@/packages/lib/types";
-import {getAllOrganizations} from "@/packages/lib/fetchers";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
+import type { Option } from "@comend/lib/types"
+import { getAllOrganizations } from "@comend/lib/fetchers"
 
 const dataAccessRequestSchema = z.object({
     // Basic Request Info

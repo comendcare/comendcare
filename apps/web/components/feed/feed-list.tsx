@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import {FeedCard} from "~web/components/feed/feed-card-registry";
-import type {FeedItemDTO, FeedPageDTO} from "@/packages/lib/types";
+import type {FeedItemDTO, FeedPageDTO} from "@comend/lib/types";
 import { Button } from "@comend/components/ui/button";
 
 

@@ -1,5 +1,5 @@
-import { TooltipProvider } from "@/packages/components/ui/tooltip"
-import { getSession } from "@/packages/lib/auth"
+import { TooltipProvider } from "@comend/components/ui/tooltip"
+import { getSession } from "@comend/lib/auth"
 import prisma from "@comend/lib/prisma"
 import { notFound, redirect } from "next/navigation"
 import InviteUserToOrgDialog from "~admin/components/invite-user-to-org-dialog"

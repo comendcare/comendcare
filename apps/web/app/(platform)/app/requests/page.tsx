@@ -1,8 +1,8 @@
 import NoOrganization from "~web/components/no-organization"
 import RequestStats from "@comend/components/requests/request-stats";
 import * as React from "react"
-import {getAllOrganizationRequests} from "@/packages/lib/fetchers";
-import {getSession} from "@/packages/lib/auth";
+import {getAllOrganizationRequests} from "@comend/lib/fetchers";
+import {getSession} from "@comend/lib/auth";
 import RequestHistory from "~web/components/requests/request-history";
 import RequestToolbar from "~web/components/requests/request-toolbar";
 

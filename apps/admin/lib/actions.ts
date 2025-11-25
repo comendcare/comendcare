@@ -4,16 +4,16 @@ import prisma from "@comend/lib/prisma"
 import type {Company, Organization} from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withAdminAuth} from "./auth"
-import {getSession} from "@/packages/lib/auth"
+import {getSession} from "@comend/lib/auth"
 import {addTypeSenseDocument, deleteTypeSenseDocument, updateTypeSenseDocument} from "@comend/lib/utils";
 import {getCategoriesAndMilestones} from "@comend/lib/utils"
 import { JsonValue } from "@prisma/client/runtime/library"
 import {writeRawEvent} from "@comend/lib/raw-events";
 import z from "zod"
 import { companyFormSchema, institutionFormSchema } from "./types"
-import { ApiResponse } from "@/packages/lib/types"
-import { validateEmailDomain } from "@/packages/lib/server-utils"
-import { sendInviteEmail } from "@/packages/lib/emails"
+import { ApiResponse } from "@comend/lib/types"
+import { validateEmailDomain } from "@comend/lib/server-utils"
+import { sendInviteEmail } from "@comend/lib/emails"
 
 export const getSessionInfo = async () => {
     const session = await getSession()

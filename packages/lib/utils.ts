@@ -1,23 +1,59 @@
 import {type ClassValue, clsx} from "clsx"
 import {twMerge} from "tailwind-merge"
 import {Active, DataRef, Over} from "@dnd-kit/core";
-import {ColumnDragData, TaskDragData} from "./types";
-import {identicon, personas} from "@dicebear/collection";
-import {createAvatar} from "@dicebear/core";
-import {formatDistanceToNowStrict} from "date-fns";
 import {
+    ACADEMIC_ROLES,
+    ColumnDragData,
     Condition,
     CustomOrganization,
     ImportField,
+    Milestone,
     MILESTONE_TYPE_OPTIONS,
     milestoneCategories,
-    MilestoneKey,
-    Milestone, 
+    MilestoneKey, MODALITIES,
     Option,
-    Task
+    Task,
+    TaskDragData
 } from "./types";
+import {identicon, personas} from "@dicebear/collection";
+import {createAvatar} from "@dicebear/core";
+import {formatDistanceToNowStrict} from "date-fns";
 import Papa from "papaparse";
-import type { RFP } from "@prisma/client";
+import type {RFP} from "@prisma/client";
+
+export const getStatusColor = (status: string) => {
+    switch (status) {
+        case "APPROVED":
+            return "bg-green-100 text-green-800 border-green-200 hover:bg-green-100"
+        case "PENDING":
+            return "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100"
+        case "IN-PROGRESS":
+            return "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100"
+        case "REJECTED":
+            return "bg-red-100 text-red-800 border-red-200 hover:bg-red-100"
+        case "COMPLETED":
+            return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-100"
+        default:
+            return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-100"
+    }
+}
+
+export const getStatusText = (status: string) => {
+    switch (status) {
+        case "APPROVED":
+            return "Approved"
+        case "PENDING":
+            return "Under Review"
+        case "IN-PROGRESS":
+            return "In Progress"
+        case "REJECTED":
+            return "Rejected"
+        case "COMPLETED":
+            return "Completed"
+        default:
+            return status
+    }
+}
 
 const STATUS_PRIORITY = {
   'OPEN': 1,
@@ -173,8 +209,51 @@ export function typesenseSortByFromColumnId(id: string, desc: boolean): string {
     return `${id}:${direction}`;
 }
 
+export const handleAsyncOrganizationSearch = async (query?: string | undefined): Promise<Option[]> => {
+    try {
+        const response = await fetch(`/api/organizations?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data;
+    } catch (error) {
+        console.error("Failed to fetch organizations:", error);
+        return [];
+    }
+}
+
+export const handleAsyncConditionSearch = async (query?: string | undefined): Promise<Option[]> => {
+    // if (!query) return []; // Return empty if no input
+
+    try {
+        const response = await fetch(`/api/conditions?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data;
+    } catch (error) {
+        console.error("Failed to fetch conditions:", error);
+        return [];
+    }
+}
+
+export const handleAsyncDiagnosesSearch = async (query?: string | undefined): Promise<Option[]> => {
+    // if (!query) return []; // Return empty if no input
+
+    try {
+        const response = await fetch(`/api/diagnoses?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data;
+    } catch (error) {
+        console.error("Failed to fetch diagnoses:", error);
+        return [];
+    }
+};
+
 export const handleAsyncGeneSearch = async (query?: string | undefined): Promise<Option[]> => {
-    if (!query) return []; // Return empty if no input
+    // if (!query) return []; // Return empty if no input
 
     try {
         const response = await fetch(`/api/genes?search=${query}`);
@@ -188,8 +267,15 @@ export const handleAsyncGeneSearch = async (query?: string | undefined): Promise
     }
 };
 
+export const handleAsyncCompanyAndInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
+    const companies = await handleAsyncCompanySearch(query)
+    const institutions = await handleAsyncInstitutionSearch(query)
+
+    return companies.concat(institutions)
+}
+
 export const handleAsyncInstitutionSearch = async (query?: string | undefined): Promise<Option[]> => {
-    if (!query) return []; // Return empty if no input
+    // if (!query) return []; // Return empty if no input
 
     try {
         const response = await fetch(`/api/institutions?search=${query}`);
@@ -203,8 +289,24 @@ export const handleAsyncInstitutionSearch = async (query?: string | undefined): 
     }
 };
 
+export const handleAsyncCompanySearch = async (query?: string | undefined): Promise<Option[]> => {
+    // if (!query) return []; // Return empty if no input
+
+    try {
+        const response = await fetch(`/api/companies?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data.map((company: Option) => ({label: company.label, value: company.label}));
+    } catch (error) {
+        console.error("Failed to fetch companies:", error);
+        return [];
+    }
+};
+
 export const handleAsyncMilestoneSearch = async (organizationId: string | null | undefined, query?: string | undefined): Promise<Option[]> => {
-    if (!query || !organizationId) return []
+    // if (!query || !organizationId) return []
+    if (!organizationId) return []
 
     try {
         const response = await fetch(`/api/milestones?search=${query}&orgId=${organizationId}`);
@@ -213,7 +315,7 @@ export const handleAsyncMilestoneSearch = async (organizationId: string | null |
         // Return the fetched options
         return data
     } catch (error) {
-        console.error("Failed to fetch institutions:", error);
+        console.error("Failed to fetch projects:", error);
         return [];
     }
 }
@@ -805,3 +907,22 @@ export function getCategoriesAndMilestones(services: string[]) {
         milestoneTypes: Array.from(milestoneSet),
     };
 }
+
+export const mapTitleToValue = (
+    title?: string | null
+): string | undefined => {
+    if (!title) return undefined;
+
+    const match = ACADEMIC_ROLES.find(
+        (role) =>
+            role.id === title ||
+            role.value === title ||
+            role.label === title
+    );
+
+    return match?.label;
+};
+
+export const mapModalityValueToLabel = (value: string) => {
+    return MODALITIES.find(m => m.value === value)?.label ?? value;
+};

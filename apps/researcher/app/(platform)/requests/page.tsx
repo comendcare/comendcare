@@ -1,49 +1,58 @@
-import RequestStats from "@/packages/components/requests/request-stats";
-import * as React from "react"
-import {getAllResearcherRequests} from "@/packages/lib/fetchers";
-import {getSession} from "@/packages/lib/auth";
-import RequestToolbar from "~researcher/components/requests/request-toolbar";
-import RequestHistory from "~researcher/components/requests/request-history";
+// import RequestStats from "@comend/components/requests/request-stats";
+// import * as React from "react"
+// import {getAllResearcherRequests} from "@comend/lib/fetchers";
+// import {getSession} from "@comend/lib/auth";
+// import RequestToolbar from "~researcher/components/requests/request-toolbar";
+// import RequestHistory from "~researcher/components/requests/request-history";
+import { redirect } from "next/navigation";
 
-function calculateStats(requests: any[]) {
-    const totalRequests = requests.length;
+export default function ResearcherAccessRequestsPage() {
+    // Redirect to the target page immediately
+    redirect('/profile');
 
-    const approvedRequests = requests.filter(req => req.status === 'APPROVED');
-    const pendingRequests = requests.filter(req => req.status === 'PENDING');
-    const approvalRate = totalRequests
-        ? ((approvedRequests.length / totalRequests) * 100).toFixed(0) + "%"
-        : "0%";
-
-    const totalSamples = requests.reduce((sum, req) => sum + (req.sampleCount || 0), 0);
-
-    return [
-        { name: 'Total Requests Submitted', value: totalRequests.toString() },
-        { name: 'Pending Requests', value: pendingRequests.length.toString() },
-        { name: 'Samples Received', value: totalSamples.toString() },
-        { name: 'Approval Rate', value: approvalRate },
-    ];
+    // You can return null because this page won't render
+    return null;
 }
 
-export default async function ResearcherAccessRequestsPage() {
-    const session = await getSession()
+// function calculateStats(requests: any[]) {
+//     const totalRequests = requests.length;
 
-    let requestsData = []
-    if (session?.user?.id) {
-        const response = await getAllResearcherRequests(session.user.id)
-        if (response.success) {
-            requestsData = response.data
-        } else {
-            console.error(response.error)
-        }
-    }
+//     const approvedRequests = requests.filter(req => req.status === 'APPROVED');
+//     const pendingRequests = requests.filter(req => req.status === 'PENDING');
+//     const approvalRate = totalRequests
+//         ? ((approvedRequests.length / totalRequests) * 100).toFixed(0) + "%"
+//         : "0%";
 
-    const stats = calculateStats(requestsData)
+//     const totalSamples = requests.reduce((sum, req) => sum + (req.sampleCount || 0), 0);
 
-    return (
-        <div className="flex max-w-screen-xl flex-col mx-auto space-y-8 p-8">
-            <RequestStats stats={stats} />
-            <RequestToolbar />
-            <RequestHistory />
-        </div>
-    )
-}
+//     return [
+//         { name: 'Total Requests Submitted', value: totalRequests.toString() },
+//         { name: 'Pending Requests', value: pendingRequests.length.toString() },
+//         { name: 'Samples Received', value: totalSamples.toString() },
+//         { name: 'Approval Rate', value: approvalRate },
+//     ];
+// }
+
+// export default async function ResearcherAccessRequestsPage() {
+//     const session = await getSession()
+
+//     let requestsData = []
+//     if (session?.user?.id) {
+//         const response = await getAllResearcherRequests(session.user.id)
+//         if (response.success) {
+//             requestsData = response.data
+//         } else {
+//             console.error(response.error)
+//         }
+//     }
+
+//     const stats = calculateStats(requestsData)
+
+//     return (
+//         <div className="flex max-w-screen-xl flex-col mx-auto space-y-8 p-8">
+//             <RequestStats stats={stats} />
+//             <RequestToolbar />
+//             <RequestHistory />
+//         </div>
+//     )
+// }

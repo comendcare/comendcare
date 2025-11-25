@@ -1,4 +1,4 @@
-import React, {memo, useEffect, useRef, useState} from "react"
+import React, {memo, useEffect, useState} from "react"
 import {
     Handle,
     Position,
@@ -13,28 +13,20 @@ import {Button} from "@comend/components/ui/button"
 import {
     Card,
     CardContent,
-    CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle
 } from "@comend/components/ui/card"
-import StatusButton from "./milestone-status-button"
-import {truncate, cn, formatMoney} from "@comend/lib/utils"
-import {DateView} from "./miletone-date-view"
-import {PrivateBadge} from "./private-badge"
+import StatusButton from "@comend/components/milestone-status-button"
+import {cn, formatMoney} from "@comend/lib/utils"
+import {DateView} from "@comend/components/milestone-date-view"
 import {Badge, badgeVariants} from "@comend/components/ui/badge"
-import {BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, Milestone, StatusType} from "@comend/lib/types"
-import {RoadmapState, useRoadmapStore} from "~web/state/roadmap/roadmapStore"
+import {Milestone, StatusType} from "@comend/lib/types"
+import {RoadmapState, useRoadmapStore} from "./../state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-// import {PublicMilestoneNode} from "./public-milestone-node"
-import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge"
-import { Box, Calendar, ExternalLink, Megaphone, Microscope, Plus, Trash, User, Lock, BadgeAlert, DollarSign, TestTubeDiagonal, Rat, Database, Globe } from "lucide-react"
+import { ExternalLink, Microscope, Plus, Trash, User, DollarSign } from "lucide-react"
 import { ProjectActionsMenu } from "./project-actions-menu"
-import { Separator } from "@/packages/components/ui/separator"
-import { Tooltip, TooltipContent } from "@/packages/components/ui/tooltip"
-import { TooltipTrigger } from "@/packages/components/plate-ui/tooltip"
 import { Organization } from "@prisma/client"
-import { PublicPrivateButton } from "./public-private-button"
+import { PublicPrivateButton } from "@comend/components/public-private-button"
 
 export type MilestoneNodeType = Node<
     Milestone & {

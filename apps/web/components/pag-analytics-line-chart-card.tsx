@@ -2,12 +2,12 @@
 
 import {useState, useEffect} from "react";
 import {ResponsiveContainer, Line, LineChart, XAxis, YAxis, Tooltip, CartesianGrid} from "recharts";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/packages/components/ui/card";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {Button} from "@comend/components/ui/button";
 import {useRouter} from "next/navigation";
 import {ExternalLink} from "lucide-react"
 import Link from "next/link";
-import {OrganizationForAnalytics} from "@/packages/lib/types";
+import {OrganizationForAnalytics} from "@comend/lib/types";
 
 type Point = { date: string; pageViews: number };
 

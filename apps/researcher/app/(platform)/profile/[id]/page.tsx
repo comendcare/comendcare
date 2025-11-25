@@ -1,7 +1,13 @@
 import React from "react";
 import ResearcherProfile from "~researcher/components/researcher-profile";
-import {getSession} from "@/packages/lib/auth";
-import {getResearcherWithMergedDataAdvanced, getResearcherWithMergedData} from "@comend/lib/fetchers";
+import {getSession} from "@comend/lib/auth";
+import {
+    getResearcherWithMergedDataAdvanced,
+    getResearcherWithMergedData,
+    getResearcher,
+    getResearcherPublications, getResearcherMetrics,
+    getResearcherFromUserID
+} from "@comend/lib/fetchers";
 
 export default async function ResearcherProfilePage({
                                                   params
@@ -11,33 +17,27 @@ export default async function ResearcherProfilePage({
     const id = decodeURIComponent(params.id)
     const session = await getSession()
 
-    // let researcherData
-    // if (session?.user?.id) {
-    //     const response = await getResearcher(session.user.id, {
-    //         id: true,
-    //         orcid: true,
-    //         email: true,
-    //         emailHash: true,
-    //         title: true,
-    //         name: true,
-    //         researchInterests: true,
-    //         conditionsOfInterest: true,
-    //         genesOfInterest: true,
-    //         affiliations: true,
-    //         createdAt: true,
-    //         updatedAt: true,
-    //         metadata: true
-    //     });
-    //     if (response.success) {
-    //         researcherData = response.data
-    //     } else {
-    //         console.error(response.error)
-    //     }
-    // }
-
     let researcherData
     if (session?.user?.id) {
-        const response = await getResearcherWithMergedDataAdvanced(session.user.id)
+        const response = await getResearcherFromUserID(
+            session.user.id, 
+            {
+                id: true,
+                orcid: true,
+                title: true,
+                user: true,
+                country: true,
+                description: true,
+                researchInterests: true,
+                therapeuticsOfInterest: true,
+                conditionsOfInterest: true,
+                genesOfInterest: true,
+                affiliations: true,
+                createdAt: true,
+                updatedAt: true,
+                metadata: true
+            }
+        );
         if (response.success) {
             researcherData = response.data
         } else {
@@ -45,7 +45,31 @@ export default async function ResearcherProfilePage({
         }
     }
 
+    let publications
+    if (session?.user?.id) {
+        const response = await getResearcherPublications(session.user.id)
+        if (response.success) {
+            publications = response.data
+        } else {
+            console.error(response.error)
+        }
+    }
+
+    let metrics
+    if (session?.user?.id) {
+        const response = await getResearcherMetrics(session.user.id)
+        if (response.success) {
+            metrics = response.data
+        } else {
+            console.error(response.error)
+        }
+    }
+
     return (
-        <ResearcherProfile researcherData={researcherData}/>
+        <ResearcherProfile
+            researcherData={researcherData}
+            publications={publications}
+            metrics={metrics}
+        />
     )
 }

@@ -61,6 +61,7 @@ export function getDefaultFilterOperator(filterVariant: FilterVariant) {
   if (operators[0]?.value) {
     if (filterVariant === 'text') return 'iLike'
     if (filterVariant === 'range') return 'isBetween'
+    if (filterVariant === 'multiSelect') return 'inArray'
   }
 
   return 'eq'

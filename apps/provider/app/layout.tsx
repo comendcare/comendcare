@@ -1,4 +1,4 @@
-import "@/globals.css"
+import "./../../../globals.css"
 import { ThemeProvider } from "~provider/theme-provider"
 import type { Metadata, ResolvingMetadata } from "next"
 import { Analytics } from '@vercel/analytics/next';
@@ -10,7 +10,7 @@ import { Providers } from "~provider/providers"
 // import OnboardingCard from "@comend/components/ui/onboarding-card"
 // import { Tour } from "@comend/components/onborda/types"
 import { Suspense } from "react"
-import Loading from "@/loading";
+import Loading from "./../../../loading";
 import { CookieyesScripts } from "@comend/lib/cookie-yes-scripts";
 
 // Set up Playfair Display and Source Sans 3 fonts

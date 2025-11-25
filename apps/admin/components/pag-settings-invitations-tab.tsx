@@ -1,7 +1,7 @@
 import Image from "next/image"
 import { ProfilePhoto } from "@comend/components/profile-photo"
 import {Invitation, Prisma} from "@prisma/client";
-import {getSession} from "@/packages/lib/auth";
+import {getSession} from "@comend/lib/auth";
 
 export default async function PAGSettingsInvitationsTab({organization}: {organization: Prisma.OrganizationGetPayload<{
         include: { invitations: true };

@@ -6,8 +6,8 @@ import { toast } from "sonner"
 import { Button } from "@comend/components/ui/button"
 import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogTitle } from "@comend/components/ui/dialog"
 import { usePathname } from "next/navigation"
-import { revalidate } from "@/packages/lib/revalidate"
-import { deleteBiosample } from "@/packages/lib/actions"
+import { revalidate } from "@comend/lib/revalidate"
+import { deleteBiosample } from "@comend/lib/actions"
 
 export const DeleteBiosampleDialog = ({toolId, closeDialog}: {toolId: string | undefined, closeDialog?: () => void}) => {
     const {data: session} = useSession()

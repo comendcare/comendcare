@@ -1,13 +1,13 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import PAGAnalyticsLineChartCard from "~web/components/pag-analytics-line-chart-card";
 import {Workflow, ExternalLink, Microscope, Megaphone} from "lucide-react";
-import {getSession} from "@/packages/lib/auth";
+import {getSession} from "@comend/lib/auth";
 import {DashboardProjectsStatusCard} from "~web/components/dashboard-projects-status-card";
 import PAGAnalyticsToolsCard from "~web/components/pag-analytics-tools-card";
 import PAGAnalyticsProfileCard from "~web/components/pag-analytics-profile-card";
 import {Button} from "@comend/components/ui/button";
 import Link from "next/link";
-import {OrganizationForAnalytics} from "@/packages/lib/types";
+import {OrganizationForAnalytics} from "@comend/lib/types";
 
 export default async function PAGDashboardAnalyticsTab({organization}: {organization: OrganizationForAnalytics}) {
     const session = await getSession()

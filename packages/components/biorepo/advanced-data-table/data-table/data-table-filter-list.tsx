@@ -458,7 +458,7 @@ function DataTableFilterItem<TData>({
           <PopoverContent
             id={fieldListboxId}
             align="start"
-            className="w-40 origin-[var(--radix-popover-content-transform-origin)] p-0"
+            className="w-200 origin-[var(--radix-popover-content-transform-origin)] p-0"
           >
             <Command>
               <CommandInput placeholder="Search fields..." />
@@ -893,10 +893,6 @@ export function AsyncFacetedContent({
     setLoading(false)
   }, 300)
 
-  useEffect(() => {
-    console.log(`options changed`, options)
-  }, [options])
-
   return (
     <FacetedContent
       id={inputListboxId}
@@ -916,7 +912,6 @@ export function AsyncFacetedContent({
         ) : (
           <FacetedGroup>
             {options.map((option) => {
-              console.log(`OPTION`, option)
               return (
                 <FacetedItem key={option.value} value={String(option.value)}>
                   {option.icon && <option.icon />}

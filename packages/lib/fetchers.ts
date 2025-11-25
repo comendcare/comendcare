@@ -46,6 +46,8 @@ import {
 } from "./validations";
 import {notFound, redirect} from "next/navigation";
 import {switchOrganization} from "./actions";
+import { ColumnDef } from "@tanstack/react-table";
+import { ExtendedColumnSort } from "@comend/lib/types/data-table";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function findInstitutions(
@@ -1587,14 +1589,9 @@ export const getConditionsFromOrganizationId = withOrganizationAuth(
                     },
                 },
                 select: {
-                    ...select, // your existing scalar selections
-                    associatedConditions: {
-                        select: {
-                            id: true,
-                            name: true,
-                            slug: true,
-                        },
-                    },
+                    ...select,
+                    // ensure we don't try to nest-select on a scalar
+                    ...(select.associatedConditions ? {} : { associatedConditions: true }),
                 },
             });
 
@@ -2120,9 +2117,9 @@ export async function getTopPubMedPublications(keyword?: string) {
     }
 }
 
-export const getResearcher = withUserAuth(
+export const getResearcherFromUserID = withUserAuth(
     async (
-        researcher: Researcher,
+        user: User,
         select: Prisma.ResearcherSelect<InternalArgs & {
             result: {};
             model: {};
@@ -2130,10 +2127,47 @@ export const getResearcher = withUserAuth(
             client: {};
         }>
     ) => {
+        const session = await getSession();
+        if (!session?.user?.id) return { success: false, error: "No session or user id" };
+
         try {
             const fetchedResearcher = await prisma.researcher.findUnique({
-                where: {id: researcher.id},
-                // include: {organizations: true},
+                where: {userId: user.id},
+                select
+            })
+
+            if (!fetchedResearcher) {
+                return {success: false, error: "Researcher not found"};
+            }
+
+            return {
+                success: true,
+                data: fetchedResearcher
+            };
+        } catch (error: any) {
+            logError("Error fetching researcher", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const getResearcher = withUserAuth(
+    async (
+        userId: string,
+        researcherId: string,
+        select: Prisma.ResearcherSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        const session = await getSession();
+        if (!session?.user?.id) return { success: false, error: "No session or user id" };
+
+        try {
+            const fetchedResearcher = await prisma.researcher.findUnique({
+                where: {id: researcherId},
                 select
             })
 
@@ -2359,6 +2393,278 @@ export const getResearcherFromOrcidApi = withUserAuth(
     }
 );
 
+export interface RawPublication {
+    source: "openalex" | "crossref" | "europe_pmc" | "datacite";
+    doi: string | null;
+    title: string | null;
+    year: number | null;
+    type?: string | null;
+    venue?: string | null;
+    citations?: number | null;
+    authors?: string[];
+    raw: any;
+}
+
+function normalizeKey(p: RawPublication): string | null {
+    const doi = p.doi?.trim().toLowerCase();
+    if (doi) return `doi:${doi}`;
+
+    const title = p.title?.trim().toLowerCase();
+    const year = p.year ?? "";
+    if (title) return `title:${title}|year:${year}`;
+
+    return null;
+}
+
+export const getResearcherMetrics = withUserAuth(async () => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "No session found" };
+
+    const researcher = await prisma.researcher.findUnique({
+        where: { userId: session.user.id },
+        select: { orcid: true },
+    });
+
+    if (!researcher) return { success: false, error: "Researcher not found" };
+    if (!researcher.orcid) return { success: false, error: "No ORCID available" };
+
+    let openAlex: any = null;
+
+    const res = await fetch(
+        `https://api.openalex.org/authors?filter=orcid:${encodeURIComponent(researcher.orcid)}`
+    );
+
+    if (res.ok) {
+        const json = await res.json();
+        openAlex = json.results?.[0] ?? null;
+    }
+
+    if (!openAlex) {
+        return {
+            success: true,
+            data: {
+                citations: 0,
+                hIndex: 0,
+                publications: 0,
+                yearsActive: 0,
+            },
+        };
+    }
+
+    const metrics = {
+        citations: openAlex.cited_by_count ?? 0,
+        hIndex: openAlex.summary_stats?.h_index ?? 0,
+        publications: openAlex.works_count ?? 0,
+        yearsActive: openAlex.counts_by_year ? openAlex.counts_by_year.length : 0,
+    };
+
+    return { success: true, data: metrics };
+});
+
+export const getResearcherPublications = withUserAuth(
+    async (userId?: string) => {
+        const session = await getSession();
+        if (!session?.user?.id) return { success: false, error: "No session or user id" };
+
+        const dbResearcher = await prisma.researcher.findUnique({
+            where: { userId: session?.user?.id },
+        });
+
+        if (!dbResearcher) {
+            return { success: false, error: "Researcher not found" };
+        }
+
+        const hasOrcid = !!dbResearcher.orcid;
+        if (!hasOrcid) {
+            return { success: true, data: [] as RawPublication[] };
+        }
+
+        const orcid = dbResearcher.orcid as string;
+
+        // ---- OpenAlex author + works ----
+        let openAlexPublications: any[] = [];
+        try {
+            const authorRes = await fetch(
+                `https://api.openalex.org/authors?filter=orcid:${encodeURIComponent(
+                    orcid
+                )}`
+            );
+            if (authorRes.ok) {
+                const authorJson = await authorRes.json();
+                const openAlexAuthor = authorJson.results?.[0];
+                if (openAlexAuthor?.works_api_url) {
+                    const worksRes = await fetch(
+                        `${openAlexAuthor.works_api_url}&per-page=25`
+                    );
+                    if (worksRes.ok) {
+                        const worksJson = await worksRes.json();
+                        openAlexPublications = worksJson.results || [];
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("OpenAlex fetch error", e);
+        }
+
+        // ---- Crossref, Europe PMC, DataCite in parallel ----
+        let crossrefItems: any[] = [];
+        let europePmcResults: any[] = [];
+        let dataciteItems: any[] = [];
+
+        try {
+            const [crRes, epmcRes, dcRes] = await Promise.all([
+                fetch(
+                    `https://api.crossref.org/works?filter=orcid:${encodeURIComponent(
+                        orcid
+                    )}&rows=25`
+                ),
+                fetch(
+                    `https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=ORCID:${encodeURIComponent(
+                        orcid
+                    )}&format=json&pageSize=25`
+                ),
+                fetch(
+                    `https://api.datacite.org/dois?query=creators.nameIdentifiers.nameIdentifier:${encodeURIComponent(
+                        orcid
+                    )}&page[size]=25`
+                ),
+            ]);
+
+            const [crossref, epmc, datacite] = await Promise.all([
+                crRes.ok ? crRes.json() : Promise.resolve(null),
+                epmcRes.ok ? epmcRes.json() : Promise.resolve(null),
+                dcRes.ok ? dcRes.json() : Promise.resolve(null),
+            ]);
+
+            crossrefItems = crossref?.message?.items ?? [];
+            europePmcResults = epmc?.resultList?.result ?? [];
+            dataciteItems = datacite?.data ?? [];
+        } catch (e) {
+            console.error("Secondary sources fetch error", e);
+        }
+
+        // ---- Normalize into RawPublication[] ----
+        const all: RawPublication[] = [];
+
+// OpenAlex
+        for (const w of openAlexPublications) {
+            all.push({
+                source: "openalex",
+                doi: w.doi ?? w.doi_url ?? null,
+                title: w.display_name ?? null,
+                year: w.publication_year ?? null,
+                type: w.type ?? null,
+                venue: w.host_venue?.display_name ?? null,
+                citations: w.cited_by_count ?? null,
+                authors: Array.isArray(w.authorships)
+                    ? w.authorships
+                        .map((a: any) => a.author?.display_name)
+                        .filter(Boolean)
+                    : [],
+                raw: w,
+            });
+        }
+
+// Crossref
+        for (const item of crossrefItems) {
+            const doi = item.DOI ?? null;
+            const titleArr: string[] | undefined = item.title;
+            const title = Array.isArray(titleArr) ? titleArr[0] : titleArr;
+            const issuedYear =
+                item["published-print"]?.["date-parts"]?.[0]?.[0] ??
+                item["published-online"]?.["date-parts"]?.[0]?.[0] ??
+                item.issued?.["date-parts"]?.[0]?.[0] ??
+                null;
+
+            all.push({
+                source: "crossref",
+                doi,
+                title: title ?? null,
+                year: issuedYear,
+                type: item.type ?? null,
+                venue: Array.isArray(item["container-title"])
+                    ? item["container-title"][0]
+                    : item["container-title"] ?? null,
+                citations: null,
+                authors: Array.isArray(item.author)
+                    ? item.author
+                        .map((a: any) =>
+                            [a.given, a.family].filter(Boolean).join(" ")
+                        )
+                        .filter(Boolean)
+                    : [],
+                raw: item,
+            });
+        }
+
+// Europe PMC
+        for (const r of europePmcResults) {
+            const doi = r.doi ?? null;
+            const year = r.pubYear ? Number(r.pubYear) : null;
+
+            all.push({
+                source: "europe_pmc",
+                doi,
+                title: r.title ?? null,
+                year,
+                type: r.pubType ?? null,
+                venue: r.journalTitle ?? null,
+                citations: r.citedByCount ? Number(r.citedByCount) : null,
+                authors: r.authorString
+                    ? r.authorString.split(",").map((s: string) => s.trim())
+                    : [],
+                raw: r,
+            });
+        }
+
+// DataCite
+        for (const d of dataciteItems) {
+            const doi = d.id ?? d.attributes?.doi ?? null;
+            const titleArr: any[] | undefined = d.attributes?.titles;
+            const title =
+                Array.isArray(titleArr) && titleArr.length > 0
+                    ? titleArr[0].title
+                    : null;
+            const pubYear =
+                d.attributes?.published ?? d.attributes?.publicationYear ?? null;
+
+            all.push({
+                source: "datacite",
+                doi,
+                title,
+                year: pubYear ? Number(pubYear) : null,
+                type: d.attributes?.types?.resourceTypeGeneral ?? null,
+                venue: d.attributes?.publisher ?? null,
+                citations: null,
+                authors: Array.isArray(d.attributes?.creators)
+                    ? d.attributes.creators
+                        .map((c: any) => c.name)
+                        .filter(Boolean)
+                    : [],
+                raw: d,
+            });
+        }
+
+        // ---- Dedupe (by DOI if present, else title+year) ----
+        const seen = new Set<string>();
+        const deduped: RawPublication[] = [];
+
+        for (const p of all) {
+            const key = normalizeKey(p);
+            if (!key) {
+                // if truly no key, just push it
+                deduped.push(p);
+                continue;
+            }
+            if (seen.has(key)) continue;
+            seen.add(key);
+            deduped.push(p);
+        }
+
+        return { success: true, data: deduped };
+    }
+);
+
 export const getResearcherWithMergedDataAdvanced = withUserAuth(async () => {
     const session = await getSession();
     if (!session) return { success: false, error: "No session found" };
@@ -2479,21 +2785,32 @@ export const getDiseaseModels = async (
         client: {};
     }>,
     input?: GetDiseaseModelSchema,
-    publicOnly: boolean = false
+    publicOnly: boolean = false,
+    columns?: ColumnDef<any>[],
 ): Promise<{data: DiseaseModel[], pageCount: number}> => {
     if (publicOnly) { // allow any requester to fetch public data
-        if (!organizationId) return {data: [], pageCount: 0}
-        const organization = await prisma.organization.findUnique({
-            where: {id: organizationId}
-        })
-        if (!organization) return {data: [], pageCount: 0}
-        
-        return await fetchDiseaseModels(
-            organization,
-            select,
-            input,
-            publicOnly
-        )
+        if (organizationId) {
+            // if org ID is provided only fetch tools for organization
+            const organization = await prisma.organization.findUnique({
+                where: {id: organizationId}
+            })
+
+            return await fetchDiseaseModels(
+                organization,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        } else {
+            return await fetchDiseaseModels(
+                undefined,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        }
     }
 
     // only allow members of the organization to fetch private data
@@ -2512,6 +2829,7 @@ export const getDiseaseModels = async (
             return await fetchDiseaseModels(
                 organization,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -2520,13 +2838,14 @@ export const getDiseaseModels = async (
 }
 
 const fetchDiseaseModels = async (
-    organization: Organization, 
+    organization: Organization | null | undefined, 
     select: Prisma.DiseaseModelSelect<InternalArgs & {
         result: {};
         model: {};
         query: {};
         client: {};
     }>,
+    columns?: ColumnDef<any>[] | undefined, 
     input?: GetDiseaseModelSchema,
     publicOnly: boolean = false
 ): Promise<{
@@ -2538,21 +2857,18 @@ const fetchDiseaseModels = async (
             const [data, total] = await prisma.$transaction([
                 prisma.diseaseModel.findMany({
                     where: {
-                        organizationId: organization.id,
+                        ...(organization ? {organizationId: organization.id} : undefined),
                         ...(publicOnly ? {private: false} : undefined)
                     },
-                    // include: {
-                    //     attachments: true,
-                    //     contacts: true,
-                    //     organization: {include: {conditions: {include: {condition: true}}}},
-                    //     gene: true,
-                    //     institution: true,
-                    //     milestones: {include: {milestone: true}},
-                    // },
                     select,
                     orderBy: {createdAt: "asc"},
                 }),
-                prisma.diseaseModel.count({where: {organizationId: organization.id}}),
+                prisma.diseaseModel.count({
+                    where: {
+                        ...(organization ? {organizationId: organization.id} : undefined),
+                        ...(publicOnly ? {private: false} : undefined)
+                    }
+                }),
             ]);
 
             return {data, pageCount: 1};
@@ -2563,17 +2879,12 @@ const fetchDiseaseModels = async (
             input.filterFlag === "advancedFilters"
 
         let where: any = {};
-        console.log(`input`, input)
 
         if (advancedTable) {
-            const preProcessedFilters: any = input.filters.map(filter => ({
-                ...filter,
-                ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
-            }))
-
             where = filterColumns({
-                filters: preProcessedFilters,
+                filters: input.filters,
                 joinOperator: input.joinOperator,
+                schemaColumns: columns
             })
         } else {
             const filters: any[] = []
@@ -2616,8 +2927,19 @@ const fetchDiseaseModels = async (
                 { id: { contains: input.q, mode: "insensitive" } },
                 { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
                 { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
-                { description: {contains: input.q, mode: "insensitive"}},
+                { company: {title: {contains: input.q, mode: "insensitive"} } },
                 { genotype: {contains: input.q, mode: "insensitive"}},
+                { organization: {name: {contains: input.q, mode: "insensitive"}}},
+                { organization: {
+                    conditions: {
+                        some: {
+                            condition: {
+                                name: {contains: input.q, mode: "insensitive"}}
+                            }
+                        }
+                    }
+                },
+                { description: {contains: input.q, mode: "insensitive"}},
                 { strain: {contains: input.q, mode: "insensitive"}},
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
@@ -2630,7 +2952,7 @@ const fetchDiseaseModels = async (
         }
 
         const orderBy = input.sort.length
-            ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+            ? input.sort.map(s => prismaOrderByFromColumnId(s))
             : [{ createdAt: { sort: "asc" } }];
 
         const [data, total] = await prisma.$transaction([
@@ -2639,26 +2961,16 @@ const fetchDiseaseModels = async (
                 take: input.perPage,
                 where: {
                     ...where,
-                    organizationId: organization.id,
+                    ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 },
-                include: {
-                    attachments: true,
-                    contacts: true,
-                    organization: {include: {conditions: {include: {condition: true}}}},
-                    gene: true,
-                    // genes: true,
-                    institution: true,
-                    company: true,
-                    milestones: {include: {milestone: true}},
-                    createFacilityRequests: true,
-                },
+                select,
                 orderBy,
             }),
             prisma.diseaseModel.count({
                 where: {
                     ...where, 
-                    organizationId: organization.id,
+                    ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 }
             }),
@@ -2671,12 +2983,17 @@ const fetchDiseaseModels = async (
     }
 }
 
-function prismaOrderByFromColumnId(id: string, desc: boolean): any {
-    const parts = id.split(".")
+function prismaOrderByFromColumnId(sort: ExtendedColumnSort<any>, schemaColumns?: ColumnDef<any>[] | undefined): any {
+    const parts = sort.id.split(".")
+    const sortAccessor = schemaColumns?.find(col => col.id === sort.id)?.meta?.sortAccessor
+
+    // if schema has provided an overried for accessing the database use the dbOverride
+    // instead of the filter ID to generate the WHERE object
+    if (sortAccessor) return sortAccessor(sort)
 
     // build nested object dynamically
     return parts.reduceRight((acc, key) => {
-        return { [key]: Object.keys(acc).length ? acc : (desc ? "desc" : "asc") }
+        return { [key]: Object.keys(acc).length ? acc : (sort.desc ? "desc" : "asc") }
     }, {})
 }
 
@@ -2689,21 +3006,33 @@ export const getBiosamples = async (
         client: {};
     }>,
     input?: GetBiosamplesSchema,
-    publicOnly: boolean = false
+    publicOnly: boolean = false,
+    columns?: ColumnDef<any>[],
 ): Promise<{data: Biosample[], pageCount: number}> => {
     if (publicOnly) { // allow any requester to fetch public data
-        if (!organizationId) return {data: [], pageCount: 0}
-        const organization = await prisma.organization.findUnique({
-            where: {id: organizationId}
-        })
-        if (!organization) return {data: [], pageCount: 0}
-        
-        return await fetchBiosamples(
-            organization,
-            select,
-            input,
-            publicOnly
-        )
+        if (organizationId) {
+            // if org ID is provided only fetch tools for organization
+            const organization = await prisma.organization.findUnique({
+                where: {id: organizationId}
+            })
+
+            return await fetchBiosamples(
+                organization,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        } else {
+            // if org ID is not provided fetch all public tools
+            return await fetchBiosamples(
+                undefined,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        }
     }
 
     // only allow members of the organization to fetch private data
@@ -2722,6 +3051,7 @@ export const getBiosamples = async (
             return await fetchBiosamples(
                 organization,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -2730,13 +3060,14 @@ export const getBiosamples = async (
 }
 
 const fetchBiosamples = async (
-    organization: Organization, 
+    organization: Organization | null | undefined, 
     select: Prisma.BiosampleSelect<InternalArgs & {
         result: {};
         model: {};
         query: {};
         client: {};
     }>,
+    columns?: ColumnDef<any>[] | undefined, 
     input?: GetBiosamplesSchema,
     publicOnly: boolean = false
 ) => {
@@ -2745,13 +3076,18 @@ const fetchBiosamples = async (
             const [data, total] = await prisma.$transaction([
                 prisma.biosample.findMany({
                     where: {
-                        organizationId: organization.id,
+                        ...(organization ? {organizationId: organization.id} : undefined),
                         ...(publicOnly ? {private: false} : undefined)
                     },
                     select,
                     orderBy: {createdAt: "asc"},
                 }),
-                prisma.biosample.count({where: {organizationId: organization.id}}),
+                prisma.biosample.count({
+                    where: {
+                        ...(organization ? {organizationId: organization.id} : undefined),
+                        ...(publicOnly ? {private: false} : undefined)
+                    }
+                }),
             ]);
 
             return {data, pageCount: 1};
@@ -2764,18 +3100,10 @@ const fetchBiosamples = async (
         let where: any = {};
 
         if (advancedTable) {
-            const preProcessedFilters: any = input.filters.map(filter => ({
-                ...filter,
-                ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined),
-                ...(filter.id === "donor.diagnoses" && Array.isArray(filter.value) ? {value: filter.value.map(diagnosisOption => ({typeId: diagnosisOption}))} : undefined),
-                ...(filter.id === "gene" && {value: {symbol: filter.value}}),
-                ...(filter.id === "institution" && {value: {name: filter.value}}),
-                ...(filter.id === "milestones" && Array.isArray(filter.value) ? {value: filter.value.map(projectOption => ({milestone: {title: projectOption}}))} : undefined)
-            }))
-
             where = filterColumns({
-                filters: preProcessedFilters,
+                filters: input.filters,
                 joinOperator: input.joinOperator,
+                schemaColumns: columns
             })
         } else {
             const filters: any[] = []
@@ -2814,9 +3142,16 @@ const fetchBiosamples = async (
             if (input.quantity) {
                 filters.push({
                     id: 'quantity',
-                    value: input.quantity,
+                    value: input.quantity.slice(0, 2),
                     variant: 'range',
                     operator: 'isBetween',
+                    filterId: nanoid()
+                }),
+                filters.push({
+                    id: 'quantityUnit',
+                    value: input.quantity[2],
+                    variant: 'select',
+                    operator: 'eq',
                     filterId: nanoid()
                 })
             }
@@ -2825,6 +3160,8 @@ const fetchBiosamples = async (
                 filters,
                 joinOperator: "and"
             }) || {}
+
+            console.log(`where filter`, where)
         }
 
         // add global filter
@@ -2837,7 +3174,18 @@ const fetchBiosamples = async (
                 { id: { contains: input.q, mode: "insensitive" } },
                 { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
                 { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                { company: {title: {contains: input.q, mode: "insensitive"} } },
                 { genotype: {contains: input.q, mode: "insensitive"}},
+                { organization: {name: {contains: input.q, mode: "insensitive"}}},
+                // { organization: {
+                //     conditions: {
+                //         some: {
+                //             condition: {
+                //                 name: {contains: input.q, mode: "insensitive"}}
+                //             }
+                //         }
+                //     }
+                // },
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                 // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
@@ -2862,7 +3210,7 @@ const fetchBiosamples = async (
         }
 
         const orderBy = input.sort.length
-            ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+            ? input.sort.map(s => prismaOrderByFromColumnId(s, columns))
             : [{ createdAt: { sort: "asc" } }];
 
         const [data, total] = await prisma.$transaction([
@@ -2871,29 +3219,16 @@ const fetchBiosamples = async (
                 take: input.perPage,
                 where: {
                     ...where,
-                    organizationId: organization.id,
+                    ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 },
-                include: {
-                    milestones: {include: {milestone: true}},
-                    contacts: true,
-                    attachments: true,
-                    gene: true,
-                    // genes: true,
-                    donor: {
-                        include: {diagnoses: {include: {type: true}}}
-                    },
-                    institution: true,
-                    company: true,
-                    materialAndDataAccessRequests: true,
-                    createFacilityRequests: true,
-                },
+                select,
                 orderBy,
             }),
             prisma.biosample.count({
                 where: {
                     ...where, 
-                    organizationId: organization.id, 
+                    ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 }
             }),
@@ -2999,7 +3334,7 @@ export const getAllBiosamples = withResearcherAuth(
             }
 
             const orderBy = input.sort.length
-                ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+                ? input.sort.map(s => prismaOrderByFromColumnId(s))
                 : [{ createdAt: { sort: "asc" } }];
 
             const biosampleTypes = BIOSAMPLE_TYPE_OPTIONS
@@ -3059,21 +3394,31 @@ export const getClinicalDatasets = async (
         client: {};
     }>,
     input?: GetClinicalDatasetsSchema,
-    publicOnly: boolean = false
+    publicOnly: boolean = false,
+    columns?: ColumnDef<any>[],
 ): Promise<{data: Tool[], pageCount: number}> => {
     if (publicOnly) { // allow any requester to fetch public data
-        if (!organizationId) return {data: [], pageCount: 0}
-        const organization = await prisma.organization.findUnique({
-            where: {id: organizationId}
-        })
-        if (!organization) return {data: [], pageCount: 0}
-        
-        return await fetchClinicalDatsets(
-            organization,
-            select,
-            input,
-            publicOnly
-        )
+        if (organizationId) {
+            const organization = await prisma.organization.findUnique({
+                where: {id: organizationId}
+            })
+
+            return await fetchClinicalDatsets(
+                organization,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        } else {
+            return await fetchClinicalDatsets(
+                undefined,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        }
     }
 
     // only allow members of the organization to fetch private data
@@ -3092,6 +3437,7 @@ export const getClinicalDatasets = async (
             return await fetchClinicalDatsets(
                 organization,
                 select,
+                columns,
                 input,
                 publicOnly
             )
@@ -3100,13 +3446,14 @@ export const getClinicalDatasets = async (
 }
 
 const fetchClinicalDatsets = async (
-    organization: Organization, 
+    organization: Organization | null | undefined, 
     select: Prisma.ToolSelect<InternalArgs & {
         result: {};
         model: {};
         query: {};
         client: {};
     }>,
+    columns?: ColumnDef<any>[] | undefined,
     input?: GetClinicalDatasetsSchema,
     publicOnly: boolean = false
 ): Promise<{
@@ -3118,21 +3465,18 @@ const fetchClinicalDatsets = async (
             const [data, total] = await prisma.$transaction([
                 prisma.tool.findMany({
                     where: {
-                        organizationId: organization.id,
+                        ...(organization ? {organizationId: organization.id} : undefined),
                         ...(publicOnly ? {private: false} : undefined)
                     },
-                    // include: {
-                    //     organization: {include: {conditions: {include: {condition: true}}}},
-                    //     milestones: {include: {milestone: true}},
-                    //     contacts: true,
-                    //     attachments: true,
-                    //     institution: true,
-                    //     gene: true,
-                    // },
                     select,
                     orderBy: {createdAt: "asc"},
                 }),
-                prisma.tool.count({where: {organizationId: organization.id}}),
+                prisma.tool.count({
+                    where: {
+                        ...(organization ? {organizationId: organization.id} : undefined),
+                        ...(publicOnly ? {private: false} : undefined)
+                    }
+                }),
             ]);
 
             return {data, pageCount: 1};
@@ -3145,14 +3489,10 @@ const fetchClinicalDatsets = async (
         let where: any = {};
 
         if (advancedTable) {
-            const preProcessedFilters: any = input.filters.map(filter => ({
-                ...filter,
-                ...(filter.id === "private" ? {value: filter.value === "true" ? true : false} : undefined)
-            }))
-
             where = filterColumns({
-                filters: preProcessedFilters,
+                filters: input.filters,
                 joinOperator: input.joinOperator,
+                schemaColumns: columns
             })
         } else {
             const filters: any[] = []
@@ -3199,13 +3539,32 @@ const fetchClinicalDatsets = async (
             // custom filtering for types - if any of the type labels include the query, include biosamples
             // with these types
             const queriedTypes = TOOL_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+            const queriedGenes = await prisma.gene.findMany({
+                where: {
+                    symbol: {contains: input.q, mode: "insensitive"}
+                }
+            })
+            const geneSymbols = queriedGenes?.map(gene => gene.symbol)
 
             where.OR = [
                 { id: { contains: input.q, mode: "insensitive" } },
                 { title: {contains: input.q, mode: "insensitive"}},
-                { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
-                { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
                 { description: {contains: input.q, mode: "insensitive"}},
+                { genes: {
+                    hasSome: geneSymbols // matches any symbol in the array
+                }},
+                { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
+                { company: {title: {contains: input.q, mode: "insensitive"} } },
+                { organization: {name: {contains: input.q, mode: "insensitive"}}},
+                { organization: {
+                    conditions: {
+                        some: {
+                            condition: {
+                                name: {contains: input.q, mode: "insensitive"}}
+                            }
+                        }
+                    }
+                },
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                 // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
@@ -3217,7 +3576,7 @@ const fetchClinicalDatsets = async (
         }
 
         const orderBy = input.sort.length
-            ? input.sort.map(s => prismaOrderByFromColumnId(s.id, s.desc))
+            ? input.sort.map(s => prismaOrderByFromColumnId(s))
             : [{ createdAt: { sort: "asc" } }];
 
         const [data, total] = await prisma.$transaction([
@@ -3226,26 +3585,16 @@ const fetchClinicalDatsets = async (
                 take: input.perPage,
                 where: {
                     ...where,
-                    organizationId: organization.id,
+                    ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 },
-                include: {
-                    organization: {include: {conditions: {include: {condition: true}}}},
-                    milestones: {include: {milestone: true}},
-                    contacts: true,
-                    attachments: true,
-                    institution: true,
-                    company: true,
-                    gene: true,
-                    // genes: true,
-                    createFacilityRequests: true,
-                },
+                select,
                 orderBy,
             }),
             prisma.tool.count({
                 where: {
                     ...where, 
-                    organizationId: organization.id, 
+                    ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 }
             }),

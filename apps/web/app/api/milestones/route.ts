@@ -1,7 +1,7 @@
 import prisma from '@comend/lib/prisma';
 import { NextResponse } from 'next/server';
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
     try {
         // Extract and normalize the search query from the request URL
         const url = new URL(req.url);
@@ -15,7 +15,8 @@ export async function POST(req: Request) {
         // Query the Milestone model with a case-insensitive search
         const milestones = await prisma.milestone.findMany({
             where: {
-                private: false,
+                // private: false,
+                organizationId,
                 title: {
                     contains: searchQuery,
                     mode: 'insensitive',
@@ -28,7 +29,7 @@ export async function POST(req: Request) {
         // Format for selector input (e.g., dropdown)
         const formattedResults = milestones.map((milestone) => ({
             label: milestone.title,
-            value: milestone.id, // You could also use milestone.title if preferred
+            value: milestone.id,
         }));
 
         return NextResponse.json(formattedResults);

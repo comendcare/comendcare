@@ -2,42 +2,22 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import {formatMoney, getDates, truncate} from "@comend/lib/utils";
-import {PrivateBadge} from "./private-badge"
 import { cn } from "@comend/lib/utils"
 import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
-import { Button } from "@comend/components/ui/button"
 import { ScrollArea } from "@comend/components/ui/scroll-area"
-import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, Milestone, StatusType } from "@comend/lib/types"
-import StatusButton from "./milestone-status-button"
-import { MilestoneTypeBadge } from "@comend/components/milestone-type-badge"
+import { Milestone, StatusType } from "@comend/lib/types"
+import StatusButton from "@comend/components/milestone-status-button"
 import {
-    DndContext,
-    useSensor,
-    useSensors,
-    KeyboardSensor,
-    Announcements,
-    TouchSensor,
-    MouseSensor,
-    closestCorners
-} from "@dnd-kit/core"
-import {
-    arrayMove,
     SortableContext,
-    sortableKeyboardCoordinates,
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {GripVertical, Megaphone, Microscope, User, Lock, Calendar, DollarSign, Database, Rat, TestTubeDiagonal, Globe} from "lucide-react"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
+import {Microscope, User, DollarSign} from "lucide-react"
 import { ProjectActionsMenu } from "./project-actions-menu";
-import { TypeBadge } from "./type-badge";
-import { Badge } from "@/packages/components/ui/badge";
-import { DateView } from "./miletone-date-view";
-import { Separator } from "@/packages/components/ui/separator";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/packages/components/ui/card";
+import { Badge } from "@comend/components/ui/badge";
 import { Organization } from "@prisma/client";
-import { PublicPrivateButton } from "./public-private-button";
+import { PublicPrivateButton } from "@comend/components/public-private-button";
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NEXT_PUBLIC_NODE_ENV !== "production"
 

@@ -29,27 +29,26 @@ import {toast} from "sonner";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
-import {Ellipsis, Pencil} from "lucide-react";
+import {Pencil} from "lucide-react";
 import {useRouter} from "next/navigation";
 import {editUser, updateResearcher} from "@comend/lib/actions";
-import {COUNTRIES, MILESTONE_TYPE_OPTIONS, MODALITIES, Option, optionSchema} from "@comend/lib/types";
-import {
-    getUser,
-    getResearcherFromUserId,
-} from "@comend/lib/fetchers";
+import {ACADEMIC_ROLES, COUNTRIES, MILESTONE_TYPE_OPTIONS, MODALITIES, Option, optionSchema} from "@comend/lib/types";
 import {useSession} from "next-auth/react";
-import {Skeleton} from "@/packages/components/ui/skeleton";
-import {badgeVariants} from "@/packages/components/ui/badge";
-import LoadingDots from "@/packages/components/icons/loading-dots";
-import {EnrichedResearcher} from "~researcher/types/types";
-import {Textarea} from "@/packages/components/ui/textarea";
+import {badgeVariants} from "@comend/components/ui/badge";
+import LoadingDots from "@comend/components/icons/loading-dots";
+import {Textarea} from "@comend/components/ui/textarea";
+import {TitleEnum} from "~researcher/lib/utils";
+import type {Prisma} from "@prisma/client";
+import {FormImageSelector} from "@comend/components/form-image-selector";
+import {FileWithPreview} from "@comend/components/image-selector";
+import {getPublicFile} from "@comend/lib/utils";
+import {handleImageDelete, handleImageUpload} from "@comend/lib/upload";
+import mixpanel from "mixpanel-browser";
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
     ...option,
     value: option.id,
 }));
-
-const TitleEnum = z.enum(["researcher","pm","pi","student","other"]);
 
 const formSchema = z.object({
     name: z.string().min(2),
@@ -57,59 +56,97 @@ const formSchema = z.object({
         (v) => (v === "" ? undefined : v),
         TitleEnum.optional()
     ),
+    image: z.string().nullable().optional(),
     website: z.string().optional(),
-    country: z.string().optional(),
-    description: z.string().min(2, {
-        message: "Your profile's description must be at least 2 characters long.",
+    country: z.string(),
+    description: z.string().min(50, {
+        message: "Your profile's description must be at least 50 characters long.",
     }).max(500, {
         message: "Your profile's description must less than 500 characters long.",
     }).optional(),
-    affiliations: z.array(optionSchema).optional(),
-    orcid: z.string().regex(/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/, {
-        message: "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
-    }).optional(),
-    researchInterests: z.array(optionSchema).optional(),
+    affiliations: z.array(optionSchema),
+    orcid: z.preprocess(
+        (val) => {
+            if (typeof val !== "string") return val;
+            const trimmed = val.trim();
+            // treat empty string as "not provided"
+            return trimmed === "" ? undefined : trimmed;
+        },
+        z
+            .string()
+            .regex(/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/, {
+                message:
+                    "ORCID must be in the format 0000-0000-0000-0000, and end in a digit or 'X'",
+            })
+            .optional()
+    ),
+    researchInterests: z.array(optionSchema),
     therapeuticsOfInterest: z.array(optionSchema).optional(),
     otherTherapeuticsOfInterest: z.string().optional(),
     genesOfInterest: z.array(optionSchema).optional(),
-    conditionsOfInterest: z.array(optionSchema).optional(),
+    conditionsOfInterest: z.array(optionSchema),
     notificationSettings: z.boolean().default(false),
     consentSettings: z.boolean().default(false),
 });
 
-export default function EditResearcherProfileDialog({ researcher }: { researcher: EnrichedResearcher["researcher"] }) {
-    const {data: session} = useSession()
+type ResearcherWithRelations = Prisma.ResearcherGetPayload<{
+    include: {
+        user: true;
+        affiliations: {
+            include: {
+                institution: true;
+            };
+        };
+    };
+}>;
+
+export default function EditResearcherProfileDialog({researcher}: { researcher: ResearcherWithRelations }) {
+    const {data: session} = useSession();
     const router = useRouter();
-    const [initialData, setInitialData] = useState<z.infer<typeof formSchema>>();
     const [loading, setLoading] = useState(false);
+    const [isCropping, setIsCropping] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
+    const [defaultValues, setDefaultValues] = useState<z.infer<typeof formSchema> | undefined>(undefined);
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: initialData,
+        defaultValues,
     });
 
     useEffect(() => {
         async function fetchData() {
-            const userRes = await getUser(session?.user.id, {
-                id: true,
-                name: true,
-                notificationSettings: true,
-                consentSettings: true,
-            });
-
-            if (researcher && researcher.name) {
-                const user = userRes.data;
-                form.reset({
-                    name: user.name || "",
-                    title: researcher.title || undefined,
+            if (researcher && researcher.user) {
+                const fetchedValues: z.infer<typeof formSchema> = {
+                    name: researcher.user?.name || "",
+                    title: researcher.title as any,
+                    country: researcher.country || "",
+                    description: researcher.description || undefined,
+                    website: researcher.website || undefined,
                     affiliations: researcher.affiliations?.map((a: any) => ({
-                        label: a.institution.name,
-                        value: a.institution.id,
+                        label: a.institution?.name,
+                        value: a.institution?.id,
                     })) || [],
                     orcid: researcher.orcid || "",
-                    researchInterests: researcher.researchInterests?.map((r: string) => ({
-                        label: r,
-                        value: r,
-                    })) || [],
+                    researchInterests:
+                        (researcher.researchInterests || []).map((stored: string) => {
+                            const option = MILESTONE_TYPE_OPTIONS_WITH_VALUE.find(
+                                o => o.value === stored || o.label === stored
+                            );
+
+                            return {
+                                label: option?.label ?? stored,
+                                value: option?.value ?? stored,
+                            };
+                        }),
+                    therapeuticsOfInterest:
+                        (researcher.therapeuticsOfInterest || []).map((stored: string) => {
+                            const option = MODALITIES.find(m => m.value === stored || m.label === stored);
+
+                            return {
+                                label: option?.label ?? stored,
+                                value: option?.value ?? stored,
+                            };
+                        }),
                     conditionsOfInterest: researcher.conditionsOfInterest?.map((c: string) => ({
                         label: c,
                         value: c,
@@ -118,40 +155,141 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                         label: g,
                         value: g,
                     })) || [],
-                    notificationSettings: user.notificationSettings ?? false,
-                    consentSettings: user.consentSettings ?? false,
-                });
+                    notificationSettings: researcher.user?.notificationSettings ?? false,
+                    consentSettings: researcher.user?.consentSettings ?? false,
+                    image: researcher.user?.image || undefined,
+                    otherTherapeuticsOfInterest: undefined,
+                };
+
+                setDefaultValues(fetchedValues);
+                form.reset(fetchedValues);
+
+                if (researcher.user.image) {
+                    try {
+                        const userPhoto: File = await getPublicFile(researcher.user.image);
+                        if (userPhoto) {
+                            const fileWithPreview = Object.assign(userPhoto, {
+                                preview: URL.createObjectURL(userPhoto),
+                            }) as FileWithPreview;
+                            setSelectedFile(fileWithPreview);
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
             }
         }
 
         fetchData();
-    }, [session?.user.id, form]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [researcher?.id]);
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        const userUpdate = await editUser(session?.user.id, {
-            name: values.name,
-            notificationSettings: values.notificationSettings,
-            consentSettings: values.consentSettings,
-        });
+        setLoading(true);
+        try {
+            // mixpanel consent handling
+            try {
+                if (values.consentSettings) {
+                    mixpanel.opt_in_tracking();
+                    if (session?.user?.id && session?.user?.email && !(mixpanel as any)._disabled) {
+                        if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") {
+                            mixpanel.identify(session.user.email);
+                        } else {
+                            mixpanel.identify(session.user.id);
+                        }
+                    } else {
+                        console.warn("Tried to call identify while Mixpanel is disabled.");
+                    }
+                } else {
+                    mixpanel.opt_out_tracking();
+                }
+            } catch (e) {
+                console.error(`Failed to update mixpanel status`, e)
+            }
 
-        if (userUpdate?.error) {
-            toast.error(userUpdate.error);
-            return;
+            // handle image upload / delete on User (not Researcher)
+            if (selectedFile && values.image && values.image !== defaultValues?.image) {
+                const imgUrl = await handleImageUpload(selectedFile as File, values.image);
+                values.image = imgUrl || undefined;
+            }
+
+            if (values.image !== defaultValues?.image && defaultValues?.image) {
+                await handleImageDelete(defaultValues.image);
+            }
+
+            // update user model (name, notification/consent, image)
+            const userPayload: {[key: string]: unknown} = {
+                name: values.name,
+                notificationSettings: values.notificationSettings,
+                consentSettings: values.consentSettings,
+            };
+
+            if (values.image === null || values.image === undefined) {
+                userPayload.image = null;
+            } else {
+                userPayload.image = values.image;
+            }
+
+            const userRes: any = await editUser(session?.user?.id as string, userPayload);
+            if (userRes?.error) {
+                toast.error(userRes.error);
+                return;
+            }
+
+            // update researcher model
+            const fd = new FormData();
+
+            fd.append("title", values.title ?? "");
+            fd.append("country", values.country ?? "");
+            fd.append("description", values.description ?? "");
+            fd.append("website", values.website ?? "");
+            fd.append(
+                "orcid",
+                values.orcid?.trim() || ""
+            );
+            fd.append(
+                "therapeuticsOfInterest",
+                values.therapeuticsOfInterest?.map(t => t.value).join(",") ?? ""
+            );
+            fd.append(
+                "genesOfInterest",
+                values.genesOfInterest?.map(g => g.label).join(",") ?? ""
+            );
+            fd.append(
+                "conditionsOfInterest",
+                values.conditionsOfInterest?.map(c => c.label).join(",") ?? ""
+            );
+            fd.append(
+                "researchInterests",
+                values.researchInterests?.map(r => r.value).join(",") ?? ""
+            );
+            fd.append(
+                "metadata",
+                JSON.stringify({
+                    otherTherapeuticsOfInterest: values.otherTherapeuticsOfInterest
+                })
+            );
+
+            console.log(`update data`, fd)
+
+            const res = await updateResearcher(session?.user?.id, fd);
+            if (res?.error) {
+                toast.error(res.error);
+                return;
+            }
+
+            toast.success("User updated successfully");
+            router.refresh();
+        } catch (error) {
+            console.error("Error:", error);
+            toast.error("An error occurred while updating your profile.");
+        } finally {
+            setLoading(false);
         }
-
-        const {name, notificationSettings, consentSettings, ...researcherValues} = values;
-        const res = await updateResearcher(session?.user.id, researcherValues);
-        if (res?.error) {
-            toast.error(res.error);
-            return;
-        }
-
-        toast.success("User updated successfully");
-        router.refresh();
     };
 
     const handleInstitutionAsyncSearch = async (query: string): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
+        if (!query) return [];
 
         setLoading(true);
 
@@ -169,7 +307,7 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
     };
 
     const handleConditionAsyncSearch = async (query: string): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
+        if (!query) return [];
 
         setLoading(true);
 
@@ -177,7 +315,6 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
             const response = await fetch(`/api/conditions?search=${query}`);
             const data = await response.json();
 
-            // Return the fetched options
             return data;
         } catch (error) {
             console.error("Failed to fetch conditions:", error);
@@ -188,7 +325,7 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
     };
 
     const handleGeneAsyncSearch = async (query: string): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
+        if (!query) return [];
 
         setLoading(true);
 
@@ -196,7 +333,6 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
             const response = await fetch(`/api/genes?search=${query}`);
             const data = await response.json();
 
-            // Return the fetched options
             return data;
         } catch (error) {
             console.error("Failed to fetch genes:", error);
@@ -240,13 +376,24 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Your Full Name (required)</FormLabel>
-                                    {/*<FormDescription>This is your public display name.</FormDescription>*/}
                                     <FormControl>
                                         <Input type="text" {...field} />
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem>
                             )}
+                        />
+
+                        <FormImageSelector
+                            form={form}
+                            name="image"
+                            title="Your Profile Picture"
+                            description="PNG/JPG only (no SVG)."
+                            aspect={1}
+                            img={defaultValues?.image || undefined}
+                            selectedFile={selectedFile}
+                            setSelectedFile={setSelectedFile}
+                            setIsCropping={setIsCropping}
                         />
 
                         <FormField
@@ -258,18 +405,16 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                                     <FormDescription>Your primary title or role.</FormDescription>
                                     <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined}>
                                         <FormControl>
-                                            <SelectTrigger
-                                                aria-label="Select title or role"
-                                            >
+                                            <SelectTrigger aria-label="Select title or role">
                                                 <SelectValue placeholder="Role"/>
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent className="rounded-xl">
-                                            <SelectItem value="researcher">Researcher</SelectItem>
-                                            <SelectItem value="pm">Project Manager</SelectItem>
-                                            <SelectItem value="pi">Principal Investigator</SelectItem>
-                                            <SelectItem value="student">Student</SelectItem>
-                                            <SelectItem value="other">Other</SelectItem>
+                                            {ACADEMIC_ROLES.map((role: any) => (
+                                                <SelectItem key={role.id} value={role.value}>
+                                                    {role.label}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                     <FormMessage/>
@@ -309,7 +454,7 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
 
                         <FormField
                             control={form.control}
-                            name="conditionsOfInterest"
+                            name="country"
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>
@@ -317,7 +462,6 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                                     </FormLabel>
                                     <FormControl>
                                         <MultipleSelector
-                                            {...field}
                                             maxSelected={1}
                                             defaultOptions={COUNTRIES}
                                             placeholder="Search for countries..."
@@ -325,6 +469,11 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                                             loadingIndicator={<p>Loading countries...</p>}
                                             emptyIndicator={<p>No countries found.</p>}
                                             showHoverCard={false}
+                                            value={field.value ? [{label: field.value, value: field.value}] : []}
+                                            onChange={(items) => {
+                                                const selected = items?.[0]?.value ?? "";
+                                                field.onChange(selected);
+                                            }}
                                         />
                                     </FormControl>
                                     <FormMessage/>
@@ -359,9 +508,14 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                         <FormField
                             control={form.control}
                             name="orcid"
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>Your ORCID</FormLabel>
+                                    <FormLabel>
+                                        Your ORCID
+                                    </FormLabel>
+                                    <FormDescription>
+                                        {`We'll use APIs to find your research metrics and publications.`}
+                                    </FormDescription>
                                     <FormControl>
                                         <Input
                                             type="text"
@@ -382,7 +536,7 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                                             placeholder="0000-0000-0000-0000"
                                         />
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />
@@ -432,19 +586,21 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                                                 inputProps={{
                                                     id,
                                                     "aria-labelledby": `${id}-label`,
-                                                    "aria-label": "Therapeutics of Interest", // keep for a11y
+                                                    "aria-label": "Therapeutics of Interest",
                                                     "data-testid": id,
                                                 }}
                                                 hidePlaceholderWhenSelected
-                                                emptyIndicator={<p
-                                                    className="text-center text-sm text-muted-foreground">no
-                                                    results found.</p>}
+                                                emptyIndicator={
+                                                    <p className="text-center text-sm text-muted-foreground">
+                                                        no results found.
+                                                    </p>
+                                                }
                                                 showHoverCard={false}
                                             />
                                         </FormControl>
                                         <FormMessage/>
                                     </FormItem>
-                                )
+                                );
                             }}
                         />
 
@@ -564,9 +720,11 @@ export default function EditResearcherProfileDialog({ researcher }: { researcher
                             />
                         </div>
 
-                        <Button type="submit" disabled={loading}>
-                            {loading ? <LoadingDots color="#808080"/> : "Save"}
-                        </Button>
+                        <DialogFooter>
+                            <Button type="submit" disabled={isCropping || loading}>
+                                {loading ? <LoadingDots color="#808080"/> : "Save"}
+                            </Button>
+                        </DialogFooter>
                     </form>
                 </Form>
             </DialogContent>
