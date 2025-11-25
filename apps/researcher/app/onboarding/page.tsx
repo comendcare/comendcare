@@ -168,14 +168,26 @@ export default function ResearcherOnboardingForm() {
                             value: affiliation.id
                         })) || [],
                         orcid: researcherData.orcid || "",
-                        researchInterests: researcherData.researchInterests.map((interests: any) => ({
-                            label: interests,
-                            value: interests
-                        })) || [],
-                        therapeuticsOfInterest: researcherData.therapeuticsOfInterest.map((interests: any) => ({
-                            label: interests,
-                            value: interests
-                        })) || [],
+                        researchInterests:
+                            (researcherData.researchInterests || []).map((stored: string) => {
+                                const option = MILESTONE_TYPE_OPTIONS_WITH_VALUE.find(
+                                    o => o.value === stored || o.label === stored
+                                );
+
+                                return {
+                                    label: option?.label ?? stored,
+                                    value: option?.value ?? stored,
+                                };
+                            }),
+                        therapeuticsOfInterest:
+                            (researcherData.therapeuticsOfInterest || []).map((stored: string) => {
+                                const option = MODALITIES.find(m => m.value === stored || m.label === stored);
+
+                                return {
+                                    label: option?.label ?? stored, // what user sees
+                                    value: option?.value ?? stored, // what we store
+                                };
+                            }),
                         conditionsOfInterest: researcherData.conditionsOfInterest.map((condition: any) => ({
                             label: condition,
                             value: condition
@@ -256,7 +268,7 @@ export default function ResearcherOnboardingForm() {
 
             fd.append(
                 "researchInterests",
-                researcherOnlyValues.researchInterests?.map(r => r.label).join(",") ?? ""
+                researcherOnlyValues.researchInterests?.map(r => r.value).join(",") ?? ""
             );
 
             fd.append(
@@ -266,7 +278,7 @@ export default function ResearcherOnboardingForm() {
 
             fd.append(
                 "therapeuticsOfInterest",
-                researcherOnlyValues.therapeuticsOfInterest?.map(t => t.label).join(",") ?? ""
+                researcherOnlyValues.therapeuticsOfInterest?.map(t => t.value).join(",") ?? ""
             );
 
             fd.append(
@@ -629,8 +641,9 @@ export default function ResearcherOnboardingForm() {
                                 name="otherTherapeuticsOfInterest"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormDescription>(Optional) Other details for internal improvement
-                                            only.</FormDescription>
+                                        <FormDescription>
+                                            (Optional) Other details for internal improvement only.
+                                        </FormDescription>
                                         <FormControl>
                                             <Input {...field} />
                                         </FormControl>

@@ -125,14 +125,26 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                         value: a.institution.id,
                     })) || [],
                     orcid: researcher.orcid || "",
-                    researchInterests: researcher.researchInterests?.map((r: string) => ({
-                        label: r,
-                        value: r,
-                    })) || [],
-                    therapeuticsOfInterest: researcher.therapeuticsOfInterest?.map((r: string) => ({
-                        label: r,
-                        value: r,
-                    })) || [],
+                    researchInterests:
+                        (researcher.researchInterests || []).map((stored: string) => {
+                            const option = MILESTONE_TYPE_OPTIONS_WITH_VALUE.find(
+                                o => o.value === stored || o.label === stored
+                            );
+
+                            return {
+                                label: option?.label ?? stored,
+                                value: option?.value ?? stored,
+                            };
+                        }),
+                    therapeuticsOfInterest:
+                        (researcher.therapeuticsOfInterest || []).map((stored: string) => {
+                            const option = MODALITIES.find(m => m.value === stored || m.label === stored);
+
+                            return {
+                                label: option?.label ?? stored, // what user sees
+                                value: option?.value ?? stored, // what we store
+                            };
+                        }),
                     conditionsOfInterest: researcher.conditionsOfInterest?.map((c: string) => ({
                         label: c,
                         value: c,
@@ -161,7 +173,7 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
 
         fd.append(
             "therapeuticsOfInterest",
-            values.therapeuticsOfInterest?.map(t => t.label).join(",") ?? ""
+            values.therapeuticsOfInterest?.map(t => t.value).join(",") ?? ""
         );
         fd.append(
             "genesOfInterest",
@@ -173,7 +185,7 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
         );
         fd.append(
             "researchInterests",
-            values.researchInterests?.map(r => r.label).join(",") ?? ""
+            values.researchInterests?.map(r => r.value).join(",") ?? ""
         );
 
         fd.append(
