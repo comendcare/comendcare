@@ -11,19 +11,8 @@ import { PropertyBadge } from "@comend/components/property-badge";
 import { Building2, MapPin } from "lucide-react";
 
 export const ResearcherCard = ({researcher}: {researcher: any}) => {
-    console.log(`researcher data`, researcher)
-
-    const tags: string[] = 
-        MILESTONE_TYPE_OPTIONS_WITH_VALUE.filter((option: any) => researcher.researchInterests.includes(option.label)).map((option: any) => option.label)
-            .concat(MODALITIES.filter((option: any) => researcher.therapeuticsOfInterest.includes(option.label)).map((option: any) => option.label))
-            .concat(researcher.conditionsOfInterest)
-            .concat(researcher.genesOfInterest)
-
-
-    // const researchInterests: string[] = MILESTONE_TYPE_OPTIONS_WITH_VALUE.filter((option: any) => researcher.researchInterests.includes(option.value)).map((option: any) => option.label)
-    // const therapeuticsOfInterest: string[] = MODALITIES.filter((option: any) => researcher.therapeuticsOfInterest.includes(option.value)).map((option: any) => option.label)
-    const researchInterests: string[] = researcher.researchInterests
-    const therapeuticsOfInterest: string[] = researcher.therapeuticsOfInterest
+    const researchInterests: string[] = MILESTONE_TYPE_OPTIONS_WITH_VALUE.filter((option: any) => researcher.researchInterests.includes(option.value)).map((option: any) => option.label)
+    const therapeuticsOfInterest: string[] = MODALITIES.filter((option: any) => researcher.therapeuticsOfInterest.includes(option.value)).map((option: any) => option.label)
     const conditionsOfInterest: string[] = researcher.conditionsOfInterest
     const genesOfInterest: string[] = researcher.genesOfInterest
 
@@ -31,9 +20,9 @@ export const ResearcherCard = ({researcher}: {researcher: any}) => {
         <Card className="h-full w-full text-left flex flex-col gap-2">
             <CardHeader className="gap-2 relative pb-2">
                 <div className="flex flex-row gap-2 items-start">
-                    <ProfilePhoto img={researcher.user?.image} name={researcher.name} className="h-9 w-9 -mt-1"/>
+                    <ProfilePhoto img={researcher.user?.image} name={researcher.name || researcher.user?.name} className="h-9 w-9 -mt-1"/>
                     <div className="flex flex-col gap-1">
-                        <CardTitle>{researcher.name}</CardTitle>
+                        <CardTitle>{researcher.name || researcher.user?.name}</CardTitle>
                         <CardDescription>{researcher.role}</CardDescription>
                     </div>
                 </div>

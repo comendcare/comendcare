@@ -5,7 +5,8 @@ import {
     getResearcherWithMergedDataAdvanced,
     getResearcherWithMergedData,
     getResearcher,
-    getResearcherPublications, getResearcherMetrics
+    getResearcherPublications, getResearcherMetrics,
+    getResearcherFromUserID
 } from "@comend/lib/fetchers";
 
 export default async function ResearcherProfilePage({
@@ -18,22 +19,25 @@ export default async function ResearcherProfilePage({
 
     let researcherData
     if (session?.user?.id) {
-        const response = await getResearcher(session.user.id, {
-            id: true,
-            orcid: true,
-            title: true,
-            user: true,
-            country: true,
-            description: true,
-            researchInterests: true,
-            therapeuticsOfInterest: true,
-            conditionsOfInterest: true,
-            genesOfInterest: true,
-            affiliations: true,
-            createdAt: true,
-            updatedAt: true,
-            metadata: true
-        });
+        const response = await getResearcherFromUserID(
+            session.user.id, 
+            {
+                id: true,
+                orcid: true,
+                title: true,
+                user: true,
+                country: true,
+                description: true,
+                researchInterests: true,
+                therapeuticsOfInterest: true,
+                conditionsOfInterest: true,
+                genesOfInterest: true,
+                affiliations: true,
+                createdAt: true,
+                updatedAt: true,
+                metadata: true
+            }
+        );
         if (response.success) {
             researcherData = response.data
         } else {

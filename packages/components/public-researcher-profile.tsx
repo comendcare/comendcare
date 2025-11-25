@@ -70,11 +70,11 @@ export default function PublicResearcherProfile({
                     <div className="flex flex-col md:flex-row gap-6">
                         <Avatar className="w-32 h-32">
                             <AvatarImage
-                                src={researcherData.user.image}
-                                alt={researcherData.user.name}
+                                src={researcherData?.user?.image}
+                                alt={researcherData?.user?.name}
                             />
                             <AvatarFallback className="text-2xl">
-                                {researcherData.user.name?.[0]}
+                                {researcherData?.user?.name?.[0]}
                             </AvatarFallback>
                         </Avatar>
 
@@ -82,31 +82,31 @@ export default function PublicResearcherProfile({
                             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                 <div>
                                     <h1 className="text-3xl font-bold text-gray-900">
-                                        {researcherData.user.name}
+                                        {researcherData?.user?.name}
                                     </h1>
-                                    {mapTitleToValue(researcherData.title) && (
+                                    {mapTitleToValue(researcherData?.title) && (
                                         <p className="text-xl text-gray-600 mt-1">
-                                            {mapTitleToValue(researcherData.title)}
+                                            {mapTitleToValue(researcherData?.title)}
                                         </p>
                                     )}
 
                                     <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600">
 
-                                        {researcherData.institution && (
+                                        {researcherData?.institution && (
                                             <div className="flex items-center gap-1">
                                                 <Building2 className="w-4 h-4" />
                                                 <span>{researcherData.institution}</span>
                                             </div>
                                         )}
 
-                                        {researcherData.country && (
+                                        {researcherData?.country && (
                                             <div className="flex items-center gap-1">
                                                 <MapPin className="w-4 h-4" />
                                                 <span>{resolveCountry(researcherData.country)}</span>
                                             </div>
                                         )}
 
-                                        {researcherData.user?.email && (
+                                        {researcherData?.user?.email && (
                                             <div className="flex items-center gap-1">
                                                 <Mail className="w-4 h-4" />
                                                 <span>{researcherData.user.email}</span>

@@ -2117,9 +2117,9 @@ export async function getTopPubMedPublications(keyword?: string) {
     }
 }
 
-export const getResearcher = withUserAuth(
+export const getResearcherFromUserID = withUserAuth(
     async (
-        researcher: Researcher,
+        user: User,
         select: Prisma.ResearcherSelect<InternalArgs & {
             result: {};
             model: {};
@@ -2132,7 +2132,42 @@ export const getResearcher = withUserAuth(
 
         try {
             const fetchedResearcher = await prisma.researcher.findUnique({
-                where: {userId: session?.user.id},
+                where: {userId: user.id},
+                select
+            })
+
+            if (!fetchedResearcher) {
+                return {success: false, error: "Researcher not found"};
+            }
+
+            return {
+                success: true,
+                data: fetchedResearcher
+            };
+        } catch (error: any) {
+            logError("Error fetching researcher", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const getResearcher = withUserAuth(
+    async (
+        userId: string,
+        researcherId: string,
+        select: Prisma.ResearcherSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        const session = await getSession();
+        if (!session?.user?.id) return { success: false, error: "No session or user id" };
+
+        try {
+            const fetchedResearcher = await prisma.researcher.findUnique({
+                where: {id: researcherId},
                 select
             })
 
