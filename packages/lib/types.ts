@@ -2216,7 +2216,7 @@ export const companyTypeMap: Record<string, string> = {
 };
 
 export interface MaterialAndDataAccessRequestWithResearcherAndComments extends MaterialAndDataAccessRequest {
-    researcher: Researcher;
+    researcher: Researcher & { user: User | null };
     institutions: Institution[]
     comments: RequestComment[];
 }
