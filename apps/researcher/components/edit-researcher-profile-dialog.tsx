@@ -188,19 +188,23 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
         setLoading(true);
         try {
             // mixpanel consent handling
-            if (values.consentSettings) {
-                mixpanel.opt_in_tracking();
-                if (session?.user?.id && session?.user?.email && !(mixpanel as any)._disabled) {
-                    if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") {
-                        mixpanel.identify(session.user.email);
+            try {
+                if (values.consentSettings) {
+                    mixpanel.opt_in_tracking();
+                    if (session?.user?.id && session?.user?.email && !(mixpanel as any)._disabled) {
+                        if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") {
+                            mixpanel.identify(session.user.email);
+                        } else {
+                            mixpanel.identify(session.user.id);
+                        }
                     } else {
-                        mixpanel.identify(session.user.id);
+                        console.warn("Tried to call identify while Mixpanel is disabled.");
                     }
                 } else {
-                    console.warn("Tried to call identify while Mixpanel is disabled.");
+                    mixpanel.opt_out_tracking();
                 }
-            } else {
-                mixpanel.opt_out_tracking();
+            } catch (e) {
+                console.error(`Failed to update mixpanel status`, e)
             }
 
             // handle image upload / delete on User (not Researcher)
