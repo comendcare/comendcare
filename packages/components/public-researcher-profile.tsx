@@ -125,52 +125,52 @@ export default function PublicResearcherProfile({
                     {/* Left Sidebar */}
                     <div className="space-y-6">
                         {/* Metrics */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <TrendingUp className="w-5 h-5"/>
-                                    Research Metrics
-                                </CardTitle>
-                            </CardHeader>
+                        {/*<Card>*/}
+                        {/*    <CardHeader>*/}
+                        {/*        <CardTitle className="flex items-center gap-2">*/}
+                        {/*            <TrendingUp className="w-5 h-5"/>*/}
+                        {/*            Research Metrics*/}
+                        {/*        </CardTitle>*/}
+                        {/*    </CardHeader>*/}
 
-                            <CardContent className="space-y-4">
-                                {!researcherData?.orcid ? (
-                                    <div className="text-sm text-gray-600">
-                                        Add your ORCID to see your citation metrics.
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="text-center">
-                                            <div className="text-2xl font-bold text-blue-600">
-                                                {formatNumberWithCommas(metrics.citations)}
-                                            </div>
-                                            <div className="text-sm text-gray-600">Citations</div>
-                                        </div>
+                        {/*    <CardContent className="space-y-4">*/}
+                        {/*        {!researcherData?.orcid ? (*/}
+                        {/*            <div className="text-sm text-gray-600">*/}
+                        {/*                Add your ORCID to see your citation metrics.*/}
+                        {/*            </div>*/}
+                        {/*        ) : (*/}
+                        {/*            <div className="grid grid-cols-2 gap-4">*/}
+                        {/*                <div className="text-center">*/}
+                        {/*                    <div className="text-2xl font-bold text-blue-600">*/}
+                        {/*                        {formatNumberWithCommas(metrics.citations)}*/}
+                        {/*                    </div>*/}
+                        {/*                    <div className="text-sm text-gray-600">Citations</div>*/}
+                        {/*                </div>*/}
 
-                                        <div className="text-center">
-                                            <div className="text-2xl font-bold text-green-600">
-                                                {metrics.hIndex}
-                                            </div>
-                                            <div className="text-sm text-gray-600">h-index</div>
-                                        </div>
+                        {/*                <div className="text-center">*/}
+                        {/*                    <div className="text-2xl font-bold text-green-600">*/}
+                        {/*                        {metrics.hIndex}*/}
+                        {/*                    </div>*/}
+                        {/*                    <div className="text-sm text-gray-600">h-index</div>*/}
+                        {/*                </div>*/}
 
-                                        <div className="text-center">
-                                            <div className="text-2xl font-bold text-purple-600">
-                                                {metrics.publications}
-                                            </div>
-                                            <div className="text-sm text-gray-600">Publications</div>
-                                        </div>
+                        {/*                <div className="text-center">*/}
+                        {/*                    <div className="text-2xl font-bold text-purple-600">*/}
+                        {/*                        {metrics.publications}*/}
+                        {/*                    </div>*/}
+                        {/*                    <div className="text-sm text-gray-600">Publications</div>*/}
+                        {/*                </div>*/}
 
-                                        <div className="text-center">
-                                            <div className="text-2xl font-bold text-orange-600">
-                                                {metrics.yearsActive}
-                                            </div>
-                                            <div className="text-sm text-gray-600">Years Active</div>
-                                        </div>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
+                        {/*                <div className="text-center">*/}
+                        {/*                    <div className="text-2xl font-bold text-orange-600">*/}
+                        {/*                        {metrics.yearsActive}*/}
+                        {/*                    </div>*/}
+                        {/*                    <div className="text-sm text-gray-600">Years Active</div>*/}
+                        {/*                </div>*/}
+                        {/*            </div>*/}
+                        {/*        )}*/}
+                        {/*    </CardContent>*/}
+                        {/*</Card>*/}
 
 
                         {/* Research Interests */}
