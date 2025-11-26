@@ -4,14 +4,13 @@ import React from "react";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 import TruncatedList from "@comend/components/marketplace/marketplace-pag-card";
-import { MILESTONE_TYPE_OPTIONS_WITH_VALUE } from "@comend/components/marketplace/service-providers/cro-filters";
-import { MODALITIES } from "@comend/lib/types";
+import { MILESTONE_TYPE_OPTIONS, MODALITIES } from "@comend/lib/types";
 import { Badge } from "@comend/components/ui/badge";
 import { PropertyBadge } from "@comend/components/property-badge";
 import { Building2, MapPin } from "lucide-react";
 
 export const ResearcherCard = ({researcher}: {researcher: any}) => {
-    const researchInterests: string[] = MILESTONE_TYPE_OPTIONS_WITH_VALUE.filter((option: any) => researcher.researchInterests.includes(option.value)).map((option: any) => option.label)
+    const researchInterests: string[] = MILESTONE_TYPE_OPTIONS.filter((option: any) => researcher.researchInterests.includes(option.id)).map((option: any) => option.label)
     const therapeuticsOfInterest: string[] = MODALITIES.filter((option: any) => researcher.therapeuticsOfInterest.includes(option.value)).map((option: any) => option.label)
     const conditionsOfInterest: string[] = researcher.conditionsOfInterest
     const genesOfInterest: string[] = researcher.genesOfInterest

@@ -79,7 +79,7 @@ function generateFiltersString(filters: FiltersType) {
 
 const sortByFilters: { [key: string]: string } = {
     "recently-updated": "updatedAt:desc",
-    "alphabetical": "name:asc",
+    "alphabetical": "user.name:asc",
 }
 
 const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true): Promise<{results: any[], total: number}> => {
@@ -96,7 +96,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "name,description,researchInterests,therapeuticsOfInterest,conditionsOfInterest,genesOfInterest,affiliations.institution.name",
+            query_by: "user.name,description,researchInterests,therapeuticsOfInterest,conditionsOfInterest,genesOfInterest,affiliations.institution.name",
             per_page: 12,
             page: state.lastFetchedPage,
             ...(filtersString ? { filter_by: filtersString } : undefined),

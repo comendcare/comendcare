@@ -1,7 +1,7 @@
 // import { syncToTypesense } from '@comend/lib/sync';
 import { NextResponse } from 'next/server';
 import prisma from "@comend/lib/prisma"
-import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, RFP, TOOL_TYPE_OPTIONS } from '@comend/lib/types';
+import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, MILESTONE_TYPE_OPTIONS, MODALITIES, RFP, TOOL_TYPE_OPTIONS } from '@comend/lib/types';
 import { checkDateRangeUTC, getSortRank, handleGetAvailability, stringToSortableInt } from '@comend/lib/utils';
 
 const sendTypeSenseRequest = async (
@@ -640,7 +640,7 @@ const syncToTypesense = async (env: {
                     type: "auto",
                 },
                 {
-                    name: "name",
+                    name: "user.name",
                     type: "string",
                     sort: true,
                     optional: true
@@ -1032,21 +1032,30 @@ const syncToTypesense = async (env: {
                 const fetchedResearcher = await prisma.researcher.findUnique({
                     where: { id: researcher.id },
                     include: {
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                image: true,
+                                createdAt: true,
+                                updatedAt: true,
+                            }
+                        },
                         affiliations: {include: {institution: true}}
                     }
                 })
-
-                // const orgUpdatedAt = Math.max(...[organization.updatedAt.valueOf()].concat(
-                //     organization.roadmaps.map(roadmap => roadmap.updatedAt.valueOf()),
-                //     organization.milestones.map(milestone => milestone.updatedAt.valueOf()),
-                //     organization.tools.map(tool => tool.updatedAt.valueOf()),
-                //     organization.rfps.map(rfp => rfp.updatedAt.valueOf())
-                // ))
 
                 return {
                     ...fetchedResearcher,
                     // updatedAt: orgUpdatedAt,
                     createdAt: researcher.createdAt.valueOf(),
+                    researchInterests: MILESTONE_TYPE_OPTIONS
+                        .filter((option: any) => researcher.researchInterests.includes(option.id))
+                        .map((option: any) => option.label),
+                    therapeuticsOfInterest: MODALITIES
+                        .filter((option: any) => researcher.therapeuticsOfInterest.includes(option.value))
+                        .map((option: any) => option.label)
                 }
             }))
 
