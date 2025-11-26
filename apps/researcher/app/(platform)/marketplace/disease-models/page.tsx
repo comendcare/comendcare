@@ -3,7 +3,7 @@ import {SearchParams} from "@comend/components/types"
 import {getValidFilters} from "@comend/lib/data-table"
 import { getDiseaseModels } from "@comend/lib/fetchers"
 import { biosampleSearchParamsCache } from "@comend/lib/validations"
-import { DiseaseModelMarketplacePage } from "~researcher/components/marketplace/disease-model-tools-page"
+import { DiseaseModelMarketplacePage } from "@comend/components/marketplace/disease-models/disease-model-tools-page"
 import { useDiseaseModelsTableColumns } from "@comend/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
 
 export const dynamic = "force-dynamic";

@@ -5,7 +5,7 @@ import {SearchParams} from "@comend//components/types"
 import {getValidFilters} from "@comend/lib/data-table"
 import { getBiosamples } from "@comend/lib/fetchers"
 import { biosampleSearchParamsCache } from "@comend/lib/validations"
-import { BiosampleMarketplacePage } from "~researcher/components/marketplace/biosample-tools-page"
+import { BiosampleMarketplacePage } from "@comend/components/marketplace/biosamples/biosample-tools-page"
 import { useBiosamplesTableColumns } from "@comend/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns"
 
 export const dynamic = "force-dynamic";

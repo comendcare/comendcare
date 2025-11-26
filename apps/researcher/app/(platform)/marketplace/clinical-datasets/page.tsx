@@ -3,7 +3,7 @@ import {SearchParams} from "@comend/components/types"
 import {getValidFilters} from "@comend/lib/data-table"
 import { getClinicalDatasets } from "@comend/lib/fetchers"
 import { biosampleSearchParamsCache } from "@comend/lib/validations"
-import { ClinicalDatasetMarketplacePage } from "~researcher/components/marketplace/clinical-dataset-tools-page"
+import { ClinicalDatasetMarketplacePage } from "@comend/components/marketplace/clinical-datasets/clinical-dataset-tools-page"
 import { useClinicalDatasetsTableColumns } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
 
 export const dynamic = "force-dynamic";
