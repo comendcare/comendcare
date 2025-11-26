@@ -65,7 +65,7 @@ export function ResearcherNavbarMenu() {
                             })}
                         >
                             {comingSoon ? (
-                                <Tooltip key={href}>
+                                <Tooltip key={href} delayDuration={0}>
                                     <TooltipTrigger asChild>
                                         <div
                                             // href={""}
