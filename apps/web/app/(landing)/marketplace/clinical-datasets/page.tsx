@@ -7,6 +7,7 @@ import { SearchParams } from "@comend/components/types";
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
 import { useShallow } from "zustand/react/shallow";
 import { initializeClinicalDatasetSearch } from "@comend/lib/initialize-client-state";
+import { redirect } from "next/navigation";
 
 interface IndexPageProps {
     searchParams: Promise<SearchParams>
@@ -18,6 +19,8 @@ const selector = (state: ClinicalDatasetSearchState) => ({
 })
 
 export default function ClinicalDatasetsPage(props: IndexPageProps) {
+    redirect("/marketplace") // temporary redirect
+    
     const {initialized, setSortBy} = useClinicalDatasetSearchStore(useShallow(selector))
     const [isInitialized, setIsInitialized] = useState(false)
  

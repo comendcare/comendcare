@@ -7,6 +7,7 @@ import { SearchParams } from "@comend/components/types";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
 import { useShallow } from "zustand/react/shallow";
 import { initializeBiosampleSearch } from "@comend/lib/initialize-client-state";
+import { redirect } from "next/navigation";
 
 interface IndexPageProps {
     searchParams: Promise<SearchParams>
@@ -18,6 +19,8 @@ const selector = (state: BiosampleSearchState) => ({
 })
 
 export default function BiosamplesPage(props: IndexPageProps) {
+    redirect("/marketplace") // temporary redirect
+    
     const {initialized, setSortBy} = useBiosampleSearchStore(useShallow(selector))
     const [isInitialized, setIsInitialized] = useState(false)
     

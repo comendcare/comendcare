@@ -6,12 +6,15 @@ import PAGMarketplaceIntegratedSearchAndFilter from "@comend/components/marketpl
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
 import { useShallow } from "zustand/react/shallow";
 import { initializeOrganizationSearch } from "@comend/lib/initialize-client-state";
+import { redirect } from "next/navigation";
 
 const selector = (state: OrganizationSearchState) => ({
     initialized: state.initialized
 })
 
 export default function PatientGroupsPage() {
+    redirect("/marketplace") // temporary redirect
+    
     const {initialized} = useOrganizationSearchStore(useShallow(selector))
 
     // initial fetch on mount

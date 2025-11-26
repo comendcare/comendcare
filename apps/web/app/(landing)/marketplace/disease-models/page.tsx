@@ -7,6 +7,7 @@ import { initializeDiseaseModelSearch } from "@comend/lib/initialize-client-stat
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore";
 import { SearchParams } from "@comend/components/types";
 import { useShallow } from "zustand/react/shallow";
+import { redirect } from "next/navigation";
 
 interface IndexPageProps {
     searchParams: Promise<SearchParams>
@@ -18,6 +19,8 @@ const selector = (state: DiseaseModelSearchState) => ({
 })
 
 export default function DiseaseModelsPage(props: IndexPageProps) {
+    redirect("/marketplace") // temporary redirect
+    
     const {initialized, setSortBy} = useDiseaseModelSearchStore(useShallow(selector))
     const [isInitialized, setIsInitialized] = useState(false)
 
