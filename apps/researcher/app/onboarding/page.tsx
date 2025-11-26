@@ -54,12 +54,32 @@ const userFormSchema = z.object({
     title: z.string().optional(),
     website: z.string().optional(),
     country: z.string(),
-    description: z.string().min(50, {
-        message: "Your profile's description must be at least 50 characters long.",
-    }).max(500, {
-        message: "Your profile's description must less than 500 characters long.",
-    }).optional(),
+    description: z.preprocess(
+        (val) => {
+            if (typeof val !== "string") return val;
+            const trimmed = val.trim();
+            // treat empty string as "not provided"
+            return trimmed === "" ? undefined : trimmed;
+        },
+        z
+            .string()
+            .min(50, {
+                message: "Your profile's description must be at least 50 characters long.",
+            })
+            .max(500, {
+                message: "Your profile's description must less than 500 characters long.",
+            })
+            .optional()
+    ),
     affiliations: z.array(optionSchema),
+    groupName: z.preprocess(
+        (val) => {
+            if (typeof val !== "string") return val;
+            const trimmed = val.trim();
+            return trimmed === "" ? undefined : trimmed;
+        },
+        z.string().min(2).optional()
+    ),
     orcid: z.preprocess(
         (val) => {
             if (typeof val !== "string") return val;
@@ -111,6 +131,7 @@ export default function ResearcherOnboardingForm() {
                     description: true,
                     website: true,
                     title: true,
+                    groupName: true,
                     researchInterests: true,
                     conditionsOfInterest: true,
                     genesOfInterest: true,
@@ -134,6 +155,9 @@ export default function ResearcherOnboardingForm() {
                 const userResponse = await getUser(session.user.id, {
                     id: true,
                     name: true,
+                    notificationSettings: true,
+                    consentSettings: true,
+                    image: true,
                 });
                 if (userResponse.success) {
                     userData = userResponse.data
@@ -167,6 +191,7 @@ export default function ResearcherOnboardingForm() {
                             label: affiliation.institution.name,
                             value: affiliation.id
                         })) || [],
+                        groupName: researcherData.groupName || undefined,
                         orcid: researcherData.orcid || "",
                         researchInterests:
                             (researcherData.researchInterests || []).map((stored: string) => {
@@ -264,6 +289,7 @@ export default function ResearcherOnboardingForm() {
             fd.append("description", researcherOnlyValues.description ?? "");
             fd.append("website", researcherOnlyValues.website ?? "");
             fd.append("orcid", researcherOnlyValues.orcid ?? "");
+            fd.append("groupName", researcherOnlyValues.groupName ?? "");
 
             fd.append(
                 "affiliations",
@@ -451,26 +477,6 @@ export default function ResearcherOnboardingForm() {
 
                     <FormField
                         control={form.control}
-                        name="description"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>
-                                    Describe your research in a few sentences.
-                                </FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                        rows={4}
-                                        placeholder="Up to 500 characters"
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
                         name="website"
                         render={({field}) => (
                             <FormItem>
@@ -540,6 +546,25 @@ export default function ResearcherOnboardingForm() {
                                         emptyIndicator={<p>No institutions found.</p>}
                                         showHoverCard={false}
                                     />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="groupName"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>
+                                    Group name
+                                </FormLabel>
+                                <FormDescription>
+                                    {`Name of your department, lab, or team.`}
+                                </FormDescription>
+                                <FormControl>
+                                    <Input type="text" {...field} />
                                 </FormControl>
                                 <FormMessage/>
                             </FormItem>
@@ -703,6 +728,29 @@ export default function ResearcherOnboardingForm() {
                             )}
                         />
                     </div>
+
+                    <FormField
+                        control={form.control}
+                        name="description"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>
+                                    Description
+                                </FormLabel>
+                                <FormDescription>
+                                    Tell people about you — your background, projects, interests or anything else you’d like to share
+                                </FormDescription>
+                                <FormControl>
+                                    <Textarea
+                                        rows={4}
+                                        placeholder="Up to 500 characters"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
