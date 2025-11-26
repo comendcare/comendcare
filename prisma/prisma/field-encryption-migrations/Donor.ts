@@ -46,12 +46,12 @@ async function migrateRecord(client: PrismaClient, cursor: Cursor | undefined) {
         race: true,
         ethnicity: true,
         species: true,
-        age: true,
-        height: true,
-        weight: true,
-        bmi: true,
-        treatments: true,
-        medications: true
+        // age: true,
+        // height: true,
+        // weight: true,
+        // bmi: true,
+        // treatments: true,
+        // medications: true
       }
     })
     console.log(`record`, record)
@@ -69,12 +69,18 @@ async function migrateRecord(client: PrismaClient, cursor: Cursor | undefined) {
         race: record.race,
         ethnicity: record.ethnicity,
         species: record.species,
-        age: record.age,
-        height: record.height,
-        weight: record.weight,
-        bmi: record.bmi,
-        treatments: record.treatments,
-        medications: record.medications
+        // age: record.age,
+        // age: null,
+        // height: record.height,
+        // height: null,
+        // weight: record.weight,
+        // weight: null,
+        // bmi: record.bmi,
+        // bmi: null,
+        // treatments: record.treatments,
+        // treatments: [],
+        // medications: record.medications
+        // medications: [],
       }
     })
     return record.id
