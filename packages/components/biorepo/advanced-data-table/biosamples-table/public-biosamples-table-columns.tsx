@@ -87,6 +87,7 @@ export function useBiosamplesTableColumns(
                 </>
             ),
             enableHiding: true,
+            enableSorting,
             enableColumnFilter: true,
             meta: {
                 label: "Type",
