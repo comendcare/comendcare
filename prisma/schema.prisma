@@ -1327,6 +1327,7 @@ model Researcher {
   description                   String?
   country                       String?
   title                         String?
+  groupName                     String?
   researchInterests             String[]
   therapeuticsOfInterest        String[]
   conditionsOfInterest          String[]
