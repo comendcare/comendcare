@@ -59,12 +59,32 @@ const formSchema = z.object({
     image: z.string().nullable().optional(),
     website: z.string().optional(),
     country: z.string(),
-    description: z.string().min(50, {
-        message: "Your profile's description must be at least 50 characters long.",
-    }).max(500, {
-        message: "Your profile's description must less than 500 characters long.",
-    }).optional(),
+    description: z.preprocess(
+        (val) => {
+            if (typeof val !== "string") return val;
+            const trimmed = val.trim();
+            // treat empty string as "not provided"
+            return trimmed === "" ? undefined : trimmed;
+        },
+        z
+            .string()
+            .min(50, {
+                message: "Your profile's description must be at least 50 characters long.",
+            })
+            .max(500, {
+                message: "Your profile's description must less than 500 characters long.",
+            })
+            .optional()
+    ),
     affiliations: z.array(optionSchema),
+    groupName: z.preprocess(
+        (val) => {
+            if (typeof val !== "string") return val;
+            const trimmed = val.trim();
+            return trimmed === "" ? undefined : trimmed;
+        },
+        z.string().min(2).optional()
+    ),
     orcid: z.preprocess(
         (val) => {
             if (typeof val !== "string") return val;
@@ -126,6 +146,7 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                         label: a.institution?.name,
                         value: a.institution?.id,
                     })) || [],
+                    groupName: researcher.groupName || undefined,
                     orcid: researcher.orcid || "",
                     researchInterests:
                         (researcher.researchInterests || []).map((stored: string) => {
@@ -243,10 +264,8 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
             fd.append("country", values.country ?? "");
             fd.append("description", values.description ?? "");
             fd.append("website", values.website ?? "");
-            fd.append(
-                "orcid",
-                values.orcid?.trim() || ""
-            );
+            fd.append("groupName", values.groupName ?? "");
+            fd.append("orcid", values.orcid?.trim() || "");
             fd.append(
                 "therapeuticsOfInterest",
                 values.therapeuticsOfInterest?.map(t => t.value).join(",") ?? ""
@@ -424,24 +443,6 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
 
                         <FormField
                             control={form.control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Describe your research in a few sentences.</FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            rows={4}
-                                            placeholder="Up to 500 characters"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
                             name="website"
                             render={({field}) => (
                                 <FormItem>
@@ -499,6 +500,25 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                                             emptyIndicator={<p>No institutions found.</p>}
                                             showHoverCard={false}
                                         />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="groupName"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Group name
+                                    </FormLabel>
+                                    <FormDescription>
+                                        {`Name of your department, lab, or team.`}
+                                    </FormDescription>
+                                    <FormControl>
+                                        <Input type="text" {...field} />
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem>
@@ -663,6 +683,29 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                                             loadingIndicator={<p>Loading genes...</p>}
                                             emptyIndicator={<p>No genes found.</p>}
                                             showHoverCard={false}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Description
+                                    </FormLabel>
+                                    <FormDescription>
+                                        Tell people about you — your background, projects, interests or anything else you’d like to share
+                                    </FormDescription>
+                                    <FormControl>
+                                        <Textarea
+                                            rows={4}
+                                            placeholder="Up to 500 characters"
+                                            {...field}
                                         />
                                     </FormControl>
                                     <FormMessage/>

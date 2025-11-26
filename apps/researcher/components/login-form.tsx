@@ -11,6 +11,8 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@c
 import {Input} from "@comend/components/ui/input";
 import {Button} from "@comend/components/ui/button";
 import {z} from "zod"
+import {Alert, AlertDescription, AlertTitle} from "@comend/components/ui/alert";
+import {CheckCircle2Icon} from "lucide-react";
 
 const signinFormSchema = z.object({
     email: z.string({required_error: "Email is required"}).email({message: "Invalid email format"}) // Custom error message is optional
@@ -50,6 +52,15 @@ export default function ResearcherLoginForm({callback = "/", isCaptchaVerified =
 
     return (
         <div className="flex flex-col space-y-8">
+            <Alert>
+                <CheckCircle2Icon />
+                <AlertTitle>
+                    {`Be sure to use a reachable organization email to create your account.`}
+                </AlertTitle>
+                <AlertDescription>
+                    {`Don't use your personal account.`}
+                </AlertDescription>
+            </Alert>
             <Form {...form}>
                 <form className="space-y-2">
                     <FormField
