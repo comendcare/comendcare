@@ -3331,15 +3331,15 @@ export const updateBiosample = withOrganizationAuth(
                     where: {id: data.donorId},
                     data: {
                         internalId: data.internalDonorId,
-                        age: typeof data.age === "string" ? parseInt(data.age, 10) : data.age,
+                        // age: typeof data.age === "string" ? parseInt(data.age, 10) : data.age,
                         sex: data.sex,
                         gender: data.gender,
                         race: data.race,
                         ethnicity: data.ethnicity,
                         treatments: data.treatments,
-                        height: typeof data.height === "string" ? parseInt(data.height, 10) : data.height,
-                        weight: typeof data.weight === "string" ? parseInt(data.weight, 10) : data.weight,
-                        bmi: typeof data.bmi === "string" ? parseInt(data.bmi, 10) : data.bmi,
+                        // height: typeof data.height === "string" ? parseInt(data.height, 10) : data.height,
+                        // weight: typeof data.weight === "string" ? parseInt(data.weight, 10) : data.weight,
+                        // bmi: typeof data.bmi === "string" ? parseInt(data.bmi, 10) : data.bmi,
                         medications: data.medications,
                         ...(data.diagnoses
                             ? {
