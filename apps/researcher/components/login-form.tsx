@@ -164,39 +164,39 @@ export default function ResearcherLoginForm({callback = "/", isCaptchaVerified =
                         </>
                     )}
                 </Button>
-                <Button
-                    variant="outline"
-                    disabled={loading || !isCaptchaVerified}
-                    onClick={() => {
-                        setLoading(true)
-                        signIn("orcid", {
-                            callbackUrl: callback
-                        })
-                    }}
-                    className="w-full"
-                >
-                    {loading ? (
-                        <LoadingDots color="#A8A29E"/>
-                    ) : (
-                        <>
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 aria-label="Orcid" role="img"
-                                 viewBox="0 0 512 512">
-                                <rect
-                                    width="512" height="512"
-                                    rx="15%"
-                                    fill="#fff"/>
-                                <circle cx="256" cy="256" r="256" fill="#a6ce39"/>
-                                <path
-                                    d="m173 372h-31v-214h31zm45-214h83c79 0 114 57 114 107 0 55-43 107-114 107h-84zm31 187h49c70 0 86-53 86-79 0-43-27-79-87-79h-47zm-71-231c0 11-9 20-20 20s-20-9-20-20a20 20 0 0 1 20-20c11 0 20 9 20 20z"
-                                    fill="#fff"/>
-                            </svg>
-                            <p className="text-sm font-medium text-stone-600 dark:text-stone-400">
-                                Login with ORCID
-                            </p>
-                        </>
-                    )}
-                </Button>
+                {/*<Button*/}
+                {/*    variant="outline"*/}
+                {/*    disabled={loading || !isCaptchaVerified}*/}
+                {/*    onClick={() => {*/}
+                {/*        setLoading(true)*/}
+                {/*        signIn("orcid", {*/}
+                {/*            callbackUrl: callback*/}
+                {/*        })*/}
+                {/*    }}*/}
+                {/*    className="w-full"*/}
+                {/*>*/}
+                {/*    {loading ? (*/}
+                {/*        <LoadingDots color="#A8A29E"/>*/}
+                {/*    ) : (*/}
+                {/*        <>*/}
+                {/*            <svg xmlns="http://www.w3.org/2000/svg"*/}
+                {/*                 aria-label="Orcid" role="img"*/}
+                {/*                 viewBox="0 0 512 512">*/}
+                {/*                <rect*/}
+                {/*                    width="512" height="512"*/}
+                {/*                    rx="15%"*/}
+                {/*                    fill="#fff"/>*/}
+                {/*                <circle cx="256" cy="256" r="256" fill="#a6ce39"/>*/}
+                {/*                <path*/}
+                {/*                    d="m173 372h-31v-214h31zm45-214h83c79 0 114 57 114 107 0 55-43 107-114 107h-84zm31 187h49c70 0 86-53 86-79 0-43-27-79-87-79h-47zm-71-231c0 11-9 20-20 20s-20-9-20-20a20 20 0 0 1 20-20c11 0 20 9 20 20z"*/}
+                {/*                    fill="#fff"/>*/}
+                {/*            </svg>*/}
+                {/*            <p className="text-sm font-medium text-stone-600 dark:text-stone-400">*/}
+                {/*                Login with ORCID*/}
+                {/*            </p>*/}
+                {/*        </>*/}
+                {/*    )}*/}
+                {/*</Button>*/}
             </div>
         </div>
     )
