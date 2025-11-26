@@ -162,6 +162,7 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                 />
             ),
             enableHiding: true,
+            enableSorting: false,
             meta: { label: "Internal donor ID" }
         },
         {
