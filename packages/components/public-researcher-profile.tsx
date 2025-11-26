@@ -45,10 +45,10 @@ const resolveCountry = (countryCodeOrName?: string | null) => {
 };
 
 export default function PublicResearcherProfile({
-                                              researcherData,
-                                              publications = [],
-                                              metrics = defaultMetrics,
-                                          }: {
+                                                    researcherData,
+                                                    publications = [],
+                                                    metrics = defaultMetrics,
+                                                }: {
     researcherData: any;        // or EnrichedResearcher
     publications?: any[];
     metrics?: ResearchMetrics;
@@ -92,21 +92,21 @@ export default function PublicResearcherProfile({
 
                                         {researcherData?.institution && (
                                             <div className="flex items-center gap-1">
-                                                <Building2 className="w-4 h-4" />
+                                                <Building2 className="w-4 h-4"/>
                                                 <span>{researcherData.institution}</span>
                                             </div>
                                         )}
 
                                         {researcherData?.country && (
                                             <div className="flex items-center gap-1">
-                                                <MapPin className="w-4 h-4" />
+                                                <MapPin className="w-4 h-4"/>
                                                 <span>{resolveCountry(researcherData.country)}</span>
                                             </div>
                                         )}
 
                                         {researcherData?.user?.email && (
                                             <div className="flex items-center gap-1">
-                                                <Mail className="w-4 h-4" />
+                                                <Mail className="w-4 h-4"/>
                                                 <span>{researcherData.user.email}</span>
                                             </div>
                                         )}
@@ -227,22 +227,29 @@ export default function PublicResearcherProfile({
                                     </CardContent>
                                 </>
                                 :
-                                <CardContent className="flex flex-col space-y-4">
-                                    {!researcherData?.orcid ? (
-                                        <div className="text-sm text-gray-600">
-                                            Add your ORCID to display your publications.
-                                        </div>
-                                    ) : publications.length > 0 ? (
-                                        <ResearcherProfilePublicationsSection
-                                            publications={publications}
-                                            orcid={researcherData?.orcid}
-                                        />
-                                    ) : (
-                                        <div className="text-sm text-gray-600">
-                                            No publications available.
-                                        </div>
-                                    )}
-                                </CardContent>
+                                <>
+                                    <CardHeader>
+                                        <CardTitle>
+                                            About
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="flex flex-col space-y-4">
+                                        {!researcherData?.orcid ? (
+                                            <div className="text-sm text-gray-600">
+                                                Add your ORCID to display your publications.
+                                            </div>
+                                        ) : publications.length > 0 ? (
+                                            <ResearcherProfilePublicationsSection
+                                                publications={publications}
+                                                orcid={researcherData?.orcid}
+                                            />
+                                        ) : (
+                                            <div className="text-sm text-gray-600">
+                                                No publications available.
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </>
                             }
                         </Card>
                     </div>
