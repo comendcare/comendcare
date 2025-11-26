@@ -3189,7 +3189,7 @@ const fetchBiosamples = async (
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                 // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
-                { donor: { internalId: { contains: input.q, mode: "insensitive" } } },
+                // { donor: { internalId: { contains: input.q, mode: "insensitive" } } }, // disable for now since this is encrypted
                 { donor: { id: {contains: input.q, mode: "insensitive" } } },
                 {
                     donor: {

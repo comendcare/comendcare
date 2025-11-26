@@ -95,21 +95,21 @@ export default function ResearcherProfile({
 
                                         {researcherData?.institution && (
                                             <div className="flex items-center gap-1">
-                                                <Building2 className="w-4 h-4" />
+                                                <Building2 className="w-4 h-4"/>
                                                 <span>{researcherData.institution}</span>
                                             </div>
                                         )}
 
                                         {researcherData?.country && (
                                             <div className="flex items-center gap-1">
-                                                <MapPin className="w-4 h-4" />
+                                                <MapPin className="w-4 h-4"/>
                                                 <span>{resolveCountry(researcherData.country)}</span>
                                             </div>
                                         )}
 
                                         {researcherData?.user?.email && (
                                             <div className="flex items-center gap-1">
-                                                <Mail className="w-4 h-4" />
+                                                <Mail className="w-4 h-4"/>
                                                 <span>{researcherData.user.email}</span>
                                             </div>
                                         )}
@@ -135,52 +135,52 @@ export default function ResearcherProfile({
                     {/* Left Sidebar */}
                     <div className="space-y-6">
                         {/* Metrics */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <TrendingUp className="w-5 h-5"/>
-                                    Research Metrics
-                                </CardTitle>
-                            </CardHeader>
+                        {/*<Card>*/}
+                        {/*    <CardHeader>*/}
+                        {/*        <CardTitle className="flex items-center gap-2">*/}
+                        {/*            <TrendingUp className="w-5 h-5"/>*/}
+                        {/*            Research Metrics*/}
+                        {/*        </CardTitle>*/}
+                        {/*    </CardHeader>*/}
 
-                            <CardContent className="space-y-4">
-                                {!researcherData?.orcid ? (
-                                    <div className="text-sm text-gray-600">
-                                        Add your ORCID to see your citation metrics.
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="text-center">
-                                            <div className="text-2xl font-bold text-blue-600">
-                                                {formatNumberWithCommas(metrics.citations)}
-                                            </div>
-                                            <div className="text-sm text-gray-600">Citations</div>
-                                        </div>
+                        {/*    <CardContent className="space-y-4">*/}
+                        {/*        {!researcherData?.orcid ? (*/}
+                        {/*            <div className="text-sm text-gray-600">*/}
+                        {/*                Add your ORCID to see your citation metrics.*/}
+                        {/*            </div>*/}
+                        {/*        ) : (*/}
+                        {/*            <div className="grid grid-cols-2 gap-4">*/}
+                        {/*                <div className="text-center">*/}
+                        {/*                    <div className="text-2xl font-bold text-blue-600">*/}
+                        {/*                        {formatNumberWithCommas(metrics.citations)}*/}
+                        {/*                    </div>*/}
+                        {/*                    <div className="text-sm text-gray-600">Citations</div>*/}
+                        {/*                </div>*/}
 
-                                        <div className="text-center">
-                                            <div className="text-2xl font-bold text-green-600">
-                                                {metrics.hIndex}
-                                            </div>
-                                            <div className="text-sm text-gray-600">h-index</div>
-                                        </div>
+                        {/*                <div className="text-center">*/}
+                        {/*                    <div className="text-2xl font-bold text-green-600">*/}
+                        {/*                        {metrics.hIndex}*/}
+                        {/*                    </div>*/}
+                        {/*                    <div className="text-sm text-gray-600">h-index</div>*/}
+                        {/*                </div>*/}
 
-                                        <div className="text-center">
-                                            <div className="text-2xl font-bold text-purple-600">
-                                                {metrics.publications}
-                                            </div>
-                                            <div className="text-sm text-gray-600">Publications</div>
-                                        </div>
+                        {/*                <div className="text-center">*/}
+                        {/*                    <div className="text-2xl font-bold text-purple-600">*/}
+                        {/*                        {metrics.publications}*/}
+                        {/*                    </div>*/}
+                        {/*                    <div className="text-sm text-gray-600">Publications</div>*/}
+                        {/*                </div>*/}
 
-                                        <div className="text-center">
-                                            <div className="text-2xl font-bold text-orange-600">
-                                                {metrics.yearsActive}
-                                            </div>
-                                            <div className="text-sm text-gray-600">Years Active</div>
-                                        </div>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
+                        {/*                <div className="text-center">*/}
+                        {/*                    <div className="text-2xl font-bold text-orange-600">*/}
+                        {/*                        {metrics.yearsActive}*/}
+                        {/*                    </div>*/}
+                        {/*                    <div className="text-sm text-gray-600">Years Active</div>*/}
+                        {/*                </div>*/}
+                        {/*            </div>*/}
+                        {/*        )}*/}
+                        {/*    </CardContent>*/}
+                        {/*</Card>*/}
 
 
                         {/* Research Interests */}
@@ -237,22 +237,29 @@ export default function ResearcherProfile({
                                     </CardContent>
                                 </>
                                 :
-                                <CardContent className="flex flex-col space-y-4">
-                                    {!researcherData?.orcid ? (
-                                        <div className="text-sm text-gray-600">
-                                            Add your ORCID to display your publications.
-                                        </div>
-                                    ) : publications.length > 0 ? (
-                                        <ResearcherProfilePublicationsSection
-                                            publications={publications}
-                                            orcid={researcherData?.orcid}
-                                        />
-                                    ) : (
-                                        <div className="text-sm text-gray-600">
-                                            No publications available.
-                                        </div>
-                                    )}
-                                </CardContent>
+                                <>
+                                    <CardHeader>
+                                        <CardTitle>
+                                            About
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="flex flex-col space-y-4">
+                                        {!researcherData?.orcid ? (
+                                            <div className="text-sm text-gray-600">
+                                                Add your ORCID to display your publications.
+                                            </div>
+                                        ) : publications.length > 0 ? (
+                                            <ResearcherProfilePublicationsSection
+                                                publications={publications}
+                                                orcid={researcherData?.orcid}
+                                            />
+                                        ) : (
+                                            <div className="text-sm text-gray-600">
+                                                No publications available.
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </>
                             }
                         </Card>
                     </div>

@@ -427,25 +427,37 @@ model DiagnosisType {
 }
 
 model Donor {
-  id         String   @id @unique @default(uuid())
-  internalId String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
+  id             String   @id @unique @default(uuid())
+  internalId     String? /// @encrypted
+  internalIdHash String? /// @encryption:hash(internalId) // searchable
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
 
-  age         Int?
-  sex         String?
-  gender      String?
-  race        String?
-  ethnicity   String?
-  treatments  String[]
-  diagnoses   DonorDiagnosis[]
-  height      Float?
-  weight      Float?
-  bmi         Float?
-  medications String[]
-  species     String?
+  sex           String? /// @encrypted
+  sexHash       String? /// @encryption:hash(sex)
+  gender        String? /// @encrypted
+  genderHash    String? /// @encryption:hash(gender)
+  race          String? /// @encrypted
+  raceHash      String? /// @encryption:hash(race)
+  ethnicity     String? /// @encrypted
+  ethnicityHash String? /// @encryption:hash(ethnicity)
+  species       String? /// @encrypted
+  speciesHash   String? /// @encryption:hash(species)
 
-  biosamples     Biosample[]
+  age    String? /// @encrypted
+  height String? /// @encrypted
+  weight String? /// @encrypted
+  bmi    String? /// @encrypted
+
+  // Encrypted arrays (cannot be hashed or searched)
+  treatments  String[] /// @encrypted
+  medications String[] /// @encrypted
+
+  // Relations
+  diagnoses  DonorDiagnosis[]
+  biosamples Biosample[]
+
+  // Org relation
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
