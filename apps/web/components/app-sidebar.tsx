@@ -31,7 +31,6 @@ import {usePathname} from "next/navigation";
 import {RoadmapState} from "./../state/roadmap/roadmapStore";
 import {Separator} from "@comend/components/ui/separator"
 
-// This is sample data.
 const data = {
     navMain: [
         {
