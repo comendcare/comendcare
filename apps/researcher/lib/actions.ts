@@ -60,7 +60,7 @@ export const deleteResearcher = withResearcherAuth(
             return {success: true, data: deletedUser};
         } catch (error: any) {
             logError("Error deleting researcher", error);
-            return {success: false, error: "Internal server error"};
+            return {success: false, error: error};
         }
     }
 );

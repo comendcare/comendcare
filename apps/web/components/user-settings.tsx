@@ -29,22 +29,21 @@ export default function UserSettings() {
         setIsDeleting(true); // Disable the button
 
         try {
-            await signOut()
             const response = await deleteUser()
 
-            mixpanelTrack("User Account Deleted", {
+            mixpanelTrack("Researcher Account Deleted", {
                 "Name": response?.data?.name,
                 "Email": response?.data?.email
             })
 
             if (response.success) {
-                revalidatePath("/app/profile")
                 toast.success("Deleted your account successfully.");
+                await signOut()
             } else {
                 toast.error("Failed to delete your account. Please try again.");
             }
         } catch (error) {
-            toast.error("An error occurred. Please try again later.");
+            toast.error(`An error occurred. ${error}.`);
         } finally {
             setIsDeleting(false); // Re-enable the button
         }

@@ -2218,7 +2218,7 @@ export const getResearcherFromUserId = withUserAuth(
             };
         } catch (error: any) {
             logError("Error fetching researcher", error);
-            return {success: false, error: "Internal server error"};
+            return {success: false, error: error};
         }
     }
 )

@@ -29,14 +29,8 @@ export default function ResearcherSettingsPage() {
         setIsDeleting(true); // Disable the button
 
         try {
-            await signOut()
             const researcherRes = await getResearcherFromUserId(session?.user.id, {
-                title: true,
-                affiliations: {select: {institution: true}},
-                orcid: true,
-                researchInterests: true,
-                conditionsOfInterest: true,
-                genesOfInterest: true,
+                id: true
             });
 
             const response = await deleteResearcher(researcherRes.data.id)
@@ -47,13 +41,13 @@ export default function ResearcherSettingsPage() {
             })
 
             if (response.success) {
-                revalidatePath("/app/profile")
                 toast.success("Deleted your account successfully.");
+                await signOut()
             } else {
-                toast.error("Failed to delete your account. Please try again.");
+                toast.error(`Failed to delete your account. ${response.error}.`);
             }
         } catch (error) {
-            toast.error("An error occurred. Please try again later.");
+            toast.error(`An error occurred. ${error}.`);
         } finally {
             setIsDeleting(false); // Re-enable the button
         }
