@@ -10,6 +10,7 @@ import dynamic from "next/dynamic";
 import {Button} from "@comend/components/ui/button";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import React from "react";
+import {Badge} from "@comend/components/ui/badge";
 
 const EditPagProfileAboutCardDialog = dynamic(
     () => import("~web/components/edit-pag-profile-about-card-dialog"),
@@ -38,8 +39,8 @@ export const PagProfileAboutCard = ({
     isPrivate?: boolean;
 }) => {
     // Cleaned lists (used for conditional rendering)
-    // const therapeuticsOfInterest = cleanBadges(organization?.therapeuticsOfInterest);
-    // const therapeuticsInDevelopment = cleanBadges(organization?.therapeuticsInDevelopment);
+    const therapeuticsOfInterest = cleanBadges(organization?.therapeuticsOfInterest);
+    const therapeuticsInDevelopment = cleanBadges(organization?.therapeuticsInDevelopment);
 
     return (
         <Card className="organization-profile-tour-step1" data-testid="about-card">
@@ -82,41 +83,41 @@ export const PagProfileAboutCard = ({
                         </div>
                     </div>
 
-                    {/* Therapeutics of interest — render only if we have items */}
-                    {/*{therapeuticsOfInterest.length > 0 && (*/}
-                    {/*    <>*/}
-                    {/*        <div className="flex flex-row items-center justify-between w-full">*/}
-                    {/*            <h4 className="scroll-m-20 text-base font-semibold" data-testid="toi-heading">*/}
-                    {/*                Therapeutics of interest*/}
-                    {/*            </h4>*/}
-                    {/*        </div>*/}
-                    {/*        <div className="flex flex-wrap gap-1 sm:gap-2" data-testid="toi-section">*/}
-                    {/*            {therapeuticsOfInterest.map((item, i) => (*/}
-                    {/*                <Badge data-testid="toi-badge" key={`${item}-${i}`} className="text-sm">*/}
-                    {/*                    {item.charAt(0).toUpperCase() + item.slice(1)}*/}
-                    {/*                </Badge>*/}
-                    {/*            ))}*/}
-                    {/*        </div>*/}
-                    {/*    </>*/}
-                    {/*)}*/}
+                     Therapeutics of interest — render only if we have items
+                    {therapeuticsOfInterest.length > 0 && (
+                        <>
+                            <div className="flex flex-row items-center justify-between w-full">
+                                <h4 className="scroll-m-20 text-base font-semibold" data-testid="toi-heading">
+                                    Therapeutics of interest
+                                </h4>
+                            </div>
+                            <div className="flex flex-wrap gap-1 sm:gap-2" data-testid="toi-section">
+                                {therapeuticsOfInterest.map((item, i) => (
+                                    <Badge data-testid="toi-badge" key={`${item}-${i}`} className="text-sm">
+                                        {item.charAt(0).toUpperCase() + item.slice(1)}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </>
+                    )}
 
-                    {/*/!* Therapeutics in development — render only if we have items *!/*/}
-                    {/*{therapeuticsInDevelopment.length > 0 && (*/}
-                    {/*    <>*/}
-                    {/*        <div className="flex flex-row items-center justify-between w-full">*/}
-                    {/*            <h4 className="scroll-m-20 text-base font-semibold" data-testid="tid-heading">*/}
-                    {/*                Therapeutics in development*/}
-                    {/*            </h4>*/}
-                    {/*        </div>*/}
-                    {/*        <div className="flex flex-wrap gap-1 sm:gap-2" data-testid="tid-section">*/}
-                    {/*            {therapeuticsInDevelopment.map((item, i) => (*/}
-                    {/*                <Badge data-testid="tid-badge" key={`${item}-${i}`} className="text-sm">*/}
-                    {/*                    {item.charAt(0).toUpperCase() + item.slice(1)}*/}
-                    {/*                </Badge>*/}
-                    {/*            ))}*/}
-                    {/*        </div>*/}
-                    {/*    </>*/}
-                    {/*)}*/}
+                    {/* Therapeutics in development — render only if we have items */}
+                    {therapeuticsInDevelopment.length > 0 && (
+                        <>
+                            <div className="flex flex-row items-center justify-between w-full">
+                                <h4 className="scroll-m-20 text-base font-semibold" data-testid="tid-heading">
+                                    Therapeutics in development
+                                </h4>
+                            </div>
+                            <div className="flex flex-wrap gap-1 sm:gap-2" data-testid="tid-section">
+                                {therapeuticsInDevelopment.map((item, i) => (
+                                    <Badge data-testid="tid-badge" key={`${item}-${i}`} className="text-sm">
+                                        {item.charAt(0).toUpperCase() + item.slice(1)}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </>
+                    )}
 
                     <div className="space-y-2" data-testid="members-section">
                         <div className="flex flex-wrap justify-between items-baseline gap-x-2 gap-y-1">
