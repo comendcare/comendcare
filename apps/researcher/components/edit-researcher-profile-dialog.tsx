@@ -31,7 +31,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
 import {Pencil} from "lucide-react";
 import {useRouter} from "next/navigation";
-import {editUser, updateResearcher} from "@comend/lib/actions";
+import {editUser} from "@comend/lib/actions";
 import {ACADEMIC_ROLES, COUNTRIES, MILESTONE_TYPE_OPTIONS, MODALITIES, Option, optionSchema} from "@comend/lib/types";
 import {useSession} from "next-auth/react";
 import {badgeVariants} from "@comend/components/ui/badge";
@@ -44,6 +44,7 @@ import {FileWithPreview} from "@comend/components/image-selector";
 import {getPublicFile} from "@comend/lib/utils";
 import {handleImageDelete, handleImageUpload} from "@comend/lib/upload";
 import mixpanel from "mixpanel-browser";
+import {updateResearcher} from "~researcher/lib/actions";
 
 const formSchema = z.object({
     name: z.string().min(2),

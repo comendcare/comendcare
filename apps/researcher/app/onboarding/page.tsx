@@ -17,7 +17,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import {editUser, updateResearcher} from "@comend/lib/actions";
+import {editUser} from "@comend/lib/actions";
 import {Checkbox} from "@comend/components/ui/checkbox";
 import {AddressType, COUNTRIES, MODALITIES, Option} from "@comend/lib/types";
 import React, {useEffect, useState} from "react";
@@ -37,6 +37,7 @@ import {badgeVariants} from "@comend/components/ui/badge"
 import {Textarea} from "@comend/components/ui/textarea";
 import {Separator} from "@comend/components/ui/separator";
 import {getResearcherFromUserId} from "~researcher/lib/fetchers";
+import {updateResearcher} from "~researcher/lib/actions";
 
 const optionSchema = z.object({
     label: z.string(),

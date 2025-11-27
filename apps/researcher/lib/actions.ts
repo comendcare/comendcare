@@ -1,28 +1,18 @@
 "use server"
 
 import prisma from "@comend/lib/prisma";
-import {logError} from "@comend/lib/utils";
-import {deleteTypeSenseDocument} from "@comend/lib/utils";
-import {withResearcherAuth, getSession} from "~researcher/lib/auth";
+import {deleteTypeSenseDocument, logError} from "@comend/lib/utils";
+import {withResearcherAuth} from "~researcher/lib/auth";
+import {getSession, withAuth} from "@comend/lib/auth";
 
 export const deleteResearcher = withResearcherAuth(
-    async (researcherId: string | null, text: string) => {
+    async (researcher: Researcher, text: string) => {
         const session = await getSession();
 
         try {
             if (!session?.user?.id) {
                 return {success: false, error: "Session not found."};
             }
-
-            if (!researcherId) {
-                return {success: false, error: "Researcher ID not provided."};
-            }
-
-            // Get researcher + linked user
-            const researcher = await prisma.researcher.findUnique({
-                where: {id: researcherId},
-                select: {id: true, userId: true},
-            });
 
             if (!researcher) {
                 return {success: false, error: "Researcher not found."};
@@ -61,6 +51,132 @@ export const deleteResearcher = withResearcherAuth(
         } catch (error: any) {
             logError("Error deleting researcher", error);
             return {success: false, error: error};
+        }
+    }
+);
+export const updateResearcher = withAuth(
+    async (_id: unknown, formData: FormData) => {
+        const session = await getSession();
+        if (!session?.user.id) {
+            return {error: "Not authenticated"};
+        }
+
+        try {
+            const researcher = await prisma.researcher.findUnique({
+                where: {userId: session.user.id},
+                select: {id: true},
+            });
+
+            if (!researcher) return {error: "Researcher not found"};
+
+            const researcherData: Record<string, any> = {};
+            const userData: Record<string, any> = {};
+
+            // 👇 make this a normal string[] + flag
+            let affiliationIds: string[] = [];
+            let hasAffiliationsField = false;
+
+            formData.forEach((value, key) => {
+                const str = value.toString().trim();
+
+                // ARRAY FIELDS ON RESEARCHER
+                if (
+                    key === "researchInterests" ||
+                    key === "therapeuticsOfInterest" ||
+                    key === "conditionsOfInterest" ||
+                    key === "genesOfInterest"
+                ) {
+                    researcherData[key] = str ? str.split(",") : [];
+                    return;
+                }
+
+                // AFFILIATIONS (institution IDs)
+                if (key === "affiliations") {
+                    hasAffiliationsField = true;
+                    affiliationIds = str ? str.split(",") : [];
+                    return;
+                }
+
+                // USER FIELDS
+                if (key === "name") {
+                    userData.name = str === "" ? null : str;
+                    return;
+                }
+
+                if (key === "notificationSettings" || key === "consentSettings") {
+                    if (str === "") return; // don't touch if not sent
+                    userData[key] = str === "true";
+                    return;
+                }
+
+                // EVERYTHING ELSE → RESEARCHER SCALARS
+                // (title, country, website, description, orcid, etc.)
+                researcherData[key] = str === "" ? null : str;
+            });
+
+            // Handle affiliations via junction table
+            if (hasAffiliationsField) {
+                await prisma.affiliation.deleteMany({
+                    where: {researcherId: researcher.id},
+                });
+
+                if (affiliationIds.length > 0) {
+                    const existing = await prisma.institution.findMany({
+                        where: {id: {in: affiliationIds}},
+                        select: {id: true},
+                    });
+
+                    if (existing.length) {
+                        await prisma.affiliation.createMany({
+                            data: existing.map((inst) => ({
+                                researcherId: researcher.id,
+                                institutionId: inst.id,
+                            })),
+                        });
+                    }
+                }
+            }
+
+            // Update user if needed
+            if (Object.keys(userData).length > 0) {
+                await prisma.user.update({
+                    where: {id: session.user.id},
+                    data: userData,
+                });
+            }
+
+            // Update researcher
+            const response = await prisma.researcher.update({
+                where: {userId: session.user.id},
+                data: {
+                    ...researcherData,
+                    researchInterests: {
+                        set: Array.isArray(researcherData.researchInterests)
+                            ? researcherData.researchInterests
+                            : [],
+                    },
+                    therapeuticsOfInterest: {
+                        set: Array.isArray(researcherData.therapeuticsOfInterest)
+                            ? researcherData.therapeuticsOfInterest
+                            : [],
+                    },
+                    genesOfInterest: {
+                        set: Array.isArray(researcherData.genesOfInterest)
+                            ? researcherData.genesOfInterest
+                            : [],
+                    },
+                    conditionsOfInterest: {
+                        set: Array.isArray(researcherData.conditionsOfInterest)
+                            ? researcherData.conditionsOfInterest
+                            : [],
+                    },
+                },
+            });
+
+            return response;
+        } catch (error: any) {
+            console.error(error);
+            return {error: error.message};
         }
     }
 );

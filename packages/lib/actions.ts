@@ -1,47 +1,36 @@
 "use server"
 
 import prisma from "./prisma"
-import type {
-    Roadmap,
-    Organization,
-    User,
-    Invitation,
-    PlatformNotification,
-    Review,
-    Institution, Condition,
-    Biosample,
-    DiseaseModel,
-    Tool,
-} from "@prisma/client"
+import type {Condition, Invitation, Organization, PlatformNotification, Review, Roadmap, User,} from "@prisma/client"
 import {Prisma} from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
-import {authOptions, withAuth, withOrganizationAuth, withUserAuth} from "./auth"
-import {getSession} from "./auth"
+import {authOptions, getSession, withAuth, withOrganizationAuth, withUserAuth} from "./auth"
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
 import {
     addTypeSenseDocument,
     deleteTypeSenseDocument,
     getBlurDataURL,
-    logError, runInProduction,
+    logError,
+    runInProduction,
     toKebabCase,
     updateTypeSenseDocument
 } from "./utils";
 import {validateEmailDomain} from "./server-utils";
-import {getServerSession, Session} from "next-auth";
+import {getServerSession} from "next-auth";
 import {
     sendInviteEmail,
-    sendMemberRequestCreatedEmail,
+    sendMemberDeletedEmail,
     sendMemberRequestApprovedEmail,
-    sendNewOrganizationEmail,
+    sendMemberRequestCreatedEmail,
     sendMemberRequestDeniedEmail,
-    sendMemberDeletedEmail, sendProviderContactRequestEmail,
+    sendNewOrganizationEmail,
+    sendProviderContactRequestEmail,
 } from "./emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {
     Actor,
     ApiResponse,
-    Asset,
     DEFAULT_KANBAN_COLUMNS,
     editBiosampleForm,
     editDataToolForm,
@@ -49,11 +38,10 @@ import {
     MemberRequestWithUserAndOrganization,
     Milestone,
     Option,
-    optionSchema,
     RFP
 } from "./types";
 import {templateResearchPlans} from "./templates"
-import {InputJsonObject, JsonObject, JsonValue} from "@prisma/client/runtime/library"
+import {InputJsonObject, JsonObject} from "@prisma/client/runtime/library"
 import z from "zod"
 import {writeRawEvent} from "./raw-events";
 import crypto from "node:crypto";
@@ -5981,133 +5969,6 @@ export const deletePharmaProject = withAuth(
         }
     }
 )
-
-export const updateResearcher = withAuth(
-    async (_id: unknown, formData: FormData) => {
-        const session = await getSession();
-        if (!session?.user.id) {
-            return { error: "Not authenticated" };
-        }
-
-        try {
-            const researcher = await prisma.researcher.findUnique({
-                where: { userId: session.user.id },
-                select: { id: true },
-            });
-
-            if (!researcher) return { error: "Researcher not found" };
-
-            const researcherData: Record<string, any> = {};
-            const userData: Record<string, any> = {};
-
-            // 👇 make this a normal string[] + flag
-            let affiliationIds: string[] = [];
-            let hasAffiliationsField = false;
-
-            formData.forEach((value, key) => {
-                const str = value.toString().trim();
-
-                // ARRAY FIELDS ON RESEARCHER
-                if (
-                    key === "researchInterests" ||
-                    key === "therapeuticsOfInterest" ||
-                    key === "conditionsOfInterest" ||
-                    key === "genesOfInterest"
-                ) {
-                    researcherData[key] = str ? str.split(",") : [];
-                    return;
-                }
-
-                // AFFILIATIONS (institution IDs)
-                if (key === "affiliations") {
-                    hasAffiliationsField = true;
-                    affiliationIds = str ? str.split(",") : [];
-                    return;
-                }
-
-                // USER FIELDS
-                if (key === "name") {
-                    userData.name = str === "" ? null : str;
-                    return;
-                }
-
-                if (key === "notificationSettings" || key === "consentSettings") {
-                    if (str === "") return; // don't touch if not sent
-                    userData[key] = str === "true";
-                    return;
-                }
-
-                // EVERYTHING ELSE → RESEARCHER SCALARS
-                // (title, country, website, description, orcid, etc.)
-                researcherData[key] = str === "" ? null : str;
-            });
-
-            // Handle affiliations via junction table
-            if (hasAffiliationsField) {
-                await prisma.affiliation.deleteMany({
-                    where: { researcherId: researcher.id },
-                });
-
-                if (affiliationIds.length > 0) {
-                    const existing = await prisma.institution.findMany({
-                        where: { id: { in: affiliationIds } },
-                        select: { id: true },
-                    });
-
-                    if (existing.length) {
-                        await prisma.affiliation.createMany({
-                            data: existing.map((inst) => ({
-                                researcherId: researcher.id,
-                                institutionId: inst.id,
-                            })),
-                        });
-                    }
-                }
-            }
-
-            // Update user if needed
-            if (Object.keys(userData).length > 0) {
-                await prisma.user.update({
-                    where: { id: session.user.id },
-                    data: userData,
-                });
-            }
-
-            // Update researcher
-            const response = await prisma.researcher.update({
-                where: { userId: session.user.id },
-                data: {
-                    ...researcherData,
-                    researchInterests: {
-                        set: Array.isArray(researcherData.researchInterests)
-                            ? researcherData.researchInterests
-                            : [],
-                    },
-                    therapeuticsOfInterest: {
-                        set: Array.isArray(researcherData.therapeuticsOfInterest)
-                            ? researcherData.therapeuticsOfInterest
-                            : [],
-                    },
-                    genesOfInterest: {
-                        set: Array.isArray(researcherData.genesOfInterest)
-                            ? researcherData.genesOfInterest
-                            : [],
-                    },
-                    conditionsOfInterest: {
-                        set: Array.isArray(researcherData.conditionsOfInterest)
-                            ? researcherData.conditionsOfInterest
-                            : [],
-                    },
-                },
-            });
-
-            return response;
-        } catch (error: any) {
-            console.error(error);
-            return { error: error.message };
-        }
-    }
-);
 
 export const createMaterialAndDataAccessRequest = withResearcherAuth(
     async (user: User, formData: FormData) => {

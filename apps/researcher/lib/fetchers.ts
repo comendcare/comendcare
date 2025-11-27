@@ -30,6 +30,7 @@ export const getAllBiosamples = withResearcherAuth(
         }
     }
 );
+
 export const getResearcherFromUserId = withUserAuth(
     async (
         userId: string,
