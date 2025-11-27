@@ -23,7 +23,6 @@ import {AddressType, COUNTRIES, MODALITIES, Option} from "@comend/lib/types";
 import React, {useEffect, useState} from "react";
 import {FileWithPreview} from "@comend/components/image-selector";
 import {
-    getResearcherFromUserId,
     getUser
 } from "@comend/lib/fetchers";
 import {handleImageUpload} from "@comend/lib/upload";
@@ -37,6 +36,7 @@ import {MILESTONE_TYPE_OPTIONS, ACADEMIC_ROLES} from "@comend/lib/types"
 import {badgeVariants} from "@comend/components/ui/badge"
 import {Textarea} from "@comend/components/ui/textarea";
 import {Separator} from "@comend/components/ui/separator";
+import {getResearcherFromUserId} from "~researcher/lib/fetchers";
 
 const optionSchema = z.object({
     label: z.string(),

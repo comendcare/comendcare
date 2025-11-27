@@ -1,12 +1,11 @@
 import {getServerSession, type NextAuthOptions} from "next-auth"
-import GitHubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google"
 import FacebookProvider from "next-auth/providers/facebook"
 import LinkedInProvider from "next-auth/providers/linkedin"
 import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "./prisma"
-import {Member, Organization, PrismaClient} from "@prisma/client";
+import {PrismaClient} from "@prisma/client";
 import sgMail from "@sendgrid/mail";
 import {cioIdentify} from "./customer-io-identify";
 
@@ -410,35 +409,3 @@ export function withUserAuth(action: any) {
     }
 }
 
-export function withResearcherAuth(action: any) {
-    return async (
-        userId: string | null | undefined,
-        ...args: any
-    ) => {
-        const session = await getSession()
-        if (!session) {
-            // toast.error("Not authenticated: could not find session data")
-            return {error: "Not authenticated: could not find session data"}
-        }
-
-        if (!userId) return {error: "Not authorized: userId not provided"}
-        if (userId !== session.user.id) return {error: "Not authorized: provided userId does not match userId in session"}
-
-        const user = await prisma.user.findUnique({
-            where: {id: userId}
-        })
-        if (!user) {
-            // toast.error("Not authorized: user doesn't exist")
-            return {error: "Not authorized: user doesn't exist"}
-        }
-
-        const researcher = await prisma.researcher.findUnique({
-            where: {userId: userId}
-        })
-        if (!researcher) {
-            return {error: "Not authorized: researcher doesn't exist"}
-        }
-
-        return action(researcher, ...args)
-    }
-}

@@ -1,9 +1,9 @@
 "use server"
 
-import {getSession, withResearcherAuth} from "@comend/lib/auth";
 import prisma from "@comend/lib/prisma";
 import {logError} from "@comend/lib/utils";
 import {deleteTypeSenseDocument} from "@comend/lib/utils";
+import {withResearcherAuth, getSession} from "~researcher/lib/auth";
 
 export const deleteResearcher = withResearcherAuth(
     async (researcherId: string | null, text: string) => {

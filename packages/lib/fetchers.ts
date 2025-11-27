@@ -3,51 +3,47 @@
 import prisma from "./prisma"
 import {
     ApiResponse,
+    BIOSAMPLE_TYPE_OPTIONS,
     DISEASE_MODEL_TYPE_OPTIONS,
     GLOBAL_FEED_TYPES,
-    milestoneCategories,
+    Option,
     RequestFiltersType,
-    RESEARCH_PLAN_TYPES
+    TOOL_TYPE_OPTIONS
 } from "./types";
-import {formatMoney, getProfileCompletionChecks, getStage, logError} from "./utils";
-import {getSession, withOrganizationAuth, withUserAuth, withResearcherAuth} from "./auth";
+import {logError} from "./utils";
+import {getSession, withOrganizationAuth, withUserAuth} from "./auth";
 import type {
+    Biosample,
     Condition,
+    DiseaseModel,
     MaterialAndDataAccessRequest,
     Organization,
     Prisma,
     Researcher,
-    User,
-    Biosample,
-    DiseaseModel,
-    Tool
+    Tool,
+    User
 } from "@prisma/client";
 import {promises as fs} from "fs";
 import path from "path";
 import {z} from "zod";
 import {
-    IPSchema,
     biosampleSchema,
     clinicalStudySchema,
-    preclinicalStudySchema,
-    taskSchema
+    IPSchema,
+    preclinicalStudySchema
 } from "./../../packages/data/pharma-data/schema";
 import {InternalArgs} from "@prisma/client/runtime/library"
 import {omit} from "lodash";
-import {getPubMedSearchResultIds, getPubMedSearchResultData} from "./pubmed";
+import {getPubMedSearchResultData, getPubMedSearchResultIds} from "./pubmed";
 import {filterColumns} from "./filter-columns";
 import {nanoid} from "nanoid";
-import {BIOSAMPLE_TYPE_OPTIONS, TOOL_TYPE_OPTIONS, Option} from "./types";
 import {mergeResearcherData, mergeResearcherDataAdvanced} from "./../../apps/researcher/lib/utils";
-import {
-    GetBiosamplesSchema,
-    GetClinicalDatasetsSchema,
-    GetDiseaseModelSchema
-} from "./validations";
+import {GetBiosamplesSchema, GetClinicalDatasetsSchema, GetDiseaseModelSchema} from "./validations";
 import {notFound, redirect} from "next/navigation";
 import {switchOrganization} from "./actions";
-import { ColumnDef } from "@tanstack/react-table";
-import { ExtendedColumnSort } from "@comend/lib/types/data-table";
+import {ColumnDef} from "@tanstack/react-table";
+import {ExtendedColumnSort} from "@comend/lib/types/data-table";
+import {withResearcherAuth} from "comend-researcher-hub/lib/auth";
 
 /* PUBLIC FUNCTION - these functions are accessible to anyone on the platform, no auth needed */
 export async function findInstitutions(
@@ -2182,43 +2178,6 @@ export const getResearcher = withUserAuth(
         } catch (error: any) {
             logError("Error fetching researcher", error);
             return {success: false, error: "Internal server error"};
-        }
-    }
-)
-
-export const getResearcherFromUserId = withUserAuth(
-    async (
-        userId: string,
-        select: Prisma.ResearcherSelect<InternalArgs & {
-            result: {};
-            model: {};
-            query: {};
-            client: {};
-        }>
-    ) => {
-        const session = await getSession();
-
-        try {
-            if (!session) {
-                return {success: false, error: "Session not found."};
-            }
-
-            const fetchedResearcher = await prisma.researcher.findUnique({
-                where: {userId: session.user.id},
-                select
-            })
-
-            if (!fetchedResearcher) {
-                return {success: false, error: "Researcher not found"};
-            }
-
-            return {
-                success: true,
-                data: fetchedResearcher
-            };
-        } catch (error: any) {
-            logError("Error fetching researcher", error);
-            return {success: false, error: error};
         }
     }
 )

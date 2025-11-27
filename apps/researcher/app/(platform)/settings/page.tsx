@@ -18,7 +18,8 @@ import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {revalidatePath} from "next/cache";
 import {toast} from "sonner";
 import {deleteResearcher} from "~researcher/lib/actions";
-import {getResearcherFromUserId} from "@comend/lib/fetchers";
+
+import {getResearcherFromUserId} from "~researcher/lib/fetchers";
 
 
 export default function ResearcherSettingsPage() {

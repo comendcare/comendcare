@@ -1,7 +1,6 @@
 import {getServerSession, type NextAuthOptions} from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import EmailProvider from "next-auth/providers/email";
-import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@comend/lib/prisma"
 import {PrismaClient} from "@prisma/client";
 import {OAuthConfig} from "next-auth/providers/oauth";
@@ -288,4 +287,63 @@ export function getSession() {
             orcid?: string
         }
     } | null>
+}
+
+export function withUserAuth(action: any) {
+    return async (
+        userId: string | null | undefined,
+        ...args: any
+    ) => {
+        const session = await getSession()
+        if (!session) {
+            // toast.error("Not authenticated: could not find session data")
+            return {error: "Not authenticated: could not find session data"}
+        }
+
+        if (!userId) return {error: "Not authorized: userId not provided"}
+        if (userId !== session.user.id) return {error: "Not authorized: provided userId does not match userId in session"}
+
+        const user = await prisma.user.findUnique({
+            where: {id: userId}
+        })
+        if (!user) {
+            // toast.error("Not authorized: user doesn't exist")
+            return {error: "Not authorized: user doesn't exist"}
+        }
+
+        return action(user, ...args)
+    }
+}
+
+export function withResearcherAuth(action: any) {
+    return async (
+        userId: string | null | undefined,
+        ...args: any
+    ) => {
+        const session = await getSession()
+        if (!session) {
+            // toast.error("Not authenticated: could not find session data")
+            return {error: "Not authenticated: could not find session data"}
+        }
+
+        if (!userId) return {error: "Not authorized: userId not provided"}
+        if (userId !== session.user.id) return {error: "Not authorized: provided userId does not match userId in session"}
+
+        const user = await prisma.user.findUnique({
+            where: {id: userId}
+        })
+        if (!user) {
+            // toast.error("Not authorized: user doesn't exist")
+            return {error: "Not authorized: user doesn't exist"}
+        }
+
+        const researcher = await prisma.researcher.findUnique({
+            where: {userId: userId}
+        })
+        if (!researcher) {
+            return {error: "Not authorized: researcher doesn't exist"}
+        }
+
+        return action(researcher, ...args)
+    }
 }

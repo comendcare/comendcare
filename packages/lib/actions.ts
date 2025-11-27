@@ -15,7 +15,7 @@ import type {
 } from "@prisma/client"
 import {Prisma} from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
-import {authOptions, withAuth, withOrganizationAuth, withResearcherAuth, withUserAuth} from "./auth"
+import {authOptions, withAuth, withOrganizationAuth, withUserAuth} from "./auth"
 import {getSession} from "./auth"
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
@@ -59,6 +59,7 @@ import {writeRawEvent} from "./raw-events";
 import crypto from "node:crypto";
 import {customerIOTrack} from "./customer-io-track";
 import {cioDeleteUser} from "./customer-io";
+import {withResearcherAuth} from "comend-researcher-hub/lib/auth";
 
 const PATHS = [
     "/app",
