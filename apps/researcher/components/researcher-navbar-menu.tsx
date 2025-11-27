@@ -78,7 +78,9 @@ export function ResearcherNavbarMenu() {
                                         >
                                             <div className="flex flex-row items-center gap-2">
                                                 <div>{icon}</div>
-                                                <div>{label}</div>
+                                                <div className="hidden sm:block">
+                                                    {label}
+                                                </div>
                                             </div>
                                         </div>
                                     </TooltipTrigger>
@@ -95,7 +97,9 @@ export function ResearcherNavbarMenu() {
                                 >
                                     <div className="flex flex-row items-center gap-2">
                                         <div>{icon}</div>
-                                        <div>{label}</div>
+                                        <div className="hidden sm:block">
+                                            {label}
+                                        </div>
                                     </div>
                                 </Link>
                             )}
