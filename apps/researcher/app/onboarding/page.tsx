@@ -44,11 +44,6 @@ const optionSchema = z.object({
     disable: z.boolean().optional(),
 });
 
-const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
-    ...option,
-    value: option.id,
-}));
-
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
     title: z.string().optional(),
@@ -195,7 +190,7 @@ export default function ResearcherOnboardingForm() {
                         orcid: researcherData.orcid || "",
                         researchInterests:
                             (researcherData.researchInterests || []).map((stored: string) => {
-                                const option = MILESTONE_TYPE_OPTIONS_WITH_VALUE.find(
+                                const option = MILESTONE_TYPE_OPTIONS.find(
                                     o => o.value === stored || o.label === stored
                                 );
 
@@ -613,7 +608,7 @@ export default function ResearcherOnboardingForm() {
                                         <MultipleSelector
                                             {...field}
                                             badgeClassName={badgeVariants({variant: "lightBlue"})}
-                                            defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
+                                            defaultOptions={MILESTONE_TYPE_OPTIONS}
                                             hidePlaceholderWhenSelected={true}
                                             placeholder="Select research interests..."
                                             emptyIndicator={

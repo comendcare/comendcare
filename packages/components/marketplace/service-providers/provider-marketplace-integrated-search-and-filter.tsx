@@ -3,7 +3,6 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from "react"
 import {Funnel, X} from "lucide-react"
 import {useShallow} from "zustand/react/shallow"
-import {MILESTONE_TYPE_OPTIONS_WITH_VALUE} from "@comend/components/marketplace/service-providers/cro-filters";
 import {Button} from "@comend/components/ui/button"
 import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"
@@ -16,7 +15,7 @@ import {useCROSearchStore, CROSearchState} from "@/state/search/croSearchStore"
 import {
     BUSINESS_TYPES,
     CRO_CERTIFICATIONS,
-    CRO_TAGS,
+    CRO_TAGS, MILESTONE_TYPE_OPTIONS,
 } from "@comend/lib/types"
 import {debounce} from "lodash";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
@@ -102,7 +101,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                     <MultipleSelector
                         value={filters.milestoneTypes}
                         onChange={(vals) => setFilterKey("milestoneTypes", vals)}
-                        defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
+                        defaultOptions={MILESTONE_TYPE_OPTIONS}
                         placeholder="Any project types"
                         hidePlaceholderWhenSelected
                         className="mt-1 border-0 px-0 py-0"
@@ -185,7 +184,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                                     value={filters.milestoneTypes}
                                     badgeClassName={badgeVariants({variant: "lightBlue"})}
                                     onChange={(vals) => setFilterKey("milestoneTypes", vals)}
-                                    defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
+                                    defaultOptions={MILESTONE_TYPE_OPTIONS}
                                     placeholder="Select project types..."
                                     hidePlaceholderWhenSelected
                                     commandProps={{className: "bg-transparent"}}
@@ -258,7 +257,7 @@ export function ProviderMarketplaceIntegratedSearchAndFilter() {
                     filters.tags.length) > 0 && (
                     <div className="flex flex-wrap gap-2 items-center">
                         {[
-                            {key: "milestoneTypes", options: MILESTONE_TYPE_OPTIONS_WITH_VALUE},
+                            {key: "milestoneTypes", options: MILESTONE_TYPE_OPTIONS},
                             {key: "types", options: BUSINESS_TYPES},
                             {key: "certifications", options: CRO_CERTIFICATIONS},
                             {key: "tags", options: CRO_TAGS},
