@@ -42,7 +42,7 @@ export default function ResearcherProfilePublicationsSection({
     return (
         <>
             <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Recent Publications</h2>
+                <h2 className="text-xl font-semibold">Publications</h2>
             </div>
 
             <div className="space-y-4">

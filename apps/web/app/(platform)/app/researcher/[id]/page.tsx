@@ -82,6 +82,7 @@ export default async function ResearcherProfilePage({
             </Link>
             <PublicResearcherProfile
                 researcherData={researcherData}
+                publications={publications}
             />
         </div>
     )
