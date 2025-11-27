@@ -45,11 +45,6 @@ import {getPublicFile} from "@comend/lib/utils";
 import {handleImageDelete, handleImageUpload} from "@comend/lib/upload";
 import mixpanel from "mixpanel-browser";
 
-export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
-    ...option,
-    value: option.id,
-}));
-
 const formSchema = z.object({
     name: z.string().min(2),
     title: z.preprocess(
@@ -150,7 +145,7 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                     orcid: researcher.orcid || "",
                     researchInterests:
                         (researcher.researchInterests || []).map((stored: string) => {
-                            const option = MILESTONE_TYPE_OPTIONS_WITH_VALUE.find(
+                            const option = MILESTONE_TYPE_OPTIONS.find(
                                 o => o.value === stored || o.label === stored
                             );
 
@@ -571,7 +566,7 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                                         <MultipleSelector
                                             {...field}
                                             badgeClassName={badgeVariants({variant: "lightBlue"})}
-                                            defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
+                                            defaultOptions={MILESTONE_TYPE_OPTIONS}
                                             hidePlaceholderWhenSelected={true}
                                             placeholder="Select research interests..."
                                             emptyIndicator={

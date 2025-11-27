@@ -926,3 +926,6 @@ export const mapTitleToValue = (
 export const mapModalityValueToLabel = (value: string) => {
     return MODALITIES.find(m => m.value === value)?.label ?? value;
 };
+
+export const mapMilestoneValueToLabel = (value: string) =>
+    MILESTONE_TYPE_OPTIONS.find(o => o.value === value)?.label ?? value;

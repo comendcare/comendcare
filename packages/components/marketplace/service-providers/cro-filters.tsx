@@ -24,11 +24,6 @@ import {Info} from "lucide-react"
 import { badgeVariants } from "@comend/components/ui/badge"
 import { usePathname, useSearchParams } from "next/navigation"
 
-export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
-    ...option,
-    value: option.id,
-}));
-
 const selector = (state: CROSearchState) => ({
     filters: state.filters,
     allResults: state.allResults,
@@ -155,7 +150,7 @@ export function CROFilters() {
                                     <MultipleSelector
                                         {...field}
                                         badgeClassName={badgeVariants({variant: "lightBlue"})}
-                                        defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
+                                        defaultOptions={MILESTONE_TYPE_OPTIONS}
                                         hidePlaceholderWhenSelected={true}
                                         placeholder="Select associated project types..."
                                         emptyIndicator={
