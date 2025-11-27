@@ -117,9 +117,9 @@ export function Roadmap({
     // const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false)
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     // controlling tabs in this upper level so we can manually control which tab is selected, based on which trigger button is clicked
-    const [tab, setTab] = useState<TabType>('projects')
+    const [tab, setTab] = useState<TabType>("projects")
     // const [sortBy, setSortBy] = useState('custom')
-    const [sortBy, setSortBy] = useState('default')
+    const [sortBy, setSortBy] = useState("default")
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     const contextMenuRef = useRef<HTMLDivElement>(null)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)

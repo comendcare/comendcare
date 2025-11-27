@@ -10,7 +10,6 @@ declare module "next-auth" {
             bio?: string | null;
             organizationId?: string | null;
             membership?: any;
-            orcid?: string;
         };
         accessToken?: string;
         terminate?: boolean;
@@ -22,7 +21,6 @@ declare module "next-auth" {
         bio?: string | null;
         organizationId?: string | null;
         membership?: any;
-        orcid?: string;
     }
 }
 
@@ -38,7 +36,6 @@ declare module "next-auth/jwt" {
             bio?: string | null;
             organizationId?: string | null;
             membership?: any;
-            orcid?: string;
         };
     }
 }

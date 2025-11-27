@@ -260,9 +260,7 @@ export const researcherAuthOptions: NextAuthOptions = {
                 // @ts-expect-error
                 id: token.sub,
             };
-            // Optional: Add ORCID iD to session if available
-            if (token.orcid) {
-                session.user.orcid = token.orcid;
+            if (token.accessToken) {
                 session.accessToken = token.accessToken;
             }
             return session;
