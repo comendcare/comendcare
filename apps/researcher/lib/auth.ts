@@ -4,7 +4,7 @@ import EmailProvider from "next-auth/providers/email";
 import prisma from "@comend/lib/prisma"
 import {PrismaClient} from "@prisma/client";
 import {OAuthConfig} from "next-auth/providers/oauth";
-import {CustomPrismaAdapter} from "~researcher/lib/custom-prisma-adapter";
+import {CustomPrismaAdapter} from "./custom-prisma-adapter";
 import sgMail from "@sendgrid/mail";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
