@@ -50,11 +50,13 @@ export const PAGProfileConditionsCard = ({
                                              organization,
                                              showEditDialog,
                                              isPrivate = false, // no longer affects badge-section visibility
+                                             conditionTags = []
                                          }: {
     conditions: Partial<Condition>[] | null;
     organization: Partial<Organization>;
     showEditDialog: boolean;
     isPrivate?: boolean;
+    conditionTags?: string[];
 }) => {
     if (conditions === null) {
         return (
@@ -94,6 +96,7 @@ export const PAGProfileConditionsCard = ({
         const associatedSystems = cleanBadges(condition?.associatedSystems);
         const causalGenes = cleanBadges(condition?.causalGenes);
         const associatedGenes = cleanBadges(condition?.associatedGenes);
+        const tags = cleanBadges(conditionTags);
 
         return (
             <Card className="organization-profile-tour-step2" data-testid="conditions-card">
@@ -158,6 +161,22 @@ export const PAGProfileConditionsCard = ({
                                 </p>
                             )}
                         </div>
+
+                        {tags.length > 0 && (
+                            <div className="space-y-2" data-testid="condition-tags-section">
+                                <div className="flex flex-row items-center justify-between w-full">
+                                    <h4
+                                        className="scroll-m-20 text-base font-semibold"
+                                        data-testid="condition-tags-heading"
+                                    >
+                                        Tags
+                                    </h4>
+                                </div>
+                                <p className="text-sm text-gray-700" data-testid="condition-tags">
+                                    {tags.map((t, idx) => `#${t}`).join(", ")}
+                                </p>
+                            </div>
+                        )}
 
                         {/* Badge sections: render ONLY when there are cleaned items */}
                         {diseaseCategories.length > 0 && (

@@ -41,6 +41,7 @@ type PAGProfilePageProps = {
     isOwner: boolean;
     rootDomain: string;
     searchParams: SearchParams
+    conditionTags: string[]
 };
 
 
@@ -62,20 +63,21 @@ const EditPAGProfileHeaderDialog = dynamic(
 );
 
 export default function PAGProfilePage({
-                                           organization,
-                                           conditions,
-                                           roadmaps,
-                                           toolCounts,
-                                           biosamples,
-                                           biosamplesPageCount,
-                                           diseaseModels,
-                                           diseaseModelsPageCount,
-                                           clinicalDatasets,
-                                           clinicalDatasetsPageCount,
-                                           rfps,
-                                           isOwner,
-                                           rootDomain,
-                                           searchParams
+                                        organization,
+                                        conditions,
+                                        roadmaps,
+                                        toolCounts,
+                                        biosamples,
+                                        biosamplesPageCount,
+                                        diseaseModels,
+                                        diseaseModelsPageCount,
+                                        clinicalDatasets,
+                                        clinicalDatasetsPageCount,
+                                        rfps,
+                                        isOwner,
+                                        rootDomain,
+                                        searchParams,
+                                        conditionTags
                                        }: PAGProfilePageProps) {
     return (
         <div className="grid grid-cols-5 px-4 w-full max-w-7xl my-4 mx-auto gap-4">
@@ -201,6 +203,7 @@ export default function PAGProfilePage({
                                         organization={organization}
                                         showEditDialog={true}
                                         isPrivate={true}
+                                        conditionTags={conditionTags}
                                     />
                                     <PagProfileAboutCard
                                         organization={organization}

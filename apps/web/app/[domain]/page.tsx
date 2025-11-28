@@ -9,7 +9,7 @@ import {
     getPublicToolCountsForOrganization,
     getBiosamples,
     getDiseaseModels,
-    getClinicalDatasets
+    getClinicalDatasets, getTagsForEntity
 } from "@comend/lib/fetchers"
 import PAGPublicProfileHeader from "~web/components/pag-public-profile-header";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
@@ -27,6 +27,7 @@ import { SearchParams } from "@comend/components/types";
 import { biosampleSearchParamsCache } from "@comend/lib/validations";
 import { getValidFilters } from "@comend/lib/data-table";
 import { RFPSort } from "@comend/lib/utils";
+import {TaggableType} from "@prisma/client";
 
 interface IndexPageProps {
     params: {domain: string},
@@ -300,6 +301,18 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
         );
     }
 
+    let conditionTags: string[] = []
+    if (conditions) {
+        const tagsResult = await getTagsForEntity(
+            TaggableType.CONDITION,
+            conditions[0].id
+        );
+
+        conditionTags = tagsResult.success
+            ? tagsResult.data?.map(t => t.value) ?? []
+            : [];
+    }
+
     return (
         <>
             <main className="grid grid-cols-8 w-full max-w-7xl mx-auto mt-16 gap-4">
@@ -313,6 +326,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                                     conditions={conditions}
                                     organization={organization}
                                     showEditDialog={false}
+                                    conditionTags={conditionTags}
                                 />
                                 <PagProfileAboutCard
                                     organization={organization as any}

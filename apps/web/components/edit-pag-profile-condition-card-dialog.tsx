@@ -13,7 +13,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import React, {useEffect, useState} from "react";
-import {updateCondition} from "@comend/lib/actions";
+import {updateCondition, updateEntityTags} from "@comend/lib/actions";
 import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@comend/lib/types";
 import {Input} from "@comend/components/ui/input";
 import {Textarea} from "@comend/components/ui/textarea";
@@ -21,7 +21,7 @@ import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {Button} from "@comend/components/ui/button";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
-import {getConditionsFromOrganizationId} from "@comend/lib/fetchers";
+import {getConditionsFromOrganizationId, getTagsForEntity } from "@comend/lib/fetchers";
 import {
     Dialog,
     DialogContent,
@@ -32,7 +32,7 @@ import {
 } from "@comend/components/ui/dialog";
 import {formatNumberWithCommas, toKebabCase} from "@comend/lib/utils"; // ← added to normalize creatable values
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import type {Organization} from "@prisma/client";
+import {type Organization, TaggableType} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
 import {researchFormSchema} from "./research-onboarding-form";
 import { badgeVariants } from "@comend/components/ui/badge";
@@ -108,6 +108,10 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                 label: system,
                                 value: system
                             })) || [],
+                            tags: condition.tags?.map((t: any) => ({
+                                label: t.tag.value,
+                                value: t.tag.value,
+                            })) ?? [],
                             prevalenceNumerator: condition.prevalenceNumerator?.toString() || "",
                             prevalenceDenominator: condition.prevalenceDenominator?.toString() || "",
                             engaged: condition.numberOfPatientsEngaged?.toString() || "",
@@ -125,7 +129,28 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                         }));
 
                         // Assuming you're working with one condition at a time (e.g., the first condition)
-                        const defaultValues = fetchedValues[0] || {};
+                        let defaultValues = fetchedValues[0] || {};
+
+                        const firstCondition = conditions[0];
+                        const conditionId = firstCondition?.id;
+
+                        if (conditionId) {
+                            const tagsResponse = await getTagsForEntity(
+                                TaggableType.CONDITION,
+                                conditionId
+                            );
+
+                            if (tagsResponse.success && tagsResponse.data) {
+                                const tagString = tagsResponse.data
+                                    .map((t) => t.value)
+                                    .join(", ");
+
+                                defaultValues = {
+                                    ...defaultValues,
+                                    tags: tagString,
+                                };
+                            }
+                        }
 
                         setDefaultResearchValues(defaultValues);
                         editResearchForm.reset(defaultValues);
@@ -150,6 +175,11 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
             toast.error("You're not signed into an organization right now.");
             return;
         }
+
+        const tagStrings = (values.tags || "")
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean);
 
         setLoading(true); // Show loading state
 
@@ -201,9 +231,30 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
             const response = await updateCondition(session.user.organizationId, formData);
 
             if (response.success) {
+                const conditionId = response.data?.id; // assuming updateCondition returns the Condition
+
+                // Only call the tag action if we have a Condition id
+                if (conditionId && tagStrings.length > 0) {
+                    const tagResult =   await updateEntityTags(
+                        TaggableType.CONDITION,
+                        conditionId,
+                        tagStrings
+                    );
+
+
+                if (!tagResult.success) {
+                        console.error(tagResult.error);
+                        // optional: toast a softer warning instead of erroring the whole flow
+                        toast.error(tagResult.error || "Tags were not saved.");
+                    }
+                } else if (conditionId && tagStrings.length === 0) {
+                    // clear tags if user removed them all
+                    await updateEntityTags(TaggableType.CONDITION, conditionId, []);
+                }
+
                 toast.success("Condition updated successfully!");
-                setOpen(false)
-                window.location.reload()
+                setOpen(false);
+                window.location.reload();
             } else {
                 console.error(response.error);
                 toast.error(response.error || "Failed to update condition.");
@@ -556,6 +607,28 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     )}
                                 />
                             )}
+
+                            <FormField
+                                control={editResearchForm.control}
+                                name="tags"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Tags</FormLabel>
+                                        <FormDescription>
+                                            Enter tags separated by commas. Example: <code>#neuro, #rare, metabolism</code>
+                                        </FormDescription>
+
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                placeholder="#neuro, #ultrarare, #rna"
+                                            />
+                                        </FormControl>
+
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
                             <FormField
                                 control={editResearchForm.control}
