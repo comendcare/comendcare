@@ -76,10 +76,7 @@ export const PAGProfileConditionsCard = ({
                         Conditions
                     </CardTitle>
                     {showEditDialog && (
-                        <EditPAGProfileConditionCardDialog
-                            condition={condition}
-                            conditionTags={tags}
-                        />
+                        <EditPAGProfileConditionCardDialog />
                     )}
                 </CardHeader>
                 <CardContent data-testid="conditions-empty-state">
