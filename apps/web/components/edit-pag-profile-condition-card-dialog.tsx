@@ -36,8 +36,17 @@ import {type Organization, TaggableType} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
 import {researchFormSchema} from "./research-onboarding-form";
 import { badgeVariants } from "@comend/components/ui/badge";
+import {ConditionForCard} from "~web/components/pag-profile-conditions-card";
 
-export default function EditPAGProfileConditionCardDialog({organization}: { organization: Partial<Organization> }) {
+export default function EditPAGProfileConditionCardDialog({
+                                                              organization,
+                                                              condition,
+                                                              conditionTags,
+                                                          }: {
+    organization: Partial<Organization>;
+    condition: ConditionForCard | null;
+    conditionTags: string[];
+}) {
     const {data: session, status} = useSession()
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -50,125 +59,37 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
     })
 
     useEffect(() => {
-        async function fetchResearchData() {
-            if (status === "authenticated" && !organization.id) {
-                toast.error("You're not a part of an organization.");
-                return;
-            }
+        if (!condition) return;
 
-            try {
-                // Fetch conditions for the given organization ID
-                const response = await getConditionsFromOrganizationId(organization.id,
-                    {
-                        id: true,
-                        name: true,
-                        slug: true,
-                        synonyms: true,
-                        description: true,
-                        diseaseCategories: true,
-                        prevalenceNumerator: true,
-                        prevalenceDenominator: true,
-                        numberOfPatientsEngaged: true,
-                        nationalEstimatedPopulation: true,
-                        globalEstimatedPopulation: true,
-                        relevantDiseaseMechanisms: true,
-                        causalGenes: true,
-                        associatedGenes: true,
-                        associatedSystems: true,
-                        associatedSignsAndSymptoms: true,
-                        existingDatabasesAndStudies: true,
-                        toolsUnderDevelopment: true,
-                        createdAt: true,
-                        updatedAt: true,
-                        gardURL: true,
-                        nordURL: true,
-                        summary: true,
-                        prevalenceRatio: true,
-                    }
-                );
+        const defaultValues: z.infer<typeof researchFormSchema> = {
+            disorder: condition.name ? [{ label: condition.name, value: condition.name }] : [],
+            associatedConditions: (condition.associatedConditions ?? []).map((name) => ({
+                label: name,
+                value: name,
+            })),
+            summary: condition.summary ?? "",
+            categories: (condition.diseaseCategories ?? []).map((cat) => ({ label: cat, value: cat })),
+            causal: (condition.causalGenes ?? []).map((gene) => ({ label: gene, value: gene })),
+            genes: (condition.associatedGenes ?? []).map((gene) => ({ label: gene, value: gene })),
+            systems: (condition.associatedSystems ?? []).map((system) => ({
+                label: system,
+                value: system,
+            })),
+            // tags are stored as comma-separated string in your form:
+            tags: conditionTags.join(", "),
+            prevalenceNumerator: condition.prevalenceNumerator?.toString() ?? "",
+            prevalenceDenominator: condition.prevalenceDenominator?.toString() ?? "",
+            engaged: condition.numberOfPatientsEngaged?.toString() ?? "",
+            national: condition.nationalEstimatedPopulation?.toString() ?? "",
+            global: condition.globalEstimatedPopulation?.toString() ?? "",
+            otherCategories: undefined,
+            otherMechanisms: undefined,
+            otherSystems: undefined,
+        };
 
-                console.log("response", response)
-
-                if (response.success) {
-                    const conditions = response.data;
-
-                    if (conditions && conditions.length > 0) {
-                        const fetchedValues = conditions.map((condition: any) => ({
-                            disorder: condition.name ? [{label: condition.name, value: condition.name}] : [],
-                            associatedConditions:
-                                (condition.associatedConditions ?? []).map((name: string) => ({
-                                    label: name,
-                                    value: name,
-                                })),
-                            summary: condition.summary || "",
-                            categories: condition.diseaseCategories.map((cat: any) => ({label: cat, value: cat})) || [],
-                            causal: condition.causalGenes.map((gene: any) => ({label: gene, value: gene})) || [],
-                            genes: condition.associatedGenes.map((gene: any) => ({label: gene, value: gene})) || [],
-                            systems: condition.associatedSystems.map((system: any) => ({
-                                label: system,
-                                value: system
-                            })) || [],
-                            tags: condition.tags?.map((t: any) => ({
-                                label: t.tag.value,
-                                value: t.tag.value,
-                            })) ?? [],
-                            prevalenceNumerator: condition.prevalenceNumerator?.toString() || "",
-                            prevalenceDenominator: condition.prevalenceDenominator?.toString() || "",
-                            engaged: condition.numberOfPatientsEngaged?.toString() || "",
-                            national: condition.nationalEstimatedPopulation?.toString() || "",
-                            global: condition.globalEstimatedPopulation?.toString() || "",
-                            otherCategories: typeof condition.metadata == 'object' ? (condition.metadata as {
-                                [key: string]: any
-                            })?.otherCategories : undefined,
-                            otherMechanisms: typeof condition.metadata == 'object' ? (condition.metadata as {
-                                [key: string]: any
-                            })?.otherMechanisms : undefined,
-                            otherSystems: typeof condition.metadata == 'object' ? (condition.metadata as {
-                                [key: string]: any
-                            })?.otherSystems : undefined,
-                        }));
-
-                        // Assuming you're working with one condition at a time (e.g., the first condition)
-                        let defaultValues = fetchedValues[0] || {};
-
-                        const firstCondition = conditions[0];
-                        const conditionId = firstCondition?.id;
-
-                        if (conditionId) {
-                            const tagsResponse = await getTagsForEntity(
-                                TaggableType.CONDITION,
-                                conditionId
-                            );
-
-                            if (tagsResponse.success && tagsResponse.data) {
-                                const tagString = tagsResponse.data
-                                    .map((t) => t.value)
-                                    .join(", ");
-
-                                defaultValues = {
-                                    ...defaultValues,
-                                    tags: tagString,
-                                };
-                            }
-                        }
-
-                        setDefaultResearchValues(defaultValues);
-                        editResearchForm.reset(defaultValues);
-                    } else {
-                        toast.error("No conditions found for this organization.");
-                    }
-                } else {
-                    console.error(response.error);
-                    toast.error(response.error);
-                }
-            } catch (error) {
-                console.error("Failed to fetch research data:", error);
-                toast.error("An error occurred while fetching research data.");
-            }
-        }
-
-        fetchResearchData();
-    }, [session?.user?.organizationId, editResearchForm]);
+        setDefaultResearchValues(defaultValues);
+        editResearchForm.reset(defaultValues);
+    }, [condition, conditionTags, editResearchForm]);
 
     async function onResearchFormSubmit(values: z.infer<typeof researchFormSchema>) {
         if (!session?.user?.organizationId) {

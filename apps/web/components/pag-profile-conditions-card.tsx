@@ -21,7 +21,7 @@ const EditPAGProfileConditionCardDialog = dynamic(
 
 type AssocMini = { id: string; name: string; slug: string };
 
-type ConditionForCard = Prisma.ConditionGetPayload<{
+export type ConditionForCard = Prisma.ConditionGetPayload<{
     select: {
         id: true;
         name: true;
@@ -36,12 +36,11 @@ type ConditionForCard = Prisma.ConditionGetPayload<{
         associatedSystems: true;
         causalGenes: true;
         associatedGenes: true;
-        associatedConditions: true; // string[]
+        associatedConditions: true;
     };
 }>;
 
 
-// NEW: clean + normalize badge arrays
 const cleanBadges = (arr?: (string | null | undefined)[] | null) =>
     (arr ?? []).map(s => (s ?? "").trim()).filter(Boolean) as string[];
 
@@ -104,7 +103,13 @@ export const PAGProfileConditionsCard = ({
                     <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="conditions-title">
                         {condition?.name ?? "No name condition"}
                     </CardTitle>
-                    {showEditDialog && <EditPAGProfileConditionCardDialog organization={organization} />}
+                    {showEditDialog && (
+                        <EditPAGProfileConditionCardDialog
+                            organization={organization}
+                            condition={condition}
+                            conditionTags={tags}
+                        />
+                    )}
                 </CardHeader>
 
                 <CardContent>
