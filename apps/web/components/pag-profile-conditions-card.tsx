@@ -46,13 +46,11 @@ const cleanBadges = (arr?: (string | null | undefined)[] | null) =>
 
 export const PAGProfileConditionsCard = ({
                                              conditions,
-                                             organization,
                                              showEditDialog,
                                              isPrivate = false, // no longer affects badge-section visibility
                                              conditionTags = []
                                          }: {
     conditions: Partial<Condition>[] | null;
-    organization: Partial<Organization>;
     showEditDialog: boolean;
     isPrivate?: boolean;
     conditionTags?: string[];
@@ -77,7 +75,12 @@ export const PAGProfileConditionsCard = ({
                     <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="conditions-title">
                         Conditions
                     </CardTitle>
-                    {showEditDialog && <EditPAGProfileConditionCardDialog organization={organization} />}
+                    {showEditDialog && (
+                        <EditPAGProfileConditionCardDialog
+                            condition={condition}
+                            conditionTags={tags}
+                        />
+                    )}
                 </CardHeader>
                 <CardContent data-testid="conditions-empty-state">
                     <div className="flex flex-col space-y-2 text-left">
@@ -105,7 +108,6 @@ export const PAGProfileConditionsCard = ({
                     </CardTitle>
                     {showEditDialog && (
                         <EditPAGProfileConditionCardDialog
-                            organization={organization}
                             condition={condition}
                             conditionTags={tags}
                         />

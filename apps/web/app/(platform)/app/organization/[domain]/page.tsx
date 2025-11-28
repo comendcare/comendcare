@@ -333,7 +333,6 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                                 />
                                 <PAGProfileConditionsCard
                                     conditions={conditions}
-                                    organization={organization}
                                     showEditDialog={false}
                                     conditionTags={conditionTags}
                                 />

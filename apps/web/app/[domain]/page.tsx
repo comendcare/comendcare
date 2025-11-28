@@ -324,7 +324,6 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                             <div className="sticky top-4 space-y-4">
                                 <PAGProfileConditionsCard
                                     conditions={conditions}
-                                    organization={organization}
                                     showEditDialog={false}
                                     conditionTags={conditionTags}
                                 />

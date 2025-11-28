@@ -200,7 +200,6 @@ export default function PAGProfilePage({
                                 <div className="sticky top-4 space-y-4">
                                     <PAGProfileConditionsCard
                                         conditions={conditions}
-                                        organization={organization}
                                         showEditDialog={true}
                                         isPrivate={true}
                                         conditionTags={conditionTags}

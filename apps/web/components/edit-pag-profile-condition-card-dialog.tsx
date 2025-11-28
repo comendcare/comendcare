@@ -39,13 +39,11 @@ import { badgeVariants } from "@comend/components/ui/badge";
 import {ConditionForCard} from "~web/components/pag-profile-conditions-card";
 
 export default function EditPAGProfileConditionCardDialog({
-                                                              organization,
                                                               condition,
                                                               conditionTags,
                                                           }: {
-    organization: Partial<Organization>;
-    condition: ConditionForCard | null;
-    conditionTags: string[];
+    condition?: ConditionForCard | null;
+    conditionTags?: string[];
 }) {
     const {data: session, status} = useSession()
     const [open, setOpen] = useState(false);
