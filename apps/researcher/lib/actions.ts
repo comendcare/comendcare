@@ -4,6 +4,7 @@ import prisma from "@comend/lib/prisma";
 import {deleteTypeSenseDocument, logError} from "@comend/lib/utils";
 import {withResearcherAuth} from "~researcher/lib/auth";
 import {getSession, withAuth} from "@comend/lib/auth";
+import type {Researcher} from "@prisma/client";
 
 export const deleteResearcher = withResearcherAuth(
     async (researcher: Researcher, text: string) => {
