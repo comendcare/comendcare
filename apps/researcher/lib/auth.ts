@@ -260,9 +260,6 @@ export const researcherAuthOptions: NextAuthOptions = {
                 // @ts-expect-error
                 id: token.sub,
             };
-            if (token.accessToken) {
-                session.accessToken = token.accessToken;
-            }
             return session;
         },
     },
