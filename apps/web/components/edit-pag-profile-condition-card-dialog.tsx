@@ -32,7 +32,7 @@ import {
 } from "@comend/components/ui/dialog";
 import {formatNumberWithCommas, toKebabCase} from "@comend/lib/utils"; // ← added to normalize creatable values
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import {type Organization, TaggableType} from "@prisma/client";
+import {TaggableType} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
 import {researchFormSchema} from "./research-onboarding-form";
 import { badgeVariants } from "@comend/components/ui/badge";
@@ -57,7 +57,7 @@ export default function EditPAGProfileConditionCardDialog({
     })
 
     useEffect(() => {
-        if (!condition) return;
+        if (!condition || !conditionTags) return;
 
         const defaultValues: z.infer<typeof researchFormSchema> = {
             disorder: condition.name ? [{ label: condition.name, value: condition.name }] : [],
