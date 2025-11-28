@@ -31,7 +31,7 @@ import React, {useEffect, useState} from "react";
 import {Info, Pencil} from "lucide-react";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {MODALITIES, optionSchema} from "@comend/lib/types";
-import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
+import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 
 const editOrgFormSchema = z.object({
     description: z.string().max(500, {
