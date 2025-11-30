@@ -66,7 +66,7 @@ export const researcherAuthOptions: NextAuthOptions = {
                 const text = `Complete signing in: ${preflightUrl}`;
                 const html = `
                     <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; line-height:1.5; color:#111;">
-                        <p>Click the button to complete signing in:</p>
+                        <p>Click the button to complete signing in to the Researcher Hub:</p>
                         <p>
                             <a
                                 href="${preflightUrl}"
