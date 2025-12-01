@@ -134,7 +134,10 @@ export default function MarketplaceExplorePage({
             <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Service providers</h2>
+                        <div>
+                            <h2 className="text-2xl semibold">Service providers</h2>
+                            <p className="text-muted-foreground">Supporting 128 types of services</p>
+                        </div>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/service-providers"}
@@ -173,7 +176,10 @@ export default function MarketplaceExplorePage({
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Patient groups</h2>
+                        <div>
+                            <h2 className="text-2xl semibold">Patient groups</h2>
+                            <p className="text-muted-foreground">Pursuing Y therapeutic pipelines</p>
+                        </div>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/patient-groups"}
@@ -213,7 +219,10 @@ export default function MarketplaceExplorePage({
         
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Patient biosamples</h2>
+                        <div>
+                            <h2 className="text-2xl semibold">Patient biosamples</h2>
+                            <p className="text-muted-foreground">Powering studies across Y conditions</p>
+                        </div>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/biosamples"}
@@ -239,7 +248,10 @@ export default function MarketplaceExplorePage({
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Disease models</h2>
+                        <div>
+                            <h2 className="text-2xl semibold">Disease models</h2>
+                            <p className="text-muted-foreground">Accelerating discovery across Y genes</p>
+                        </div>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/disease-models"}
@@ -265,7 +277,10 @@ export default function MarketplaceExplorePage({
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Clinical datasets</h2>
+                        <div>
+                            <h2 className="text-2xl semibold">Clinical datasets</h2>
+                            <p className="text-muted-foreground">Capturing progression for X patients</p>
+                        </div>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/clinical-datasets"}
@@ -291,7 +306,10 @@ export default function MarketplaceExplorePage({
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Requests for proposals</h2>
+                        <div>
+                            <h2 className="text-2xl semibold">Requests for proposals</h2>
+                            <p className="text-muted-foreground">Across $Y in active budgets</p>
+                        </div>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/rfps"}
