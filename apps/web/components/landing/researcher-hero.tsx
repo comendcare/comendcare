@@ -29,7 +29,9 @@ export const ResearcherHero = () => {
                 }}
                 className="mx-auto text-center max-w-screen-lg text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-700 dark:text-white leading-relaxed lg:leading-snug"
             >
-                <Balancer>Generate Images, Text and Videos with AI</Balancer>
+                <Balancer>
+                    Systematically identify opportunities for research
+                </Balancer>
             </motion.h1>
             <motion.p
                 initial={{
@@ -48,9 +50,7 @@ export const ResearcherHero = () => {
                 className="mx-auto text-center max-w-screen-sm text-2xl"
             >
                 <Balancer>
-                    Everything AI seamlessly integrated all the modern AI generation tools
-                    into one platform so that you can generate content with a single
-                    click.
+                    Patient foundations, research tools, and grants all in one place.
                 </Balancer>
             </motion.p>
             <motion.div
@@ -70,12 +70,10 @@ export const ResearcherHero = () => {
                 className="flex items-center gap-4 justify-center mt-6 relative z-10"
             >
                 <Button
-                    className="flex space-x-2 items-center group"
-                    onClick={() => router.push("https://researcher.comend.io/login")}
+                    variant="cta"
+                    className="w-fit text-base"
                 >
-                    <span>Sign up</span>
-                    <ArrowRight
-                        className="text-muted group-hover:translate-x-1 stroke-[1px] h-3 w-3 transition-transform duration-200 dark:text-muted-dark"/>
+                    Sign in
                 </Button>
             </motion.div>
             <div

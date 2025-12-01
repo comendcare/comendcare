@@ -255,7 +255,7 @@ export const CloudHeroSection = () => {
                     >
                         The digital platform for
                         <Highlight className="text-black dark:text-white">
-                            patient research groups
+                            genetic conditions
                         </Highlight>
                     </motion.h1>
                 </HeroHighlight>
@@ -268,7 +268,7 @@ export const CloudHeroSection = () => {
                     className="flex flex-col justify-center items-center mx-auto space-y-4"
                 >
                     <p className="max-w-screen-sm text-xl">
-                        {`Organize your research and share it with the world.`}
+                        {`Find projects, tools, and partners all in one place.`}
                     </p>
                     {/*<PulsatingButton*/}
                     {/*    className="w-fit"*/}
@@ -281,15 +281,26 @@ export const CloudHeroSection = () => {
                     {/*>*/}
                     {/*    Sign up*/}
                     {/*</PulsatingButton>*/}
-                    <Button
-                        variant="cta"
-                        className="w-fit"
-                        asChild
-                    >
-                        <Link href={"https://calendly.com/albertatcomend/onboarding"}>
-                            Sign in
-                        </Link>
-                    </Button>
+                    <div className="flex flex-row items-center justify-between space-x-4">
+                        <Button
+                            variant="cta"
+                            className="w-fit"
+                            asChild
+                        >
+                            <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                                {`I'm a researcher`}
+                            </Link>
+                        </Button>
+                        <Button
+                            variant="cta"
+                            className="w-fit"
+                            asChild
+                        >
+                            <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                                {`I'm with a patient group`}
+                            </Link>
+                        </Button>
+                    </div>
                     {/* <Link
                         href="/marketplace"
                         className={cn(
