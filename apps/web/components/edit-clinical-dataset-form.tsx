@@ -31,7 +31,7 @@ import { toast } from "sonner"
 import { Info, Lock } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
 import ProjectMultipleSelector from "./project-multiple-selector"
-import { DeleteAssetDialog } from "./delete-asset-dialog"
+import { DeleteClinicalDatasetDialog } from "./delete-clinical-dataset-dialog"
 import { Badge, badgeVariants } from "@comend/components/ui/badge"
 import MultipleSelector, { MultipleSelectorRef } from "@comend/components/ui/multiple-selector"
 import { editDataToolForm, Option } from "@comend/lib/types"
@@ -554,7 +554,7 @@ export function EditClincalDatasetForm({
                     Delete tool
                 </Button>
                 <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                    <DeleteAssetDialog toolIds={[toolData.id]} closeDialog={closeDialog}/>
+                    <DeleteClinicalDatasetDialog toolIds={[toolData.id]} closeDialog={closeDialog}/>
                 </Dialog>
                 <div className="bg-white rounded-md p-0">
                     <Button

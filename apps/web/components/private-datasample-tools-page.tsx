@@ -21,7 +21,7 @@ import { DialogPortal } from "@comend/components/plate-ui/dialog";
 import { Asset } from "@comend/lib/types";
 import { Row } from "@tanstack/react-table";
 import Image from "next/image";
-import { DeleteAssetDialog } from "./delete-asset-dialog";
+import { DeleteClinicalDatasetDialog } from "./delete-clinical-dataset-dialog";
 
 export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
     const {data: session} = useSession()
@@ -82,7 +82,7 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                                         )}
                                     </Tooltip>
                                 </DialogTrigger>
-                                <DeleteAssetDialog 
+                                <DeleteClinicalDatasetDialog 
                                     toolIds={rowSelection.map((row: any) => row.id)} 
                                     closeDialog={() => {}}
                                 />
