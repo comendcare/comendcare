@@ -2232,22 +2232,11 @@ export const deleteAsset = withOrganizationAuth(
 )
 
 
-export const deleteBiosample = withOrganizationAuth(
-    async (_: Organization, id: string) => {
+export const deleteBiosamples = withOrganizationAuth(
+    async (_: Organization, ids: string[]) => {
         try {
-            const response = await prisma.biosample.delete({
-                where: {id},
-                include: {
-                    contacts: true,
-                    attachments: true,
-                    milestones: {
-                        include: {
-                            milestone: {
-                                include: {types: {include: {milestoneType: true}}}
-                            }
-                        }
-                    }
-                },
+            const response = await prisma.biosample.deleteMany({
+                where: {id: {in: ids}}
             })
 
             return response
