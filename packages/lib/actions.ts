@@ -2241,23 +2241,23 @@ export const deleteBiosamples = withOrganizationAuth(
 
             return response
         } catch (error: any) {
-            console.error("Error deleting tool:", error.message);
-            throw new Error(error.message || "Failed to delete tool.");
+            console.error("Error deleting biosample(s):", error.message);
+            throw new Error(error.message || "Failed to delete biosample(s).");
         }
     }
 )
 
-export const deleteDiseaseModel = withOrganizationAuth(
-    async (_: Organization, id: string) => {
+export const deleteDiseaseModels = withOrganizationAuth(
+    async (_: Organization, ids: string[]) => {
         try {
-            const response = await prisma.diseaseModel.delete({
-                where: {id}
+            const response = await prisma.diseaseModel.deleteMany({
+                where: {id: {in: ids}}
             })
 
             return response
         } catch (error: any) {
-            console.error("Error deleting tool:", error.message);
-            throw new Error(error.message || "Failed to delete tool.");
+            console.error("Error deleting disease model(s):", error.message);
+            throw new Error(error.message || "Failed to delete disease model(s).");
         }
     }
 )

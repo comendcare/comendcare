@@ -136,8 +136,8 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
                 <DialogPortal>
                     <div onClick={(e) => e.stopPropagation()}>
                         {(() => {
-                            if (type === 'biosample') return <DeleteBiosampleDialog toolId={tool.id} />
-                            if (type === 'diseaseModel') return <DeleteDiseaseModelDialog toolId={tool.id} />
+                            if (type === 'biosample') return <DeleteBiosampleDialog toolIds={[tool.id]} />
+                            if (type === 'diseaseModel') return <DeleteDiseaseModelDialog toolIds={[tool.id]} />
                             if (type === 'data') return <DeleteAssetDialog toolId={tool.id} />
                         })()}
                     </div>
