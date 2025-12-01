@@ -287,7 +287,7 @@ export const CloudHeroSection = () => {
                         asChild
                     >
                         <Link href={"https://calendly.com/albertatcomend/onboarding"}>
-                            Sign up
+                            Sign in
                         </Link>
                     </Button>
                     {/* <Link

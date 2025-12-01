@@ -18,8 +18,17 @@ import {
 import {PulsatingButton} from "@comend/components/ui/pulsating-button";
 import {usePathname, useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
-import { X, Menu as MenuIcon } from "lucide-react"
+import {X, Menu as MenuIcon} from "lucide-react"
 import {Button} from "@comend/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@comend/components/ui/dropdown-menu"
+
 
 interface NavbarItem {
     name: string
@@ -41,6 +50,16 @@ const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN
 
 export const LandingNavbar: React.FC = () => {
     const navItems: NavbarItem[] = process.env.NEXT_PUBLIC_NODE_ENV === 'production' ? [
+        {
+            name: "For PAGs",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/for-pags` : `http://${rootDomain}/for-pags`
+        },
+        {
+            name: "For Researchers",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/for-researchers` : `http://${rootDomain}/for-researchers`
+        },
         {
             name: "About",
             link: process.env.NEXT_PUBLIC_VERCEL_ENV
@@ -96,6 +115,16 @@ export const LandingNavbar: React.FC = () => {
         // },
         // { name: "Features", link: "/#features" },
         {
+            name: "For PAGs",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/for-pags` : `http://${rootDomain}/for-pags`
+        },
+        {
+            name: "For Researchers",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/for-researchers` : `http://${rootDomain}/for-researchers`
+        },
+        {
             name: "About",
             link: process.env.NEXT_PUBLIC_VERCEL_ENV
                 ? `https://${rootDomain}/about` : `http://${rootDomain}/about`
@@ -148,8 +177,6 @@ export const LandingNavbar: React.FC = () => {
 
 const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
     const session = useSession()
-    const pathname = usePathname();
-    const router = useRouter()
     const [hovered, setHovered] = useState<number | null>(null)
     const [active, setActive] = useState<string | null>(null)
 
@@ -198,7 +225,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                                     className="w-full h-full absolute inset-0 bg-gray-100 dark:bg-neutral-800 rounded-full"
                                 />
                             )}
-                            <span className="text-base relative z-20">
+                            <span className="text-base relative z-20 whitespace-nowrap">
                                 {navItem.name}
                             </span>
                         </Link>
@@ -232,51 +259,99 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
             {/*    </Link>*/}
             {/*</div>*/}
 
-            {session &&
-                <div
-                    className="flex space-x-4 justify-end"
-                >
-                    <Button
-                        className="w-fit text-base"
-                        onClick={() => router.push("/login")}
-                        variant="ghost"
-                    >
-                        Log in
-                    </Button>
-                    {/*<PulsatingButton*/}
-                    {/*    className="w-fit"*/}
-                    {/*    onClick={() => {*/}
-                    {/*        if (pathname === "/") {*/}
-                    {/*            // If we're on the landing page, scroll to the bottom*/}
-                    {/*            window.scrollTo({*/}
-                    {/*                top: document.documentElement.scrollHeight,*/}
-                    {/*                behavior: 'smooth'*/}
-                    {/*            });*/}
-                    {/*        } else {*/}
-                    {/*            // Otherwise, redirect to the landing page with the anchor*/}
-                    {/*            router.push("/contact");*/}
-                    {/*        }*/}
-                    {/*    }}*/}
-                    {/*>*/}
-                    {/*    Sign up*/}
-                    {/*</PulsatingButton>*/}
-                    <Button
-                        variant="cta"
-                        className="w-fit"
-                        asChild
-                    >
-                        <Link href={"https://calendly.com/albertatcomend/onboarding"}>
-                            Sign up
-                        </Link>
-                    </Button>
+            {/*{session &&*/}
+            {/*    <div*/}
+            {/*        className="flex space-x-4 justify-end"*/}
+            {/*    >*/}
+            {/*        <Button*/}
+            {/*            className="w-fit text-base"*/}
+            {/*            onClick={() => router.push("/login")}*/}
+            {/*            variant="ghost"*/}
+            {/*        >*/}
+            {/*            Log in*/}
+            {/*        </Button>*/}
+            {/*        <Button*/}
+            {/*            variant="cta"*/}
+            {/*            className="w-fit"*/}
+            {/*            asChild*/}
+            {/*        >*/}
+            {/*            <Link href={"https://calendly.com/albertatcomend/onboarding"}>*/}
+            {/*                Sign up*/}
+            {/*            </Link>*/}
+            {/*        </Button>*/}
+            {/*    </div>*/}
+            {/*}*/}
+
+            {session && (
+                <div className="flex justify-end">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="cta"
+                                className="w-fit text-base"
+                            >
+                                Sign in
+                            </Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent
+                            align="end"
+                            className="w-96 p-4 flex-col space-y-4"
+                        >
+                            <h1 className="mx-auto text-center">
+                                Sign up to access the marketplace, manage requests, and more.
+                            </h1>
+                            <div className="flex flex-col gap-4">
+                                <Link href="/researcher/login" className="w-full">
+                                    <Button
+                                        variant="cta"
+                                        className="w-full justify-center"
+                                    >
+                                        Researcher Log in
+                                    </Button>
+                                </Link>
+
+                                <Link href="/researcher/signup" className="w-full">
+                                    <Button
+                                        variant="outline"
+                                        className="w-full justify-center"
+                                    >
+                                        Researcher Sign up
+                                    </Button>
+                                </Link>
+
+                                <Link href="/login" className="w-full">
+                                    <Button
+                                        variant="cta"
+                                        className="w-full justify-center"
+                                    >
+                                        Patient Group Log in
+                                    </Button>
+                                </Link>
+
+                                <Link
+                                    href="https://calendly.com/albertatcomend/onboarding"
+                                    className="w-full"
+                                >
+                                    <Button
+                                        variant="outline"
+                                        className="w-full justify-center"
+                                    >
+                                        Patient Group Sign up
+                                    </Button>
+                                </Link>
+                            </div>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
-            }
+            )}
 
         </motion.div>
     )
 }
 
 const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
+    const session = useSession()
     const [open, setOpen] = useState(false)
 
     return (
@@ -354,6 +429,55 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                             {/*>*/}
                             {/*    Login*/}
                             {/*</Link>*/}
+
+                            {session && (
+                                <div className="flex flex-col space-y-4">
+                                    <h1 className="mx-auto text-center">
+                                        Sign up to access the marketplace, manage requests, and more.
+                                    </h1>
+                                    <div className="flex flex-col gap-4">
+                                        <Link href="/researcher/login" className="w-full">
+                                            <Button
+                                                variant="cta"
+                                                className="w-full justify-center"
+                                            >
+                                                Researcher Log in
+                                            </Button>
+                                        </Link>
+
+                                        <Link href="/researcher/signup" className="w-full">
+                                            <Button
+                                                variant="outline"
+                                                className="w-full justify-center"
+                                            >
+                                                Researcher Sign up
+                                            </Button>
+                                        </Link>
+
+                                        <Link href="/login" className="w-full">
+                                            <Button
+                                                variant="cta"
+                                                className="w-full justify-center"
+                                            >
+                                                Patient Group Log in
+                                            </Button>
+                                        </Link>
+
+                                        <Link
+                                            href="https://calendly.com/albertatcomend/onboarding"
+                                            className="w-full"
+                                        >
+                                            <Button
+                                                variant="outline"
+                                                className="w-full justify-center"
+                                            >
+                                                Patient Group Sign up
+                                            </Button>
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
+
                         </motion.div>
                     )}
                 </AnimatePresence>
