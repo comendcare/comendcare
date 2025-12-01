@@ -29,7 +29,6 @@ import {HorizontalTabsFeatures} from "~web/components/landing/horizontal-tabs-fe
 export default function App() {
     return (
         <>
-            <CloudHeroSection/>
             <HorizontalTabsFeatures />
             <FeaturePublicPages />
             <FeatureResearchMarketplace  />

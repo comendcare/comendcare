@@ -373,7 +373,7 @@ export default function MarketplacePage() {
                             ? (
                                 <>
                                     {rfpStore.searchResults?.slice(0, 3).map((rfp, index) => (
-                                        <Dialog>
+                                        <Dialog key={index}>
                                             <DialogTrigger
                                                 className="w-full max-w-full h-full"
                                                 onClick={() => {

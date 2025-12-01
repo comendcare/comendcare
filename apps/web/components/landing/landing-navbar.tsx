@@ -44,11 +44,14 @@ interface NavbarItem {
 interface NavbarProps {
     navItems: NavbarItem[]
     visible: boolean
+    pathname?: string
 }
 
 const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN
 
 export const LandingNavbar: React.FC = () => {
+    const pathname = usePathname()
+
     const navItems: NavbarItem[] = process.env.NEXT_PUBLIC_NODE_ENV === 'production' ? [
         {
             name: "For PAGs",
@@ -169,16 +172,27 @@ export const LandingNavbar: React.FC = () => {
 
     return (
         <motion.div ref={ref} className="w-full fixed top-0 inset-x-0 z-50">
-            <DesktopNav visible={visible} navItems={navItems}/>
+            <DesktopNav visible={visible} navItems={navItems} pathname={pathname}/>
             <MobileNav visible={visible} navItems={navItems}/>
         </motion.div>
     )
 }
 
-const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
+const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, pathname}) => {
     const session = useSession()
     const [hovered, setHovered] = useState<number | null>(null)
     const [active, setActive] = useState<string | null>(null)
+
+    const isLinkActive = (link?: string) => {
+        if (!link || !pathname) return false
+
+        // Don't give active state to in-page anchors like /about#news
+        if (link.includes("#")) return false
+
+        // Extract pathname from absolute URL
+        const url = new URL(link)
+        return url.pathname === pathname
+    }
 
     return (
         <motion.div
@@ -211,15 +225,17 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
             </Link>
             <motion.div
                 className="lg:flex flex-row flex-1 hidden items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
-                {navItems.map((navItem, idx) =>
-                    navItem.link ? (
+                {navItems.map((navItem, idx) => {
+                    const activeForRoute = isLinkActive(navItem.link)
+
+                    return navItem.link ? (
                         <Link
                             onMouseEnter={() => setHovered(idx)}
                             className="text-neutral-600 dark:text-neutral-300 relative px-4 py-2"
                             key={`link-${idx}`}
                             href={navItem.link}
                         >
-                            {hovered === idx && (
+                            {(hovered === idx || activeForRoute) && (
                                 <motion.div
                                     layoutId="hovered"
                                     className="w-full h-full absolute inset-0 bg-gray-100 dark:bg-neutral-800 rounded-full"
@@ -249,7 +265,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                                 </div>
                             </MenuItem>
                         </Menu>
-                    )
+                    )}
                 )}
             </motion.div>
 
@@ -301,22 +317,13 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                             <h1 className="mx-auto text-center">
                                 Sign up to access the marketplace, manage requests, and more.
                             </h1>
-                            <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-2">
                                 <Link href="/researcher/login" className="w-full">
                                     <Button
                                         variant="cta"
                                         className="w-full justify-center"
                                     >
                                         Researcher Log in
-                                    </Button>
-                                </Link>
-
-                                <Link href="/researcher/signup" className="w-full">
-                                    <Button
-                                        variant="outline"
-                                        className="w-full justify-center"
-                                    >
-                                        Researcher Sign up
                                     </Button>
                                 </Link>
 
@@ -435,22 +442,13 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                                     <h1 className="mx-auto text-center">
                                         Sign up to access the marketplace, manage requests, and more.
                                     </h1>
-                                    <div className="flex flex-col gap-4">
+                                    <div className="flex flex-col gap-2">
                                         <Link href="/researcher/login" className="w-full">
                                             <Button
                                                 variant="cta"
                                                 className="w-full justify-center"
                                             >
                                                 Researcher Log in
-                                            </Button>
-                                        </Link>
-
-                                        <Link href="/researcher/signup" className="w-full">
-                                            <Button
-                                                variant="outline"
-                                                className="w-full justify-center"
-                                            >
-                                                Researcher Sign up
                                             </Button>
                                         </Link>
 

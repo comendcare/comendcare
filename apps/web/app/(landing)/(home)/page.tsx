@@ -12,7 +12,7 @@
 // import { StatsSection } from "@comend/components/landing/sections/stats-section"
 // import { ScimanticSection } from "@comend/components/landing/sections/scimantic-section"
 // import WhatElseSection from "@comend/components/landing/sections/what-else-section"
-import { CloudHeroSection } from "~web/components/landing/cloud-hero"
+import {CloudHeroSection} from "~web/components/landing/cloud-hero"
 // import { BetaSignup } from "@comend/components/beta-signup"
 // import JoinWaitlistSection from "@comend/components/landing/sections/join-waitlist-section"
 // import MoreFeaturesSection from "@comend/components/landing/sections/more-features-section";
@@ -26,24 +26,28 @@ import FeatureFeed from "~web/components/landing/feature-feed";
 import {News} from "~web/components/landing/news";
 import LogoInfiniteCarousel from "~web/components/landing/logo-infinite-carousel";
 import {HorizontalTabsFeatures} from "~web/components/landing/horizontal-tabs-feature";
+import MarketplacePage from "~web/app/(platform)/app/marketplace/page";
 
 export default function App() {
     return (
         <>
             {/*<HeroSection/>*/}
-            <CloudHeroSection />
-            <LogoInfiniteCarousel />
+            <CloudHeroSection/>
+            <LogoInfiniteCarousel/>
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <MarketplacePage/>
+            </div>
             {/*<JoinWaitlistSection*/}
             {/*    isSubscribedCallback={betaSubscribeCallback}*/}
             {/*    isSubscribed={isSubscribed}*/}
             {/*/>*/}
             {/*<HowItWorks/>*/}
             {/*<ClientsLogoCloud />*/}
-            <HorizontalTabsFeatures />
+            {/*<HorizontalTabsFeatures/>*/}
             {/*<FeatureResearchPlan />*/}
-            <FeaturePublicPages />
-            <FeatureResearchMarketplace  />
-            <FeatureFeed />
+            {/*<FeaturePublicPages/>*/}
+            {/*<FeatureResearchMarketplace/>*/}
+            {/*<FeatureFeed/>*/}
             {/*<VerticalTimedTabsFeaturesSection />*/}
             {/*<MoreFeaturesSection />*/}
             {/*<WhoSection/>*/}
@@ -58,7 +62,7 @@ export default function App() {
             {/*    isSubscribedCallback={betaSubscribeCallback}*/}
             {/*    isSubscribed={isSubscribed}*/}
             {/*/>*/}
-            <ContactSection />
+            <ContactSection/>
         </>
     )
 }

@@ -241,7 +241,7 @@ export function HorizontalTabsFeatures() {
         <section
             id="secondary-features"
             aria-label="Features for simplifying everyday business tasks"
-            className="py-16"
+            className="px-4 py-8 md:py-24 mt-8"
         >
             <Container>
                 <div className="mx-auto max-w-2xl md:text-center">
