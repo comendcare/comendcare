@@ -205,7 +205,11 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
             milestones: {include: {milestone: true}},
             donorId: true,
             donor: {
-                include: {diagnoses: {include: {type: true}}}
+                include: {
+                    diagnoses: {
+                        include: {type: true}
+                    }
+                }
             },
             institutionId: true,
             institution: true,
