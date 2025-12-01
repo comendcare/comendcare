@@ -554,7 +554,7 @@ export function EditClincalDatasetForm({
                     Delete tool
                 </Button>
                 <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                    <DeleteAssetDialog toolId={toolData.id} closeDialog={closeDialog}/>
+                    <DeleteAssetDialog toolIds={[toolData.id]} closeDialog={closeDialog}/>
                 </Dialog>
                 <div className="bg-white rounded-md p-0">
                     <Button

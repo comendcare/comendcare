@@ -2205,28 +2205,16 @@ export const updateCondition = withOrganizationAuth(
 );
 
 export const deleteAsset = withOrganizationAuth(
-    async (_: Organization, toolId: string) => {
+    async (_: Organization, toolIds: string[]) => {
         try {
-            const response = await prisma.tool.delete({
-                where: {id: toolId},
-                include: {
-                    organization: {include: {conditions: {include: {condition: true}}}},
-                    contacts: true,
-                    attachments: true,
-                    milestones: {
-                        include: {
-                            milestone: {
-                                include: {types: {include: {milestoneType: true}}}
-                            }
-                        }
-                    }
-                },
+            const response = await prisma.tool.deleteMany({
+                where: {id: {in: toolIds}},
             })
 
             return response
         } catch (error: any) {
-            console.error("Error deleting tool:", error.message);
-            throw new Error(error.message || "Failed to delete tool.");
+            console.error("Error deleting clinical dataset(s):", error.message);
+            throw new Error(error.message || "Failed to delete clinical dataset(s)");
         }
     }
 )

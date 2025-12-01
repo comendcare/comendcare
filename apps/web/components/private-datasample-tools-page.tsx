@@ -14,13 +14,14 @@ import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { Button } from "@comend/components/ui/button";
-import { Globe, Lock } from "lucide-react";
+import { Globe, Lock, Trash } from "lucide-react";
 import { setDataToolsVisibility } from "@comend/lib/actions";
-import { Dialog } from "@comend/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@comend/components/ui/dialog";
 import { DialogPortal } from "@comend/components/plate-ui/dialog";
 import { Asset } from "@comend/lib/types";
 import { Row } from "@tanstack/react-table";
 import Image from "next/image";
+import { DeleteAssetDialog } from "./delete-asset-dialog";
 
 export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
     const {data: session} = useSession()
@@ -62,6 +63,30 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                     <>
                         {rowSelection?.length > 0 && (
                             <>
+                            <Dialog>
+                                <DialogTrigger>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button
+                                                variant={"destructive"}
+                                                size={isCollapsed ? "icon" : "default"}
+                                            >
+                                                <Trash />
+                                                {!isCollapsed && `Delete selected`}
+                                            </Button>
+                                        </TooltipTrigger>
+                                        {isCollapsed && (
+                                            <TooltipContent>
+                                                Delete selected
+                                            </TooltipContent>
+                                        )}
+                                    </Tooltip>
+                                </DialogTrigger>
+                                <DeleteAssetDialog 
+                                    toolIds={rowSelection.map((row: any) => row.id)} 
+                                    closeDialog={() => {}}
+                                />
+                            </Dialog>
                             <Tooltip>
                                 <TooltipTrigger>
                                     <Button
