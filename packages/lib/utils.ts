@@ -929,3 +929,19 @@ export const mapModalityValueToLabel = (value: string) => {
 
 export const mapMilestoneValueToLabel = (value: string) =>
     MILESTONE_TYPE_OPTIONS.find(o => o.value === value)?.label ?? value;
+
+export function normalizeTag(input: string): { display: string; normalized: string } | null {
+    let raw = input.trim();
+    if (raw.startsWith("#")) raw = raw.slice(1);
+
+    if (!raw) return null;
+
+    const display = raw;
+    const normalized = raw
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+
+    if (!normalized) return null;
+    return { display, normalized };
+}

@@ -19,7 +19,7 @@ import type {
     MaterialAndDataAccessRequest,
     Organization,
     Prisma,
-    Researcher,
+    Researcher, TaggableType,
     Tool,
     User
 } from "@prisma/client";
@@ -110,7 +110,7 @@ export async function fetchCreateRequests(
             },
             select
         })
-        
+
         return {success: true, data: createRequests}
     } catch (error) {
         logError("Error fetching create facility requests", error);
@@ -1457,7 +1457,7 @@ export const getRoadmapMilestones = withOrganizationAuth(
             return {success: false, error: "Internal server error."};
         }
     }
-) 
+)
 
 export const getRoadmap = withOrganizationAuth(
     async (
@@ -1581,13 +1581,13 @@ export const getConditionsFromOrganizationId = withOrganizationAuth(
             const conditions = await prisma.condition.findMany({
                 where: {
                     organizations: {
-                        some: { organizationId: organization.id },
+                        some: {organizationId: organization.id},
                     },
                 },
                 select: {
                     ...select,
                     // ensure we don't try to nest-select on a scalar
-                    ...(select.associatedConditions ? {} : { associatedConditions: true }),
+                    ...(select.associatedConditions ? {} : {associatedConditions: true}),
                 },
             });
 
@@ -2124,7 +2124,7 @@ export const getResearcherFromUserID = withUserAuth(
         }>
     ) => {
         const session = await getSession();
-        if (!session?.user?.id) return { success: false, error: "No session or user id" };
+        if (!session?.user?.id) return {success: false, error: "No session or user id"};
 
         try {
             const fetchedResearcher = await prisma.researcher.findUnique({
@@ -2159,7 +2159,7 @@ export const getResearcher = withUserAuth(
         }>
     ) => {
         const session = await getSession();
-        if (!session?.user?.id) return { success: false, error: "No session or user id" };
+        if (!session?.user?.id) return {success: false, error: "No session or user id"};
 
         try {
             const fetchedResearcher = await prisma.researcher.findUnique({
@@ -2377,15 +2377,15 @@ function normalizeKey(p: RawPublication): string | null {
 
 export const getResearcherMetrics = withUserAuth(async () => {
     const session = await getSession();
-    if (!session) return { success: false, error: "No session found" };
+    if (!session) return {success: false, error: "No session found"};
 
     const researcher = await prisma.researcher.findUnique({
-        where: { userId: session.user.id },
-        select: { orcid: true },
+        where: {userId: session.user.id},
+        select: {orcid: true},
     });
 
-    if (!researcher) return { success: false, error: "Researcher not found" };
-    if (!researcher.orcid) return { success: false, error: "No ORCID available" };
+    if (!researcher) return {success: false, error: "Researcher not found"};
+    if (!researcher.orcid) return {success: false, error: "No ORCID available"};
 
     let openAlex: any = null;
 
@@ -2417,25 +2417,25 @@ export const getResearcherMetrics = withUserAuth(async () => {
         yearsActive: openAlex.counts_by_year ? openAlex.counts_by_year.length : 0,
     };
 
-    return { success: true, data: metrics };
+    return {success: true, data: metrics};
 });
 
 export const getResearcherPublications = withUserAuth(
     async (userId?: string) => {
         const session = await getSession();
-        if (!session?.user?.id) return { success: false, error: "No session or user id" };
+        if (!session?.user?.id) return {success: false, error: "No session or user id"};
 
         const dbResearcher = await prisma.researcher.findUnique({
-            where: { userId: session?.user?.id },
+            where: {userId: session?.user?.id},
         });
 
         if (!dbResearcher) {
-            return { success: false, error: "Researcher not found" };
+            return {success: false, error: "Researcher not found"};
         }
 
         const hasOrcid = !!dbResearcher.orcid;
         if (!hasOrcid) {
-            return { success: true, data: [] as RawPublication[] };
+            return {success: true, data: [] as RawPublication[]};
         }
 
         const orcid = dbResearcher.orcid as string;
@@ -2620,24 +2620,24 @@ export const getResearcherPublications = withUserAuth(
             deduped.push(p);
         }
 
-        return { success: true, data: deduped };
+        return {success: true, data: deduped};
     }
 );
 
 export const getResearcherWithMergedDataAdvanced = withUserAuth(async () => {
     const session = await getSession();
-    if (!session) return { success: false, error: "No session found" };
+    if (!session) return {success: false, error: "No session found"};
 
     const dbResearcher = await prisma.researcher.findUnique({
-        where: { userId: session.user.id },
+        where: {userId: session.user.id},
         include: {
             affiliations: {
-                include: { institution: true },
+                include: {institution: true},
             },
         },
     });
 
-    if (!dbResearcher) return { success: false, error: "Researcher not found" };
+    if (!dbResearcher) return {success: false, error: "Researcher not found"};
 
     const hasOrcid = !!dbResearcher.orcid;
     let openAlexAuthor: any = null;
@@ -2746,7 +2746,7 @@ export const getDiseaseModels = async (
     input?: GetDiseaseModelSchema,
     publicOnly: boolean = false,
     columns?: ColumnDef<any>[],
-): Promise<{data: DiseaseModel[], pageCount: number}> => {
+): Promise<{ data: DiseaseModel[], pageCount: number }> => {
     if (publicOnly) { // allow any requester to fetch public data
         if (organizationId) {
             // if org ID is provided only fetch tools for organization
@@ -2797,14 +2797,14 @@ export const getDiseaseModels = async (
 }
 
 const fetchDiseaseModels = async (
-    organization: Organization | null | undefined, 
+    organization: Organization | null | undefined,
     select: Prisma.DiseaseModelSelect<InternalArgs & {
         result: {};
         model: {};
         query: {};
         client: {};
     }>,
-    columns?: ColumnDef<any>[] | undefined, 
+    columns?: ColumnDef<any>[] | undefined,
     input?: GetDiseaseModelSchema,
     publicOnly: boolean = false
 ): Promise<{
@@ -2883,36 +2883,38 @@ const fetchDiseaseModels = async (
             const queriedTypes = DISEASE_MODEL_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
 
             where.OR = [
-                { id: { contains: input.q, mode: "insensitive" } },
-                { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
-                { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
-                { company: {title: {contains: input.q, mode: "insensitive"} } },
-                { genotype: {contains: input.q, mode: "insensitive"}},
-                { organization: {name: {contains: input.q, mode: "insensitive"}}},
-                { organization: {
-                    conditions: {
-                        some: {
-                            condition: {
-                                name: {contains: input.q, mode: "insensitive"}}
+                {id: {contains: input.q, mode: "insensitive"}},
+                {gene: {symbol: {contains: input.q, mode: "insensitive"}}},
+                {institution: {name: {contains: input.q, mode: "insensitive"}}},
+                {company: {title: {contains: input.q, mode: "insensitive"}}},
+                {genotype: {contains: input.q, mode: "insensitive"}},
+                {organization: {name: {contains: input.q, mode: "insensitive"}}},
+                {
+                    organization: {
+                        conditions: {
+                            some: {
+                                condition: {
+                                    name: {contains: input.q, mode: "insensitive"}
+                                }
                             }
                         }
                     }
                 },
-                { description: {contains: input.q, mode: "insensitive"}},
-                { strain: {contains: input.q, mode: "insensitive"}},
+                {description: {contains: input.q, mode: "insensitive"}},
+                {strain: {contains: input.q, mode: "insensitive"}},
                 // NOTE - cannot match contact names or email addresses, as they are encrypted in the database
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                 // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
             ];
 
             if (queriedTypes) {
-                where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
+                where.OR = where.OR.concat([{types: {hasSome: queriedTypes.map(t => t.value)}}])
             }
         }
 
         const orderBy = input.sort.length
             ? input.sort.map(s => prismaOrderByFromColumnId(s))
-            : [{ createdAt: { sort: "asc" } }];
+            : [{createdAt: {sort: "asc"}}];
 
         const [data, total] = await prisma.$transaction([
             prisma.diseaseModel.findMany({
@@ -2928,7 +2930,7 @@ const fetchDiseaseModels = async (
             }),
             prisma.diseaseModel.count({
                 where: {
-                    ...where, 
+                    ...where,
                     ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 }
@@ -2952,7 +2954,7 @@ function prismaOrderByFromColumnId(sort: ExtendedColumnSort<any>, schemaColumns?
 
     // build nested object dynamically
     return parts.reduceRight((acc, key) => {
-        return { [key]: Object.keys(acc).length ? acc : (sort.desc ? "desc" : "asc") }
+        return {[key]: Object.keys(acc).length ? acc : (sort.desc ? "desc" : "asc")}
     }, {})
 }
 
@@ -2967,7 +2969,7 @@ export const getBiosamples = async (
     input?: GetBiosamplesSchema,
     publicOnly: boolean = false,
     columns?: ColumnDef<any>[],
-): Promise<{data: Biosample[], pageCount: number}> => {
+): Promise<{ data: Biosample[], pageCount: number }> => {
     if (publicOnly) { // allow any requester to fetch public data
         if (organizationId) {
             // if org ID is provided only fetch tools for organization
@@ -3019,14 +3021,14 @@ export const getBiosamples = async (
 }
 
 const fetchBiosamples = async (
-    organization: Organization | null | undefined, 
+    organization: Organization | null | undefined,
     select: Prisma.BiosampleSelect<InternalArgs & {
         result: {};
         model: {};
         query: {};
         client: {};
     }>,
-    columns?: ColumnDef<any>[] | undefined, 
+    columns?: ColumnDef<any>[] | undefined,
     input?: GetBiosamplesSchema,
     publicOnly: boolean = false
 ) => {
@@ -3106,13 +3108,13 @@ const fetchBiosamples = async (
                     operator: 'isBetween',
                     filterId: nanoid()
                 }),
-                filters.push({
-                    id: 'quantityUnit',
-                    value: input.quantity[2],
-                    variant: 'select',
-                    operator: 'eq',
-                    filterId: nanoid()
-                })
+                    filters.push({
+                        id: 'quantityUnit',
+                        value: input.quantity[2],
+                        variant: 'select',
+                        operator: 'eq',
+                        filterId: nanoid()
+                    })
             }
 
             where = filterColumns({
@@ -3130,12 +3132,12 @@ const fetchBiosamples = async (
             const queriedTypes = BIOSAMPLE_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
 
             where.OR = [
-                { id: { contains: input.q, mode: "insensitive" } },
-                { gene: { symbol: {contains: input.q, mode: "insensitive"} } },
-                { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
-                { company: {title: {contains: input.q, mode: "insensitive"} } },
-                { genotype: {contains: input.q, mode: "insensitive"}},
-                { organization: {name: {contains: input.q, mode: "insensitive"}}},
+                {id: {contains: input.q, mode: "insensitive"}},
+                {gene: {symbol: {contains: input.q, mode: "insensitive"}}},
+                {institution: {name: {contains: input.q, mode: "insensitive"}}},
+                {company: {title: {contains: input.q, mode: "insensitive"}}},
+                {genotype: {contains: input.q, mode: "insensitive"}},
+                {organization: {name: {contains: input.q, mode: "insensitive"}}},
                 // { organization: {
                 //     conditions: {
                 //         some: {
@@ -3149,13 +3151,13 @@ const fetchBiosamples = async (
                 // { contacts: {some: {name: {contains: input.q, mode: "insensitive"}}}},
                 // { contacts: {some: {email: {contains: input.q, mode: "insensitive"}}}},
                 // { donor: { internalId: { contains: input.q, mode: "insensitive" } } }, // disable for now since this is encrypted
-                { donor: { id: {contains: input.q, mode: "insensitive" } } },
+                {donor: {id: {contains: input.q, mode: "insensitive"}}},
                 {
                     donor: {
                         diagnoses: {
                             some: {
                                 type: {
-                                    label: { contains: input.q, mode: "insensitive" },
+                                    label: {contains: input.q, mode: "insensitive"},
                                 },
                             },
                         },
@@ -3164,13 +3166,13 @@ const fetchBiosamples = async (
             ];
 
             if (queriedTypes) {
-                where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
+                where.OR = where.OR.concat([{types: {hasSome: queriedTypes.map(t => t.value)}}])
             }
         }
 
         const orderBy = input.sort.length
             ? input.sort.map(s => prismaOrderByFromColumnId(s, columns))
-            : [{ createdAt: { sort: "asc" } }];
+            : [{createdAt: {sort: "asc"}}];
 
         const [data, total] = await prisma.$transaction([
             prisma.biosample.findMany({
@@ -3186,7 +3188,7 @@ const fetchBiosamples = async (
             }),
             prisma.biosample.count({
                 where: {
-                    ...where, 
+                    ...where,
                     ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 }
@@ -3294,7 +3296,7 @@ export const getAllBiosamples = withResearcherAuth(
 
             const orderBy = input.sort.length
                 ? input.sort.map(s => prismaOrderByFromColumnId(s))
-                : [{ createdAt: { sort: "asc" } }];
+                : [{createdAt: {sort: "asc"}}];
 
             const biosampleTypes = BIOSAMPLE_TYPE_OPTIONS
 
@@ -3355,7 +3357,7 @@ export const getClinicalDatasets = async (
     input?: GetClinicalDatasetsSchema,
     publicOnly: boolean = false,
     columns?: ColumnDef<any>[],
-): Promise<{data: Tool[], pageCount: number}> => {
+): Promise<{ data: Tool[], pageCount: number }> => {
     if (publicOnly) { // allow any requester to fetch public data
         if (organizationId) {
             const organization = await prisma.organization.findUnique({
@@ -3405,7 +3407,7 @@ export const getClinicalDatasets = async (
 }
 
 const fetchClinicalDatsets = async (
-    organization: Organization | null | undefined, 
+    organization: Organization | null | undefined,
     select: Prisma.ToolSelect<InternalArgs & {
         result: {};
         model: {};
@@ -3506,20 +3508,24 @@ const fetchClinicalDatsets = async (
             const geneSymbols = queriedGenes?.map(gene => gene.symbol)
 
             where.OR = [
-                { id: { contains: input.q, mode: "insensitive" } },
-                { title: {contains: input.q, mode: "insensitive"}},
-                { description: {contains: input.q, mode: "insensitive"}},
-                { genes: {
-                    hasSome: geneSymbols // matches any symbol in the array
-                }},
-                { institution: {name: {contains: input.q, mode: "insensitive"} } }, 
-                { company: {title: {contains: input.q, mode: "insensitive"} } },
-                { organization: {name: {contains: input.q, mode: "insensitive"}}},
-                { organization: {
-                    conditions: {
-                        some: {
-                            condition: {
-                                name: {contains: input.q, mode: "insensitive"}}
+                {id: {contains: input.q, mode: "insensitive"}},
+                {title: {contains: input.q, mode: "insensitive"}},
+                {description: {contains: input.q, mode: "insensitive"}},
+                {
+                    genes: {
+                        hasSome: geneSymbols // matches any symbol in the array
+                    }
+                },
+                {institution: {name: {contains: input.q, mode: "insensitive"}}},
+                {company: {title: {contains: input.q, mode: "insensitive"}}},
+                {organization: {name: {contains: input.q, mode: "insensitive"}}},
+                {
+                    organization: {
+                        conditions: {
+                            some: {
+                                condition: {
+                                    name: {contains: input.q, mode: "insensitive"}
+                                }
                             }
                         }
                     }
@@ -3530,13 +3536,13 @@ const fetchClinicalDatsets = async (
             ];
 
             if (queriedTypes) {
-                where.OR = where.OR.concat([{ types: { hasSome: queriedTypes.map(t => t.value) } }])
+                where.OR = where.OR.concat([{types: {hasSome: queriedTypes.map(t => t.value)}}])
             }
         }
 
         const orderBy = input.sort.length
             ? input.sort.map(s => prismaOrderByFromColumnId(s))
-            : [{ createdAt: { sort: "asc" } }];
+            : [{createdAt: {sort: "asc"}}];
 
         const [data, total] = await prisma.$transaction([
             prisma.tool.findMany({
@@ -3552,7 +3558,7 @@ const fetchClinicalDatsets = async (
             }),
             prisma.tool.count({
                 where: {
-                    ...where, 
+                    ...where,
                     ...(organization ? {organizationId: organization.id} : undefined),
                     ...(publicOnly ? {private: false} : undefined)
                 }
@@ -3788,8 +3794,8 @@ export async function ensureOrgContextForRoadmap(roadmapId: string) {
 
     // Minimal lookup to learn which org owns this roadmap (no sensitive fields)
     const roadmap = await prisma.roadmap.findUnique({
-        where: { id: roadmapId },
-        select: { id: true, organizationId: true },
+        where: {id: roadmapId},
+        select: {id: true, organizationId: true},
     });
 
     if (!roadmap) notFound(); // 404 if it doesn’t exist
@@ -3799,15 +3805,15 @@ export async function ensureOrgContextForRoadmap(roadmapId: string) {
     // If roadmap isn't tied to an org (rare), only allow if it's published or owned, etc.
     // Customize this branch as your product rules require.
     if (!orgId) {
-        return { orgId: null, switched: false };
+        return {orgId: null, switched: false};
     }
 
     // Is the user a member of that org?
     const membership = await prisma.member.findUnique({
         where: {
-            userId_organizationId: { userId: session.user.id, organizationId: orgId },
+            userId_organizationId: {userId: session.user.id, organizationId: orgId},
         },
-        select: { id: true },
+        select: {id: true},
     });
 
     // If not a member: pretend it doesn’t exist (or show a 403 page if you prefer)
@@ -3815,8 +3821,8 @@ export async function ensureOrgContextForRoadmap(roadmapId: string) {
 
     // Switch org if needed (server-side, before render)
     const user = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { activeOrganizationId: true },
+        where: {id: session.user.id},
+        select: {activeOrganizationId: true},
     });
 
     let switched = false;
@@ -3826,9 +3832,45 @@ export async function ensureOrgContextForRoadmap(roadmapId: string) {
     }
 
     const organization = await prisma.organization.findUnique({
-        where: { id: orgId },
+        where: {id: orgId},
         select: {id: true, name: true},
     })
 
-    return { organization, switched };
+    return {organization, switched};
 }
+
+export const getTagsForEntity =
+    async (
+        taggableType: TaggableType,
+        taggableId: string | undefined | null
+    ): Promise<{
+        success: boolean;
+        error?: string;
+        data?: { value: string; normalizedValue: string }[];
+    }> => {
+        try {
+
+            if (!taggableId) {
+                return {success: false, error: "Missing taggableId"};
+            }
+
+            const assignments = await prisma.tagAssignment.findMany({
+                where: {
+                    taggableType,
+                    taggableId,
+                },
+                include: {tag: true},
+            });
+
+            return {
+                success: true,
+                data: assignments.map((a) => ({
+                    value: a.tag.value,
+                    normalizedValue: a.tag.normalizedValue,
+                })),
+            };
+        } catch (err) {
+            console.error("Error fetching tags for entity:", err);
+            return {success: false, error: "Server error occurred."};
+        }
+    }

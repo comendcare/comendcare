@@ -42,6 +42,9 @@ export const PagProfileAboutCard = ({
     const therapeuticsOfInterest = cleanBadges(organization?.therapeuticsOfInterest);
     const therapeuticsInDevelopment = cleanBadges(organization?.therapeuticsInDevelopment);
 
+    const visibleMembers = organization?.members
+        ?.filter(m => !m.user.email?.toLowerCase().endsWith("@comendcare.com"));
+
     return (
         <Card className="organization-profile-tour-step1" data-testid="about-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -83,7 +86,6 @@ export const PagProfileAboutCard = ({
                         </div>
                     </div>
 
-                     Therapeutics of interest — render only if we have items
                     {therapeuticsOfInterest.length > 0 && (
                         <>
                             <div className="flex flex-row items-center justify-between w-full">
@@ -101,7 +103,6 @@ export const PagProfileAboutCard = ({
                         </>
                     )}
 
-                    {/* Therapeutics in development — render only if we have items */}
                     {therapeuticsInDevelopment.length > 0 && (
                         <>
                             <div className="flex flex-row items-center justify-between w-full">
@@ -129,10 +130,8 @@ export const PagProfileAboutCard = ({
                             )}
                         </div>
 
-                        {organization?.members && organization.members.length > 0 ? (
-                            organization.members
-                                .filter(member => !member.user.email?.toLowerCase().endsWith("@comendcare.com"))
-                                .map((member, index) => (
+                        {visibleMembers && visibleMembers.length > 0 ? (
+                            visibleMembers.map((member, index) => (
                                 <div key={index} className="flex items-center space-x-4" data-testid="member-item">
                                     <Avatar>
                                         <AvatarImage src={member.user.image || ""} />

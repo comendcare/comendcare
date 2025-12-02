@@ -82,7 +82,7 @@ export async function generateMetadata({
     const baseUrl = `https://${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
 
     return {
-        title: data.subdomain ? `${data.subdomain.toLocaleUpperCase()} - Comend` : title,
+        title: data.name ? `${data.name} - Comend` : title,
         description,
         openGraph: {
             title,

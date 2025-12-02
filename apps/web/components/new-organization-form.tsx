@@ -279,7 +279,7 @@ export default function NewOrganizationForm({invitations, organizations}: {
                 const condRes = await createCondition(cfd);
                 if (condRes?.success && condRes?.data?.id) {
                     await connectOrganizationToCondition(orgId, condRes.data.id);
-                    toast.success("Condition saved.");
+                    toast.success("Condition saved!");
                 } else if (condRes?.error) {
                     console.error(condRes.error);
                     toast.error(condRes.error);
