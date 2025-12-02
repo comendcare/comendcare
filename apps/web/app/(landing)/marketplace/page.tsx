@@ -18,12 +18,20 @@ import Link from "next/link"
 import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
 import { OrganizationMarketplaceCard } from "@comend/components/marketplace/marketplace-pag-card"
-import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeRFPSearch } from "@comend/lib/initialize-client-state"
+import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeRFPSearch } from "@comend/lib/initialize-client-state"
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
 import { RFPCard } from "@comend/components/rfp-card"
 import { mixpanelTrack } from "@comend/lib/mixpanel"
 import { Dialog, DialogContent, DialogTrigger } from "@comend/components/ui/dialog"
 import { RFPDetails } from "@comend/components/pag-profile-rfps-card"
+import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
+import { CROMarketplaceCard } from "@comend/components/marketplace/marketplace-cro-card"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@comend/components/ui/dropdown-menu"
+
+const croSelector = (state: CROSearchState) => ({
+    setSearchTerm: state.setSearchTerm,
+    searchResults: state.searchResults,
+})
 
 const organizationSelector = (state: OrganizationSearchState) => ({
     featuredOrgs: state.featuredOrgs,
@@ -57,6 +65,7 @@ const rfpSelector = (state: RFPSearchState) => ({
 
 export default function MarketplacePage() {
     // const {data: session, status} = useSession()
+    const croStore = useCROSearchStore(useShallow(croSelector))
     const organizationStore = useOrganizationSearchStore(useShallow(organizationSelector))
     const biosampleStore = useBiosampleSearchStore(useShallow(biosampleSelector))
     const diseaseModelStore = useDiseaseModelSearchStore(useShallow(diseaseModelSelector))
@@ -75,6 +84,7 @@ export default function MarketplacePage() {
         false, // disable sorting,
         false, // disable hiding
     )
+    const [crosInitialized, setCROsInitialized] = useState(false)
     const [pagsInitialized, setPagsInitialized] = useState(false)
     const [biosamplesInitialized, setBiosamplesInitialized] = useState(false)
     const [diseaseModelsInitialized, setDiseaseModelsInitialized] = useState(false)
@@ -85,6 +95,17 @@ export default function MarketplacePage() {
     useEffect(() => {
         const init = async () => {
             console.log(`start init...`)
+            const parsedCROFilters = {
+                categories: [] as any[],
+                milestoneTypes: [] as any[],
+                types: [] as any[],
+                certifications: [] as any[],
+                tags: [] as any[],
+            }
+            await initializeCROSearch(parsedCROFilters)
+            setCROsInitialized(true)
+            console.log(`CRO search initialized...`)
+
             const parsedPAGFilters = {
                 genes: [] as any[],
                 conditions: [] as any[],
@@ -154,20 +175,143 @@ export default function MarketplacePage() {
         return () => window.removeEventListener('resize', handleResize)
     }, [])
 
+    const SignInDropdownContent = () => {
+        return (
+            <DropdownMenuContent
+                align="end"
+                className="w-96 p-4 flex-col space-y-4"
+            >
+                <h1 className="mx-auto text-center">
+                    Sign up to edit your profile, access the marketplace, and more.
+                </h1>
+                <div className="flex flex-col gap-2">
+                    <Link
+                        href={
+                            process.env.NEXT_PUBLIC_NODE_ENV === "production"
+                                ? "https://researcher.comend.io/login"
+                                : `http://researcher.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
+                        }
+                        className="w-full"
+                    >
+                        <Button
+                            variant="cta"
+                            className="w-full justify-center"
+                        >
+                            Researcher Log in
+                        </Button>
+                    </Link>
+
+                    <Link
+                        href={
+                            process.env.NEXT_PUBLIC_NODE_ENV === "production"
+                                ? "https://comend.io/login"
+                                : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
+                        }
+                        className="w-full"
+                    >
+                        <Button
+                            variant="cta"
+                            className="w-full justify-center"
+                        >
+                            Patient Group Log in
+                        </Button>
+                    </Link>
+
+                    <Link
+                        href="https://calendly.com/albertatcomend/onboarding"
+                        className="w-full"
+                        target="_blank"
+                    >
+                        <Button
+                            variant="outline"
+                            className="w-full justify-center"
+                        >
+                            Patient Group Sign up
+                        </Button>
+                    </Link>
+                </div>
+            </DropdownMenuContent>
+        )
+    }
+
     return (
         <div className="flex flex-col w-full h-full mx-auto gap-8">
             <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
+                        <h2 className="text-2xl semibold">Service providers</h2>
+                        {/* <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                            <Link
+                                // href={"/app/marketplace/service-providers"}
+                                href={"https://calendly.com/albertatcomend/onboarding"}
+                            >
+                                Browse all service providers
+                                <ArrowRight />
+                            </Link>
+                        </Button> */}
+                        <DropdownMenu modal={false}>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="secondary"
+                                    className="justify-self-end self-end"
+                                >
+                                    Browse all
+                                    <ArrowRight />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <SignInDropdownContent />
+                        </DropdownMenu>
+                    </div>
+                    <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {(crosInitialized && croStore.searchResults && croStore.searchResults.length > 0 )
+                            ? (
+                                <>
+                                    {croStore.searchResults?.slice(0, width < 1280 ? 2 : 3)
+                                        .map((cro, index) => (
+                                            <CROMarketplaceCard
+                                                cro={cro}
+                                                key={index}
+                                                location={"Marketplace"}
+                                                // savedCompanyIds={savedCompanyIds}
+                                                savedCompanyIds={new Set()}
+                                            />
+                                    ))}
+                                </>
+                            )
+                            : (
+                                <>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                    {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
+                                </>
+                            )
+                        }
+                    </ol>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Patient groups</h2>
-                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                        {/* <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/marketplace/patient-groups"}
                             >
                                 Browse all patient groups
                                 <ArrowRight />
                             </Link>
-                        </Button>
+                        </Button> */}
+                        <DropdownMenu modal={false}>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="secondary"
+                                    className="justify-self-end self-end"
+                                >
+                                    Browse all
+                                    <ArrowRight />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <SignInDropdownContent />
+                        </DropdownMenu>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {(pagsInitialized && ([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0))
@@ -200,14 +344,26 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Patient biosamples</h2>
-                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                        {/* <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/marketplace/biosamples"}
                             >
                                 Browse all patient biosamples
                                 <ArrowRight />
                             </Link>
-                        </Button>
+                        </Button> */}
+                        <DropdownMenu modal={false}>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="secondary"
+                                    className="justify-self-end self-end"
+                                >
+                                    Browse all
+                                    <ArrowRight />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <SignInDropdownContent />
+                        </DropdownMenu>
                     </div>
                     <ol className="w-full">
                         {(biosamplesInitialized && biosampleStore.searchResults && biosampleStore.searchResults.length > 0 )
@@ -257,14 +413,26 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Disease models</h2>
-                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                        {/* <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/marketplace/disease-models"}
                             >
                                 Browse all disease models
                                 <ArrowRight />
                             </Link>
-                        </Button>
+                        </Button> */}
+                        <DropdownMenu modal={false}>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="secondary"
+                                    className="justify-self-end self-end"
+                                >
+                                    Browse all
+                                    <ArrowRight />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <SignInDropdownContent />
+                        </DropdownMenu>
                     </div>
                     <ol className="w-full">
                         {(diseaseModelsInitialized && diseaseModelStore.searchResults && diseaseModelStore.searchResults.length > 0 )
@@ -308,14 +476,26 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Clinical datasets</h2>
-                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                        {/* <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/marketplace/clinical-datasets"}
                             >
                                 Browse all clinical datasets
                                 <ArrowRight />
                             </Link>
-                        </Button>
+                        </Button> */}
+                        <DropdownMenu modal={false}>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="secondary"
+                                    className="justify-self-end self-end"
+                                >
+                                    Browse all
+                                    <ArrowRight />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <SignInDropdownContent />
+                        </DropdownMenu>
                     </div>
                     <ol className="w-full">
                         {(clinicalDatasetsInitialized && clinicalDatasetStore.searchResults && clinicalDatasetStore.searchResults.length > 0 )
@@ -359,14 +539,26 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Requests for proposals</h2>
-                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                        {/* <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
                                 href={"/app/marketplace/rfps"}
                             >
                                 Browse all requests for proposals
                                 <ArrowRight />
                             </Link>
-                        </Button>
+                        </Button> */}
+                        <DropdownMenu modal={false}>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="secondary"
+                                    className="justify-self-end self-end"
+                                >
+                                    Browse all
+                                    <ArrowRight />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <SignInDropdownContent />
+                        </DropdownMenu>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {(rfpsInitialized && rfpStore.searchResults && rfpStore.searchResults.length > 0 )

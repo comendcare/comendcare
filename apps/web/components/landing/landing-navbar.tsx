@@ -318,7 +318,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, pathname}) => {
                             className="w-96 p-4 flex-col space-y-4"
                         >
                             <h1 className="mx-auto text-center">
-                                Sign up to access the marketplace, manage requests, and more.
+                                Sign up to edit your profile, access the marketplace, and more.
                             </h1>
                             <div className="flex flex-col gap-2">
                                 <Link

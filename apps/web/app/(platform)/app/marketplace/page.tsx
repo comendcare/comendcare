@@ -223,8 +223,7 @@ export default function MarketplacePage() {
                         <h2 className="text-2xl semibold">Service providers</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
-                                // href={"/app/marketplace/service-providers"}
-                                href={"https://calendly.com/albertatcomend/onboarding"}
+                                href={"/app/marketplace/service-providers"}
                             >
                                 Browse all service providers
                                 <ArrowRight />
@@ -263,8 +262,7 @@ export default function MarketplacePage() {
                         <h2 className="text-2xl semibold">Patient groups</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
-                                // href={"/app/marketplace/patient-groups"}
-                                href={"https://calendly.com/albertatcomend/onboarding"}
+                                href={"/app/marketplace/patient-groups"}
                             >
                                 Browse all patient groups
                                 <ArrowRight />
@@ -304,8 +302,7 @@ export default function MarketplacePage() {
                         <h2 className="text-2xl semibold">Patient biosamples</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
-                                // href={"/app/marketplace/biosamples"}
-                                href={"https://calendly.com/albertatcomend/onboarding"}
+                                href={"/app/marketplace/biosamples"}
                             >
                                 Browse all patient biosamples
                                 <ArrowRight />
@@ -362,8 +359,7 @@ export default function MarketplacePage() {
                         <h2 className="text-2xl semibold">Disease models</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
-                                // href={"/app/marketplace/disease-models"}
-                                href={"https://calendly.com/albertatcomend/onboarding"}
+                                href={"/app/marketplace/disease-models"}
                             >
                                 Browse all disease models
                                 <ArrowRight />
@@ -414,8 +410,7 @@ export default function MarketplacePage() {
                         <h2 className="text-2xl semibold">Clinical datasets</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
-                                // href={"/app/marketplace/clinical-datasets"}
-                                href={"https://calendly.com/albertatcomend/onboarding"}
+                                href={"/app/marketplace/clinical-datasets"}
                             >
                                 Browse all clinical datasets
                                 <ArrowRight />
@@ -466,8 +461,7 @@ export default function MarketplacePage() {
                         <h2 className="text-2xl semibold">Requests for proposals</h2>
                         <Button asChild variant={"secondary"} className="justify-self-end self-end">
                             <Link
-                                // href={"/app/marketplace/rfps"}
-                                href={"https://calendly.com/albertatcomend/onboarding"}
+                                href={"/app/marketplace/rfps"}
                             >
                                 Browse all requests for proposals
                                 <ArrowRight />
