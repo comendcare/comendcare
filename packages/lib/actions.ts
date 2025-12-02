@@ -1,7 +1,18 @@
 "use server"
 
 import prisma from "./prisma"
-import type {Condition, Invitation, Organization, PlatformNotification, Review, Roadmap, User,} from "@prisma/client"
+import type {
+    TaggableType,
+    TagAssignment,
+    Tag,
+    Condition,
+    Invitation,
+    Organization,
+    PlatformNotification,
+    Review,
+    Roadmap,
+    User
+} from "@prisma/client"
 import {Prisma} from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {authOptions, getSession, withAuth, withOrganizationAuth, withUserAuth} from "./auth"
@@ -14,7 +25,8 @@ import {
     logError,
     runInProduction,
     toKebabCase,
-    updateTypeSenseDocument
+    updateTypeSenseDocument,
+    normalizeTag
 } from "./utils";
 import {validateEmailDomain} from "./server-utils";
 import {getServerSession} from "next-auth";
@@ -2205,70 +2217,47 @@ export const updateCondition = withOrganizationAuth(
 );
 
 export const deleteAsset = withOrganizationAuth(
-    async (_: Organization, toolId: string) => {
+    async (_: Organization, toolIds: string[]) => {
         try {
-            const response = await prisma.tool.delete({
-                where: {id: toolId},
-                include: {
-                    organization: {include: {conditions: {include: {condition: true}}}},
-                    contacts: true,
-                    attachments: true,
-                    milestones: {
-                        include: {
-                            milestone: {
-                                include: {types: {include: {milestoneType: true}}}
-                            }
-                        }
-                    }
-                },
+            const response = await prisma.tool.deleteMany({
+                where: {id: {in: toolIds}},
             })
 
             return response
         } catch (error: any) {
-            console.error("Error deleting tool:", error.message);
-            throw new Error(error.message || "Failed to delete tool.");
+            console.error("Error deleting clinical dataset(s):", error.message);
+            throw new Error(error.message || "Failed to delete clinical dataset(s)");
         }
     }
 )
 
 
-export const deleteBiosample = withOrganizationAuth(
-    async (_: Organization, id: string) => {
+export const deleteBiosamples = withOrganizationAuth(
+    async (_: Organization, ids: string[]) => {
         try {
-            const response = await prisma.biosample.delete({
-                where: {id},
-                include: {
-                    contacts: true,
-                    attachments: true,
-                    milestones: {
-                        include: {
-                            milestone: {
-                                include: {types: {include: {milestoneType: true}}}
-                            }
-                        }
-                    }
-                },
+            const response = await prisma.biosample.deleteMany({
+                where: {id: {in: ids}}
             })
 
             return response
         } catch (error: any) {
-            console.error("Error deleting tool:", error.message);
-            throw new Error(error.message || "Failed to delete tool.");
+            console.error("Error deleting biosample(s):", error.message);
+            throw new Error(error.message || "Failed to delete biosample(s).");
         }
     }
 )
 
-export const deleteDiseaseModel = withOrganizationAuth(
-    async (_: Organization, id: string) => {
+export const deleteDiseaseModels = withOrganizationAuth(
+    async (_: Organization, ids: string[]) => {
         try {
-            const response = await prisma.diseaseModel.delete({
-                where: {id}
+            const response = await prisma.diseaseModel.deleteMany({
+                where: {id: {in: ids}}
             })
 
             return response
         } catch (error: any) {
-            console.error("Error deleting tool:", error.message);
-            throw new Error(error.message || "Failed to delete tool.");
+            console.error("Error deleting disease model(s):", error.message);
+            throw new Error(error.message || "Failed to delete disease model(s).");
         }
     }
 )
@@ -6329,3 +6318,135 @@ export async function subscribeToOrganization(email: string, host?: string | nul
         return { success: false, error: "Database error. Please try again later." };
     }
 }
+
+type UpdateTagsResult = {
+    success: boolean;
+    error?: string;
+    data?: {
+        assignments: (TagAssignment & { tag: Tag })[];
+    };
+};
+
+export const updateEntityTags = withAuth(
+    async (
+        taggableType: TaggableType,
+        taggableId: string,
+        rawTags: string[]
+    ): Promise<UpdateTagsResult> => {
+        try {
+            const session = await getSession();
+            if (!session?.user?.id) {
+                return { success: false, error: "Not authenticated" };
+            }
+
+            // Basic guardrails – up to you how strict you want to be
+            if (!taggableId) {
+                return { success: false, error: "Missing taggableId" };
+            }
+
+            // Normalize + dedupe
+            const normalized = rawTags
+                .map(normalizeTag)
+                .filter(
+                    (t): t is { display: string; normalized: string } => !!t
+                );
+
+            // If you want to allow “clear all tags” when array is empty:
+            if (normalized.length === 0) {
+                await prisma.tagAssignment.deleteMany({
+                    where: { taggableType, taggableId },
+                });
+
+                const emptyAssignments: (TagAssignment & { tag: Tag })[] = [];
+
+                return {
+                    success: true,
+                    data: { assignments: emptyAssignments },
+                };
+            }
+
+            const result = await prisma.$transaction(async (tx) => {
+                // 1. Upsert Tag records
+                const tags = await Promise.all(
+                    normalized.map(({ display, normalized }) =>
+                        tx.tag.upsert({
+                            where: { normalizedValue: normalized },
+                            update: { value: display },
+                            create: {
+                                value: display,
+                                normalizedValue: normalized,
+                            },
+                        })
+                    )
+                );
+
+                const tagIds = tags.map((t) => t.id);
+
+                // 2. Remove old assignments for this entity that are no longer present
+                await tx.tagAssignment.deleteMany({
+                    where: {
+                        taggableType,
+                        taggableId,
+                        tagId: { notIn: tagIds },
+                    },
+                });
+
+                // 3. Create missing assignments
+                await tx.tagAssignment.createMany({
+                    data: tagIds.map((tagId) => ({
+                        taggableType,
+                        taggableId,
+                        tagId,
+                    })),
+                    skipDuplicates: true,
+                });
+
+                // 4. Return fresh assignments + tags
+                const assignments = await tx.tagAssignment.findMany({
+                    where: { taggableType, taggableId },
+                    include: { tag: true },
+                });
+
+                return assignments;
+            });
+
+            // If/when you want Typesense + revalidation, you can branch on taggableType here
+            // and update the appropriate collection, e.g.:
+            //
+            // if (taggableType === TaggableType.MATERIAL_AND_DATA_ACCESS_REQUEST) {
+            //   const tags = result.map((a) => a.tag.value);
+            //   const tagsNormalized = result.map((a) => a.tag.normalizedValue);
+            //
+            //   // Fetch the underlying entity if needed for the doc payload
+            //   const request = await prisma.materialAndDataAccessRequest.findUnique({
+            //     where: { id: taggableId },
+            //     include: { organization: true },
+            //   });
+            //
+            //   if (request) {
+            //     await updateTypeSenseDocument(
+            //       `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+            //       (
+            //         process.env.NEXT_PUBLIC_NODE_ENV === "development" ||
+            //         process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+            //           ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+            //           : process.env.TYPESENSE_ADMIN_API_KEY
+            //       )!,
+            //       { ...request, tags, tags_normalized: tagsNormalized },
+            //       "requests"
+            //     );
+            //   }
+            //
+            //   revalidatePath("/requests");
+            // }
+
+            return {
+                success: true,
+                data: { assignments: result },
+            };
+        } catch (error) {
+            console.error("Error updating tags:", error);
+            return { success: false, error: "Server error occurred." };
+        }
+    }
+);

@@ -21,7 +21,7 @@ const EditPAGProfileConditionCardDialog = dynamic(
 
 type AssocMini = { id: string; name: string; slug: string };
 
-type ConditionForCard = Prisma.ConditionGetPayload<{
+export type ConditionForCard = Prisma.ConditionGetPayload<{
     select: {
         id: true;
         name: true;
@@ -36,25 +36,24 @@ type ConditionForCard = Prisma.ConditionGetPayload<{
         associatedSystems: true;
         causalGenes: true;
         associatedGenes: true;
-        associatedConditions: true; // string[]
+        associatedConditions: true;
     };
 }>;
 
 
-// NEW: clean + normalize badge arrays
 const cleanBadges = (arr?: (string | null | undefined)[] | null) =>
     (arr ?? []).map(s => (s ?? "").trim()).filter(Boolean) as string[];
 
 export const PAGProfileConditionsCard = ({
                                              conditions,
-                                             organization,
                                              showEditDialog,
                                              isPrivate = false, // no longer affects badge-section visibility
+                                             conditionTags = []
                                          }: {
     conditions: Partial<Condition>[] | null;
-    organization: Partial<Organization>;
     showEditDialog: boolean;
     isPrivate?: boolean;
+    conditionTags?: string[];
 }) => {
     if (conditions === null) {
         return (
@@ -76,7 +75,9 @@ export const PAGProfileConditionsCard = ({
                     <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="conditions-title">
                         Conditions
                     </CardTitle>
-                    {showEditDialog && <EditPAGProfileConditionCardDialog organization={organization} />}
+                    {showEditDialog && (
+                        <EditPAGProfileConditionCardDialog />
+                    )}
                 </CardHeader>
                 <CardContent data-testid="conditions-empty-state">
                     <div className="flex flex-col space-y-2 text-left">
@@ -94,6 +95,7 @@ export const PAGProfileConditionsCard = ({
         const associatedSystems = cleanBadges(condition?.associatedSystems);
         const causalGenes = cleanBadges(condition?.causalGenes);
         const associatedGenes = cleanBadges(condition?.associatedGenes);
+        const tags = cleanBadges(conditionTags);
 
         return (
             <Card className="organization-profile-tour-step2" data-testid="conditions-card">
@@ -101,7 +103,12 @@ export const PAGProfileConditionsCard = ({
                     <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="conditions-title">
                         {condition?.name ?? "No name condition"}
                     </CardTitle>
-                    {showEditDialog && <EditPAGProfileConditionCardDialog organization={organization} />}
+                    {showEditDialog && (
+                        <EditPAGProfileConditionCardDialog
+                            condition={condition}
+                            conditionTags={tags}
+                        />
+                    )}
                 </CardHeader>
 
                 <CardContent>
@@ -158,6 +165,22 @@ export const PAGProfileConditionsCard = ({
                                 </p>
                             )}
                         </div>
+
+                        {tags.length > 0 && (
+                            <div className="space-y-2" data-testid="condition-tags-section">
+                                <div className="flex flex-row items-center justify-between w-full">
+                                    <h4
+                                        className="scroll-m-20 text-base font-semibold"
+                                        data-testid="condition-tags-heading"
+                                    >
+                                        Tags
+                                    </h4>
+                                </div>
+                                <p className="text-sm text-gray-700" data-testid="condition-tags">
+                                    {tags.map((t, idx) => `#${t}`).join(", ")}
+                                </p>
+                            </div>
+                        )}
 
                         {/* Badge sections: render ONLY when there are cleaned items */}
                         {diseaseCategories.length > 0 && (
