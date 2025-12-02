@@ -404,7 +404,7 @@ function DataTableFilterItem<TData>({
       <li
         id={filterItemId}
         tabIndex={-1}
-        className="flex items-center gap-2"
+        className="flex flex-wrap items-center gap-2"
         onKeyDown={onItemKeyDown}
       >
         <div className="min-w-[72px] text-center">
@@ -446,7 +446,7 @@ function DataTableFilterItem<TData>({
               aria-controls={fieldListboxId}
               variant="outline"
               size="sm"
-              className="w-32 justify-between rounded font-normal"
+              className="w-full md:w-32 justify-between rounded font-normal"
             >
               <span className="truncate">
                 {columns.find((column) => column.id === filter.id)?.columnDef
@@ -514,7 +514,7 @@ function DataTableFilterItem<TData>({
         >
           <SelectTrigger
             aria-controls={operatorListboxId}
-            className="h-8 w-32 rounded lowercase [&[data-size]]:h-8"
+            className="h-8 w-full md:w-32 rounded lowercase [&[data-size]]:h-8"
           >
             <div className="truncate">
               <SelectValue placeholder={filter.operator} />
