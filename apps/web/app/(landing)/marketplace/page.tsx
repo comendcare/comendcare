@@ -13,7 +13,7 @@ import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/bi
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, X } from "lucide-react"
 import Link from "next/link"
 import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
@@ -179,7 +179,7 @@ export default function MarketplacePage() {
         return (
             <DropdownMenuContent
                 align="end"
-                className="w-96 p-4 flex-col space-y-4"
+                className="border-2 w-96 p-4 flex-col space-y-4"
             >
                 <h1 className="mx-auto text-center">
                     Sign up to edit your profile, access the marketplace, and more.

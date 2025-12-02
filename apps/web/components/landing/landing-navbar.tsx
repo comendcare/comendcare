@@ -29,6 +29,7 @@ import {
     DropdownMenuTrigger,
 } from "@comend/components/ui/dropdown-menu"
 import {useSigninDropdown} from "@/state/signin/signin-drodown-context";
+import { Separator } from "@comend/components/ui/separator"
 
 
 interface NavbarItem {
@@ -432,7 +433,7 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                             initial={{opacity: 0}}
                             animate={{opacity: 1}}
                             exit={{opacity: 0}}
-                            className="flex rounded-lg absolute top-16 bg-white dark:bg-neutral-950 inset-x-0 z-50 flex-col items-start justify-start gap-4 w-full px-4 py-8"
+                            className="border-2 flex rounded-lg absolute top-16 bg-white dark:bg-neutral-950 inset-x-0 z-50 flex-col items-start justify-start gap-4 w-full px-4 py-8"
                         >
                             {navItems.map((navItem, idx) => (
                                 <Link
@@ -456,6 +457,8 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                             {/*</Link>*/}
 
                             {session && (
+                                <>
+                                <Separator />
                                 <div className="flex flex-col space-y-4">
                                     <h1 className="mx-auto text-center">
                                         Sign up to access the marketplace, manage requests, and more.
@@ -492,6 +495,7 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                                         </Link>
                                     </div>
                                 </div>
+                                </>
                             )}
 
                         </motion.div>
