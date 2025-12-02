@@ -140,6 +140,7 @@ export default async function MarketplacePage(props: IndexPageProps) {
     return (
         <FeatureFlagsProvider>
         <MarketplaceExplorePage 
+            isExternal={false}
             biosampleData={biosampleData}
             diseaseModelData={diseaseModelData}
             clinicalDatasetData={clinicalDatasetData}

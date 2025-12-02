@@ -14,6 +14,7 @@ import {beaconFlush} from "~web/lib/flushOps"
 import {usePathname} from "next/navigation"
 import {Session} from "next-auth";
 import { TooltipProvider } from "@comend/components/ui/tooltip"
+import { FeatureFlagsProvider } from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider"
 
 
 export function Providers({children, session}: { children: React.ReactNode, session: Session | null }) {

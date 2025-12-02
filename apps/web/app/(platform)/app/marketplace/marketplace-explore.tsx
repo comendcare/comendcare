@@ -7,7 +7,7 @@ import { Button } from "@comend/components/ui/button"
 import { Skeleton } from "@comend/components/ui/skeleton"
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, X } from "lucide-react"
 import Link from "next/link"
 import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
@@ -23,6 +23,7 @@ import { DatabaseBiosamplesTable } from "@comend/components/biorepo/advanced-dat
 import { SearchParams } from "@comend/components/types"
 import { DatabaseDiseaseModelsTable } from "@comend/components/biorepo/advanced-data-table/disease-models-table/database-disease-models-table"
 import { DatabaseClinicalDatasetsTable } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/database-clinical-datasets-table"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@comend/components/ui/dropdown-menu"
 
 const croSelector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -42,11 +43,13 @@ const rfpSelector = (state: RFPSearchState) => ({
 })
 
 export default function MarketplaceExplorePage({
+    isExternal,
     biosampleData,
     diseaseModelData,
     clinicalDatasetData,
     searchParams
 }: {
+    isExternal: boolean,
     biosampleData: any[],
     diseaseModelData: any[],
     clinicalDatasetData: any[]
@@ -129,6 +132,84 @@ export default function MarketplaceExplorePage({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const BrowseAllSignInButton = () => {
+        const [isOpen, setIsOpen] = useState(false)
+
+        return (
+            <DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false}>
+                <DropdownMenuTrigger asChild>
+                    <Button
+                        variant="secondary"
+                        className="justify-self-end self-end"
+                    >
+                        Browse all
+                        <ArrowRight />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                    align="end"
+                    className="border-2 w-96 p-4 flex-col space-y-4"
+                >
+                    <button
+                        className="absolute top-0 right-0 p-2 m-2"
+                        onClick={() => setIsOpen(false)}
+                    >
+                        <X className="h-4 w-4"/>
+                    </button>
+                    <h1 className="mx-auto text-center">
+                        Sign up to edit your profile, access the marketplace, and more.
+                    </h1>
+                    <div className="flex flex-col gap-2">
+                        <Link
+                            href={
+                                process.env.NEXT_PUBLIC_NODE_ENV === "production"
+                                    ? "https://researcher.comend.io/login"
+                                    : `http://researcher.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
+                            }
+                            className="w-full"
+                        >
+                            <Button
+                                variant="cta"
+                                className="w-full justify-center"
+                            >
+                                Researcher Log in
+                            </Button>
+                        </Link>
+
+                        <Link
+                            href={
+                                process.env.NEXT_PUBLIC_NODE_ENV === "production"
+                                    ? "https://comend.io/login"
+                                    : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
+                            }
+                            className="w-full"
+                        >
+                            <Button
+                                variant="cta"
+                                className="w-full justify-center"
+                            >
+                                Patient Group Log in
+                            </Button>
+                        </Link>
+
+                        <Link
+                            href="https://calendly.com/albertatcomend/onboarding"
+                            className="w-full"
+                            target="_blank"
+                        >
+                            <Button
+                                variant="outline"
+                                className="w-full justify-center"
+                            >
+                                Patient Group Sign up
+                            </Button>
+                        </Link>
+                    </div>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        )
+    }
+
     return (
         <div className="flex flex-col w-full h-full mx-auto gap-8">
             <div className="flex flex-col gap-8">
@@ -138,14 +219,18 @@ export default function MarketplaceExplorePage({
                             <h2 className="text-2xl semibold">Service providers</h2>
                             <p className="text-muted-foreground">Supporting 128 types of services</p>
                         </div>
-                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
-                            <Link
-                                href={"/app/marketplace/service-providers"}
-                            >
-                                Browse all service providers
-                                <ArrowRight />
-                            </Link>
-                        </Button>
+                        {isExternal 
+                            ? (<BrowseAllSignInButton />) 
+                            : (
+                                <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                                    <Link
+                                        href={"/app/marketplace/service-providers"}
+                                    >
+                                        Browse all
+                                        <ArrowRight />
+                                    </Link>
+                                </Button>
+                            )}
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {(crosInitialized && croStore.searchResults && croStore.searchResults.length > 0 )
@@ -180,14 +265,18 @@ export default function MarketplaceExplorePage({
                             <h2 className="text-2xl semibold">Patient groups</h2>
                             <p className="text-muted-foreground">Pursuing Y therapeutic pipelines</p>
                         </div>
-                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
-                            <Link
-                                href={"/app/marketplace/patient-groups"}
-                            >
-                                Browse all patient groups
-                                <ArrowRight />
-                            </Link>
-                        </Button>
+                        {isExternal 
+                            ? (<BrowseAllSignInButton />) 
+                            : (
+                                <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                                    <Link
+                                        href={"/app/marketplace/patient-groups"}
+                                    >
+                                        Browse all
+                                        <ArrowRight />
+                                    </Link>
+                                </Button>
+                            )}
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {(pagsInitialized && ([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0))
@@ -223,14 +312,18 @@ export default function MarketplaceExplorePage({
                             <h2 className="text-2xl semibold">Patient biosamples</h2>
                             <p className="text-muted-foreground">Powering studies across Y conditions</p>
                         </div>
-                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
-                            <Link
-                                href={"/app/marketplace/biosamples"}
-                            >
-                                Browse all patient biosamples
-                                <ArrowRight />
-                            </Link>
-                        </Button>
+                        {isExternal 
+                            ? (<BrowseAllSignInButton />) 
+                            : (
+                                <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                                    <Link
+                                        href={"/app/marketplace/biosamples"}
+                                    >
+                                        Browse all patient biosamples
+                                        <ArrowRight />
+                                    </Link>
+                                </Button>
+                            )}
                     </div>
                     <ol className="w-full">
                         <div className="max-w-7xl w-full overflow-auto">
@@ -252,14 +345,18 @@ export default function MarketplaceExplorePage({
                             <h2 className="text-2xl semibold">Disease models</h2>
                             <p className="text-muted-foreground">Accelerating discovery across Y genes</p>
                         </div>
-                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
-                            <Link
-                                href={"/app/marketplace/disease-models"}
-                            >
-                                Browse all disease models
-                                <ArrowRight />
-                            </Link>
-                        </Button>
+                        {isExternal 
+                            ? (<BrowseAllSignInButton />) 
+                            : (
+                                <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                                    <Link
+                                        href={"/app/marketplace/disease-models"}
+                                    >
+                                        Browse all disease models
+                                        <ArrowRight />
+                                    </Link>
+                                </Button>
+                            )}
                     </div>
                     <ol className="w-full">
                         <div className="max-w-7xl w-full overflow-auto">
@@ -281,14 +378,18 @@ export default function MarketplaceExplorePage({
                             <h2 className="text-2xl semibold">Clinical datasets</h2>
                             <p className="text-muted-foreground">Capturing progression for X patients</p>
                         </div>
-                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
-                            <Link
-                                href={"/app/marketplace/clinical-datasets"}
-                            >
-                                Browse all clinical datasets
-                                <ArrowRight />
-                            </Link>
-                        </Button>
+                        {isExternal 
+                            ? (<BrowseAllSignInButton />) 
+                            : (
+                                <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                                    <Link
+                                        href={"/app/marketplace/clinical-datasets"}
+                                    >
+                                        Browse all clinical datasets
+                                        <ArrowRight />
+                                    </Link>
+                                </Button>
+                            )}
                     </div>
                     <ol className="w-full">
                         <div className="max-w-7xl w-full overflow-auto">
@@ -310,14 +411,18 @@ export default function MarketplaceExplorePage({
                             <h2 className="text-2xl semibold">Requests for proposals</h2>
                             <p className="text-muted-foreground">Across $Y in active budgets</p>
                         </div>
-                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
-                            <Link
-                                href={"/app/marketplace/rfps"}
-                            >
-                                Browse all requests for proposals
-                                <ArrowRight />
-                            </Link>
-                        </Button>
+                        {isExternal 
+                            ? (<BrowseAllSignInButton />) 
+                            : (
+                                <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                                    <Link
+                                        href={"/app/marketplace/rfps"}
+                                    >
+                                        Browse all requests for proposals
+                                        <ArrowRight />
+                                    </Link>
+                                </Button>
+                            )}
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {(rfpsInitialized && rfpStore.searchResults && rfpStore.searchResults.length > 0 )
