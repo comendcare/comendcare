@@ -692,7 +692,7 @@ export function EditBiosampleToolForm({
                     Delete tool
                 </Button>
                 <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                    <DeleteBiosampleDialog toolId={toolData.id} closeDialog={closeDialog}/>
+                    <DeleteBiosampleDialog toolIds={[toolData.id]} closeDialog={closeDialog}/>
                 </Dialog>
                 <div className="bg-white rounded-md p-0">
                     <Button

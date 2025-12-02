@@ -1,24 +1,16 @@
 "use client"
 
-import { ToolState, useToolStore } from "@/state/tool/toolStore"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
-import { useShallow } from "zustand/react/shallow"
 import { Button } from "@comend/components/ui/button"
-import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogTitle } from "@comend/components/ui/dialog"
+import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@comend/components/ui/dialog"
 import { usePathname } from "next/navigation"
 import { revalidate } from "@comend/lib/revalidate"
+import { deleteAsset } from "@comend/lib/actions"
 
-const toolSelector = (state: ToolState) => ({
-    createTool: state.createTool,
-    updateTool: state.updateTool,
-    deleteTool: state.deleteTool,
-})
-
-export const DeleteAssetDialog = ({toolId, closeDialog}: {toolId: string | undefined, closeDialog?: () => void}) => {
+export const DeleteClinicalDatasetDialog = ({toolIds, closeDialog}: {toolIds: string[] | undefined, closeDialog?: () => void}) => {
     const {data: session} = useSession()
     const pathname = usePathname()
-    const { deleteTool } = useToolStore(useShallow(toolSelector))
 
     const handleDeleteAsset = async () => {
         if (!session?.user?.organizationId) {
@@ -29,7 +21,7 @@ export const DeleteAssetDialog = ({toolId, closeDialog}: {toolId: string | undef
             return
         }
 
-        if (!toolId) {
+        if (!toolIds) {
             toast.error(
                 "This tool does not have an id.",
                 {position: "bottom-left"}
@@ -38,7 +30,7 @@ export const DeleteAssetDialog = ({toolId, closeDialog}: {toolId: string | undef
         }
 
         try {
-            await deleteTool(toolId, session.user.organizationId)
+            await deleteAsset(session.user.organizationId, toolIds)
             await revalidate(pathname)
             if (closeDialog) closeDialog()
         } catch (error) {
@@ -57,7 +49,9 @@ export const DeleteAssetDialog = ({toolId, closeDialog}: {toolId: string | undef
                     Are you absolutely sure?
                 </DialogTitle>
                 <DialogDescription>
-                    {`This action cannot be undone. This will permanently delete your Tool and it's data.`}
+                    {toolIds && toolIds.length > 1 
+                        ? (`This action cannot be undone. This will permanently delete your tools and their data.`) 
+                        : (`This action cannot be undone. This will permanently delete your tool and it's data.`)}
                 </DialogDescription>
                 <DialogFooter>
                     <DialogClose>
@@ -71,7 +65,7 @@ export const DeleteAssetDialog = ({toolId, closeDialog}: {toolId: string | undef
                             variant={"destructive"}
                             onClick={handleDeleteAsset}
                         >
-                            Delete tool
+                            {toolIds && toolIds.length > 1 ? "Delete tools" : "Delete tool"}
                         </Button>
                     </DialogClose>
                 </DialogFooter>

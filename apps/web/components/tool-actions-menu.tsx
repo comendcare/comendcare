@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from "react"
 import { Asset } from "@comend/lib/types"
 import { useSession } from "next-auth/react"
 import { Dialog, DialogPortal } from "@comend/components/ui/dialog"
-import { DeleteAssetDialog } from "comend-pag-platform/components/delete-asset-dialog"
+import { DeleteClinicalDatasetDialog } from "comend-pag-platform/components/delete-clinical-dataset-dialog"
 import { EditAssetDialog } from "./edit-tool-dialog"
 import { usePathname } from "next/navigation"
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog"
@@ -136,9 +136,9 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
                 <DialogPortal>
                     <div onClick={(e) => e.stopPropagation()}>
                         {(() => {
-                            if (type === 'biosample') return <DeleteBiosampleDialog toolId={tool.id} />
-                            if (type === 'diseaseModel') return <DeleteDiseaseModelDialog toolId={tool.id} />
-                            if (type === 'data') return <DeleteAssetDialog toolId={tool.id} />
+                            if (type === 'biosample') return <DeleteBiosampleDialog toolIds={[tool.id]} />
+                            if (type === 'diseaseModel') return <DeleteDiseaseModelDialog toolIds={[tool.id]} />
+                            if (type === 'data') return <DeleteClinicalDatasetDialog toolIds={[tool.id]} />
                         })()}
                     </div>
                 </DialogPortal>

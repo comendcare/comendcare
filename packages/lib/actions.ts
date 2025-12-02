@@ -2217,70 +2217,47 @@ export const updateCondition = withOrganizationAuth(
 );
 
 export const deleteAsset = withOrganizationAuth(
-    async (_: Organization, toolId: string) => {
+    async (_: Organization, toolIds: string[]) => {
         try {
-            const response = await prisma.tool.delete({
-                where: {id: toolId},
-                include: {
-                    organization: {include: {conditions: {include: {condition: true}}}},
-                    contacts: true,
-                    attachments: true,
-                    milestones: {
-                        include: {
-                            milestone: {
-                                include: {types: {include: {milestoneType: true}}}
-                            }
-                        }
-                    }
-                },
+            const response = await prisma.tool.deleteMany({
+                where: {id: {in: toolIds}},
             })
 
             return response
         } catch (error: any) {
-            console.error("Error deleting tool:", error.message);
-            throw new Error(error.message || "Failed to delete tool.");
+            console.error("Error deleting clinical dataset(s):", error.message);
+            throw new Error(error.message || "Failed to delete clinical dataset(s)");
         }
     }
 )
 
 
-export const deleteBiosample = withOrganizationAuth(
-    async (_: Organization, id: string) => {
+export const deleteBiosamples = withOrganizationAuth(
+    async (_: Organization, ids: string[]) => {
         try {
-            const response = await prisma.biosample.delete({
-                where: {id},
-                include: {
-                    contacts: true,
-                    attachments: true,
-                    milestones: {
-                        include: {
-                            milestone: {
-                                include: {types: {include: {milestoneType: true}}}
-                            }
-                        }
-                    }
-                },
+            const response = await prisma.biosample.deleteMany({
+                where: {id: {in: ids}}
             })
 
             return response
         } catch (error: any) {
-            console.error("Error deleting tool:", error.message);
-            throw new Error(error.message || "Failed to delete tool.");
+            console.error("Error deleting biosample(s):", error.message);
+            throw new Error(error.message || "Failed to delete biosample(s).");
         }
     }
 )
 
-export const deleteDiseaseModel = withOrganizationAuth(
-    async (_: Organization, id: string) => {
+export const deleteDiseaseModels = withOrganizationAuth(
+    async (_: Organization, ids: string[]) => {
         try {
-            const response = await prisma.diseaseModel.delete({
-                where: {id}
+            const response = await prisma.diseaseModel.deleteMany({
+                where: {id: {in: ids}}
             })
 
             return response
         } catch (error: any) {
-            console.error("Error deleting tool:", error.message);
-            throw new Error(error.message || "Failed to delete tool.");
+            console.error("Error deleting disease model(s):", error.message);
+            throw new Error(error.message || "Failed to delete disease model(s).");
         }
     }
 )

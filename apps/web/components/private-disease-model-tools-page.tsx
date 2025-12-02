@@ -15,12 +15,13 @@ import {useEffect, useRef, useState} from "react";
 import {useSession} from "next-auth/react";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import {Button} from "@comend/components/ui/button";
-import {Lock, Globe} from "lucide-react"
+import {Lock, Globe, Trash} from "lucide-react"
 import {setDiseaseModelsVisibility} from "@comend/lib/actions";
 import {DiseaseModelBulkImportDialog} from "./disease-model-bulk-import-dialog";
-import { Dialog, DialogPortal } from "@comend/components/ui/dialog";
+import { Dialog, DialogPortal, DialogTrigger } from "@comend/components/ui/dialog";
 import { Row } from "@tanstack/react-table";
 import Image from "next/image";
+import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog";
 
 export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
     data: DiseaseModel[],
@@ -66,6 +67,30 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                         <>
                             {rowSelection?.length > 0 && (
                                 <>
+                                    <Dialog>
+                                        <DialogTrigger>
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <Button
+                                                        variant={"destructive"}
+                                                        size={isCollapsed ? "icon" : "default"}
+                                                    >
+                                                        <Trash />
+                                                        {!isCollapsed && `Delete selected`}
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                {isCollapsed && (
+                                                    <TooltipContent>
+                                                        Delete selected
+                                                    </TooltipContent>
+                                                )}
+                                            </Tooltip>
+                                        </DialogTrigger>
+                                        <DeleteDiseaseModelDialog 
+                                            toolIds={rowSelection.map((row: any) => row.id)} 
+                                            closeDialog={() => {}}
+                                        />
+                                    </Dialog>
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <Button
