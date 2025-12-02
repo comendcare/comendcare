@@ -4,7 +4,8 @@ import { useId } from 'react'
 import Image, { type ImageProps } from 'next/image'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import clsx from 'clsx'
-
+import Link from 'next/link'
+import {buttonVariants} from "@comend/components/ui/button";
 import preclinicalTookit from "@/public/screenshots/pre-clinical toolkit.png"
 import projects from "@/public/screenshots/projects.png"
 import rfps from "@/public/screenshots/RFPs.png"
@@ -251,6 +252,16 @@ export function HorizontalTabsFeatures() {
                     <p className="mt-6 text-lg/8 text-gray-600">
                         Organize projects, tools, and opportunities with your team and streamline them for researchers to discover and access.
                     </p>
+                    <Link
+                        className={clsx(buttonVariants({variant: "cta"}), "mt-6")}
+                        href={
+                            process.env.NEXT_PUBLIC_NODE_ENV === "production"
+                                ? "https://comend.io/login"
+                                : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
+                        }
+                    >
+                        Sign in to patient group platform
+                    </Link>
                 </div>
                 <FeaturesMobile />
                 <FeaturesDesktop />
