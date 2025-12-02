@@ -161,7 +161,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // update DB milestones
                 const response = await updateMilestones(get().details?.organizationId, {milestones: milestones.filter(milestone => milestone.nodeId === nodeId)})
                 if (response?.success && response?.data) {
-                    console.log(`successfully updated milestone`)
+                    console.log(`successfully updated milestone`, response)
                     return response.data as Milestone[]
                 } else {
                     toast.error("Could not update milestones", {position: "bottom-left"})

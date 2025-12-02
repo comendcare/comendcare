@@ -4731,25 +4731,6 @@ export const updateMilestones = withOrganizationAuth(
                         );
                     }
 
-                    // let foundInstitutions = undefined
-                    // let foundCompanies = undefined
-
-                    // if (milestone.partners && milestone.partners.length > 0) {
-                    //     foundInstitutions = await prisma.institution.findMany({
-                    //         where: {
-                    //             id: {in: milestone?.partners?.map((partner: Option) => partner.value)}
-                    //         }
-                    //     })
-                    //     foundCompanies = await prisma.company.findMany({
-                    //         where: {
-                    //             id: {in: milestone?.partners?.map((partner: Option) => partner.value)}
-                    //         }
-                    //     })
-                    // }
-
-                    // console.log(`found companies`, milestone.companies)
-                    // console.log(`found institutions`, milestone.institutions)
-
                     const m = await prisma.milestone.update({
                         where: {nodeId: milestone.nodeId},
                         include: {
@@ -4928,6 +4909,8 @@ export const updateMilestones = withOrganizationAuth(
                     },
                 });
             }
+
+            console.log(`UPDATED MILESTONES`, updatedMilestones)
 
             return {success: true, data: updatedMilestones};
         } catch (error: any) {

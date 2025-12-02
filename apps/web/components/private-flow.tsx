@@ -25,7 +25,7 @@ import { isOnboarded, setOnboarded} from "@comend/lib/utils"
 import { debounce } from "lodash"
 import { CustomEdge } from "./custom-edge"
 import { useOnborda } from "./onborda/OnbordaContext"
-import { Organization } from "@prisma/client"
+import { Milestone, Organization } from "@prisma/client"
 
 const proOptions = { hideAttribution: true }
 
@@ -61,15 +61,17 @@ export const PrivateFlowView = ({
     width,
     organization,
     contextMenuRef,
+    milestones,
 }: {
     width: number,
     organization?: Organization,
     contextMenuRef: React.RefObject<HTMLDivElement>,
+    milestones: any[],
 }) => {
     const {
         selectedNodeIds,
         setSelectedNodeIds,
-        milestones,
+        // milestones,
         nodes,
         setNodes: setDbNodes,
         edges,

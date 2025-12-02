@@ -91,7 +91,8 @@ import {EditClincalDatasetForm} from "./edit-clinical-dataset-form"
 import {Separator} from "@comend/components/ui/separator"
 import dynamic from "next/dynamic";
 import { SubmitCreateRequest } from "./create-facility-request-button"
-import { createCreateFacilityRequest } from "@comend/lib/actions"
+import { createCreateFacilityRequest, updateMilestones } from "@comend/lib/actions"
+import { revalidate } from "@comend/lib/revalidate"
 
 type PlateEditorProps = {
     value: any[];
@@ -483,7 +484,15 @@ export function EditMilestoneForm({
             }))
         }
 
-        if (milestoneData?.nodeId) setMilestone(milestoneData.nodeId, updateData)
+        if (milestoneData?.nodeId) {
+            // const updatedMilestone = await setMilestone(milestoneData.nodeId, updateData)
+            const response = await updateMilestones(
+                session?.user?.organizationId,
+                {milestones: [{...updateData}]}
+            )
+            console.log(`revalidate milestone data`, response)    
+            revalidate(pathname)
+        }
 
         setIsMigrating(false)
     }

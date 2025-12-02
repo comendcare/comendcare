@@ -96,15 +96,16 @@ export function Roadmap({
     urlNode: string | string[] | undefined;
     urlView: string | string[] | undefined;
 }) {
+    console.log(`init data`, initMilestones)
     const { defaultLayout } = useSidebarStore()
     const { 
         roadmapId,
         details,
-        selectedView,
-        setSelectedView,
+        // selectedView,
+        // setSelectedView,
         selectedNodeIds, 
         setSelectedNodeIds, 
-        milestones, 
+        // milestones, 
         saveState,
         addMilestones,
         deleteNode,
@@ -123,6 +124,7 @@ export function Roadmap({
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     const contextMenuRef = useRef<HTMLDivElement>(null)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
+    const [selectedView, setSelectedView] = useState('flow')
 
     useEffect(() => {
         // Don’t call the API until we know the session status
@@ -140,7 +142,8 @@ export function Roadmap({
             details: initRoadmap,
             nodes: initNodes || [],
             edges: initEdges || [],
-            milestones: initMilestones || [],
+            // milestones: initMilestones || [],
+            milestones: [],
             selectedView: (() => {
                 if (typeof urlView === 'string') return urlView
                 return undefined
@@ -220,9 +223,9 @@ export function Roadmap({
         document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
     }
 
-    if (!roadmapId) {
-        return <Loading />
-    }
+    // if (!roadmapId) {
+    //     return <Loading />
+    // }
 
     return (
         <ContextMenu>
@@ -233,10 +236,10 @@ export function Roadmap({
             >
                 <ResizablePanel className="p-2 flex flex-col gap-2">
                     <RoadmapHeader 
-                        researchPlanId={roadmapId}
+                        researchPlanId={initRoadmap.id}
                         researchPlanDetails={{
-                            id: roadmapId,
-                            ...details
+                            ...initRoadmap,
+                            id: initRoadmap.id
                         }}
                         setTab={setTab}
                         setNewMilestoneIsOpen={setNewMilestoneIsOpen}
@@ -244,7 +247,11 @@ export function Roadmap({
                         // setBulkImportIsOpen={setBulkImportIsOpen}
                         orgSubdomain={orgSubdomain}
                     />
-                    <Tabs defaultValue={selectedView ? selectedView : "flow"} onValueChange={handleTabChange} className="flex flex-col gap-4">
+                    <Tabs 
+                        defaultValue={selectedView ? selectedView : "flow"} 
+                        onValueChange={setSelectedView} 
+                        className="flex flex-col gap-4"
+                    >
                         <div className="flex flex-row items-center gap-x-1 justify-start">
                             <TabsList className="mr-auto">
                                 <TabsTrigger value="flow" className="relative">
@@ -295,7 +302,7 @@ export function Roadmap({
                                     </Select>
                                 </div>
                             )}
-
+{/* 
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button 
@@ -338,7 +345,7 @@ export function Roadmap({
                                 <TooltipContent className="max-w-80">
                                     <p>{`Redo (⌘+Shift+Z)`}</p>
                                 </TooltipContent>
-                            </Tooltip>
+                            </Tooltip> */}
                         </div>
 
                         {/* Flow view */}
@@ -346,11 +353,12 @@ export function Roadmap({
                             value="flow"
                             className="m-0 h-[calc(100vh-10rem)]"
                         >
-                            {milestones.length > 0 ? (
+                            {initMilestones.length > 0 ? (
                                 <PrivateFlowView
                                     width={defaultLayout[0]}
                                     organization={organization}
                                     contextMenuRef={contextMenuRef} 
+                                    milestones={initMilestones}
                                 />
                             ): (
                                 <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} setTab={setTab}/>
@@ -362,7 +370,7 @@ export function Roadmap({
                             value="list"
                             className="mt-0 h-[calc(100vh-12rem)]"
                         >
-                            {milestones.length > 0 ? (
+                            {initMilestones.length > 0 ? (
                                 <TimelineView
                                     sortBy={sortBy} 
                                     organization={organization}
@@ -389,7 +397,11 @@ export function Roadmap({
                             <MilestoneDetailsPanel
                                 organization={organization}
                                 remountKey={milestoneRemountKey}
-                                milestone={milestones.find(
+                                // milestone={milestones.find(
+                                //     milestone =>
+                                //         milestone.nodeId === selectedNodeIds[0]
+                                // )}
+                                milestone={initMilestones.find(
                                     milestone =>
                                         milestone.nodeId === selectedNodeIds[0]
                                 )}
@@ -405,77 +417,6 @@ export function Roadmap({
                     </>
                 )}
 
-                {/* <Dialog open={bulkImportIsOpen} onOpenChange={(open: boolean) => {
-                    setBulkImportIsOpen(open)
-                }}>
-                    <DialogContent className="flex flex-col justify-start">
-                        <DialogHeader>
-                            <DialogTitle className="text-2xl">
-                                Import projects
-                            </DialogTitle>
-                            <DialogDescription>
-                                Import multiple projects at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">Project input template</Link>, filling it out, downloading it as a CSV, and uploading it.
-                            </DialogDescription>
-                        </DialogHeader>
-
-                        <FileUploadForm 
-                            accept=".csv" 
-                            onSubmit={async (file) => {
-                                if (file && file.name.endsWith(".csv")) {
-                                    // parse CSV file
-                                    try {
-                                        const result = await parseCSV(
-                                            file,
-                                            [
-                                                {key: 'title', required: true, defaultValue: 'Untitled Milestone', isValid: (entry) => typeof entry === 'string' && entry.length > 0},
-                                                {key: 'description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
-                                                {key: 'type', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string' && (milestoneTypes || []).find(type => type.label === entry) !== undefined}
-                                            ]
-                                        )
-
-                                        if (milestoneTypes.length === 0) {
-                                            toast('Warning!', {
-                                                position: "bottom-left",
-                                                duration: 6000,
-                                                description: `Could not find the type for one or more of your imported projects. Projects may be imported without the proper types.`
-                                            })
-                                        } else if (result.errors.length > 0) {
-                                            toast('Warning!', {
-                                                position: "bottom-left",
-                                                duration: 6000,
-                                                description: `Missing fields in import file: A title is required for each project. Edit the Project to add title.`
-                                            })
-                                            console.error("Error: imported projects are missing required fields", result.errors)
-                                        }
-
-                                        const newNodes = await addMilestones(result.values.map(milestone => {
-                                            const foundType = milestoneTypes.find(type => type.label === milestone.type)
-
-                                            return {
-                                                title: milestone.title, 
-                                                description: milestone.description, 
-                                                types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
-                                                nodeType: "PROJECT"
-                                            }
-                                        }), "Import")
-
-                                        if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
-                                    } catch (e) {
-                                        toast('Error!', {
-                                            position: "bottom-left",
-                                            duration: 6000,
-                                            description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
-                                        })
-                                        console.error("Error: failed to import tools", e)
-                                    }
-                                } else {
-                                    console.error("Please upload a valid CSV file.");
-                                }
-                            }}
-                        />
-                    </DialogContent>
-                </Dialog> */}
-
                 <NewMilestoneDialogForm 
                     open={newMilestoneIsOpen}
                     setOpen={setNewMilestoneIsOpen}
@@ -486,7 +427,7 @@ export function Roadmap({
         </ContextMenuTrigger>
 
         <ContextMenuContent ref={contextMenuRef}>
-            <ContextMenuItem 
+            {/* <ContextMenuItem 
                 onSelect={(e) => {
                     selectedNodeIds.forEach((nodeId: string) => {
                         setMilestone(nodeId, {private: false})
@@ -503,7 +444,7 @@ export function Roadmap({
                 }}
             >
                 {`Make selected project(s) private`}
-            </ContextMenuItem>
+            </ContextMenuItem> */}
             <ContextMenuItem onClick={(e) => {
                 e.preventDefault()
                 // we have to ensure the context menu closes properly before triggering the dialog
@@ -542,7 +483,7 @@ export function Roadmap({
                                 onClick={async (e) => {
                                     e.preventDefault()
                                     setDeleteIsOpen(false)
-                                    await Promise.all(selectedNodeIds.map(async (nodeId: string) => await deleteNode(nodeId)))
+                                    // await Promise.all(selectedNodeIds.map(async (nodeId: string) => await deleteNode(nodeId)))
                                 }}
                             >
                                 Delete Selected Projects
