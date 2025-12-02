@@ -15,12 +15,12 @@ export default function ResearcherMainFeatures() {
     const words = "Biosamples galore".split(" ");
 
     return (
-        <div className="bg-[#FFFFFF] w-full flex max-w-7xl flex-row items-center mx-auto p-8 space-x-8">
+        <div className="bg-[#FFFFFF] w-full flex max-w-7xl flex-col lg:flex-row items-center mx-auto p-8 gap-y-8 gap-x-8">
             <div
-                className="bg-[#FFFFFF] h-[460px] lg:w-2/5 flex flex-col items-center rounded-[26px] p-5 border overflow-hidden"
+                className="bg-[#FFFFFF] h-[460px] w-full lg:w-2/5 flex flex-col items-stretch rounded-[26px] p-5 border overflow-hidden"
             >
-                <div className="p-4 sm:p-8 relative">
-                    <div className="flex flex-col items-center">
+                <div className="relative flex flex-col h-full">
+                    <div className="flex flex-col items-center flex-none">
                         <h1 className="text-xl md:text-4xl font-semibold tracking-tight text-center">
                             {words.map((word, index) => (
                                 <React.Fragment key={index}>
@@ -29,19 +29,22 @@ export default function ResearcherMainFeatures() {
                                 </React.Fragment>
                             ))}
                         </h1>
-                        <Balancer className="text-center text-sm mt-2 md:mt-4">
-                            Biosamples for any and all use cases, made discoverable with search, filter, and sort.
-                        </Balancer>
+                        <div className="text-center text-sm mt-2 md:mt-4">
+                            Biosamples for any and all use cases, made discoverable with search,
+                            filter, and sort.
+                        </div>
                     </div>
-                    <div className="h-full w-full">
-                        <SkeletonFour/>
+
+                    {/* ↓ This is the only real change: let this area flex instead of fixed h-full */}
+                    <div className="w-full flex-1 min-h-0 mt-4">
+                        <SkeletonFour />
                     </div>
                 </div>
             </div>
 
             <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
-                    <div className="h-[460px] lg:w-3/5 flex flex-col items-center">
+                    <div className="h-[460px] w-full lg:w-3/5 flex flex-col items-center">
                         <div className="bg-[#FFFFFF] h-full w-full flex flex-col items-center rounded-[26px] p-5 border overflow-hidden">
                             <div className="relative w-full h-[293px] mt-5 flex flex-col items-center">
                                 <div className="absolute -left-[70px] scale-125 top-7 rotate-[12deg]">
@@ -56,33 +59,33 @@ export default function ResearcherMainFeatures() {
                                         {
                                             avatar: 1,
                                             name: "Request for biosample A",
-                                            description: "For study on something.",
+                                            description: "For study on effects...",
                                             status: "ACCEPTED",
                                         },
                                         {
                                             avatar: 2,
-                                            name: "Request for data sample X",
-                                            description: "For study on effect of something.",
+                                            name: "Request for dataset X",
+                                            description: "For ablation study...",
                                             status: "REQUESTED",
                                         },
                                         {
                                             avatar: 3,
-                                            name: "Request for dataset",
-                                            description: "I just need it.",
+                                            name: "Request for clinical model",
+                                            description: "To test efficacy...",
                                             status: "SHIPPED",
                                         },
                                     ].map((item, index) => (
                                         <div
                                             key={index}
-                                            className="relative flex items-center justify-between p-4 lg:w-[400px] w-[270px] h-20 bg-white border rounded-xl shadow-[0px_3px_8px_-1px_#3232470D,0px_0px_1px_0px_#0C1A4B3D]"
+                                            className="relative flex items-center justify-between p-2 lg:p-4 lg:w-[400px] w-[270px] h-20 bg-white border rounded-xl shadow-[0px_3px_8px_-1px_#3232470D,0px_0px_1px_0px_#0C1A4B3D]"
                                         >
                                             <div className="flex items-center">
                                                 <div className="grid ml-4">
-                                                    <h1 className="font-semibold">{item.name}</h1>
-                                                    <p className="font-normal text-sm">{item.description}</p>
+                                                    <h1 className="font-semibold text-sm">{item.name}</h1>
+                                                    <p className="font-normal text-xs">{item.description}</p>
                                                 </div>
                                             </div>
-                                            <div className="flex flex-row items-center justify-between space-x-2">
+                                            <div className="flex flex-row items-center justify-between gap-x-2">
                                                 <div
                                                     className={cn(
                                                         "text-xs font-medium px-2 py-0.5 rounded border transition-colors",

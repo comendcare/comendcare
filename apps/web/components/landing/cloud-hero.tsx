@@ -287,7 +287,7 @@ export const CloudHeroSection = () => {
                             className="w-fit"
                             asChild
                         >
-                            <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                            <Link href={"/for-researchers"}>
                                 {`I'm a researcher`}
                             </Link>
                         </Button>
@@ -296,7 +296,7 @@ export const CloudHeroSection = () => {
                             className="w-fit"
                             asChild
                         >
-                            <Link href={"https://calendly.com/albertatcomend/onboarding"}>
+                            <Link href={"/for-pags"}>
                                 {`I'm with a patient group`}
                             </Link>
                         </Button>

@@ -228,46 +228,47 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, pathname}) => {
             <motion.div
                 className="lg:flex flex-row flex-1 hidden items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
                 {navItems.map((navItem, idx) => {
-                    const activeForRoute = isLinkActive(navItem.link)
+                        const activeForRoute = isLinkActive(navItem.link)
 
-                    return navItem.link ? (
-                        <Link
-                            onMouseEnter={() => setHovered(idx)}
-                            className="text-neutral-600 dark:text-neutral-300 relative px-4 py-2"
-                            key={`link-${idx}`}
-                            href={navItem.link}
-                        >
-                            {(hovered === idx || activeForRoute) && (
-                                <motion.div
-                                    layoutId="hovered"
-                                    className="w-full h-full absolute inset-0 bg-gray-100 dark:bg-neutral-800 rounded-full"
-                                />
-                            )}
-                            <span className="text-base relative z-20 whitespace-nowrap">
+                        return navItem.link ? (
+                            <Link
+                                onMouseEnter={() => setHovered(idx)}
+                                className="text-neutral-600 dark:text-neutral-300 relative px-4 py-2"
+                                key={`link-${idx}`}
+                                href={navItem.link}
+                            >
+                                {(hovered === idx || activeForRoute) && (
+                                    <motion.div
+                                        layoutId="hovered"
+                                        className="w-full h-full absolute inset-0 bg-gray-100 dark:bg-neutral-800 rounded-full"
+                                    />
+                                )}
+                                <span className="text-base relative z-20 whitespace-nowrap">
                                 {navItem.name}
                             </span>
-                        </Link>
-                    ) : (
-                        <Menu setActive={setActive} key={`menu-${idx}`}>
-                            <MenuItem
-                                setActive={setActive}
-                                active={active}
-                                item="Products"
-                            >
-                                <div className="text-base grid grid-cols-2 gap-10 p-4">
-                                    {navItem.items?.map((item, idx) => (
-                                        <ProductItem
-                                            key={idx}
-                                            title={item.title}
-                                            href={item.href}
-                                            imgParams={item.imgParams}
-                                            description={item.description}
-                                        />
-                                    ))}
-                                </div>
-                            </MenuItem>
-                        </Menu>
-                    )}
+                            </Link>
+                        ) : (
+                            <Menu setActive={setActive} key={`menu-${idx}`}>
+                                <MenuItem
+                                    setActive={setActive}
+                                    active={active}
+                                    item="Products"
+                                >
+                                    <div className="text-base grid grid-cols-2 gap-10 p-4">
+                                        {navItem.items?.map((item, idx) => (
+                                            <ProductItem
+                                                key={idx}
+                                                title={item.title}
+                                                href={item.href}
+                                                imgParams={item.imgParams}
+                                                description={item.description}
+                                            />
+                                        ))}
+                                    </div>
+                                </MenuItem>
+                            </Menu>
+                        )
+                    }
                 )}
             </motion.div>
 
@@ -320,7 +321,14 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, pathname}) => {
                                 Sign up to access the marketplace, manage requests, and more.
                             </h1>
                             <div className="flex flex-col gap-2">
-                                <Link href="/researcher/login" className="w-full">
+                                <Link
+                                    href={
+                                        process.env.NEXT_PUBLIC_NODE_ENV === "production"
+                                            ? "https://researcher.comend.io/login"
+                                            : `http://researcher.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
+                                    }
+                                    className="w-full"
+                                >
                                     <Button
                                         variant="cta"
                                         className="w-full justify-center"
@@ -329,7 +337,14 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, pathname}) => {
                                     </Button>
                                 </Link>
 
-                                <Link href="/login" className="w-full">
+                                <Link
+                                    href={
+                                        process.env.NEXT_PUBLIC_NODE_ENV === "production"
+                                            ? "https://comend.io/login"
+                                            : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
+                                    }
+                                    className="w-full"
+                                >
                                     <Button
                                         variant="cta"
                                         className="w-full justify-center"
@@ -341,6 +356,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, pathname}) => {
                                 <Link
                                     href="https://calendly.com/albertatcomend/onboarding"
                                     className="w-full"
+                                    target="_blank"
                                 >
                                     <Button
                                         variant="outline"

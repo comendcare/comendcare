@@ -62,7 +62,7 @@ export default function App() {
             {/*    isSubscribedCallback={betaSubscribeCallback}*/}
             {/*    isSubscribed={isSubscribed}*/}
             {/*/>*/}
-            <ContactSection/>
+            {/*<ContactSection/>*/}
         </>
     )
 }
