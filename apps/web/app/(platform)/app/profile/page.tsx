@@ -10,11 +10,12 @@ import {
     getDiseaseModels,
     getPublicRFPsForOrganization,
     getPublicRoadmapsForOrganization,
-    getPublicToolCountsForOrganization
+    getPublicToolCountsForOrganization, getTagsForEntity
 } from "@comend/lib/fetchers";
 import { biosampleSearchParamsCache } from "@comend/lib/validations"
 import { getValidFilters } from "@comend/lib/data-table";
 import { RFPSort } from "@comend/lib/utils";
+import {TaggableType} from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -264,6 +265,19 @@ export default async function ProfilePage(props: IndexPageProps) {
         clinicalDatasetCount: Number((toolCountsRaw as any)?.clinicalDatasetCount ?? 0),
     };
 
+    let conditionTags: string[] = []
+    if (conditions) {
+        const unpackedConditions = conditions?.success ? conditions.data : []
+        const tagsResult = await getTagsForEntity(
+            TaggableType.CONDITION,
+            unpackedConditions[0].id
+        );
+
+        conditionTags = tagsResult.success
+            ? tagsResult.data?.map(t => t.value) ?? []
+            : [];
+    }
+
     return (
         <PAGProfilePage
             organization={safeOrg}
@@ -280,6 +294,7 @@ export default async function ProfilePage(props: IndexPageProps) {
             isOwner={!!isOwner}
             rootDomain={process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? "comend.io"}
             searchParams={searchParams}
+            conditionTags={conditionTags}
         />
     );
 }
