@@ -14,14 +14,15 @@ import {BiosampleBulkImportDialog} from "./biosample-bulk-import-dialog";
 import {SearchParams} from "@comend/components/types";
 import {useEffect, useRef, useState} from "react";
 import { Button } from "@comend/components/ui/button";
-import { Globe, Lock } from "lucide-react";
+import { Globe, Lock, Trash } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { setBiosamplesVisibility } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
-import { Dialog, DialogPortal } from "@comend/components/ui/dialog";
+import { Dialog, DialogPortal, DialogTrigger } from "@comend/components/ui/dialog";
 import { Row } from "@tanstack/react-table";
 import { Asset } from "@comend/lib/types";
 import Image from "next/image";
+import { DeleteBiosampleDialog } from "./delete-biosample-dialog";
 
 export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     data: Biosample[],
@@ -32,7 +33,7 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     const columns = useBiosamplesTableColumns({session})
     const [rowSelection, setRowSelection] = useState<Object[]>([])
     const [parentWidth, setParentWidth] = useState(0)
-    const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1100)
+    const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1160)
     const [editingTool, setEditingTool] = useState<Partial<Asset> | undefined>(undefined)
     const parentRef = useRef<HTMLDivElement>(null)
 
@@ -53,7 +54,7 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     }, []);
 
     useEffect(() => {
-        setIsCollapsed(parentWidth <= 1100)
+        setIsCollapsed(parentWidth <= 1160)
     }, [parentWidth])
 
     return (
@@ -67,6 +68,30 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                         <>
                             {rowSelection?.length > 0 && (
                                 <>
+                                <Dialog>
+                                    <DialogTrigger>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <Button
+                                                    variant={"destructive"}
+                                                    size={isCollapsed ? "icon" : "default"}
+                                                >
+                                                    <Trash />
+                                                    {!isCollapsed && `Delete selected`}
+                                                </Button>
+                                            </TooltipTrigger>
+                                            {isCollapsed && (
+                                                <TooltipContent>
+                                                    Delete selected
+                                                </TooltipContent>
+                                            )}
+                                        </Tooltip>
+                                    </DialogTrigger>
+                                    <DeleteBiosampleDialog 
+                                        toolIds={rowSelection.map((row: any) => row.id)} 
+                                        closeDialog={() => {}}
+                                    />
+                                </Dialog>
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <Button
@@ -80,9 +105,11 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                             {!isCollapsed && `Make selected private`}
                                         </Button>
                                     </TooltipTrigger>
-                                    <TooltipContent>
-                                        Make selected private
-                                    </TooltipContent>
+                                    {isCollapsed && (
+                                        <TooltipContent>
+                                            Make selected private
+                                        </TooltipContent>
+                                    )}
                                 </Tooltip>
                                 <Tooltip>
                                     <TooltipTrigger>
@@ -97,9 +124,11 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                             {!isCollapsed && `Make selected public`}
                                         </Button>
                                     </TooltipTrigger>
-                                    <TooltipContent>
-                                        Make selected public
-                                    </TooltipContent>
+                                    {isCollapsed && (
+                                        <TooltipContent>
+                                            Make selected public
+                                        </TooltipContent>
+                                    )}
                                 </Tooltip>
                                 </>
                             )}

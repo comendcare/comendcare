@@ -13,7 +13,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import React, {useEffect, useState} from "react";
-import {updateCondition} from "@comend/lib/actions";
+import {updateCondition, updateEntityTags} from "@comend/lib/actions";
 import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@comend/lib/types";
 import {Input} from "@comend/components/ui/input";
 import {Textarea} from "@comend/components/ui/textarea";
@@ -21,7 +21,7 @@ import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {Button} from "@comend/components/ui/button";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
-import {getConditionsFromOrganizationId} from "@comend/lib/fetchers";
+import {getConditionsFromOrganizationId, getTagsForEntity } from "@comend/lib/fetchers";
 import {
     Dialog,
     DialogContent,
@@ -32,12 +32,19 @@ import {
 } from "@comend/components/ui/dialog";
 import {formatNumberWithCommas, toKebabCase} from "@comend/lib/utils"; // ← added to normalize creatable values
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import type {Organization} from "@prisma/client";
+import {TaggableType} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
 import {researchFormSchema} from "./research-onboarding-form";
 import { badgeVariants } from "@comend/components/ui/badge";
+import {ConditionForCard} from "~web/components/pag-profile-conditions-card";
 
-export default function EditPAGProfileConditionCardDialog({organization}: { organization: Partial<Organization> }) {
+export default function EditPAGProfileConditionCardDialog({
+                                                              condition,
+                                                              conditionTags,
+                                                          }: {
+    condition?: ConditionForCard | null;
+    conditionTags?: string[];
+}) {
     const {data: session, status} = useSession()
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -50,106 +57,48 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
     })
 
     useEffect(() => {
-        async function fetchResearchData() {
-            if (status === "authenticated" && !organization.id) {
-                toast.error("You're not a part of an organization.");
-                return;
-            }
+        if (!condition || !conditionTags) return;
 
-            try {
-                // Fetch conditions for the given organization ID
-                const response = await getConditionsFromOrganizationId(organization.id,
-                    {
-                        id: true,
-                        name: true,
-                        slug: true,
-                        synonyms: true,
-                        description: true,
-                        diseaseCategories: true,
-                        prevalenceNumerator: true,
-                        prevalenceDenominator: true,
-                        numberOfPatientsEngaged: true,
-                        nationalEstimatedPopulation: true,
-                        globalEstimatedPopulation: true,
-                        relevantDiseaseMechanisms: true,
-                        causalGenes: true,
-                        associatedGenes: true,
-                        associatedSystems: true,
-                        associatedSignsAndSymptoms: true,
-                        existingDatabasesAndStudies: true,
-                        toolsUnderDevelopment: true,
-                        createdAt: true,
-                        updatedAt: true,
-                        gardURL: true,
-                        nordURL: true,
-                        summary: true,
-                        prevalenceRatio: true,
-                    }
-                );
+        const defaultValues: z.infer<typeof researchFormSchema> = {
+            disorder: condition.name ? [{ label: condition.name, value: condition.name }] : [],
+            associatedConditions: (condition.associatedConditions ?? []).map((name) => ({
+                label: name,
+                value: name,
+            })),
+            summary: condition.summary ?? "",
+            categories: (condition.diseaseCategories ?? []).map((cat) => ({ label: cat, value: cat })),
+            causal: (condition.causalGenes ?? []).map((gene) => ({ label: gene, value: gene })),
+            genes: (condition.associatedGenes ?? []).map((gene) => ({ label: gene, value: gene })),
+            systems: (condition.associatedSystems ?? []).map((system) => ({
+                label: system,
+                value: system,
+            })),
+            // tags are stored as comma-separated string in your form:
+            tags: conditionTags.join(", "),
+            prevalenceNumerator: condition.prevalenceNumerator?.toString() ?? "",
+            prevalenceDenominator: condition.prevalenceDenominator?.toString() ?? "",
+            engaged: condition.numberOfPatientsEngaged?.toString() ?? "",
+            national: condition.nationalEstimatedPopulation?.toString() ?? "",
+            global: condition.globalEstimatedPopulation?.toString() ?? "",
+            otherCategories: undefined,
+            otherMechanisms: undefined,
+            otherSystems: undefined,
+        };
 
-                console.log("response", response)
-
-                if (response.success) {
-                    const conditions = response.data;
-
-                    if (conditions && conditions.length > 0) {
-                        const fetchedValues = conditions.map((condition: any) => ({
-                            disorder: condition.name ? [{label: condition.name, value: condition.name}] : [],
-                            associatedConditions:
-                                (condition.associatedConditions ?? []).map((name: string) => ({
-                                    label: name,
-                                    value: name,
-                                })),
-                            summary: condition.summary || "",
-                            categories: condition.diseaseCategories.map((cat: any) => ({label: cat, value: cat})) || [],
-                            causal: condition.causalGenes.map((gene: any) => ({label: gene, value: gene})) || [],
-                            genes: condition.associatedGenes.map((gene: any) => ({label: gene, value: gene})) || [],
-                            systems: condition.associatedSystems.map((system: any) => ({
-                                label: system,
-                                value: system
-                            })) || [],
-                            prevalenceNumerator: condition.prevalenceNumerator?.toString() || "",
-                            prevalenceDenominator: condition.prevalenceDenominator?.toString() || "",
-                            engaged: condition.numberOfPatientsEngaged?.toString() || "",
-                            national: condition.nationalEstimatedPopulation?.toString() || "",
-                            global: condition.globalEstimatedPopulation?.toString() || "",
-                            otherCategories: typeof condition.metadata == 'object' ? (condition.metadata as {
-                                [key: string]: any
-                            })?.otherCategories : undefined,
-                            otherMechanisms: typeof condition.metadata == 'object' ? (condition.metadata as {
-                                [key: string]: any
-                            })?.otherMechanisms : undefined,
-                            otherSystems: typeof condition.metadata == 'object' ? (condition.metadata as {
-                                [key: string]: any
-                            })?.otherSystems : undefined,
-                        }));
-
-                        // Assuming you're working with one condition at a time (e.g., the first condition)
-                        const defaultValues = fetchedValues[0] || {};
-
-                        setDefaultResearchValues(defaultValues);
-                        editResearchForm.reset(defaultValues);
-                    } else {
-                        toast.error("No conditions found for this organization.");
-                    }
-                } else {
-                    console.error(response.error);
-                    toast.error(response.error);
-                }
-            } catch (error) {
-                console.error("Failed to fetch research data:", error);
-                toast.error("An error occurred while fetching research data.");
-            }
-        }
-
-        fetchResearchData();
-    }, [session?.user?.organizationId, editResearchForm]);
+        setDefaultResearchValues(defaultValues);
+        editResearchForm.reset(defaultValues);
+    }, [condition, conditionTags, editResearchForm]);
 
     async function onResearchFormSubmit(values: z.infer<typeof researchFormSchema>) {
         if (!session?.user?.organizationId) {
             toast.error("You're not signed into an organization right now.");
             return;
         }
+
+        const tagStrings = (values.tags || "")
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean);
 
         setLoading(true); // Show loading state
 
@@ -201,9 +150,30 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
             const response = await updateCondition(session.user.organizationId, formData);
 
             if (response.success) {
+                const conditionId = response.data?.id; // assuming updateCondition returns the Condition
+
+                // Only call the tag action if we have a Condition id
+                if (conditionId && tagStrings.length > 0) {
+                    const tagResult =   await updateEntityTags(
+                        TaggableType.CONDITION,
+                        conditionId,
+                        tagStrings
+                    );
+
+
+                if (!tagResult.success) {
+                        console.error(tagResult.error);
+                        // optional: toast a softer warning instead of erroring the whole flow
+                        toast.error(tagResult.error || "Tags were not saved.");
+                    }
+                } else if (conditionId && tagStrings.length === 0) {
+                    // clear tags if user removed them all
+                    await updateEntityTags(TaggableType.CONDITION, conditionId, []);
+                }
+
                 toast.success("Condition updated successfully!");
-                setOpen(false)
-                window.location.reload()
+                setOpen(false);
+                window.location.reload();
             } else {
                 console.error(response.error);
                 toast.error(response.error || "Failed to update condition.");
@@ -556,6 +526,28 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                     )}
                                 />
                             )}
+
+                            <FormField
+                                control={editResearchForm.control}
+                                name="tags"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Tags</FormLabel>
+                                        <FormDescription>
+                                            Enter tags separated by commas. Example: <code>#neuro, #rare, metabolism</code>
+                                        </FormDescription>
+
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                placeholder="#neuro, #ultrarare, #rna"
+                                            />
+                                        </FormControl>
+
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
                             <FormField
                                 control={editResearchForm.control}

@@ -541,7 +541,7 @@ export function EditDiseaseModelToolForm({
                     Delete tool
                 </Button>
                 <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                    <DeleteDiseaseModelDialog toolId={toolData.id} closeDialog={closeDialog}/>
+                    <DeleteDiseaseModelDialog toolIds={[toolData.id]} closeDialog={closeDialog}/>
                 </Dialog>
                 <div className="bg-white rounded-md p-0">
                     <Button

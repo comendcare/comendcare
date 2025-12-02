@@ -1,11 +1,8 @@
 import React from "react"
-import Image from "next/image"
-import {getSession} from "@comend/lib/auth"
 import {SearchParams} from "@comend/components/types"
 import {getValidFilters} from "@comend/lib/data-table"
-import { getBiosamples, getClinicalDatasets } from "@comend/lib/fetchers"
+import { getClinicalDatasets } from "@comend/lib/fetchers"
 import { biosampleSearchParamsCache } from "@comend/lib/validations"
-import { BiosampleMarketplacePage } from "~researcher/components/marketplace/biosample-tools-page"
 import { ClinicalDatasetMarketplacePage } from "~researcher/components/marketplace/clinical-dataset-tools-page"
 import { useClinicalDatasetsTableColumns } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
 

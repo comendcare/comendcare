@@ -19,6 +19,13 @@ export async function POST(req: Request) {
                     where: {milestone: {private: false}},
                     include: {milestone: true}
                 },
+                donor: {
+                    include: {
+                        diagnoses: {
+                            include: {type: true}
+                        }
+                    }
+                },
                 attachments: true,
                 contacts: true,
                 createFacilityRequests: true,

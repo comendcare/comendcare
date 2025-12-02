@@ -32,6 +32,7 @@ export const researchFormSchema = z.object({
     summary: emptyToUndefined(z.string().max(500)),
     categories: z.array(optionSchema).optional(),
     otherCategories: emptyToUndefined(z.string()),
+    tags: z.string().optional(),
     engaged: emptyToUndefined(
         z.string().regex(/^\d+$/, "Must be a positive integer")
     ),
