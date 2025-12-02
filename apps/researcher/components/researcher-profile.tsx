@@ -2,7 +2,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar"
 import {Badge} from "@comend/components/ui/badge"
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card"
 import {
-    Building2,
+    Building2, Globe,
     Mail,
     MapPin,
     Star,
@@ -70,6 +70,8 @@ export default function ResearcherProfile({
         )
     );
 
+    console.log("shit", researcherData.website)
+    console.log("shit", researcherData.website)
     return (
         <div className="max-w-7xl mx-auto flex flex-col py-4">
             <div className="bg-white border-b">
@@ -99,10 +101,10 @@ export default function ResearcherProfile({
 
                                     <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600">
 
-                                        {researcherData?.institution && (
+                                        {researcherData?.affiliations[0].institution.name && (
                                             <div className="flex items-center gap-1">
                                                 <Building2 className="w-4 h-4"/>
-                                                <span>{researcherData.institution}</span>
+                                                <span>{researcherData?.affiliations[0].institution.name}</span>
                                             </div>
                                         )}
 
@@ -117,6 +119,13 @@ export default function ResearcherProfile({
                                             <div className="flex items-center gap-1">
                                                 <Mail className="w-4 h-4"/>
                                                 <span>{researcherData.user.email}</span>
+                                            </div>
+                                        )}
+
+                                        {researcherData?.website && (
+                                            <div className="flex items-center gap-1">
+                                                <Globe className="w-4 h-4"/>
+                                                <span>{researcherData.website}</span>
                                             </div>
                                         )}
 

@@ -55,6 +55,7 @@ export const deleteResearcher = withResearcherAuth(
         }
     }
 );
+
 export const updateResearcher = withAuth(
     async (_id: unknown, formData: FormData) => {
         const session = await getSession();
@@ -112,7 +113,36 @@ export const updateResearcher = withAuth(
 
                 // EVERYTHING ELSE → RESEARCHER SCALARS
                 // (title, country, website, description, orcid, etc.)
-                researcherData[key] = str === "" ? null : str;
+
+                if (key === "title") {
+                    researcherData.title = str === "" ? null : str;
+                    return;
+                }
+
+                if (key === "country") {
+                    researcherData.country = str === "" ? null : str;
+                    return;
+                }
+
+                if (key === "website") {
+                    researcherData.website = str === "" ? null : str;
+                    return;
+                }
+
+                if (key === "description") {
+                    researcherData.description = str === "" ? null : str;
+                    return;
+                }
+
+                if (key === "orcid") {
+                    researcherData.orcid = str === "" ? null : str;
+                    return;
+                }
+
+                if (key === "groupName") {
+                    researcherData.groupName = str === "" ? null : str;
+                    return;
+                }
             });
 
             // Handle affiliations via junction table
