@@ -23,7 +23,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
                         <h1 className="text-3xl md:text-4xl font-semibold">Explore Comend</h1>
                     </div>
                     <Separator />
-                    <PublicMarketplaceNav />
+                    {/* <PublicMarketplaceNav /> */}
                     {children}
                 </div>
             </div>

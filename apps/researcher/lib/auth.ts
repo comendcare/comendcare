@@ -6,9 +6,14 @@ import {PrismaClient} from "@prisma/client";
 import {OAuthConfig} from "next-auth/providers/oauth";
 import {CustomPrismaAdapter} from "./custom-prisma-adapter";
 import sgMail from "@sendgrid/mail";
+import {cioIdentify} from "@comend/lib/customer-io-identify";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
+
+const isProd =
+    process.env.NODE_ENV === 'production' ||
+    process.env.NEXT_PUBLIC_APP_ENV === 'production';
 
 const OrcidProvider = (): OAuthConfig<any> => (    {
     id: 'orcid',
@@ -260,6 +265,33 @@ export const researcherAuthOptions: NextAuthOptions = {
                 // @ts-expect-error
                 id: token.sub,
             };
+
+            const dbUser = await prisma.user.findUnique({
+                where: {id: token.sub!},
+                include: {memberships: true},
+            });
+
+            if (!dbUser) {
+                session.terminate = true;
+                session.expires = new Date().toISOString();
+                // @ts-expect-error
+                session.user = {id: token.sub, organizationId: null, membership: null};
+                return session;
+            }
+
+            try {
+                if (isProd) {
+                    await cioIdentify(dbUser.id!, {
+                        user_type: "researcher",
+                        email: dbUser.email ?? undefined,
+                        name: dbUser.name ?? undefined,
+                        created_at: dbUser.createdAt,
+                    });
+                }
+            } catch (err) {
+                console.warn("Failed to identify user in Customer.io:", err);
+            }
+
             return session;
         },
     },

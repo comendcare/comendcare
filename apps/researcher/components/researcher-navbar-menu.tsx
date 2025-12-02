@@ -73,7 +73,8 @@ export function ResearcherNavbarMenu() {
                                                 navigationMenuTriggerStyle({
                                                     className: `${isActive(pathname, href) ? "bg-muted text-foreground" : ""}`,
                                                 }),
-                                                comingSoon ? "opacity-60" : "" // Disable click and add opacity
+                                                comingSoon ? "opacity-60" : "", // Disable click and add opacity
+                                                "hidden lg:block"
                                             )}
                                         >
                                             <div className="flex flex-row items-center gap-2">

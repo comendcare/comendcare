@@ -95,6 +95,7 @@ export function DataTableFilterList<TData>({
   const descriptionId = React.useId();
   const [open, setOpen] = React.useState(false);
   const addButtonRef = React.useRef<HTMLButtonElement>(null);
+  const [isSmall, setIsSmall] = useState<null | boolean>(null);
 
   const columns = React.useMemo(() => {
     return table
@@ -230,94 +231,141 @@ export function DataTableFilterList<TData>({
     setTimeout(() => setOpen(true), 300)
   }, [])
 
+  useEffect(() => {
+    const check = () => setIsSmall(window.innerWidth < 768); // < md
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  const Content = () => {
+    return (
+      <>
+      <div className="flex flex-col gap-1">
+        <h4 id={labelId} className="font-medium leading-none">
+          {filters.length > 0 ? "Filters" : "No filters applied"}
+        </h4>
+        <p
+          id={descriptionId}
+          className={cn(
+            "text-muted-foreground text-sm",
+            filters.length > 0 && "sr-only",
+          )}
+        >
+          {filters.length > 0
+            ? "Modify filters to refine your rows."
+            : "Add filters to refine your rows."}
+        </p>
+      </div>
+      {filters.length > 0 ? (
+        <SortableContent asChild>
+          <ul className="flex max-h-[300px] flex-col gap-2 overflow-y-auto p-1">
+            {filters.map((filter, index) => (
+              <DataTableFilterItem<TData>
+                key={filter.filterId}
+                filter={filter}
+                index={index}
+                filterItemId={`${id}-filter-${filter.filterId}`}
+                joinOperator={joinOperator}
+                setJoinOperator={setJoinOperator}
+                columns={columns}
+                onFilterUpdate={onFilterUpdate}
+                onFilterRemove={onFilterRemove}
+              />
+            ))}
+          </ul>
+        </SortableContent>
+      ) : null}
+      <div className="flex w-full items-center gap-2">
+        <Button
+          size="sm"
+          className="rounded"
+          ref={addButtonRef}
+          onClick={onFilterAdd}
+        >
+          Add filter
+        </Button>
+        {filters.length > 0 ? (
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded"
+            onClick={onFiltersReset}
+          >
+            Reset filters
+          </Button>
+        ) : null}
+      </div>
+      </>
+    )
+  }
+
   return (
     <Sortable
       value={filters}
       onValueChange={setFilters}
       getItemValue={(item) => item.filterId}
     >
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onKeyDown={onTriggerKeyDown} 
-          >
-            <ListFilter />
-            Filter
-            {filters.length > 0 && (
-              <Badge
-                variant="secondary"
-                className="h-[18.24px] rounded-[3.2px] px-[5.12px] font-mono font-normal text-[10.4px]"
-              >
-                {filters.length}
-              </Badge>
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          aria-describedby={descriptionId}
-          aria-labelledby={labelId}
-          className="flex w-full max-w-[var(--radix-popover-content-available-width)] origin-[var(--radix-popover-content-transform-origin)] flex-col gap-3.5 p-4 sm:min-w-[380px]"
-          {...props}
-        >
-          <div className="flex flex-col gap-1">
-            <h4 id={labelId} className="font-medium leading-none">
-              {filters.length > 0 ? "Filters" : "No filters applied"}
-            </h4>
-            <p
-              id={descriptionId}
-              className={cn(
-                "text-muted-foreground text-sm",
-                filters.length > 0 && "sr-only",
+      {isSmall ? (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onKeyDown={onTriggerKeyDown} 
+            >
+              <ListFilter />
+              Filter
+              {filters.length > 0 && (
+                <Badge
+                  variant="secondary"
+                  className="h-[18.24px] rounded-[3.2px] px-[5.12px] font-mono font-normal text-[10.4px]"
+                >
+                  {filters.length}
+                </Badge>
               )}
-            >
-              {filters.length > 0
-                ? "Modify filters to refine your rows."
-                : "Add filters to refine your rows."}
-            </p>
-          </div>
-          {filters.length > 0 ? (
-            <SortableContent asChild>
-              <ul className="flex max-h-[300px] flex-col gap-2 overflow-y-auto p-1">
-                {filters.map((filter, index) => (
-                  <DataTableFilterItem<TData>
-                    key={filter.filterId}
-                    filter={filter}
-                    index={index}
-                    filterItemId={`${id}-filter-${filter.filterId}`}
-                    joinOperator={joinOperator}
-                    setJoinOperator={setJoinOperator}
-                    columns={columns}
-                    onFilterUpdate={onFilterUpdate}
-                    onFilterRemove={onFilterRemove}
-                  />
-                ))}
-              </ul>
-            </SortableContent>
-          ) : null}
-          <div className="flex w-full items-center gap-2">
-            <Button
-              size="sm"
-              className="rounded"
-              ref={addButtonRef}
-              onClick={onFilterAdd}
-            >
-              Add filter
             </Button>
-            {filters.length > 0 ? (
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded"
-                onClick={onFiltersReset}
-              >
-                Reset filters
-              </Button>
-            ) : null}
-          </div>
-        </PopoverContent>
-      </Popover>
+          </DialogTrigger>
+          <DialogContent
+            aria-describedby={descriptionId}
+            aria-labelledby={labelId}
+            className="flex w-full flex-col gap-3.5 p-4"
+            {...props}
+          >
+            <Content />
+          </DialogContent>
+        </Dialog>
+      ) : (
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onKeyDown={onTriggerKeyDown} 
+            >
+              <ListFilter />
+              Filter
+              {filters.length > 0 && (
+                <Badge
+                  variant="secondary"
+                  className="h-[18.24px] rounded-[3.2px] px-[5.12px] font-mono font-normal text-[10.4px]"
+                >
+                  {filters.length}
+                </Badge>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            aria-describedby={descriptionId}
+            aria-labelledby={labelId}
+            className="flex w-full max-w-[var(--radix-popover-content-available-width)] origin-[var(--radix-popover-content-transform-origin)] flex-col gap-3.5 p-4 sm:min-w-[380px]"
+            {...props}
+          >
+            <Content />
+          </PopoverContent>
+        </Popover>
+      )}
+
       <SortableOverlay>
         <div className="flex items-center gap-2">
           <div className="h-8 min-w-[72px] rounded-sm bg-primary/10" />
@@ -404,7 +452,7 @@ function DataTableFilterItem<TData>({
       <li
         id={filterItemId}
         tabIndex={-1}
-        className="flex items-center gap-2"
+        className="flex flex-wrap items-center gap-2"
         onKeyDown={onItemKeyDown}
       >
         <div className="min-w-[72px] text-center">
@@ -446,7 +494,7 @@ function DataTableFilterItem<TData>({
               aria-controls={fieldListboxId}
               variant="outline"
               size="sm"
-              className="w-32 justify-between rounded font-normal"
+              className="w-full md:w-32 justify-between rounded font-normal"
             >
               <span className="truncate">
                 {columns.find((column) => column.id === filter.id)?.columnDef
@@ -514,7 +562,7 @@ function DataTableFilterItem<TData>({
         >
           <SelectTrigger
             aria-controls={operatorListboxId}
-            className="h-8 w-32 rounded lowercase [&[data-size]]:h-8"
+            className="h-8 w-full md:w-32 rounded lowercase [&[data-size]]:h-8"
           >
             <div className="truncate">
               <SelectValue placeholder={filter.operator} />
@@ -849,6 +897,7 @@ function onFilterInputRender<TData>({
 
 import { useEffect, useState } from "react"
 import { debounce } from "lodash" // or write your own debounce
+import { Dialog, DialogContent, DialogTrigger } from "./../../../ui/dialog";
 
 interface Option {
   value: string

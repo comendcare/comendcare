@@ -6,6 +6,7 @@ const isProd =
 
 
 type Traits = {
+    user_type?: string | null;
     email?: string | null;
     name?: string | null;
     created_at?: number | Date; // seconds or Date
