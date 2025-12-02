@@ -30,10 +30,10 @@ export default function App() {
         <>
             <ResearcherHero />
             <ResearcherMainFeatures />
-            <ResearcherStatsSection />
-            <ResearcherQuickFeaturesSection />
-            <News />
-            <ContactSection />
+            {/*<ResearcherStatsSection />*/}
+            {/*<ResearcherQuickFeaturesSection />*/}
+            {/*<News />*/}
+            {/*<ContactSection />*/}
         </>
     )
 }
