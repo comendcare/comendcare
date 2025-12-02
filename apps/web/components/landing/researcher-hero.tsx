@@ -2,16 +2,14 @@
 
 import Balancer from "react-wrap-balancer";
 import {Button} from "@comend/components/ui/button";
-import {Badge} from "@comend/components/ui/badge";
 import {motion} from "framer-motion";
-import marketplace from "@/public/screenshots/marketplace.png"
+import rfpMarketplace from "@/public/screenshots/rfp-marketplace.png"
 import Image from "next/image";
-import {useRouter} from "next/navigation";
-import Link from "next/link";
-import {ArrowRight} from "lucide-react";
+import {useSigninDropdown} from "@/state/signin/signin-drodown-context";
 
 export const ResearcherHero = () => {
-    const router = useRouter();
+    const { setOpen } = useSigninDropdown()
+
     return (
         <div className="flex flex-col max-w-7xl mx-auto min-h-screen pt-20 md:pt-40 relative overflow-hidden">
             <motion.h1
@@ -72,6 +70,7 @@ export const ResearcherHero = () => {
                 <Button
                     variant="cta"
                     className="w-fit text-base"
+                    onClick={() => setOpen(true)}
                 >
                     Sign in
                 </Button>
@@ -83,7 +82,7 @@ export const ResearcherHero = () => {
                 <div
                     className="p-2 bg-white dark:bg-black dark:border-neutral-700 border border-neutral-200 rounded-[24px]">
                     <Image
-                        src={marketplace}
+                        src={rfpMarketplace}
                         alt="Researcher hub screenshot"
                         width={1920}
                         height={1080}

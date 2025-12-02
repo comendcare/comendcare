@@ -107,7 +107,7 @@ export default function ResearcherMainFeatures() {
                     </div>
                 </TooltipTrigger>
 
-                <TooltipContent>
+                <TooltipContent className="text-lg">
                     🎉 Coming soon!
                 </TooltipContent>
             </Tooltip>

@@ -28,6 +28,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@comend/components/ui/dropdown-menu"
+import {useSigninDropdown} from "@/state/signin/signin-drodown-context";
 
 
 interface NavbarItem {
@@ -182,6 +183,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, pathname}) => {
     const session = useSession()
     const [hovered, setHovered] = useState<number | null>(null)
     const [active, setActive] = useState<string | null>(null)
+    const {open, setOpen} = useSigninDropdown();
 
     const isLinkActive = (link?: string) => {
         if (!link || !pathname) return false
@@ -300,7 +302,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, pathname}) => {
 
             {session && (
                 <div className="flex justify-end">
-                    <DropdownMenu>
+                    <DropdownMenu open={open} onOpenChange={setOpen} modal={false}>
                         <DropdownMenuTrigger asChild>
                             <Button
                                 variant="cta"

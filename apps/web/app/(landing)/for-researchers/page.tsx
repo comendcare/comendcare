@@ -33,7 +33,7 @@ export default function App() {
             {/*<ResearcherStatsSection />*/}
             {/*<ResearcherQuickFeaturesSection />*/}
             {/*<News />*/}
-            <ContactSection />
+            {/*<ContactSection />*/}
         </>
     )
 }
