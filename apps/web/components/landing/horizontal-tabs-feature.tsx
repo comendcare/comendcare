@@ -246,10 +246,10 @@ export function HorizontalTabsFeatures() {
         >
             <Container>
                 <div className="mx-auto max-w-2xl md:text-center">
-                    <p className="text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+                    <h1 className="text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl mx-auto text-center max-w-screen-lg md:text-5xl lg:text-6xl dark:text-white leading-relaxed lg:leading-snug">
                         Systematize your research
-                    </p>
-                    <p className="mt-6 text-lg/8 text-gray-600">
+                    </h1>
+                    <p className="mt-4 text-lg/8 text-gray-600">
                         Organize projects, tools, and opportunities with your team and streamline them for researchers to discover and access.
                     </p>
                     <Link
@@ -260,7 +260,7 @@ export function HorizontalTabsFeatures() {
                                 : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
                         }
                     >
-                        Sign in to patient group platform
+                        Sign up
                     </Link>
                 </div>
                 <FeaturesMobile />

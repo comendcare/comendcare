@@ -17,7 +17,7 @@ export default function VerifyRequest() {
                     >
                         {`Go back home`}
                     </Link>
-                    <Link href="/contact" className="text-sm font-semibold text-gray-900">
+                    <Link href="mailto:support@comend.io" className="text-sm font-semibold text-gray-900">
                         {`Contact support`}
                         <span aria-hidden="true">&rarr;</span>
                     </Link>
