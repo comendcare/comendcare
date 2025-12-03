@@ -192,7 +192,7 @@ export default function MarketplacePage() {
                         variant="secondary"
                         className="justify-self-end self-end"
                     >
-                        {(count && count > 0 )? (`Browse all (${formatMoney(count)})`) : (`Browse all`)}
+                        {(count && count > 0 )? (`Browse all ${formatMoney(count)}`) : (`Browse all`)}
                         <ArrowRight />
                     </Button>
                 </DropdownMenuTrigger>
