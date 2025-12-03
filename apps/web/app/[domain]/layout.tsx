@@ -98,7 +98,8 @@ export async function generateMetadata({
             creator: "@comendcare"
         },
         icons: {
-            icon: logo ? [logo] : undefined,
+            // icon: logo ? [logo] : '/icon.ico',
+            icon: '/icon.ico',
         },
         metadataBase: new URL(`https://${domain}`),
         // Optional: Set canonical URL to custom domain if it exists
