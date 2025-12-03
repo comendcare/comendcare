@@ -27,12 +27,23 @@ export default async function ResearcherProfilePage({
                 title: true,
                 user: true,
                 country: true,
+                website: true,
+                groupName: true,
                 description: true,
                 researchInterests: true,
                 therapeuticsOfInterest: true,
                 conditionsOfInterest: true,
                 genesOfInterest: true,
-                affiliations: true,
+                affiliations: {
+                    select: {
+                        institution: {
+                            select: {
+                                id: true,
+                                name: true,
+                            },
+                        }
+                    }
+                },
                 createdAt: true,
                 updatedAt: true,
                 metadata: true
