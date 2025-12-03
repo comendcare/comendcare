@@ -415,7 +415,7 @@ export default function ResearcherOnboardingForm() {
                         Welcome to Comend
                     </h1>
                     <p className="text-sm text-muted-foreground">
-                        We just have a few questions for you to get started.
+                        This should only take a few minutes. You can return to update this at any time.
                     </p>
                 </div>
             </div>

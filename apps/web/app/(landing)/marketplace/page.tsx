@@ -200,8 +200,7 @@ export default function MarketplacePage() {
                         <X className="h-4 w-4"/>
                     </button>
                     <h1 className="mx-auto text-center">
-                        Sign up to edit your profile, access the marketplace, and more.
-                    </h1>
+                        Sign up to create a profile, access our marketplace, and more.                    </h1>
                     <div className="flex flex-col gap-2">
                         <Link
                             href={

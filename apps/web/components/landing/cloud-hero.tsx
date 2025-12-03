@@ -253,7 +253,7 @@ export const CloudHeroSection = () => {
                         transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
                         className="max-w-screen-lg text-3xl md:text-5xl lg:text-6xl font-bold text-neutral-700 dark:text-white leading-relaxed lg:leading-snug"
                     >
-                        The digital platform for
+                        The research platform for
                         <Highlight className="text-black dark:text-white">
                             genetic conditions
                         </Highlight>

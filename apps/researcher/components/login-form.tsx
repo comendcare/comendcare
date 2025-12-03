@@ -55,7 +55,7 @@ export default function ResearcherLoginForm({callback = "/", isCaptchaVerified =
             <Alert>
                 <CheckCircle2Icon />
                 <AlertTitle>
-                    {`Be sure to use a reachable organization email to create your account.`}
+                    {`Please use an email address that others can use to reach you.`}
                 </AlertTitle>
                 <AlertDescription>
                     {`Don't use your personal account.`}
