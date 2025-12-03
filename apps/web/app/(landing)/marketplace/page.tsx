@@ -31,36 +31,42 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@comend/
 const croSelector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
+    totalResults: state.totalResults,
 })
 
 const organizationSelector = (state: OrganizationSearchState) => ({
     featuredOrgs: state.featuredOrgs,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
+    totalResults: state.totalResults,
 })
 
 const biosampleSelector = (state: BiosampleSearchState) => ({
     initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
+    totalResults: state.totalResults,
 })
 
 const diseaseModelSelector = (state: DiseaseModelSearchState) => ({
     initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
+    totalResults: state.totalResults,
 })
 
 const clinicalDatsetSelector = (state: ClinicalDatasetSearchState) => ({
     initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
+    totalResults: state.totalResults,
 })
 
 const rfpSelector = (state: RFPSearchState) => ({
     initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
+    totalResults: state.totalResults,
 })
 
 export default function MarketplacePage() {
@@ -257,7 +263,11 @@ export default function MarketplacePage() {
             <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Service providers</h2>
+                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{
+                            crosInitialized 
+                                ? `Service providers (${croStore.totalResults})`
+                                : `Service providers`
+                        }</h2>
                         <BrowseAllSignInButton />
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -289,7 +299,11 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Patient groups</h2>
+                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{
+                            pagsInitialized 
+                                ? `Patient groups (${organizationStore.totalResults})`
+                                : `Patient groups`
+                        }</h2>
                         <BrowseAllSignInButton />
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -322,7 +336,11 @@ export default function MarketplacePage() {
         
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Patient biosamples</h2>
+                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{
+                            biosamplesInitialized 
+                                ? `Patient biosamples (${biosampleStore.totalResults})`
+                                : `Patient biosamples`
+                        }</h2>
                         <BrowseAllSignInButton />
                     </div>
                     <ol className="w-full">
@@ -372,7 +390,11 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Disease models</h2>
+                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{
+                            diseaseModelsInitialized 
+                                ? `Disease models (${diseaseModelStore.totalResults})`
+                                : `Disease models`
+                        }</h2>
                         <BrowseAllSignInButton />
                     </div>
                     <ol className="w-full">
@@ -416,7 +438,11 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Clinical datasets</h2>
+                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{
+                            clinicalDatasetsInitialized 
+                                ? `Clinical datasets (${clinicalDatasetStore.totalResults})`
+                                : `Clinical datasets`
+                        }</h2>
                         <BrowseAllSignInButton />
                     </div>
                     <ol className="w-full">
@@ -460,7 +486,11 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Requests for proposals</h2>
+                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{
+                            rfpsInitialized 
+                                ? `Requests for proposals (${rfpStore.totalResults})`
+                                : `Requests for proposals`
+                        }</h2>
                         <BrowseAllSignInButton />
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
