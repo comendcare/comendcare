@@ -27,40 +27,47 @@ import { RFPDetails } from "@comend/components/pag-profile-rfps-card"
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
 import { CROMarketplaceCard } from "@comend/components/marketplace/marketplace-cro-card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@comend/components/ui/dropdown-menu"
+import { formatMoney } from "@comend/lib/utils"
 
 const croSelector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
+    totalResults: state.totalResults,
 })
 
 const organizationSelector = (state: OrganizationSearchState) => ({
     featuredOrgs: state.featuredOrgs,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
+    totalResults: state.totalResults,
 })
 
 const biosampleSelector = (state: BiosampleSearchState) => ({
     initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
+    totalResults: state.totalResults,
 })
 
 const diseaseModelSelector = (state: DiseaseModelSearchState) => ({
     initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
+    totalResults: state.totalResults,
 })
 
 const clinicalDatsetSelector = (state: ClinicalDatasetSearchState) => ({
     initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
+    totalResults: state.totalResults,
 })
 
 const rfpSelector = (state: RFPSearchState) => ({
     initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
+    totalResults: state.totalResults,
 })
 
 export default function MarketplacePage() {
@@ -175,7 +182,7 @@ export default function MarketplacePage() {
         return () => window.removeEventListener('resize', handleResize)
     }, [])
 
-    const BrowseAllSignInButton = () => {
+    const BrowseAllSignInButton = ({count}: {count?: number}) => {
         const [isOpen, setIsOpen] = useState(false)
 
         return (
@@ -185,7 +192,7 @@ export default function MarketplacePage() {
                         variant="secondary"
                         className="justify-self-end self-end"
                     >
-                        Browse all
+                        {(count && count > 0 )? (`Browse all ${formatMoney(count)}`) : (`Browse all`)}
                         <ArrowRight />
                     </Button>
                 </DropdownMenuTrigger>
@@ -257,8 +264,8 @@ export default function MarketplacePage() {
             <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Service providers</h2>
-                        <BrowseAllSignInButton />
+                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Service providers`}</h2>
+                        <BrowseAllSignInButton count={croStore.totalResults}/>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {(crosInitialized && croStore.searchResults && croStore.searchResults.length > 0 )
@@ -289,8 +296,8 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Patient groups</h2>
-                        <BrowseAllSignInButton />
+                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Patient groups`}</h2>
+                        <BrowseAllSignInButton count={organizationStore.totalResults}/>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {(pagsInitialized && ([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0))
@@ -322,8 +329,8 @@ export default function MarketplacePage() {
         
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Patient biosamples</h2>
-                        <BrowseAllSignInButton />
+                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Patient biosamples`}</h2>
+                        <BrowseAllSignInButton count={biosampleStore.totalResults}/>
                     </div>
                     <ol className="w-full">
                         {(biosamplesInitialized && biosampleStore.searchResults && biosampleStore.searchResults.length > 0 )
@@ -372,8 +379,8 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Disease models</h2>
-                        <BrowseAllSignInButton />
+                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Disease models`}</h2>
+                        <BrowseAllSignInButton count={diseaseModelStore.totalResults}/>
                     </div>
                     <ol className="w-full">
                         {(diseaseModelsInitialized && diseaseModelStore.searchResults && diseaseModelStore.searchResults.length > 0 )
@@ -416,8 +423,8 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Clinical datasets</h2>
-                        <BrowseAllSignInButton />
+                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Clinical datasets`}</h2>
+                        <BrowseAllSignInButton count={clinicalDatasetStore.totalResults}/>
                     </div>
                     <ol className="w-full">
                         {(clinicalDatasetsInitialized && clinicalDatasetStore.searchResults && clinicalDatasetStore.searchResults.length > 0 )
@@ -460,8 +467,8 @@ export default function MarketplacePage() {
 
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Requests for proposals</h2>
-                        <BrowseAllSignInButton />
+                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Requests for proposals`}</h2>
+                        <BrowseAllSignInButton count={rfpStore.totalResults}/>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {(rfpsInitialized && rfpStore.searchResults && rfpStore.searchResults.length > 0 )
