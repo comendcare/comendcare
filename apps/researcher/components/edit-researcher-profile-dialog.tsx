@@ -136,13 +136,13 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                     name: researcher.user?.name || "",
                     title: researcher.title as any,
                     country: researcher.country || "",
-                    description: researcher.description || undefined,
-                    website: researcher.website || undefined,
+                    description: researcher.description || "",
+                    website: researcher.website || "",
                     affiliations: researcher.affiliations?.map((a: any) => ({
                         label: a.institution?.name,
                         value: a.institution?.id,
                     })) || [],
-                    groupName: researcher.groupName || undefined,
+                    groupName: researcher.groupName || "",
                     orcid: researcher.orcid || "",
                     researchInterests:
                         (researcher.researchInterests || []).map((stored: string) => {

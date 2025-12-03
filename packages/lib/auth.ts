@@ -272,6 +272,7 @@ export const authOptions: NextAuthOptions = {
             try {
                 if (isProd) {
                     await cioIdentify(dbUser.id!, {
+                        user_type: "pag",
                         email: dbUser.email ?? undefined,
                         name: dbUser.name ?? undefined,
                         created_at: dbUser.createdAt,

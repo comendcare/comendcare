@@ -133,7 +133,12 @@ export default function ResearcherOnboardingForm() {
                     genesOfInterest: true,
                     affiliations: {
                         select: {
-                            institution: true
+                            institution: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                },
+                            }
                         }
                     },
                     createdAt: true,
@@ -182,7 +187,9 @@ export default function ResearcherOnboardingForm() {
                     const fetchedValues: z.infer<typeof userFormSchema> = {
                         name: userData.name || "",
                         title: mapTitleToValue(researcherData.title),
+                        website: researcherData.website || "",
                         country: researcherData.country || "",
+                        description: researcherData.description || "",
                         affiliations: researcherData.affiliations.map((affiliation: any) => ({
                             label: affiliation.institution.name,
                             value: affiliation.id

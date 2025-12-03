@@ -18,8 +18,19 @@ import {
 import {PulsatingButton} from "@comend/components/ui/pulsating-button";
 import {usePathname, useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
-import { X, Menu as MenuIcon } from "lucide-react"
+import {X, Menu as MenuIcon} from "lucide-react"
 import {Button} from "@comend/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@comend/components/ui/dropdown-menu"
+import {useSigninDropdown} from "@/state/signin/signin-drodown-context";
+import { Separator } from "@comend/components/ui/separator"
+
 
 interface NavbarItem {
     name: string
@@ -35,12 +46,25 @@ interface NavbarItem {
 interface NavbarProps {
     navItems: NavbarItem[]
     visible: boolean
+    pathname?: string
 }
 
 const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN
 
 export const LandingNavbar: React.FC = () => {
+    const pathname = usePathname()
+
     const navItems: NavbarItem[] = process.env.NEXT_PUBLIC_NODE_ENV === 'production' ? [
+        {
+            name: "For PAGs",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/for-pags` : `http://${rootDomain}/for-pags`
+        },
+        {
+            name: "For Researchers",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/for-researchers` : `http://${rootDomain}/for-researchers`
+        },
         {
             name: "About",
             link: process.env.NEXT_PUBLIC_VERCEL_ENV
@@ -96,6 +120,16 @@ export const LandingNavbar: React.FC = () => {
         // },
         // { name: "Features", link: "/#features" },
         {
+            name: "For PAGs",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/for-pags` : `http://${rootDomain}/for-pags`
+        },
+        {
+            name: "For Researchers",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/for-researchers` : `http://${rootDomain}/for-researchers`
+        },
+        {
             name: "About",
             link: process.env.NEXT_PUBLIC_VERCEL_ENV
                 ? `https://${rootDomain}/about` : `http://${rootDomain}/about`
@@ -140,18 +174,28 @@ export const LandingNavbar: React.FC = () => {
 
     return (
         <motion.div ref={ref} className="w-full fixed top-0 inset-x-0 z-50">
-            <DesktopNav visible={visible} navItems={navItems}/>
+            <DesktopNav visible={visible} navItems={navItems} pathname={pathname}/>
             <MobileNav visible={visible} navItems={navItems}/>
         </motion.div>
     )
 }
 
-const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
+const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, pathname}) => {
     const session = useSession()
-    const pathname = usePathname();
-    const router = useRouter()
     const [hovered, setHovered] = useState<number | null>(null)
     const [active, setActive] = useState<string | null>(null)
+    const {open, setOpen} = useSigninDropdown();
+
+    const isLinkActive = (link?: string) => {
+        if (!link || !pathname) return false
+
+        // Don't give active state to in-page anchors like /about#news
+        if (link.includes("#")) return false
+
+        // Extract pathname from absolute URL
+        const url = new URL(link)
+        return url.pathname === pathname
+    }
 
     return (
         <motion.div
@@ -184,45 +228,48 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
             </Link>
             <motion.div
                 className="lg:flex flex-row flex-1 hidden items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
-                {navItems.map((navItem, idx) =>
-                    navItem.link ? (
-                        <Link
-                            onMouseEnter={() => setHovered(idx)}
-                            className="text-neutral-600 dark:text-neutral-300 relative px-4 py-2"
-                            key={`link-${idx}`}
-                            href={navItem.link}
-                        >
-                            {hovered === idx && (
-                                <motion.div
-                                    layoutId="hovered"
-                                    className="w-full h-full absolute inset-0 bg-gray-100 dark:bg-neutral-800 rounded-full"
-                                />
-                            )}
-                            <span className="text-base relative z-20">
+                {navItems.map((navItem, idx) => {
+                        const activeForRoute = isLinkActive(navItem.link)
+
+                        return navItem.link ? (
+                            <Link
+                                onMouseEnter={() => setHovered(idx)}
+                                className="text-neutral-600 dark:text-neutral-300 relative px-4 py-2"
+                                key={`link-${idx}`}
+                                href={navItem.link}
+                            >
+                                {(hovered === idx || activeForRoute) && (
+                                    <motion.div
+                                        layoutId="hovered"
+                                        className="w-full h-full absolute inset-0 bg-gray-100 dark:bg-neutral-800 rounded-full"
+                                    />
+                                )}
+                                <span className="text-base relative z-20 whitespace-nowrap">
                                 {navItem.name}
                             </span>
-                        </Link>
-                    ) : (
-                        <Menu setActive={setActive} key={`menu-${idx}`}>
-                            <MenuItem
-                                setActive={setActive}
-                                active={active}
-                                item="Products"
-                            >
-                                <div className="text-base grid grid-cols-2 gap-10 p-4">
-                                    {navItem.items?.map((item, idx) => (
-                                        <ProductItem
-                                            key={idx}
-                                            title={item.title}
-                                            href={item.href}
-                                            imgParams={item.imgParams}
-                                            description={item.description}
-                                        />
-                                    ))}
-                                </div>
-                            </MenuItem>
-                        </Menu>
-                    )
+                            </Link>
+                        ) : (
+                            <Menu setActive={setActive} key={`menu-${idx}`}>
+                                <MenuItem
+                                    setActive={setActive}
+                                    active={active}
+                                    item="Products"
+                                >
+                                    <div className="text-base grid grid-cols-2 gap-10 p-4">
+                                        {navItem.items?.map((item, idx) => (
+                                            <ProductItem
+                                                key={idx}
+                                                title={item.title}
+                                                href={item.href}
+                                                imgParams={item.imgParams}
+                                                description={item.description}
+                                            />
+                                        ))}
+                                    </div>
+                                </MenuItem>
+                            </Menu>
+                        )
+                    }
                 )}
             </motion.div>
 
@@ -232,51 +279,105 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
             {/*    </Link>*/}
             {/*</div>*/}
 
-            {session &&
-                <div
-                    className="flex space-x-4 justify-end"
-                >
-                    <Button
-                        className="w-fit text-base"
-                        onClick={() => router.push("/login")}
-                        variant="ghost"
-                    >
-                        Log in
-                    </Button>
-                    {/*<PulsatingButton*/}
-                    {/*    className="w-fit"*/}
-                    {/*    onClick={() => {*/}
-                    {/*        if (pathname === "/") {*/}
-                    {/*            // If we're on the landing page, scroll to the bottom*/}
-                    {/*            window.scrollTo({*/}
-                    {/*                top: document.documentElement.scrollHeight,*/}
-                    {/*                behavior: 'smooth'*/}
-                    {/*            });*/}
-                    {/*        } else {*/}
-                    {/*            // Otherwise, redirect to the landing page with the anchor*/}
-                    {/*            router.push("/contact");*/}
-                    {/*        }*/}
-                    {/*    }}*/}
-                    {/*>*/}
-                    {/*    Sign up*/}
-                    {/*</PulsatingButton>*/}
-                    <Button
-                        variant="cta"
-                        className="w-fit"
-                        asChild
-                    >
-                        <Link href={"https://calendly.com/albertatcomend/onboarding"}>
-                            Sign up
-                        </Link>
-                    </Button>
+            {/*{session &&*/}
+            {/*    <div*/}
+            {/*        className="flex space-x-4 justify-end"*/}
+            {/*    >*/}
+            {/*        <Button*/}
+            {/*            className="w-fit text-base"*/}
+            {/*            onClick={() => router.push("/login")}*/}
+            {/*            variant="ghost"*/}
+            {/*        >*/}
+            {/*            Log in*/}
+            {/*        </Button>*/}
+            {/*        <Button*/}
+            {/*            variant="cta"*/}
+            {/*            className="w-fit"*/}
+            {/*            asChild*/}
+            {/*        >*/}
+            {/*            <Link href={"https://calendly.com/albertatcomend/onboarding"}>*/}
+            {/*                Sign up*/}
+            {/*            </Link>*/}
+            {/*        </Button>*/}
+            {/*    </div>*/}
+            {/*}*/}
+
+            {session && (
+                <div className="flex justify-end">
+                    <DropdownMenu open={open} onOpenChange={setOpen} modal={false}>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="cta"
+                                className="w-fit text-base"
+                            >
+                                Sign in
+                            </Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent
+                            align="end"
+                            className="w-96 p-4 flex-col space-y-4"
+                        >
+                            <h1 className="mx-auto text-center">
+                                Sign up to edit your profile, access the marketplace, and more.
+                            </h1>
+                            <div className="flex flex-col gap-2">
+                                <Link
+                                    href={
+                                        process.env.NEXT_PUBLIC_NODE_ENV === "production"
+                                            ? "https://researcher.comend.io/login"
+                                            : `http://researcher.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
+                                    }
+                                    className="w-full"
+                                >
+                                    <Button
+                                        variant="cta"
+                                        className="w-full justify-center"
+                                    >
+                                        Researcher Log in
+                                    </Button>
+                                </Link>
+
+                                <Link
+                                    href={
+                                        process.env.NEXT_PUBLIC_NODE_ENV === "production"
+                                            ? "https://comend.io/login"
+                                            : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
+                                    }
+                                    className="w-full"
+                                >
+                                    <Button
+                                        variant="cta"
+                                        className="w-full justify-center"
+                                    >
+                                        Patient Group Log in
+                                    </Button>
+                                </Link>
+
+                                <Link
+                                    href="https://calendly.com/albertatcomend/onboarding"
+                                    className="w-full"
+                                    target="_blank"
+                                >
+                                    <Button
+                                        variant="outline"
+                                        className="w-full justify-center"
+                                    >
+                                        Patient Group Sign up
+                                    </Button>
+                                </Link>
+                            </div>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
-            }
+            )}
 
         </motion.div>
     )
 }
 
 const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
+    const session = useSession()
     const [open, setOpen] = useState(false)
 
     return (
@@ -332,7 +433,7 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                             initial={{opacity: 0}}
                             animate={{opacity: 1}}
                             exit={{opacity: 0}}
-                            className="flex rounded-lg absolute top-16 bg-white dark:bg-neutral-950 inset-x-0 z-50 flex-col items-start justify-start gap-4 w-full px-4 py-8"
+                            className="border-2 flex rounded-lg absolute top-16 bg-white dark:bg-neutral-950 inset-x-0 z-50 flex-col items-start justify-start gap-4 w-full px-4 py-8"
                         >
                             {navItems.map((navItem, idx) => (
                                 <Link
@@ -354,6 +455,49 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                             {/*>*/}
                             {/*    Login*/}
                             {/*</Link>*/}
+
+                            {session && (
+                                <>
+                                <Separator />
+                                <div className="flex flex-col space-y-4">
+                                    <h1 className="mx-auto text-center">
+                                        Sign up to access the marketplace, manage requests, and more.
+                                    </h1>
+                                    <div className="flex flex-col gap-2">
+                                        <Link href="/researcher/login" className="w-full">
+                                            <Button
+                                                variant="cta"
+                                                className="w-full justify-center"
+                                            >
+                                                Researcher Log in
+                                            </Button>
+                                        </Link>
+
+                                        <Link href="/login" className="w-full">
+                                            <Button
+                                                variant="cta"
+                                                className="w-full justify-center"
+                                            >
+                                                Patient Group Log in
+                                            </Button>
+                                        </Link>
+
+                                        <Link
+                                            href="https://calendly.com/albertatcomend/onboarding"
+                                            className="w-full"
+                                        >
+                                            <Button
+                                                variant="outline"
+                                                className="w-full justify-center"
+                                            >
+                                                Patient Group Sign up
+                                            </Button>
+                                        </Link>
+                                    </div>
+                                </div>
+                                </>
+                            )}
+
                         </motion.div>
                     )}
                 </AnimatePresence>
