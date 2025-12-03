@@ -7,6 +7,7 @@ import type {Prisma} from "@prisma/client";
 import dynamic from "next/dynamic";
 import {Button} from "@comend/components/ui/button"; // type-only; erased at build
 import LoadingDots from "@comend/components/icons/loading-dots"
+import {SeeMoreDescription} from "@comend/components/see-more-description"
 
 const EditPAGProfileConditionCardDialog = dynamic(
     () => import("~web/components/edit-pag-profile-condition-card-dialog"),
@@ -113,9 +114,10 @@ export const PAGProfileConditionsCard = ({
 
                 <CardContent>
                     <div key={condition?.id} className="flex flex-col space-y-4">
-                        <p className="line-clamp-6" data-testid="conditions-summary">
+                        {/* <p className="line-clamp-6" data-testid="conditions-summary">
                             {condition?.summary}
-                        </p>
+                        </p> */}
+                        <SeeMoreDescription description={condition?.summary ?? ""} />
 
                         {/* Epidemiology (unchanged) */}
                         <div className="space-y-2" data-testid="epidemiology-section">
