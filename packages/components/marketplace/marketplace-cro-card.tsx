@@ -75,34 +75,72 @@ export function CRORecommendationCard({cro, milestone, location}: { cro: Company
     );
 }
 
-export function CROMarketplaceCard({cro, milestone, location, savedCompanyIds}: {
+export function CROMarketplaceCard({
+    cro, 
+    milestone, 
+    location, 
+    savedCompanyIds,
+    disabled = false
+}: {
     cro: CompanyWithReviewsAndServices,
     milestone?: Milestone,
     location?: string,
-    savedCompanyIds?: Set<string>
+    savedCompanyIds?: Set<string>,
+    disabled?: boolean
 }) {
     const {id} = cro;
 
+    if (disabled) {
+        return (
+            <Card className="h-full w-full text-left flex flex-col justify-between">
+                <CardHeader className="gap-2">
+                    <CROCardHeaderContents
+                        cro={cro}
+                        milestone={milestone}
+                        location={location}
+                        savedCompanyIds={savedCompanyIds}
+                    />
+                </CardHeader>
+                <CROCardContents cro={cro}/>
+            </Card>
+        )
+    }
+
     return (
-        <Card className="h-full w-full text-left flex flex-col justify-between">
-            <CardHeader className="gap-2">
-                <CROCardHeaderContents
-                    cro={cro}
-                    milestone={milestone}
-                    location={location}
-                    savedCompanyIds={savedCompanyIds}
-                />
-            </CardHeader>
-            <CROCardContents cro={cro}/>
-        </Card>
+        <Link
+            href={
+                process.env.NEXT_PUBLIC_VERCEL_ENV
+                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${id}`
+                    : `http://localhost:3000/app/service-providers/${id}`
+            }
+        >
+            <Card className="h-full w-full text-left flex flex-col justify-between">
+                <CardHeader className="gap-2">
+                    <CROCardHeaderContents
+                        cro={cro}
+                        milestone={milestone}
+                        location={location}
+                        savedCompanyIds={savedCompanyIds}
+                    />
+                </CardHeader>
+                <CROCardContents cro={cro}/>
+            </Card>
+        </Link>
     )
 }
 
-export function CROCardHeaderContents({cro, milestone, location, savedCompanyIds}: {
+export function CROCardHeaderContents({
+    cro, 
+    milestone, 
+    location, 
+    savedCompanyIds,
+    // disabled = false,
+}: {
     cro: CompanyWithReviewsAndServices,
     milestone?: Milestone,
     location?: string,
-    savedCompanyIds?: Set<string>
+    savedCompanyIds?: Set<string>,
+    // disabled?: boolean
 }) {
     const {id, title, description, companyType, avgRating} = cro;
 
@@ -117,19 +155,21 @@ export function CROCardHeaderContents({cro, milestone, location, savedCompanyIds
     return (
         <>
             <div className="flex justify-between gap-2">
-                <Link
+                {/* <Link
                     href={
                         process.env.NEXT_PUBLIC_VERCEL_ENV
                             ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${id}`
                             : `http://localhost:3000/app/service-providers/${id}`
                     }
                     className="flex flex-row gap-4 items-center"
-                >
+                > */}
+                <div className="flex flex-row gap-4 items-center">
                     {favicon}
                     <CardTitle className="text-lg flex flex-row gap-2 items-center">
                         {title}
                     </CardTitle>
-                </Link>
+                </div>
+                {/* </Link> */}
                 {/*<SaveCRODialog cro={cro} type={"card"} milestone={milestone} location={location}/>*/}
                 {/*<SaveCROButton*/}
                 {/*    cro={cro}*/}
@@ -138,14 +178,15 @@ export function CROCardHeaderContents({cro, milestone, location, savedCompanyIds
                 {/*    savedCompanyIds={savedCompanyIds}*/}
                 {/*/>*/}
             </div>
-            <Link
+            {/* <Link
                 href={
                     process.env.NEXT_PUBLIC_VERCEL_ENV
                         ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${id}`
                         : `http://localhost:3000/app/service-providers/${id}`
                 }
                 className="flex flex-col gap-2"
-            >
+            > */}
+            <div className="flex flex-col gap-2">
                 <div className="flex flex-row justify-between items-center">
                     {companyType && (
                         <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
@@ -169,7 +210,8 @@ export function CROCardHeaderContents({cro, milestone, location, savedCompanyIds
                 <div className="mt-2">
                     <RelatedProjectTypeBadges services={cro.services} />
                 </div>
-            </Link>
+            </div>
+            {/* </Link> */}
         </>
     )
 }
@@ -186,13 +228,14 @@ export function CROCardContents({cro}: { cro: Company }) {
     ];
 
     return (
-        <Link
-            href={
-                process.env.NEXT_PUBLIC_VERCEL_ENV
-                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${cro.id}`
-                    : `http://localhost:3000/app/service-providers/${cro.id}`
-            }
-        >
+        // <Link
+        //     href={
+        //         process.env.NEXT_PUBLIC_VERCEL_ENV
+        //             ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${cro.id}`
+        //             : `http://localhost:3000/app/service-providers/${cro.id}`
+        //     }
+        // >
+        <>
             {Object.values(categoryCounts).some(count => count > 0) && (
                 <CardContent className="flex flex-col items-start justify-center space-y-4">
                     <div>
@@ -249,7 +292,8 @@ export function CROCardContents({cro}: { cro: Company }) {
                     </div>
                 </CardContent>
             )}
-        </Link>
+        </>
+        // </Link>
     )
 }
 
