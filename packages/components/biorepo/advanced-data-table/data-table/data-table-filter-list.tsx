@@ -238,7 +238,7 @@ export function DataTableFilterList<TData>({
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const Content = () => {
+  const Content = ({closeCallback}: {closeCallback?: () => void}) => {
     return (
       <>
       <div className="flex flex-col gap-1">
@@ -295,6 +295,15 @@ export function DataTableFilterList<TData>({
             Reset filters
           </Button>
         ) : null}
+        {(filters.length > 0 && closeCallback) ? (
+          <Button
+            size="sm"
+            className="rounded ml-auto"
+            onClick={closeCallback}
+          >
+            Apply filters
+          </Button>
+        ) : null}
       </div>
       </>
     )
@@ -332,7 +341,7 @@ export function DataTableFilterList<TData>({
             className="flex w-full flex-col gap-3.5 p-4"
             {...props}
           >
-            <Content />
+            <Content closeCallback={() => setOpen(false)}/>
           </DialogContent>
         </Dialog>
       ) : (

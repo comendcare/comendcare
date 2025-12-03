@@ -26,7 +26,7 @@ export const ResearcherHero = () => {
                     ease: "easeOut",
                     duration: 0.5,
                 }}
-                className="mx-auto text-center max-w-screen-lg text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-700 dark:text-white leading-relaxed lg:leading-snug"
+                className="text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl mx-auto text-center max-w-screen-lg md:text-5xl lg:text-6xl dark:text-white leading-relaxed lg:leading-snug"
             >
                 <Balancer>
                     Systematically identify opportunities for research
@@ -46,7 +46,7 @@ export const ResearcherHero = () => {
                     duration: 0.5,
                     delay: 0.2,
                 }}
-                className="mx-auto text-center max-w-screen-sm text-2xl"
+                className="mx-auto text-center max-w-screen-sm text-2xl mt-4"
             >
                 <Balancer>
                     Patient foundations, research tools, and grants all in one place.
@@ -76,7 +76,7 @@ export const ResearcherHero = () => {
                             : `http://researcher.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
                     }
                 >
-                    Sign in to researcher hub
+                    Sign up
                 </Link>
             </motion.div>
             <div

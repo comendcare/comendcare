@@ -56,12 +56,12 @@ export const LandingNavbar: React.FC = () => {
 
     const navItems: NavbarItem[] = process.env.NEXT_PUBLIC_NODE_ENV === 'production' ? [
         {
-            name: "For PAGs",
+            name: "For patient groups",
             link: process.env.NEXT_PUBLIC_VERCEL_ENV
                 ? `https://${rootDomain}/for-pags` : `http://${rootDomain}/for-pags`
         },
         {
-            name: "For Researchers",
+            name: "For researchers",
             link: process.env.NEXT_PUBLIC_VERCEL_ENV
                 ? `https://${rootDomain}/for-researchers` : `http://${rootDomain}/for-researchers`
         },
@@ -120,12 +120,12 @@ export const LandingNavbar: React.FC = () => {
         // },
         // { name: "Features", link: "/#features" },
         {
-            name: "For PAGs",
+            name: "For patient groups",
             link: process.env.NEXT_PUBLIC_VERCEL_ENV
                 ? `https://${rootDomain}/for-pags` : `http://${rootDomain}/for-pags`
         },
         {
-            name: "For Researchers",
+            name: "For researchers",
             link: process.env.NEXT_PUBLIC_VERCEL_ENV
                 ? `https://${rootDomain}/for-researchers` : `http://${rootDomain}/for-researchers`
         },
@@ -319,8 +319,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, pathname}) => {
                             className="w-96 p-4 flex-col space-y-4"
                         >
                             <h1 className="mx-auto text-center">
-                                Sign up to edit your profile, access the marketplace, and more.
-                            </h1>
+                                Sign up to create a profile, access our marketplace, and more.                            </h1>
                             <div className="flex flex-col gap-2">
                                 <Link
                                     href={
@@ -334,7 +333,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, pathname}) => {
                                         variant="cta"
                                         className="w-full justify-center"
                                     >
-                                        Researcher Log in
+                                        Researcher login
                                     </Button>
                                 </Link>
 
@@ -350,7 +349,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, pathname}) => {
                                         variant="cta"
                                         className="w-full justify-center"
                                     >
-                                        Patient Group Log in
+                                        Patient group login
                                     </Button>
                                 </Link>
 
@@ -363,7 +362,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, pathname}) => {
                                         variant="outline"
                                         className="w-full justify-center"
                                     >
-                                        Patient Group Sign up
+                                        Sign up your patient group
                                     </Button>
                                 </Link>
                             </div>

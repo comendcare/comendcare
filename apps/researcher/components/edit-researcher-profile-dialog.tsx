@@ -123,6 +123,7 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
     const [isCropping, setIsCropping] = useState(false);
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
     const [defaultValues, setDefaultValues] = useState<z.infer<typeof formSchema> | undefined>(undefined);
+    const [open, setOpen] = useState(false)
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -294,6 +295,7 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
             }
 
             toast.success("User updated successfully");
+            setOpen(false)
             router.refresh();
         } catch (error) {
             console.error("Error:", error);
@@ -358,7 +360,7 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
     };
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button>
                     <Pencil className="mr-2 h-4 w-4"/>
