@@ -19,12 +19,20 @@ export default async function ResearcherProfilePage({
     if (session?.user?.id) {
         const response = await getResearcher(
             session.user.id, 
-            id,
             {
                 id: true,
                 orcid: true,
                 title: true,
-                user: true,
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                        createdAt: true,
+                        updatedAt: true,
+                    }
+                },
                 country: true,
                 description: true,
                 researchInterests: true,
