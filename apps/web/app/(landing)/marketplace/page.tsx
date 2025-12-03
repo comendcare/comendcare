@@ -271,6 +271,7 @@ export default function MarketplacePage() {
                                                 key={index}
                                                 location={"Marketplace"}
                                                 savedCompanyIds={new Set()}
+                                                disabled={true}
                                             />
                                     ))}
                                 </>

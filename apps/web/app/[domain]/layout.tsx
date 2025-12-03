@@ -193,7 +193,8 @@ export default async function SiteLayout({
         <>
         <link 
             rel="icon" 
-            href={data.image ? data.image :  "/icon.ico"}
+            // href={data.image ? data.image :  "/icon.ico"}
+            href={"/icon.ico"}
             sizes="any" 
         />
         <div>

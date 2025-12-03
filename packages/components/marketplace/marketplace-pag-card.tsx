@@ -27,7 +27,7 @@ export function OrganizationMarketplaceCard({
     const {associatedGenes = [], causalGenes = [], numberOfPatientsEngaged} = orgCondition
 
     const numProjects = organization.milestones?.length || 0
-    const numTools = (organization.tools?.length || 0) + (organization.biosamples?.length || 0) + (organization.diseaseModels?.length || 0)
+    const numTools = (organization.tools?.length || 0) + (organization.biosamples?.length || 0) + (organization.diseaseModel?.length || 0)
     const numRFPs = organization.rfps?.length || 0
 
     const stages = Object.keys(milestoneCategories)

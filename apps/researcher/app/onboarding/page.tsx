@@ -38,6 +38,7 @@ import {Textarea} from "@comend/components/ui/textarea";
 import {Separator} from "@comend/components/ui/separator";
 import {getResearcherFromUserId} from "~researcher/lib/fetchers";
 import {updateResearcher} from "~researcher/lib/actions";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -238,6 +239,17 @@ export default function ResearcherOnboardingForm() {
         fetchResearcherData();
     }, [session, form]);
 
+    useEffect(() => {
+        try {
+            mixpanelTrack("Onboarding Started", {
+                "User ID": session?.user?.id,
+                "User Name": session?.user?.name,
+            })
+        } catch (e) {
+            console.error("Error tracking mixpanel event:", e)
+        }
+    }, [])
+
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
         setLoading(true);
 
@@ -323,6 +335,17 @@ export default function ResearcherOnboardingForm() {
             if (res?.error) {
                 toast.error(res.error);
                 return;
+            }
+
+            try {
+                mixpanelTrack("Onboarding Completed", {
+                    "User ID": session?.user?.id,
+                    "User Name": session?.user?.name,
+                    "Name": res.name,
+                    "ID": res.id,
+                })
+            } catch (e) {
+                console.error("Error tracking mixpanel event:", e)
             }
 
             toast.success("Successfully updated researcher profile!");
