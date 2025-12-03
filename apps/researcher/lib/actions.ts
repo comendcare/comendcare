@@ -5,6 +5,7 @@ import {deleteTypeSenseDocument, logError} from "@comend/lib/utils";
 import {withResearcherAuth} from "~researcher/lib/auth";
 import {getSession, withAuth} from "@comend/lib/auth";
 import type {Researcher} from "@prisma/client";
+import {revalidatePath} from "next/cache";
 
 export const deleteResearcher = withResearcherAuth(
     async (researcher: Researcher, text: string) => {
@@ -203,6 +204,8 @@ export const updateResearcher = withAuth(
                     },
                 },
             });
+
+            revalidatePath("/profile")
 
             return response;
         } catch (error: any) {

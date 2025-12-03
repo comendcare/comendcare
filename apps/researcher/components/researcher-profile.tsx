@@ -101,10 +101,10 @@ export default function ResearcherProfile({
 
                                     <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600">
 
-                                        {researcherData?.affiliations[0].institution.name && (
+                                        {researcherData?.affiliations[0]?.institution?.name && (
                                             <div className="flex items-center gap-1">
                                                 <Building2 className="w-4 h-4"/>
-                                                <span>{researcherData?.affiliations[0].institution.name}</span>
+                                                <span>{researcherData?.affiliations[0]?.institution?.name}</span>
                                             </div>
                                         )}
 
