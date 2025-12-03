@@ -7,6 +7,7 @@ import {OAuthConfig} from "next-auth/providers/oauth";
 import {CustomPrismaAdapter} from "./custom-prisma-adapter";
 import sgMail from "@sendgrid/mail";
 import {cioIdentify} from "@comend/lib/customer-io-identify";
+import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
@@ -230,12 +231,21 @@ export const researcherAuthOptions: NextAuthOptions = {
             });
 
             if (!existingResearcher) {
-                await prisma.researcher.create({
+                const newResearcher = await prisma.researcher.create({
                     data: {
                         userId: user.id,
                         ...(orcid && { orcid }),
                     },
                 });
+                try {
+                    mixpanelTrack("Researcher Created", {
+                        "ID": newResearcher.id,
+                        "User ID": newResearcher.userId,
+                        "orcid": newResearcher.orcid
+                    })
+                } catch (e) {
+                    console.error("Error tracking mixpanel event:", e)
+                }
             } else if (orcid && !existingResearcher.orcid) {
                 // Optionally update ORCID on later ORCID logins
                 await prisma.researcher.update({
