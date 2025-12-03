@@ -1172,6 +1172,7 @@ export const DISEASE_MODEL_TYPE_OPTIONS: Option[] = [
   { value: 'IPSCS', label: 'iPSCs', group: 'Cell-based' },
   { value: 'STEM_CELLS', label: 'Stem cells', group: 'Cell-based' },
   { value: 'ORGANOIDS', label: 'Organoids', group: 'Cell-based' },
+  { value: 'OTHER_CELL', label: 'Other cell lines', group: 'Cell-based' },
 
   { value: 'OTHER', label: 'Other', group: 'Other' },
 ]

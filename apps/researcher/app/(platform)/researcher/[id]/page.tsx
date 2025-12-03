@@ -16,13 +16,22 @@ export default async function ResearcherProfilePage({
     let researcherData
     if (session?.user?.id) {
         const response = await getResearcher(
-            session.user.id, 
+            // session.user.id, 
             id,
             {
                 id: true,
                 orcid: true,
                 title: true,
-                user: true,
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                        createdAt: true,
+                        updatedAt: true,
+                    }
+                },
                 country: true,
                 description: true,
                 researchInterests: true,
@@ -41,6 +50,8 @@ export default async function ResearcherProfilePage({
             console.error(response.error)
         }
     }
+
+    console.log(`researcher data`, researcherData)
 
     let publications
     if (session?.user?.id) {

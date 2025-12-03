@@ -60,10 +60,10 @@ export function ResearcherSearchResults({
                                 //         ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/researcher/${researcher.id}`
                                 //         : `http://localhost:3000/app/researcher/${researcher.id}`
                                 // }
-                                href={`${linkBasePath}${researcher.id}`}
+                                href={`${linkBasePath}${researcher.user.id}`}
                                 className="flex flex-row gap-4 items-center"
                             >
-                                <ResearcherCard researcher={researcher}/>
+                                <ResearcherCard researcher={researcher} />
                             </Link>
                         ))}
                     </div>

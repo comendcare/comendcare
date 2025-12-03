@@ -70,8 +70,8 @@ export default function PublicResearcherProfile({
                 <div className="px-4 py-8">
                     <div className="flex flex-col md:flex-row gap-6">
                         <ProfilePhoto
-                            img={researcherData.user.image}
-                            name={researcherData.user.name ?? "No researcher name"}
+                            img={researcherData?.user?.image}
+                            name={researcherData?.user?.name ?? "No researcher name"}
                             className="h-32 w-32 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
                             textSize="large"
                         />
@@ -93,21 +93,21 @@ export default function PublicResearcherProfile({
                                         {researcherData?.institution && (
                                             <div className="flex items-center gap-1">
                                                 <Building2 className="w-4 h-4"/>
-                                                <span>{researcherData.institution}</span>
+                                                <span>{researcherData?.institution}</span>
                                             </div>
                                         )}
 
                                         {researcherData?.country && (
                                             <div className="flex items-center gap-1">
                                                 <MapPin className="w-4 h-4"/>
-                                                <span>{resolveCountry(researcherData.country)}</span>
+                                                <span>{resolveCountry(researcherData?.country)}</span>
                                             </div>
                                         )}
 
                                         {researcherData?.user?.email && (
                                             <div className="flex items-center gap-1">
                                                 <Mail className="w-4 h-4"/>
-                                                <span>{researcherData.user.email}</span>
+                                                <span>{researcherData?.user?.email}</span>
                                             </div>
                                         )}
 

@@ -70,8 +70,6 @@ export default function ResearcherProfile({
         )
     );
 
-    console.log("shit", researcherData.website)
-    console.log("shit", researcherData.website)
     return (
         <div className="max-w-7xl mx-auto flex flex-col py-4">
             <div className="bg-white border-b">
