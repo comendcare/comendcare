@@ -11,6 +11,7 @@ import {Button} from "@comend/components/ui/button";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import React from "react";
 import {Badge} from "@comend/components/ui/badge";
+import { SeeMoreDescription } from "@comend/components/see-more-description";
 
 const EditPagProfileAboutCardDialog = dynamic(
     () => import("~web/components/edit-pag-profile-about-card-dialog"),
@@ -57,7 +58,8 @@ export const PagProfileAboutCard = ({
             <CardContent>
                 <div className="flex flex-col space-y-4">
                     <div className="space-y-2">
-                        <p data-testid="about-description-value">{organization?.description}</p>
+                        {/* <p data-testid="about-description-value">{organization?.description}</p> */}
+                        <SeeMoreDescription description={organization?.description ?? ""} />
 
                         <div className="max-w-full overflow-hidden" data-testid="about-website-section">
                             {(isPrivate || (!isPrivate && organization?.website)) &&
