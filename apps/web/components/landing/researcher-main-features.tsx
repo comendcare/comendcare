@@ -130,7 +130,7 @@ export default function ResearcherMainFeatures() {
 
                         <ContentCard
                             title="Researcher profiles"
-                            description="Complete your researcher profile to join the Comend marketplace."
+                            description="Complete your profile to browse Comend’s marketplace.”"
                             className="mt-8"
                         />
                     </div>
