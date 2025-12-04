@@ -159,6 +159,12 @@ export default function AdminNav({children}: { children: ReactNode }) {
                 icon: <Building width={18}/>
             },
             {
+                name: "Researchers",
+                href: "/admin/researchers",
+                isActive: segments[0] === "researchers",
+                icon: <FlaskConical width={18}/>
+            },
+            {
                 name: "Settings",
                 href: "/admin/settings",
                 isActive: segments[0] === "settings",
