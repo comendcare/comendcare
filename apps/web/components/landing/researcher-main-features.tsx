@@ -9,6 +9,8 @@ import {Label} from "@comend/components/ui/label"
 import {Input} from "@comend/components/ui/input"
 import {Textarea} from "@comend/components/ui/textarea"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
+import Image from "next/image";
+import researcherProfileScreenshot from "@/public/screenshots/researcher-profile-screenshot.png"
 
 
 export default function ResearcherMainFeatures() {
@@ -41,7 +43,7 @@ export default function ResearcherMainFeatures() {
                 </div>
             </div> */}
 
-            <Tooltip delayDuration={0}>
+            {/* <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
                     <div className="h-[460px] w-full flex flex-col items-center">
                         <div className="bg-[#FFFFFF] h-full w-full flex flex-col items-center rounded-[26px] p-5 border overflow-hidden">
@@ -112,7 +114,28 @@ export default function ResearcherMainFeatures() {
                 <TooltipContent className="text-lg">
                     🎉 Coming soon!
                 </TooltipContent>
-            </Tooltip>
+            </Tooltip> */}
+
+            <div className="h-fit w-full flex flex-col items-center">
+                <div className="bg-[#FFFFFF] w-full flex flex-col items-center rounded-[26px] p-5 border overflow-hidden">
+                    <div className="relative w-full h-fit mt-5 flex flex-col items-center">
+                        <div className="space-y-3 z-10">
+                                <Image
+                                    src={researcherProfileScreenshot}
+                                    alt="Researcher profile screenshot"
+                                    // height={500}
+                                    className="rounded-[20px]"
+                                />
+                        </div>
+
+                        <ContentCard
+                            title="Researcher profiles"
+                            description="Complete your researcher profile to join the Comend marketplace."
+                            className="mt-8"
+                        />
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
