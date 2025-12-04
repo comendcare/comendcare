@@ -66,7 +66,7 @@ export default function LoginPage() {
     }, [session])
 
     return (
-        <div className="flex flex-col items-center justify-center space-y-2">
+        <div className="flex flex-col items-center justify-center space-y-4">
             <Link 
                 href={process.env.NEXT_PUBLIC_VERCEL_ENV ? `https://${rootDomain}/` : `http://${rootDomain}/`}
                 className="absolute top-0 left-0"
