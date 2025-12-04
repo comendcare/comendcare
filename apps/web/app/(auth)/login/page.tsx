@@ -7,7 +7,10 @@ import fullLogo from "@/public/logos/affiliations/comend-full-logo.svg"
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import ReCAPTCHA from "react-google-recaptcha";
+import Link from "next/link";
+import logo from "@/public/logo.png"
 
+const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN
 
 export default function LoginPage() {
     const {data: session} = useSession()
@@ -64,6 +67,12 @@ export default function LoginPage() {
 
     return (
         <div className="flex flex-col items-center justify-center space-y-4">
+            <Link 
+                href={process.env.NEXT_PUBLIC_VERCEL_ENV ? `https://${rootDomain}/` : `http://${rootDomain}/`}
+                className="absolute top-0 left-0"
+            >
+                <Image className="w-20 p-4 inline" src={logo} alt="Comend Logo"/>
+            </Link>
             <div
                 className="bg-neutral-50 dark:bg-neutral-700 no-underline group relative md:shadow-2xl shadow-zinc-900 rounded-full p-px text-[10px] sm:text-xs font-semibold leading-6  text-neutral-700 dark:text-neutral-300 inline-block w-fit mx-auto"
             >
@@ -94,7 +103,10 @@ export default function LoginPage() {
                         src={fullLogo}
                         quality={100}
                     />
-                    <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                    <h1 className="text-center text-3xl font-bold leading-9 tracking-tight text-gray-900">
+                        {`Patient Group Platform`}
+                    </h1>
+                    <h2 className="text-center text-xl font-bold leading-9 tracking-tight text-gray-900">
                         {`Sign in or create account`}
                     </h2>
                 </div>
