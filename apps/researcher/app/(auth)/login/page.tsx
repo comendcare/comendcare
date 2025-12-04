@@ -68,10 +68,11 @@ export default function LoginPage() {
     return (
         <div className="flex flex-col items-center justify-center space-y-4">
             <Link 
-                href={process.env.NEXT_PUBLIC_VERCEL_ENV ? `https://${rootDomain}/` : `http://${rootDomain}/`}
+                // href={process.env.NEXT_PUBLIC_VERCEL_ENV ? `https://${rootDomain}/` : `http://${rootDomain}/`}
+                href={"https://comend.io"}
                 className="absolute top-0 left-0"
             >
-                <Image className="w-20 p-4 inline" src={logo} alt="Comend Logo"/>
+                <Image className="w-16 p-4 inline" src={logo} alt="Comend Logo"/>
             </Link>
 
             <div
