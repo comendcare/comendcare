@@ -123,7 +123,7 @@ export default function ResearcherMainFeatures() {
                                 <Image
                                     src={researcherProfileScreenshot}
                                     alt="Researcher profile screenshot"
-                                    height={500}
+                                    // height={500}
                                     className="rounded-[20px]"
                                 />
                         </div>
