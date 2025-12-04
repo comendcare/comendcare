@@ -68,10 +68,11 @@ export default function LoginPage() {
     return (
         <div className="flex flex-col items-center justify-center space-y-4">
             <Link 
-                href={process.env.NEXT_PUBLIC_VERCEL_ENV ? `https://${rootDomain}/` : `http://${rootDomain}/`}
+                // href={process.env.NEXT_PUBLIC_VERCEL_ENV ? `https://${rootDomain}/` : `http://${rootDomain}/`}
+                href={"https://comend.io"}
                 className="absolute top-0 left-0"
             >
-                <Image className="w-20 p-4 inline" src={logo} alt="Comend Logo"/>
+                <Image className="w-16 p-4 inline" src={logo} alt="Comend Logo"/>
             </Link>
             <div
                 className="bg-neutral-50 dark:bg-neutral-700 no-underline group relative md:shadow-2xl shadow-zinc-900 rounded-full p-px text-[10px] sm:text-xs font-semibold leading-6  text-neutral-700 dark:text-neutral-300 inline-block w-fit mx-auto"
@@ -103,7 +104,7 @@ export default function LoginPage() {
                         src={fullLogo}
                         quality={100}
                     />
-                    <h1 className="text-center text-3xl font-bold leading-9 tracking-tight text-gray-900">
+                    <h1 className="text-center text-3xl font-bold leading-9 tracking-tight text-gray-900 px-2">
                         {`Patient Group Platform`}
                     </h1>
                     <h2 className="text-center text-xl font-bold leading-9 tracking-tight text-gray-900">

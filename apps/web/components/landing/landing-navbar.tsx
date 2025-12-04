@@ -322,11 +322,12 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible, pathname}) => {
                                 Sign up to create a profile, access our marketplace, and more.                            </h1>
                             <div className="flex flex-col gap-2">
                                 <Link
-                                    href={
-                                        process.env.NEXT_PUBLIC_NODE_ENV === "production"
-                                            ? "https://researcher.comend.io/login"
-                                            : `http://researcher.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
-                                    }
+                                    // href={
+                                    //     process.env.NEXT_PUBLIC_NODE_ENV === "production"
+                                    //         ? "https://researcher.comend.io/login"
+                                    //         : `http://researcher.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
+                                    // }
+                                    href="https://researcher.comend.io/login"
                                     className="w-full"
                                 >
                                     <Button
@@ -463,12 +464,15 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                                         Sign up to create a profile, access our marketplace, and more.
                                     </h1>
                                     <div className="flex flex-col gap-2">
-                                        <Link href="/researcher/login" className="w-full">
+                                        <Link 
+                                            href="https://researcher.comend.io/login"
+                                            className="w-full"
+                                        >
                                             <Button
                                                 variant="cta"
                                                 className="w-full justify-center"
                                             >
-                                                Researcher Log in
+                                                Researcher login
                                             </Button>
                                         </Link>
 
@@ -477,7 +481,7 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                                                 variant="cta"
                                                 className="w-full justify-center"
                                             >
-                                                Patient Group Log in
+                                                Patient group login
                                             </Button>
                                         </Link>
 
@@ -489,7 +493,7 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                                                 variant="outline"
                                                 className="w-full justify-center"
                                             >
-                                                Patient Group Sign up
+                                                Sign up your patient group
                                             </Button>
                                         </Link>
                                     </div>
