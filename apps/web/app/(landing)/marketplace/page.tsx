@@ -102,17 +102,6 @@ export default function MarketplacePage() {
     useEffect(() => {
         const init = async () => {
             console.log(`start init...`)
-            const parsedCROFilters = {
-                categories: [] as any[],
-                milestoneTypes: [] as any[],
-                types: [] as any[],
-                certifications: [] as any[],
-                tags: [] as any[],
-            }
-            await initializeCROSearch(parsedCROFilters)
-            setCROsInitialized(true)
-            console.log(`CRO search initialized...`)
-
             const parsedPAGFilters = {
                 genes: [] as any[],
                 conditions: [] as any[],
@@ -164,6 +153,17 @@ export default function MarketplacePage() {
             initializeRFPSearch(parsedRFPFilters)
             setRfpsInitialized(true)
             console.log(`RFP search initialized...`)
+            
+            const parsedCROFilters = {
+                categories: [] as any[],
+                milestoneTypes: [] as any[],
+                types: [] as any[],
+                certifications: [] as any[],
+                tags: [] as any[],
+            }
+            await initializeCROSearch(parsedCROFilters)
+            setCROsInitialized(true)
+            console.log(`CRO search initialized...`)
         }
 
         init()
@@ -263,38 +263,6 @@ export default function MarketplacePage() {
     return (
         <div className="flex flex-col w-full h-full mx-auto gap-8">
             <div className="flex flex-col gap-8">
-                <div className="flex flex-col gap-2">
-                    <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Service providers`}</h2>
-                        <BrowseAllSignInButton count={croStore.totalResults}/>
-                    </div>
-                    <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        {(crosInitialized && croStore.searchResults && croStore.searchResults.length > 0 )
-                            ? (
-                                <>
-                                    {croStore.searchResults?.slice(0, width < 1280 ? 2 : 3)
-                                        .map((cro, index) => (
-                                            <CROMarketplaceCard
-                                                cro={cro}
-                                                key={index}
-                                                location={"Marketplace"}
-                                                savedCompanyIds={new Set()}
-                                                disabled={true}
-                                            />
-                                    ))}
-                                </>
-                            )
-                            : (
-                                <>
-                                    <Skeleton className="h-[286px] w-full"/>
-                                    <Skeleton className="h-[286px] w-full"/>
-                                    {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
-                                </>
-                            )
-                        }
-                    </ol>
-                </div>
-
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Patient groups`}</h2>
@@ -509,6 +477,38 @@ export default function MarketplacePage() {
                                     <Skeleton className="h-[286px] w-full"/>
                                     <Skeleton className="h-[286px] w-full"/>
                                     <Skeleton className="h-[286px] w-full"/>
+                                </>
+                            )
+                        }
+                    </ol>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center gap-4">
+                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Service providers`}</h2>
+                        <BrowseAllSignInButton count={croStore.totalResults}/>
+                    </div>
+                    <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {(crosInitialized && croStore.searchResults && croStore.searchResults.length > 0 )
+                            ? (
+                                <>
+                                    {croStore.searchResults?.slice(0, width < 1280 ? 2 : 3)
+                                        .map((cro, index) => (
+                                            <CROMarketplaceCard
+                                                cro={cro}
+                                                key={index}
+                                                location={"Marketplace"}
+                                                savedCompanyIds={new Set()}
+                                                disabled={true}
+                                            />
+                                    ))}
+                                </>
+                            )
+                            : (
+                                <>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                    {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
                                 </>
                             )
                         }
