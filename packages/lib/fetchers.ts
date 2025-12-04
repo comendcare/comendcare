@@ -2147,23 +2147,22 @@ export const getResearcherFromUserID = withUserAuth(
     }
 )
 
-export const getResearcher = withUserAuth(
-    async (
-        userId: string,
-        researcherId: string,
-        select: Prisma.ResearcherSelect<InternalArgs & {
-            result: {};
-            model: {};
-            query: {};
-            client: {};
-        }>
-    ) => {
+export const getResearcher = async (
+    userId: string,
+    // researcherId: string,
+    select: Prisma.ResearcherSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>
+) => {
         const session = await getSession();
         if (!session?.user?.id) return {success: false, error: "No session or user id"};
 
         try {
             const fetchedResearcher = await prisma.researcher.findUnique({
-                where: {id: researcherId},
+                where: {userId},
                 select
             })
 
@@ -2180,7 +2179,7 @@ export const getResearcher = withUserAuth(
             return {success: false, error: "Internal server error"};
         }
     }
-)
+
 
 export const getResearcherRequest = withUserAuth(
     async (
