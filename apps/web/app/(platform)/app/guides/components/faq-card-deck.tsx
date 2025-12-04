@@ -52,7 +52,8 @@ export const cards = [
             },
             {
                 prompt: "Privacy policy",
-                href: "https://comend.notion.site/Librarey-s-Policies-98d960fe48e34b97a5bb5b152266ecc2"
+                // href: "https://comend.notion.site/Librarey-s-Policies-98d960fe48e34b97a5bb5b152266ecc2"
+                href: "https://comend.io/privacy-policy"
             },
             // {
             //     prompt: "Terms and conditions",

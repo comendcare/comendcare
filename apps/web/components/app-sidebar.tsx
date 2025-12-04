@@ -241,7 +241,8 @@ export function AppSidebar({memberships}: { memberships: MembershipWithOrganizat
                             </Link>
                             <p className="text-md">{'\u00B7'}</p>
                             <Link
-                                href="https://comend.notion.site/Comend-s-Policies-241801a6fddc801fb582d5d1b260c673?source=copy_link"
+                                // href="https://comend.notion.site/Comend-s-Policies-241801a6fddc801fb582d5d1b260c673?source=copy_link"
+                                href="https://comend.io/privacy-policy"
                                 className="text-xs hover:underline hover:text-primary">
                                 Privacy Policy
                             </Link>

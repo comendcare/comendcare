@@ -77,7 +77,9 @@ export default function LandingFooter() {
                             Terms of Services
                         </Link>
                         <Link
-                            href="https://comend.notion.site/Comend-s-Policies-241801a6fddc801fb582d5d1b260c673?source=copy_link">
+                            // href="https://comend.notion.site/Comend-s-Policies-241801a6fddc801fb582d5d1b260c673?source=copy_link">
+                            href="https://comend.io/privacy-policy"
+                        >
                             Privacy Policy
                         </Link>
                         <Link href="https://comend.io/security">
