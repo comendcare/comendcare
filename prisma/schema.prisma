@@ -1309,7 +1309,7 @@ model Affiliation {
   startDate     DateTime?
   endDate       DateTime?
 
-  researcher  Researcher  @relation(fields: [researcherId], references: [id])
+  researcher  Researcher  @relation(fields: [researcherId], references: [id], onDelete: Cascade)
   institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())

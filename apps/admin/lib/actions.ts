@@ -33,10 +33,7 @@ export const deleteResearcher = withAdminAuth(
                 return {success: false, error: "Researcher not found."};
             }
 
-            // Optional: enforce only owner can delete themselves
-            if (researcher.userId !== session.user.id) {
-                return {success: false, error: "Not authorized to delete this researcher."};
-            }
+            console.log(`GOT HERE!!!`)
 
             // Delete Typesense doc (index name: adjust if you use something else)
             const typesenseDelete = deleteTypeSenseDocument(
@@ -51,18 +48,27 @@ export const deleteResearcher = withAdminAuth(
                 "researchers"
             );
 
+            const researcherDelete = prisma.researcher.delete({
+                where: {id: researcher.id}
+            })
+
             // Delete the User; Prisma FK is on Researcher.userId with onDelete: Cascade,
             // so this will also delete the Researcher row.
-            const userDelete = prisma.user.delete({
-                where: {id: researcher.userId},
-            });
+            // const userDelete = prisma.user.delete({
+            //     where: {id: researcher.userId},
+            // });
 
-            const [deletedUser] = await Promise.all([
-                userDelete,
-                typesenseDelete,
-            ]);
+            // const [deletedUser] = await Promise.all([
+            //     userDelete,
+            //     typesenseDelete,
+            // ]);
 
-            return {success: true, data: deletedUser};
+            const [deleteResearcher] = await Promise.all([
+                researcherDelete,
+                typesenseDelete
+            ])
+
+            return {success: true, data: deleteResearcher};
         } catch (error: any) {
             logError("Error deleting researcher", error);
             return {success: false, error: error};

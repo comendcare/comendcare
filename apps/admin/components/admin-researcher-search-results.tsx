@@ -12,7 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "@comend/components/ui/button";
 import { Ellipsis, Trash } from "lucide-react";
 import { Dialog, DialogPortal } from "@comend/components/ui/dialog";
-import { DeleteResearcherDialogContent } from "@comend/components/delete-researcher-dialog-content"
+import { DeleteResearcherDialogContent } from "./delete-researcher-dialog-content";
 
 const selector = (state: ResearcherSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -74,34 +74,6 @@ export function AdminResearcherSearchResults() {
                                 key={index} 
                                 contextMenu={(
                                     <AdminResearcherContextMenu researcher={researcher} />
-                                    // <DropdownMenu modal={false}>
-                                    //     <DropdownMenuTrigger asChild>
-                                    //         <Button
-                                    //             onClick={(e) => {
-                                    //                 e.preventDefault()
-                                    //                 e.stopPropagation()
-                                    //                 // setIsOpen(true)
-                                    //             }}
-                                    //             variant="ghost"
-                                    //             className="p-2 justify-end h-full hover:bg-red-100"
-                                    //         >
-                                    //             <Ellipsis/>
-                                    //         </Button>
-                                    //     </DropdownMenuTrigger>
-                                    //     <DropdownMenuContent side="left" sideOffset={4} className="w-40 p-1">
-
-                                    //         <DropdownMenuItem
-                                    //             onClick={(e) => {
-                                    //                 e.preventDefault()
-                                    //                 // handleDelete()
-                                    //                 // setIsOpen(false)
-                                    //             }}
-                                    //         >
-                                    //             <Trash/>
-                                    //             Delete
-                                    //         </DropdownMenuItem>
-                                    //     </DropdownMenuContent>
-                                    // </DropdownMenu>
                                 )}
                             />
                         ))}

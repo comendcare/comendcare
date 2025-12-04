@@ -9,6 +9,7 @@ import {
     DialogTitle,
 } from "@comend/components/ui/dialog"
 import { DialogClose } from "@radix-ui/react-dialog"
+import { deleteResearcher } from "~admin/lib/actions"
 
 export function DeleteResearcherDialogContent({
     researcher
