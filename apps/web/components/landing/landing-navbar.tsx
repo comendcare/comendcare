@@ -460,7 +460,7 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                                 <Separator />
                                 <div className="flex flex-col space-y-4">
                                     <h1 className="mx-auto text-center">
-                                        Sign up to access the marketplace, manage requests, and more.
+                                        Sign up to create a profile, access our marketplace, and more.
                                     </h1>
                                     <div className="flex flex-col gap-2">
                                         <Link href="/researcher/login" className="w-full">
