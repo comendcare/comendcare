@@ -16,7 +16,7 @@ export default function ResearcherMainFeatures() {
 
     return (
         <div className="bg-[#FFFFFF] w-full flex max-w-7xl flex-col lg:flex-row items-center mx-auto p-8 gap-y-8 gap-x-8">
-            <div
+            {/* <div
                 className="bg-[#FFFFFF] h-[460px] w-full lg:w-2/5 flex flex-col items-stretch rounded-[26px] p-5 border overflow-hidden"
             >
                 <div className="relative flex flex-col h-full">
@@ -35,16 +35,15 @@ export default function ResearcherMainFeatures() {
                         </div>
                     </div>
 
-                    {/* ↓ This is the only real change: let this area flex instead of fixed h-full */}
                     <div className="w-full flex-1 min-h-0 mt-4">
                         <SkeletonFour />
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
-                    <div className="h-[460px] w-full lg:w-3/5 flex flex-col items-center">
+                    <div className="h-[460px] w-full flex flex-col items-center">
                         <div className="bg-[#FFFFFF] h-full w-full flex flex-col items-center rounded-[26px] p-5 border overflow-hidden">
                             <div className="relative w-full h-[293px] mt-5 flex flex-col items-center">
                                 <div className="absolute -left-[70px] scale-125 top-7 rotate-[12deg]">

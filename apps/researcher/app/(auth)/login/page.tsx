@@ -5,6 +5,12 @@ import {useRouter, useSearchParams} from "next/navigation";
 import ReCAPTCHA from "react-google-recaptcha";
 import {useSession} from "next-auth/react";
 import ResearcherLoginForm from "~researcher/components/login-form";
+import Image from "next/image"
+import Link from "next/link"
+import logo from "@/public/logo.png"
+import fullLogo from "@/public/logos/affiliations/comend-full-logo.svg"
+
+const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN
 
 export default function LoginPage() {
     const {data: session} = useSession()
@@ -60,7 +66,13 @@ export default function LoginPage() {
     }, [session])
 
     return (
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-center justify-center space-y-2">
+            <Link 
+                href={process.env.NEXT_PUBLIC_VERCEL_ENV ? `https://${rootDomain}/` : `http://${rootDomain}/`}
+                className="absolute top-0 left-0"
+            >
+                <Image className="w-20 p-4 inline" src={logo} alt="Comend Logo"/>
+            </Link>
 
             <div
                 className="mx-4 space-y-8 border border-stone-200 py-10 dark:border-stone-700 sm:mx-auto sm:w-full sm:max-w-lg sm:rounded-lg sm:shadow-md">
@@ -75,8 +87,16 @@ export default function LoginPage() {
                         src={fullLogo}
                         quality={100}
                     /> */}
+                    <Image
+                        alt="Comend"
+                        width={100}
+                        height={100}
+                        className="relative mx-auto h-12 w-auto dark:scale-110 dark:rounded-full dark:border dark:border-stone-400"
+                        src={fullLogo}
+                        quality={100}
+                    />
                     <h1 className="text-center text-3xl font-bold leading-9 tracking-tight text-gray-900">
-                        {`Comend Researcher Hub`}
+                        {`Researcher Hub`}
                     </h1>
                     <h2 className="text-center text-xl font-bold leading-9 tracking-tight text-gray-900">
                         {`Sign in or create account`}

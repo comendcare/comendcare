@@ -51,15 +51,16 @@ export default function ResearcherLoginForm({callback = "/", isCaptchaVerified =
     }, [error])
 
     return (
+        <>
         <div className="flex flex-col space-y-8">
             <Alert>
                 <CheckCircle2Icon />
                 <AlertTitle>
                     {`Please use an email address that others can use to reach you.`}
                 </AlertTitle>
-                <AlertDescription>
+                {/* <AlertDescription>
                     {`Don't use your personal account.`}
-                </AlertDescription>
+                </AlertDescription> */}
             </Alert>
             <Form {...form}>
                 <form className="space-y-2">
@@ -199,5 +200,6 @@ export default function ResearcherLoginForm({callback = "/", isCaptchaVerified =
                 {/*</Button>*/}
             </div>
         </div>
+        </>
     )
 }
