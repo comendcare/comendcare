@@ -15,23 +15,6 @@ export function DeleteResearcherDialogContent({
 }: {
     researcher: any
 }) {
-    // const handleDeleteMilestone = async (e: React.MouseEvent<HTMLElement>) => {
-    //     console.log(`handle Milestone delete...`, milestoneData?.nodeId)
-
-    //     await setSelectedNodeIds([])
-    //     await deleteNode(milestoneData?.nodeId)
-
-    //     toast(
-    //         <div className="flex justify-between items-center w-full">
-    //             <p className="font-semibold text-gray-900">
-    //                 {`Project Deleted`}
-    //             </p>
-    //             <Button className="self-end" onClick={handleUndo}>Undo Delete</Button>
-    //         </div>,
-    //         {position: "bottom-left", duration: 20000, id: "undo-toast"}
-    //     )
-    // }
-
     return (
         <DialogContent>
             <DialogHeader>
@@ -51,8 +34,9 @@ export function DeleteResearcherDialogContent({
                         <Button
                             type="button"
                             variant={"destructive"}
-                            onClick={() => {
-                                console.log(`Delete researcher...`)
+                            onClick={async () => {
+                                console.log(`Delete researcher...`, researcher)
+                                await deleteResearcher(researcher)
                             }}
                         >
                             Delete researcher

@@ -74,6 +74,34 @@ export function AdminResearcherSearchResults() {
                                 key={index} 
                                 contextMenu={(
                                     <AdminResearcherContextMenu researcher={researcher} />
+                                    // <DropdownMenu modal={false}>
+                                    //     <DropdownMenuTrigger asChild>
+                                    //         <Button
+                                    //             onClick={(e) => {
+                                    //                 e.preventDefault()
+                                    //                 e.stopPropagation()
+                                    //                 // setIsOpen(true)
+                                    //             }}
+                                    //             variant="ghost"
+                                    //             className="p-2 justify-end h-full hover:bg-red-100"
+                                    //         >
+                                    //             <Ellipsis/>
+                                    //         </Button>
+                                    //     </DropdownMenuTrigger>
+                                    //     <DropdownMenuContent side="left" sideOffset={4} className="w-40 p-1">
+
+                                    //         <DropdownMenuItem
+                                    //             onClick={(e) => {
+                                    //                 e.preventDefault()
+                                    //                 // handleDelete()
+                                    //                 // setIsOpen(false)
+                                    //             }}
+                                    //         >
+                                    //             <Trash/>
+                                    //             Delete
+                                    //         </DropdownMenuItem>
+                                    //     </DropdownMenuContent>
+                                    // </DropdownMenu>
                                 )}
                             />
                         ))}
@@ -121,6 +149,7 @@ const AdminResearcherContextMenu = ({researcher}: {researcher: any}) => {
                             e.preventDefault()
                             // handleDelete()
                             setIsOpen(false)
+                            setDeleteIsOpen(true)
                         }}
                     >
                         <Trash/>

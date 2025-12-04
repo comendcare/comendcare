@@ -23,11 +23,6 @@ export const ResearcherCard = ({
 
     return (
         <Card className="relative h-full w-full text-left flex flex-col gap-2">
-            {contextMenu && (
-                <div className="absolute top-0 right-0 p-2">
-                    {contextMenu}
-                </div>
-            )}
             <CardHeader className="gap-2 relative pb-2">
                 <div className="flex flex-row gap-2 items-start">
                     <ProfilePhoto img={researcher.user?.image} name={researcher.name || researcher.user?.name} className="h-9 w-9 -mt-1"/>
@@ -99,6 +94,12 @@ export const ResearcherCard = ({
                 )}
 
             </CardContent>
+            
+            {contextMenu && (
+                <div className="absolute top-0 right-0 p-2">
+                    {contextMenu}
+                </div>
+            )}
         </Card>
     );
 };
