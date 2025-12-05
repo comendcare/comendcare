@@ -9,14 +9,20 @@ import { Badge } from "@comend/components/ui/badge";
 import { PropertyBadge } from "@comend/components/property-badge";
 import { Building2, MapPin } from "lucide-react";
 
-export const ResearcherCard = ({researcher}: {researcher: any}) => {
+export const ResearcherCard = ({
+    researcher,
+    contextMenu,
+}: {
+    researcher: any,
+    contextMenu?: React.ReactNode
+}) => {
     const researchInterests: string[] = MILESTONE_TYPE_OPTIONS.filter((option: any) => researcher.researchInterests.includes(option.id)).map((option: any) => option.label)
     const therapeuticsOfInterest: string[] = MODALITIES.filter((option: any) => researcher.therapeuticsOfInterest.includes(option.value)).map((option: any) => option.label)
     const conditionsOfInterest: string[] = researcher.conditionsOfInterest
     const genesOfInterest: string[] = researcher.genesOfInterest
 
     return (
-        <Card className="h-full w-full text-left flex flex-col gap-2">
+        <Card className="relative h-full w-full text-left flex flex-col gap-2">
             <CardHeader className="gap-2 relative pb-2">
                 <div className="flex flex-row gap-2 items-start">
                     <ProfilePhoto img={researcher.user?.image} name={researcher.name || researcher.user?.name} className="h-9 w-9 -mt-1"/>
@@ -88,6 +94,12 @@ export const ResearcherCard = ({researcher}: {researcher: any}) => {
                 )}
 
             </CardContent>
+            
+            {contextMenu && (
+                <div className="absolute top-0 right-0 p-2">
+                    {contextMenu}
+                </div>
+            )}
         </Card>
     );
 };
