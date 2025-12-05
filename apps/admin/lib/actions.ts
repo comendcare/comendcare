@@ -1,11 +1,11 @@
 "use server"
 
 import prisma from "@comend/lib/prisma"
-import type {Company, Organization} from "@prisma/client"
+import type {Company, Organization, Researcher} from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withAdminAuth} from "./auth"
 import {getSession} from "@comend/lib/auth"
-import {addTypeSenseDocument, deleteTypeSenseDocument, updateTypeSenseDocument} from "@comend/lib/utils";
+import {addTypeSenseDocument, deleteTypeSenseDocument, logError, updateTypeSenseDocument} from "@comend/lib/utils";
 import {getCategoriesAndMilestones} from "@comend/lib/utils"
 import { JsonValue } from "@prisma/client/runtime/library"
 import {writeRawEvent} from "@comend/lib/raw-events";
@@ -19,6 +19,84 @@ export const getSessionInfo = async () => {
     const session = await getSession()
     return session
 }
+
+export const deleteResearcherOnly = withAdminAuth(
+    async (researcher: Researcher, text: string) => {
+        const session = await getSession();
+
+        try {
+            if (!session?.user?.id) return {success: false, error: "Session not found."}
+            if (!researcher) return {success: false, error: "Researcher not found."}
+
+            // Delete Typesense doc (index name: adjust if you use something else)
+            const typesenseDelete = deleteTypeSenseDocument(
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                (
+                    process.env.NEXT_PUBLIC_NODE_ENV === "development" ||
+                    process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                        : process.env.TYPESENSE_ADMIN_API_KEY
+                )!,
+                researcher.id,
+                "researchers"
+            );
+
+            const researcherDelete = prisma.researcher.delete({
+                where: {id: researcher.id}
+            })
+
+            const [deleteResearcher] = await Promise.all([
+                researcherDelete,
+                typesenseDelete
+            ])
+
+            return {success: true, data: deleteResearcher};
+        } catch (error: any) {
+            logError("Error deleting researcher", error);
+            return {success: false, error: error};
+        }
+    }
+);
+
+export const deleteResearcherAndUser = withAdminAuth(
+    async (researcher: Researcher, text: string) => {
+        const session = await getSession();
+
+        try {
+            if (!session?.user?.id) return {success: false, error: "Session not found."}
+            if (!researcher) return {success: false, error: "Researcher not found."}
+
+            // Delete Typesense doc (index name: adjust if you use something else)
+            const typesenseDelete = deleteTypeSenseDocument(
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                (
+                    process.env.NEXT_PUBLIC_NODE_ENV === "development" ||
+                    process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                        : process.env.TYPESENSE_ADMIN_API_KEY
+                )!,
+                researcher.id,
+                "researchers"
+            );
+
+            // Delete the User; Prisma FK is on Researcher.userId with onDelete: Cascade,
+            // so this will also delete the Researcher row.
+            const userDelete = prisma.user.delete({
+                where: {id: researcher.userId},
+            });
+
+            const [deletedUser] = await Promise.all([
+                userDelete,
+                typesenseDelete,
+            ]);
+
+            return {success: true, data: deletedUser};
+        } catch (error: any) {
+            logError("Error deleting researcher", error);
+            return {success: false, error: error};
+        }
+    }
+);
 
 // Invite user function with updated Organization model
 export const inviteUser = withAdminAuth(

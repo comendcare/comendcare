@@ -21,6 +21,23 @@ export default async function PlatformLayout({children}: PlatformLayoutProps) {
         redirect("/signed-out?reason=roleChanged");
     }
 
+    const rawEmail = session.user?.email;
+    if (!rawEmail) redirect("/signed-out?reason=no_email");
+
+    const email = rawEmail.toLowerCase();
+
+    // Targeted, parallel lookups (fast & index-friendly)
+    const [blacklistHit] = await Promise.all([
+        prisma.blacklist.findFirst({
+            where: { email: { equals: email, mode: "insensitive" } },
+            select: { email: true },
+        }),
+    ]);
+
+    const isBlacklisted = Boolean(blacklistHit);
+
+    if (isBlacklisted) redirect("/signed-out?reason=blacklisted");
+
     const [user] = await Promise.all([
         prisma.user.findUnique({
             where: { id: userId },
