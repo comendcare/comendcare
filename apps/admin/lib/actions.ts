@@ -20,20 +20,13 @@ export const getSessionInfo = async () => {
     return session
 }
 
-export const deleteResearcher = withAdminAuth(
+export const deleteResearcherOnly = withAdminAuth(
     async (researcher: Researcher, text: string) => {
         const session = await getSession();
 
         try {
-            if (!session?.user?.id) {
-                return {success: false, error: "Session not found."};
-            }
-
-            if (!researcher) {
-                return {success: false, error: "Researcher not found."};
-            }
-
-            console.log(`GOT HERE!!!`)
+            if (!session?.user?.id) return {success: false, error: "Session not found."}
+            if (!researcher) return {success: false, error: "Researcher not found."}
 
             // Delete Typesense doc (index name: adjust if you use something else)
             const typesenseDelete = deleteTypeSenseDocument(
@@ -48,17 +41,43 @@ export const deleteResearcher = withAdminAuth(
                 "researchers"
             );
 
-            console.log(`typesense researcher deleted`, typesenseDelete)
-            // const researcherDelete = prisma.researcher.delete({
-            //     where: {id: researcher.id}
-            // })
+            const researcherDelete = prisma.researcher.delete({
+                where: {id: researcher.id}
+            })
 
-            // const [deleteResearcher] = await Promise.all([
-            //     researcherDelete,
-            //     typesenseDelete
-            // ])
+            const [deleteResearcher] = await Promise.all([
+                researcherDelete,
+                typesenseDelete
+            ])
 
-            // return {success: true, data: deleteResearcher};
+            return {success: true, data: deleteResearcher};
+        } catch (error: any) {
+            logError("Error deleting researcher", error);
+            return {success: false, error: error};
+        }
+    }
+);
+
+export const deleteResearcherAndUser = withAdminAuth(
+    async (researcher: Researcher, text: string) => {
+        const session = await getSession();
+
+        try {
+            if (!session?.user?.id) return {success: false, error: "Session not found."}
+            if (!researcher) return {success: false, error: "Researcher not found."}
+
+            // Delete Typesense doc (index name: adjust if you use something else)
+            const typesenseDelete = deleteTypeSenseDocument(
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                (
+                    process.env.NEXT_PUBLIC_NODE_ENV === "development" ||
+                    process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                        : process.env.TYPESENSE_ADMIN_API_KEY
+                )!,
+                researcher.id,
+                "researchers"
+            );
 
             // Delete the User; Prisma FK is on Researcher.userId with onDelete: Cascade,
             // so this will also delete the Researcher row.
