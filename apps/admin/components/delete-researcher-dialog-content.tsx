@@ -21,6 +21,12 @@ import { Label } from "@comend/components/ui/label"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { Info } from "lucide-react"
 import { Badge } from "@comend/components/ui/badge"
+import { ResearcherSearchState, useResearcherSearchStore } from "@/state/search/researcherSearchStore"
+import { useShallow } from "zustand/react/shallow"
+
+const selector = (state: ResearcherSearchState) => ({
+    setSearchTerm: state.setSearchTerm,
+})
 
 const handleDeleteResearcherAndUser = async (researcher: Researcher) => {
     const response = await deleteResearcherAndUser(researcher)
@@ -48,6 +54,10 @@ export function DeleteResearcherDialogContent({
 
     const [researcherOnly, setResearcherOnly] = useState(true)
     const [isOnPagPlatform, setIsOnPagPlatform] = useState(false)
+
+    const {
+        setSearchTerm,
+    } = useResearcherSearchStore(useShallow(selector))
 
     useEffect(() => {
         const init = async () => {
@@ -178,6 +188,7 @@ export function DeleteResearcherDialogContent({
                                 } else {
                                     await handleDeleteResearcherAndUser(researcher)
                                 }
+                                setSearchTerm("")
                                 revalidate(pathname)
                                 router.refresh()
                             }}
