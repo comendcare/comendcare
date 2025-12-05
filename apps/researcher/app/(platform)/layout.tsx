@@ -25,7 +25,6 @@ export default async function PlatformLayout({children}: PlatformLayoutProps) {
     if (!rawEmail) redirect("/signed-out?reason=no_email");
 
     const email = rawEmail.toLowerCase();
-    const isCompanyEmail = email.endsWith("@comendcare.com");
 
     // Targeted, parallel lookups (fast & index-friendly)
     const [blacklistHit] = await Promise.all([
@@ -38,10 +37,6 @@ export default async function PlatformLayout({children}: PlatformLayoutProps) {
     const isBlacklisted = Boolean(blacklistHit);
 
     if (isBlacklisted) redirect("/signed-out?reason=blacklisted");
-
-    // Custom flags on the session (type these on your Session object)
-    if ((session as any).terminate) redirect("/signed-out?reason=terminated");
-    if ((session as any).roleChanged) redirect("/signed-out?reason=roleChanged");
 
     const [user] = await Promise.all([
         prisma.user.findUnique({
