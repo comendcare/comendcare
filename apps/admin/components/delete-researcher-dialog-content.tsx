@@ -10,12 +10,19 @@ import {
 } from "@comend/components/ui/dialog"
 import { DialogClose } from "@radix-ui/react-dialog"
 import { deleteResearcher } from "~admin/lib/actions"
+import { toast } from "sonner"
+import { usePathname } from "next/navigation"
+import { revalidate } from "@comend/lib/revalidate"
+import {useRouter} from "next/navigation"
 
 export function DeleteResearcherDialogContent({
     researcher
 }: {
     researcher: any
 }) {
+    const pathname = usePathname()
+    const router = useRouter()
+    
     return (
         <DialogContent>
             <DialogHeader>
@@ -36,8 +43,13 @@ export function DeleteResearcherDialogContent({
                             type="button"
                             variant={"destructive"}
                             onClick={async () => {
-                                console.log(`Delete researcher...`, researcher)
-                                await deleteResearcher(researcher)
+                                const response = await deleteResearcher(researcher)
+                                console.log(`researcher delete`, response)
+                                if (!response.success || response.error) {
+                                    toast.error(`Error deleting researcher: ${response.error}`)
+                                }
+                                revalidate(pathname)
+                                router.refresh()
                             }}
                         >
                             Delete researcher

@@ -48,27 +48,30 @@ export const deleteResearcher = withAdminAuth(
                 "researchers"
             );
 
-            const researcherDelete = prisma.researcher.delete({
-                where: {id: researcher.id}
-            })
+            console.log(`typesense researcher deleted`, typesenseDelete)
+            // const researcherDelete = prisma.researcher.delete({
+            //     where: {id: researcher.id}
+            // })
+
+            // const [deleteResearcher] = await Promise.all([
+            //     researcherDelete,
+            //     typesenseDelete
+            // ])
+
+            // return {success: true, data: deleteResearcher};
 
             // Delete the User; Prisma FK is on Researcher.userId with onDelete: Cascade,
             // so this will also delete the Researcher row.
-            // const userDelete = prisma.user.delete({
-            //     where: {id: researcher.userId},
-            // });
+            const userDelete = prisma.user.delete({
+                where: {id: researcher.userId},
+            });
 
-            // const [deletedUser] = await Promise.all([
-            //     userDelete,
-            //     typesenseDelete,
-            // ]);
+            const [deletedUser] = await Promise.all([
+                userDelete,
+                typesenseDelete,
+            ]);
 
-            const [deleteResearcher] = await Promise.all([
-                researcherDelete,
-                typesenseDelete
-            ])
-
-            return {success: true, data: deleteResearcher};
+            return {success: true, data: deletedUser};
         } catch (error: any) {
             logError("Error deleting researcher", error);
             return {success: false, error: error};
