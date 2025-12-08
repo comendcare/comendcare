@@ -1177,24 +1177,25 @@ export function EditMilestoneForm({
                                             </DialogTrigger>
                                             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
                                         </Dialog>
-                                        {isSaving ? (
-                                            <div className="w-[81px] flex justify-center items-center">
-                                                <LoadingDots />
-                                            </div>
-                                        ) : (
-                                            <Button
-                                                disabled={!form.formState.isValid}
-                                                variant={"cta"}
-                                                id="edit-milestone-scroll-area"
-                                                className="onborda-save-project"
-                                                type="submit"
-                                                onClick={async () => {
-                                                    await handleMilestoneFormSubmit(form.getValues())
-                                                }}
-                                            >
-                                                Save changes
-                                            </Button>
-                                        )}
+                                        <Button
+                                            disabled={!form.formState.isValid}
+                                            variant={"cta"}
+                                            id="edit-milestone-scroll-area"
+                                            className="onborda-save-project"
+                                            type="submit"
+                                            onClick={async () => {
+                                                await handleMilestoneFormSubmit(form.getValues())
+                                            }}
+                                        >
+                                            {isSaving 
+                                                ? (
+                                                    <div className="w-[81px] flex justify-center items-center">
+                                                        <LoadingDots/>
+                                                    </div>
+                                                ) 
+                                                : ("Save changes")
+                                            }
+                                        </Button>
                                     </span>
                                 </TabsContent>
                                 <TabsContent value="notes" className="space-y-6 w-full h-full">
