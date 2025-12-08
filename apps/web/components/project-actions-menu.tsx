@@ -8,7 +8,7 @@ import {
 } from "@comend/components/ui/dropdown-menu"
 import {Button} from "@comend/components/ui/button"
 import {useRef, useState} from "react"
-import {Milestone} from "@comend/lib/types"
+import {Milestone, MILESTONE_TYPE_OPTIONS} from "@comend/lib/types"
 import {RoadmapState, useRoadmapStore} from "./../state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import {Dialog, DialogContent, DialogPortal} from "@comend/components/ui/dialog"
@@ -20,6 +20,7 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@comend/components/ui/tooltip"
+import { EditMilestoneForm } from "./edit-milestone-form"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeIds: state.selectedNodeIds,
@@ -37,65 +38,19 @@ export const ProjectActionsMenu = ({
     organization?: Partial<Organization> 
 }) => {
     const [isOpen, setIsOpen] = useState(false)
+    const [editIsOpen, setEditIsOpen] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [shareIsOpen, setShareIsOpen] = useState(false)
-    const popoverRef = useRef<HTMLInputElement>(null)
-
-    const {setSelectedNodeIds, addMilestones} = useRoadmapStore(useShallow(selector))
-
-    const handleEdit = () => {
-        if (milestone.nodeId) setSelectedNodeIds([milestone.nodeId])
-    }
 
     const handleShare = async () => {
         // override default delete behaviour with our custom dialog
         setShareIsOpen(true)
     }
 
-    // const handleDuplicate = async () => {
-    //     const newNodes = await addMilestones([{
-    //         // nodeType: milestone.nodeType || milestone.nodeType,
-    //         // title: milestone.title,
-    //         // description: milestone.description,
-    //         // types: milestone.types || [],
-    //         // status: milestone.status,
-    //         // tools: milestone.tools,
-    //         // rfps: milestone.rfps,
-    //         // contacts: milestone.contacts,
-    //         ...milestone
-    //     }], "Duplicate")
-    //     if (newNodes && newNodes.length > 0) setSelectedNodeIds([newNodes[0].id])
-    // }
-
     const handleDelete = async () => {
         // override default delete behaviour with our custom dialog
         setDeleteIsOpen(true)
     }
-
-    // const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-    //     if (
-    //         popoverRef.current &&
-    //         !popoverRef.current.contains(event.target as Node)
-    //     ) {
-    //         setIsOpen(false);
-    //         popoverRef.current.blur();
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     if (isOpen) {
-    //         document.addEventListener('mousedown', handleClickOutside);
-    //         document.addEventListener('touchend', handleClickOutside);
-    //     } else {
-    //         document.removeEventListener('mousedown', handleClickOutside);
-    //         document.removeEventListener('touchend', handleClickOutside);
-    //     }
-
-    //     return () => {
-    //         document.removeEventListener('mousedown', handleClickOutside);
-    //         document.removeEventListener('touchend', handleClickOutside);
-    //     };
-    // }, [isOpen]);
 
     return (
         <>
@@ -117,7 +72,8 @@ export const ProjectActionsMenu = ({
                     <DropdownMenuItem
                         onClick={(e) => {
                             e.preventDefault()
-                            handleEdit()
+                            e.stopPropagation()
+                            setEditIsOpen(true)
                             setIsOpen(false)
                         }}
                     >
@@ -132,6 +88,7 @@ export const ProjectActionsMenu = ({
                                     onClick={(e) => {
                                         if (milestone.private) return
                                         e.preventDefault()
+                                        e.stopPropagation()
                                         handleShare()
                                         setIsOpen(false)
                                     }}
@@ -147,19 +104,10 @@ export const ProjectActionsMenu = ({
                             </TooltipContent>
                         )}
                     </Tooltip>
-                    {/*<DropdownMenuItem*/}
-                    {/*    onClick={(e) => {*/}
-                    {/*        e.preventDefault()*/}
-                    {/*        handleDuplicate()*/}
-                    {/*        setIsOpen(false)*/}
-                    {/*    }}*/}
-                    {/*>*/}
-                    {/*    <Copy/>*/}
-                    {/*    Duplicate*/}
-                    {/*</DropdownMenuItem>*/}
                     <DropdownMenuItem
                         onClick={(e) => {
                             e.preventDefault()
+                            e.stopPropagation()
                             handleDelete()
                             setIsOpen(false)
                         }}
@@ -214,6 +162,26 @@ export const ProjectActionsMenu = ({
                 <DialogPortal>
                     <div onClick={(e) => e.stopPropagation()}>
                         <DeleteMilestoneDialogContent milestoneData={milestone}/>
+                    </div>
+                </DialogPortal>
+            </Dialog>
+
+            <Dialog open={editIsOpen} onOpenChange={setEditIsOpen}>
+                <DialogPortal>
+                    <div onClick={(e) => e.stopPropagation()}>
+                    <DialogContent>
+                        <EditMilestoneForm 
+                            organization={undefined}
+                            milestoneData={milestone}
+                            orgIsPublished={true}
+                            biosampleOptions={[]}
+                            diseaseModelOptions={[]}
+                            clinicalDatasetOptions={[]}
+                            rfpOptions={[]}
+                            milestoneTypeOptions={MILESTONE_TYPE_OPTIONS}
+                            onClose={() => setEditIsOpen(false)}
+                        />
+                    </DialogContent>
                     </div>
                 </DialogPortal>
             </Dialog>
