@@ -93,6 +93,7 @@ import dynamic from "next/dynamic";
 import { SubmitCreateRequest } from "./create-facility-request-button"
 import { createCreateFacilityRequest, updateMilestones } from "@comend/lib/actions"
 import { revalidate } from "@comend/lib/revalidate"
+import LoadingDots from "@comend/components/icons/loading-dots"
 
 type PlateEditorProps = {
     value: any[];
@@ -222,9 +223,8 @@ export function EditMilestoneForm({
     onClose: () => void
 }) {
     const initializing = useRef(true)
-    const {data: session, status} = useSession()
+    const {data: session} = useSession()
     const pathname = usePathname()
-    const [isMigrating, setIsMigrating] = useState(false)
     const [fetchedTools, setFetchedTools] = useState<Option[]>([])
     const [tab, setTab] = useState<string>("edit")
     const [shareIsOpen, setShareIsOpen] = useState(false)
@@ -237,6 +237,7 @@ export function EditMilestoneForm({
     const [hasBudget, setHasBudget] = useState(milestoneData?.budget !== undefined && milestoneData?.budget !== null)
     const [hasStartDate, setHasStartDate] = useState(milestoneData?.startDate || false)
     const [hasEndDate, setHasEndDate] = useState(milestoneData?.endDate || false)
+    const [isSaving, setIsSaving] = useState(false)
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -335,6 +336,7 @@ export function EditMilestoneForm({
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         // if form state is not valid, don't submit
         if (!form.formState.isValid) return
+        setIsSaving(true)
 
         console.log(`START SAVING MILESTONE DATA`)
 
@@ -462,10 +464,11 @@ export function EditMilestoneForm({
                 {milestones: [{...updateData}]}
             )
             console.log(`revalidate milestone data`, response)    
-            revalidate(pathname)
+            await revalidate(pathname)
         }
 
-        setIsMigrating(false)
+        onClose()
+        setIsSaving(false)
     }
 
     const handleStorageFacilityAsyncSearch = async (query: string): Promise<Option[]> => {
@@ -496,10 +499,10 @@ export function EditMilestoneForm({
     }
 
     // memo ensures we're not creating a new debounce every time this is called
-    const debounceUpdates = useMemo(() =>
-            debounce((updatedValues) => handleMilestoneFormSubmitCallback(updatedValues), 500),
-        [handleMilestoneFormSubmitCallback]
-    )
+    // const debounceUpdates = useMemo(() =>
+    //         debounce((updatedValues) => handleMilestoneFormSubmitCallback(updatedValues), 500),
+    //     [handleMilestoneFormSubmitCallback]
+    // )
 
     const debounceMixpanelTrackBudget = useMemo(() =>
             debounce((updatedBudget) => {
@@ -597,10 +600,10 @@ export function EditMilestoneForm({
     }, [milestoneData])
 
     // Watch form changes, don't watch while initializing
-    useEffect(() => {
-        const subscription = form.watch((values) => debounceUpdates(values))
-        return () => subscription.unsubscribe();
-    }, [form.watch, debounceUpdates, form])
+    // useEffect(() => {
+    //     const subscription = form.watch((values) => debounceUpdates(values))
+    //     return () => subscription.unsubscribe();
+    // }, [form.watch, debounceUpdates, form])
 
     useEffect(() => {
         // Forces re-validation whenever the startDate or endDate changes
@@ -652,265 +655,330 @@ export function EditMilestoneForm({
                                     </TabsTrigger>
                                 </TabsList>
                             </div>
-                            {isMigrating ? (
-                                <Loading/>
-                            ) : (
-                                <>
-                                    <Separator/>
-                                    <TabsContent value="edit" className="space-y-6 w-full h-full">
-                                        <div className="w-full grid grid-cols-[100px_auto] gap-2 items-center">
-                                            <FormLabel>Visibility</FormLabel>
-                                            <div className="flex gap-2 justify-between items-center">
-                                                <PrivatePublicFormField
-                                                    form={form}
-                                                    formData={formData}
-                                                    // disabled={!orgIsPublished}
-                                                    mixpanelTrackCallback={(updatedIsPrivate) => {
-                                                        mixpanelTrack("Project Visibility Updated", {
-                                                            "ID": milestoneData.id,
-                                                            "Title": formData.title,
-                                                            "Visibility": updatedIsPrivate ? "Private" : "Published"
-                                                        })
-                                                    }}
-                                                />
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <div>
-                                                            <Button
-                                                                disabled={formData.isPrivate}
-                                                                onClick={(e) => {
-                                                                    if (formData.isPrivate) return
-                                                                    e.preventDefault()
-                                                                    handleShare()
-                                                                }}
-                                                                variant={'secondary'}
-                                                            >
-                                                                <Share/>
-                                                                Share
-                                                            </Button>
-                                                        </div>
-                                                    </TooltipTrigger>
-                                                    {formData.isPrivate && (
-                                                        <TooltipContent side={"top"}>
-                                                            <p>Publish project to share.</p>
-                                                        </TooltipContent>
-                                                    )}
-                                                </Tooltip>
-                                            </div>
+                            <>
+                                <Separator/>
+                                <TabsContent value="edit" className="space-y-6 w-full h-full">
+                                    <div className="w-full grid grid-cols-[100px_auto] gap-2 items-center">
+                                        <FormLabel>Visibility</FormLabel>
+                                        <div className="flex gap-2 justify-between items-center">
+                                            <PrivatePublicFormField
+                                                form={form}
+                                                formData={formData}
+                                                // disabled={!orgIsPublished}
+                                                mixpanelTrackCallback={(updatedIsPrivate) => {
+                                                    mixpanelTrack("Project Visibility Updated", {
+                                                        "ID": milestoneData.id,
+                                                        "Title": formData.title,
+                                                        "Visibility": updatedIsPrivate ? "Private" : "Published"
+                                                    })
+                                                }}
+                                            />
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <div>
+                                                        <Button
+                                                            disabled={formData.isPrivate}
+                                                            onClick={(e) => {
+                                                                if (formData.isPrivate) return
+                                                                e.preventDefault()
+                                                                handleShare()
+                                                            }}
+                                                            variant={'secondary'}
+                                                        >
+                                                            <Share/>
+                                                            Share
+                                                        </Button>
+                                                    </div>
+                                                </TooltipTrigger>
+                                                {formData.isPrivate && (
+                                                    <TooltipContent side={"top"}>
+                                                        <p>Publish project to share.</p>
+                                                    </TooltipContent>
+                                                )}
+                                            </Tooltip>
+                                        </div>
 
+                                        <FormField
+                                            control={form.control}
+                                            name="description"
+                                            render={({field}) => (
+                                                <>
+                                                    <FormLabel>{`Description`}</FormLabel>
+                                                    <div className="flex flex-col gap-2">
+                                                        <FormControl>
+                                                            <Textarea
+                                                                id="description"
+                                                                placeholder={`Enter a description...`}
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage/>
+                                                    </div>
+                                                </>
+                                            )}
+                                        />
+
+                                        <div>
+                                            <FormLabel>{`Project type`}</FormLabel>
+                                            {formData?.types?.length === 3 &&
+                                                <FormDescription>{`Maximum selection is 3 types.`}</FormDescription>}
+                                        </div>
+                                        <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypeOptions}/>
+
+                                        <FormLabel>{`Project status`}</FormLabel>
+                                        <StatusFormField
+                                            form={form}
+                                            mixpanelTrackCallback={(updatedStatus) => {
+                                                mixpanelTrack("Project Status Updated", {
+                                                    "ID": milestoneData.id,
+                                                    "Title": formData.title,
+                                                    "Status": updatedStatus
+                                                })
+                                            }}
+                                        />
+
+                                        <FormLabel>Linked tools</FormLabel>
+                                        <FormField
+                                            control={form.control}
+                                            name="tools"
+                                            render={({field}) => (
+                                                <FormItem className="w-full">
+                                                    <FormControl>
+                                                        <MultipleSelector
+                                                            value={field.value}
+                                                            onChange={field.onChange}
+                                                            defaultOptions={fetchedTools}
+                                                            options={fetchedTools}
+                                                            hidePlaceholderWhenSelected={true}
+                                                            showHoverCard={false}
+                                                            placeholder="Link tools"
+                                                            badgeClassName="border-transparent bg-green-100 text-green-900"
+                                                            emptyIndicator={
+                                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                                    no results found.
+                                                                </p>
+                                                            }
+                                                            groupBy={'type'}
+                                                            creatable={true}
+                                                            creatableItemOverride={() => (
+                                                                <div
+                                                                    className="w-full p-1 bg-white flex flex-col gap-1">
+                                                                    <Separator/>
+                                                                    <Button
+                                                                        value={undefined}
+                                                                        variant={'ghost'}
+                                                                        className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                        onMouseDown={(e) => {
+                                                                            e.preventDefault();
+                                                                            e.stopPropagation();
+                                                                        }}
+                                                                        onClick={() => setCreateBiosampleIsOpen(true)}
+                                                                    >
+                                                                        {`+ Create biosample`}
+                                                                    </Button>
+                                                                    <Button
+                                                                        value={undefined}
+                                                                        variant={'ghost'}
+                                                                        className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                        onMouseDown={(e) => {
+                                                                            e.preventDefault();
+                                                                            e.stopPropagation();
+                                                                        }}
+                                                                        onClick={() => setCreateDiseaseModelIsOpen(true)}
+                                                                    >
+                                                                        {`+ Create Disease Model`}
+                                                                    </Button>
+                                                                    <Button
+                                                                        value={undefined}
+                                                                        variant={'ghost'}
+                                                                        className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                        onMouseDown={(e) => {
+                                                                            e.preventDefault();
+                                                                            e.stopPropagation();
+                                                                        }}
+                                                                        onClick={() => setCreateClinicalDatasetIsOpen(true)}
+                                                                    >
+                                                                        {`+ Create Clinical Dataset`}
+                                                                    </Button>
+                                                                </div>
+                                                            )}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage className="text-primary"/>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormLabel>Linked RFPs</FormLabel>
+                                        <FormField
+                                            control={form.control}
+                                            name="rfps"
+                                            render={({field}) => (
+                                                <FormItem className="w-full">
+                                                    <FormControl>
+                                                        <MultipleSelector
+                                                            value={field.value?.map(rfp => ({
+                                                                ...rfp,
+                                                                value: rfp.id,
+                                                                label: rfp.title,
+                                                                icon: 'megaphone'
+                                                            } as Option))}
+                                                            onChange={field.onChange}
+                                                            defaultOptions={rfpOptions?.map(rfp => ({
+                                                                ...rfp,
+                                                                value: rfp.id,
+                                                                label: rfp.title,
+                                                            } as Option))}
+                                                            options={rfpOptions?.map(rfp => ({
+                                                                ...rfp,
+                                                                value: rfp.id,
+                                                                label: rfp.title
+                                                            } as Option))}
+                                                            hidePlaceholderWhenSelected={true}
+                                                            badgeClassName="border-transparent bg-orange-100 text-orange-900"
+                                                            showHoverCard={false}
+                                                            placeholder="Link RFPs"
+                                                            emptyIndicator={
+                                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                                    no results found.
+                                                                </p>
+                                                            }
+                                                            creatable={true}
+                                                            creatableItemOverride={() => (
+                                                                <div
+                                                                    className="w-full px-1 pb-1 flex flex-col gap-1">
+                                                                    <Separator/>
+                                                                    <Button
+                                                                        value={undefined}
+                                                                        variant={'ghost'}
+                                                                        className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                        onMouseDown={(e) => {
+                                                                            e.preventDefault();
+                                                                            e.stopPropagation();
+                                                                        }}
+                                                                        onClick={() => setCreateRFPIsOpen(true)}
+                                                                    >
+                                                                        {`+ Create RFP`}
+                                                                    </Button>
+                                                                </div>
+                                                            )}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage className="text-primary"/>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        {hasBudget && (
+                                            <>
+                                                <FormLabel>{`Budget`}</FormLabel>
+                                                <span className="w-full flex gap-2">
+                                                    <div className="w-full grow">
+                                                        <BudgetFormField
+                                                            form={form}
+                                                            mixpanelTrackCallback={(updatedBudget) =>
+                                                                debounceMixpanelTrackBudget(updatedBudget)
+                                                            }
+                                                        />
+                                                    </div>
+                                                    <Button
+                                                        variant="secondary"
+                                                        size={'icon'}
+                                                        className="h-[32px] min-w-[32px]"
+                                                        onClick={() => {
+                                                            form.setValue('budget', undefined, {shouldValidate: true})
+                                                            setHasBudget(false)
+                                                        }}
+                                                    >
+                                                        <Trash/>
+                                                    </Button>
+                                                </span>
+                                            </>
+                                        )}
+
+                                        {hasStartDate && (
                                             <FormField
                                                 control={form.control}
-                                                name="description"
+                                                name="startDate"
                                                 render={({field}) => (
                                                     <>
-                                                        <FormLabel>{`Description`}</FormLabel>
-                                                        <div className="flex flex-col gap-2">
-                                                            <FormControl>
-                                                                <Textarea
-                                                                    id="description"
-                                                                    placeholder={`Enter a description...`}
-                                                                    {...field}
-                                                                />
-                                                            </FormControl>
-                                                            <FormMessage/>
+                                                        <FormLabel>{'Start date'}</FormLabel>
+                                                        <div className="flex gap-2">
+                                                            <Select
+                                                                defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
+                                                                onValueChange={(value) => {
+                                                                    const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
+                                                                    const monthIndex = monthsList.indexOf(value)
+                                                                    const newStartDate: Date = new Date(previousStartDate.setMonth(monthIndex))
+                                                                    form.setValue('startDate', newStartDate, {shouldValidate: true})
+                                                                }}
+                                                            >
+                                                                <FormControl>
+                                                                    <SelectTrigger className="h-[32px]">
+                                                                        <SelectValue placeholder="Month"/>
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    {monthsList.map(
+                                                                        (
+                                                                            month: string,
+                                                                            index: number
+                                                                        ) => (
+                                                                            <SelectItem
+                                                                                value={month}
+                                                                                key={index}
+                                                                            >
+                                                                                {month}
+                                                                            </SelectItem>
+                                                                        )
+                                                                    )}
+                                                                </SelectContent>
+                                                            </Select>
+
+                                                            <Input
+                                                                placeholder="Year"
+                                                                maxLength={4}
+                                                                defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
+                                                                onChange={(event) => {
+                                                                    const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
+                                                                    const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
+                                                                    form.setValue('startDate', newStartDate, {shouldValidate: true})
+                                                                }}
+                                                            />
+
+                                                            <Button
+                                                                variant={'secondary'}
+                                                                size={'icon'}
+                                                                className="h-[32px] min-w-[32px]"
+                                                                onClick={() => {
+                                                                    form.setValue('startDate', undefined, {shouldValidate: true})
+                                                                    setHasStartDate(false)
+                                                                }}
+                                                            >
+                                                                <Trash/>
+                                                            </Button>
                                                         </div>
                                                     </>
                                                 )}
                                             />
+                                        )}
 
-                                            <div>
-                                                <FormLabel>{`Project type`}</FormLabel>
-                                                {formData?.types?.length === 3 &&
-                                                    <FormDescription>{`Maximum selection is 3 types.`}</FormDescription>}
-                                            </div>
-                                            <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypeOptions}/>
-
-                                            <FormLabel>{`Project status`}</FormLabel>
-                                            <StatusFormField
-                                                form={form}
-                                                mixpanelTrackCallback={(updatedStatus) => {
-                                                    mixpanelTrack("Project Status Updated", {
-                                                        "ID": milestoneData.id,
-                                                        "Title": formData.title,
-                                                        "Status": updatedStatus
-                                                    })
-                                                }}
-                                            />
-
-                                            <FormLabel>Linked tools</FormLabel>
+                                        {hasEndDate && (
                                             <FormField
                                                 control={form.control}
-                                                name="tools"
+                                                name="endDate"
                                                 render={({field}) => (
-                                                    <FormItem className="w-full">
-                                                        <FormControl>
-                                                            <MultipleSelector
-                                                                value={field.value}
-                                                                onChange={field.onChange}
-                                                                defaultOptions={fetchedTools}
-                                                                options={fetchedTools}
-                                                                hidePlaceholderWhenSelected={true}
-                                                                showHoverCard={false}
-                                                                placeholder="Link tools"
-                                                                badgeClassName="border-transparent bg-green-100 text-green-900"
-                                                                emptyIndicator={
-                                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                                        no results found.
-                                                                    </p>
-                                                                }
-                                                                groupBy={'type'}
-                                                                creatable={true}
-                                                                creatableItemOverride={() => (
-                                                                    <div
-                                                                        className="w-full p-1 bg-white flex flex-col gap-1">
-                                                                        <Separator/>
-                                                                        <Button
-                                                                            value={undefined}
-                                                                            variant={'ghost'}
-                                                                            className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
-                                                                            onMouseDown={(e) => {
-                                                                                e.preventDefault();
-                                                                                e.stopPropagation();
-                                                                            }}
-                                                                            onClick={() => setCreateBiosampleIsOpen(true)}
-                                                                        >
-                                                                            {`+ Create biosample`}
-                                                                        </Button>
-                                                                        <Button
-                                                                            value={undefined}
-                                                                            variant={'ghost'}
-                                                                            className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
-                                                                            onMouseDown={(e) => {
-                                                                                e.preventDefault();
-                                                                                e.stopPropagation();
-                                                                            }}
-                                                                            onClick={() => setCreateDiseaseModelIsOpen(true)}
-                                                                        >
-                                                                            {`+ Create Disease Model`}
-                                                                        </Button>
-                                                                        <Button
-                                                                            value={undefined}
-                                                                            variant={'ghost'}
-                                                                            className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
-                                                                            onMouseDown={(e) => {
-                                                                                e.preventDefault();
-                                                                                e.stopPropagation();
-                                                                            }}
-                                                                            onClick={() => setCreateClinicalDatasetIsOpen(true)}
-                                                                        >
-                                                                            {`+ Create Clinical Dataset`}
-                                                                        </Button>
-                                                                    </div>
-                                                                )}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage className="text-primary"/>
-                                                    </FormItem>
-                                                )}
-                                            />
-
-                                            <FormLabel>Linked RFPs</FormLabel>
-                                            <FormField
-                                                control={form.control}
-                                                name="rfps"
-                                                render={({field}) => (
-                                                    <FormItem className="w-full">
-                                                        <FormControl>
-                                                            <MultipleSelector
-                                                                value={field.value?.map(rfp => ({
-                                                                    ...rfp,
-                                                                    value: rfp.id,
-                                                                    label: rfp.title,
-                                                                    icon: 'megaphone'
-                                                                } as Option))}
-                                                                onChange={field.onChange}
-                                                                defaultOptions={rfpOptions?.map(rfp => ({
-                                                                    ...rfp,
-                                                                    value: rfp.id,
-                                                                    label: rfp.title,
-                                                                } as Option))}
-                                                                options={rfpOptions?.map(rfp => ({
-                                                                    ...rfp,
-                                                                    value: rfp.id,
-                                                                    label: rfp.title
-                                                                } as Option))}
-                                                                hidePlaceholderWhenSelected={true}
-                                                                badgeClassName="border-transparent bg-orange-100 text-orange-900"
-                                                                showHoverCard={false}
-                                                                placeholder="Link RFPs"
-                                                                emptyIndicator={
-                                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                                        no results found.
-                                                                    </p>
-                                                                }
-                                                                creatable={true}
-                                                                creatableItemOverride={() => (
-                                                                    <div
-                                                                        className="w-full px-1 pb-1 flex flex-col gap-1">
-                                                                        <Separator/>
-                                                                        <Button
-                                                                            value={undefined}
-                                                                            variant={'ghost'}
-                                                                            className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
-                                                                            onMouseDown={(e) => {
-                                                                                e.preventDefault();
-                                                                                e.stopPropagation();
-                                                                            }}
-                                                                            onClick={() => setCreateRFPIsOpen(true)}
-                                                                        >
-                                                                            {`+ Create RFP`}
-                                                                        </Button>
-                                                                    </div>
-                                                                )}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage className="text-primary"/>
-                                                    </FormItem>
-                                                )}
-                                            />
-
-                                            {hasBudget && (
-                                                <>
-                                                    <FormLabel>{`Budget`}</FormLabel>
-                                                    <span className="w-full flex gap-2">
-                                                        <div className="w-full grow">
-                                                            <BudgetFormField
-                                                                form={form}
-                                                                mixpanelTrackCallback={(updatedBudget) =>
-                                                                    debounceMixpanelTrackBudget(updatedBudget)
-                                                                }
-                                                            />
-                                                        </div>
-                                                        <Button
-                                                            variant="secondary"
-                                                            size={'icon'}
-                                                            className="h-[32px] min-w-[32px]"
-                                                            onClick={() => {
-                                                                form.setValue('budget', undefined, {shouldValidate: true})
-                                                                setHasBudget(false)
-                                                            }}
-                                                        >
-                                                            <Trash/>
-                                                        </Button>
-                                                    </span>
-                                                </>
-                                            )}
-
-                                            {hasStartDate && (
-                                                <FormField
-                                                    control={form.control}
-                                                    name="startDate"
-                                                    render={({field}) => (
-                                                        <>
-                                                            <FormLabel>{'Start date'}</FormLabel>
+                                                    <>
+                                                        <FormLabel>{'End date'}</FormLabel>
+                                                        <div className="flex flex-col gap-2">
                                                             <div className="flex gap-2">
                                                                 <Select
                                                                     defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
                                                                     onValueChange={(value) => {
-                                                                        const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
+                                                                        const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
                                                                         const monthIndex = monthsList.indexOf(value)
-                                                                        const newStartDate: Date = new Date(previousStartDate.setMonth(monthIndex))
-                                                                        form.setValue('startDate', newStartDate, {shouldValidate: true})
+                                                                        const newEndDate: Date = new Date(previousEndDate.setMonth(monthIndex))
+                                                                        form.setValue('endDate', newEndDate, {shouldValidate: true})
                                                                     }}
                                                                 >
                                                                     <FormControl>
@@ -940,9 +1008,9 @@ export function EditMilestoneForm({
                                                                     maxLength={4}
                                                                     defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
                                                                     onChange={(event) => {
-                                                                        const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
-                                                                        const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
-                                                                        form.setValue('startDate', newStartDate, {shouldValidate: true})
+                                                                        const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
+                                                                        const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
+                                                                        form.setValue('endDate', newEndDate, {shouldValidate: true})
                                                                     }}
                                                                 />
 
@@ -951,232 +1019,169 @@ export function EditMilestoneForm({
                                                                     size={'icon'}
                                                                     className="h-[32px] min-w-[32px]"
                                                                     onClick={() => {
-                                                                        form.setValue('startDate', undefined, {shouldValidate: true})
-                                                                        setHasStartDate(false)
+                                                                        form.setValue('endDate', undefined, {shouldValidate: true})
+                                                                        setHasEndDate(false)
                                                                     }}
                                                                 >
                                                                     <Trash/>
                                                                 </Button>
                                                             </div>
-                                                        </>
-                                                    )}
-                                                />
-                                            )}
-
-                                            {hasEndDate && (
-                                                <FormField
-                                                    control={form.control}
-                                                    name="endDate"
-                                                    render={({field}) => (
-                                                        <>
-                                                            <FormLabel>{'End date'}</FormLabel>
-                                                            <div className="flex flex-col gap-2">
-                                                                <div className="flex gap-2">
-                                                                    <Select
-                                                                        defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
-                                                                        onValueChange={(value) => {
-                                                                            const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
-                                                                            const monthIndex = monthsList.indexOf(value)
-                                                                            const newEndDate: Date = new Date(previousEndDate.setMonth(monthIndex))
-                                                                            form.setValue('endDate', newEndDate, {shouldValidate: true})
-                                                                        }}
-                                                                    >
-                                                                        <FormControl>
-                                                                            <SelectTrigger className="h-[32px]">
-                                                                                <SelectValue placeholder="Month"/>
-                                                                            </SelectTrigger>
-                                                                        </FormControl>
-                                                                        <SelectContent>
-                                                                            {monthsList.map(
-                                                                                (
-                                                                                    month: string,
-                                                                                    index: number
-                                                                                ) => (
-                                                                                    <SelectItem
-                                                                                        value={month}
-                                                                                        key={index}
-                                                                                    >
-                                                                                        {month}
-                                                                                    </SelectItem>
-                                                                                )
-                                                                            )}
-                                                                        </SelectContent>
-                                                                    </Select>
-
-                                                                    <Input
-                                                                        placeholder="Year"
-                                                                        maxLength={4}
-                                                                        defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
-                                                                        onChange={(event) => {
-                                                                            const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
-                                                                            const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
-                                                                            form.setValue('endDate', newEndDate, {shouldValidate: true})
-                                                                        }}
-                                                                    />
-
-                                                                    <Button
-                                                                        variant={'secondary'}
-                                                                        size={'icon'}
-                                                                        className="h-[32px] min-w-[32px]"
-                                                                        onClick={() => {
-                                                                            form.setValue('endDate', undefined, {shouldValidate: true})
-                                                                            setHasEndDate(false)
-                                                                        }}
-                                                                    >
-                                                                        <Trash/>
-                                                                    </Button>
-                                                                </div>
-                                                                <FormMessage/>
-                                                            </div>
-                                                        </>
-                                                    )}
-                                                />
-                                            )}
-
-                                            <FormField
-                                                control={form.control}
-                                                name="partners"
-                                                render={({field}) => (
-                                                    <>
-                                                        <FormLabel>Partners</FormLabel>
-                                                        <span className="w-full flex gap-2">
-                                                            <FormControl className="w-full">
-                                                                <MultipleSelector
-                                                                    {...field}
-                                                                    ref={storageFacilityRef}
-                                                                    creatable={true}
-                                                                    createOnBlur={false}
-                                                                    creatableItemOverride={(props) => (
-                                                                        <SubmitCreateRequest
-                                                                            {...props}
-                                                                            parentRef={storageFacilityRef}
-                                                                            onClickCallback={async (e) => {
-                                                                                e.preventDefault()
-                                                                                e.stopPropagation()
-                                                                                const newRequest = await createCreateFacilityRequest(
-                                                                                    session?.user.organizationId,
-                                                                                    {
-                                                                                        name: props.inputValue,
-                                                                                        milestoneId: milestoneData.id
-                                                                                    }
-                                                                                )
-                                                                                setCreateRequests(prev => [...prev, newRequest])
-                                                                            }}
-                                                                        />
-                                                                    )}
-                                                                    triggerSearchOnFocus={true}
-                                                                    onSearch={handleStorageFacilityAsyncSearch}
-                                                                    placeholder="Search..."
-                                                                    hidePlaceholderWhenSelected={true}
-                                                                    loadingIndicator={<p>Loading results...</p>}
-                                                                    emptyIndicator={<p>No results found. Try a different search.</p>}
-                                                                    showHoverCard={false}
-                                                                    className="w-full min-h-[40px]"
-                                                                />
-                                                            </FormControl>
                                                             <FormMessage/>
-                                                        </span>
+                                                        </div>
                                                     </>
                                                 )}
                                             />
-                                            
-                                            {/* spacer */}
-                                            <div></div> 
+                                        )}
 
-                                            <div className="flex flex-col gap-2">
-                                                {createRequests.map((request, index) => (
-                                                    <Badge className="w-full text-sm font-normal" key={index}>{`Creation request for "${request?.name}" submitted.`}</Badge>
-                                                ))}
-                                            </div>
+                                        <FormField
+                                            control={form.control}
+                                            name="partners"
+                                            render={({field}) => (
+                                                <>
+                                                    <FormLabel>Partners</FormLabel>
+                                                    <span className="w-full flex gap-2">
+                                                        <FormControl className="w-full">
+                                                            <MultipleSelector
+                                                                {...field}
+                                                                ref={storageFacilityRef}
+                                                                creatable={true}
+                                                                createOnBlur={false}
+                                                                creatableItemOverride={(props) => (
+                                                                    <SubmitCreateRequest
+                                                                        {...props}
+                                                                        parentRef={storageFacilityRef}
+                                                                        onClickCallback={async (e) => {
+                                                                            e.preventDefault()
+                                                                            e.stopPropagation()
+                                                                            const newRequest = await createCreateFacilityRequest(
+                                                                                session?.user.organizationId,
+                                                                                {
+                                                                                    name: props.inputValue,
+                                                                                    milestoneId: milestoneData.id
+                                                                                }
+                                                                            )
+                                                                            setCreateRequests(prev => [...prev, newRequest])
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                                triggerSearchOnFocus={true}
+                                                                onSearch={handleStorageFacilityAsyncSearch}
+                                                                placeholder="Search..."
+                                                                hidePlaceholderWhenSelected={true}
+                                                                loadingIndicator={<p>Loading results...</p>}
+                                                                emptyIndicator={<p>No results found. Try a different search.</p>}
+                                                                showHoverCard={false}
+                                                                className="w-full min-h-[40px]"
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage/>
+                                                    </span>
+                                                </>
+                                            )}
+                                        />
+                                        
+                                        {/* spacer */}
+                                        <div></div> 
+
+                                        <div className="flex flex-col gap-2">
+                                            {createRequests.map((request, index) => (
+                                                <Badge className="w-full text-sm font-normal" key={index}>{`Creation request for "${request?.name}" submitted.`}</Badge>
+                                            ))}
                                         </div>
+                                    </div>
 
-                                        {(formData?.contacts && formData?.contacts.length > 0) && (
-                                            <ContactsFormField form={form}/>
-                                        )}
+                                    {(formData?.contacts && formData?.contacts.length > 0) && (
+                                        <ContactsFormField form={form}/>
+                                    )}
 
-                                        {(formData?.attachments && formData?.attachments.length > 0) && (
-                                            <AttachmentsFormField form={form}/>
-                                        )}
+                                    {(formData?.attachments && formData?.attachments.length > 0) && (
+                                        <AttachmentsFormField form={form}/>
+                                    )}
 
-                                        {(
-                                            !hasBudget ||
-                                            !hasStartDate ||
-                                            !hasEndDate ||
-                                            !(formData?.contacts && formData?.contacts.length > 0) ||
-                                            !(formData?.attachments && formData?.attachments.length > 0)
-                                        ) && (
-                                            <>
-                                                {/* <FormLabel>Additional Properties</FormLabel> */}
-                                                <span className="flex flex-wrap gap-2">
-                                                    {(!hasBudget) && (
-                                                        <Button
-                                                            onClick={() => setHasBudget(true)}
-                                                            variant={'secondary'}
-                                                            className="p-2 max-h-[28px]"
-                                                        >
-                                                            {'+ Add budget'}
-                                                        </Button>
-                                                    )}
-                                                    {(!hasStartDate) && (
-                                                        <Button
-                                                            onClick={() => setHasStartDate(true)}
-                                                            variant={'secondary'}
-                                                            className="p-2 max-h-[28px]"
-                                                        >
-                                                            {'+ Add start date'}
-                                                        </Button>
-                                                    )}
-                                                    {(!hasEndDate) && (
-                                                        <Button
-                                                            onClick={() => setHasEndDate(true)}
-                                                            variant={'secondary'}
-                                                            className="p-2 max-h-[28px]"
-                                                        >
-                                                            {'+ Add end date'}
-                                                        </Button>
-                                                    )}
-                                                    {(!formData?.contacts || formData?.contacts.length <= 0) && (
-                                                        <Button
-                                                            onClick={() => {
-                                                                form.setValue("contacts", [
-                                                                    {name: "", email: "", role: null}
-                                                                ])
-                                                            }}
-                                                            variant={'secondary'}
-                                                            className="p-2 max-h-[28px]"
-                                                        >
-                                                            {'+ Add contacts'}
-                                                        </Button>
-                                                    )}
-                                                    {(!formData?.attachments || formData?.attachments.length <= 0) && (
-                                                        <Button
-                                                            onClick={() => {
-                                                                form.setValue("attachments", [
-                                                                    {name: '', link: ''} as any
-                                                                ])
-                                                            }}
-                                                            variant={'secondary'}
-                                                            className="p-2 max-h-[28px]"
-                                                        >
-                                                            {'+ Add links'}
-                                                        </Button>
-                                                    )}
-                                                </span>
-                                            </>
-                                        )}
-
-                                        <span className="h-8"/>
-
-                                        <span
-                                            className="flex justify-end gap-4 flex-wrap absolute bottom-2 right-0 m-4">
-                                            <Dialog>
-                                                <DialogTrigger asChild>
-                                                    <Button type="button" variant="destructive">
-                                                        Delete project
+                                    {(
+                                        !hasBudget ||
+                                        !hasStartDate ||
+                                        !hasEndDate ||
+                                        !(formData?.contacts && formData?.contacts.length > 0) ||
+                                        !(formData?.attachments && formData?.attachments.length > 0)
+                                    ) && (
+                                        <>
+                                            {/* <FormLabel>Additional Properties</FormLabel> */}
+                                            <span className="flex flex-wrap gap-2">
+                                                {(!hasBudget) && (
+                                                    <Button
+                                                        onClick={() => setHasBudget(true)}
+                                                        variant={'secondary'}
+                                                        className="p-2 max-h-[28px]"
+                                                    >
+                                                        {'+ Add budget'}
                                                     </Button>
-                                                </DialogTrigger>
-                                                <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
-                                            </Dialog>
+                                                )}
+                                                {(!hasStartDate) && (
+                                                    <Button
+                                                        onClick={() => setHasStartDate(true)}
+                                                        variant={'secondary'}
+                                                        className="p-2 max-h-[28px]"
+                                                    >
+                                                        {'+ Add start date'}
+                                                    </Button>
+                                                )}
+                                                {(!hasEndDate) && (
+                                                    <Button
+                                                        onClick={() => setHasEndDate(true)}
+                                                        variant={'secondary'}
+                                                        className="p-2 max-h-[28px]"
+                                                    >
+                                                        {'+ Add end date'}
+                                                    </Button>
+                                                )}
+                                                {(!formData?.contacts || formData?.contacts.length <= 0) && (
+                                                    <Button
+                                                        onClick={() => {
+                                                            form.setValue("contacts", [
+                                                                {name: "", email: "", role: null}
+                                                            ])
+                                                        }}
+                                                        variant={'secondary'}
+                                                        className="p-2 max-h-[28px]"
+                                                    >
+                                                        {'+ Add contacts'}
+                                                    </Button>
+                                                )}
+                                                {(!formData?.attachments || formData?.attachments.length <= 0) && (
+                                                    <Button
+                                                        onClick={() => {
+                                                            form.setValue("attachments", [
+                                                                {name: '', link: ''} as any
+                                                            ])
+                                                        }}
+                                                        variant={'secondary'}
+                                                        className="p-2 max-h-[28px]"
+                                                    >
+                                                        {'+ Add links'}
+                                                    </Button>
+                                                )}
+                                            </span>
+                                        </>
+                                    )}
+
+                                    <span className="h-8"/>
+
+                                    <span
+                                        className="flex justify-end gap-4 flex-wrap absolute bottom-2 right-0 m-4">
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button type="button" variant="destructive">
+                                                    Delete project
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
+                                        </Dialog>
+                                        {isSaving ? (
+                                            <div className="w-[81px] flex justify-center items-center">
+                                                <LoadingDots />
+                                            </div>
+                                        ) : (
                                             <Button
                                                 disabled={!form.formState.isValid}
                                                 variant={"cta"}
@@ -1184,115 +1189,114 @@ export function EditMilestoneForm({
                                                 className="onborda-save-project"
                                                 type="submit"
                                                 onClick={async () => {
-                                                    // await handleMilestoneFormSubmit(form.getValues())
-                                                    onClose()
+                                                    await handleMilestoneFormSubmit(form.getValues())
                                                 }}
                                             >
                                                 Save changes
                                             </Button>
-                                        </span>
-                                    </TabsContent>
-                                    <TabsContent value="notes" className="space-y-6 w-full h-full">
-                                        <FormField
-                                            control={form.control}
-                                            name="notes"
-                                            render={({field}) => (
-                                                <FormItem className="w-full">
-                                                    <FormLabel className="flex gap-2 items-center">
-                                                        {`Notes`}
-                                                        <PrivateBadge className="font-normal text-gray-500"
-                                                                      iconOnly={true}/>
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        {`Add any internal notes about this project. Notes are always private, and will never be shown on your profile.`}
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <div className="w-full col-span-2 z-10" data-registry="plate">
-                                                            <PlateEditor
-                                                                value={field.value ?? []}
-                                                                onChange={field.onChange}
-                                                            />
-                                                        </div>
-                                                    </FormControl>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </TabsContent>
-                                    {/* <TabsContent value="recommendations" className="space-y-4 w-full">
-                                        {!recommendations && (
-                                            <div className="flex flex-col gap-4">
-                                                <Skeleton className="w-full h-[230px]"/>
-                                                <Skeleton className="w-full h-[230px]"/>
-                                                <Skeleton className="w-full h-[230px]"/>
-                                            </div>
                                         )}
-
-                                        {(recommendations && recommendations.length === 0) && (
-                                            <Card
-                                                className="w-full flex flex-col mx-auto justify-center items-center align-center">
-                                                <CardContent className="flex flex-col gap-4 p-4">
-                                                    <h2 className="text-xl">{`Sorry, we don't have any recommendations for this project`}</h2>
-                                                    <div className="flex justify-center">
-                                                        <Image
-                                                            alt="No recommendations"
-                                                            src="https://illustrations.popsy.co/gray/team-idea.svg"
-                                                            width={300}
-                                                            height={300}
-                                                            className="dark:hidden"
-                                                        />
-                                                        <Image
-                                                            alt="No recommendations"
-                                                            src="https://illustrations.popsy.co/gray/team-idea.svg"
-                                                            width={300}
-                                                            height={300}
-                                                            className="hidden dark:block"
+                                    </span>
+                                </TabsContent>
+                                <TabsContent value="notes" className="space-y-6 w-full h-full">
+                                    <FormField
+                                        control={form.control}
+                                        name="notes"
+                                        render={({field}) => (
+                                            <FormItem className="w-full">
+                                                <FormLabel className="flex gap-2 items-center">
+                                                    {`Notes`}
+                                                    <PrivateBadge className="font-normal text-gray-500"
+                                                                    iconOnly={true}/>
+                                                </FormLabel>
+                                                <FormDescription>
+                                                    {`Add any internal notes about this project. Notes are always private, and will never be shown on your profile.`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <div className="w-full col-span-2 z-10" data-registry="plate">
+                                                        <PlateEditor
+                                                            value={field.value ?? []}
+                                                            onChange={field.onChange}
                                                         />
                                                     </div>
-                                                    <p className="text-md">
-                                                        {`Please add more information to your project to generate some recommendations.`}
-                                                    </p>
-                                                </CardContent>
-                                            </Card>
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
                                         )}
+                                    />
+                                </TabsContent>
+                                {/* <TabsContent value="recommendations" className="space-y-4 w-full">
+                                    {!recommendations && (
+                                        <div className="flex flex-col gap-4">
+                                            <Skeleton className="w-full h-[230px]"/>
+                                            <Skeleton className="w-full h-[230px]"/>
+                                            <Skeleton className="w-full h-[230px]"/>
+                                        </div>
+                                    )}
 
-                                        {recommendations && recommendations.length > 0 && (
-                                            <>
-                                                <div className={cn("w-full grid gap-4 grid-cols-1")}>
-                                                    {(recommendations || []).map((result: Recommendation, index) => (
-                                                        <CROMarketplaceCard
-                                                            cro={result.content}
-                                                            key={index}
-                                                            milestone={milestoneData}
-                                                            location={"Research Planner"}
-                                                            savedCompanyIds={savedCompanyIds}
-                                                        />
-                                                    ))}
+                                    {(recommendations && recommendations.length === 0) && (
+                                        <Card
+                                            className="w-full flex flex-col mx-auto justify-center items-center align-center">
+                                            <CardContent className="flex flex-col gap-4 p-4">
+                                                <h2 className="text-xl">{`Sorry, we don't have any recommendations for this project`}</h2>
+                                                <div className="flex justify-center">
+                                                    <Image
+                                                        alt="No recommendations"
+                                                        src="https://illustrations.popsy.co/gray/team-idea.svg"
+                                                        width={300}
+                                                        height={300}
+                                                        className="dark:hidden"
+                                                    />
+                                                    <Image
+                                                        alt="No recommendations"
+                                                        src="https://illustrations.popsy.co/gray/team-idea.svg"
+                                                        width={300}
+                                                        height={300}
+                                                        className="hidden dark:block"
+                                                    />
                                                 </div>
-                                            </>
-                                        )}
+                                                <p className="text-md">
+                                                    {`Please add more information to your project to generate some recommendations.`}
+                                                </p>
+                                            </CardContent>
+                                        </Card>
+                                    )}
 
-                                        <Link
-                                            href={`/app/marketplace/service-providers?milestoneTypes=${(formData?.types || [])
-                                                .map((t: any) => t?.value || t?.id)
-                                                .join(",")}`}
-                                        >
-                                            <Button className="pl-0" variant={"link"}>
-                                                <Store/>
-                                                Explore Marketplace
-                                            </Button>
-                                        </Link>
-                                    </TabsContent> */}
-                                    {/*<TabsContent value="publications" className="space-y-4 w-full">*/}
-                                    {/*    <EditMilestoneDetailsPublicationsTab*/}
-                                    {/*        onAttach={(att) => addAttachmentToForm(form, att)}*/}
-                                    {/*    />*/}
-                                    {/*</TabsContent>*/}
-                                    <TabsContent value="projects" className="space-y-4 w-full">
-                                        <EditMilestoneDetailsProjectsTab projectId={milestoneData.id}/>
-                                    </TabsContent>
-                                </>
-                            )}
+                                    {recommendations && recommendations.length > 0 && (
+                                        <>
+                                            <div className={cn("w-full grid gap-4 grid-cols-1")}>
+                                                {(recommendations || []).map((result: Recommendation, index) => (
+                                                    <CROMarketplaceCard
+                                                        cro={result.content}
+                                                        key={index}
+                                                        milestone={milestoneData}
+                                                        location={"Research Planner"}
+                                                        savedCompanyIds={savedCompanyIds}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </>
+                                    )}
+
+                                    <Link
+                                        href={`/app/marketplace/service-providers?milestoneTypes=${(formData?.types || [])
+                                            .map((t: any) => t?.value || t?.id)
+                                            .join(",")}`}
+                                    >
+                                        <Button className="pl-0" variant={"link"}>
+                                            <Store/>
+                                            Explore Marketplace
+                                        </Button>
+                                    </Link>
+                                </TabsContent> */}
+                                {/*<TabsContent value="publications" className="space-y-4 w-full">*/}
+                                {/*    <EditMilestoneDetailsPublicationsTab*/}
+                                {/*        onAttach={(att) => addAttachmentToForm(form, att)}*/}
+                                {/*    />*/}
+                                {/*</TabsContent>*/}
+                                <TabsContent value="projects" className="space-y-4 w-full">
+                                    <EditMilestoneDetailsProjectsTab projectId={milestoneData.id}/>
+                                </TabsContent>
+                            </>
                         </Tabs>
                     </form>
                 </ScrollArea>

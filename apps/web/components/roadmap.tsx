@@ -27,7 +27,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@comend/components/ui/dialog"
-import { Globe, Info, LayoutTemplate, Lock, Pencil, Plus, Redo2, Share, Undo2, Wand2 } from "lucide-react"
+import { Globe, Info, LayoutTemplate, Lock, Pencil, Plus, Share, Wand2 } from "lucide-react"
 import Image from "next/image"
 import { NewMilestoneDialogForm, TabType } from "./new-milestone-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@comend/components/ui/select"
@@ -47,6 +47,8 @@ import {
 } from "@comend/components/ui/context-menu"
 import {initializeRoadmapState} from "@comend/lib/initialize-client-state";
 import { ProjectBulkImportDialog } from "./project-bulk-import-dialog"
+import { updateMilestones } from "@comend/lib/actions"
+import { revalidate } from "@comend/lib/revalidate"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -96,32 +98,21 @@ export function Roadmap({
     urlNode: string | string[] | undefined;
     urlView: string | string[] | undefined;
 }) {
-    console.log(`init data`, initMilestones)
     const { defaultLayout } = useSidebarStore()
     const { 
-        roadmapId,
-        details,
-        // selectedView,
-        // setSelectedView,
         selectedNodeIds, 
         setSelectedNodeIds, 
-        // milestones, 
-        saveState,
-        addMilestones,
-        deleteNode,
-        setMilestone
     } = useRoadmapStore(useShallow(selector))
     const {data: session, status} = useSession()
     const pathname = usePathname()
-    const { undo, redo } = useRoadmapStore.temporal.getState()
-    const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
+    // const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
     // const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false)
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     // controlling tabs in this upper level so we can manually control which tab is selected, based on which trigger button is clicked
     const [tab, setTab] = useState<TabType>("projects")
     // const [sortBy, setSortBy] = useState('custom')
     const [sortBy, setSortBy] = useState("default")
-    const milestoneRemountKeyRef = useRef(milestoneRemountKey);
+    // const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     const contextMenuRef = useRef<HTMLDivElement>(null)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [selectedView, setSelectedView] = useState('flow')
@@ -157,40 +148,6 @@ export function Roadmap({
     }, [status, session?.user.organizationId, researchPlanId])
 
     useEffect(() => {
-        milestoneRemountKeyRef.current = milestoneRemountKey;  // Always sync ref with the latest state
-    
-        const handleUndoRedo = (event: KeyboardEvent) => {
-            if (event.shiftKey && (event.metaKey || event.ctrlKey) && event.key === "z") {
-                console.log("Redo action triggered")
-                redo() // undo updates zustand state
-                saveState() // save state to update database
-
-                if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
-                    // if there is a node selected, remount the milestone form
-                    // to update the form data after the undo was triggered
-                    setMilestoneRemountKey(prevKey => prevKey + 1)
-                }
-
-                return
-            }
-            if ((event.metaKey || event.ctrlKey) && event.key === "z") {
-                console.log("Undo action triggered");
-                undo(); // undo updates zustand state
-                saveState(); // save state to update database
-    
-                if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
-                    // Remount the milestone form and update the milestoneRemountKey
-                    // using the ref to get the most recent value
-                    setMilestoneRemountKey(milestoneRemountKeyRef.current + 1);
-                }
-            }
-        };
-    
-        document.addEventListener("keydown", handleUndoRedo);
-        return () => document.removeEventListener("keydown", handleUndoRedo);
-    }, [selectedNodeIds, milestoneRemountKey, redo, undo, saveState]);
-
-    useEffect(() => {
         const params = new URLSearchParams()
 
         if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
@@ -210,14 +167,14 @@ export function Roadmap({
         window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
     }, [selectedNodeIds, selectedView, pathname])
     
-    const handleMilestonePanelChange = (open: boolean) => {
-        if (!open) { setSelectedNodeIds([]) }
-    }
+    // const handleMilestonePanelChange = (open: boolean) => {
+    //     if (!open) { setSelectedNodeIds([]) }
+    // }
 
-    const handleTabChange = (value: string) => {
-        setSelectedView(value)
-        setSelectedNodeIds([]) // deselect any selected milestones when switching tabs
-    }
+    // const handleTabChange = (value: string) => {
+    //     setSelectedView(value)
+    //     setSelectedNodeIds([]) // deselect any selected milestones when switching tabs
+    // }
     
     function closeContextMenu() {
         document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
@@ -302,50 +259,6 @@ export function Roadmap({
                                     </Select>
                                 </div>
                             )}
-{/* 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button 
-                                        data-skip-outside-click
-                                        onClick={(e) => {
-                                            undo() // undo updates zustand state
-                                            saveState() // save state to update database
-                            
-                                            if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
-                                                // if there is a node selected, remount the milestone form
-                                                // to update the form data after the undo was triggered
-                                                setMilestoneRemountKey(prevKey => prevKey + 1)
-                                            }
-                                        }} size={"icon"} variant={"ghost"}
-                                    >
-                                        <Undo2 />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-80">
-                                    <p>{`Undo (⌘+Z)`}</p>
-                                </TooltipContent>
-                            </Tooltip>
-
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button onClick={() => {
-                                        console.log("Redo action triggered")
-                                        redo() // undo updates zustand state
-                                        saveState() // save state to update database
-                        
-                                        if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
-                                            // if there is a node selected, remount the milestone form
-                                            // to update the form data after the undo was triggered
-                                            setMilestoneRemountKey(prevKey => prevKey + 1)
-                                        }
-                                    }} size={"icon"} variant={"ghost"}>
-                                        <Redo2 />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-80">
-                                    <p>{`Redo (⌘+Shift+Z)`}</p>
-                                </TooltipContent>
-                            </Tooltip> */}
                         </div>
 
                         {/* Flow view */}
@@ -384,7 +297,7 @@ export function Roadmap({
                     </Tabs>
                 </ResizablePanel>
 
-                {selectedNodeIds.length === 1 && selectedNodeIds[0] != null && (
+                {/* {selectedNodeIds.length === 1 && selectedNodeIds[0] != null && (
                     <>
                         <ResizableHandle withHandle />
 
@@ -415,7 +328,7 @@ export function Roadmap({
                             />
                         </ResizablePanel>
                     </>
-                )}
+                )} */}
 
                 <NewMilestoneDialogForm 
                     open={newMilestoneIsOpen}
@@ -633,6 +546,7 @@ const RoadmapHeader = ({
     orgSubdomain: string | undefined
 }) => {
     const {data: session, status} = useSession()
+    const pathname = usePathname()
     const { milestones, setSelectedNodeIds, addMilestones, setMilestone } = useRoadmapStore(useShallow(selector))
     const parentRef = useRef<HTMLDivElement>(null)
     const [parentWidth, setParentWidth] = useState(0)
@@ -688,13 +602,19 @@ const RoadmapHeader = ({
                                 <TooltipTrigger asChild>
                                     <Button
                                         className="h-full w-full rounded-md flex justify-center items-center bg-red-100 hover:bg-red-300"
-                                        onClick={() => {
+                                        onClick={async () => {
                                             console.log(`make all projects published`)
                                             milestones
                                                 .map(milestone => milestone.nodeId)
                                                 .forEach((nodeId: string | null) => {
                                                     if (nodeId) setMilestone(nodeId, {private: false})
                                                 })
+                                            // const response = await updateMilestones(
+                                            //     session?.user?.organizationId,
+                                            //     {milestones: milestones.map(milestone => ({...milestone, private: false}))}
+                                            // )
+                                            // console.log(`revalidate milestone data`, response)    
+                                            // await revalidate(pathname)
                                         }}
                                     >
                                         <Lock className="text-red-600 h-4 w-4"/>

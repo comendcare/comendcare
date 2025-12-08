@@ -20,13 +20,19 @@ import StatusButton from "@comend/components/milestone-status-button"
 import {cn, formatMoney} from "@comend/lib/utils"
 import {DateView} from "@comend/components/milestone-date-view"
 import {Badge, badgeVariants} from "@comend/components/ui/badge"
-import {Milestone, StatusType} from "@comend/lib/types"
+import {Milestone, MILESTONE_TYPE_OPTIONS, StatusType} from "@comend/lib/types"
 import {RoadmapState, useRoadmapStore} from "./../state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import { ExternalLink, Microscope, Plus, Trash, User, DollarSign } from "lucide-react"
 import { ProjectActionsMenu } from "./project-actions-menu"
 import { Organization } from "@prisma/client"
 import { PublicPrivateButton } from "@comend/components/public-private-button"
+import { Dialog, DialogContent, DialogTrigger } from "@comend/components/ui/dialog"
+import { EditMilestoneForm } from "./edit-milestone-form"
+import { updateMilestones } from "@comend/lib/actions"
+import { usePathname } from "next/navigation"
+import { useSession } from "next-auth/react"
+import { revalidate } from "@comend/lib/revalidate"
 
 export type MilestoneNodeType = Node<
     Milestone & {
@@ -57,271 +63,296 @@ const selector = (state: RoadmapState) => ({
 })
 
 export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
-    const {selectedNodeIds, setSelectedNodeIds, setMilestone} = useRoadmapStore(useShallow(selector))
+    const {data: session} = useSession()
+    const pathname = usePathname()
+    const [isEditing, setIsEditing] = useState(false)
 
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-        const target = event.target as any;
+    // const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+    //     const target = event.target as any;
 
-        // Check if click was inside context menu
-        if (props.data.contextMenuRef?.current?.contains(target)) return
-        if (props.data.contextMenuRef?.current?.contains(target) || target.closest('[data-skip-outside-click]') || (event instanceof MouseEvent && event.button === 2)) {
-            return
-        }
-        // Skip right clicks
-        if (event instanceof MouseEvent && event.button === 2) return
-        // skip if user had meta (ctrl/cmd), ctrl, or alt key held down
-        if (event.metaKey || event.ctrlKey || event.altKey) return
+    //     // Check if click was inside context menu
+    //     if (props.data.contextMenuRef?.current?.contains(target)) return
+    //     if (props.data.contextMenuRef?.current?.contains(target) || target.closest('[data-skip-outside-click]') || (event instanceof MouseEvent && event.button === 2)) {
+    //         return
+    //     }
+    //     // Skip right clicks
+    //     if (event instanceof MouseEvent && event.button === 2) return
+    //     // skip if user had meta (ctrl/cmd), ctrl, or alt key held down
+    //     if (event.metaKey || event.ctrlKey || event.altKey) return
 
-        if (selectedNodeIds.length > 1 && props.id && selectedNodeIds.includes(props.id)) {
-            setSelectedNodeIds([])
-        }
-    }
+    //     if (selectedNodeIds.length > 1 && props.id && selectedNodeIds.includes(props.id)) {
+    //         setSelectedNodeIds([])
+    //     }
+    // }
 
-    useEffect(() => {
-        if (selectedNodeIds.length > 1) {
-            document.addEventListener('mousedown', handleClickOutside);
-            document.addEventListener('touchend', handleClickOutside);
-        } else {
-            document.removeEventListener('mousedown', handleClickOutside);
-            document.removeEventListener('touchend', handleClickOutside);
-        }
+    // useEffect(() => {
+    //     if (selectedNodeIds.length > 1) {
+    //         document.addEventListener('mousedown', handleClickOutside);
+    //         document.addEventListener('touchend', handleClickOutside);
+    //     } else {
+    //         document.removeEventListener('mousedown', handleClickOutside);
+    //         document.removeEventListener('touchend', handleClickOutside);
+    //     }
         
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-            document.removeEventListener('touchend', handleClickOutside);
-        };
-    }, [selectedNodeIds])
+    //     return () => {
+    //         document.removeEventListener('mousedown', handleClickOutside);
+    //         document.removeEventListener('touchend', handleClickOutside);
+    //     };
+    // }, [selectedNodeIds])
 
-    const handleEditClick = (event: React.MouseEvent, nodeId: string) => {
-        if (event.ctrlKey || event.altKey) return
-        if (event.metaKey) {
-            // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
-            if (nodeId && !selectedNodeIds.includes(nodeId)) {
-                setSelectedNodeIds([...selectedNodeIds, nodeId])
-            }
-        } else {
-            // regular click, set selected node id
-            if (nodeId) {
-                setSelectedNodeIds([nodeId])
-            } else {
-                setSelectedNodeIds([])
-            }
-        }
-    }
+    // const handleEditClick = (event: React.MouseEvent, nodeId: string) => {
+    //     if (event.ctrlKey || event.altKey) return
+    //     if (event.metaKey) {
+    //         // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
+    //         if (nodeId && !selectedNodeIds.includes(nodeId)) {
+    //             setSelectedNodeIds([...selectedNodeIds, nodeId])
+    //         }
+    //     } else {
+    //         // regular click, set selected node id
+    //         if (nodeId) {
+    //             setSelectedNodeIds([nodeId])
+    //         } else {
+    //             setSelectedNodeIds([])
+    //         }
+    //     }
+    // }
 
     return (
-        <Card 
-            className={cn(
-                "drag-handle border-2 border-gray-300 w-[350px] text-wrap",
-                props?.id && selectedNodeIds.includes(props?.id) ? "border-gray-900 border-2 click-project-step" : "",
-                props.id === "preview" ? "opacity-50" : "",
-            )}
-            style={{
-                // transform the node so the 'snap to grid' point is centered in the node
-                // this allows edges to be straight, and perfectly align handles no matter the node's card height
-                transform: props.id === 'preview' ? 'translate(0%, 50%)' : 'translate(0%, -50%)',
-            }}
-            onClick={(e) => {
-                handleEditClick(e, props.id)
-            }}
-        >
-            <CardHeader className="py-4">
-                {props.data?.contextMenuRef && (
-                    <div className="absolute top-0 right-0 p-2">
-                        <ProjectActionsMenu milestone={props.data as Milestone} organization={props?.data?.organization}/>
-                    </div>
-                )}
-                <CardTitle className="text-gray-900">
-                    {!props?.data?.isPublic && (
-                        <PublicPrivateButton 
-                            isPrivate={props.data?.private}
-                            updateCallback={async (isPrivate) => {
-                                if (props.data?.nodeId) {
-                                    setMilestone(props.data.nodeId, {private: isPrivate})
-                                }
-                            }}
-                        />
-                        // props.data?.private ? (
-                        //     <Button
-                        //         className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-red-100 hover:bg-red-300"
-                        //         onClick={(e) => {
-                        //             e.stopPropagation()
-                        //             if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: false})
-                        //         }}
-                        //     >
-                        //         <Lock size={20} className="text-red-800"/>
-                        //     </Button>
-                        // ) : (
-                        //     <Button
-                        //         className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-green-100 hover:bg-green-300"
-                        //         onClick={(e) => {
-                        //             e.stopPropagation()
-                        //             if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: true})
-                        //         }}
-                        //     >
-                        //         <Globe size={20} className="text-green-800"/>
-                        //     </Button>
-                        // )
+        <Dialog open={isEditing} onOpenChange={setIsEditing}>
+            <DialogTrigger asChild>
+                <Card 
+                    className={cn(
+                        "drag-handle border-2 border-gray-300 w-[350px] text-wrap",
+                        // props?.id && selectedNodeIds.includes(props?.id) ? "border-gray-900 border-2 click-project-step" : "",
+                        props.id === "preview" ? "opacity-50" : "",
                     )}
-                    {props.data?.title || "New Milestone"}
-                </CardTitle>
-                {/* <CardDescription className="line-clamp-2">
-                    {truncate(props.data?.description || "", 200)}
-                </CardDescription> */}
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2">
-                <ul className="w-full flex flex-row flex-wrap gap-2 text-sm text-wrap break-words">
-                    {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label && b?.milestoneType?.label ? a?.milestoneType?.label.length - b?.milestoneType?.label.length : 0).map((milestoneType, index) => (
-                        <li key={index}>
-                            <Badge className="w-fit" variant={'lightBlue'}>
-                                {milestoneType?.milestoneType?.label || "No type"}
-                            </Badge>
-                        </li>
-                    ))}
-
-                    {(props.data?.contacts || []).map((contact, index) => {
-                        if (contact.affiliation) {
-                            return (
+                    style={{
+                        // transform the node so the 'snap to grid' point is centered in the node
+                        // this allows edges to be straight, and perfectly align handles no matter the node's card height
+                        transform: props.id === 'preview' ? 'translate(0%, 50%)' : 'translate(0%, -50%)',
+                    }}
+                    // onClick={(e) => {
+                    //     handleEditClick(e, props.id)
+                    // }}
+                >
+                    <CardHeader className="py-4">
+                        {props.data?.contextMenuRef && (
+                            <div className="absolute top-0 right-0 p-2">
+                                <ProjectActionsMenu milestone={props.data as Milestone} organization={props?.data?.organization}/>
+                            </div>
+                        )}
+                        <CardTitle className="text-gray-900">
+                            {!props?.data?.isPublic && (
+                                <PublicPrivateButton 
+                                    isPrivate={props.data?.private}
+                                    updateCallback={async (isPrivate) => {
+                                        if (props.data?.nodeId) {
+                                            // setMilestone(props.data.nodeId, {private: isPrivate})
+                                            const response = await updateMilestones(
+                                                session?.user?.organizationId,
+                                                {milestones: [{...props.data, private: isPrivate}]}
+                                            )
+                                            console.log(`revalidate milestone data`, response)    
+                                            await revalidate(pathname)
+                                        }
+                                    }}
+                                />
+                                // props.data?.private ? (
+                                //     <Button
+                                //         className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-red-100 hover:bg-red-300"
+                                //         onClick={(e) => {
+                                //             e.stopPropagation()
+                                //             if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: false})
+                                //         }}
+                                //     >
+                                //         <Lock size={20} className="text-red-800"/>
+                                //     </Button>
+                                // ) : (
+                                //     <Button
+                                //         className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-green-100 hover:bg-green-300"
+                                //         onClick={(e) => {
+                                //             e.stopPropagation()
+                                //             if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: true})
+                                //         }}
+                                //     >
+                                //         <Globe size={20} className="text-green-800"/>
+                                //     </Button>
+                                // )
+                            )}
+                            {props.data?.title || "New Milestone"}
+                        </CardTitle>
+                        {/* <CardDescription className="line-clamp-2">
+                            {truncate(props.data?.description || "", 200)}
+                        </CardDescription> */}
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-2">
+                        <ul className="w-full flex flex-row flex-wrap gap-2 text-sm text-wrap break-words">
+                            {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label && b?.milestoneType?.label ? a?.milestoneType?.label.length - b?.milestoneType?.label.length : 0).map((milestoneType, index) => (
                                 <li key={index}>
-                                    <Badge>
-                                        <User size={18}/>
-                                        <p className="w-[90%] text-wrap break-words">{contact.affiliation}</p>
+                                    <Badge className="w-fit" variant={'lightBlue'}>
+                                        {milestoneType?.milestoneType?.label || "No type"}
                                     </Badge>
                                 </li>
-                            )
-                        }
-                    })}
+                            ))}
 
-                    {(props?.data?.startDate || props?.data?.endDate) && (
-                        <li>
-                            <Badge>
-                                <DateView startDate={props.data?.startDate || undefined} endDate={props.data?.endDate || undefined}/>
-                            </Badge>
-                        </li>
+                            {(props.data?.contacts || []).map((contact, index) => {
+                                if (contact.affiliation) {
+                                    return (
+                                        <li key={index}>
+                                            <Badge>
+                                                <User size={18}/>
+                                                <p className="w-[90%] text-wrap break-words">{contact.affiliation}</p>
+                                            </Badge>
+                                        </li>
+                                    )
+                                }
+                            })}
+
+                            {(props?.data?.startDate || props?.data?.endDate) && (
+                                <li>
+                                    <Badge>
+                                        <DateView startDate={props.data?.startDate || undefined} endDate={props.data?.endDate || undefined}/>
+                                    </Badge>
+                                </li>
+                            )}
+
+                            {(!!props?.data?.budget) && (
+                                <li>
+                                    <Badge>
+                                        <DollarSign size={16}/>
+                                        <p>{formatMoney(props?.data?.budget)}</p>
+                                    </Badge>
+                                </li>
+                            )}
+
+                            {(props.data?.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0) && (
+                                <li>
+                                    <Badge variant={'green'}>
+                                        <Microscope size={16} />
+                                        {(props.data?.biosamples?.length + props.data?.diseaseModels?.length + props.data?.tools?.length) <= 1 
+                                            ? `1 Linked tool` 
+                                            : `${(props.data?.biosamples?.length + props.data?.diseaseModels?.length + props.data?.tools?.length)} Linked tools`}
+                                    </Badge>
+                                </li>
+                            )}
+
+                            {(props.data?.rfps?.length > 0) && (
+                                <li>
+                                    <Badge variant={'orange'}>
+                                        <Microscope size={16} />
+                                        {(props.data?.rfps?.length) <= 1 
+                                            ? `1 Linked RFP` 
+                                            : `${(props.data?.rfps?.length)} Linked RFPs`}
+                                    </Badge>
+                                </li>
+                            )}
+                        </ul>
+
+                        <StatusButton 
+                            status={props.data?.status as StatusType || undefined}
+                            minimal={true}
+                            disabled={true}
+                            onStatusChange={() => {}}
+                        />
+
+                        {/* {(props.data?.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0 || props.data?.rfps?.length > 0) && (
+                            <>
+                            <Separator className="bg-gray-300 h-[2px] rounded-full my-4"/>
+                                {(props.data?.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0) && (
+                                    <div className="border-l-4 border-green-200 pl-4 space-y-3">
+                                        <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
+                                            <Microscope className="h-4 w-4 min-w-4 text-green-900" />
+                                            <span className="text-green-900 text-nowrap">Linked Tools</span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {(props.data?.biosamples || []).map(({biosample}, index) => {
+                                                return (
+                                                    <Badge key={index} variant="green">
+                                                        <TestTubeDiagonal className="h-4 w-4" />
+                                                        {`${biosample.id}`}
+                                                    </Badge>
+                                                )
+                                            })}
+                                            {(props.data?.diseaseModels || []).map(({diseaseModel}, index) => {
+                                                return (
+                                                    <Badge key={index} variant="green">
+                                                        <Rat className="h-4 w-4" />
+                                                        {`${diseaseModel.id}`}
+                                                    </Badge>
+                                                )
+                                            })}
+                                            {(props.data?.tools || []).map(({tool}, index) => (
+                                                <Badge key={index} variant="green">
+                                                    <Database className="h-4 w-4" />
+                                                    {`${tool?.id}`}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                {props.data?.rfps?.length > 0 && (
+                                    <div className="border-l-4 border-orange-200 pl-4 space-y-3">
+                                        <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
+                                            <Megaphone className="h-4 w-4 min-w-4 text-orange-900" />
+                                            <span className="text-orange-900 text-nowrap">Linked RFPs</span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {props.data?.rfps.map(({rfp}, index) => (
+                                                <Badge key={index} variant="orange">
+                                                    <Megaphone className="h-4 w-4 min-w-4" />
+                                                    {`${rfp?.title}`}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        )} */}
+                    </CardContent>
+
+                    {props.data?.contextMenuRef && props.id !== "preview" ? (
+                        <>
+                            <NodeHandle 
+                                type="target" 
+                                position={Position.Left} 
+                                node={props as NodeProps<MilestoneNodeType>}
+                            />
+                            <NodeHandle 
+                                type="source" 
+                                position={Position.Right}
+                                node={props as NodeProps<MilestoneNodeType>}
+                            />
+                        </>
+                    ): (
+                        <>
+                            <Handle
+                                type="target"
+                                position={Position.Left}
+                                className="z-10 bg-black p-1 rounded-full border-solid border-black border-2"
+                            />
+                            <Handle
+                                type="source"
+                                position={Position.Right}
+                                className="z-10 bg-black p-1 rounded-full border-solid border-black border-2"
+                            />
+                        </>
                     )}
-
-                    {(!!props?.data?.budget) && (
-                        <li>
-                            <Badge>
-                                <DollarSign size={16}/>
-                                <p>{formatMoney(props?.data?.budget)}</p>
-                            </Badge>
-                        </li>
-                    )}
-
-                    {(props.data?.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0) && (
-                        <li>
-                            <Badge variant={'green'}>
-                                <Microscope size={16} />
-                                {(props.data?.biosamples?.length + props.data?.diseaseModels?.length + props.data?.tools?.length) <= 1 
-                                    ? `1 Linked tool` 
-                                    : `${(props.data?.biosamples?.length + props.data?.diseaseModels?.length + props.data?.tools?.length)} Linked tools`}
-                            </Badge>
-                        </li>
-                    )}
-
-                    {(props.data?.rfps?.length > 0) && (
-                        <li>
-                            <Badge variant={'orange'}>
-                                <Microscope size={16} />
-                                {(props.data?.rfps?.length) <= 1 
-                                    ? `1 Linked RFP` 
-                                    : `${(props.data?.rfps?.length)} Linked RFPs`}
-                            </Badge>
-                        </li>
-                    )}
-                </ul>
-
-                <StatusButton 
-                    status={props.data?.status as StatusType || undefined}
-                    minimal={true}
-                    disabled={true}
-                    onStatusChange={() => {}}
+                </Card>
+            </DialogTrigger>
+            <DialogContent>
+                <EditMilestoneForm 
+                    organization={undefined}
+                    milestoneData={props.data}
+                    orgIsPublished={true}
+                    biosampleOptions={[]}
+                    diseaseModelOptions={[]}
+                    clinicalDatasetOptions={[]}
+                    rfpOptions={[]}
+                    milestoneTypeOptions={MILESTONE_TYPE_OPTIONS}
+                    onClose={() => setIsEditing(false)}
                 />
-
-                {/* {(props.data?.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0 || props.data?.rfps?.length > 0) && (
-                    <>
-                    <Separator className="bg-gray-300 h-[2px] rounded-full my-4"/>
-                        {(props.data?.biosamples?.length > 0 || props.data?.diseaseModels?.length > 0 || props.data?.tools?.length > 0) && (
-                            <div className="border-l-4 border-green-200 pl-4 space-y-3">
-                                <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
-                                    <Microscope className="h-4 w-4 min-w-4 text-green-900" />
-                                    <span className="text-green-900 text-nowrap">Linked Tools</span>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {(props.data?.biosamples || []).map(({biosample}, index) => {
-                                        return (
-                                            <Badge key={index} variant="green">
-                                                <TestTubeDiagonal className="h-4 w-4" />
-                                                {`${biosample.id}`}
-                                            </Badge>
-                                        )
-                                    })}
-                                    {(props.data?.diseaseModels || []).map(({diseaseModel}, index) => {
-                                        return (
-                                            <Badge key={index} variant="green">
-                                                <Rat className="h-4 w-4" />
-                                                {`${diseaseModel.id}`}
-                                            </Badge>
-                                        )
-                                    })}
-                                    {(props.data?.tools || []).map(({tool}, index) => (
-                                        <Badge key={index} variant="green">
-                                            <Database className="h-4 w-4" />
-                                            {`${tool?.id}`}
-                                        </Badge>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                        {props.data?.rfps?.length > 0 && (
-                            <div className="border-l-4 border-orange-200 pl-4 space-y-3">
-                                <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
-                                    <Megaphone className="h-4 w-4 min-w-4 text-orange-900" />
-                                    <span className="text-orange-900 text-nowrap">Linked RFPs</span>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {props.data?.rfps.map(({rfp}, index) => (
-                                        <Badge key={index} variant="orange">
-                                            <Megaphone className="h-4 w-4 min-w-4" />
-                                            {`${rfp?.title}`}
-                                        </Badge>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </>
-                )} */}
-            </CardContent>
-
-            {props.data?.contextMenuRef && props.id !== "preview" ? (
-                <>
-                    <NodeHandle 
-                        type="target" 
-                        position={Position.Left} 
-                        node={props as NodeProps<MilestoneNodeType>}
-                    />
-                    <NodeHandle 
-                        type="source" 
-                        position={Position.Right}
-                        node={props as NodeProps<MilestoneNodeType>}
-                    />
-                </>
-            ): (
-                <>
-                    <Handle
-                        type="target"
-                        position={Position.Left}
-                        className="z-10 bg-black p-1 rounded-full border-solid border-black border-2"
-                    />
-                    <Handle
-                        type="source"
-                        position={Position.Right}
-                        className="z-10 bg-black p-1 rounded-full border-solid border-black border-2"
-                    />
-                </>
-            )}
-        </Card>
+            </DialogContent>
+        </Dialog>
     )
 }
 

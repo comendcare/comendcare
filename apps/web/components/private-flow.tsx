@@ -26,6 +26,7 @@ import { debounce } from "lodash"
 import { CustomEdge } from "./custom-edge"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { Milestone, Organization } from "@prisma/client"
+import { revalidate } from "@comend/lib/revalidate"
 
 const proOptions = { hideAttribution: true }
 
@@ -233,6 +234,7 @@ export const PrivateFlowView = ({
                 }
 
                 addNodes([newNode], "Flow Connection")
+                revalidate(pathname)
 
                 // Handle connection direction based on the dragged handle
                 const source = connectionState.fromHandle?.position === "left" 
