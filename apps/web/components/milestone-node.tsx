@@ -33,6 +33,7 @@ import { updateMilestones } from "@comend/lib/actions"
 import { usePathname } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { revalidate } from "@comend/lib/revalidate"
+import LoadingDots from "@comend/components/icons/loading-dots"
 
 export type MilestoneNodeType = Node<
     Milestone & {
@@ -67,55 +68,13 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
     const pathname = usePathname()
     const [isEditing, setIsEditing] = useState(false)
 
-    // const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-    //     const target = event.target as any;
-
-    //     // Check if click was inside context menu
-    //     if (props.data.contextMenuRef?.current?.contains(target)) return
-    //     if (props.data.contextMenuRef?.current?.contains(target) || target.closest('[data-skip-outside-click]') || (event instanceof MouseEvent && event.button === 2)) {
-    //         return
-    //     }
-    //     // Skip right clicks
-    //     if (event instanceof MouseEvent && event.button === 2) return
-    //     // skip if user had meta (ctrl/cmd), ctrl, or alt key held down
-    //     if (event.metaKey || event.ctrlKey || event.altKey) return
-
-    //     if (selectedNodeIds.length > 1 && props.id && selectedNodeIds.includes(props.id)) {
-    //         setSelectedNodeIds([])
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     if (selectedNodeIds.length > 1) {
-    //         document.addEventListener('mousedown', handleClickOutside);
-    //         document.addEventListener('touchend', handleClickOutside);
-    //     } else {
-    //         document.removeEventListener('mousedown', handleClickOutside);
-    //         document.removeEventListener('touchend', handleClickOutside);
-    //     }
-        
-    //     return () => {
-    //         document.removeEventListener('mousedown', handleClickOutside);
-    //         document.removeEventListener('touchend', handleClickOutside);
-    //     };
-    // }, [selectedNodeIds])
-
-    // const handleEditClick = (event: React.MouseEvent, nodeId: string) => {
-    //     if (event.ctrlKey || event.altKey) return
-    //     if (event.metaKey) {
-    //         // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
-    //         if (nodeId && !selectedNodeIds.includes(nodeId)) {
-    //             setSelectedNodeIds([...selectedNodeIds, nodeId])
-    //         }
-    //     } else {
-    //         // regular click, set selected node id
-    //         if (nodeId) {
-    //             setSelectedNodeIds([nodeId])
-    //         } else {
-    //             setSelectedNodeIds([])
-    //         }
-    //     }
-    // }
+    if (!props.data.id) {
+        return (
+            <Card className="h-[100px] w-[250px]">
+                <LoadingDots />
+            </Card>
+        )
+    }
 
     return (
         <Dialog open={isEditing} onOpenChange={setIsEditing}>
@@ -123,7 +82,6 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                 <Card 
                     className={cn(
                         "drag-handle border-2 border-gray-300 w-[350px] text-wrap",
-                        // props?.id && selectedNodeIds.includes(props?.id) ? "border-gray-900 border-2 click-project-step" : "",
                         props.id === "preview" ? "opacity-50" : "",
                     )}
                     style={{
@@ -131,9 +89,6 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                         // this allows edges to be straight, and perfectly align handles no matter the node's card height
                         transform: props.id === 'preview' ? 'translate(0%, 50%)' : 'translate(0%, -50%)',
                     }}
-                    // onClick={(e) => {
-                    //     handleEditClick(e, props.id)
-                    // }}
                 >
                     <CardHeader className="py-4">
                         {props.data?.contextMenuRef && (
@@ -157,33 +112,9 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                                         }
                                     }}
                                 />
-                                // props.data?.private ? (
-                                //     <Button
-                                //         className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-red-100 hover:bg-red-300"
-                                //         onClick={(e) => {
-                                //             e.stopPropagation()
-                                //             if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: false})
-                                //         }}
-                                //     >
-                                //         <Lock size={20} className="text-red-800"/>
-                                //     </Button>
-                                // ) : (
-                                //     <Button
-                                //         className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-green-100 hover:bg-green-300"
-                                //         onClick={(e) => {
-                                //             e.stopPropagation()
-                                //             if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: true})
-                                //         }}
-                                //     >
-                                //         <Globe size={20} className="text-green-800"/>
-                                //     </Button>
-                                // )
                             )}
                             {props.data?.title || "New Milestone"}
                         </CardTitle>
-                        {/* <CardDescription className="line-clamp-2">
-                            {truncate(props.data?.description || "", 200)}
-                        </CardDescription> */}
                     </CardHeader>
                     <CardContent className="flex flex-col gap-2">
                         <ul className="w-full flex flex-row flex-wrap gap-2 text-sm text-wrap break-words">

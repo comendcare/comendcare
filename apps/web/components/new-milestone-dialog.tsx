@@ -11,6 +11,8 @@ import { DialogDescription } from "@radix-ui/react-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@comend/components/ui/tabs"
 import { ScrollArea } from "@comend/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
+import { revalidate } from "@comend/lib/revalidate"
+import { usePathname } from "next/navigation"
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones,
@@ -30,6 +32,7 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
         addNodesFromTemplate,
         setSelectedNodeIds
     } = useRoadmapStore(useShallow(selector))
+    const pathname = usePathname()
     const [selectedMilestonesTemplate, setSelectedMilestonesTemplate] = useState<string[]>([])
     const [selectedResearchPlanTemplate, setSelectedResearchPlanTemplate] = useState<any | undefined>(undefined)
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
@@ -167,6 +170,9 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                                         const newNodes = await addNodesFromTemplate(selectedResearchPlanTemplate)
                                         if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
                                     }
+
+                                    console.log(`revalidate`, pathname)
+                                    await revalidate(pathname)
                                 }}
                             >
                                 <Plus />
