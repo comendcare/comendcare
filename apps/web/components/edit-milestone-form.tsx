@@ -221,23 +221,12 @@ export function EditMilestoneForm({
     milestoneTypeOptions: Partial<MilestoneType>[],
     onClose: () => void
 }) {
-    const {setMilestone} = useRoadmapStore(useShallow(selector))
-    // const {recommendations, setRecommendations} = useCROSearchStore(useShallow(recommendationsSelector))
-    // const {
-    //     initialized: notificationsInitialized,
-    //     notifications,
-    //     addNotification,
-    //     setNotificationsViewed,
-    // } = useNotificationsStore(useShallow(notificationsSelector))
     const initializing = useRef(true)
     const {data: session, status} = useSession()
     const pathname = usePathname()
-    // const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [fetchedTools, setFetchedTools] = useState<Option[]>([])
     const [tab, setTab] = useState<string>("edit")
-    // const {step} = useOnbordaStore(useShallow(onbordaSelector))
-    // const {isOnbordaVisible} = useOnborda()
     const [shareIsOpen, setShareIsOpen] = useState(false)
     const [createRFPIsOpen, setCreateRFPIsOpen] = useState(false)
     const [createBiosampleIsOpen, setCreateBiosampleIsOpen] = useState(false)
@@ -245,25 +234,6 @@ export function EditMilestoneForm({
     const [createClincalDatasetIsOpen, setCreateClinicalDatasetIsOpen] = useState(false)
     const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(milestoneData.createFacilityRequests || [])
     const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
-    // const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
-    // const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
-
-    // useEffect(() => {
-    //     async function fetchSavedCompanies() {
-    //         const res = await getSavedCompaniesFromOrganizationId(
-    //             session?.user?.organizationId,
-    //             { companyId: true }
-    //         );
-
-    //         if (res.success && res.data) {
-    //             setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
-    //         }
-    //     }
-
-    //     fetchSavedCompanies();
-    // }, [session, status]);
-
-    // state for adding fields
     const [hasBudget, setHasBudget] = useState(milestoneData?.budget !== undefined && milestoneData?.budget !== null)
     const [hasStartDate, setHasStartDate] = useState(milestoneData?.startDate || false)
     const [hasEndDate, setHasEndDate] = useState(milestoneData?.endDate || false)
@@ -365,6 +335,8 @@ export function EditMilestoneForm({
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         // if form state is not valid, don't submit
         if (!form.formState.isValid) return
+
+        console.log(`START SAVING MILESTONE DATA`)
 
         const {
             nodeType,
@@ -485,7 +457,6 @@ export function EditMilestoneForm({
         }
 
         if (milestoneData?.nodeId) {
-            // const updatedMilestone = await setMilestone(milestoneData.nodeId, updateData)
             const response = await updateMilestones(
                 session?.user?.organizationId,
                 {milestones: [{...updateData}]}
@@ -516,7 +487,7 @@ export function EditMilestoneForm({
 
     const handleMilestoneFormSubmitCallback = useCallback(
         handleMilestoneFormSubmit,
-        [milestoneData, setMilestone, milestoneTypeOptions]
+        [milestoneData, milestoneTypeOptions]
     )
 
     const handleShare = async () => {
