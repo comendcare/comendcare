@@ -718,7 +718,9 @@ const RoadmapHeader = ({
                                         title: 'New Project',
                                 }], "Create Empty Button")
 
-                                if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
+                                revalidate(pathname)
+
+                                // if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
                             }} 
                             variant={"cta"}
                             size={isCollapsed ? "icon" : "default"}

@@ -17,6 +17,7 @@ import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore";
 import Papa from "papaparse";
 import { Badge } from "@comend/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
+import { revalidate } from "@comend/lib/revalidate";
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones,
@@ -389,6 +390,7 @@ export function ProjectBulkImportDialog({
                 }
 
                 await addMilestones(newNodes)
+                revalidate(pathname)
 
                 setTotalErrors(errors)
                 setImportCount(newNodes.length)

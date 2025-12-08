@@ -68,9 +68,9 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
     const pathname = usePathname()
     const [isEditing, setIsEditing] = useState(false)
 
-    if (!props.data.id) {
+    if (!props.data.id && props.id !== 'preview') {
         return (
-            <Card className="h-[100px] w-[250px]">
+            <Card className="h-[100px] w-[250px] flex justify-center items-center">
                 <LoadingDots />
             </Card>
         )
