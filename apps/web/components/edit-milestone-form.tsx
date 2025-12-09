@@ -471,82 +471,82 @@ export function EditMilestoneForm({
         []
     )
 
-    // const init = async () => {
-    //     // backup fetch create requests - double check if there are any
-    //     if (milestoneData?.id) {
-    //         const createRequestsResponse = await fetchCreateRequests(
-    //             milestoneData.id,
-    //             {
-    //                 id: true,
-    //                 name: true,
-    //                 milestoneId: true,
-    //                 milestone: true,
-    //                 createdAt: true,
-    //                 updatedAt: true,
-    //             }
-    //         )
+    const init = async () => {
+        // backup fetch create requests - double check if there are any
+        if (milestoneData?.id) {
+            const createRequestsResponse = await fetchCreateRequests(
+                milestoneData.id,
+                {
+                    id: true,
+                    name: true,
+                    milestoneId: true,
+                    milestone: true,
+                    createdAt: true,
+                    updatedAt: true,
+                }
+            )
 
-    //         if (createRequestsResponse.success && createRequestsResponse.data) {
-    //             setCreateRequests(createRequestsResponse.data)
-    //         }
-    //     }
+            if (createRequestsResponse.success && createRequestsResponse.data) {
+                setCreateRequests(createRequestsResponse.data)
+            }
+        }
 
-    //     if (session?.user.organizationId) {
-    //         const formattedBiosamples: Option[] = (biosampleOptions || []).map((biosample: Partial<Biosample>,) => {
-    //             return (
-    //                 {
-    //                     value: biosample.id || '',
-    //                     type: 'Biosamples',
-    //                     icon: "test-tube-diagonal",
-    //                     // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
-    //                     label: `${biosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
-    //                     biosample
-    //                 }
-    //             )
-    //         })
-    //         const formattedDiseaseModels: Option[] = (diseaseModelOptions || []).map((diseaseModel: Partial<DiseaseModel>) => {
-    //             return (
-    //                 {
-    //                     value: diseaseModel.id || '',
-    //                     label: `${diseaseModel.id} - ${(DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
-    //                     icon: 'rat',
-    //                     type: 'Disease Models',
-    //                     diseaseModel
-    //                 }
-    //             )
-    //         })
-    //         const formattedDatasamples: Option[] = (clinicalDatasetOptions || []).map((datasample: Partial<Tool>) => {
-    //             return (
-    //                 {
-    //                     value: datasample.id || '',
-    //                     label: `${datasample?.id} - ${datasample?.title}`,
-    //                     icon: 'database',
-    //                     type: 'Clinical Datasets',
-    //                     datasample
-    //                 }
-    //             )
-    //         })
-    //         setFetchedTools([...formattedBiosamples, ...formattedDiseaseModels, ...formattedDatasamples])
-    //     }
+        if (session?.user.organizationId) {
+            const formattedBiosamples: Option[] = (biosampleOptions || []).map((biosample: Partial<Biosample>,) => {
+                return (
+                    {
+                        value: biosample.id || '',
+                        type: 'Biosamples',
+                        icon: "test-tube-diagonal",
+                        // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
+                        label: `${biosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
+                        biosample
+                    }
+                )
+            })
+            const formattedDiseaseModels: Option[] = (diseaseModelOptions || []).map((diseaseModel: Partial<DiseaseModel>) => {
+                return (
+                    {
+                        value: diseaseModel.id || '',
+                        label: `${diseaseModel.id} - ${(DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
+                        icon: 'rat',
+                        type: 'Disease Models',
+                        diseaseModel
+                    }
+                )
+            })
+            const formattedDatasamples: Option[] = (clinicalDatasetOptions || []).map((datasample: Partial<Tool>) => {
+                return (
+                    {
+                        value: datasample.id || '',
+                        label: `${datasample?.id} - ${datasample?.title}`,
+                        icon: 'database',
+                        type: 'Clinical Datasets',
+                        datasample
+                    }
+                )
+            })
+            setFetchedTools([...formattedBiosamples, ...formattedDiseaseModels, ...formattedDatasamples])
+        }
 
-    //     // if (milestoneData) {
-    //     //     await setRecommendations([milestoneData as Milestone], {limit: 3})
-    //     // }
+        // if (milestoneData) {
+        //     await setRecommendations([milestoneData as Milestone], {limit: 3})
+        // }
 
-    //     // trigger a form validation, if the imported data is not valid, let the user know right away
-    //     form.trigger()
+        // trigger a form validation, if the imported data is not valid, let the user know right away
+        form.trigger()
 
-    //     initializing.current = false
-    // }
+        initializing.current = false
+    }
 
     // Initialization - Allow update once form is initialized
-    // useEffect(() => {
+    useEffect(() => {
 
-    //     init()
+        init()
 
-    //     // missing dependencies disabled - we only want to run this once on initialization
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [])
+        // missing dependencies disabled - we only want to run this once on initialization
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     useEffect(() => {
         // handle updating any properties that can be edited externally (outside this form)
