@@ -27,7 +27,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@comend/components/ui/dialog"
-import { Globe, Info, LayoutTemplate, Lock, Pencil, Plus, Redo2, Share, Undo2, Wand2 } from "lucide-react"
+import { CircleCheckBig, Globe, Info, LayoutTemplate, Lock, Pencil, Plus, Redo2, RefreshCcw, Share, Undo2, Wand2 } from "lucide-react"
 import Image from "next/image"
 import { NewMilestoneDialogForm, TabType } from "./new-milestone-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@comend/components/ui/select"
@@ -60,7 +60,8 @@ const selector = (state: RoadmapState) => ({
     saveState: state.saveState,
     addMilestones: state.addMilestones,
     deleteNode: state.deleteNode,
-    setMilestone: state.setMilestone
+    setMilestone: state.setMilestone,
+    savingList: state.savingList
 })
 
 export function Roadmap({
@@ -105,14 +106,13 @@ export function Roadmap({
         selectedNodeIds, 
         setSelectedNodeIds, 
         milestones, 
-        saveState,
-        addMilestones,
         deleteNode,
-        setMilestone
+        setMilestone,
+        // savingState,
+        savingList,
     } = useRoadmapStore(useShallow(selector))
     const {data: session, status} = useSession()
     const pathname = usePathname()
-    const { undo, redo } = useRoadmapStore.temporal.getState()
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
     // const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false)
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
@@ -153,39 +153,39 @@ export function Roadmap({
         })
     }, [status, session?.user.organizationId, researchPlanId])
 
-    useEffect(() => {
-        milestoneRemountKeyRef.current = milestoneRemountKey;  // Always sync ref with the latest state
+    // useEffect(() => {
+    //     milestoneRemountKeyRef.current = milestoneRemountKey;  // Always sync ref with the latest state
     
-        const handleUndoRedo = (event: KeyboardEvent) => {
-            if (event.shiftKey && (event.metaKey || event.ctrlKey) && event.key === "z") {
-                console.log("Redo action triggered")
-                redo() // undo updates zustand state
-                saveState() // save state to update database
+    //     const handleUndoRedo = (event: KeyboardEvent) => {
+    //         if (event.shiftKey && (event.metaKey || event.ctrlKey) && event.key === "z") {
+    //             console.log("Redo action triggered")
+    //             redo() // undo updates zustand state
+    //             saveState() // save state to update database
 
-                if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
-                    // if there is a node selected, remount the milestone form
-                    // to update the form data after the undo was triggered
-                    setMilestoneRemountKey(prevKey => prevKey + 1)
-                }
+    //             if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
+    //                 // if there is a node selected, remount the milestone form
+    //                 // to update the form data after the undo was triggered
+    //                 setMilestoneRemountKey(prevKey => prevKey + 1)
+    //             }
 
-                return
-            }
-            if ((event.metaKey || event.ctrlKey) && event.key === "z") {
-                console.log("Undo action triggered");
-                undo(); // undo updates zustand state
-                saveState(); // save state to update database
+    //             return
+    //         }
+    //         if ((event.metaKey || event.ctrlKey) && event.key === "z") {
+    //             console.log("Undo action triggered");
+    //             undo(); // undo updates zustand state
+    //             saveState(); // save state to update database
     
-                if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
-                    // Remount the milestone form and update the milestoneRemountKey
-                    // using the ref to get the most recent value
-                    setMilestoneRemountKey(milestoneRemountKeyRef.current + 1);
-                }
-            }
-        };
+    //             if (selectedNodeIds.length === 1 && selectedNodeIds[0]) {
+    //                 // Remount the milestone form and update the milestoneRemountKey
+    //                 // using the ref to get the most recent value
+    //                 setMilestoneRemountKey(milestoneRemountKeyRef.current + 1);
+    //             }
+    //         }
+    //     };
     
-        document.addEventListener("keydown", handleUndoRedo);
-        return () => document.removeEventListener("keydown", handleUndoRedo);
-    }, [selectedNodeIds, milestoneRemountKey, redo, undo, saveState]);
+    //     document.addEventListener("keydown", handleUndoRedo);
+    //     return () => document.removeEventListener("keydown", handleUndoRedo);
+    // }, [selectedNodeIds, milestoneRemountKey, redo, undo, saveState]);
 
     useEffect(() => {
         const params = new URLSearchParams()
@@ -246,6 +246,7 @@ export function Roadmap({
                     />
                     <Tabs defaultValue={selectedView ? selectedView : "flow"} onValueChange={handleTabChange} className="flex flex-col gap-4">
                         <div className="flex flex-row items-center gap-x-1 justify-start">
+                            <div className="flex gap-2">
                             <TabsList className="mr-auto">
                                 <TabsTrigger value="flow" className="relative">
                                     Flow view
@@ -262,6 +263,9 @@ export function Roadmap({
                                 </TabsTrigger>
                                 <TabsTrigger value="list">List view</TabsTrigger>
                             </TabsList>
+                            {savingList.length > 0 && <p className="flex gap-1 items-center"><RefreshCcw className="h-4 w-4"/> Saving...</p>}
+                            {/* {savingState === 'saved' && <p className="flex gap-1 items-center"><CircleCheckBig className="h-4 w-4"/> Saved</p>} */}
+                            </div>
 
                             {selectedView === "list" && (
                                 <div className="flex flex-row gap-4 items-center">
@@ -296,7 +300,7 @@ export function Roadmap({
                                 </div>
                             )}
 
-                            <Tooltip>
+                            {/* <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button 
                                         data-skip-outside-click
@@ -317,9 +321,9 @@ export function Roadmap({
                                 <TooltipContent className="max-w-80">
                                     <p>{`Undo (⌘+Z)`}</p>
                                 </TooltipContent>
-                            </Tooltip>
+                            </Tooltip> */}
 
-                            <Tooltip>
+                            {/* <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button onClick={() => {
                                         console.log("Redo action triggered")
@@ -338,7 +342,7 @@ export function Roadmap({
                                 <TooltipContent className="max-w-80">
                                     <p>{`Redo (⌘+Shift+Z)`}</p>
                                 </TooltipContent>
-                            </Tooltip>
+                            </Tooltip> */}
                         </div>
 
                         {/* Flow view */}

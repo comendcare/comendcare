@@ -22,6 +22,7 @@ import {nanoid} from "nanoid"
 import {Milestone, Roadmap} from "@comend/lib/types"
 import {getMilestoneTypes} from "@comend/lib/fetchers"
 import {mixpanelTrack} from "@comend/lib/mixpanel";
+import { sleep } from "@comend/lib/utils"
 
 export type RoadmapState = {
     initialized: boolean,
@@ -59,6 +60,11 @@ export type RoadmapState = {
     addNodesFromTemplate: (template: any) => Promise<Node[]>
     deleteNode: (nodeId: string) => Promise<void>
     saveState: () => void
+    // savingState: 'saving' | 'saved' | undefined
+    // setSavingState: (savingState: 'saving' | 'saved' | undefined) => void,
+    savingList: string[],
+    savingListAdd: (id: string) => void,
+    savingListRemove: (id: string) => void,
 }
 
 export const useRoadmapStore = create<RoadmapState>()(
@@ -246,23 +252,24 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // });
             },
             setNodes: async (nodes: Node[]) => {
-                console.log(`set nodes`)
-                set({nodes})
+                // console.log(`set nodes`)
+                // set({nodes})
 
-                const orgId = get().details?.organizationId
-                const response = await updateDBFlow(orgId, {roadmapId: get().roadmapId, nodes, edges: get().edges})
-                if (response?.success && response?.data) {
-                    const newNodes = response.data.nodes.map((n: any) => ({
-                        id: n.id,
-                        position: {x: n.positionX, y: n.positionY},
-                        origin: n.origin
-                    })) as Node[]
+                // const orgId = get().details?.organizationId
+                // const response = await updateDBFlow(orgId, {roadmapId: get().roadmapId, nodes, edges: get().edges})
+                // if (response?.success && response?.data) {
+                //     const newNodes = response.data.nodes.map((n: any) => ({
+                //         id: n.id,
+                //         position: {x: n.positionX, y: n.positionY},
+                //         origin: n.origin
+                //     })) as Node[]
                 
-                    return newNodes as Node[]
-                } else {
-                    console.error(`Error updating database nodes`, response?.error)
-                    toast.success("Error updating node state... your node may node's position may not have been saved")
-                }
+                //     return newNodes as Node[]
+                // } else {
+                //     console.error(`Error updating database nodes`, response?.error)
+                //     toast.success("Error updating node state... your node may node's position may not have been saved")
+                // }
+
                 // const orgId = get().details?.organizationId;
                 // useWriteQueue.getState().enqueue({
                 //     kind: "UPDATE_FLOW",
@@ -416,32 +423,59 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // });
             },
             saveState: () => {
-                console.log(`save state`)
-                const state = get()
-                updateDBFlow(state.details?.organizationId, {
-                    roadmapId: state.roadmapId,
-                    nodes: state.nodes,
-                    edges: state.edges
-                })
-                updateMilestones(state.details?.organizationId, {milestones: state.milestones})
+                // console.log(`save state`)
+                // const state = get()
+                // updateDBFlow(state.details?.organizationId, {
+                //     roadmapId: state.roadmapId,
+                //     nodes: state.nodes,
+                //     edges: state.edges
+                // })
+                // updateMilestones(state.details?.organizationId, {milestones: state.milestones})
+
                 // const {enqueue} = useWriteQueue.getState();
                 // enqueue({
                 //     kind: "UPDATE_FLOW",
                 //     payload: {orgId: state.details?.organizationId, roadmapId: state.roadmapId, nodes: state.nodes, edges: state.edges}
                 // });
                 // enqueue({kind: "UPDATE_MILESTONES", payload: {orgId: state.details?.organizationId, milestones: state.milestones}});
-            }
+            },
+            // savingState: undefined,
+            // setSavingState: async (savingState: 'saving' | 'saved' | undefined) => {
+            //     set({savingState})
+
+            //     // if (savingState === 'saved') {
+            //     //     // after 5 seconds of the state being saved, remove the notification.
+            //     //     await sleep(5000)
+            //     //     set({savingState: undefined})
+            //     // }
+            // },
+            savingList: [],
+            savingListAdd: (id: string) => {
+                set({savingList: [...get().savingList, id]})
+            },
+            savingListRemove: (id: string) => {
+                const saved = get().savingList
+                console.log(`saved list`, saved)
+                const index = saved.findIndex(elementId => elementId === id)
+
+                // if the item was found in the list, remove the first instance
+                if (index >= 0) {
+                    saved.splice(index, 1)
+                    console.log(`update saving list`, saved)
+                    set({savingList: saved})
+                }
+            },
         }),
         {
             limit: 100, // limit the stored history states to 100
-            onSave: (pastState, currentState) => {
-                console.log(`Past state`, pastState)
-                console.log(`Saved Roadmap State: `, currentState)
-                return
-            },
-            partialize: (state) => {
-                const {selectedNodeIds, nodes, edges, milestones, details, ...rest} = state;
-                return {selectedNodeIds, nodes, edges, milestones, details};
-            },
+            // onSave: (pastState, currentState) => {
+            //     console.log(`Past state`, pastState)
+            //     console.log(`Saved Roadmap State: `, currentState)
+            //     return
+            // },
+            // partialize: (state) => {
+            //     const {selectedNodeIds, nodes, edges, milestones, details, ...rest} = state;
+            //     return {selectedNodeIds, nodes, edges, milestones, details};
+            // },
         })
 )

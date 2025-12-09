@@ -76,7 +76,7 @@ import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group"
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs"
 import Loading from "./../../../loading";
 import {fetchCreateRequests, findCompanies, findInstitutions} from "@comend/lib/fetchers"
-import {Globe, Lock, Plus, X, Share, Trash} from "lucide-react"
+import {Globe, Lock, Plus, X, Share, Trash, RefreshCcw, CircleCheckBig} from "lucide-react"
 import {Badge, badgeVariants} from "@comend/components/ui/badge"
 import {mixpanelTrack} from "@comend/lib/mixpanel"
 import ShareDialog from "./share-dialog"
@@ -127,26 +127,13 @@ const EditMilestoneDetailsProjectsTab = dynamic(
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
 
-// const onbordaSelector = (state: ResearchPlanOnbordaState) => ({
-//     step: state.step
-// })
-
 const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone,
-    selectedNodeIds: state.selectedNodeIds
+    selectedNodeIds: state.selectedNodeIds,
+    savingList: state.savingList,
+    savingListAdd: state.savingListAdd,
+    savingListRemove: state.savingListRemove,
 })
-
-// const recommendationsSelector = (state: CROSearchState) => ({
-//     recommendations: state.recommendations,
-//     setRecommendations: state.setRecommendations
-// })
-
-// const notificationsSelector = (state: NotificationsState) => ({
-//     initialized: state.initialized,
-//     notifications: state.notifications,
-//     addNotification: state.addNotification,
-//     setNotificationsViewed: state.setNotificationsViewed
-// })
 
 const nilOrEmptyToUndef = <T extends z.ZodTypeAny>(inner: T) =>
     z.preprocess(v => (v === "" || v === null ? undefined : v), inner.optional());
@@ -188,17 +175,6 @@ const editMilestoneForm = z.object({
 
 type SimpleAttachment = { name: string; link: string };
 
-// function addAttachmentToForm(form: any, att: SimpleAttachment) {
-//     const prev = form.getValues("attachments") ?? [];
-//     const norm = (s: string) => s.trim().toLowerCase();
-
-//     const already = prev.some((a: any) => norm(a.link) === norm(att.link));
-//     if (already) return false;
-
-//     form.setValue("attachments", [...prev, att], { shouldValidate: true, shouldDirty: true });
-//     return true;
-// }
-
 export function EditMilestoneForm({
                                       organization,
                                       milestoneData,
@@ -220,23 +196,13 @@ export function EditMilestoneForm({
     milestoneTypeOptions: Partial<MilestoneType>[],
     onClose: () => void
 }) {
-    const {setMilestone} = useRoadmapStore(useShallow(selector))
-    // const {recommendations, setRecommendations} = useCROSearchStore(useShallow(recommendationsSelector))
-    // const {
-    //     initialized: notificationsInitialized,
-    //     notifications,
-    //     addNotification,
-    //     setNotificationsViewed,
-    // } = useNotificationsStore(useShallow(notificationsSelector))
+    const {setMilestone, savingList, savingListAdd, savingListRemove} = useRoadmapStore(useShallow(selector))
     const initializing = useRef(true)
     const {data: session, status} = useSession()
     const pathname = usePathname()
-    // const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [fetchedTools, setFetchedTools] = useState<Option[]>([])
     const [tab, setTab] = useState<string>("edit")
-    // const {step} = useOnbordaStore(useShallow(onbordaSelector))
-    // const {isOnbordaVisible} = useOnborda()
     const [shareIsOpen, setShareIsOpen] = useState(false)
     const [createRFPIsOpen, setCreateRFPIsOpen] = useState(false)
     const [createBiosampleIsOpen, setCreateBiosampleIsOpen] = useState(false)
@@ -244,25 +210,6 @@ export function EditMilestoneForm({
     const [createClincalDatasetIsOpen, setCreateClinicalDatasetIsOpen] = useState(false)
     const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(milestoneData.createFacilityRequests || [])
     const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
-    // const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
-    // const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
-
-    // useEffect(() => {
-    //     async function fetchSavedCompanies() {
-    //         const res = await getSavedCompaniesFromOrganizationId(
-    //             session?.user?.organizationId,
-    //             { companyId: true }
-    //         );
-
-    //         if (res.success && res.data) {
-    //             setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
-    //         }
-    //     }
-
-    //     fetchSavedCompanies();
-    // }, [session, status]);
-
-    // state for adding fields
     const [hasBudget, setHasBudget] = useState(milestoneData?.budget !== undefined && milestoneData?.budget !== null)
     const [hasStartDate, setHasStartDate] = useState(milestoneData?.startDate || false)
     const [hasEndDate, setHasEndDate] = useState(milestoneData?.endDate || false)
@@ -364,6 +311,7 @@ export function EditMilestoneForm({
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         // if form state is not valid, don't submit
         if (!form.formState.isValid) return
+        console.log(`start saving...`)
 
         const {
             nodeType,
@@ -412,9 +360,6 @@ export function EditMilestoneForm({
             nodeType,
             title,
             ...(description !== undefined && description !== null ? {description} : undefined),
-            // ...(startDate ? {startDate} : undefined),
-            // ...(endDate ? {endDate} : undefined),
-            // ...(budget ? {budget} : undefined),
             startDate: startDate || null,
             endDate: endDate || null,
             budget: budget !== undefined && budget !== null ? budget : null,
@@ -426,7 +371,6 @@ export function EditMilestoneForm({
                     milestoneType: type
                 })
             }).filter((type) => type !== undefined),
-            // ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             metadata: {
                 ...(milestoneData?.metadata ? JSON.parse(JSON.stringify(milestoneData.metadata)) : undefined),
                 otherTypeDetails: values.otherTypeDetails
@@ -435,13 +379,6 @@ export function EditMilestoneForm({
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             ...(contacts ? {contacts} : undefined),
             ...(openTo ? {openTo} : undefined),
-            // tools: (tools || []).map((tool) => {
-            //     return ({
-            //         milestoneId: milestoneData.id,
-            //         toolId: tool.id,
-            //         tool: tool
-            //     })
-            // }).filter((tool) => tool !== undefined),
             biosamples: (tools || []).filter(tool => tool.type === "Biosamples").map((tool) => {
                 return ({
                     milestoneId: milestoneData.id,
@@ -483,9 +420,11 @@ export function EditMilestoneForm({
             }))
         }
 
-        if (milestoneData?.nodeId) setMilestone(milestoneData.nodeId, updateData)
+        if (milestoneData?.nodeId) await setMilestone(milestoneData.nodeId, updateData)
 
         setIsMigrating(false)
+        savingListRemove(milestoneData.id)
+        console.log(`end saving...`)
     }
 
     const handleStorageFacilityAsyncSearch = async (query: string): Promise<Option[]> => {
@@ -505,10 +444,10 @@ export function EditMilestoneForm({
         }
     }
 
-    const handleMilestoneFormSubmitCallback = useCallback(
-        handleMilestoneFormSubmit,
-        [milestoneData, setMilestone, milestoneTypeOptions]
-    )
+    // const handleMilestoneFormSubmitCallback = useCallback(
+    //     handleMilestoneFormSubmit,
+    //     [milestoneData, setMilestone, milestoneTypeOptions]
+    // )
 
     const handleShare = async () => {
         // override default delete behaviour with our custom dialog
@@ -516,10 +455,10 @@ export function EditMilestoneForm({
     }
 
     // memo ensures we're not creating a new debounce every time this is called
-    const debounceUpdates = useMemo(() =>
-            debounce((updatedValues) => handleMilestoneFormSubmitCallback(updatedValues), 500),
-        [handleMilestoneFormSubmitCallback]
-    )
+    // const debounceUpdates = useMemo(() =>
+    //         debounce((updatedValues) => handleMilestoneFormSubmitCallback(updatedValues), 500),
+    //     [handleMilestoneFormSubmitCallback]
+    // )
 
     const debounceMixpanelTrackBudget = useMemo(() =>
             debounce((updatedBudget) => {
@@ -532,82 +471,82 @@ export function EditMilestoneForm({
         []
     )
 
-    const init = async () => {
-        // backup fetch create requests - double check if there are any
-        if (milestoneData?.id) {
-            const createRequestsResponse = await fetchCreateRequests(
-                milestoneData.id,
-                {
-                    id: true,
-                    name: true,
-                    milestoneId: true,
-                    milestone: true,
-                    createdAt: true,
-                    updatedAt: true,
-                }
-            )
+    // const init = async () => {
+    //     // backup fetch create requests - double check if there are any
+    //     if (milestoneData?.id) {
+    //         const createRequestsResponse = await fetchCreateRequests(
+    //             milestoneData.id,
+    //             {
+    //                 id: true,
+    //                 name: true,
+    //                 milestoneId: true,
+    //                 milestone: true,
+    //                 createdAt: true,
+    //                 updatedAt: true,
+    //             }
+    //         )
 
-            if (createRequestsResponse.success && createRequestsResponse.data) {
-                setCreateRequests(createRequestsResponse.data)
-            }
-        }
+    //         if (createRequestsResponse.success && createRequestsResponse.data) {
+    //             setCreateRequests(createRequestsResponse.data)
+    //         }
+    //     }
 
-        if (session?.user.organizationId) {
-            const formattedBiosamples: Option[] = (biosampleOptions || []).map((biosample: Partial<Biosample>,) => {
-                return (
-                    {
-                        value: biosample.id || '',
-                        type: 'Biosamples',
-                        icon: "test-tube-diagonal",
-                        // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
-                        label: `${biosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
-                        biosample
-                    }
-                )
-            })
-            const formattedDiseaseModels: Option[] = (diseaseModelOptions || []).map((diseaseModel: Partial<DiseaseModel>) => {
-                return (
-                    {
-                        value: diseaseModel.id || '',
-                        label: `${diseaseModel.id} - ${(DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
-                        icon: 'rat',
-                        type: 'Disease Models',
-                        diseaseModel
-                    }
-                )
-            })
-            const formattedDatasamples: Option[] = (clinicalDatasetOptions || []).map((datasample: Partial<Tool>) => {
-                return (
-                    {
-                        value: datasample.id || '',
-                        label: `${datasample?.id} - ${datasample?.title}`,
-                        icon: 'database',
-                        type: 'Clinical Datasets',
-                        datasample
-                    }
-                )
-            })
-            setFetchedTools([...formattedBiosamples, ...formattedDiseaseModels, ...formattedDatasamples])
-        }
+    //     if (session?.user.organizationId) {
+    //         const formattedBiosamples: Option[] = (biosampleOptions || []).map((biosample: Partial<Biosample>,) => {
+    //             return (
+    //                 {
+    //                     value: biosample.id || '',
+    //                     type: 'Biosamples',
+    //                     icon: "test-tube-diagonal",
+    //                     // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`,
+    //                     label: `${biosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => biosample?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
+    //                     biosample
+    //                 }
+    //             )
+    //         })
+    //         const formattedDiseaseModels: Option[] = (diseaseModelOptions || []).map((diseaseModel: Partial<DiseaseModel>) => {
+    //             return (
+    //                 {
+    //                     value: diseaseModel.id || '',
+    //                     label: `${diseaseModel.id} - ${(DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
+    //                     icon: 'rat',
+    //                     type: 'Disease Models',
+    //                     diseaseModel
+    //                 }
+    //             )
+    //         })
+    //         const formattedDatasamples: Option[] = (clinicalDatasetOptions || []).map((datasample: Partial<Tool>) => {
+    //             return (
+    //                 {
+    //                     value: datasample.id || '',
+    //                     label: `${datasample?.id} - ${datasample?.title}`,
+    //                     icon: 'database',
+    //                     type: 'Clinical Datasets',
+    //                     datasample
+    //                 }
+    //             )
+    //         })
+    //         setFetchedTools([...formattedBiosamples, ...formattedDiseaseModels, ...formattedDatasamples])
+    //     }
 
-        // if (milestoneData) {
-        //     await setRecommendations([milestoneData as Milestone], {limit: 3})
-        // }
+    //     // if (milestoneData) {
+    //     //     await setRecommendations([milestoneData as Milestone], {limit: 3})
+    //     // }
 
-        // trigger a form validation, if the imported data is not valid, let the user know right away
-        form.trigger()
+    //     // trigger a form validation, if the imported data is not valid, let the user know right away
+    //     form.trigger()
 
-        initializing.current = false
-    }
+    //     initializing.current = false
+    // }
 
     // Initialization - Allow update once form is initialized
-    useEffect(() => {
+    // useEffect(() => {
 
-        init()
+    //     init()
 
-        // missing dependencies disabled - we only want to run this once on initialization
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    //     // missing dependencies disabled - we only want to run this once on initialization
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [])
 
     useEffect(() => {
         // handle updating any properties that can be edited externally (outside this form)
@@ -617,10 +556,10 @@ export function EditMilestoneForm({
     }, [milestoneData])
 
     // Watch form changes, don't watch while initializing
-    useEffect(() => {
-        const subscription = form.watch((values) => debounceUpdates(values))
-        return () => subscription.unsubscribe();
-    }, [form.watch, debounceUpdates, form])
+    // useEffect(() => {
+    //     const subscription = form.watch((values) => debounceUpdates(values))
+    //     return () => subscription.unsubscribe();
+    // }, [form.watch, debounceUpdates, form])
 
     useEffect(() => {
         // Forces re-validation whenever the startDate or endDate changes
@@ -1188,7 +1127,10 @@ export function EditMilestoneForm({
                                         <span className="h-8"/>
 
                                         <span
-                                            className="flex justify-end gap-4 flex-wrap absolute bottom-2 right-0 m-4">
+                                            className="flex justify-end items-center gap-4 flex-wrap absolute bottom-2 right-0 m-4"
+                                        >
+                                            {savingList.includes(milestoneData.id) && <p className="flex gap-1 items-center"><RefreshCcw className="h-4 w-4"/> Saving...</p>}
+                                            {/* {savingState === 'saved' && <p className="flex gap-1 items-center"><CircleCheckBig className="h-4 w-4"/> Saved</p>} */}
                                             <Dialog>
                                                 <DialogTrigger asChild>
                                                     <Button type="button" variant="destructive">
@@ -1204,8 +1146,9 @@ export function EditMilestoneForm({
                                                 className="onborda-save-project"
                                                 type="submit"
                                                 onClick={async () => {
-                                                    // await handleMilestoneFormSubmit(form.getValues())
-                                                    onClose()
+                                                    savingListAdd(milestoneData.id)
+                                                    await handleMilestoneFormSubmit(form.getValues())
+                                                    // onClose()
                                                 }}
                                             >
                                                 Save changes
