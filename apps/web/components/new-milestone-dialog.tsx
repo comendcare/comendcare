@@ -18,7 +18,7 @@ const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones,
     selectedView: state.selectedView,
     addNodes: state.addNodes,
-    addNodesFromTemplate: state.addNodesFromTemplate,
+    addMilestonesFromTemplate: state.addMilestonesFromTemplate,
     setSelectedNodeIds: state.setSelectedNodeIds
 })
 
@@ -29,7 +29,7 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
         addMilestones,
         selectedView,
         addNodes,
-        addNodesFromTemplate,
+        addMilestonesFromTemplate,
         setSelectedNodeIds
     } = useRoadmapStore(useShallow(selector))
     const pathname = usePathname()
@@ -147,7 +147,14 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                                 type="button"
                                 variant={"cta"}
                                 onClick={async () => {
-                                    const newNodes = await addMilestones(selectedMilestonesTemplate.map((template: any) => {
+
+                                    if(selectedResearchPlanTemplate) {
+                                        // reearch plan template
+                                        const newNodes = await addMilestonesFromTemplate(selectedResearchPlanTemplate)
+                                        if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
+                                    } else {
+                                        // individual project templates
+                                        const newNodes = await addMilestones(selectedMilestonesTemplate.map((template: any) => {
                                         return ({
                                             nodeType: "PROJECT",
                                             title: template?.title,
@@ -162,14 +169,9 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                                             }).filter((type: Partial<MilestoneTypeOnMilestone> | undefined) => type !== undefined),
                                             status: template?.status,
                                         })
-                                    }), "Project Template")
+                                    }), "Project Template")}
 
-                                    if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
-
-                                    if (selectedResearchPlanTemplate) {
-                                        const newNodes = await addNodesFromTemplate(selectedResearchPlanTemplate)
-                                        if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
-                                    }
+                                    // if (newNodes) setSelectedNodeIds(newNodes.map(node => node.id))
 
                                     console.log(`revalidate`, pathname)
                                     await revalidate(pathname)

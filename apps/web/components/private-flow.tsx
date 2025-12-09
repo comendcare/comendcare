@@ -294,17 +294,17 @@ export const PrivateFlowView = ({
     }))
 
     // when the handle is adjusted (width changes) or a node is selected (details panel opens), fit the view
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (selectedNodeIds.length === 1) {
-                fitView({ nodes: [{ id: selectedNodeIds[0] }], padding: 2, duration: 500 })
-            } else {
-                fitView({ padding: 0.4, duration: 500 })
-            }
-        }, 1) // Delay by a short time to allow landing adjustment
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //         if (selectedNodeIds.length === 1) {
+    //             fitView({ nodes: [{ id: selectedNodeIds[0] }], padding: 2, duration: 500 })
+    //         } else {
+    //             fitView({ padding: 0.4, duration: 500 })
+    //         }
+    //     }, 1) // Delay by a short time to allow landing adjustment
 
-        return () => clearTimeout(timer)
-    }, [width, selectedNodeIds, fitView])
+    //     return () => clearTimeout(timer)
+    // }, [width, selectedNodeIds, fitView])
 
     useEffect(() => {
         const startOnbordaAndRemoveToast = () => {

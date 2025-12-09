@@ -62,7 +62,8 @@ const selector = (state: RoadmapState) => ({
     saveState: state.saveState,
     addMilestones: state.addMilestones,
     deleteNode: state.deleteNode,
-    setMilestone: state.setMilestone
+    setMilestone: state.setMilestone,
+    nodes: state.nodes,
 })
 
 export function Roadmap({
@@ -102,6 +103,7 @@ export function Roadmap({
     const { 
         selectedNodeIds, 
         setSelectedNodeIds, 
+        nodes,
     } = useRoadmapStore(useShallow(selector))
     const {data: session, status} = useSession()
     const pathname = usePathname()
@@ -266,7 +268,7 @@ export function Roadmap({
                             value="flow"
                             className="m-0 h-[calc(100vh-10rem)]"
                         >
-                            {initMilestones.length > 0 ? (
+                            {nodes.length > 0 ? (
                                 <PrivateFlowView
                                     width={defaultLayout[0]}
                                     organization={organization}
@@ -283,7 +285,7 @@ export function Roadmap({
                             value="list"
                             className="mt-0 h-[calc(100vh-12rem)]"
                         >
-                            {initMilestones.length > 0 ? (
+                            {nodes.length > 0 ? (
                                 <TimelineView
                                     sortBy={sortBy} 
                                     organization={organization}

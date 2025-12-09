@@ -56,7 +56,7 @@ export type RoadmapState = {
     setEdges: (edges: Edge[]) => Promise<Edge[] | void>
     addMilestones: (milestones: Partial<Milestone>[], creationMethod?: string) => Promise<Node[] | void>
     addNodes: (node: Node[], creationMethod?: string) => Promise<Node[] | void>
-    addNodesFromTemplate: (template: any) => Promise<Node[]>
+    addMilestonesFromTemplate: (template: any) => Promise<Node[]>
     deleteNode: (nodeId: string) => Promise<void>
     saveState: () => void
 }
@@ -286,29 +286,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // });
             },
             addMilestones: async (milestones: Partial<Milestone>[], creationMethod?: string) => {
-                console.log(`add milestones`, milestones)
-                const newNodes: Node[] = []
-
-                // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
-                // const {
-                //     height,
-                //     width,
-                //     transform: [transformX, transformY, zoomLevel]
-                // } = store.getState()
-
-                // const zoomMultiplier = 1 / zoomLevel
-                // let centerX =
-                //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-                // let centerY =
-                //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
-
-                const milestoneTypes = await getMilestoneTypes({
-                    id: true,
-                    label: true,
-                    services: true,
-                    categories: true,
-                    description: true
-                })
+                console.log(`start add milestones`, Date.now())
 
                 const milestonesAlongXAxis = get().nodes.sort((a, b) => {
                     return a?.position?.x - b?.position?.x
@@ -316,9 +294,9 @@ export const useRoadmapStore = create<RoadmapState>()(
                 let centerX = milestonesAlongXAxis.length > 0 ? ((milestonesAlongXAxis[milestonesAlongXAxis.length - 1]?.position?.x || 0) + 500) : (0)
                 let centerY = 0
 
-                milestones.forEach((defaultData, index) => {
+                const newNodes = milestones.map((defaultData, index) => {
                     const id = nanoid()
-                    const milestoneId = nanoid()
+                    // const milestoneId = nanoid()
                     const newNode: Node = {
                         id: id,
                         type: defaultData?.nodeType || "PROJECT",
@@ -329,7 +307,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                         origin: [0.0, 0.0],
                         data: {
                             ...defaultData,
-                            id: milestoneId,
+                            // id: milestoneId,
                             nodeId: id,
                             private: defaultData?.private !== null && defaultData?.private !== undefined ? defaultData.private: true,
                             timelineOrder: get().milestones.length + index, // add in last position in timeline
@@ -344,10 +322,14 @@ export const useRoadmapStore = create<RoadmapState>()(
                     centerX += 500
                     // centerY += 200
 
-                    newNodes.push(newNode)
+                    return newNode
                 })
 
+                console.log(`finished processing milestones`, Date.now())
+
                 const nodes = await get().addNodes(newNodes, creationMethod)
+
+                console.log(`finished adding nodes`, Date.now())
                 return nodes
             },
             addNodes: async (nodes: Node[], creationMethod?: string) => {
@@ -376,23 +358,82 @@ export const useRoadmapStore = create<RoadmapState>()(
                 //     payload: {orgId: get().details?.organizationId, roadmapId: get().roadmapId, nodes, creationMethod}
                 // });
             },
-            addNodesFromTemplate: async (template: any) => {
-                const response = await createNodesAndEdgesFromTemplate(get().details?.organizationId, get().roadmapId, template)
-                if (response.success && response.data && response.data.nodes && response.data.milestones && response.data.edges) {
-                    const newNodes = response.data.nodes.filter((node: any) => !get().nodes.map(n => n.id).includes(node.id))
-                    set({
-                        nodes: (response.data.nodes.map((node: any) => ({
-                            ...node,
-                            position: {x: node.positionX, y: node.positionY}
-                        }))),
-                        milestones: response.data.milestones,
-                        edges: response.data.edges
-                    })
-                    return newNodes
-                } else {
-                    console.error(`Error adding nodes`, response?.error)
-                    toast.error(`Error adding projects from template: ${response?.error}`)
+            addMilestonesFromTemplate: async (template: any) => {
+                // maps the original node id (from the template) to the new node ID that's stored in the DB
+                const nodeIDMap: { [originalNodeId: string]: string } = {}
+        
+                // if a roadmap template was provided, create the relevant nodes, milestones, and edges
+                if (template?.milestones) {
+                    const milestones = template.milestones
+        
+                    const newNodes = await Promise.all(
+                        milestones.map(async (milestone: any, index: number) => {
+                            // find the node associated with the milestone, used to fetch position information
+                            const templateNode = template.nodes.find((n: any) => n.id === milestone.nodeId)
+                            const id = nanoid()
+        
+                            // create Node & associated Milestone
+                            const node = {
+                                id: id,
+                                type: templateNode.nodeType || "PROJECT",
+                                position: {
+                                    x: templateNode ? templateNode.positionX : index * 500,
+                                    y: templateNode ? templateNode.positionY : 0,
+                                },
+                                origin: [0.0, 0.0],
+                                data: {
+                                    ...milestone,
+                                    // id: milestoneId,
+                                    nodeId: id,
+                                    private: milestone?.private !== null && milestone?.private !== undefined ? milestone.private: true,
+                                    timelineOrder: get().milestones.length + index, // add in last position in timeline
+                                    nodeType: milestone?.nodeType || "PROJECT",
+                                    title: milestone?.title || 'New Milestone',
+                                    description: milestone?.description || '',
+                                    types: milestone?.types,
+                                    status: milestone?.status || "PLANNED",
+                                }
+                            }
+        
+                            // append to node ID map, this is used to create edges so we can map the template node ID to the
+                            // new node ID that will be used in the database
+                            if (templateNode) nodeIDMap[templateNode.id] = node.id
+        
+                            return node
+                        })
+                    )
+
+                    // let newEdges = []
+        
+                    // create any edges that are connecting nodes
+                    // if (template.edges) {
+                    //     newEdges = template.edges.map((edge: Edge, index: number) => ({
+                    //         source: nodeIDMap[edge.source] || edge.source,
+                    //         target: nodeIDMap[edge.target] || edge.target,
+                    //     }))
+                    // } else {
+                    //     // template doesn't have any defined edges, use default edge generation
+                    //     for (let i = 0; i < newNodes.length - 1; i++) {
+                    //         newEdges.push({
+                    //             source: newNodes[i]?.id,
+                    //             target: newNodes[i+1]?.id,
+                    //         })
+                    //     }
+                    // }
+
+                    // const edges = addEdge(
+                    //     {...connection, style: {stroke: 'black'}},
+                    //     get().edges
+                    // )
+
+                    // update DB edges
+                    // const response = await updateEdges(get().details?.organizationId, {roadmapId: get().roadmapId, edges})
+
+                    const nodes = await get().addNodes(newNodes, 'template')
+                    return nodes || []
                 }
+
+                return [] as Node[]
             },
             deleteNode: async (nodeId: string | undefined) => {
                 console.log(`delete nodes`)

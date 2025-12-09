@@ -1177,11 +1177,10 @@ export function EditMilestoneForm({
                                             </DialogTrigger>
                                             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
                                         </Dialog>
+                                        <div className="bg-white rounded-md p-0">
                                         <Button
-                                            disabled={!form.formState.isValid}
+                                            disabled={!form.formState.isValid || isSaving}
                                             variant={"cta"}
-                                            id="edit-milestone-scroll-area"
-                                            className="onborda-save-project"
                                             type="submit"
                                             onClick={async () => {
                                                 await handleMilestoneFormSubmit(form.getValues())
@@ -1189,13 +1188,14 @@ export function EditMilestoneForm({
                                         >
                                             {isSaving 
                                                 ? (
-                                                    <div className="w-[81px] flex justify-center items-center">
+                                                    <div className="w-[80px] flex justify-center items-center">
                                                         <LoadingDots/>
                                                     </div>
                                                 ) 
                                                 : ("Save changes")
                                             }
                                         </Button>
+                                        </div>
                                     </span>
                                 </TabsContent>
                                 <TabsContent value="notes" className="space-y-6 w-full h-full">

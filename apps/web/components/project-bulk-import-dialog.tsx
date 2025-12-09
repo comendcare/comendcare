@@ -23,7 +23,7 @@ const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones,
     selectedView: state.selectedView,
     addNodes: state.addNodes,
-    addNodesFromTemplate: state.addNodesFromTemplate,
+    addMilestonesFromTemplate: state.addMilestonesFromTemplate,
     setSelectedNodeIds: state.setSelectedNodeIds
 })
 
