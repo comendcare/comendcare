@@ -52,7 +52,10 @@ import { revalidate } from "@comend/lib/revalidate"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeIds: state.selectedNodeIds,
+    setSelectedNodeIds: state.setSelectedNodeIds,
     nodes: state.nodes,
+    milestones: state.milestones,
+    addMilestones: state.addMilestones,
 })
 
 export function Roadmap({
@@ -519,7 +522,7 @@ const RoadmapHeader = ({
 }) => {
     const {data: session, status} = useSession()
     const pathname = usePathname()
-    const { milestones, setSelectedNodeIds, addMilestones, setMilestone } = useRoadmapStore(useShallow(selector))
+    const { milestones, addMilestones, } = useRoadmapStore(useShallow(selector))
     const parentRef = useRef<HTMLDivElement>(null)
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1024)
