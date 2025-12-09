@@ -23,7 +23,7 @@ import {Badge, badgeVariants} from "@comend/components/ui/badge"
 import {Milestone, StatusType} from "@comend/lib/types"
 import {RoadmapState, useRoadmapStore} from "./../state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import { ExternalLink, Microscope, Plus, Trash, User, DollarSign } from "lucide-react"
+import { ExternalLink, Microscope, Plus, Trash, User, DollarSign, RefreshCcw } from "lucide-react"
 import { ProjectActionsMenu } from "./project-actions-menu"
 import { Organization } from "@prisma/client"
 import { PublicPrivateButton } from "@comend/components/public-private-button"
@@ -53,11 +53,12 @@ const selector = (state: RoadmapState) => ({
     edges: state.edges,
     onEdgesChange: state.onEdgesChange,
     setSelectedNodeIds: state.setSelectedNodeIds,
-    setMilestone: state.setMilestone
+    setMilestone: state.setMilestone,
+    savingList: state.savingList
 })
 
 export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
-    const {selectedNodeIds, setSelectedNodeIds, setMilestone} = useRoadmapStore(useShallow(selector))
+    const {selectedNodeIds, setSelectedNodeIds, setMilestone, savingList} = useRoadmapStore(useShallow(selector))
 
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
         const target = event.target as any;
@@ -292,6 +293,8 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                         )}
                     </>
                 )} */}
+
+                {savingList.includes(props.data.id) && <p className="flex gap-1 items-center"><RefreshCcw className="h-4 w-4"/> Saving...</p>}
             </CardContent>
 
             {props.data?.contextMenuRef && props.id !== "preview" ? (
