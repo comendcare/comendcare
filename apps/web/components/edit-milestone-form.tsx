@@ -133,11 +133,6 @@ type ContactType = Prisma.ExternalContactGetPayload<{}>
 //     step: state.step
 // })
 
-const selector = (state: RoadmapState) => ({
-    setMilestone: state.setMilestone,
-    selectedNodeIds: state.selectedNodeIds
-})
-
 // const recommendationsSelector = (state: CROSearchState) => ({
 //     recommendations: state.recommendations,
 //     setRecommendations: state.setRecommendations

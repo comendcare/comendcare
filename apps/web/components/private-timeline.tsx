@@ -25,8 +25,6 @@ const selector = (state: RoadmapState) => ({
     selectedNodeIds: state.selectedNodeIds,
     setSelectedNodeIds: state.setSelectedNodeIds,
     milestones: state.milestones,
-    setMilestones: state.setMilestones,
-    setMilestone: state.setMilestone
 })
 
 export const TimelineView = ({
@@ -41,151 +39,69 @@ export const TimelineView = ({
     const {
         selectedNodeIds,
         milestones,
-        setMilestones
     } = useRoadmapStore(useShallow(selector))
-
-    // const sensors = useSensors(
-    //     useSensor(MouseSensor),
-    //     useSensor(TouchSensor),
-    //     useSensor(KeyboardSensor, {
-    //         coordinateGetter: sortableKeyboardCoordinates
-    //     })
-    // )
-
-    // function getDraggedData(id: string) {
-    //     const name = milestones?.find(item => item.id === id)?.title
-    //     const position = (milestones?.findIndex(item => item.id === id) || 0) + 1
-    //     const length = milestones?.length || 0
-
-    //     return {name, position, length}
-    // }
-
-    // const announcements: Announcements = {
-    //     onDragStart({active}) {
-    //         const data = getDraggedData(active?.id.toString())
-    //         const message = `Picked up milestone ${data.name} at position ${data.position} of ${data.length}`
-    //         if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-    //         return message
-    //     },
-    //     onDragOver({active, over}) {
-    //         const activeData = getDraggedData(active?.id.toString())
-
-    //         if (over) {
-    //             const overData = getDraggedData(over?.id.toString())
-    //             const message = `Milestone ${activeData.name} was moved over position ${overData.position} of ${activeData.length}.`
-    //             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-    //             return message
-    //         }
-
-    //         const message = `Milestone ${activeData.name} is no longer over a droppable position.`
-    //         if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-    //         return message
-    //     },
-    //     onDragEnd({active, over}) {
-    //         const activeData = getDraggedData(active?.id.toString())
-
-    //         if (over) {
-    //             const overData = getDraggedData(over?.id.toString())
-    //             const message = `Milestone ${activeData.name} was dropped into position ${overData.position} of ${activeData.length}`
-    //             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-    //             return message
-    //         }
-
-    //         const message = `Milestone ${activeData} was dropped.`
-    //         if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-    //         return message
-    //     },
-    //     onDragCancel({active}) {
-    //         const activeData = getDraggedData(active?.id.toString())
-    //         const message = `Dragging was cancelled. Milestone ${activeData.name} was dropped.`
-    //         if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-    //         return message
-    //     },
-    // }
 
     return (
         <ScrollArea className="w-full h-full px-10 pt-0">
-            {/* <DndContext
-                accessibility={{
-                    announcements
-                }}
-                collisionDetection={closestCorners}
-                sensors={sensors}
-                onDragEnd={(event) => {
-                    const {active, over} = event
+            <ol className="ml-2 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
+                <SortableContext 
+                    disabled={sortBy !== "custom"}
+                    items={
+                        milestones ? milestones
+                            .sort((a, b) => {
+                                // pre sort by creation date
+                                return ((a.createdAt?.getTime() || (new Date().getTime())) - (b.createdAt?.getTime() || (new Date().getTime())))
+                            })
+                            .sort((a, b) => {
+                                switch (sortBy) {
+                                    case "custom": 
+                                        return a.timelineOrder - b.timelineOrder
+                                    case "start":
+                                        if (!!a.startDate && !!b.startDate) return a.startDate.getTime() - b.startDate.getTime()
+                                
+                                        // Keep relative order of items without a startDate
+                                        if (!a.startDate && !b.startDate) return 0
+                                
+                                        // Move items without startDate to the end
+                                        return !!a.startDate ? -1 : 1
+                                    case "end":
+                                        if (!!a.endDate && !!b.endDate) return a.endDate.getTime() - b.endDate.getTime()
+                                
+                                        // Keep relative order of items without a startDate
+                                        if (!a.endDate && !b.endDate) return 0
+                                
+                                        // Move items without startDate to the end
+                                        return !!a.endDate ? -1 : 1
+                                    case "default":
+                                        if (!!a.node?.positionX && !!b.node?.positionX) return a.node.positionX - b.node.positionX
 
-                    if (active.id === over?.id) return
-
-                    const originalPosition = milestones?.findIndex(item => item.id === active.id) || 0
-                    const newPosition = milestones?.findIndex(item => item.id === over?.id) || 0
-
-                    const updatedMilestones = arrayMove(milestones || [], originalPosition, newPosition)
-                    setMilestones(updatedMilestones.map((milestone, index) => ({
-                        ...milestone,
-                        timelineOrder: index
-                    })))
-                }}
-            > */}
-                <ol className="ml-2 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
-                    <SortableContext 
-                        disabled={sortBy !== "custom"}
-                        items={
-                            milestones ? milestones
-                                .sort((a, b) => {
-                                    // pre sort by creation date
-                                    return ((a.createdAt?.getTime() || (new Date().getTime())) - (b.createdAt?.getTime() || (new Date().getTime())))
-                                })
-                                .sort((a, b) => {
-                                    switch (sortBy) {
-                                        case "custom": 
-                                            return a.timelineOrder - b.timelineOrder
-                                        case "start":
-                                            if (!!a.startDate && !!b.startDate) return a.startDate.getTime() - b.startDate.getTime()
-                                    
-                                            // Keep relative order of items without a startDate
-                                            if (!a.startDate && !b.startDate) return 0
-                                    
-                                            // Move items without startDate to the end
-                                            return !!a.startDate ? -1 : 1
-                                        case "end":
-                                            if (!!a.endDate && !!b.endDate) return a.endDate.getTime() - b.endDate.getTime()
-                                    
-                                            // Keep relative order of items without a startDate
-                                            if (!a.endDate && !b.endDate) return 0
-                                    
-                                            // Move items without startDate to the end
-                                            return !!a.endDate ? -1 : 1
-                                        case "default":
-                                            if (!!a.node?.positionX && !!b.node?.positionX) return a.node.positionX - b.node.positionX
-
-                                            // Keep relative order of items without a node position
-                                            if (!a.node?.positionX && !b.node?.positionX) return 0
-                                    
-                                            // Move items without nodePosition to the end
-                                            return !!a.node?.positionX ? -1 : 1
-                                        default:
-                                            return 0
-                                    }
-                            }).map(milestone => milestone.id) : []
-                        }
-                        strategy={verticalListSortingStrategy}
-                    >
-                        {(milestones || []).map((milestone, index) => (
-                            <DraggableTimelineItem 
-                                milestone={milestone} 
-                                index={index} 
-                                key={milestone.id}
-                                selectedNodeIds={selectedNodeIds} 
-                                disabled={sortBy !== "custom"}
-                                contextMenuRef={contextMenuRef}
-                                isPrivate={true}
-                                isDraggable={true}
-                                organization={organization}
-                            />
-                        ))}
-                    </SortableContext>
-                </ol>
-            {/* </DndContext> */}
+                                        // Keep relative order of items without a node position
+                                        if (!a.node?.positionX && !b.node?.positionX) return 0
+                                
+                                        // Move items without nodePosition to the end
+                                        return !!a.node?.positionX ? -1 : 1
+                                    default:
+                                        return 0
+                                }
+                        }).map(milestone => milestone.id) : []
+                    }
+                    strategy={verticalListSortingStrategy}
+                >
+                    {(milestones || []).map((milestone, index) => (
+                        <DraggableTimelineItem 
+                            milestone={milestone} 
+                            index={index} 
+                            key={milestone.id}
+                            selectedNodeIds={selectedNodeIds} 
+                            disabled={sortBy !== "custom"}
+                            contextMenuRef={contextMenuRef}
+                            isPrivate={true}
+                            isDraggable={true}
+                            organization={organization}
+                        />
+                    ))}
+                </SortableContext>
+            </ol>
         </ScrollArea>
     )
 }
@@ -345,62 +261,22 @@ export const TimelineItemContent = ({
     attributes?: any,
     listeners?: any
 }) => {
-
-    const {setMilestone} = useRoadmapStore(useShallow(selector))
-
     return (
         <>
         <div className="flex flex-row items-start justify-start gap-4 mr-8">
             <span>
-                {/* hide for now, until we bring back custom order in the list view */}
-                {/* {isDraggable && (
-                    disabled ? (
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <Button
-                                    disabled={true}
-                                    type="button"
-                                    variant={"ghost"}
-                                    {...attributes}
-                                    {...listeners}
-                                    className="p-2 h-fit text-secondary-foreground/50 cursor-grab"
-                                >
-                                    <span className="sr-only">Move timeline</span>
-                                    <GripVertical/>
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-80">
-                                <p>
-                                    {`Dragging is only available in custom mode.`}
-                                </p>
-                            </TooltipContent>
-                        </Tooltip>
-                    ): (
-                        <Button
-                            type="button"
-                            variant={"ghost"}
-                            {...attributes}
-                            {...listeners}
-                            className="p-2 h-fit text-secondary-foreground/50 cursor-grab"
-                        >
-                            <span className="sr-only">Move timeline</span>
-                            <GripVertical/>
-                        </Button>
-                    )
-                )} */}
                 {isPrivate && (
                     <PublicPrivateButton 
                         isPrivate={milestone.private}
                         updateCallback={async (isPrivate) => {
-                            if (milestone.nodeId) {
-                                setMilestone(milestone.nodeId, {private: isPrivate})
-                            }
+                            // if (milestone.nodeId) {
+                            //     setMilestone(milestone.nodeId, {private: isPrivate})
+                            // }
                         }}
                     />
                 )}
                 <p className="inline mr-2 font-semibold text-lg group-hover:underline">{milestone.title}</p>
             </span>
-            {/* {milestone.private && <PrivateBadge iconOnly/>} */}
             <time
                 className="mt-[12px] ml-auto min-w-fit block font-semibold leading-none dark:text-gray-500">
                 {getDates(milestone)}
@@ -411,9 +287,6 @@ export const TimelineItemContent = ({
                 </div>
             )}
         </div>
-        {/* <p className={"mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-1"}>
-            {milestone.description}
-        </p> */}
 
         <span className="flex flex-wrap gap-2 items-center">
             {(milestone?.types || []).map((milestoneType, index) => (
@@ -462,45 +335,6 @@ export const TimelineItemContent = ({
                     </Badge>
                 </li>
             )}
-
-            {/* {(milestone?.biosamples?.length > 0 || milestone?.diseaseModels?.length > 0 || milestone?.tools?.length > 0) && (
-                <>
-                    {(milestone.biosamples || []).map(({biosample}, index) => {
-                        const type = BIOSAMPLE_TYPE_OPTIONS.find((option, index) => option.value === biosample.types?.[0])
-                        return (
-                            <Badge key={index} variant="green">
-                                <TestTubeDiagonal className="h-4 w-4" />
-                                {`${biosample.id}`}
-                            </Badge>
-                        )
-                    })}
-                    {(milestone.diseaseModels || []).map(({diseaseModel}, index) => {
-                        const type = DISEASE_MODEL_TYPE_OPTIONS.find((option, index) => option.value === diseaseModel.types?.[0])
-                        return (
-                            <Badge key={index} variant="green">
-                                <Rat className="h-4 w-4" />
-                                {`${diseaseModel.id}`}
-                            </Badge>
-                        )
-                    })}
-                    {(milestone.tools || []).map(({tool}, index) => (
-                        <Badge key={index} variant="green">
-                            <Database className="h-4 w-4" />
-                            {`${tool?.id}`}
-                        </Badge>
-                    ))}
-                </>
-            )}
-            {milestone?.rfps?.length > 0 && (
-                <>
-                    {milestone.rfps.map(({rfp}, index) => (
-                        <Badge variant="orange">
-                            <Megaphone className="h-4 w-4 min-w-4" />
-                            {`${rfp?.title}`}
-                        </Badge>
-                    ))}
-                </>
-            )} */}
         </span>
 
         <li className="mt-4">
@@ -512,7 +346,6 @@ export const TimelineItemContent = ({
                 onStatusChange={() => {}}
             />
         </li>
-        {/* <TimelineCardContents milestoneData={milestone} nodeType={milestone?.nodeType || milestone?.nodeType || "PROJECT"}/> */}
         </>
     )
 }

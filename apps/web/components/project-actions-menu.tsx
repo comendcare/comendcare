@@ -26,7 +26,6 @@ const selector = (state: RoadmapState) => ({
     selectedNodeIds: state.selectedNodeIds,
     setSelectedNodeIds: state.setSelectedNodeIds,
     milestones: state.milestones,
-    setMilestones: state.setMilestones,
     addMilestones: state.addMilestones
 })
 

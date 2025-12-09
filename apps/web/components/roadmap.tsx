@@ -51,18 +51,7 @@ import { updateMilestones } from "@comend/lib/actions"
 import { revalidate } from "@comend/lib/revalidate"
 
 const selector = (state: RoadmapState) => ({
-    roadmapId: state.roadmapId,
-    details: state.details,
-    initialized: state.initialized,
-    selectedView: state.selectedView,
-    setSelectedView: state.setSelectedView,
     selectedNodeIds: state.selectedNodeIds,
-    setSelectedNodeIds: state.setSelectedNodeIds,
-    milestones: state.milestones,
-    saveState: state.saveState,
-    addMilestones: state.addMilestones,
-    deleteNode: state.deleteNode,
-    setMilestone: state.setMilestone,
     nodes: state.nodes,
 })
 
@@ -102,7 +91,6 @@ export function Roadmap({
     const { defaultLayout } = useSidebarStore()
     const { 
         selectedNodeIds, 
-        setSelectedNodeIds, 
         nodes,
     } = useRoadmapStore(useShallow(selector))
     const {data: session, status} = useSession()
@@ -342,24 +330,6 @@ export function Roadmap({
         </ContextMenuTrigger>
 
         <ContextMenuContent ref={contextMenuRef}>
-            {/* <ContextMenuItem 
-                onSelect={(e) => {
-                    selectedNodeIds.forEach((nodeId: string) => {
-                        setMilestone(nodeId, {private: false})
-                    })
-                }}
-            >
-                {`Make selected project(s) public`}
-            </ContextMenuItem>
-            <ContextMenuItem
-                onSelect={(e) => {
-                    selectedNodeIds.forEach((nodeId: string) => {
-                        setMilestone(nodeId, {private: true})
-                    })
-                }}
-            >
-                {`Make selected project(s) private`}
-            </ContextMenuItem> */}
             <ContextMenuItem onClick={(e) => {
                 e.preventDefault()
                 // we have to ensure the context menu closes properly before triggering the dialog
@@ -609,7 +579,7 @@ const RoadmapHeader = ({
                                             milestones
                                                 .map(milestone => milestone.nodeId)
                                                 .forEach((nodeId: string | null) => {
-                                                    if (nodeId) setMilestone(nodeId, {private: false})
+                                                    // if (nodeId) setMilestone(nodeId, {private: false})
                                                 })
                                             // const response = await updateMilestones(
                                             //     session?.user?.organizationId,
@@ -639,7 +609,7 @@ const RoadmapHeader = ({
                                             milestones
                                                 .map(milestone => milestone.nodeId)
                                                 .forEach((nodeId: string | null) => {
-                                                    if (nodeId) setMilestone(nodeId, {private: true})
+                                                    // if (nodeId) setMilestone(nodeId, {private: true})
                                                 })
                                         }}
                                     >

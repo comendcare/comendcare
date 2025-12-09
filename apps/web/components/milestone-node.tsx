@@ -60,7 +60,6 @@ const selector = (state: RoadmapState) => ({
     edges: state.edges,
     onEdgesChange: state.onEdgesChange,
     setSelectedNodeIds: state.setSelectedNodeIds,
-    setMilestone: state.setMilestone
 })
 
 export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
@@ -102,7 +101,6 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                                     isPrivate={props.data?.private}
                                     updateCallback={async (isPrivate) => {
                                         if (props.data?.nodeId) {
-                                            // setMilestone(props.data.nodeId, {private: isPrivate})
                                             const response = await updateMilestones(
                                                 session?.user?.organizationId,
                                                 {milestones: [{...props.data, private: isPrivate}]}

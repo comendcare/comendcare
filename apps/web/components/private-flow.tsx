@@ -126,12 +126,12 @@ export const PrivateFlowView = ({
                 title: "New Milestone",
                 private: true,
                 handleType: node.handleType
-             }, 
+                }, 
             type: "PROJECT",
         });
-      }, []);
-    
-      const handleMouseMove = useCallback((event: any) => {
+    }, []);
+
+    const handleMouseMove = useCallback((event: any) => {
         if (startConnectNode) {
             let position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
             const width = 40
@@ -156,7 +156,7 @@ export const PrivateFlowView = ({
                         title: "New Milestone",
                         private: true,
                         handleType: startConnectNode?.handleType
-                     }, 
+                        }, 
                     type: "PROJECT",
                 });
             }
@@ -164,24 +164,7 @@ export const PrivateFlowView = ({
             setStartConnectNode(null)
             setPreviewNode(null)
         }
-      }, [startConnectNode, screenToFlowPosition, getIntersectingNodes]);
-
-    // const handleEditClick = (event: React.MouseEvent, node: Node) => {
-    //     if (event.ctrlKey || event.altKey) return
-    //     if (event.metaKey) {
-    //         // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
-    //         if (node.id && !selectedNodeIds.includes(node.id)) {
-    //             setSelectedNodeIds([...selectedNodeIds, node.id])
-    //         }
-    //     } else {
-    //         // regular click, set selected node id
-    //         if (node.id) {
-    //             setSelectedNodeIds([node.id])
-    //         } else {
-    //             setSelectedNodeIds([])
-    //         }
-    //     }
-    // }
+    }, [startConnectNode, screenToFlowPosition, getIntersectingNodes]);
 
     const onNodesChange = (changes: NodeChange<Node>[]) => {
         const newNodes = applyNodeChanges(changes, localNodes).map(node => {

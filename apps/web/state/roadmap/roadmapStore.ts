@@ -20,7 +20,6 @@ import {
 import {toast} from "sonner"
 import {nanoid} from "nanoid"
 import {Milestone, Roadmap} from "@comend/lib/types"
-import {getMilestoneTypes} from "@comend/lib/fetchers"
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 
 export type RoadmapState = {
@@ -46,8 +45,6 @@ export type RoadmapState = {
     selectedNodeIds: string[]
     setSelectedNodeIds: (ids: string[]) => void
     milestones: Milestone[]
-    setMilestone: (id: string, newProperties: Partial<Milestone>) => Promise<Milestone[] | void>
-    setMilestones: (milestones: Milestone[]) => Promise<Milestone[] | void>
     nodes: Node[]
     edges: Edge[]
     onEdgesChange: (changes: EdgeChange[]) => Promise<Edge[] | void>
@@ -149,59 +146,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                 set({selectedNodeIds: ids})
             },
             milestones: [],
-            setMilestone: async (nodeId: string | null, newProperties: Partial<Milestone>) => {
-                console.log(`set milestone`)
-                const milestones = get().milestones.map(milestone =>
-                    milestone.nodeId === nodeId
-                        ? {...milestone, ...newProperties}
-                        : milestone
-                )
-                set({milestones})
-
-                // update DB milestones
-                const response = await updateMilestones(get().details?.organizationId, {milestones: milestones.filter(milestone => milestone.nodeId === nodeId)})
-                if (response?.success && response?.data) {
-                    console.log(`successfully updated milestone`, response)
-                    return response.data as Milestone[]
-                } else {
-                    toast.error("Could not update milestones", {position: "bottom-left"})
-                    console.error(`Error updating milestones`, response?.error)
-                }
-                // const {enqueue} = useWriteQueue.getState();
-                // enqueue({
-                //     kind: "UPDATE_MILESTONES",
-                //     payload: {orgId: get().details?.organizationId, milestones}
-                // });
-            },
-            setMilestones: async (milestones: Milestone[]) => {
-                console.log(`set milestones`)
-                const updatedMilestones = get().milestones.map(oldMilestone => {
-                    const newMilestone = milestones.find(m => m.id === oldMilestone.id)
-                    if (newMilestone) {
-                        return ({
-                            ...oldMilestone,
-                            ...newMilestone
-                        })
-                    } else {
-                        return oldMilestone
-                    }
-                })
-                set({milestones: updatedMilestones})
-
-                // update DB milestones
-                const response = await updateMilestones(get().details?.organizationId, {milestones: updatedMilestones})
-                if (response?.success && response?.data) {
-                    return response.data as Milestone[]
-                } else {
-                    toast.error("Could not update milestones", {position: "bottom-left"})
-                    console.error(`Error updating milestones`, response?.error)
-                }
-                // const {enqueue} = useWriteQueue.getState();
-                // enqueue({
-                //     kind: "UPDATE_MILESTONES",
-                //     payload: {orgId: get().details?.organizationId, milestones: updatedMilestones}
-                // });
-            },
             nodes: [],
             edges: [],
             onEdgesChange: async (changes: EdgeChange[]) => {
