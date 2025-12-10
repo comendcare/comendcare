@@ -9,6 +9,7 @@ import {
     Microscope, 
     LayoutDashboard,
     Users,
+    MessageCircle,
 } from "lucide-react"
 import {NavMain} from "./../components/nav-main"
 import {OrganizationSwitcher} from "./../components/organization-switcher"
@@ -22,14 +23,15 @@ import {
     SidebarGroupLabel,
     SidebarRail,
     useSidebar,
+    SidebarMenuButton,
 } from "@comend/components/ui/sidebar"
 import {MembershipWithOrganization} from "@comend/lib/types";
 import {Button} from "@comend/components/ui/button";
 import Link from "next/link";
-import {FeedbackSheet} from "./../components/feedback";
 import {usePathname} from "next/navigation";
 import {RoadmapState} from "./../state/roadmap/roadmapStore";
 import {Separator} from "@comend/components/ui/separator"
+import {FeedbackSheet} from "@comend/components/feedback"
 
 const data = {
     navMain: [
@@ -224,7 +226,16 @@ export function AppSidebar({memberships}: { memberships: MembershipWithOrganizat
                     {/*        }*/}
                     {/*    </Link>*/}
                     {/*</SidebarMenuButton>*/}
-                    <FeedbackSheet/>
+                    <FeedbackSheet 
+                        triggerButton={
+                            <SidebarMenuButton>
+                                <div className="relative">
+                                    <MessageCircle className="mr-2 h-4 w-4"/>
+                                </div>
+                                {'Message a team member'}
+                            </SidebarMenuButton>
+                        }
+                    />
                 </div>
                 {state === "expanded" && (
                     <>
