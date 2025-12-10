@@ -4063,6 +4063,32 @@ export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
     }
 )
 
+export const moveNodes = withOrganizationAuth(
+    async (organization: Organization, nodes: any[]) => {
+        try {
+            const updatedNodes: Node[] = []
+
+            for (const node of nodes) {
+
+                const n = await prisma.$transaction(async tx => {
+                    return await tx.node.update({
+                        where: { id: node.id },
+                        data: { positionX: node.position.x || node.positionX, positionY: node.position.y || node.positionY },
+                    })
+                })
+
+                updatedNodes.push(n)
+            }
+
+            console.log(`Successfully moving Node(s)`)
+            return {success: true, data: updatedNodes}
+        } catch (error) {
+            console.error(`Error moving Node(s): `, error)
+            return {success: false, error: "Internal server error"}
+        }
+    }
+)
+
 /* HANDLE UPDATING FLOW NODES - roadmap nodes positions, nothing in here is needed for typesense ------------------------- */
 export const updateDBFlow = withOrganizationAuth(
     async (organization: Organization, {roadmapId, nodes, edges}: {
@@ -4071,132 +4097,153 @@ export const updateDBFlow = withOrganizationAuth(
         edges: any[]
     }) => {
         try {
-            if (!roadmapId) throw new Error('No roadmapId provided.')
-            // console.log(`nodes:`, nodes)
-            // console.log(`milestones:`, milestones)
-            // console.log(`edges:`, edges)
+            if (!roadmapId) throw new Error("No roadmapId provided.");
 
-            // const organizations = await prisma.organization.findMany({
-            //     include: {
-            //         roadmaps: true
-            //     }
-            // })
-            // const organization = organizations.find(org => org.roadmaps.map(r => r.id).includes(roadmapId))
+            const [existingNodes, existingEdges] = await Promise.all([
+                prisma.node.findMany({
+                    where: { roadmapId },
+                    select: { id: true },
+                }),
+                prisma.edge.findMany({
+                    where: { roadmapId },
+                    select: { id: true },
+                }),
+            ])
 
-            // if (!organization) throw new Error(`Could not find organization with roadmap id: ${roadmapId}`)
-            // const organizationId: string = organization.id
+            const existingNodeIds = existingNodes.map(n => n.id)
+            const existingEdgeIds = existingEdges.map(e => e.id)
 
-            // Delete any nodes that are not in the request
-            // node ids in this request
-            const nodeIds = nodes.map((node: any) => node.id)
-            // nodes in this roadmap
-            const nodesInDB = await prisma.node.findMany({
-                select: {id: true},
-                where: {roadmapId}
-            })
-            const nodeIdsInDB = (nodesInDB || []).map((node: any) => node.id)
-            const nodesToDelete = nodeIdsInDB.filter(
-                (id: string) => !nodeIds.includes(id)
-            )
+            const incomingNodeIds = nodes.map(n => n.id)
+            const incomingEdgeIds = edges.map(e => e.id)
 
-            await prisma.node.deleteMany({
-                where: {
-                    id: {in: nodesToDelete},
-                    roadmapId: roadmapId
+            const nodesToCreate = nodes.filter(n => !existingNodeIds.includes(n.id))
+            const nodesToUpdate = nodes.filter(n => existingNodeIds.includes(n.id))
+            const nodesToDeleteIds = existingNodeIds.filter(id => !incomingNodeIds.includes(id))
+
+            const edgesToCreate = edges.filter(e => !existingEdgeIds.includes(e.id))
+            const edgesToUpdate = edges.filter(e => existingEdgeIds.includes(e.id))
+            const edgesToDeleteIds = existingEdgeIds.filter(id => !incomingEdgeIds.includes(id))
+
+            await prisma.$transaction(async tx => {
+                if (nodesToDeleteIds.length > 0) {
+                    await tx.node.deleteMany({ where: { id: { in: nodesToDeleteIds }, roadmapId } })
                 }
-            })
+                if (edgesToDeleteIds.length > 0) {
+                    await tx.edge.deleteMany({ where: { id: { in: edgesToDeleteIds }, roadmapId } })
+                }
 
-            // await prisma.edge.deleteMany()
+                if (nodesToCreate.length > 0) {
+                    await tx.node.createMany({
+                        data: nodesToCreate.map(node => ({
+                        id: node.id,
+                        roadmapId,
+                        positionX: node.position?.x,
+                        positionY: node.position?.y,
+                        origin: node.origin,
+                        })),
+                    })
+                }
 
-            // Save or update nodes
-            await Promise.all(
-                nodes.map(async (node: any) => {
-                    const n = await prisma.node.upsert({
-                        include: {data: true},
-                        where: {id: node.id},
-                        update: {
-                            positionX: node.position?.x,
-                            positionY: node.position?.y,
-                            origin: node.origin
+                for (const node of nodesToUpdate) {
+                    await tx.node.update({
+                        where: { id: node.id },
+                        data: {
+                        positionX: node.position?.x,
+                        positionY: node.position?.y,
+                        origin: node.origin,
                         },
-                        create: {
-                            id: node.id,
-                            roadmap: {
-                                connect: {id: roadmapId}
-                            },
-                            positionX: node.position?.x,
-                            positionY: node.position?.y,
-                            origin: node.origin,
+                    })
+                }
+
+                for (const node of nodes) {
+                    if (!node.data) continue;
+
+                    const existingData = await tx.milestone.findUnique({
+                        where: { nodeId: node.id },
+                        select: { id: true },
+                    })
+
+                    const attachments = (node.data.attachments || []).map((a: any) => ({
+                        link: a.link,
+                        name: a.name ?? undefined,
+                    }))
+
+                    if (existingData) {
+                        // Update milestone fields
+                        await tx.milestone.update({
+                            where: { nodeId: node.id },
                             data: {
-                                create: {
-                                    id: node.data?.id,
-                                    roadmap: {
-                                        connect: {id: roadmapId}
-                                    },
-                                    organization: {
-                                        connect: {id: organization.id}
-                                    },
-                                    title: node.data?.title || "New Milestone",
-                                    // types: node.data?.types || [],
-                                    description: node.data?.description,
-                                    startDate: node.data?.startDate,
-                                    endDate: node.data?.endDate,
-                                    budget: node.data?.budget,
-                                    attachments: {
-                                        createMany: {
-                                            data: (node.data?.attachments || []).map((attachment: any) => ({
-                                                link: attachment.link,
-                                                ...(attachment.name ? {name: attachment.name} : undefined)
-                                            }))
-                                        }
-                                    },
-                                    status: node.data?.status || "PLANNED",
-                                    private: node.data?.private || false,
-                                }
-                            }
-                        }
-                    })
-                })
-            )
-
-            // Save or update edges
-            await Promise.all(
-                edges.map(async (edge: any) => {
-                    await prisma.edge.upsert({
-                        where: {id: edge.id},
-                        update: {
-                            source: edge.source,
-                            target: edge.target
-                        },
-                        create: {
-                            id: edge.id,
-                            roadmap: {
-                                connect: {id: roadmapId}
+                                title: node.data.title || "New Milestone",
+                                description: node.data.description,
+                                startDate: node.data.startDate,
+                                endDate: node.data.endDate,
+                                budget: node.data.budget ?? null,
+                                status: node.data.status || "PLANNED",
+                                private: node.data.private ?? false,
+                                attachments: {
+                                deleteMany: {}, // optionally diff like updateMilestones
+                                createMany: { data: attachments },
+                                },
                             },
-                            source: edge.source,
-                            target: edge.target,
-                        }
-                    })
-                })
-            )
+                        })
+                    } else {
+                        // Create milestone with nested data
+                        await tx.milestone.create({
+                            data: {
+                                nodeId: node.id,
+                                roadmap: { connect: { id: roadmapId } },
+                                organization: { connect: { id: organization.id } },
+                                title: node.data.title || "New Milestone",
+                                description: node.data.description,
+                                startDate: node.data.startDate,
+                                endDate: node.data.endDate,
+                                budget: node.data.budget ?? null,
+                                status: node.data.status || "PLANNED",
+                                private: node.data.private ?? false,
+                                attachments: { createMany: { data: attachments } },
+                            },
+                        })
+                    }
+                }
 
-            const updatedNodes = await prisma.node.findMany({
-                where: {roadmapId}
-            })
+                if (edgesToCreate.length > 0) {
+                    await tx.edge.createMany({
+                        data: edgesToCreate.map(e => ({
+                        id: e.id,
+                        roadmapId,
+                        source: e.source,
+                        target: e.target,
+                        })),
+                    })
+                }
+
+                for (const edge of edgesToUpdate) {
+                    await tx.edge.update({
+                        where: { id: edge.id },
+                        data: {
+                        source: edge.source,
+                        target: edge.target,
+                        },
+                    })
+                }
+            });
+
+            const [updatedNodes, updatedEdges] = await Promise.all([
+                prisma.node.findMany({ where: { roadmapId } }),
+                prisma.edge.findMany({ where: { roadmapId } }),
+            ]);
+
             const updatedMilestones = await prisma.milestone.findMany({
+                where: { roadmapId },
                 include: {
                     node: true,
                     contacts: true,
                     attachments: true,
-                    types: {include: {milestoneType: true}},
-                    tools: {include: {tool: true}},
-                    rfps: {include: {rfp: true}}
+                    types: { include: { milestoneType: true } },
+                    tools: { include: { tool: true } },
+                    rfps: { include: { rfp: true } },
                 },
-                where: {roadmapId}
-            })
-            const updatedEdges = await prisma.edge.findMany({
-                where: {roadmapId}
-            })
+            });
 
             console.log(`Successfully updated Flow`)
             return {success: true, data: {nodes: updatedNodes, milestones: updatedMilestones, edges: updatedEdges}}

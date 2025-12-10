@@ -12,6 +12,7 @@ import {
     createNodes,
     createNodesAndEdgesFromTemplate,
     deleteNode,
+    moveNodes,
     updateDBFlow,
     updateEdges,
     updateMilestones,
@@ -54,6 +55,7 @@ export type RoadmapState = {
     onEdgesChange: (changes: EdgeChange[]) => Promise<Edge[] | void>
     onConnect: (connection: Connection) => Promise<Edge[] | void>
     setNodes: (nodes: Node[]) => Promise<Node[] | void>
+    moveNodes: (nodes: Node[]) => Promise<Node[] | void>
     setEdges: (edges: Edge[]) => Promise<Edge[] | void>
     addMilestones: (milestones: Partial<Milestone>[], creationMethod?: string) => Promise<Node[] | void>
     addNodes: (node: Node[], creationMethod?: string) => Promise<Node[] | void>
@@ -260,17 +262,18 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // });
             },
             setNodes: async (nodes: Node[]) => {
-                console.log(`set nodes`)
+                console.log(`set nodes start`, Date.now())
                 set({nodes})
 
                 const orgId = get().details?.organizationId
                 const response = await updateDBFlow(orgId, {roadmapId: get().roadmapId, nodes, edges: get().edges})
                 if (response?.success && response?.data) {
-                    const newNodes = response.data.nodes.map((n: any) => ({
+                    const newNodes = response.data?.nodes?.map((n: any) => ({
                         id: n.id,
                         position: {x: n.positionX, y: n.positionY},
                         origin: n.origin
                     })) as Node[]
+                    console.log(`set ndoes end`, Date.now())
                 
                     return newNodes as Node[]
                 } else {
@@ -283,6 +286,32 @@ export const useRoadmapStore = create<RoadmapState>()(
                 //     kind: "UPDATE_FLOW",
                 //     payload: {orgId, roadmapId: get().roadmapId, nodes, edges: get().edges}
                 // });
+            },
+            moveNodes: async (nodes: Node[]) => {
+                console.log(`move node start`, Date.now())
+                const updatedNodes = get().nodes.map(originalNode => {
+                    const foundIndex = nodes.findIndex(newNode => newNode.id === originalNode.id)
+                    if (foundIndex >= 0) return nodes[foundIndex]
+                    else return originalNode
+                })
+
+                set({nodes: updatedNodes})
+
+                const orgId = get().details?.organizationId
+                const response = await moveNodes(orgId, nodes)
+                if (response?.success && response?.data) {
+                    const newNodes = response.data.map((n: any) => ({
+                        id: n.id,
+                        position: {x: n.positionX, y: n.positionY},
+                        origin: n.origin
+                    })) as Node[]
+                    console.log(`set nodes end`, Date.now())
+                
+                    return newNodes as Node[]
+                } else {
+                    console.error(`Error updating database nodes`, response?.error)
+                    toast.success("Error updating node state... your node may node's position may not have been saved")
+                }
             },
             setEdges: async (edges: Edge[]) => {
                 console.log(`set edges`)
