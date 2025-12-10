@@ -312,7 +312,7 @@ export function EditMilestoneForm({
         // if form state is not valid, don't submit
         if (!form.formState.isValid) return
         // savingListAdd(milestoneData.id)
-        console.log(`start saving...`)
+        console.log(`start saving...`, Date.now())
 
         const {
             nodeType,
@@ -425,7 +425,7 @@ export function EditMilestoneForm({
 
         setIsMigrating(false)
         // savingListRemove(milestoneData.id)
-        console.log(`end saving...`)
+        console.log(`end saving...`, Date.now())
     }
 
     const handleStorageFacilityAsyncSearch = async (query: string): Promise<Option[]> => {

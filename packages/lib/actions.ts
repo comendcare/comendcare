@@ -4697,8 +4697,150 @@ export const syncDBRFPs = withOrganizationAuth(
 export const updateMilestones = withOrganizationAuth(
     async (_: Organization, {milestones}: { milestones: Milestone[] }) => {
         try {
-            // const session = await getSession();
-            let updatedMilestones: Milestone[] = [];
+            // const session = await getSession()
+            const updatedMilestones: any[] = []
+
+            for (const milestone of milestones) {
+                const milestoneId = milestone.id
+
+                const existing = await prisma.milestone.findUnique({
+                    where: { id: milestoneId },
+                    select: {
+                        types: { select: { milestoneTypeId: true } },
+                        biosamples: { select: { biosampleId: true } },
+                        diseaseModels: { select: { diseaseModelId: true } },
+                        tools: { select: { toolId: true } },
+                        rfps: { select: { rfpId: true } },
+                        institutions: { select: { institutionId: true } },
+                        companies: { select: { companyId: true } },
+                        attachments: { select: { id: true } },
+                        contacts: { select: { id: true } },
+                    },
+                });
+
+                if (!existing) continue
+
+                const diffIds = (incoming: string[], existingIds: string[]) => ({
+                    toAdd: incoming.filter(id => !existingIds.includes(id)),
+                    toRemove: existingIds.filter(id => !incoming.includes(id)),
+                })
+
+                const typesDiff = diffIds(
+                    (milestone.types || []).map(t => t.milestoneType?.id || t.milestoneTypeId),
+                    existing.types.map(t => t.milestoneTypeId)
+                )
+
+                const biosamplesDiff = diffIds(
+                    (milestone.biosamples || []).map(t => t.biosampleId || t.biosample.id),
+                    existing.biosamples.map(t => t.biosampleId)
+                )
+
+                const diseaseModelsDiff = diffIds(
+                    (milestone.diseaseModels || []).map(t => t.diseaseModelId || t.diseaseModel.id),
+                    existing.diseaseModels.map(t => t.diseaseModelId)
+                )
+
+                const toolsDiff = diffIds(
+                    (milestone.tools || []).map(t => t.tool?.id || t.toolId),
+                    existing.tools.map(t => t.toolId)
+                )
+
+                const rfpsDiff = diffIds(
+                    (milestone.rfps || []).map(t => t.rfp?.id || t.rfpId),
+                    existing.rfps.map(t => t.rfpId)
+                )
+
+                const institutionsDiff = diffIds(
+                    (milestone.institutions || []).map(t => t.institutionId || t.institution.id),
+                    existing.institutions.map(t => t.institutionId)
+                )
+
+                const companiesDiff = diffIds(
+                    (milestone.companies || []).map(t => t.companyId || t.company.id),
+                    existing.companies.map(t => t.companyId)
+                )
+
+                const attachmentsDiff = diffIds(
+                    (milestone.attachments || []).map(a => a.id),
+                    existing.attachments.map(a => a.id)
+                )
+
+                const contactsDiff = diffIds(
+                    (milestone.contacts || []).map(c => c.id),
+                    existing.contacts.map(c => c.id)
+                )
+
+                const m = await prisma.$transaction(async tx => {
+                    return await tx.milestone.update({
+                        where: { nodeId: milestone.nodeId || undefined },
+                        data: {
+                            title: milestone.title,
+                            description: milestone.description,
+                            startDate: milestone.startDate || null,
+                            endDate: milestone.endDate || null,
+                            budget: milestone.budget ?? null,
+                            status: milestone.status ?? "PLANNED",
+                            private: milestone.private ?? false,
+                            nodeType: milestone.nodeType ?? "PROJECT",
+                            notes: milestone.notes ?? null,
+                            otherTypeDetails: milestone.otherTypeDetails ?? null,
+                            openTo: milestone.openTo ?? [],
+                            metadata: milestone.metadata ?? undefined,
+
+                            types: {
+                                deleteMany: typesDiff.toRemove.length ? { milestoneTypeId: { in: typesDiff.toRemove } } : undefined,
+                                create: typesDiff.toAdd.map(id => ({ milestoneType: { connect: { id } } })),
+                            },
+
+                            biosamples: {
+                                deleteMany: biosamplesDiff.toRemove.length ? { biosampleId: { in: biosamplesDiff.toRemove } } : undefined,
+                                create: biosamplesDiff.toAdd.map(id => ({ biosample: { connect: { id } } })),
+                            },
+
+                            diseaseModels: {
+                                deleteMany: diseaseModelsDiff.toRemove.length ? { diseaseModelId: { in: diseaseModelsDiff.toRemove } } : undefined,
+                                create: diseaseModelsDiff.toAdd.map(id => ({ diseaseModel: { connect: { id } } })),
+                            },
+
+                            tools: {
+                                deleteMany: toolsDiff.toRemove.length ? { toolId: { in: toolsDiff.toRemove } } : undefined,
+                                create: toolsDiff.toAdd.map(id => ({ tool: { connect: { id } } })),
+                            },
+
+                            rfps: {
+                                deleteMany: rfpsDiff.toRemove.length ? { rfpId: { in: rfpsDiff.toRemove } } : undefined,
+                                create: rfpsDiff.toAdd.map(id => ({ rfp: { connect: { id } } })),
+                            },
+
+                            institutions: {
+                                deleteMany: institutionsDiff.toRemove.length ? { institutionId: { in: institutionsDiff.toRemove } } : undefined,
+                                create: institutionsDiff.toAdd.map(id => ({ institution: { connect: { id } } })),
+                            },
+
+                            companies: {
+                                deleteMany: companiesDiff.toRemove.length ? { companyId: { in: companiesDiff.toRemove } } : undefined,
+                                create: companiesDiff.toAdd.map(id => ({ company: { connect: { id } } })),
+                            },
+
+                            attachments: {
+                                deleteMany: attachmentsDiff.toRemove.length ? { id: { in: attachmentsDiff.toRemove } } : undefined,
+                                create: milestone.attachments
+                                .filter(a => attachmentsDiff.toAdd.includes(a.id))
+                                .map(a => ({ link: a.link, name: a.name ?? undefined })),
+                            },
+
+                            contacts: {
+                                deleteMany: contactsDiff.toRemove.length ? { id: { in: contactsDiff.toRemove } } : undefined,
+                                create: milestone.contacts
+                                    .filter(c => contactsDiff.toAdd.includes(c.id))
+                                    .map(c => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
+                            },
+                        },
+                    })
+                })
+
+                updatedMilestones.push(m)
+            }
 
             // const publishedProjects: Array<{
             //     projectId: string;
@@ -4715,281 +4857,269 @@ export const updateMilestones = withOrganizationAuth(
             //     orgId?: string;
             // }> = []
 
-            await Promise.all(
-                milestones.map(async (milestone: any) => {                    
-                    /* TYPES */
-                    const incomingTypeIds = (milestone.types || []).map((t: any) => t.milestoneTypeId || t.milestoneType.id);
-                    const existingTypeIds = (await prisma.milestoneTypeOnMilestone.findMany({
-                        where: { milestoneId: milestone.id },
-                        select: { milestoneTypeId: true },
-                    }))?.map((t) => t.milestoneTypeId)
-                    const typesToAdd = incomingTypeIds.filter((id: string) => !existingTypeIds.includes(id));
-                    const typesToRemove = existingTypeIds.filter((id: string) => !incomingTypeIds.includes(id));
+            // await Promise.all(
+            //     milestones.map(async (milestone: any) => {   
+            //         const existing = await prisma.milestone.findUnique({
+            //             where: { id: milestone.id },
+            //             select: {
+            //                 types: { select: { milestoneTypeId: true } },
+            //                 biosamples: { select: { biosampleId: true } },
+            //                 diseaseModels: { select: { diseaseModelId: true } },
+            //                 tools: { select: { toolId: true } },
+            //                 rfps: { select: { rfpId: true } },
+            //                 institutions: { select: { institutionId: true } },
+            //                 companies: { select: { companyId: true } },
+            //                 attachments: { select: { id: true } },
+            //                 contacts: { select: { id: true } },
+            //             }
+            //         })
 
-                    /* BIOSAMPLES */
-                    const incomingBiosampleIds = (milestone.biosamples || []).map((t: any) => t.biosampleId || t.biosample.id);
-                    const existingBiosampleIds = (await prisma.biosampleToMilestone.findMany({
-                        where: { milestoneId: milestone.id },
-                        select: { biosampleId: true },
-                    }))?.map((t) => t.biosampleId);
-                    const biosamplesToAdd = incomingBiosampleIds.filter((id: string) => !existingBiosampleIds.includes(id));
-                    const biosamplesToRemove = existingBiosampleIds.filter((id: string) => !incomingBiosampleIds.includes(id));
+            //         /* TYPES */
+            //         const incomingTypeIds = (milestone.types || []).map((t: any) => t.milestoneTypeId || t.milestoneType.id);
+            //         const existingTypeIds = existing?.types?.map((t) => t.milestoneTypeId) || []
+            //         const typesToAdd = incomingTypeIds.filter((id: string) => !existingTypeIds.includes(id));
+            //         const typesToRemove = existingTypeIds.filter((id: string) => !incomingTypeIds.includes(id));
 
-                    /* DISEASE MODELS */
-                    const incomingDiseaseModelIds = (milestone.diseaseModels || []).map((t: any) => t.diseaseModelId || t.diseaseModel.id);
-                    const existingDiseaseModelIds = (await prisma.diseaseModelToMilestone.findMany({
-                        where: { milestoneId: milestone.id },
-                        select: { diseaseModelId: true },
-                    }))?.map((t) => t.diseaseModelId);
-                    const diseaseModelsToAdd = incomingDiseaseModelIds.filter((id: string) => !existingDiseaseModelIds.includes(id));
-                    const diseaseModelsToRemove = existingDiseaseModelIds.filter((id: string) => !incomingDiseaseModelIds.includes(id));
+            //         /* BIOSAMPLES */
+            //         const incomingBiosampleIds = (milestone.biosamples || []).map((t: any) => t.biosampleId || t.biosample.id);
+            //         const existingBiosampleIds = existing?.biosamples?.map((t) => t.biosampleId) || []
+            //         const biosamplesToAdd = incomingBiosampleIds.filter((id: string) => !existingBiosampleIds.includes(id));
+            //         const biosamplesToRemove = existingBiosampleIds.filter((id: string) => !incomingBiosampleIds.includes(id));
 
-                    /* CLINICAL DATASETS */
-                    const incomingToolIds = (milestone.tools || []).map((t: any) => t.toolId || t.tool.id);
-                    const existingToolIds = (await prisma.toolToMilestone.findMany({
-                        where: { milestoneId: milestone.id },
-                        select: { toolId: true },
-                    }))?.map((t) => t.toolId);
-                    const toolsToAdd = incomingToolIds.filter((id: string) => !existingToolIds.includes(id));
-                    const toolsToRemove = existingToolIds.filter((id: string) => !incomingToolIds.includes(id));
+            //         /* DISEASE MODELS */
+            //         const incomingDiseaseModelIds = (milestone.diseaseModels || []).map((t: any) => t.diseaseModelId || t.diseaseModel.id);
+            //         const existingDiseaseModelIds = existing?.diseaseModels?.map((t) => t.diseaseModelId) || []
+            //         const diseaseModelsToAdd = incomingDiseaseModelIds.filter((id: string) => !existingDiseaseModelIds.includes(id));
+            //         const diseaseModelsToRemove = existingDiseaseModelIds.filter((id: string) => !incomingDiseaseModelIds.includes(id));
 
-                    /* RFPS */
-                    const incomingRfpIds = (milestone.rfps || []).map((t: any) => t.rfpId || t.rfp.id);
-                    const existingRfpIds = (await prisma.rFPToMilestone.findMany({
-                        where: { milestoneId: milestone.id },
-                        select: { rfpId: true },
-                    }))?.map((t) => t.rfpId);
-                    const rfpsToAdd = incomingRfpIds.filter((id: string) => !existingRfpIds.includes(id));
-                    const rfpsToRemove = existingRfpIds.filter((id: string) => !incomingRfpIds.includes(id));
+            //         /* CLINICAL DATASETS */
+            //         const incomingToolIds = (milestone.tools || []).map((t: any) => t.toolId || t.tool.id);
+            //         const existingToolIds = existing?.tools?.map((t) => t.toolId) || []
+            //         const toolsToAdd = incomingToolIds.filter((id: string) => !existingToolIds.includes(id));
+            //         const toolsToRemove = existingToolIds.filter((id: string) => !incomingToolIds.includes(id));
 
-                    /* INSTITUTIONS */
-                    const incomingInstitutionIds = (milestone.institutions || []).map((t: any) => t.institutionId || t.institution.id);
-                    const existingInstituionIds = (await prisma.milestoneToInstitution.findMany({
-                        where: { milestoneId: milestone.id },
-                        select: { institutionId: true },
-                    }))?.map((t) => t.institutionId);
-                    const institutionsToAdd = incomingInstitutionIds.filter((id: string) => !existingInstituionIds.includes(id));
-                    const institutionsToRemove = existingInstituionIds.filter((id: string) => !incomingInstitutionIds.includes(id));
+            //         /* RFPS */
+            //         const incomingRfpIds = (milestone.rfps || []).map((t: any) => t.rfpId || t.rfp.id);
+            //         const existingRfpIds = existing?.rfps?.map((t) => t.rfpId) || []
+            //         const rfpsToAdd = incomingRfpIds.filter((id: string) => !existingRfpIds.includes(id));
+            //         const rfpsToRemove = existingRfpIds.filter((id: string) => !incomingRfpIds.includes(id));
 
-                    /* COMPANIES */
-                    const incomingCompanyIds = (milestone.companies || []).map((t: any) => t.companyId || t.company.id);
-                    const existingCompanyIds = (await prisma.milestoneToCompany.findMany({
-                        where: { milestoneId: milestone.id },
-                        select: { companyId: true },
-                    }))?.map((t) => t.companyId);
-                    const companiesToAdd = incomingCompanyIds.filter((id: string) => !existingCompanyIds.includes(id));
-                    const companiesToRemove = existingCompanyIds.filter((id: string) => !incomingCompanyIds.includes(id));
+            //         /* INSTITUTIONS */
+            //         const incomingInstitutionIds = (milestone.institutions || []).map((t: any) => t.institutionId || t.institution.id);
+            //         const existingInstituionIds = existing?.institutions?.map((t) => t.institutionId) || []
+            //         const institutionsToAdd = incomingInstitutionIds.filter((id: string) => !existingInstituionIds.includes(id));
+            //         const institutionsToRemove = existingInstituionIds.filter((id: string) => !incomingInstitutionIds.includes(id));
 
-                    /* ATTACHMENTS */
-                    const incomingAttachmentIds = (milestone.attachments || []).map((t: any) => t.id);
-                    const existingAttachmentIds = (await prisma.externalAttachment.findMany({
-                        where: { milestoneId: milestone.id },
-                        select: { id: true },
-                    }))?.map((t) => t.id);
-                    const attachemntsToAdd = incomingAttachmentIds.filter((id: string) => !existingAttachmentIds.includes(id));
-                    const attachmentsToRemove = existingAttachmentIds.filter((id: string) => !incomingAttachmentIds.includes(id));
+            //         /* COMPANIES */
+            //         const incomingCompanyIds = (milestone.companies || []).map((t: any) => t.companyId || t.company.id);
+            //         const existingCompanyIds = existing?.companies?.map((t) => t.companyId) || []
+            //         const companiesToAdd = incomingCompanyIds.filter((id: string) => !existingCompanyIds.includes(id));
+            //         const companiesToRemove = existingCompanyIds.filter((id: string) => !incomingCompanyIds.includes(id));
+
+            //         /* ATTACHMENTS */
+            //         const incomingAttachmentIds = (milestone.attachments || []).map((t: any) => t.id);
+            //         const existingAttachmentIds = existing?.attachments?.map((t) => t.id) || []
+            //         const attachemntsToAdd = incomingAttachmentIds.filter((id: string) => !existingAttachmentIds.includes(id));
+            //         const attachmentsToRemove = existingAttachmentIds.filter((id: string) => !incomingAttachmentIds.includes(id));
                                         
-                    /* CONTACTS */
-                    const incomingContactIds = (milestone.contacts || []).map((t: any) => t.id);
-                    const existingContactIds = (await prisma.externalContact.findMany({
-                        where: { milestoneId: milestone.id },
-                        select: { id: true },
-                    }))?.map((t) => t.id);
-                    const contactsToAdd = incomingContactIds.filter((id: string) => !existingContactIds.includes(id));
-                    const contactsToRemove = existingContactIds.filter((id: string) => !incomingContactIds.includes(id));
+            //         /* CONTACTS */
+            //         const incomingContactIds = (milestone.contacts || []).map((t: any) => t.id);
+            //         const existingContactIds = existing?.contacts?.map((t) => t.id) || []
+            //         const contactsToAdd = incomingContactIds.filter((id: string) => !existingContactIds.includes(id));
+            //         const contactsToRemove = existingContactIds.filter((id: string) => !incomingContactIds.includes(id));
 
-                    const m = await prisma.milestone.update({
-                        where: {nodeId: milestone.nodeId},
-                        include: {
-                            node: true,
-                            contacts: true,
-                            attachments: true,
-                            roadmap: true,
-                            types: {include: {milestoneType: true}},
-                            biosamples: {include: {biosample: true}},
-                            diseaseModels: {include: {diseaseModel: true}},
-                            tools: {include: {tool: true}},
-                            rfps: {include: {rfp: true}},
-                            companies: {include: {company: true}},
-                            institutions: {include: {institution: true}},
-                            createFacilityRequests: true,
-                        },
-                        data: {
-                            title: milestone.title,
-                            types: {
-                                // deleteMany: {},
-                                // create: (milestone.types || []).map((type: any) => ({
-                                //     milestoneType: {
-                                //         connect: {id: type.milestoneTypeId || type.milestoneType.id},
-                                //     },
-                                // })),
-                                deleteMany: {
-                                    milestoneTypeId: { in: typesToRemove }
-                                },
-                                create: typesToAdd.map((id: string) => ({
-                                    milestoneType: { connect: { id } }
-                                }))
-                            },
-                            biosamples: {
-                                // deleteMany: {},
-                                // create: (milestone.biosamples || []).map((tool: any) => ({
-                                //     biosample: {
-                                //         connect: {id: tool.biosampleId || tool.biosample.id},
-                                //     },
-                                // })),
-                                deleteMany: {
-                                    biosampleId: { in: biosamplesToRemove }
-                                },
-                                create: biosamplesToAdd.map((id: string) => ({
-                                    biosample: { connect: { id } }
-                                }))
-                            },
-                            diseaseModels: {
-                                // deleteMany: {},
-                                // create: (milestone.diseaseModels || []).map((tool: any) => ({
-                                //     diseaseModel: {
-                                //         connect: {id: tool.diseaseModelId || tool.diseaseModel.id},
-                                //     },
-                                // })),
-                                deleteMany: {
-                                    diseaseModelId: { in: diseaseModelsToRemove }
-                                },
-                                create: diseaseModelsToAdd.map((id: string) => ({
-                                    diseaseModel: { connect: { id } }
-                                }))
-                            },
-                            tools: {
-                                // deleteMany: {},
-                                // create: (milestone.tools || []).map((tool: any) => ({
-                                //     tool: {
-                                //         connect: {id: tool.toolId || tool.tool.id},
-                                //     },
-                                // })),
-                                deleteMany: {
-                                    toolId: { in: toolsToRemove }
-                                },
-                                create: toolsToAdd.map((id: string) => ({
-                                    tool: { connect: { id } }
-                                }))
-                            },
-                            rfps: {
-                                // deleteMany: {},
-                                // create: (milestone.rfps || []).map((rfp: any) => ({
-                                //     rfp: {
-                                //         connect: {id: rfp.rfpId || rfp.rfp.id},
-                                //     },
-                                // })),
-                                deleteMany: {
-                                    rfpId: { in: rfpsToRemove }
-                                },
-                                create: rfpsToAdd.map((id: string) => ({
-                                    rfp: { connect: { id } }
-                                }))
-                            },
-                            institutions: {
-                                // deleteMany: {},
-                                // create: (milestone.institutions || []).map((institution: any) => ({
-                                //     institution: {
-                                //         connect: {id: institution?.institutionId || institution?.institution?.id}
-                                //     }
-                                // }))
-                                deleteMany: {
-                                    institutionId: { in: institutionsToRemove }
-                                },
-                                create: institutionsToAdd.map((id: string) => ({
-                                    institution: { connect: { id } }
-                                }))
-                            },
-                            companies: {
-                                // deleteMany: {},
-                                // create: (milestone.companies || []).map((company: any) => ({
-                                //     company: {
-                                //         connect: {id: company?.companyId || company?.company?.id}
-                                //     }
-                                // }))
-                                deleteMany: {
-                                    companyId: { in: companiesToRemove }
-                                },
-                                create: companiesToAdd.map((id: string) => ({
-                                    company: { connect: { id } }
-                                }))
-                            },
-                            timelineOrder: milestone.timelineOrder,
-                            otherTypeDetails: milestone.otherTypeDetails,
-                            description: milestone.description,
-                            startDate: milestone.startDate,
-                            endDate: milestone.endDate,
-                            budget: milestone.budget,
-                            attachments: {
-                                // deleteMany: {},
-                                // createMany: {
-                                //     data: (milestone?.attachments || []).map((attachment: any) => ({
-                                //         link: attachment.link,
-                                //         ...(attachment.name ? {name: attachment.name} : undefined),
-                                //     })),
-                                // },
-                                deleteMany: {
-                                    id: { in: attachmentsToRemove }
-                                },
-                                create: milestone.attachments.filter((attachment: any) => attachemntsToAdd.includes(attachment.id)).map((attachment: any) => ({
-                                    link: attachment.link,
-                                    ...(attachment.name ? {name: attachment.name} : undefined),
-                                }))
-                            },
-                            contacts: {
-                                // deleteMany: {},
-                                // createMany: {
-                                //     data: (milestone?.contacts || []).map((contact: any) => ({
-                                //         name: contact.name,
-                                //         email: contact.email,
-                                //         ...(contact.role ? {role: contact.role} : undefined),
-                                //         ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined),
-                                //     })),
-                                // },
-                                deleteMany: {
-                                    id: { in: contactsToRemove }
-                                },
-                                create: milestone.contacts.filter((contact: any) => contactsToAdd.includes(contact.id)).map((contact: any) => ({
-                                    name: contact.name,
-                                    email: contact.email,
-                                    ...(contact.role ? {role: contact.role} : undefined),
-                                    ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined),
-                                }))
-                            },
-                            openTo: milestone.openTo || [],
-                            status: milestone.status || "PLANNED",
-                            private: milestone.private ?? false, // <-- preserve explicit false
-                            notes: milestone.notes,
-                            nodeType: milestone.nodeType || "PROJECT",
-                            ...(milestone.metadata ? {metadata: milestone.metadata} : undefined),
-                        },
-                    });
+            //         const m = await prisma.milestone.update({
+            //             where: {nodeId: milestone.nodeId},
+            //             include: {
+            //                 node: true,
+            //                 contacts: true,
+            //                 attachments: true,
+            //                 roadmap: true,
+            //                 types: {include: {milestoneType: true}},
+            //                 biosamples: {include: {biosample: true}},
+            //                 diseaseModels: {include: {diseaseModel: true}},
+            //                 tools: {include: {tool: true}},
+            //                 rfps: {include: {rfp: true}},
+            //                 companies: {include: {company: true}},
+            //                 institutions: {include: {institution: true}},
+            //                 createFacilityRequests: true,
+            //             },
+            //             data: {
+            //                 title: milestone.title,
+            //                 types: {
+            //                     // deleteMany: {},
+            //                     // create: (milestone.types || []).map((type: any) => ({
+            //                     //     milestoneType: {
+            //                     //         connect: {id: type.milestoneTypeId || type.milestoneType.id},
+            //                     //     },
+            //                     // })),
+            //                     deleteMany: {
+            //                         milestoneTypeId: { in: typesToRemove }
+            //                     },
+            //                     create: typesToAdd.map((id: string) => ({
+            //                         milestoneType: { connect: { id } }
+            //                     }))
+            //                 },
+            //                 biosamples: {
+            //                     // deleteMany: {},
+            //                     // create: (milestone.biosamples || []).map((tool: any) => ({
+            //                     //     biosample: {
+            //                     //         connect: {id: tool.biosampleId || tool.biosample.id},
+            //                     //     },
+            //                     // })),
+            //                     deleteMany: {
+            //                         biosampleId: { in: biosamplesToRemove }
+            //                     },
+            //                     create: biosamplesToAdd.map((id: string) => ({
+            //                         biosample: { connect: { id } }
+            //                     }))
+            //                 },
+            //                 diseaseModels: {
+            //                     // deleteMany: {},
+            //                     // create: (milestone.diseaseModels || []).map((tool: any) => ({
+            //                     //     diseaseModel: {
+            //                     //         connect: {id: tool.diseaseModelId || tool.diseaseModel.id},
+            //                     //     },
+            //                     // })),
+            //                     deleteMany: {
+            //                         diseaseModelId: { in: diseaseModelsToRemove }
+            //                     },
+            //                     create: diseaseModelsToAdd.map((id: string) => ({
+            //                         diseaseModel: { connect: { id } }
+            //                     }))
+            //                 },
+            //                 tools: {
+            //                     // deleteMany: {},
+            //                     // create: (milestone.tools || []).map((tool: any) => ({
+            //                     //     tool: {
+            //                     //         connect: {id: tool.toolId || tool.tool.id},
+            //                     //     },
+            //                     // })),
+            //                     deleteMany: {
+            //                         toolId: { in: toolsToRemove }
+            //                     },
+            //                     create: toolsToAdd.map((id: string) => ({
+            //                         tool: { connect: { id } }
+            //                     }))
+            //                 },
+            //                 rfps: {
+            //                     // deleteMany: {},
+            //                     // create: (milestone.rfps || []).map((rfp: any) => ({
+            //                     //     rfp: {
+            //                     //         connect: {id: rfp.rfpId || rfp.rfp.id},
+            //                     //     },
+            //                     // })),
+            //                     deleteMany: {
+            //                         rfpId: { in: rfpsToRemove }
+            //                     },
+            //                     create: rfpsToAdd.map((id: string) => ({
+            //                         rfp: { connect: { id } }
+            //                     }))
+            //                 },
+            //                 institutions: {
+            //                     // deleteMany: {},
+            //                     // create: (milestone.institutions || []).map((institution: any) => ({
+            //                     //     institution: {
+            //                     //         connect: {id: institution?.institutionId || institution?.institution?.id}
+            //                     //     }
+            //                     // }))
+            //                     deleteMany: {
+            //                         institutionId: { in: institutionsToRemove }
+            //                     },
+            //                     create: institutionsToAdd.map((id: string) => ({
+            //                         institution: { connect: { id } }
+            //                     }))
+            //                 },
+            //                 companies: {
+            //                     // deleteMany: {},
+            //                     // create: (milestone.companies || []).map((company: any) => ({
+            //                     //     company: {
+            //                     //         connect: {id: company?.companyId || company?.company?.id}
+            //                     //     }
+            //                     // }))
+            //                     deleteMany: {
+            //                         companyId: { in: companiesToRemove }
+            //                     },
+            //                     create: companiesToAdd.map((id: string) => ({
+            //                         company: { connect: { id } }
+            //                     }))
+            //                 },
+            //                 timelineOrder: milestone.timelineOrder,
+            //                 otherTypeDetails: milestone.otherTypeDetails,
+            //                 description: milestone.description,
+            //                 startDate: milestone.startDate,
+            //                 endDate: milestone.endDate,
+            //                 budget: milestone.budget,
+            //                 attachments: {
+            //                     // deleteMany: {},
+            //                     // createMany: {
+            //                     //     data: (milestone?.attachments || []).map((attachment: any) => ({
+            //                     //         link: attachment.link,
+            //                     //         ...(attachment.name ? {name: attachment.name} : undefined),
+            //                     //     })),
+            //                     // },
+            //                     deleteMany: {
+            //                         id: { in: attachmentsToRemove }
+            //                     },
+            //                     create: milestone.attachments.filter((attachment: any) => attachemntsToAdd.includes(attachment.id)).map((attachment: any) => ({
+            //                         link: attachment.link,
+            //                         ...(attachment.name ? {name: attachment.name} : undefined),
+            //                     }))
+            //                 },
+            //                 contacts: {
+            //                     // deleteMany: {},
+            //                     // createMany: {
+            //                     //     data: (milestone?.contacts || []).map((contact: any) => ({
+            //                     //         name: contact.name,
+            //                     //         email: contact.email,
+            //                     //         ...(contact.role ? {role: contact.role} : undefined),
+            //                     //         ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined),
+            //                     //     })),
+            //                     // },
+            //                     deleteMany: {
+            //                         id: { in: contactsToRemove }
+            //                     },
+            //                     create: milestone.contacts.filter((contact: any) => contactsToAdd.includes(contact.id)).map((contact: any) => ({
+            //                         name: contact.name,
+            //                         email: contact.email,
+            //                         ...(contact.role ? {role: contact.role} : undefined),
+            //                         ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined),
+            //                     }))
+            //                 },
+            //                 openTo: milestone.openTo || [],
+            //                 status: milestone.status || "PLANNED",
+            //                 private: milestone.private ?? false, // <-- preserve explicit false
+            //                 notes: milestone.notes,
+            //                 nodeType: milestone.nodeType || "PROJECT",
+            //                 ...(milestone.metadata ? {metadata: milestone.metadata} : undefined),
+            //             },
+            //         });
 
-                    updatedMilestones = [...updatedMilestones, m];
+            //         updatedMilestones = [...updatedMilestones, m];
 
-                    // const justPublished =
-                    //     m.nodeType === "PROJECT" &&
-                    //     previousMilestone.private !== false &&
-                    //     m.private === false;
+            //         // const justPublished =
+            //         //     m.nodeType === "PROJECT" &&
+            //         //     previousMilestone.private !== false &&
+            //         //     m.private === false;
 
-                    // if (justPublished) {
-                    //     publishedProjects.push({
-                    //         projectId: m.id,
-                    //         title: m.title,
-                    //         startDate: m.startDate ? new Date(m.startDate).toISOString() : null,
-                    //         endDate: m.endDate ? new Date(m.endDate).toISOString() : null,
-                    //         private: m.private,
-                    //         status: m.status ?? null,
-                    //         budget: m.budget ?? null,
-                    //         openTo: m.openTo ?? [],
-                    //         otherTypeDetails: m.otherTypeDetails ?? null,
-                    //         timelineOrder: m.timelineOrder ?? null,
-                    //         updatedAt: m.updatedAt ? new Date(m.updatedAt).toISOString() : undefined,
-                    //         orgId: (m as any).organizationId,
-                    //     });
-                    // }
-                }),
-            );
+            //         // if (justPublished) {
+            //         //     publishedProjects.push({
+            //         //         projectId: m.id,
+            //         //         title: m.title,
+            //         //         startDate: m.startDate ? new Date(m.startDate).toISOString() : null,
+            //         //         endDate: m.endDate ? new Date(m.endDate).toISOString() : null,
+            //         //         private: m.private,
+            //         //         status: m.status ?? null,
+            //         //         budget: m.budget ?? null,
+            //         //         openTo: m.openTo ?? [],
+            //         //         otherTypeDetails: m.otherTypeDetails ?? null,
+            //         //         timelineOrder: m.timelineOrder ?? null,
+            //         //         updatedAt: m.updatedAt ? new Date(m.updatedAt).toISOString() : undefined,
+            //         //         orgId: (m as any).organizationId,
+            //         //     });
+            //         // }
+            //     }),
+            // );
 
             // --- One batched raw event for all updated public projects ---
             // if (publishedProjects.length) {
