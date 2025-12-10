@@ -131,8 +131,6 @@ const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone,
     selectedNodeIds: state.selectedNodeIds,
     savingList: state.savingList,
-    savingListAdd: state.savingListAdd,
-    savingListRemove: state.savingListRemove,
 })
 
 const nilOrEmptyToUndef = <T extends z.ZodTypeAny>(inner: T) =>
@@ -196,7 +194,7 @@ export function EditMilestoneForm({
     milestoneTypeOptions: Partial<MilestoneType>[],
     onClose: () => void
 }) {
-    const {setMilestone, savingList, savingListAdd, savingListRemove} = useRoadmapStore(useShallow(selector))
+    const {setMilestone, savingList} = useRoadmapStore(useShallow(selector))
     const initializing = useRef(true)
     const {data: session, status} = useSession()
     const pathname = usePathname()
@@ -311,7 +309,6 @@ export function EditMilestoneForm({
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         // if form state is not valid, don't submit
         if (!form.formState.isValid) return
-        // savingListAdd(milestoneData.id)
         console.log(`start saving...`, Date.now())
 
         const {
@@ -424,7 +421,6 @@ export function EditMilestoneForm({
         if (milestoneData?.nodeId) await setMilestone(milestoneData.nodeId, updateData)
 
         setIsMigrating(false)
-        // savingListRemove(milestoneData.id)
         console.log(`end saving...`, Date.now())
     }
 
@@ -1147,7 +1143,7 @@ export function EditMilestoneForm({
                                                 type="submit"
                                                 onClick={async () => {
                                                     await handleMilestoneFormSubmit(form.getValues())
-                                                    // onClose()
+                                                    onClose()
                                                 }}
                                             >
                                                 Save changes
@@ -1181,75 +1177,6 @@ export function EditMilestoneForm({
                                             )}
                                         />
                                     </TabsContent>
-                                    {/* <TabsContent value="recommendations" className="space-y-4 w-full">
-                                        {!recommendations && (
-                                            <div className="flex flex-col gap-4">
-                                                <Skeleton className="w-full h-[230px]"/>
-                                                <Skeleton className="w-full h-[230px]"/>
-                                                <Skeleton className="w-full h-[230px]"/>
-                                            </div>
-                                        )}
-
-                                        {(recommendations && recommendations.length === 0) && (
-                                            <Card
-                                                className="w-full flex flex-col mx-auto justify-center items-center align-center">
-                                                <CardContent className="flex flex-col gap-4 p-4">
-                                                    <h2 className="text-xl">{`Sorry, we don't have any recommendations for this project`}</h2>
-                                                    <div className="flex justify-center">
-                                                        <Image
-                                                            alt="No recommendations"
-                                                            src="https://illustrations.popsy.co/gray/team-idea.svg"
-                                                            width={300}
-                                                            height={300}
-                                                            className="dark:hidden"
-                                                        />
-                                                        <Image
-                                                            alt="No recommendations"
-                                                            src="https://illustrations.popsy.co/gray/team-idea.svg"
-                                                            width={300}
-                                                            height={300}
-                                                            className="hidden dark:block"
-                                                        />
-                                                    </div>
-                                                    <p className="text-md">
-                                                        {`Please add more information to your project to generate some recommendations.`}
-                                                    </p>
-                                                </CardContent>
-                                            </Card>
-                                        )}
-
-                                        {recommendations && recommendations.length > 0 && (
-                                            <>
-                                                <div className={cn("w-full grid gap-4 grid-cols-1")}>
-                                                    {(recommendations || []).map((result: Recommendation, index) => (
-                                                        <CROMarketplaceCard
-                                                            cro={result.content}
-                                                            key={index}
-                                                            milestone={milestoneData}
-                                                            location={"Research Planner"}
-                                                            savedCompanyIds={savedCompanyIds}
-                                                        />
-                                                    ))}
-                                                </div>
-                                            </>
-                                        )}
-
-                                        <Link
-                                            href={`/app/marketplace/service-providers?milestoneTypes=${(formData?.types || [])
-                                                .map((t: any) => t?.value || t?.id)
-                                                .join(",")}`}
-                                        >
-                                            <Button className="pl-0" variant={"link"}>
-                                                <Store/>
-                                                Explore Marketplace
-                                            </Button>
-                                        </Link>
-                                    </TabsContent> */}
-                                    {/*<TabsContent value="publications" className="space-y-4 w-full">*/}
-                                    {/*    <EditMilestoneDetailsPublicationsTab*/}
-                                    {/*        onAttach={(att) => addAttachmentToForm(form, att)}*/}
-                                    {/*    />*/}
-                                    {/*</TabsContent>*/}
                                     <TabsContent value="projects" className="space-y-4 w-full">
                                         <EditMilestoneDetailsProjectsTab projectId={milestoneData.id}/>
                                     </TabsContent>
@@ -1410,17 +1337,6 @@ export function EditMilestoneForm({
                                 projectId: milestoneData.id,
                                 projectTitle: milestoneData.title
                             }}
-                            // trackShareEvent={(socialOption: string) => {
-                            //     mixpanelTrack(`Project Shared`, {
-                            //         "Platform": socialOption,
-                            //         ...(organization ? {
-                            //             "Organization ID": organization.id,
-                            //             "Organization Name": organization.name,
-                            //             "Project ID": milestoneData.id,
-                            //             "Project Title": milestoneData.title
-                            //         } : undefined)
-                            //     })
-                            // }}
                             trackShareEvent={{
                                 title: `Project Shared`,
                                 additonalProperties: {
@@ -1484,7 +1400,6 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                                     <Textarea
                                         id="otherTypeDetails"
                                         placeholder={`Please add a short note about your project type — it helps us make the platform better.`}
-                                        // defaultValue={field.value}
                                         {...field}
                                     />
                                 </FormControl>
@@ -1918,28 +1833,6 @@ export const ContactsFormField = ({form, title}: { form: any, title?: string }) 
 }
 
 export const EditTitle = ({form}: { form: any }) => {
-    // const contentRef = useRef<HTMLHeadingElement>(null);
-
-    // const handleInput = (e: React.FormEvent<HTMLHeadingElement>) => {
-    //     const selection = window.getSelection();
-    //     const range = selection?.getRangeAt(0);
-    //     const cursorPosition = range ? range.startOffset : 0;
-
-    //     // Update the form value without causing a re-render
-    //     form.setValue("title", e.currentTarget.textContent || "");
-
-    //     // Restore cursor position
-    //     if (range && selection) {
-    //         setTimeout(() => {
-    //             const newRange = document.createRange();
-    //             newRange.setStart(contentRef.current!.childNodes[0], cursorPosition);
-    //             newRange.collapse(true);
-    //             selection.removeAllRanges();
-    //             selection.addRange(newRange);
-    //         }, 0);
-    //     }
-    // };
-
     return (
         <FormField
             control={form.control}
@@ -1954,19 +1847,6 @@ export const EditTitle = ({form}: { form: any }) => {
                             defaultValue={field.value}
                             onChange={field.onChange}
                         />
-                        {/* <span
-                            className="flex flex-row gap-2 items-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                            <h1
-                                id="title"
-                                ref={contentRef}
-                                className="text-3xl font-semibold w-full h-full focus:outline-none"
-                                contentEditable
-                                suppressContentEditableWarning
-                                onInput={handleInput}
-                            >
-                                {field.value}
-                            </h1>
-                        </span> */}
                     </FormControl>
                     <FormMessage/>
                 </FormItem>
