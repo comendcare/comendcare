@@ -439,30 +439,18 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // });
                 // enqueue({kind: "UPDATE_MILESTONES", payload: {orgId: state.details?.organizationId, milestones: state.milestones}});
             },
-            // savingState: undefined,
-            // setSavingState: async (savingState: 'saving' | 'saved' | undefined) => {
-            //     set({savingState})
-
-            //     // if (savingState === 'saved') {
-            //     //     // after 5 seconds of the state being saved, remove the notification.
-            //     //     await sleep(5000)
-            //     //     set({savingState: undefined})
-            //     // }
-            // },
             savingList: [],
             savingListAdd: (id: string) => {
                 set({savingList: [...get().savingList, id]})
             },
             savingListRemove: (id: string) => {
                 const saved = get().savingList
-                console.log(`saved list`, saved)
                 const index = saved.findIndex(elementId => elementId === id)
 
                 // if the item was found in the list, remove the first instance
                 if (index >= 0) {
                     saved.splice(index, 1)
-                    console.log(`update saving list`, saved)
-                    set({savingList: saved})
+                    set({savingList: [...saved]})
                 }
             },
         }),
