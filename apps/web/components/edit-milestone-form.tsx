@@ -311,6 +311,7 @@ export function EditMilestoneForm({
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         // if form state is not valid, don't submit
         if (!form.formState.isValid) return
+        // savingListAdd(milestoneData.id)
         console.log(`start saving...`)
 
         const {
@@ -423,7 +424,7 @@ export function EditMilestoneForm({
         if (milestoneData?.nodeId) await setMilestone(milestoneData.nodeId, updateData)
 
         setIsMigrating(false)
-        savingListRemove(milestoneData.id)
+        // savingListRemove(milestoneData.id)
         console.log(`end saving...`)
     }
 
@@ -444,10 +445,10 @@ export function EditMilestoneForm({
         }
     }
 
-    // const handleMilestoneFormSubmitCallback = useCallback(
-    //     handleMilestoneFormSubmit,
-    //     [milestoneData, setMilestone, milestoneTypeOptions]
-    // )
+    const handleMilestoneFormSubmitCallback = useCallback(
+        handleMilestoneFormSubmit,
+        [milestoneData, setMilestone, milestoneTypeOptions]
+    )
 
     const handleShare = async () => {
         // override default delete behaviour with our custom dialog
@@ -455,10 +456,10 @@ export function EditMilestoneForm({
     }
 
     // memo ensures we're not creating a new debounce every time this is called
-    // const debounceUpdates = useMemo(() =>
-    //         debounce((updatedValues) => handleMilestoneFormSubmitCallback(updatedValues), 500),
-    //     [handleMilestoneFormSubmitCallback]
-    // )
+    const debounceUpdates = useMemo(() =>
+            debounce((updatedValues) => handleMilestoneFormSubmitCallback(updatedValues), 500),
+        [handleMilestoneFormSubmitCallback]
+    )
 
     const debounceMixpanelTrackBudget = useMemo(() =>
             debounce((updatedBudget) => {
@@ -1130,7 +1131,6 @@ export function EditMilestoneForm({
                                             className="flex justify-end items-center gap-4 flex-wrap absolute bottom-2 right-0 m-4"
                                         >
                                             {savingList.includes(milestoneData.id) && <p className="flex gap-1 items-center"><RefreshCcw className="h-4 w-4"/> Saving...</p>}
-                                            {/* {savingState === 'saved' && <p className="flex gap-1 items-center"><CircleCheckBig className="h-4 w-4"/> Saved</p>} */}
                                             <Dialog>
                                                 <DialogTrigger asChild>
                                                     <Button type="button" variant="destructive">
@@ -1146,7 +1146,6 @@ export function EditMilestoneForm({
                                                 className="onborda-save-project"
                                                 type="submit"
                                                 onClick={async () => {
-                                                    savingListAdd(milestoneData.id)
                                                     await handleMilestoneFormSubmit(form.getValues())
                                                     // onClose()
                                                 }}

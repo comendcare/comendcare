@@ -138,7 +138,7 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                             isPrivate={props.data?.private}
                             updateCallback={async (isPrivate) => {
                                 if (props.data?.nodeId) {
-                                    setMilestone(props.data.nodeId, {private: isPrivate})
+                                    setMilestone(props.data.nodeId, {id: props.data?.id, private: isPrivate})
                                 }
                             }}
                         />

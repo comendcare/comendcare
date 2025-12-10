@@ -57,7 +57,7 @@ const selector = (state: RoadmapState) => ({
     selectedNodeIds: state.selectedNodeIds,
     setSelectedNodeIds: state.setSelectedNodeIds,
     milestones: state.milestones,
-    saveState: state.saveState,
+    // saveState: state.saveState,
     addMilestones: state.addMilestones,
     deleteNode: state.deleteNode,
     setMilestone: state.setMilestone,
@@ -108,7 +108,6 @@ export function Roadmap({
         milestones, 
         deleteNode,
         setMilestone,
-        // savingState,
         savingList,
     } = useRoadmapStore(useShallow(selector))
     const {data: session, status} = useSession()

@@ -18,7 +18,7 @@ import { mixpanelTrack } from "@comend/lib/mixpanel"
 
 const selector = (state: RoadmapState) => ({
     deleteNode: state.deleteNode,
-    saveState: state.saveState,
+    // saveState: state.saveState,
     setSelectedNodeIds: state.setSelectedNodeIds
 })
 
@@ -27,8 +27,12 @@ export function DeleteMilestoneDialogContent({
 }: {
     milestoneData: any
 }) {
-    const { deleteNode, saveState, setSelectedNodeIds } = useRoadmapStore(useShallow(selector))
-    const { undo } = useRoadmapStore.temporal.getState()
+    const { 
+        deleteNode, 
+        // saveState, 
+        setSelectedNodeIds 
+    } = useRoadmapStore(useShallow(selector))
+    // const { undo } = useRoadmapStore.temporal.getState()
 
     // const handleUndo = () => {
     //     // undo twice to open up milestone panel if it was open previously

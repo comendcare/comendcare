@@ -59,12 +59,10 @@ export type RoadmapState = {
     addNodes: (node: Node[], creationMethod?: string) => Promise<Node[] | void>
     addNodesFromTemplate: (template: any) => Promise<Node[]>
     deleteNode: (nodeId: string) => Promise<void>
-    saveState: () => void
-    // savingState: 'saving' | 'saved' | undefined
-    // setSavingState: (savingState: 'saving' | 'saved' | undefined) => void,
-    savingList: string[],
-    savingListAdd: (id: string) => void,
-    savingListRemove: (id: string) => void,
+    // saveState: () => void
+    savingList: string[]
+    savingListAdd: (ids: string[]) => void
+    savingListRemove: (ids: string[]) => void
 }
 
 export const useRoadmapStore = create<RoadmapState>()(
@@ -157,6 +155,8 @@ export const useRoadmapStore = create<RoadmapState>()(
             milestones: [],
             setMilestone: async (nodeId: string | null, newProperties: Partial<Milestone>) => {
                 console.log(`set milestone`)
+                if (newProperties?.id) get().savingListAdd([newProperties.id])
+
                 const milestones = get().milestones.map(milestone =>
                     milestone.nodeId === nodeId
                         ? {...milestone, ...newProperties}
@@ -168,11 +168,14 @@ export const useRoadmapStore = create<RoadmapState>()(
                 const response = await updateMilestones(get().details?.organizationId, {milestones: milestones.filter(milestone => milestone.nodeId === nodeId)})
                 if (response?.success && response?.data) {
                     console.log(`successfully updated milestone`)
+                    if (newProperties?.id) get().savingListRemove([newProperties.id])
                     return response.data as Milestone[]
                 } else {
                     toast.error("Could not update milestones", {position: "bottom-left"})
                     console.error(`Error updating milestones`, response?.error)
                 }
+                
+                if (newProperties?.id) get().savingListRemove([newProperties.id])
                 // const {enqueue} = useWriteQueue.getState();
                 // enqueue({
                 //     kind: "UPDATE_MILESTONES",
@@ -181,6 +184,8 @@ export const useRoadmapStore = create<RoadmapState>()(
             },
             setMilestones: async (milestones: Milestone[]) => {
                 console.log(`set milestones`)
+                get().savingListAdd(milestones.filter(milestone => !!milestone.id).map(milestone => milestone.id))
+                
                 const updatedMilestones = get().milestones.map(oldMilestone => {
                     const newMilestone = milestones.find(m => m.id === oldMilestone.id)
                     if (newMilestone) {
@@ -197,11 +202,14 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // update DB milestones
                 const response = await updateMilestones(get().details?.organizationId, {milestones: updatedMilestones})
                 if (response?.success && response?.data) {
+                    get().savingListRemove(milestones.filter(milestone => !!milestone.id).map(milestone => milestone.id))
                     return response.data as Milestone[]
                 } else {
                     toast.error("Could not update milestones", {position: "bottom-left"})
                     console.error(`Error updating milestones`, response?.error)
                 }
+
+                get().savingListRemove(milestones.filter(milestone => !!milestone.id).map(milestone => milestone.id))
                 // const {enqueue} = useWriteQueue.getState();
                 // enqueue({
                 //     kind: "UPDATE_MILESTONES",
@@ -252,23 +260,23 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // });
             },
             setNodes: async (nodes: Node[]) => {
-                // console.log(`set nodes`)
-                // set({nodes})
+                console.log(`set nodes`)
+                set({nodes})
 
-                // const orgId = get().details?.organizationId
-                // const response = await updateDBFlow(orgId, {roadmapId: get().roadmapId, nodes, edges: get().edges})
-                // if (response?.success && response?.data) {
-                //     const newNodes = response.data.nodes.map((n: any) => ({
-                //         id: n.id,
-                //         position: {x: n.positionX, y: n.positionY},
-                //         origin: n.origin
-                //     })) as Node[]
+                const orgId = get().details?.organizationId
+                const response = await updateDBFlow(orgId, {roadmapId: get().roadmapId, nodes, edges: get().edges})
+                if (response?.success && response?.data) {
+                    const newNodes = response.data.nodes.map((n: any) => ({
+                        id: n.id,
+                        position: {x: n.positionX, y: n.positionY},
+                        origin: n.origin
+                    })) as Node[]
                 
-                //     return newNodes as Node[]
-                // } else {
-                //     console.error(`Error updating database nodes`, response?.error)
-                //     toast.success("Error updating node state... your node may node's position may not have been saved")
-                // }
+                    return newNodes as Node[]
+                } else {
+                    console.error(`Error updating database nodes`, response?.error)
+                    toast.success("Error updating node state... your node may node's position may not have been saved")
+                }
 
                 // const orgId = get().details?.organizationId;
                 // useWriteQueue.getState().enqueue({
@@ -422,36 +430,40 @@ export const useRoadmapStore = create<RoadmapState>()(
                 //     payload: {orgId: get().details?.organizationId, nodeId}
                 // });
             },
-            saveState: () => {
-                // console.log(`save state`)
-                // const state = get()
-                // updateDBFlow(state.details?.organizationId, {
-                //     roadmapId: state.roadmapId,
-                //     nodes: state.nodes,
-                //     edges: state.edges
-                // })
-                // updateMilestones(state.details?.organizationId, {milestones: state.milestones})
+            // saveState: () => {
+            //     console.log(`save state`)
+            //     const state = get()
+            //     updateDBFlow(state.details?.organizationId, {
+            //         roadmapId: state.roadmapId,
+            //         nodes: state.nodes,
+            //         edges: state.edges
+            //     })
+            //     updateMilestones(state.details?.organizationId, {milestones: state.milestones})
 
-                // const {enqueue} = useWriteQueue.getState();
-                // enqueue({
-                //     kind: "UPDATE_FLOW",
-                //     payload: {orgId: state.details?.organizationId, roadmapId: state.roadmapId, nodes: state.nodes, edges: state.edges}
-                // });
-                // enqueue({kind: "UPDATE_MILESTONES", payload: {orgId: state.details?.organizationId, milestones: state.milestones}});
-            },
+            //     // const {enqueue} = useWriteQueue.getState();
+            //     // enqueue({
+            //     //     kind: "UPDATE_FLOW",
+            //     //     payload: {orgId: state.details?.organizationId, roadmapId: state.roadmapId, nodes: state.nodes, edges: state.edges}
+            //     // });
+            //     // enqueue({kind: "UPDATE_MILESTONES", payload: {orgId: state.details?.organizationId, milestones: state.milestones}});
+            // },
             savingList: [],
-            savingListAdd: (id: string) => {
-                set({savingList: [...get().savingList, id]})
+            savingListAdd: (ids: string[]) => {
+                console.log(`add saving list`, [...get().savingList, ...ids])
+                set({savingList: [...get().savingList, ...ids]})
             },
-            savingListRemove: (id: string) => {
-                const saved = get().savingList
-                const index = saved.findIndex(elementId => elementId === id)
+            savingListRemove: (ids: string[]) => {
+                ids.forEach(id => {
+                    const saved = get().savingList
+                    const index = saved.findIndex(elementId => elementId === id)
 
-                // if the item was found in the list, remove the first instance
-                if (index >= 0) {
-                    saved.splice(index, 1)
-                    set({savingList: [...saved]})
-                }
+                    // if the item was found in the list, remove the first instance
+                    if (index >= 0) {
+                        saved.splice(index, 1)
+                        console.log(`saving list remove`, [...saved])
+                        set({savingList: [...saved]})
+                    }
+                })
             },
         }),
         {

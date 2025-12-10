@@ -4697,39 +4697,106 @@ export const syncDBRFPs = withOrganizationAuth(
 export const updateMilestones = withOrganizationAuth(
     async (_: Organization, {milestones}: { milestones: Milestone[] }) => {
         try {
-            const session = await getSession();
+            // const session = await getSession();
             let updatedMilestones: Milestone[] = [];
 
-            const publishedProjects: Array<{
-                projectId: string;
-                title?: string | null;
-                startDate?: string | null;
-                endDate?: string | null;
-                private?: boolean;
-                status?: string | null;
-                budget?: number | null;
-                openTo?: string[];
-                otherTypeDetails?: string | null;
-                timelineOrder?: number | null;
-                updatedAt?: string;
-                orgId?: string;
-            }> = []
+            // const publishedProjects: Array<{
+            //     projectId: string;
+            //     title?: string | null;
+            //     startDate?: string | null;
+            //     endDate?: string | null;
+            //     private?: boolean;
+            //     status?: string | null;
+            //     budget?: number | null;
+            //     openTo?: string[];
+            //     otherTypeDetails?: string | null;
+            //     timelineOrder?: number | null;
+            //     updatedAt?: string;
+            //     orgId?: string;
+            // }> = []
 
             await Promise.all(
-                milestones.map(async (milestone: any) => {
-                    const previousMilestone = await prisma.milestone.findUnique({
-                        where: {nodeId: milestone.nodeId},
-                        select: {
-                            id: true,
-                            private: true
-                        },
-                    });
+                milestones.map(async (milestone: any) => {                    
+                    /* TYPES */
+                    const incomingTypeIds = (milestone.types || []).map((t: any) => t.milestoneTypeId || t.milestoneType.id);
+                    const existingTypeIds = (await prisma.milestoneTypeOnMilestone.findMany({
+                        where: { milestoneId: milestone.id },
+                        select: { milestoneTypeId: true },
+                    }))?.map((t) => t.milestoneTypeId)
+                    const typesToAdd = incomingTypeIds.filter((id: string) => !existingTypeIds.includes(id));
+                    const typesToRemove = existingTypeIds.filter((id: string) => !incomingTypeIds.includes(id));
 
-                    if (!previousMilestone) {
-                        throw new Error(
-                            `Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`,
-                        );
-                    }
+                    /* BIOSAMPLES */
+                    const incomingBiosampleIds = (milestone.biosamples || []).map((t: any) => t.biosampleId || t.biosample.id);
+                    const existingBiosampleIds = (await prisma.biosampleToMilestone.findMany({
+                        where: { milestoneId: milestone.id },
+                        select: { biosampleId: true },
+                    }))?.map((t) => t.biosampleId);
+                    const biosamplesToAdd = incomingBiosampleIds.filter((id: string) => !existingBiosampleIds.includes(id));
+                    const biosamplesToRemove = existingBiosampleIds.filter((id: string) => !incomingBiosampleIds.includes(id));
+
+                    /* DISEASE MODELS */
+                    const incomingDiseaseModelIds = (milestone.diseaseModels || []).map((t: any) => t.diseaseModelId || t.diseaseModel.id);
+                    const existingDiseaseModelIds = (await prisma.diseaseModelToMilestone.findMany({
+                        where: { milestoneId: milestone.id },
+                        select: { diseaseModelId: true },
+                    }))?.map((t) => t.diseaseModelId);
+                    const diseaseModelsToAdd = incomingDiseaseModelIds.filter((id: string) => !existingDiseaseModelIds.includes(id));
+                    const diseaseModelsToRemove = existingDiseaseModelIds.filter((id: string) => !incomingDiseaseModelIds.includes(id));
+
+                    /* CLINICAL DATASETS */
+                    const incomingToolIds = (milestone.tools || []).map((t: any) => t.toolId || t.tool.id);
+                    const existingToolIds = (await prisma.toolToMilestone.findMany({
+                        where: { milestoneId: milestone.id },
+                        select: { toolId: true },
+                    }))?.map((t) => t.toolId);
+                    const toolsToAdd = incomingToolIds.filter((id: string) => !existingToolIds.includes(id));
+                    const toolsToRemove = existingToolIds.filter((id: string) => !incomingToolIds.includes(id));
+
+                    /* RFPS */
+                    const incomingRfpIds = (milestone.rfps || []).map((t: any) => t.rfpId || t.rfp.id);
+                    const existingRfpIds = (await prisma.rFPToMilestone.findMany({
+                        where: { milestoneId: milestone.id },
+                        select: { rfpId: true },
+                    }))?.map((t) => t.rfpId);
+                    const rfpsToAdd = incomingRfpIds.filter((id: string) => !existingRfpIds.includes(id));
+                    const rfpsToRemove = existingRfpIds.filter((id: string) => !incomingRfpIds.includes(id));
+
+                    /* INSTITUTIONS */
+                    const incomingInstitutionIds = (milestone.institutions || []).map((t: any) => t.institutionId || t.institution.id);
+                    const existingInstituionIds = (await prisma.milestoneToInstitution.findMany({
+                        where: { milestoneId: milestone.id },
+                        select: { institutionId: true },
+                    }))?.map((t) => t.institutionId);
+                    const institutionsToAdd = incomingInstitutionIds.filter((id: string) => !existingInstituionIds.includes(id));
+                    const institutionsToRemove = existingInstituionIds.filter((id: string) => !incomingInstitutionIds.includes(id));
+
+                    /* COMPANIES */
+                    const incomingCompanyIds = (milestone.companies || []).map((t: any) => t.companyId || t.company.id);
+                    const existingCompanyIds = (await prisma.milestoneToCompany.findMany({
+                        where: { milestoneId: milestone.id },
+                        select: { companyId: true },
+                    }))?.map((t) => t.companyId);
+                    const companiesToAdd = incomingCompanyIds.filter((id: string) => !existingCompanyIds.includes(id));
+                    const companiesToRemove = existingCompanyIds.filter((id: string) => !incomingCompanyIds.includes(id));
+
+                    /* ATTACHMENTS */
+                    const incomingAttachmentIds = (milestone.attachments || []).map((t: any) => t.id);
+                    const existingAttachmentIds = (await prisma.externalAttachment.findMany({
+                        where: { milestoneId: milestone.id },
+                        select: { id: true },
+                    }))?.map((t) => t.id);
+                    const attachemntsToAdd = incomingAttachmentIds.filter((id: string) => !existingAttachmentIds.includes(id));
+                    const attachmentsToRemove = existingAttachmentIds.filter((id: string) => !incomingAttachmentIds.includes(id));
+                                        
+                    /* CONTACTS */
+                    const incomingContactIds = (milestone.contacts || []).map((t: any) => t.id);
+                    const existingContactIds = (await prisma.externalContact.findMany({
+                        where: { milestoneId: milestone.id },
+                        select: { id: true },
+                    }))?.map((t) => t.id);
+                    const contactsToAdd = incomingContactIds.filter((id: string) => !existingContactIds.includes(id));
+                    const contactsToRemove = existingContactIds.filter((id: string) => !incomingContactIds.includes(id));
 
                     const m = await prisma.milestone.update({
                         where: {nodeId: milestone.nodeId},
@@ -4750,60 +4817,101 @@ export const updateMilestones = withOrganizationAuth(
                         data: {
                             title: milestone.title,
                             types: {
-                                deleteMany: {},
-                                create: (milestone.types || []).map((type: any) => ({
-                                    milestoneType: {
-                                        connect: {id: type.milestoneTypeId || type.milestoneType.id},
-                                    },
-                                })),
-
+                                // deleteMany: {},
+                                // create: (milestone.types || []).map((type: any) => ({
+                                //     milestoneType: {
+                                //         connect: {id: type.milestoneTypeId || type.milestoneType.id},
+                                //     },
+                                // })),
+                                deleteMany: {
+                                    milestoneTypeId: { in: typesToRemove }
+                                },
+                                create: typesToAdd.map((id: string) => ({
+                                    milestoneType: { connect: { id } }
+                                }))
                             },
                             biosamples: {
-                                deleteMany: {},
-                                create: (milestone.biosamples || []).map((tool: any) => ({
-                                    biosample: {
-                                        connect: {id: tool.biosampleId || tool.biosample.id},
-                                    },
-                                })),
+                                // deleteMany: {},
+                                // create: (milestone.biosamples || []).map((tool: any) => ({
+                                //     biosample: {
+                                //         connect: {id: tool.biosampleId || tool.biosample.id},
+                                //     },
+                                // })),
+                                deleteMany: {
+                                    biosampleId: { in: biosamplesToRemove }
+                                },
+                                create: biosamplesToAdd.map((id: string) => ({
+                                    biosample: { connect: { id } }
+                                }))
                             },
                             diseaseModels: {
-                                deleteMany: {},
-                                create: (milestone.diseaseModels || []).map((tool: any) => ({
-                                    diseaseModel: {
-                                        connect: {id: tool.diseaseModelId || tool.diseaseModel.id},
-                                    },
-                                })),
+                                // deleteMany: {},
+                                // create: (milestone.diseaseModels || []).map((tool: any) => ({
+                                //     diseaseModel: {
+                                //         connect: {id: tool.diseaseModelId || tool.diseaseModel.id},
+                                //     },
+                                // })),
+                                deleteMany: {
+                                    diseaseModelId: { in: diseaseModelsToRemove }
+                                },
+                                create: diseaseModelsToAdd.map((id: string) => ({
+                                    diseaseModel: { connect: { id } }
+                                }))
                             },
                             tools: {
-                                deleteMany: {},
-                                create: (milestone.tools || []).map((tool: any) => ({
-                                    tool: {
-                                        connect: {id: tool.toolId || tool.tool.id},
-                                    },
-                                })),
+                                // deleteMany: {},
+                                // create: (milestone.tools || []).map((tool: any) => ({
+                                //     tool: {
+                                //         connect: {id: tool.toolId || tool.tool.id},
+                                //     },
+                                // })),
+                                deleteMany: {
+                                    toolId: { in: toolsToRemove }
+                                },
+                                create: toolsToAdd.map((id: string) => ({
+                                    tool: { connect: { id } }
+                                }))
                             },
                             rfps: {
-                                deleteMany: {},
-                                create: (milestone.rfps || []).map((rfp: any) => ({
-                                    rfp: {
-                                        connect: {id: rfp.rfpId || rfp.rfp.id},
-                                    },
-                                })),
+                                // deleteMany: {},
+                                // create: (milestone.rfps || []).map((rfp: any) => ({
+                                //     rfp: {
+                                //         connect: {id: rfp.rfpId || rfp.rfp.id},
+                                //     },
+                                // })),
+                                deleteMany: {
+                                    rfpId: { in: rfpsToRemove }
+                                },
+                                create: rfpsToAdd.map((id: string) => ({
+                                    rfp: { connect: { id } }
+                                }))
                             },
                             institutions: {
-                                deleteMany: {},
-                                create: (milestone.institutions || []).map((institution: any) => ({
-                                    institution: {
-                                        connect: {id: institution?.institutionId || institution?.institution?.id}
-                                    }
+                                // deleteMany: {},
+                                // create: (milestone.institutions || []).map((institution: any) => ({
+                                //     institution: {
+                                //         connect: {id: institution?.institutionId || institution?.institution?.id}
+                                //     }
+                                // }))
+                                deleteMany: {
+                                    institutionId: { in: institutionsToRemove }
+                                },
+                                create: institutionsToAdd.map((id: string) => ({
+                                    institution: { connect: { id } }
                                 }))
                             },
                             companies: {
-                                deleteMany: {},
-                                create: (milestone.companies || []).map((company: any) => ({
-                                    company: {
-                                        connect: {id: company?.companyId || company?.company?.id}
-                                    }
+                                // deleteMany: {},
+                                // create: (milestone.companies || []).map((company: any) => ({
+                                //     company: {
+                                //         connect: {id: company?.companyId || company?.company?.id}
+                                //     }
+                                // }))
+                                deleteMany: {
+                                    companyId: { in: companiesToRemove }
+                                },
+                                create: companiesToAdd.map((id: string) => ({
+                                    company: { connect: { id } }
                                 }))
                             },
                             timelineOrder: milestone.timelineOrder,
@@ -4813,24 +4921,40 @@ export const updateMilestones = withOrganizationAuth(
                             endDate: milestone.endDate,
                             budget: milestone.budget,
                             attachments: {
-                                deleteMany: {},
-                                createMany: {
-                                    data: (milestone?.attachments || []).map((attachment: any) => ({
-                                        link: attachment.link,
-                                        ...(attachment.name ? {name: attachment.name} : undefined),
-                                    })),
+                                // deleteMany: {},
+                                // createMany: {
+                                //     data: (milestone?.attachments || []).map((attachment: any) => ({
+                                //         link: attachment.link,
+                                //         ...(attachment.name ? {name: attachment.name} : undefined),
+                                //     })),
+                                // },
+                                deleteMany: {
+                                    id: { in: attachmentsToRemove }
                                 },
+                                create: milestone.attachments.filter((attachment: any) => attachemntsToAdd.includes(attachment.id)).map((attachment: any) => ({
+                                    link: attachment.link,
+                                    ...(attachment.name ? {name: attachment.name} : undefined),
+                                }))
                             },
                             contacts: {
-                                deleteMany: {},
-                                createMany: {
-                                    data: (milestone?.contacts || []).map((contact: any) => ({
-                                        name: contact.name,
-                                        email: contact.email,
-                                        ...(contact.role ? {role: contact.role} : undefined),
-                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined),
-                                    })),
+                                // deleteMany: {},
+                                // createMany: {
+                                //     data: (milestone?.contacts || []).map((contact: any) => ({
+                                //         name: contact.name,
+                                //         email: contact.email,
+                                //         ...(contact.role ? {role: contact.role} : undefined),
+                                //         ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined),
+                                //     })),
+                                // },
+                                deleteMany: {
+                                    id: { in: contactsToRemove }
                                 },
+                                create: milestone.contacts.filter((contact: any) => contactsToAdd.includes(contact.id)).map((contact: any) => ({
+                                    name: contact.name,
+                                    email: contact.email,
+                                    ...(contact.role ? {role: contact.role} : undefined),
+                                    ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined),
+                                }))
                             },
                             openTo: milestone.openTo || [],
                             status: milestone.status || "PLANNED",
@@ -4843,72 +4967,72 @@ export const updateMilestones = withOrganizationAuth(
 
                     updatedMilestones = [...updatedMilestones, m];
 
-                    const justPublished =
-                        m.nodeType === "PROJECT" &&
-                        previousMilestone.private !== false &&
-                        m.private === false;
+                    // const justPublished =
+                    //     m.nodeType === "PROJECT" &&
+                    //     previousMilestone.private !== false &&
+                    //     m.private === false;
 
-                    if (justPublished) {
-                        publishedProjects.push({
-                            projectId: m.id,
-                            title: m.title,
-                            startDate: m.startDate ? new Date(m.startDate).toISOString() : null,
-                            endDate: m.endDate ? new Date(m.endDate).toISOString() : null,
-                            private: m.private,
-                            status: m.status ?? null,
-                            budget: m.budget ?? null,
-                            openTo: m.openTo ?? [],
-                            otherTypeDetails: m.otherTypeDetails ?? null,
-                            timelineOrder: m.timelineOrder ?? null,
-                            updatedAt: m.updatedAt ? new Date(m.updatedAt).toISOString() : undefined,
-                            orgId: (m as any).organizationId,
-                        });
-                    }
+                    // if (justPublished) {
+                    //     publishedProjects.push({
+                    //         projectId: m.id,
+                    //         title: m.title,
+                    //         startDate: m.startDate ? new Date(m.startDate).toISOString() : null,
+                    //         endDate: m.endDate ? new Date(m.endDate).toISOString() : null,
+                    //         private: m.private,
+                    //         status: m.status ?? null,
+                    //         budget: m.budget ?? null,
+                    //         openTo: m.openTo ?? [],
+                    //         otherTypeDetails: m.otherTypeDetails ?? null,
+                    //         timelineOrder: m.timelineOrder ?? null,
+                    //         updatedAt: m.updatedAt ? new Date(m.updatedAt).toISOString() : undefined,
+                    //         orgId: (m as any).organizationId,
+                    //     });
+                    // }
                 }),
             );
 
             // --- One batched raw event for all updated public projects ---
-            if (publishedProjects.length) {
-                const idemSeed = publishedProjects
-                    .map((p) => `${p.projectId}@${p.updatedAt ?? ""}`)
-                    .sort()
-                    .join(",");
-                const externalId = crypto
-                    .createHash("sha256")
-                    .update(`project-batch-publish:${idemSeed}`)
-                    .digest("hex");
+            // if (publishedProjects.length) {
+            //     const idemSeed = publishedProjects
+            //         .map((p) => `${p.projectId}@${p.updatedAt ?? ""}`)
+            //         .sort()
+            //         .join(",");
+            //     const externalId = crypto
+            //         .createHash("sha256")
+            //         .update(`project-batch-publish:${idemSeed}`)
+            //         .digest("hex");
 
-                const orgId = publishedProjects[0].orgId!;
-                let orgName: string | undefined = undefined;
-                let orgImage: string | undefined = undefined;
-                let orgSubdomain: string | undefined = undefined;
-                try {
-                    const org = await prisma.organization.findUnique({
-                        where: {id: orgId},
-                        select: {name: true, image: true, subdomain: true},
-                    });
-                    orgName = org?.name ?? undefined;
-                    orgImage = org?.image ?? undefined;
-                    orgSubdomain = org?.subdomain ?? undefined;
-                } catch {
-                }
+            //     const orgId = publishedProjects[0].orgId!;
+            //     let orgName: string | undefined = undefined;
+            //     let orgImage: string | undefined = undefined;
+            //     let orgSubdomain: string | undefined = undefined;
+            //     try {
+            //         const org = await prisma.organization.findUnique({
+            //             where: {id: orgId},
+            //             select: {name: true, image: true, subdomain: true},
+            //         });
+            //         orgName = org?.name ?? undefined;
+            //         orgImage = org?.image ?? undefined;
+            //         orgSubdomain = org?.subdomain ?? undefined;
+            //     } catch {
+            //     }
 
-                await writeRawEvent({
-                    provider: "app",
-                    eventType: "org_updated_project", // batch payload handled by your register
-                    externalId,
-                    occurredAt: new Date(),
-                    payload: {
-                        orgId,
-                        orgName,
-                        orgSubdomain,
-                        orgImage,
-                        projects: publishedProjects,
-                        userId: session?.user.id,
-                        userName: session?.user.name,
-                    },
-                });
-            }
+            //     await writeRawEvent({
+            //         provider: "app",
+            //         eventType: "org_updated_project", // batch payload handled by your register
+            //         externalId,
+            //         occurredAt: new Date(),
+            //         payload: {
+            //             orgId,
+            //             orgName,
+            //             orgSubdomain,
+            //             orgImage,
+            //             projects: publishedProjects,
+            //             userId: session?.user.id,
+            //             userName: session?.user.name,
+            //         },
+            //     });
+            // }
 
             return {success: true, data: updatedMilestones};
         } catch (error: any) {
