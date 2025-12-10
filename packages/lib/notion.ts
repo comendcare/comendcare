@@ -27,7 +27,7 @@ export async function createGuidesFeedbackTicket(data: FAQFeedbackTicketData) {
     const newTicket = await client.pages.create({
         parent: {
             type: "database_id",
-            database_id: "185801a6fddc803ebb42c42ed5d78e0b"
+            database_id: process.env.NOTION_DATABASE_ID || '',
         },
         properties: {
             Name: {
@@ -184,7 +184,7 @@ export async function createFeedbackTicket(data: FeedbackTicketData) {
     const newTicket = await client.pages.create({
         parent: {
             type: "database_id",
-            database_id: "185801a6fddc803ebb42c42ed5d78e0b"
+            database_id: process.env.NOTION_DATABASE_ID || ''
         },
         properties: {
             Name: {
