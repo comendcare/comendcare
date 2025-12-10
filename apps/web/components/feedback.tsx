@@ -12,6 +12,7 @@ import FeedbackForm from "~web/components/feedback-form";
 import { MessageCircle } from "lucide-react"
 import { SidebarMenuButton, useSidebar } from "@comend/components/ui/sidebar";
 import { NavNotificationCollapsedIcon, NavNotificationExpandedIcon } from "./nav-main";
+import Link from "next/link";
 
 interface FeedbackProps {
     className?: string
@@ -32,7 +33,7 @@ export const FeedbackSheet: React.FC<FeedbackProps> = () => {
                             <NavNotificationCollapsedIcon item={{title: 'Guides', url: '/app/guides'}}/>
                         }
                     </div>
-                    {'Submit Feedback'}
+                    {'Message a team member'}
                     {state === "expanded" &&
                         <NavNotificationExpandedIcon item={{title: 'Guides', url: '/app/guides'}}/>
                     }
@@ -40,10 +41,14 @@ export const FeedbackSheet: React.FC<FeedbackProps> = () => {
             </SidebarMenuButton>
             <SheetContent onOpenAutoFocus={event => event.preventDefault()}>
                 <SheetHeader>
-                    <SheetTitle>Send Feedback</SheetTitle>
+                    <SheetTitle>Get help or give feedback</SheetTitle>
                 </SheetHeader>
 
                 <FeedbackForm/>
+
+                {/* <p className="text-sm text-muted-foreground">
+                    If you’d like on-going support, join our <Link href="" className="underline">community slack</Link>.
+                </p> */}
 
             </SheetContent>
         </Sheet>
