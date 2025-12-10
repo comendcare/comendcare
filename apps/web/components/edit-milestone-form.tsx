@@ -1143,7 +1143,7 @@ export function EditMilestoneForm({
                                                 type="submit"
                                                 onClick={async () => {
                                                     await handleMilestoneFormSubmit(form.getValues())
-                                                    onClose()
+                                                    // onClose()
                                                 }}
                                             >
                                                 Save changes
