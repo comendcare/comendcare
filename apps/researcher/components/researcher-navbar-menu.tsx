@@ -38,7 +38,7 @@ const pages = [
         icon: <UserIcon size={16}/>
     },
     {
-        href: "/marketplace/biosamples",
+        href: "/marketplace",
         label: "Marketplace",
         icon: <Store size={16} />
     },
