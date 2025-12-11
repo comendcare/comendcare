@@ -26,6 +26,7 @@ const selector = (state: RoadmapState) => ({
     setSelectedNodeIds: state.setSelectedNodeIds,
     milestones: state.milestones,
     setMilestones: state.setMilestones,
+    setMilestonesVisibility: state.setMilestonesVisibility,
     setMilestone: state.setMilestone
 })
 
@@ -346,7 +347,7 @@ export const TimelineItemContent = ({
     listeners?: any
 }) => {
 
-    const {setMilestone} = useRoadmapStore(useShallow(selector))
+    const {setMilestone, setMilestonesVisibility} = useRoadmapStore(useShallow(selector))
 
     return (
         <>
@@ -393,7 +394,7 @@ export const TimelineItemContent = ({
                         isPrivate={milestone.private}
                         updateCallback={async (isPrivate) => {
                             if (milestone.nodeId) {
-                                setMilestone(milestone.nodeId, {private: isPrivate})
+                                setMilestonesVisibility([milestone], isPrivate)
                             }
                         }}
                     />
