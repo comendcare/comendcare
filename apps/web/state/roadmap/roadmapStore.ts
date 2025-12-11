@@ -293,7 +293,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // });
             },
             moveNodes: async (nodes: Node[]) => {
-                console.log(`move nodes`, nodes)
+                console.log(`move nodes`)
 
                 // if nothing has changed, block this
                 if (JSON.stringify(nodes) === JSON.stringify(get().nodes)) return
