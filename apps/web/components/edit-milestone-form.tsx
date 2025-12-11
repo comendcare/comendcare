@@ -557,7 +557,7 @@ export function EditMilestoneForm({
                 <ScrollArea className="px-8 pb-4 h-full">
                     <form
                         onKeyDown={handleKeyDown}
-                        // onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
+                        onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                         className="flex flex-col gap-4 mt-2 px-1 pb-12"
                     >
                         <Button className="absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
@@ -1126,13 +1126,7 @@ export function EditMilestoneForm({
                                             <Button
                                                 disabled={!form.formState.isValid}
                                                 variant={"cta"}
-                                                id="edit-milestone-scroll-area"
-                                                className="onborda-save-project"
                                                 type="submit"
-                                                onClick={async () => {
-                                                    await handleMilestoneFormSubmit(form.getValues())
-                                                    // onClose()
-                                                }}
                                             >
                                                 Save changes
                                             </Button>
