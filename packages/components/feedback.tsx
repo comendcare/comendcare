@@ -8,9 +8,6 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@comend/components/ui/sheet"
-import { MessageCircle } from "lucide-react"
-// import { SidebarMenuButton, useSidebar } from "@comend/components/ui/sidebar";
-// import { NavNotificationCollapsedIcon, NavNotificationExpandedIcon } from "./nav-main";
 import Link from "next/link";
 import FeedbackForm from "./feedback-form";
 
@@ -26,8 +23,6 @@ export const FeedbackSheet: React.FC<FeedbackProps> = ({
     triggerButton: ReactNode,
     className?: string,
 }) => {
-    // const {state} = useSidebar()
-
     return (
         <Sheet>
             <SheetTrigger asChild className={className}>
@@ -40,9 +35,9 @@ export const FeedbackSheet: React.FC<FeedbackProps> = ({
 
                 <FeedbackForm/>
 
-                {/* <p className="text-sm text-muted-foreground">
-                    If you’d like on-going support, join our <Link href="" className="underline">community slack</Link>.
-                </p> */}
+                <p className="text-sm text-muted-foreground">
+                    If you’d like on-going support, join our <Link href="https://join.slack.com/t/comend-community/shared_invite/zt-3knlh762v-L4f1f9aOk_BBhHe_sY9HmA" className="underline">community slack</Link>.
+                </p>
 
             </SheetContent>
         </Sheet>
