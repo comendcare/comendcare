@@ -312,7 +312,7 @@ export function EditMilestoneForm({
         () =>
             debounce((values: z.infer<typeof editMilestoneForm>) => {
                 handleMilestoneFormSubmit(values)
-            }, 5000),
+            }, 2000),
         []
     );
 
