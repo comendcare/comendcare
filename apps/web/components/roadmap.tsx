@@ -61,7 +61,8 @@ const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones,
     deleteNode: state.deleteNode,
     setMilestone: state.setMilestone,
-    savingList: state.savingList
+    savingList: state.savingList,
+    setMilestonesVisibility: state.setMilestonesVisibility,
 })
 
 export function Roadmap({
@@ -109,6 +110,7 @@ export function Roadmap({
         deleteNode,
         setMilestone,
         savingList,
+        setMilestonesVisibility,
     } = useRoadmapStore(useShallow(selector))
     const {data: session, status} = useSession()
     const pathname = usePathname()
@@ -491,18 +493,16 @@ export function Roadmap({
         <ContextMenuContent ref={contextMenuRef}>
             <ContextMenuItem 
                 onSelect={(e) => {
-                    selectedNodeIds.forEach((nodeId: string) => {
-                        setMilestone(nodeId, {private: false})
-                    })
+                    const selectedMilestones = milestones.filter(milestone => milestone.nodeId && selectedNodeIds.includes(milestone.nodeId))
+                    setMilestonesVisibility(selectedMilestones, false)
                 }}
             >
                 {`Make selected project(s) public`}
             </ContextMenuItem>
             <ContextMenuItem
                 onSelect={(e) => {
-                    selectedNodeIds.forEach((nodeId: string) => {
-                        setMilestone(nodeId, {private: true})
-                    })
+                    const selectedMilestones = milestones.filter(milestone => milestone.nodeId && selectedNodeIds.includes(milestone.nodeId))
+                    setMilestonesVisibility(selectedMilestones, true)
                 }}
             >
                 {`Make selected project(s) private`}
@@ -695,7 +695,7 @@ const RoadmapHeader = ({
     orgSubdomain: string | undefined
 }) => {
     const {data: session, status} = useSession()
-    const { milestones, setSelectedNodeIds, addMilestones, setMilestone } = useRoadmapStore(useShallow(selector))
+    const { milestones, setSelectedNodeIds, addMilestones, setMilestone, setMilestonesVisibility } = useRoadmapStore(useShallow(selector))
     const parentRef = useRef<HTMLDivElement>(null)
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1024)
@@ -751,12 +751,7 @@ const RoadmapHeader = ({
                                     <Button
                                         className="h-full w-full rounded-md flex justify-center items-center bg-red-100 hover:bg-red-300"
                                         onClick={() => {
-                                            console.log(`make all projects published`)
-                                            milestones
-                                                .map(milestone => milestone.nodeId)
-                                                .forEach((nodeId: string | null) => {
-                                                    if (nodeId) setMilestone(nodeId, {private: false})
-                                                })
+                                            setMilestonesVisibility(milestones, false)
                                         }}
                                     >
                                         <Lock className="text-red-600 h-4 w-4"/>
@@ -775,12 +770,7 @@ const RoadmapHeader = ({
                                     <Button
                                         className="h-full w-full rounded-md flex justify-center items-center bg-green-100 hover:bg-green-300"
                                         onClick={() => {
-                                            console.log(`make all projects private`)
-                                            milestones
-                                                .map(milestone => milestone.nodeId)
-                                                .forEach((nodeId: string | null) => {
-                                                    if (nodeId) setMilestone(nodeId, {private: true})
-                                                })
+                                            setMilestonesVisibility(milestones, true)
                                         }}
                                     >
                                         <Globe className="text-green-600 h-4 w-4"/>

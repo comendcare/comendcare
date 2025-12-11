@@ -53,12 +53,13 @@ const selector = (state: RoadmapState) => ({
     edges: state.edges,
     onEdgesChange: state.onEdgesChange,
     setSelectedNodeIds: state.setSelectedNodeIds,
-    setMilestone: state.setMilestone,
+    // setMilestone: state.setMilestone,
+    setMilestonesVisibility: state.setMilestonesVisibility,
     savingList: state.savingList
 })
 
 export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
-    const {selectedNodeIds, setSelectedNodeIds, setMilestone, savingList} = useRoadmapStore(useShallow(selector))
+    const {selectedNodeIds, setSelectedNodeIds, setMilestonesVisibility, savingList} = useRoadmapStore(useShallow(selector))
 
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
         const target = event.target as any;
@@ -138,37 +139,13 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                             isPrivate={props.data?.private}
                             updateCallback={async (isPrivate) => {
                                 if (props.data?.nodeId) {
-                                    setMilestone(props.data.nodeId, {id: props.data?.id, private: isPrivate})
+                                    setMilestonesVisibility([props.data], isPrivate)
                                 }
                             }}
                         />
-                        // props.data?.private ? (
-                        //     <Button
-                        //         className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-red-100 hover:bg-red-300"
-                        //         onClick={(e) => {
-                        //             e.stopPropagation()
-                        //             if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: false})
-                        //         }}
-                        //     >
-                        //         <Lock size={20} className="text-red-800"/>
-                        //     </Button>
-                        // ) : (
-                        //     <Button
-                        //         className="inline-block align-middle mr-2 mb-1 h-fit w-fit p-1.5 bg-green-100 hover:bg-green-300"
-                        //         onClick={(e) => {
-                        //             e.stopPropagation()
-                        //             if (props?.data?.nodeId) setMilestone(props.data.nodeId, {private: true})
-                        //         }}
-                        //     >
-                        //         <Globe size={20} className="text-green-800"/>
-                        //     </Button>
-                        // )
                     )}
                     {props.data?.title || "New Milestone"}
                 </CardTitle>
-                {/* <CardDescription className="line-clamp-2">
-                    {truncate(props.data?.description || "", 200)}
-                </CardDescription> */}
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
                 <ul className="w-full flex flex-row flex-wrap gap-2 text-sm text-wrap break-words">

@@ -16,6 +16,7 @@ import {
     updateDBFlow,
     updateEdges,
     updateMilestones,
+    updateMilestonesVisibility,
     updateRoadmap
 } from "@comend/lib/actions"
 import {toast} from "sonner"
@@ -48,6 +49,7 @@ export type RoadmapState = {
     selectedNodeIds: string[]
     setSelectedNodeIds: (ids: string[]) => void
     milestones: Milestone[]
+    setMilestonesVisibility: (milestones: Milestone[], isPrivate: boolean) => Promise<Milestone[] | void>
     setMilestone: (id: string, newProperties: Partial<Milestone>) => Promise<Milestone[] | void>
     setMilestones: (milestones: Milestone[]) => Promise<Milestone[] | void>
     nodes: Node[]
@@ -183,6 +185,36 @@ export const useRoadmapStore = create<RoadmapState>()(
                 //     payload: {orgId: get().details?.organizationId, milestones}
                 // });
             },
+            setMilestonesVisibility: async (milestones: Milestone[], isPrivate: boolean) => {
+                // faster version of set milestones used for updating visibility quickly for many milestones at a time
+                console.log(`set milestones visibility`)
+                get().savingListAdd(milestones.filter(milestone => !!milestone.id).map(milestone => milestone.id))
+
+                const updatedMilestones = get().milestones.map((existingMilestone) => {
+                    if (milestones.map(m => m.id).includes(existingMilestone.id)) {
+                        return ({
+                            ...existingMilestone,
+                            private: isPrivate
+                        })
+                    } else {
+                        return existingMilestone
+                    }
+                })
+
+                set({milestones: updatedMilestones})
+
+                // update DB milestones
+                const response = await updateMilestonesVisibility(get().details?.organizationId, {milestones, isPrivate})
+                if (response?.success && response?.data) {
+                    get().savingListRemove(milestones.filter(milestone => !!milestone.id).map(milestone => milestone.id))
+                    return response.data as Milestone[]
+                } else {
+                    toast.error("Could not update milestones", {position: "bottom-left"})
+                    console.error(`Error updating milestones`, response?.error)
+                }
+
+                get().savingListRemove(milestones.filter(milestone => !!milestone.id).map(milestone => milestone.id))
+            },
             setMilestones: async (milestones: Milestone[]) => {
                 console.log(`set milestones`)
                 get().savingListAdd(milestones.filter(milestone => !!milestone.id).map(milestone => milestone.id))
@@ -261,6 +293,11 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // });
             },
             moveNodes: async (nodes: Node[]) => {
+                console.log(`move nodes`, nodes)
+
+                // if nothing has changed, block this
+                if (JSON.stringify(nodes) === JSON.stringify(get().nodes)) return
+                
                 const updatedNodes = get().nodes.map(originalNode => {
                     const foundIndex = nodes.findIndex(newNode => newNode.id === originalNode.id)
                     if (foundIndex >= 0) return nodes[foundIndex]
@@ -449,7 +486,6 @@ export const useRoadmapStore = create<RoadmapState>()(
             // },
             savingList: [],
             savingListAdd: (ids: string[]) => {
-                console.log(`add saving list`, [...get().savingList, ...ids])
                 set({savingList: [...get().savingList, ...ids]})
             },
             savingListRemove: (ids: string[]) => {
@@ -460,7 +496,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                     // if the item was found in the list, remove the first instance
                     if (index >= 0) {
                         saved.splice(index, 1)
-                        console.log(`saving list remove`, [...saved])
                         set({savingList: [...saved]})
                     }
                 })

@@ -319,7 +319,6 @@ export function EditMilestoneForm({
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         // if form state is not valid, don't submit
         if (!form.formState.isValid) return
-        console.log(`start saving...`, Date.now())
 
         const {
             nodeType,
@@ -431,7 +430,6 @@ export function EditMilestoneForm({
         if (milestoneData?.nodeId) await setMilestone(milestoneData.nodeId, updateData)
 
         setIsMigrating(false)
-        console.log(`end saving...`, Date.now())
     }
 
     const handleStorageFacilityAsyncSearch = async (query: string): Promise<Option[]> => {
@@ -530,7 +528,6 @@ export function EditMilestoneForm({
 
         // autosave event subscription
         form.watch((values) => debouncedSave(values as z.infer<typeof editMilestoneForm>))
-        console.log(`is initialized...`)
     }
 
     // Initialization - Allow update once form is initialized

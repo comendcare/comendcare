@@ -4741,6 +4741,24 @@ export const syncDBRFPs = withOrganizationAuth(
     }
 )
 
+export const updateMilestonesVisibility = withOrganizationAuth(
+    async (_: Organization, {milestones, isPrivate}: {milestones: Milestone[], isPrivate: boolean}) => {
+        try {
+            const updatedMilestones = await prisma.milestone.updateMany({
+                where: {id: {in: milestones.map(m => m.id)}},
+                data: {
+                    private: isPrivate
+                }
+            })
+
+            return {success: true, data: updatedMilestones};
+        } catch (error: any) {
+            logError(`Error updating Milestone: `, error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
 export const updateMilestones = withOrganizationAuth(
     async (_: Organization, {milestones}: { milestones: Milestone[] }) => {
         try {
