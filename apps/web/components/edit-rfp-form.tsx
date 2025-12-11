@@ -173,7 +173,7 @@ const rfpSelector = (state: RFPState) => ({
     createRFP: state.createRFP,
     updateRFP: state.updateRFP,
     deleteRFP: state.deleteRFP,
-    saveState: state.saveState
+    // saveState: state.saveState
 })
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
@@ -189,14 +189,19 @@ export function EditRFPForm({
     const initializing = useRef(true)
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
-    const { createRFP, updateRFP, deleteRFP, saveState } = useRFPStore(useShallow(rfpSelector))
-    const { undo } = useRFPStore.temporal.getState()
+    const { 
+        createRFP, 
+        updateRFP, 
+        deleteRFP, 
+        // saveState 
+    } = useRFPStore(useShallow(rfpSelector))
+    // const { undo } = useRFPStore.temporal.getState()
 
-    const handleUndo = () => {
-        undo()
-        saveState(session?.user.organizationId)
-        toast.dismiss("undo-toast")
-    }
+    // const handleUndo = () => {
+    //     undo()
+    //     saveState(session?.user.organizationId)
+    //     toast.dismiss("undo-toast")
+    // }
 
     const form = useForm<z.infer<typeof editRFPForm>>({
         mode: "onChange",
@@ -346,7 +351,7 @@ export function EditRFPForm({
                         <p className="font-semibold text-gray-900">
                             {`RFP Deleted`}
                         </p>
-                        <Button className="self-end" onClick={handleUndo}>Undo Delete</Button>
+                        {/* <Button className="self-end" onClick={handleUndo}>Undo Delete</Button> */}
                     </span>
                     <p className="text-sm text-gray-500">
                         {`Your RFP had been deleted successfully.`}

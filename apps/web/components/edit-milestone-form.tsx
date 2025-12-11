@@ -1,7 +1,7 @@
 "use client"
 
 import {zodResolver} from "@hookform/resolvers/zod"
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react"
+import React, {useCallback, useEffect, experimental_useEffectEvent, useMemo, useRef, useState} from "react"
 import {useForm, UseFormReturn} from "react-hook-form"
 import {z} from "zod"
 import {
@@ -76,7 +76,7 @@ import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group"
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs"
 import Loading from "./../../../loading";
 import {fetchCreateRequests, findCompanies, findInstitutions} from "@comend/lib/fetchers"
-import {Globe, Lock, Plus, X, Share, Trash} from "lucide-react"
+import {Globe, Lock, Plus, X, Share, Trash, RefreshCcw, CircleCheckBig} from "lucide-react"
 import {Badge, badgeVariants} from "@comend/components/ui/badge"
 import {mixpanelTrack} from "@comend/lib/mixpanel"
 import ShareDialog from "./share-dialog"
@@ -127,26 +127,11 @@ const EditMilestoneDetailsProjectsTab = dynamic(
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
 
-// const onbordaSelector = (state: ResearchPlanOnbordaState) => ({
-//     step: state.step
-// })
-
 const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone,
-    selectedNodeIds: state.selectedNodeIds
+    selectedNodeIds: state.selectedNodeIds,
+    savingList: state.savingList,
 })
-
-// const recommendationsSelector = (state: CROSearchState) => ({
-//     recommendations: state.recommendations,
-//     setRecommendations: state.setRecommendations
-// })
-
-// const notificationsSelector = (state: NotificationsState) => ({
-//     initialized: state.initialized,
-//     notifications: state.notifications,
-//     addNotification: state.addNotification,
-//     setNotificationsViewed: state.setNotificationsViewed
-// })
 
 const nilOrEmptyToUndef = <T extends z.ZodTypeAny>(inner: T) =>
     z.preprocess(v => (v === "" || v === null ? undefined : v), inner.optional());
@@ -188,17 +173,6 @@ const editMilestoneForm = z.object({
 
 type SimpleAttachment = { name: string; link: string };
 
-// function addAttachmentToForm(form: any, att: SimpleAttachment) {
-//     const prev = form.getValues("attachments") ?? [];
-//     const norm = (s: string) => s.trim().toLowerCase();
-
-//     const already = prev.some((a: any) => norm(a.link) === norm(att.link));
-//     if (already) return false;
-
-//     form.setValue("attachments", [...prev, att], { shouldValidate: true, shouldDirty: true });
-//     return true;
-// }
-
 export function EditMilestoneForm({
                                       organization,
                                       milestoneData,
@@ -220,23 +194,14 @@ export function EditMilestoneForm({
     milestoneTypeOptions: Partial<MilestoneType>[],
     onClose: () => void
 }) {
-    const {setMilestone} = useRoadmapStore(useShallow(selector))
-    // const {recommendations, setRecommendations} = useCROSearchStore(useShallow(recommendationsSelector))
-    // const {
-    //     initialized: notificationsInitialized,
-    //     notifications,
-    //     addNotification,
-    //     setNotificationsViewed,
-    // } = useNotificationsStore(useShallow(notificationsSelector))
+    const {setMilestone, savingList} = useRoadmapStore(useShallow(selector))
     const initializing = useRef(true)
+    const [isInitialized, setIsInitialized] = useState(false)
     const {data: session, status} = useSession()
     const pathname = usePathname()
-    // const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [fetchedTools, setFetchedTools] = useState<Option[]>([])
     const [tab, setTab] = useState<string>("edit")
-    // const {step} = useOnbordaStore(useShallow(onbordaSelector))
-    // const {isOnbordaVisible} = useOnborda()
     const [shareIsOpen, setShareIsOpen] = useState(false)
     const [createRFPIsOpen, setCreateRFPIsOpen] = useState(false)
     const [createBiosampleIsOpen, setCreateBiosampleIsOpen] = useState(false)
@@ -244,25 +209,6 @@ export function EditMilestoneForm({
     const [createClincalDatasetIsOpen, setCreateClinicalDatasetIsOpen] = useState(false)
     const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(milestoneData.createFacilityRequests || [])
     const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
-    // const [recommendationsViewed, setRecommendationsViewed] = useState(tab === "recommendations")
-    // const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
-
-    // useEffect(() => {
-    //     async function fetchSavedCompanies() {
-    //         const res = await getSavedCompaniesFromOrganizationId(
-    //             session?.user?.organizationId,
-    //             { companyId: true }
-    //         );
-
-    //         if (res.success && res.data) {
-    //             setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
-    //         }
-    //     }
-
-    //     fetchSavedCompanies();
-    // }, [session, status]);
-
-    // state for adding fields
     const [hasBudget, setHasBudget] = useState(milestoneData?.budget !== undefined && milestoneData?.budget !== null)
     const [hasStartDate, setHasStartDate] = useState(milestoneData?.startDate || false)
     const [hasEndDate, setHasEndDate] = useState(milestoneData?.endDate || false)
@@ -361,6 +307,15 @@ export function EditMilestoneForm({
         notes: form.watch("notes")
     }
 
+    // Debounced save (stable)
+    const debouncedSave = useMemo(
+        () =>
+            debounce((values: z.infer<typeof editMilestoneForm>) => {
+                handleMilestoneFormSubmit(values)
+            }, 2000),
+        []
+    );
+
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         // if form state is not valid, don't submit
         if (!form.formState.isValid) return
@@ -412,9 +367,6 @@ export function EditMilestoneForm({
             nodeType,
             title,
             ...(description !== undefined && description !== null ? {description} : undefined),
-            // ...(startDate ? {startDate} : undefined),
-            // ...(endDate ? {endDate} : undefined),
-            // ...(budget ? {budget} : undefined),
             startDate: startDate || null,
             endDate: endDate || null,
             budget: budget !== undefined && budget !== null ? budget : null,
@@ -426,7 +378,6 @@ export function EditMilestoneForm({
                     milestoneType: type
                 })
             }).filter((type) => type !== undefined),
-            // ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             metadata: {
                 ...(milestoneData?.metadata ? JSON.parse(JSON.stringify(milestoneData.metadata)) : undefined),
                 otherTypeDetails: values.otherTypeDetails
@@ -435,13 +386,6 @@ export function EditMilestoneForm({
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             ...(contacts ? {contacts} : undefined),
             ...(openTo ? {openTo} : undefined),
-            // tools: (tools || []).map((tool) => {
-            //     return ({
-            //         milestoneId: milestoneData.id,
-            //         toolId: tool.id,
-            //         tool: tool
-            //     })
-            // }).filter((tool) => tool !== undefined),
             biosamples: (tools || []).filter(tool => tool.type === "Biosamples").map((tool) => {
                 return ({
                     milestoneId: milestoneData.id,
@@ -483,7 +427,7 @@ export function EditMilestoneForm({
             }))
         }
 
-        if (milestoneData?.nodeId) setMilestone(milestoneData.nodeId, updateData)
+        if (milestoneData?.nodeId) await setMilestone(milestoneData.nodeId, updateData)
 
         setIsMigrating(false)
     }
@@ -505,21 +449,10 @@ export function EditMilestoneForm({
         }
     }
 
-    const handleMilestoneFormSubmitCallback = useCallback(
-        handleMilestoneFormSubmit,
-        [milestoneData, setMilestone, milestoneTypeOptions]
-    )
-
     const handleShare = async () => {
         // override default delete behaviour with our custom dialog
         setShareIsOpen(true)
     }
-
-    // memo ensures we're not creating a new debounce every time this is called
-    const debounceUpdates = useMemo(() =>
-            debounce((updatedValues) => handleMilestoneFormSubmitCallback(updatedValues), 500),
-        [handleMilestoneFormSubmitCallback]
-    )
 
     const debounceMixpanelTrackBudget = useMemo(() =>
             debounce((updatedBudget) => {
@@ -590,14 +523,11 @@ export function EditMilestoneForm({
             setFetchedTools([...formattedBiosamples, ...formattedDiseaseModels, ...formattedDatasamples])
         }
 
-        // if (milestoneData) {
-        //     await setRecommendations([milestoneData as Milestone], {limit: 3})
-        // }
-
         // trigger a form validation, if the imported data is not valid, let the user know right away
         form.trigger()
 
-        initializing.current = false
+        // autosave event subscription
+        form.watch((values) => debouncedSave(values as z.infer<typeof editMilestoneForm>))
     }
 
     // Initialization - Allow update once form is initialized
@@ -616,12 +546,6 @@ export function EditMilestoneForm({
         }
     }, [milestoneData])
 
-    // Watch form changes, don't watch while initializing
-    useEffect(() => {
-        const subscription = form.watch((values) => debounceUpdates(values))
-        return () => subscription.unsubscribe();
-    }, [form.watch, debounceUpdates, form])
-
     useEffect(() => {
         // Forces re-validation whenever the startDate or endDate changes
         if (!initializing.current) form.trigger()
@@ -633,7 +557,7 @@ export function EditMilestoneForm({
                 <ScrollArea className="px-8 pb-4 h-full">
                     <form
                         onKeyDown={handleKeyDown}
-                        onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
+                        // onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                         className="flex flex-col gap-4 mt-2 px-1 pb-12"
                     >
                         <Button className="absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
@@ -1188,7 +1112,9 @@ export function EditMilestoneForm({
                                         <span className="h-8"/>
 
                                         <span
-                                            className="flex justify-end gap-4 flex-wrap absolute bottom-2 right-0 m-4">
+                                            className="flex justify-end items-center gap-4 flex-wrap absolute bottom-2 right-0 m-4"
+                                        >
+                                            {savingList.includes(milestoneData.id) && <p className="flex gap-1 items-center"><RefreshCcw className="h-4 w-4"/> Saving...</p>}
                                             <Dialog>
                                                 <DialogTrigger asChild>
                                                     <Button type="button" variant="destructive">
@@ -1204,8 +1130,8 @@ export function EditMilestoneForm({
                                                 className="onborda-save-project"
                                                 type="submit"
                                                 onClick={async () => {
-                                                    // await handleMilestoneFormSubmit(form.getValues())
-                                                    onClose()
+                                                    await handleMilestoneFormSubmit(form.getValues())
+                                                    // onClose()
                                                 }}
                                             >
                                                 Save changes
@@ -1239,75 +1165,6 @@ export function EditMilestoneForm({
                                             )}
                                         />
                                     </TabsContent>
-                                    {/* <TabsContent value="recommendations" className="space-y-4 w-full">
-                                        {!recommendations && (
-                                            <div className="flex flex-col gap-4">
-                                                <Skeleton className="w-full h-[230px]"/>
-                                                <Skeleton className="w-full h-[230px]"/>
-                                                <Skeleton className="w-full h-[230px]"/>
-                                            </div>
-                                        )}
-
-                                        {(recommendations && recommendations.length === 0) && (
-                                            <Card
-                                                className="w-full flex flex-col mx-auto justify-center items-center align-center">
-                                                <CardContent className="flex flex-col gap-4 p-4">
-                                                    <h2 className="text-xl">{`Sorry, we don't have any recommendations for this project`}</h2>
-                                                    <div className="flex justify-center">
-                                                        <Image
-                                                            alt="No recommendations"
-                                                            src="https://illustrations.popsy.co/gray/team-idea.svg"
-                                                            width={300}
-                                                            height={300}
-                                                            className="dark:hidden"
-                                                        />
-                                                        <Image
-                                                            alt="No recommendations"
-                                                            src="https://illustrations.popsy.co/gray/team-idea.svg"
-                                                            width={300}
-                                                            height={300}
-                                                            className="hidden dark:block"
-                                                        />
-                                                    </div>
-                                                    <p className="text-md">
-                                                        {`Please add more information to your project to generate some recommendations.`}
-                                                    </p>
-                                                </CardContent>
-                                            </Card>
-                                        )}
-
-                                        {recommendations && recommendations.length > 0 && (
-                                            <>
-                                                <div className={cn("w-full grid gap-4 grid-cols-1")}>
-                                                    {(recommendations || []).map((result: Recommendation, index) => (
-                                                        <CROMarketplaceCard
-                                                            cro={result.content}
-                                                            key={index}
-                                                            milestone={milestoneData}
-                                                            location={"Research Planner"}
-                                                            savedCompanyIds={savedCompanyIds}
-                                                        />
-                                                    ))}
-                                                </div>
-                                            </>
-                                        )}
-
-                                        <Link
-                                            href={`/app/marketplace/service-providers?milestoneTypes=${(formData?.types || [])
-                                                .map((t: any) => t?.value || t?.id)
-                                                .join(",")}`}
-                                        >
-                                            <Button className="pl-0" variant={"link"}>
-                                                <Store/>
-                                                Explore Marketplace
-                                            </Button>
-                                        </Link>
-                                    </TabsContent> */}
-                                    {/*<TabsContent value="publications" className="space-y-4 w-full">*/}
-                                    {/*    <EditMilestoneDetailsPublicationsTab*/}
-                                    {/*        onAttach={(att) => addAttachmentToForm(form, att)}*/}
-                                    {/*    />*/}
-                                    {/*</TabsContent>*/}
                                     <TabsContent value="projects" className="space-y-4 w-full">
                                         <EditMilestoneDetailsProjectsTab projectId={milestoneData.id}/>
                                     </TabsContent>
@@ -1468,17 +1325,6 @@ export function EditMilestoneForm({
                                 projectId: milestoneData.id,
                                 projectTitle: milestoneData.title
                             }}
-                            // trackShareEvent={(socialOption: string) => {
-                            //     mixpanelTrack(`Project Shared`, {
-                            //         "Platform": socialOption,
-                            //         ...(organization ? {
-                            //             "Organization ID": organization.id,
-                            //             "Organization Name": organization.name,
-                            //             "Project ID": milestoneData.id,
-                            //             "Project Title": milestoneData.title
-                            //         } : undefined)
-                            //     })
-                            // }}
                             trackShareEvent={{
                                 title: `Project Shared`,
                                 additonalProperties: {
@@ -1542,7 +1388,6 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                                     <Textarea
                                         id="otherTypeDetails"
                                         placeholder={`Please add a short note about your project type — it helps us make the platform better.`}
-                                        // defaultValue={field.value}
                                         {...field}
                                     />
                                 </FormControl>
@@ -1976,28 +1821,6 @@ export const ContactsFormField = ({form, title}: { form: any, title?: string }) 
 }
 
 export const EditTitle = ({form}: { form: any }) => {
-    // const contentRef = useRef<HTMLHeadingElement>(null);
-
-    // const handleInput = (e: React.FormEvent<HTMLHeadingElement>) => {
-    //     const selection = window.getSelection();
-    //     const range = selection?.getRangeAt(0);
-    //     const cursorPosition = range ? range.startOffset : 0;
-
-    //     // Update the form value without causing a re-render
-    //     form.setValue("title", e.currentTarget.textContent || "");
-
-    //     // Restore cursor position
-    //     if (range && selection) {
-    //         setTimeout(() => {
-    //             const newRange = document.createRange();
-    //             newRange.setStart(contentRef.current!.childNodes[0], cursorPosition);
-    //             newRange.collapse(true);
-    //             selection.removeAllRanges();
-    //             selection.addRange(newRange);
-    //         }, 0);
-    //     }
-    // };
-
     return (
         <FormField
             control={form.control}
@@ -2012,19 +1835,6 @@ export const EditTitle = ({form}: { form: any }) => {
                             defaultValue={field.value}
                             onChange={field.onChange}
                         />
-                        {/* <span
-                            className="flex flex-row gap-2 items-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                            <h1
-                                id="title"
-                                ref={contentRef}
-                                className="text-3xl font-semibold w-full h-full focus:outline-none"
-                                contentEditable
-                                suppressContentEditableWarning
-                                onInput={handleInput}
-                            >
-                                {field.value}
-                            </h1>
-                        </span> */}
                     </FormControl>
                     <FormMessage/>
                 </FormItem>
