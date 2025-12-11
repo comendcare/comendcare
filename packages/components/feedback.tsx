@@ -35,8 +35,8 @@ export const FeedbackSheet: React.FC<FeedbackProps> = ({
 
                 <FeedbackForm/>
 
-                <p className="text-sm text-muted-foreground">
-                    If you’d like on-going support, join our <Link href="https://join.slack.com/t/comend-community/shared_invite/zt-3knlh762v-L4f1f9aOk_BBhHe_sY9HmA" className="underline">community slack</Link>.
+                <p className="text-sm">
+                    If you’d like on-going support, join our <Link href="https://join.slack.com/t/comend-community/shared_invite/zt-3knlh762v-L4f1f9aOk_BBhHe_sY9HmA" className="underline text-blue-600">community slack</Link>.
                 </p>
 
             </SheetContent>
