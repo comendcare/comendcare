@@ -1,7 +1,7 @@
 "use client"
 
 import {zodResolver} from "@hookform/resolvers/zod"
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react"
+import React, {useCallback, useEffect, experimental_useEffectEvent, useMemo, useRef, useState} from "react"
 import {useForm, UseFormReturn} from "react-hook-form"
 import {z} from "zod"
 import {
@@ -196,6 +196,7 @@ export function EditMilestoneForm({
 }) {
     const {setMilestone, savingList} = useRoadmapStore(useShallow(selector))
     const initializing = useRef(true)
+    const [isInitialized, setIsInitialized] = useState(false)
     const {data: session, status} = useSession()
     const pathname = usePathname()
     const [isMigrating, setIsMigrating] = useState(false)
@@ -305,6 +306,15 @@ export function EditMilestoneForm({
         rfps: form.watch("rfps"),
         notes: form.watch("notes")
     }
+
+    // Debounced save (stable)
+    const debouncedSave = useMemo(
+        () =>
+            debounce((values: z.infer<typeof editMilestoneForm>) => {
+                handleMilestoneFormSubmit(values)
+            }, 5000),
+        []
+    );
 
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         // if form state is not valid, don't submit
@@ -441,21 +451,10 @@ export function EditMilestoneForm({
         }
     }
 
-    const handleMilestoneFormSubmitCallback = useCallback(
-        handleMilestoneFormSubmit,
-        [milestoneData, setMilestone, milestoneTypeOptions]
-    )
-
     const handleShare = async () => {
         // override default delete behaviour with our custom dialog
         setShareIsOpen(true)
     }
-
-    // memo ensures we're not creating a new debounce every time this is called
-    const debounceUpdates = useMemo(() =>
-            debounce((updatedValues) => handleMilestoneFormSubmitCallback(updatedValues), 500),
-        [handleMilestoneFormSubmitCallback]
-    )
 
     const debounceMixpanelTrackBudget = useMemo(() =>
             debounce((updatedBudget) => {
@@ -526,14 +525,12 @@ export function EditMilestoneForm({
             setFetchedTools([...formattedBiosamples, ...formattedDiseaseModels, ...formattedDatasamples])
         }
 
-        // if (milestoneData) {
-        //     await setRecommendations([milestoneData as Milestone], {limit: 3})
-        // }
-
         // trigger a form validation, if the imported data is not valid, let the user know right away
         form.trigger()
 
-        initializing.current = false
+        // autosave event subscription
+        form.watch((values) => debouncedSave(values as z.infer<typeof editMilestoneForm>))
+        console.log(`is initialized...`)
     }
 
     // Initialization - Allow update once form is initialized
@@ -552,12 +549,6 @@ export function EditMilestoneForm({
         }
     }, [milestoneData])
 
-    // Watch form changes, don't watch while initializing
-    // useEffect(() => {
-    //     const subscription = form.watch((values) => debounceUpdates(values))
-    //     return () => subscription.unsubscribe();
-    // }, [form.watch, debounceUpdates, form])
-
     useEffect(() => {
         // Forces re-validation whenever the startDate or endDate changes
         if (!initializing.current) form.trigger()
@@ -569,7 +560,7 @@ export function EditMilestoneForm({
                 <ScrollArea className="px-8 pb-4 h-full">
                     <form
                         onKeyDown={handleKeyDown}
-                        onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
+                        // onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                         className="flex flex-col gap-4 mt-2 px-1 pb-12"
                     >
                         <Button className="absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
