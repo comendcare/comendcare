@@ -62,6 +62,7 @@ export default function RoadmapsPage({ orgId, organization, roadmaps }: Props) {
                     </Button>
                 </div>
                 <RoadmapsTable 
+                    isPrivate={true}
                     roadmaps={roadmaps} 
                     rowClickCallback={(roadmap) => {
                         setIsLoading(true)
