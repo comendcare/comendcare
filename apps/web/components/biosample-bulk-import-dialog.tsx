@@ -57,7 +57,7 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
 
     const data: z.infer<typeof editBiosampleForm> = {
         types: (() => {
-            const foundOption = BIOSAMPLE_TYPE_OPTIONS.find(option => option.label === biosample.Type)
+            const foundOption = BIOSAMPLE_TYPE_OPTIONS.find(option => option.label === biosample['Type']?.trim())
             if (foundOption) return [foundOption]
             return []
         })(),
@@ -134,7 +134,7 @@ export function BiosampleBulkImportDialog() {
                 const result = await parseCSV(
                     file,
                     [
-                        {key: 'Type', required: false, defaultValue: undefined, isValid: (entry) => BIOSAMPLE_TYPE_OPTIONS.find(option => option.labal === entry.Type) !== undefined},
+                        {key: 'Type', required: true, defaultValue: undefined, isValid: (entry) => BIOSAMPLE_TYPE_OPTIONS.find(option => option.labal === entry.Type) !== undefined},
                         {key: 'Gene', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Storage Facility', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Diagnoses', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
