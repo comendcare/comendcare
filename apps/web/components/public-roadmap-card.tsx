@@ -7,7 +7,7 @@ import {PublicFlowView} from "./public-flow";
 import {PublicTimelineView} from "./public-timeline";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import {Button} from "@comend/components/ui/button";
-import {ChevronsUpDown, FileText, Megaphone, Microscope, Pencil, Plus, Variable} from "lucide-react";
+import {ChevronsUpDown, FileText, Globe, Lock, Megaphone, Microscope, Pencil, Plus, Variable} from "lucide-react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@comend/components/ui/table";
 import {Milestone, milestoneCategories, MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap} from "@comend/lib/types";
 import {Badge} from "@comend/components/ui/badge";
@@ -51,6 +51,7 @@ export const RoadmapsCard = ({
             <CardContent className="px-8">
                 {(roadmaps && roadmaps.length > 0)
                     ? <RoadmapsTable
+                        isPrivate={false}
                         roadmaps={roadmaps}
                         rowClickCallback={(roadmap) =>
                             router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}` : '#')
@@ -169,7 +170,8 @@ export const NoProjectsCard = ({isPublic}: { isPublic: Boolean }) => {
     )
 }
 
-export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
+export const RoadmapsTable = ({roadmaps, rowClickCallback, isPrivate}: {
+    isPrivate: boolean,
     roadmaps: any[],
     rowClickCallback: (roadmap: any) => void
 }) => {
@@ -203,6 +205,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
                         >
                             {roadmapsForModality.map(roadmap => (
                                 <RoadmapRow 
+                                    isPrivate={isPrivate}
                                     roadmap={roadmap}
                                     rowClickCallback={rowClickCallback}
                                 />
@@ -219,6 +222,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
                     >
                         {otherRoadmaps.map(roadmap => (
                             <RoadmapRow 
+                                isPrivate={isPrivate}
                                 roadmap={roadmap}
                                 rowClickCallback={rowClickCallback}
                             />
@@ -235,8 +239,10 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback}: {
     )
 }
 
-export const RoadmapRow = ({roadmap, rowClickCallback}: {roadmap: any, rowClickCallback: (roadmap: any) => void}) => {
+export const RoadmapRow = ({roadmap, rowClickCallback, isPrivate}: {roadmap: any, rowClickCallback: (roadmap: any) => void, isPrivate: boolean}) => {
     const numProjects = roadmap.milestones.length
+    const numPrivateProjects = roadmap.milestones.filter((milestone: any) => milestone.private).length
+    const numPublishedProjects = roadmap.milestones.filter((milestone: any) => !milestone.private).length
 
     return (
         <TableRow 
@@ -248,14 +254,32 @@ export const RoadmapRow = ({roadmap, rowClickCallback}: {roadmap: any, rowClickC
                 <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
             </TableCell>
             <TableCell>
-                {numProjects > 0 && (
-                    <PropertyBadge 
-                        className="text-nowrap border-purple-200 text-purple-900 font-semibold" 
-                        icon={FileText}
-                    >
-                        {numProjects === 1 ? `${numProjects} project` : `${numProjects} projects`}
-                    </PropertyBadge>
-                )}
+                <div className="flex flex-col gap-2 justify-center text-nowrap">
+                    {isPrivate && numPrivateProjects > 0 && (
+                        <PropertyBadge 
+                            className="text-nowrap border-red-200 text-red-900 font-semibold" 
+                            icon={Lock}
+                        >
+                            {numPrivateProjects === 1 ? `${numPrivateProjects} private project` : `${numPrivateProjects} private projects`}
+                        </PropertyBadge>
+                    )}
+                    {isPrivate && numPublishedProjects > 0 && (
+                        <PropertyBadge 
+                            className="text-nowrap border-green-200 text-green-900 font-semibold" 
+                            icon={Globe}
+                        >
+                            {numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}
+                        </PropertyBadge>
+                    )}
+                    {!isPrivate && numProjects > 0 && (
+                        <PropertyBadge 
+                            className="text-nowrap border-purple-200 text-purple-900 font-semibold" 
+                            icon={FileText}
+                        >
+                            {numProjects === 1 ? `${numProjects} project` : `${numProjects} projects`}
+                        </PropertyBadge>
+                    )}
+                </div>
             </TableCell>
             <TableCell className="pr-0">
                 <div className="flex gap-2 justify-end items-center text-nowrap">
