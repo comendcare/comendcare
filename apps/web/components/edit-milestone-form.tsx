@@ -316,7 +316,7 @@ export function EditMilestoneForm({
         []
     );
 
-    const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
+    const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>, submitEvent?: any) => {
         // if form state is not valid, don't submit
         if (!form.formState.isValid) return
 
@@ -430,6 +430,8 @@ export function EditMilestoneForm({
         if (milestoneData?.nodeId) await setMilestone(milestoneData.nodeId, updateData)
 
         setIsMigrating(false)
+        // if this submit has been triggered manually, we close the side panel after submission
+        if (submitEvent) onClose()
     }
 
     const handleStorageFacilityAsyncSearch = async (query: string): Promise<Option[]> => {
