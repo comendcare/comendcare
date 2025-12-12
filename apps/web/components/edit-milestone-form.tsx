@@ -557,8 +557,7 @@ export function EditMilestoneForm({
                 <form
                     onKeyDown={handleKeyDown}
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
-                    // className="flex flex-col gap-4 mt-2 px-1 pb-12"
-                    className="h-full max-h-full flex flex-col gap-4 p-8"
+                    className="h-full max-h-full flex flex-col gap-2 2xl:gap-4 p-4 2xl:p-8"
                 >
                     <Tabs 
                         value={tab} 
@@ -1160,10 +1159,6 @@ export function EditMilestoneForm({
                                 disabled={!form.formState.isValid || savingList.includes(milestoneData.id)}
                                 variant={"cta"}
                                 type="submit"
-                                // onClick={async () => {
-                                //     await handleMilestoneFormSubmit(form.getValues())
-                                //     // onClose()
-                                // }}
                             >
                                 {savingList.includes(milestoneData.id) ? (
                                     `Saving...`
