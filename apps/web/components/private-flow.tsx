@@ -177,7 +177,7 @@ export const PrivateFlowView = ({
             return node
         })
         setLocalNodes(newNodes)
-        debounceUpdateStore(updatedNodes)
+        debounceUpdateStore(newNodes)
     }
 
     const debounceUpdateStore = useCallback(

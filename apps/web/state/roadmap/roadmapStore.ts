@@ -314,7 +314,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                         position: {x: n.positionX, y: n.positionY},
                         origin: n.origin
                     })) as Node[]
-                
+
                     return newNodes as Node[]
                 } else {
                     console.error(`Error updating database nodes`, response?.error)

@@ -4064,20 +4064,30 @@ export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
 )
 
 export const moveNodes = withOrganizationAuth(
-    async (organization: Organization, nodes: any[]) => {
+    async (_: Organization, nodes: any[]) => {
         try {
             const updatedNodes: Node[] = []
 
             for (const node of nodes) {
-
                 const n = await prisma.$transaction(async tx => {
-                    return await tx.node.update({
-                        where: { id: node.id },
-                        data: { positionX: node.position.x || node.positionX, positionY: node.position.y || node.positionY },
-                    })
+                    try {
+                        return await tx.node.update({
+                            where: { id: node.id },
+                            data: {
+                                positionX: node.position.x ?? node.positionX,
+                                positionY: node.position.y ?? node.positionY,
+                            },
+                        })
+                    } catch (e: any) {
+                        if (e.code === 'P2025') {
+                            // Record not found — gracefully skip
+                            return null
+                        }
+                        throw e // rethrow any other unexpected error
+                    }
                 })
 
-                updatedNodes.push(n)
+                if (n) updatedNodes.push(n)
             }
 
             console.log(`Successfully moving Node(s)`)
