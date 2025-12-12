@@ -269,7 +269,7 @@ export function Roadmap({
                             </div>
 
                             {selectedView === "list" && (
-                                <div className="flex flex-row gap-4 items-center">
+                                <div className="w-full flex gap-4 items-center justify-end">
                                     <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
                                         <SelectTrigger className="w-[180px]">
                                             <SelectValue 
