@@ -557,7 +557,7 @@ export function EditMilestoneForm({
                 <ScrollArea className="px-8 pb-4 h-full">
                     <form
                         onKeyDown={handleKeyDown}
-                        // onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
+                        onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                         className="flex flex-col gap-4 mt-2 px-1 pb-12"
                     >
                         <Button className="absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
@@ -569,8 +569,7 @@ export function EditMilestoneForm({
 
                         <EditTitle form={form}/>
 
-                        <Tabs value={tab} onValueChange={(value) => setTab(value)}
-                              className="space-y-4 w-full h-full">
+                        <Tabs value={tab} onValueChange={(value) => setTab(value)} className="space-y-4 w-full h-full">
                             <div className="flex gap-4 items-center justify-between">
                                 <TabsList className="flex flex-wrap h-fit gap-2 bg-white">
                                     <TabsTrigger value="edit" className="data-[state=active]:bg-secondary">
@@ -1125,11 +1124,11 @@ export function EditMilestoneForm({
                                             <Button
                                                 disabled={!form.formState.isValid || savingList.includes(milestoneData.id)}
                                                 variant={"cta"}
-                                                // type="submit"
-                                                onClick={async () => {
-                                                    await handleMilestoneFormSubmit(form.getValues())
-                                                    // onClose()
-                                                }}
+                                                type="submit"
+                                                // onClick={async () => {
+                                                //     await handleMilestoneFormSubmit(form.getValues())
+                                                //     // onClose()
+                                                // }}
                                             >
                                                 {savingList.includes(milestoneData.id) ? (
                                                     `Saving...`
