@@ -207,13 +207,9 @@ export const useRFPSearchStore = create<RFPSearchState>()(
                 const ids = 
                     process.env.NEXT_PUBLIC_NODE_ENV === 'production' 
                         ? [
-                            // 'cm6f847kk0000g1r3mkm3zh62', // AGSAA
-                            // // 'cmdrkqiqv0000w45azqlanvcd', // CDLS
-                            // 'cm6fg095e0000120vrcke39q1', // MED13L
-                            // // 'cm6quxnmv00007qh34myx7zr7', // Rory Belle Foundation
-                            // 'cmigvoy9i0001pggn86mnttlx', // ZTTK
-                            // // ADD PROJECT 8P WHEN THEY'VE CREATED THEIR ACCOUNT
-                            
+                            '79430614-19fb-4c4f-9595-76f652d031c1', // CTNNB1 Connect and Cure - The CTNNB1 Connect & Cure Research Grant
+                            '601e39a7-9cd0-414e-9874-c953d0533c9f', // Dup15q Alliance - Dup15q Alliance Research Grant Program
+                            '07341d6f-9b91-40da-b909-a1d00d36bb16', // The Rory Belle Foundation - Advance the Cure Grant Program: 2025
                         ]
                         : []
 
