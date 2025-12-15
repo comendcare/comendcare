@@ -90,47 +90,6 @@ export default function MarketplacePage() {
     const [clinicalDatasetsInitialized, setClinicalDatasetsInitialized] = useState(false)
     const [rfpsInitialized, setRfpsInitialized] = useState(false)
     const [width, setWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 0)
-    
-    // const [savedCompanyIds, setSavedCompanyIds] = useState<Set<string>>(new Set());
-    // const [savedOrganizationIds, setSavedOrganizationIds] = useState<Set<string>>(new Set());
-
-    // useEffect(() => {
-    //     async function fetchData() {
-    //         const savedOrganizationsResponse = await getSavedOrganizationsFromOrganizationId(session?.user?.organizationId || undefined, {
-    //             id: true,
-    //             organizationId: true,
-    //             organization: true,
-    //             savedOrganizationId: true,
-    //             savedOrganization: true,
-    //             updatedAt: true,
-    //             createdAt: true,
-    //             metadata: true
-    //         });
-    //         if (savedOrganizationsResponse.success) {
-    //             const savedOrganizationData = savedOrganizationsResponse.data as SavedOrganization[];
-    //             setSavedOrganizationIds(new Set(savedOrganizationData.map((c: SavedOrganization) => c.savedOrganizationId)));
-    //         } else {
-    //             console.error(savedOrganizationsResponse.error);
-    //         }
-    //     }
-
-    //     fetchData();
-    // }, [session, status])
-
-    // useEffect(() => {
-    //     async function fetchSavedCompanies() {
-    //         const res = await getSavedCompaniesFromOrganizationId(
-    //             session?.user?.organizationId,
-    //             { companyId: true }
-    //         );
-
-    //         if (res.success && res.data) {
-    //             setSavedCompanyIds(new Set(res.data.map((c: SavedCompany) => c.companyId)));
-    //         }
-    //     }
-
-    //     fetchSavedCompanies();
-    // }, [session, status]);
 
     useEffect(() => {
         function handleResize() {
@@ -146,17 +105,6 @@ export default function MarketplacePage() {
     useEffect(() => {
         const init = async () => {
             console.log(`start init...`)
-            const parsedCROFilters = {
-                categories: [] as any[],
-                milestoneTypes: [] as any[],
-                types: [] as any[],
-                certifications: [] as any[],
-                tags: [] as any[],
-            }
-            await initializeCROSearch(parsedCROFilters)
-            setCROsInitialized(true)
-            console.log(`CRO search initialized...`)
-
             const parsedPAGFilters = {
                 genes: [] as any[],
                 conditions: [] as any[],
@@ -208,6 +156,17 @@ export default function MarketplacePage() {
             initializeRFPSearch(parsedRFPFilters)
             setRfpsInitialized(true)
             console.log(`RFP search initialized...`)
+
+            const parsedCROFilters = {
+                categories: [] as any[],
+                milestoneTypes: [] as any[],
+                types: [] as any[],
+                certifications: [] as any[],
+                tags: [] as any[],
+            }
+            await initializeCROSearch(parsedCROFilters)
+            setCROsInitialized(true)
+            console.log(`CRO search initialized...`)
         }
 
         init()
@@ -218,45 +177,6 @@ export default function MarketplacePage() {
     return (
         <div className="flex flex-col w-full h-full mx-auto gap-8">
             <div className="flex flex-col gap-8">
-                <div className="flex flex-col gap-2">
-                    <div className="flex justify-between items-center gap-4">
-                        <h2 className="text-2xl semibold">Service providers</h2>
-                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
-                            <Link
-                                href={"/app/marketplace/service-providers"}
-                            >
-                                Browse all service providers
-                                <ArrowRight />
-                            </Link>
-                        </Button>
-                    </div>
-                    <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        {(crosInitialized && croStore.searchResults && croStore.searchResults.length > 0 )
-                            ? (
-                                <>
-                                    {croStore.searchResults?.slice(0, width < 1280 ? 2 : 3)
-                                        .map((cro, index) => (
-                                            <CROMarketplaceCard
-                                                cro={cro}
-                                                key={index}
-                                                location={"Marketplace"}
-                                                // savedCompanyIds={savedCompanyIds}
-                                                savedCompanyIds={new Set()}
-                                            />
-                                    ))}
-                                </>
-                            )
-                            : (
-                                <>
-                                    <Skeleton className="h-[286px] w-full"/>
-                                    <Skeleton className="h-[286px] w-full"/>
-                                    {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
-                                </>
-                            )
-                        }
-                    </ol>
-                </div>
-
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Patient groups</h2>
@@ -506,6 +426,45 @@ export default function MarketplacePage() {
                                     <Skeleton className="h-[286px] w-full"/>
                                     <Skeleton className="h-[286px] w-full"/>
                                     <Skeleton className="h-[286px] w-full"/>
+                                </>
+                            )
+                        }
+                    </ol>
+                </div>
+                
+                <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center gap-4">
+                        <h2 className="text-2xl semibold">Service providers</h2>
+                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                            <Link
+                                href={"/app/marketplace/service-providers"}
+                            >
+                                Browse all service providers
+                                <ArrowRight />
+                            </Link>
+                        </Button>
+                    </div>
+                    <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {(crosInitialized && croStore.searchResults && croStore.searchResults.length > 0 )
+                            ? (
+                                <>
+                                    {croStore.searchResults?.slice(0, width < 1280 ? 2 : 3)
+                                        .map((cro, index) => (
+                                            <CROMarketplaceCard
+                                                cro={cro}
+                                                key={index}
+                                                location={"Marketplace"}
+                                                // savedCompanyIds={savedCompanyIds}
+                                                savedCompanyIds={new Set()}
+                                            />
+                                    ))}
+                                </>
+                            )
+                            : (
+                                <>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                    <Skeleton className="h-[286px] w-full"/>
+                                    {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
                                 </>
                             )
                         }
