@@ -473,7 +473,7 @@ export const getDates = (milestone: any) => {
 }
 
 export const validateImport = (entry: any, expectedValues: ImportField[]) => {
-    const errors: {key: string, message: string, object: any}[] = []
+    const errors: {key: string, message: string, object: any, type: string}[] = []
 
     expectedValues.forEach(({key, required, isValid}) => {
         // not required, and doesn't exist, skip validation
@@ -481,13 +481,13 @@ export const validateImport = (entry: any, expectedValues: ImportField[]) => {
 
         // if required, check if value exists
         if (required && !entry[key]) {
-            errors.push({key, message: `Required field ${key} is missing`, object: entry})
+            errors.push({key, message: `Required field ${key} is missing`, object: entry, type: 'REQUIRED_MISSING'})
             return
         }
 
         // if value exists, check if it's valid
         if (entry[key] && !isValid(entry[key])) {
-            errors.push({key, message: `Field ${key} is not formatted properly`, object: entry})
+            errors.push({key, message: `Field ${key} is not formatted properly`, object: entry, type: 'INVALID_FORMAT'})
             return
         }
     })
@@ -506,15 +506,24 @@ export function parseCSV(file: File, expectedValues: ImportField[]): Promise<{va
             skipEmptyLines: true,
             complete: (result) => {
                 const newValues: any[] = []
-                let errors: {key: string, message: string, object: any}[] = []
+                let errors: {key: string, message: string, object: any, type: string}[] = []
 
                 try {
                     result.data.forEach((entry: any) => {
+                        console.log(`entry`, entry)
                         const validate = validateImport(entry, expectedValues)
                         if (validate.isValid && !validate.errors) {
+                            // row is valid - no errors importing
                             newValues.push(entry)
                         } else {
+                            // row is not valid
                             errors = errors.concat(validate.errors)
+
+                            // if any required values are missing don't attempt to import
+                            if (validate.errors.map(error => error.type).includes('REQUIRED_MISSING')) {
+                                console.log(`required missing`)
+                                return
+                            }
 
                             const attemptValue = Object.fromEntries(
                                 expectedValues.map(({key, defaultValue}) => [key, entry[key] || defaultValue || undefined])

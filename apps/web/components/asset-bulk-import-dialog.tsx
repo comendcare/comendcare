@@ -18,8 +18,8 @@ import z from "zod";
 export async function formatClinicalDatasetData(biosample: any): Promise<z.infer<typeof editDataToolForm>> {
 
     const data: z.infer<typeof editDataToolForm> = {
-        title: biosample['Title'],
-        description: biosample['Description'],
+        title: biosample['Title']?.trim(),
+        description: biosample['Description']?.trim(),
         isPrivate: true,
         types: []
         // isPrivate: biosample['Visibility'] ? (biosample['Visibility'] === 'Published' ? false : true) : true

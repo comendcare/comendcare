@@ -34,12 +34,12 @@ const selector = (state: RoadmapState) => ({
     setSelectedNodeIds: state.setSelectedNodeIds,
     milestones: state.milestones,
     nodes: state.nodes,
-    setNodes: state.setNodes,
+    moveNodes: state.moveNodes,
     edges: state.edges,
     onEdgesChange: state.onEdgesChange,
     onConnect: state.onConnect,
     addNodes: state.addNodes,
-    addMilestones: state.addMilestones
+    addMilestones: state.addMilestones,
 })
 
 const gridSize = 15
@@ -71,12 +71,11 @@ export const PrivateFlowView = ({
         setSelectedNodeIds,
         milestones,
         nodes,
-        setNodes: setDbNodes,
+        moveNodes,
         edges,
         onEdgesChange,
         addNodes,
         onConnect,
-        addMilestones
     } = useRoadmapStore(useShallow(selector))
     const nodeTypes = { PROJECT: MilestoneNode, ASSET: MilestoneNode, RFP: MilestoneNode }
     const edgeTypes = { DEFAULT: CustomEdge }
@@ -128,7 +127,7 @@ export const PrivateFlowView = ({
         });
       }, []);
     
-      const handleMouseMove = useCallback((event: any) => {
+    const handleMouseMove = useCallback((event: any) => {
         if (startConnectNode) {
             let position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
             const width = 40
@@ -161,26 +160,9 @@ export const PrivateFlowView = ({
             setStartConnectNode(null)
             setPreviewNode(null)
         }
-      }, [startConnectNode, screenToFlowPosition, getIntersectingNodes]);
+    }, [startConnectNode, screenToFlowPosition, getIntersectingNodes]);
 
-    // const handleEditClick = (event: React.MouseEvent, node: Node) => {
-    //     if (event.ctrlKey || event.altKey) return
-    //     if (event.metaKey) {
-    //         // if CMD (on mac) or CTRL (on windows) is held, add id to multiselect
-    //         if (node.id && !selectedNodeIds.includes(node.id)) {
-    //             setSelectedNodeIds([...selectedNodeIds, node.id])
-    //         }
-    //     } else {
-    //         // regular click, set selected node id
-    //         if (node.id) {
-    //             setSelectedNodeIds([node.id])
-    //         } else {
-    //             setSelectedNodeIds([])
-    //         }
-    //     }
-    // }
-
-    const onNodesChange = (changes: NodeChange<Node>[]) => {
+    const onNodesChange = (changes: any[]) => {
         const newNodes = applyNodeChanges(changes, localNodes).map(node => {
             if (node.position) {
                 const nodeElement = document.getElementById(`react-flow__node-${node.id}`)
@@ -194,7 +176,6 @@ export const PrivateFlowView = ({
             }
             return node
         })
-
         setLocalNodes(newNodes)
         debounceUpdateStore(newNodes)
     }
@@ -202,7 +183,7 @@ export const PrivateFlowView = ({
     const debounceUpdateStore = useCallback(
         debounce(
             (nodes: Node[]) => {
-                setDbNodes(nodes)
+                moveNodes(nodes)
             }, 500
         ),
         []

@@ -11,6 +11,7 @@ export function SeeMoreDescription({description}: {description: string}) {
         <div className="flex flex-col items-end gap-2">
             <p 
                 className={cn(
+                    "w-full",
                     isExpanded ? "" : "line-clamp-4"
                 )}
                 data-testid="conditions-summary"

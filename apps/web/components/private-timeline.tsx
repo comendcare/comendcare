@@ -13,7 +13,7 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {Microscope, User, DollarSign} from "lucide-react"
+import {Microscope, User, DollarSign, RefreshCcw} from "lucide-react"
 import { ProjectActionsMenu } from "./project-actions-menu";
 import { Badge } from "@comend/components/ui/badge";
 import { Organization } from "@prisma/client";
@@ -26,7 +26,9 @@ const selector = (state: RoadmapState) => ({
     setSelectedNodeIds: state.setSelectedNodeIds,
     milestones: state.milestones,
     setMilestones: state.setMilestones,
-    setMilestone: state.setMilestone
+    setMilestonesVisibility: state.setMilestonesVisibility,
+    setMilestone: state.setMilestone,
+    savingList: state.savingList
 })
 
 export const TimelineView = ({
@@ -304,7 +306,6 @@ export const DraggableTimelineItem = ({
             }}
         >
             <span className="flex items-center justify-center rounded-full mt-6">
-                {/* <TypeBadge iconOnly={true} type={milestone?.nodeType || milestone?.nodeType || "PROJECT"}/> */}
                 <div className="bg-blue-light h-4 w-4 rounded-full"/>
             </span>
             <div 
@@ -346,61 +347,24 @@ export const TimelineItemContent = ({
     listeners?: any
 }) => {
 
-    const {setMilestone} = useRoadmapStore(useShallow(selector))
+    const {setMilestonesVisibility, savingList} = useRoadmapStore(useShallow(selector))
 
     return (
         <>
         <div className="flex flex-row items-start justify-start gap-4 mr-8">
             <span>
-                {/* hide for now, until we bring back custom order in the list view */}
-                {/* {isDraggable && (
-                    disabled ? (
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <Button
-                                    disabled={true}
-                                    type="button"
-                                    variant={"ghost"}
-                                    {...attributes}
-                                    {...listeners}
-                                    className="p-2 h-fit text-secondary-foreground/50 cursor-grab"
-                                >
-                                    <span className="sr-only">Move timeline</span>
-                                    <GripVertical/>
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-80">
-                                <p>
-                                    {`Dragging is only available in custom mode.`}
-                                </p>
-                            </TooltipContent>
-                        </Tooltip>
-                    ): (
-                        <Button
-                            type="button"
-                            variant={"ghost"}
-                            {...attributes}
-                            {...listeners}
-                            className="p-2 h-fit text-secondary-foreground/50 cursor-grab"
-                        >
-                            <span className="sr-only">Move timeline</span>
-                            <GripVertical/>
-                        </Button>
-                    )
-                )} */}
                 {isPrivate && (
                     <PublicPrivateButton 
                         isPrivate={milestone.private}
                         updateCallback={async (isPrivate) => {
                             if (milestone.nodeId) {
-                                setMilestone(milestone.nodeId, {private: isPrivate})
+                                setMilestonesVisibility([milestone], isPrivate)
                             }
                         }}
                     />
                 )}
                 <p className="inline mr-2 font-semibold text-lg group-hover:underline">{milestone.title}</p>
             </span>
-            {/* {milestone.private && <PrivateBadge iconOnly/>} */}
             <time
                 className="mt-[12px] ml-auto min-w-fit block font-semibold leading-none dark:text-gray-500">
                 {getDates(milestone)}
@@ -411,9 +375,6 @@ export const TimelineItemContent = ({
                 </div>
             )}
         </div>
-        {/* <p className={"mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-1"}>
-            {milestone.description}
-        </p> */}
 
         <span className="flex flex-wrap gap-2 items-center">
             {(milestone?.types || []).map((milestoneType, index) => (
@@ -462,45 +423,6 @@ export const TimelineItemContent = ({
                     </Badge>
                 </li>
             )}
-
-            {/* {(milestone?.biosamples?.length > 0 || milestone?.diseaseModels?.length > 0 || milestone?.tools?.length > 0) && (
-                <>
-                    {(milestone.biosamples || []).map(({biosample}, index) => {
-                        const type = BIOSAMPLE_TYPE_OPTIONS.find((option, index) => option.value === biosample.types?.[0])
-                        return (
-                            <Badge key={index} variant="green">
-                                <TestTubeDiagonal className="h-4 w-4" />
-                                {`${biosample.id}`}
-                            </Badge>
-                        )
-                    })}
-                    {(milestone.diseaseModels || []).map(({diseaseModel}, index) => {
-                        const type = DISEASE_MODEL_TYPE_OPTIONS.find((option, index) => option.value === diseaseModel.types?.[0])
-                        return (
-                            <Badge key={index} variant="green">
-                                <Rat className="h-4 w-4" />
-                                {`${diseaseModel.id}`}
-                            </Badge>
-                        )
-                    })}
-                    {(milestone.tools || []).map(({tool}, index) => (
-                        <Badge key={index} variant="green">
-                            <Database className="h-4 w-4" />
-                            {`${tool?.id}`}
-                        </Badge>
-                    ))}
-                </>
-            )}
-            {milestone?.rfps?.length > 0 && (
-                <>
-                    {milestone.rfps.map(({rfp}, index) => (
-                        <Badge variant="orange">
-                            <Megaphone className="h-4 w-4 min-w-4" />
-                            {`${rfp?.title}`}
-                        </Badge>
-                    ))}
-                </>
-            )} */}
         </span>
 
         <li className="mt-4">
@@ -512,7 +434,8 @@ export const TimelineItemContent = ({
                 onStatusChange={() => {}}
             />
         </li>
-        {/* <TimelineCardContents milestoneData={milestone} nodeType={milestone?.nodeType || milestone?.nodeType || "PROJECT"}/> */}
+
+        {savingList.includes(milestone.id) && <p className="flex gap-1 items-center"><RefreshCcw className="h-4 w-4"/> Saving...</p>}
         </>
     )
 }

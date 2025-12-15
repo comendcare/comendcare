@@ -1,9 +1,15 @@
 "use client"
 import { TabNav } from "@comend/components/tab-nav";
-import { Database, FlaskConical, Megaphone, Rat, TestTubeDiagonal, Users } from "lucide-react";
+import { Database, FlaskConical, Megaphone, Rat, SearchIcon, TestTubeDiagonal, Users } from "lucide-react";
 import React from "react";
 
 const links = [
+    {
+        name: "Explore",
+        href: "/marketplace",
+        icon: SearchIcon,
+        comingSoon: false
+    },
     {
         name: "Patient groups",
         href: "/marketplace/patient-groups",

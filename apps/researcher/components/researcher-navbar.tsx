@@ -5,7 +5,9 @@ import UserNavbarProfile from "~researcher/components/user-navbar-profile";
 import {Suspense} from "react";
 import {Skeleton} from "@comend/components/ui/skeleton";
 import type {User} from "@prisma/client";
-
+import {FeedbackSheet} from "@comend/components/feedback"
+import { Button } from "@comend/components/ui/button";
+import { MessageCircle } from "lucide-react";
 
 export function ResearcherNavbar({user}: {user: Partial<User>}) {
     return (
@@ -23,7 +25,7 @@ export function ResearcherNavbar({user}: {user: Partial<User>}) {
                     <Skeleton className="w-8 h-8 rounded-full"/>
                 </nav>
             }>
-                <nav className="flex justify-between items-center">
+                <nav className="flex justify-between items-center gap-2">
                     <div className="flex justify-start items-center space-x-8">
                         <Image
                             src={ComendLogo}
@@ -35,6 +37,17 @@ export function ResearcherNavbar({user}: {user: Partial<User>}) {
 
                         <ResearcherNavbarMenu/>
                     </div>
+                    <FeedbackSheet 
+                        className="ml-auto"
+                        triggerButton={
+                            <Button variant={'ghost'}>
+                                <div className="relative">
+                                    <MessageCircle className="h-4 w-4"/>
+                                </div>
+                                {'Message a team member'}
+                            </Button>
+                        }
+                    />
                     <UserNavbarProfile user={user}/>
                 </nav>
             </Suspense>
