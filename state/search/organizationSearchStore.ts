@@ -221,6 +221,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                         : [
                             'cmd3i7su6000fmgom1v8umgfk' // arcadion is first in preview & development environments, for testing purposes
                         ]
+                        
                 console.log(`IDS`, ids)
                 const prismaResponse = await fetch('/api/organizations', {
                     method: 'POST',
