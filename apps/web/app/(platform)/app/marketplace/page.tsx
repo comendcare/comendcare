@@ -39,25 +39,22 @@ const organizationSelector = (state: OrganizationSearchState) => ({
 })
 
 const biosampleSelector = (state: BiosampleSearchState) => ({
-    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
 
 const diseaseModelSelector = (state: DiseaseModelSearchState) => ({
-    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
 
 const clinicalDatsetSelector = (state: ClinicalDatasetSearchState) => ({
-    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
 
 const rfpSelector = (state: RFPSearchState) => ({
-    initialized: state.initialized,
+    featured: state.featured,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
 })
@@ -245,7 +242,7 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                (biosamplesInitialized && biosampleStore.initialized )
+                                (biosamplesInitialized && biosamplesInitialized )
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
@@ -296,7 +293,7 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                (diseaseModelsInitialized && diseaseModelStore.initialized) 
+                                (diseaseModelsInitialized && diseaseModelsInitialized) 
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
@@ -347,7 +344,7 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                (clinicalDatasetsInitialized && clinicalDatasetStore.initialized)
+                                (clinicalDatasetsInitialized && clinicalDatasetsInitialized)
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
@@ -392,33 +389,48 @@ export default function MarketplacePage() {
                         {(rfpsInitialized && rfpStore.searchResults && rfpStore.searchResults.length > 0 )
                             ? (
                                 <>
-                                    {rfpStore.searchResults?.slice(0, 3).map((rfp, index) => (
-                                        <Dialog>
-                                            <DialogTrigger
-                                                className="w-full max-w-full h-full"
-                                                onClick={() => {
-                                                    mixpanelTrack("RFP Details Viewed", {
-                                                        "ID": rfp.id,
-                                                        "Name": rfp.title,
-                                                        "Budget": rfp.budget,
-                                                        "Linked Projects": rfp.milestones.map(({milestone}: any) => milestone),
-                                                        // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
-                                                        // we flatten them into a single list that can be parsed
-                                                        "Linked Project Types": rfp.milestones.flatMap(({milestone}: any) =>
-                                                            (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
-                                                        ),
-                                                        "Location": "marketplace explore"
-                                                    })
-                                                }}
-                                                data-testid="rfp-card-trigger"
-                                            >
-                                                <RFPCard rfp={rfp} showOrganization={true}/>
-                                            </DialogTrigger>
-                                            <DialogContent className="overflow-hidden" data-testid="dialog">
-                                                <RFPDetails rfp={rfp}/>
-                                            </DialogContent>
-                                        </Dialog>
-                                    ))}
+                                    {(rfpsInitialized && ([...(rfpStore.featured || []), ...(rfpStore.searchResults || [])].length > 0))
+                                        ? (
+                                            <>
+                                                {[...(rfpStore.featured || []), ...(rfpStore.searchResults || [])]
+                                                    .slice(0, width < 1280 ? 2 : 3)
+                                                    .map((rfp, index) => (
+                                                        <Dialog>
+                                                            <DialogTrigger
+                                                                className="w-full max-w-full h-full"
+                                                                onClick={() => {
+                                                                    mixpanelTrack("RFP Details Viewed", {
+                                                                        "ID": rfp.id,
+                                                                        "Name": rfp.title,
+                                                                        "Budget": rfp.budget,
+                                                                        "Linked Projects": rfp.milestones.map(({milestone}: any) => milestone),
+                                                                        // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                                                                        // we flatten them into a single list that can be parsed
+                                                                        "Linked Project Types": rfp.milestones.flatMap(({milestone}: any) =>
+                                                                            (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                                                                        ),
+                                                                        "Location": "marketplace explore"
+                                                                    })
+                                                                }}
+                                                                data-testid="rfp-card-trigger"
+                                                            >
+                                                                <RFPCard rfp={rfp} showOrganization={true}/>
+                                                            </DialogTrigger>
+                                                            <DialogContent className="overflow-hidden" data-testid="dialog">
+                                                                <RFPDetails rfp={rfp}/>
+                                                            </DialogContent>
+                                                        </Dialog>
+                                                ))}
+                                            </>
+                                        )
+                                        : (
+                                            <>
+                                                <Skeleton className="h-[286px] w-full"/>
+                                                <Skeleton className="h-[286px] w-full"/>
+                                                {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
+                                            </>
+                                        )
+                                    }
                                 </>
                             )
                             : (

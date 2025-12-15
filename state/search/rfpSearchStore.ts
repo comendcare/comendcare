@@ -178,6 +178,7 @@ const getUpdatedSearchResults = async (
 export interface RFPSearchState {
     initialized: boolean,
     initState: (filters: FiltersType) => Promise<void>,
+    featured: any[],
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string,
@@ -202,7 +203,34 @@ export const useRFPSearchStore = create<RFPSearchState>()(
     temporal((set, get) => ({
             initialized: false,
             initState: async (filters: FiltersType) => {
+                // set featured RFPs
+                const ids = 
+                    process.env.NEXT_PUBLIC_NODE_ENV === 'production' 
+                        ? [
+                            // 'cm6f847kk0000g1r3mkm3zh62', // AGSAA
+                            // // 'cmdrkqiqv0000w45azqlanvcd', // CDLS
+                            // 'cm6fg095e0000120vrcke39q1', // MED13L
+                            // // 'cm6quxnmv00007qh34myx7zr7', // Rory Belle Foundation
+                            // 'cmigvoy9i0001pggn86mnttlx', // ZTTK
+                            // // ADD PROJECT 8P WHEN THEY'VE CREATED THEIR ACCOUNT
+                            
+                        ]
+                        : []
+
+                console.log(`IDS`, ids)
+                const prismaResponse = await fetch('/api/rfps', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ids}),
+                });
+                console.log(`prisma response`, prismaResponse)
+                const prismaResults = await prismaResponse.json();
+
+                console.log(`featured orgs`, prismaResults)
+                const featured = ids.map(id => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
+
                 set({ 
+                    featured,
                     filters, 
                     searchTerm: '', 
                     lastFetchedPage: 1, 
@@ -224,6 +252,7 @@ export const useRFPSearchStore = create<RFPSearchState>()(
                     totalPages: totalPages
                 })
             },
+            featured: [],
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
                 const { results, total, totalPages } = await getUpdatedSearchResults({
