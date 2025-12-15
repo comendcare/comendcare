@@ -212,8 +212,10 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                     process.env.NEXT_PUBLIC_NODE_ENV === 'production' 
                         ? [
                             'cm6f847kk0000g1r3mkm3zh62', // AGSAA
-                            'cmdrkqiqv0000w45azqlanvcd', // CDLS
-                            'cm6quxnmv00007qh34myx7zr7', // Rory Belle Foundation
+                            // 'cmdrkqiqv0000w45azqlanvcd', // CDLS
+                            'cm6fg095e0000120vrcke39q1', // MED13L
+                            // 'cm6quxnmv00007qh34myx7zr7', // Rory Belle Foundation
+                            'cmigvoy9i0001pggn86mnttlx', // ZTTK
                             // ADD PROJECT 8P WHEN THEY'VE CREATED THEIR ACCOUNT
                         ]
                         : [

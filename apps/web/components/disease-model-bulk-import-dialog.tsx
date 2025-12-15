@@ -17,14 +17,14 @@ import z from "zod";
 import { getOrganizationFromOrganizationId } from "@comend/lib/fetchers";
 
 export async function formatDiseaseModelData(diseaseModel: any): Promise<z.infer<typeof editDiseaseModelForm>> {
-    const genesResponse = await fetch(`/api/genes?search=${encodeURIComponent(diseaseModel['Gene'] || '')}`)
+    const genesResponse = await fetch(`/api/genes?search=${encodeURIComponent(diseaseModel['Gene']?.trim() || '')}`)
     const foundGenes = await genesResponse.json()
 
     const institutionsResponse = await fetch(`/api/institutions?search=${encodeURIComponent(diseaseModel['Storage Facility']?.trim() || '')}`)
     const foundInstitutions = await institutionsResponse.json()
 
-    const contactNames = (diseaseModel['Point of Contact Name'] || "").split(",")
-    const contactEmails = (diseaseModel['Point of Contact Email'] || "").split(",")
+    const contactNames = (diseaseModel['Point of Contact Name']?.trim() || "").split(",")
+    const contactEmails = (diseaseModel['Point of Contact Email']?.trim() || "").split(",")
 
     const contactsLength = Math.max(contactNames.length, contactEmails.length)
     const contacts = []
@@ -50,8 +50,8 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<z.infer
         }
     }
 
-    const linkNames = (diseaseModel['Link Name'] || "").split(",")
-    const linkURLs = (diseaseModel['Link URL'] || "").split(",")
+    const linkNames = (diseaseModel['Link Name']?.trim() || "").split(",")
+    const linkURLs = (diseaseModel['Link URL']?.trim() || "").split(",")
 
     const linksLength = Math.max(linkNames.length, linkURLs.length)
     const links = []
@@ -81,12 +81,12 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<z.infer
             return []
         })(),
         genes: (() => {
-            if (foundGenes && foundGenes.length > 0 && diseaseModel['Gene']) return [{label: diseaseModel['Gene'], value: diseaseModel['Gene']}]
+            if (foundGenes && foundGenes.length > 0 && diseaseModel['Gene']?.trim()) return [{label: diseaseModel['Gene']?.trim(), value: diseaseModel['Gene']?.trim()}]
             return []
         })(),
         // storage facility
         storageFacility: (() => {
-            if (foundInstitutions && foundInstitutions.length > 0 && diseaseModel['Storage Facility']) {
+            if (foundInstitutions && foundInstitutions.length > 0 && diseaseModel['Storage Facility']?.trim()) {
                 return foundInstitutions
             }
 
@@ -95,9 +95,9 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<z.infer
         description: diseaseModel.Notes,
         contacts,
         attachments: links,
-        genotype: diseaseModel['Genotype'] || undefined,
-        strain: diseaseModel['Strain'] || undefined,
-        isPrivate: diseaseModel['Visibility'] ? (diseaseModel['Visibility'] === 'Published' ? false : true) : true
+        genotype: diseaseModel['Genotype']?.trim() || undefined,
+        strain: diseaseModel['Strain']?.trim() || undefined,
+        isPrivate: diseaseModel['Visibility']?.trim() ? (diseaseModel['Visibility']?.trim() === 'Published' ? false : true) : true
     }
     return data
 }

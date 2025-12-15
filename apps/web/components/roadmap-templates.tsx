@@ -265,11 +265,6 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {
             : false
     );
 
-    useEffect(() => {
-        // after first visit, templates are hidden by default
-        window.functionalConsentedLocalStorage?.set('isHidden', true)
-    }, [])
-
     if (isHidden) {
         return (
             <div className="w-full flex justify-end">

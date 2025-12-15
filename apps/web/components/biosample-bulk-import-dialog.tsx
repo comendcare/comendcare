@@ -18,7 +18,7 @@ import { getOrganizationFromOrganizationId } from "@comend/lib/fetchers";
 import { Donor } from "@prisma/client";
 
 export async function formatBiosampleData(biosample: any): Promise<z.infer<typeof editBiosampleForm>> {
-    const res = await fetch(`/api/genes?search=${encodeURIComponent(biosample['Gene'] || "")}`);
+    const res = await fetch(`/api/genes?search=${encodeURIComponent(biosample['Gene']?.trim() || "")}`);
     const foundGenes = await res.json();
 
     const companiesResponse = await fetch(`/api/companies?search=${encodeURIComponent(biosample['Storage Facility']?.trim() || '')}`)
@@ -27,8 +27,8 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
     const institutionsResponse = await fetch(`/api/institutions?search=${encodeURIComponent(biosample['Storage Facility']?.trim() || '')}`)
     const foundInstitutions = await institutionsResponse.json()
 
-    const diagnoses = (biosample['Diagnoses'] || "").split(",")
-    const diagnosesSeverity = (biosample['Diagnoses Severity'] || "").split(",")
+    const diagnoses = (biosample['Diagnoses']?.trim() || "").split(",")
+    const diagnosesSeverity = (biosample['Diagnoses Severity']?.trim() || "").split(",")
 
     const diagnosesLength = Math.max(diagnoses.length, diagnosesSeverity.length)
     const diagnosesList = []
@@ -57,7 +57,7 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
 
     const data: z.infer<typeof editBiosampleForm> = {
         types: (() => {
-            const foundOption = BIOSAMPLE_TYPE_OPTIONS.find(option => option.label === biosample.Type)
+            const foundOption = BIOSAMPLE_TYPE_OPTIONS.find(option => option.label === biosample['Type']?.trim())
             if (foundOption) return [foundOption]
             return []
         })(),
@@ -67,52 +67,52 @@ export async function formatBiosampleData(biosample: any): Promise<z.infer<typeo
         // })),
         diagnoses: diagnosesList || [],
         genes: (() => {
-            if (foundGenes && foundGenes.length > 0 && biosample['Gene']) return [{label: biosample['Gene'], value: biosample['Gene']}]
+            if (foundGenes && foundGenes.length > 0 && biosample['Gene']?.trim()) return [{label: biosample['Gene']?.trim(), value: biosample['Gene']?.trim()}]
             return []
         })(),
-        variant: biosample['Variant'],
-        availability: AVAILABILITY_OPTIONS.find(option => option.label === biosample['Availability'])?.value,
-        quantity: biosample['Total Available Quantity'],
-        quantityUnit: QUANTITY_OPTIONS.find(option => option.label === biosample['Quantity Unit'])?.value || 'ml',
+        variant: biosample['Variant']?.trim(),
+        availability: AVAILABILITY_OPTIONS.find(option => option.label === biosample['Availability']?.trim())?.value,
+        quantity: biosample['Total Available Quantity']?.trim(),
+        quantityUnit: QUANTITY_OPTIONS.find(option => option.label === biosample['Quantity Unit']?.trim())?.value || 'ml',
         description: biosample.Description,
-        currentCountry: COUNTRY_OPTIONS.find(option => option.label === biosample['Current Location'])?.value,
-        countryOfCollection: COUNTRY_OPTIONS.find(option => option.label === biosample['Location of Collection'])?.value,
+        currentCountry: COUNTRY_OPTIONS.find(option => option.label === biosample['Current Location']?.trim())?.value,
+        countryOfCollection: COUNTRY_OPTIONS.find(option => option.label === biosample['Location of Collection']?.trim())?.value,
         collectionDate: 
-            biosample['Collection Date'] 
-                // ? new Date(biosample['Collection Date'])
+            biosample['Collection Date']?.trim() 
+                // ? new Date(biosample['Collection Date']?.trim())
                   ? (() => {
-                        const d = new Date(biosample["Collection Date"])
+                        const d = new Date(biosample["Collection Date"]?.trim())
                         // strip time, only store date. Store at midnight UTC - when displaying display in UTC
                         return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
                     })()
                 : undefined,
-        preservationMethod: SAMPLE_PRESERVATION_METHOD_OPTIONS.find(option => option.label === biosample['Preservation Method'])?.value,
-        anatomicalSite: ANATOMICAL_SITE_OPTIONS.find(option => option.label === biosample['Anatomical Site'])?.value,
-        methodOfTransport: SAMPLE_TRANSPORT_METHOD_OPTIONS.find(option => option.label === biosample['Method of Transport'])?.value,
-        internalDonorId: biosample['Internal Donor ID'],
-        age: biosample['Donor Age at Collection'],
-        gender: DONOR_GENDER_OPTIONS.find(option => option.label === biosample['Donor Gender'])?.value,
-        race: DONOR_RACE_OPTIONS.find(option => option.label === biosample['Race'])?.value,
-        sex: DONOR_SEX_OPTIONS.find(option => option.label === biosample['Sex'])?.value,
-        ethnicity: DONOR_ETHNICITY_OPTIONS.find(option => option.label === biosample['Donor Ethnicity'])?.value,
-        height: biosample['Donor Height'],
-        weight: biosample['Donor Weight'],
-        bmi: biosample['Donor BMI'],
-        medications: biosample['Donor Medications']?.split(",") || [],
-        treatments: biosample['Donor Medical Treatments']?.split(",") || [],
+        preservationMethod: SAMPLE_PRESERVATION_METHOD_OPTIONS.find(option => option.label === biosample['Preservation Method']?.trim())?.value,
+        anatomicalSite: ANATOMICAL_SITE_OPTIONS.find(option => option.label === biosample['Anatomical Site']?.trim())?.value,
+        methodOfTransport: SAMPLE_TRANSPORT_METHOD_OPTIONS.find(option => option.label === biosample['Method of Transport']?.trim())?.value,
+        internalDonorId: biosample['Internal Donor ID']?.trim(),
+        age: biosample['Donor Age at Collection']?.trim(),
+        gender: DONOR_GENDER_OPTIONS.find(option => option.label === biosample['Donor Gender']?.trim())?.value,
+        race: DONOR_RACE_OPTIONS.find(option => option.label === biosample['Race']?.trim())?.value,
+        sex: DONOR_SEX_OPTIONS.find(option => option.label === biosample['Sex']?.trim())?.value,
+        ethnicity: DONOR_ETHNICITY_OPTIONS.find(option => option.label === biosample['Donor Ethnicity']?.trim())?.value,
+        height: biosample['Donor Height']?.trim(),
+        weight: biosample['Donor Weight']?.trim(),
+        bmi: biosample['Donor BMI']?.trim(),
+        medications: biosample['Donor Medications']?.trim()?.split(",") || [],
+        treatments: biosample['Donor Medical Treatments']?.trim()?.split(",") || [],
         priceUnit: 'usd',
-        genotype: biosample['Genotype'] || undefined,
+        genotype: biosample['Genotype']?.trim() || undefined,
         // storage facility
         storageFacility: (() => {
-            // if (foundInstitutions && foundInstitutions.length > 0 && biosample['Storage Facility']) {
+            // if (foundInstitutions && foundInstitutions.length > 0 && biosample['Storage Facility']?.trim()) {
             //     return foundInstitutions
             // }
 
             // return []
             return foundCompanies.concat(foundInstitutions)
         })(),
-        bsiId: biosample['BSI ID'],
-        isPrivate: biosample['Visibility'] ? (biosample['Visibility'] === 'Published' ? false : true) : true
+        bsiId: biosample['BSI ID']?.trim(),
+        isPrivate: biosample['Visibility']?.trim() ? (biosample['Visibility']?.trim() === 'Published' ? false : true) : true
     }
     return data
 }
@@ -134,7 +134,7 @@ export function BiosampleBulkImportDialog() {
                 const result = await parseCSV(
                     file,
                     [
-                        {key: 'Type', required: false, defaultValue: undefined, isValid: (entry) => BIOSAMPLE_TYPE_OPTIONS.find(option => option.labal === entry.Type) !== undefined},
+                        {key: 'Type', required: true, defaultValue: undefined, isValid: (entry) => BIOSAMPLE_TYPE_OPTIONS.find(option => option.labal === entry.Type) !== undefined},
                         {key: 'Gene', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Storage Facility', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
                         {key: 'Diagnoses', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},

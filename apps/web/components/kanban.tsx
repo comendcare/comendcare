@@ -43,13 +43,17 @@ const kanbanSelector = (state: KanbanState) => ({
     tasks: state.tasks,
     setTasks: state.setTasks,
     setColumns: state.setColumns,
-    saveState: state.saveState
+    // saveState: state.saveState
 })
 
 export function KanbanView() {
     const {data: session} = useSession()
-    const { undo, redo } = useKanbanStore.temporal.getState()
-    const {columns, tasks, saveState} = useKanbanStore(useShallow(kanbanSelector))
+    // const { undo, redo } = useKanbanStore.temporal.getState()
+    const {
+        columns, 
+        tasks, 
+        // saveState
+    } = useKanbanStore(useShallow(kanbanSelector))
     const [sortBy, setSortBy] = useState<string>('default')
     const [mountKey, setMountKey] = useState(1);
     const mountKeyRef = useRef(mountKey);
@@ -101,7 +105,7 @@ export function KanbanView() {
                         </SelectContent>
                     </Select>
                 </div>
-                <Tooltip>
+                {/* <Tooltip>
                     <TooltipTrigger asChild>
                         <Button onClick={() => {
                             console.log("Undo action triggered")
@@ -130,7 +134,7 @@ export function KanbanView() {
                     <TooltipContent className="max-w-80">
                         <p>{`Redo`}</p>
                     </TooltipContent>
-                </Tooltip>
+                </Tooltip> */}
                 <NewColumnDialog />
             </div>
             <ScrollArea className="pr-4 pb-4">

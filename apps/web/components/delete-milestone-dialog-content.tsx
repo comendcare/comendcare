@@ -18,7 +18,7 @@ import { mixpanelTrack } from "@comend/lib/mixpanel"
 
 const selector = (state: RoadmapState) => ({
     deleteNode: state.deleteNode,
-    saveState: state.saveState,
+    // saveState: state.saveState,
     setSelectedNodeIds: state.setSelectedNodeIds
 })
 
@@ -27,16 +27,20 @@ export function DeleteMilestoneDialogContent({
 }: {
     milestoneData: any
 }) {
-    const { deleteNode, saveState, setSelectedNodeIds } = useRoadmapStore(useShallow(selector))
-    const { undo } = useRoadmapStore.temporal.getState()
+    const { 
+        deleteNode, 
+        // saveState, 
+        setSelectedNodeIds 
+    } = useRoadmapStore(useShallow(selector))
+    // const { undo } = useRoadmapStore.temporal.getState()
 
-    const handleUndo = () => {
-        // undo twice to open up milestone panel if it was open previously
-        undo()
-        undo()
-        saveState()
-        toast.dismiss("undo-toast")
-    }
+    // const handleUndo = () => {
+    //     // undo twice to open up milestone panel if it was open previously
+    //     undo()
+    //     undo()
+    //     saveState()
+    //     toast.dismiss("undo-toast")
+    // }
 
     const handleDeleteMilestone = async (e: React.MouseEvent<HTMLElement>) => {
         console.log(`handle Milestone delete...`, milestoneData?.nodeId)
@@ -60,7 +64,7 @@ export function DeleteMilestoneDialogContent({
                 <p className="font-semibold text-gray-900">
                     {`Project Deleted`}
                 </p>
-                <Button className="self-end" onClick={handleUndo}>Undo Delete</Button>
+                {/* <Button className="self-end" onClick={handleUndo}>Undo Delete</Button> */}
             </div>,
             {position: "bottom-left", duration: 20000, id: "undo-toast"}
         )

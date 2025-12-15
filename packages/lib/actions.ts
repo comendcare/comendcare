@@ -4063,6 +4063,42 @@ export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
     }
 )
 
+export const moveNodes = withOrganizationAuth(
+    async (_: Organization, nodes: any[]) => {
+        try {
+            const updatedNodes: Node[] = []
+
+            for (const node of nodes) {
+                const n = await prisma.$transaction(async tx => {
+                    try {
+                        return await tx.node.update({
+                            where: { id: node.id },
+                            data: {
+                                positionX: node.position.x ?? node.positionX,
+                                positionY: node.position.y ?? node.positionY,
+                            },
+                        })
+                    } catch (e: any) {
+                        if (e.code === 'P2025') {
+                            // Record not found — gracefully skip
+                            return null
+                        }
+                        throw e // rethrow any other unexpected error
+                    }
+                })
+
+                if (n) updatedNodes.push(n)
+            }
+
+            console.log(`Successfully moving Node(s)`)
+            return {success: true, data: updatedNodes}
+        } catch (error) {
+            console.error(`Error moving Node(s): `, error)
+            return {success: false, error: "Internal server error"}
+        }
+    }
+)
+
 /* HANDLE UPDATING FLOW NODES - roadmap nodes positions, nothing in here is needed for typesense ------------------------- */
 export const updateDBFlow = withOrganizationAuth(
     async (organization: Organization, {roadmapId, nodes, edges}: {
@@ -4071,132 +4107,153 @@ export const updateDBFlow = withOrganizationAuth(
         edges: any[]
     }) => {
         try {
-            if (!roadmapId) throw new Error('No roadmapId provided.')
-            // console.log(`nodes:`, nodes)
-            // console.log(`milestones:`, milestones)
-            // console.log(`edges:`, edges)
+            if (!roadmapId) throw new Error("No roadmapId provided.");
 
-            // const organizations = await prisma.organization.findMany({
-            //     include: {
-            //         roadmaps: true
-            //     }
-            // })
-            // const organization = organizations.find(org => org.roadmaps.map(r => r.id).includes(roadmapId))
+            const [existingNodes, existingEdges] = await Promise.all([
+                prisma.node.findMany({
+                    where: { roadmapId },
+                    select: { id: true },
+                }),
+                prisma.edge.findMany({
+                    where: { roadmapId },
+                    select: { id: true },
+                }),
+            ])
 
-            // if (!organization) throw new Error(`Could not find organization with roadmap id: ${roadmapId}`)
-            // const organizationId: string = organization.id
+            const existingNodeIds = existingNodes.map(n => n.id)
+            const existingEdgeIds = existingEdges.map(e => e.id)
 
-            // Delete any nodes that are not in the request
-            // node ids in this request
-            const nodeIds = nodes.map((node: any) => node.id)
-            // nodes in this roadmap
-            const nodesInDB = await prisma.node.findMany({
-                select: {id: true},
-                where: {roadmapId}
-            })
-            const nodeIdsInDB = (nodesInDB || []).map((node: any) => node.id)
-            const nodesToDelete = nodeIdsInDB.filter(
-                (id: string) => !nodeIds.includes(id)
-            )
+            const incomingNodeIds = nodes.map(n => n.id)
+            const incomingEdgeIds = edges.map(e => e.id)
 
-            await prisma.node.deleteMany({
-                where: {
-                    id: {in: nodesToDelete},
-                    roadmapId: roadmapId
+            const nodesToCreate = nodes.filter(n => !existingNodeIds.includes(n.id))
+            const nodesToUpdate = nodes.filter(n => existingNodeIds.includes(n.id))
+            const nodesToDeleteIds = existingNodeIds.filter(id => !incomingNodeIds.includes(id))
+
+            const edgesToCreate = edges.filter(e => !existingEdgeIds.includes(e.id))
+            const edgesToUpdate = edges.filter(e => existingEdgeIds.includes(e.id))
+            const edgesToDeleteIds = existingEdgeIds.filter(id => !incomingEdgeIds.includes(id))
+
+            await prisma.$transaction(async tx => {
+                if (nodesToDeleteIds.length > 0) {
+                    await tx.node.deleteMany({ where: { id: { in: nodesToDeleteIds }, roadmapId } })
                 }
-            })
+                if (edgesToDeleteIds.length > 0) {
+                    await tx.edge.deleteMany({ where: { id: { in: edgesToDeleteIds }, roadmapId } })
+                }
 
-            // await prisma.edge.deleteMany()
+                if (nodesToCreate.length > 0) {
+                    await tx.node.createMany({
+                        data: nodesToCreate.map(node => ({
+                        id: node.id,
+                        roadmapId,
+                        positionX: node.position?.x,
+                        positionY: node.position?.y,
+                        origin: node.origin,
+                        })),
+                    })
+                }
 
-            // Save or update nodes
-            await Promise.all(
-                nodes.map(async (node: any) => {
-                    const n = await prisma.node.upsert({
-                        include: {data: true},
-                        where: {id: node.id},
-                        update: {
-                            positionX: node.position?.x,
-                            positionY: node.position?.y,
-                            origin: node.origin
+                for (const node of nodesToUpdate) {
+                    await tx.node.update({
+                        where: { id: node.id },
+                        data: {
+                        positionX: node.position?.x,
+                        positionY: node.position?.y,
+                        origin: node.origin,
                         },
-                        create: {
-                            id: node.id,
-                            roadmap: {
-                                connect: {id: roadmapId}
-                            },
-                            positionX: node.position?.x,
-                            positionY: node.position?.y,
-                            origin: node.origin,
+                    })
+                }
+
+                for (const node of nodes) {
+                    if (!node.data) continue;
+
+                    const existingData = await tx.milestone.findUnique({
+                        where: { nodeId: node.id },
+                        select: { id: true },
+                    })
+
+                    const attachments = (node.data.attachments || []).map((a: any) => ({
+                        link: a.link,
+                        name: a.name ?? undefined,
+                    }))
+
+                    if (existingData) {
+                        // Update milestone fields
+                        await tx.milestone.update({
+                            where: { nodeId: node.id },
                             data: {
-                                create: {
-                                    id: node.data?.id,
-                                    roadmap: {
-                                        connect: {id: roadmapId}
-                                    },
-                                    organization: {
-                                        connect: {id: organization.id}
-                                    },
-                                    title: node.data?.title || "New Milestone",
-                                    // types: node.data?.types || [],
-                                    description: node.data?.description,
-                                    startDate: node.data?.startDate,
-                                    endDate: node.data?.endDate,
-                                    budget: node.data?.budget,
-                                    attachments: {
-                                        createMany: {
-                                            data: (node.data?.attachments || []).map((attachment: any) => ({
-                                                link: attachment.link,
-                                                ...(attachment.name ? {name: attachment.name} : undefined)
-                                            }))
-                                        }
-                                    },
-                                    status: node.data?.status || "PLANNED",
-                                    private: node.data?.private || false,
-                                }
-                            }
-                        }
-                    })
-                })
-            )
-
-            // Save or update edges
-            await Promise.all(
-                edges.map(async (edge: any) => {
-                    await prisma.edge.upsert({
-                        where: {id: edge.id},
-                        update: {
-                            source: edge.source,
-                            target: edge.target
-                        },
-                        create: {
-                            id: edge.id,
-                            roadmap: {
-                                connect: {id: roadmapId}
+                                title: node.data.title || "New Milestone",
+                                description: node.data.description,
+                                startDate: node.data.startDate,
+                                endDate: node.data.endDate,
+                                budget: node.data.budget ?? null,
+                                status: node.data.status || "PLANNED",
+                                private: node.data.private ?? false,
+                                attachments: {
+                                deleteMany: {}, // optionally diff like updateMilestones
+                                createMany: { data: attachments },
+                                },
                             },
-                            source: edge.source,
-                            target: edge.target,
-                        }
-                    })
-                })
-            )
+                        })
+                    } else {
+                        // Create milestone with nested data
+                        await tx.milestone.create({
+                            data: {
+                                nodeId: node.id,
+                                roadmap: { connect: { id: roadmapId } },
+                                organization: { connect: { id: organization.id } },
+                                title: node.data.title || "New Milestone",
+                                description: node.data.description,
+                                startDate: node.data.startDate,
+                                endDate: node.data.endDate,
+                                budget: node.data.budget ?? null,
+                                status: node.data.status || "PLANNED",
+                                private: node.data.private ?? false,
+                                attachments: { createMany: { data: attachments } },
+                            },
+                        })
+                    }
+                }
 
-            const updatedNodes = await prisma.node.findMany({
-                where: {roadmapId}
-            })
+                if (edgesToCreate.length > 0) {
+                    await tx.edge.createMany({
+                        data: edgesToCreate.map(e => ({
+                        id: e.id,
+                        roadmapId,
+                        source: e.source,
+                        target: e.target,
+                        })),
+                    })
+                }
+
+                for (const edge of edgesToUpdate) {
+                    await tx.edge.update({
+                        where: { id: edge.id },
+                        data: {
+                        source: edge.source,
+                        target: edge.target,
+                        },
+                    })
+                }
+            });
+
+            const [updatedNodes, updatedEdges] = await Promise.all([
+                prisma.node.findMany({ where: { roadmapId } }),
+                prisma.edge.findMany({ where: { roadmapId } }),
+            ]);
+
             const updatedMilestones = await prisma.milestone.findMany({
+                where: { roadmapId },
                 include: {
                     node: true,
                     contacts: true,
                     attachments: true,
-                    types: {include: {milestoneType: true}},
-                    tools: {include: {tool: true}},
-                    rfps: {include: {rfp: true}}
+                    types: { include: { milestoneType: true } },
+                    tools: { include: { tool: true } },
+                    rfps: { include: { rfp: true } },
                 },
-                where: {roadmapId}
-            })
-            const updatedEdges = await prisma.edge.findMany({
-                where: {roadmapId}
-            })
+            });
 
             console.log(`Successfully updated Flow`)
             return {success: true, data: {nodes: updatedNodes, milestones: updatedMilestones, edges: updatedEdges}}
@@ -4694,11 +4751,29 @@ export const syncDBRFPs = withOrganizationAuth(
     }
 )
 
+export const updateMilestonesVisibility = withOrganizationAuth(
+    async (_: Organization, {milestones, isPrivate}: {milestones: Milestone[], isPrivate: boolean}) => {
+        try {
+            const updatedMilestones = await prisma.milestone.updateMany({
+                where: {id: {in: milestones.map(m => m.id)}},
+                data: {
+                    private: isPrivate
+                }
+            })
+
+            return {success: true, data: updatedMilestones};
+        } catch (error: any) {
+            logError(`Error updating Milestone: `, error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
 export const updateMilestones = withOrganizationAuth(
     async (_: Organization, {milestones}: { milestones: Milestone[] }) => {
         try {
-            const session = await getSession();
-            let updatedMilestones: Milestone[] = [];
+            const session = await getSession()
+            const updatedMilestones: any[] = []
 
             const publishedProjects: Array<{
                 projectId: string;
@@ -4715,176 +4790,170 @@ export const updateMilestones = withOrganizationAuth(
                 orgId?: string;
             }> = []
 
-            await Promise.all(
-                milestones.map(async (milestone: any) => {
-                    const previousMilestone = await prisma.milestone.findUnique({
-                        where: {nodeId: milestone.nodeId},
-                        select: {
-                            id: true,
-                            private: true
-                        },
-                    });
+            for (const milestone of milestones) {
+                const milestoneId = milestone.id
 
-                    if (!previousMilestone) {
-                        throw new Error(
-                            `Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`,
-                        );
-                    }
+                const existing = await prisma.milestone.findUnique({
+                    where: { id: milestoneId },
+                    select: {
+                        private: true,
+                        types: { select: { milestoneTypeId: true } },
+                        biosamples: { select: { biosampleId: true } },
+                        diseaseModels: { select: { diseaseModelId: true } },
+                        tools: { select: { toolId: true } },
+                        rfps: { select: { rfpId: true } },
+                        institutions: { select: { institutionId: true } },
+                        companies: { select: { companyId: true } },
+                        attachments: { select: { id: true } },
+                        contacts: { select: { id: true } },
+                    },
+                });
 
-                    // let foundInstitutions = undefined
-                    // let foundCompanies = undefined
+                if (!existing) continue
 
-                    // if (milestone.partners && milestone.partners.length > 0) {
-                    //     foundInstitutions = await prisma.institution.findMany({
-                    //         where: {
-                    //             id: {in: milestone?.partners?.map((partner: Option) => partner.value)}
-                    //         }
-                    //     })
-                    //     foundCompanies = await prisma.company.findMany({
-                    //         where: {
-                    //             id: {in: milestone?.partners?.map((partner: Option) => partner.value)}
-                    //         }
-                    //     })
-                    // }
+                const diffIds = (incoming: string[], existingIds: string[]) => ({
+                    toAdd: incoming.filter(id => !existingIds.includes(id)),
+                    toRemove: existingIds.filter(id => !incoming.includes(id)),
+                })
 
-                    // console.log(`found companies`, milestone.companies)
-                    // console.log(`found institutions`, milestone.institutions)
+                const typesDiff = diffIds(
+                    (milestone.types || []).map(t => t.milestoneType?.id || t.milestoneTypeId),
+                    existing.types.map(t => t.milestoneTypeId)
+                )
 
-                    const m = await prisma.milestone.update({
-                        where: {nodeId: milestone.nodeId},
-                        include: {
-                            node: true,
-                            contacts: true,
-                            attachments: true,
-                            roadmap: true,
-                            types: {include: {milestoneType: true}},
-                            biosamples: {include: {biosample: true}},
-                            diseaseModels: {include: {diseaseModel: true}},
-                            tools: {include: {tool: true}},
-                            rfps: {include: {rfp: true}},
-                            companies: {include: {company: true}},
-                            institutions: {include: {institution: true}},
-                            createFacilityRequests: true,
-                        },
+                const biosamplesDiff = diffIds(
+                    (milestone.biosamples || []).map(t => t.biosampleId || t.biosample.id),
+                    existing.biosamples.map(t => t.biosampleId)
+                )
+
+                const diseaseModelsDiff = diffIds(
+                    (milestone.diseaseModels || []).map(t => t.diseaseModelId || t.diseaseModel.id),
+                    existing.diseaseModels.map(t => t.diseaseModelId)
+                )
+
+                const toolsDiff = diffIds(
+                    (milestone.tools || []).map(t => t.tool?.id || t.toolId),
+                    existing.tools.map(t => t.toolId)
+                )
+
+                const rfpsDiff = diffIds(
+                    (milestone.rfps || []).map(t => t.rfp?.id || t.rfpId),
+                    existing.rfps.map(t => t.rfpId)
+                )
+
+                const institutionsDiff = diffIds(
+                    (milestone.institutions || []).map(t => t.institutionId || t.institution.id),
+                    existing.institutions.map(t => t.institutionId)
+                )
+
+                const companiesDiff = diffIds(
+                    (milestone.companies || []).map(t => t.companyId || t.company.id),
+                    existing.companies.map(t => t.companyId)
+                )
+
+                const attachmentsDiff = diffIds(
+                    (milestone.attachments || []).map(a => a.id),
+                    existing.attachments.map(a => a.id)
+                )
+
+                const contactsDiff = diffIds(
+                    (milestone.contacts || []).map(c => c.id),
+                    existing.contacts.map(c => c.id)
+                )
+
+                const m = await prisma.$transaction(async tx => {
+                    return await tx.milestone.update({
+                        where: { nodeId: milestone.nodeId || undefined },
                         data: {
                             title: milestone.title,
-                            types: {
-                                deleteMany: {},
-                                create: (milestone.types || []).map((type: any) => ({
-                                    milestoneType: {
-                                        connect: {id: type.milestoneTypeId || type.milestoneType.id},
-                                    },
-                                })),
-
-                            },
-                            biosamples: {
-                                deleteMany: {},
-                                create: (milestone.biosamples || []).map((tool: any) => ({
-                                    biosample: {
-                                        connect: {id: tool.biosampleId || tool.biosample.id},
-                                    },
-                                })),
-                            },
-                            diseaseModels: {
-                                deleteMany: {},
-                                create: (milestone.diseaseModels || []).map((tool: any) => ({
-                                    diseaseModel: {
-                                        connect: {id: tool.diseaseModelId || tool.diseaseModel.id},
-                                    },
-                                })),
-                            },
-                            tools: {
-                                deleteMany: {},
-                                create: (milestone.tools || []).map((tool: any) => ({
-                                    tool: {
-                                        connect: {id: tool.toolId || tool.tool.id},
-                                    },
-                                })),
-                            },
-                            rfps: {
-                                deleteMany: {},
-                                create: (milestone.rfps || []).map((rfp: any) => ({
-                                    rfp: {
-                                        connect: {id: rfp.rfpId || rfp.rfp.id},
-                                    },
-                                })),
-                            },
-                            institutions: {
-                                deleteMany: {},
-                                create: (milestone.institutions || []).map((institution: any) => ({
-                                    institution: {
-                                        connect: {id: institution?.institutionId || institution?.institution?.id}
-                                    }
-                                }))
-                            },
-                            companies: {
-                                deleteMany: {},
-                                create: (milestone.companies || []).map((company: any) => ({
-                                    company: {
-                                        connect: {id: company?.companyId || company?.company?.id}
-                                    }
-                                }))
-                            },
-                            timelineOrder: milestone.timelineOrder,
-                            otherTypeDetails: milestone.otherTypeDetails,
                             description: milestone.description,
-                            startDate: milestone.startDate,
-                            endDate: milestone.endDate,
-                            budget: milestone.budget,
+                            startDate: milestone.startDate || null,
+                            endDate: milestone.endDate || null,
+                            budget: milestone.budget ?? null,
+                            status: milestone.status ?? "PLANNED",
+                            private: milestone.private ?? false,
+                            nodeType: milestone.nodeType ?? "PROJECT",
+                            notes: milestone.notes ?? null,
+                            otherTypeDetails: milestone.otherTypeDetails ?? null,
+                            openTo: milestone.openTo ?? [],
+                            metadata: milestone.metadata ?? undefined,
+
+                            types: {
+                                deleteMany: typesDiff.toRemove.length ? { milestoneTypeId: { in: typesDiff.toRemove } } : undefined,
+                                create: typesDiff.toAdd.map(id => ({ milestoneType: { connect: { id } } })),
+                            },
+
+                            biosamples: {
+                                deleteMany: biosamplesDiff.toRemove.length ? { biosampleId: { in: biosamplesDiff.toRemove } } : undefined,
+                                create: biosamplesDiff.toAdd.map(id => ({ biosample: { connect: { id } } })),
+                            },
+
+                            diseaseModels: {
+                                deleteMany: diseaseModelsDiff.toRemove.length ? { diseaseModelId: { in: diseaseModelsDiff.toRemove } } : undefined,
+                                create: diseaseModelsDiff.toAdd.map(id => ({ diseaseModel: { connect: { id } } })),
+                            },
+
+                            tools: {
+                                deleteMany: toolsDiff.toRemove.length ? { toolId: { in: toolsDiff.toRemove } } : undefined,
+                                create: toolsDiff.toAdd.map(id => ({ tool: { connect: { id } } })),
+                            },
+
+                            rfps: {
+                                deleteMany: rfpsDiff.toRemove.length ? { rfpId: { in: rfpsDiff.toRemove } } : undefined,
+                                create: rfpsDiff.toAdd.map(id => ({ rfp: { connect: { id } } })),
+                            },
+
+                            institutions: {
+                                deleteMany: institutionsDiff.toRemove.length ? { institutionId: { in: institutionsDiff.toRemove } } : undefined,
+                                create: institutionsDiff.toAdd.map(id => ({ institution: { connect: { id } } })),
+                            },
+
+                            companies: {
+                                deleteMany: companiesDiff.toRemove.length ? { companyId: { in: companiesDiff.toRemove } } : undefined,
+                                create: companiesDiff.toAdd.map(id => ({ company: { connect: { id } } })),
+                            },
+
                             attachments: {
-                                deleteMany: {},
-                                createMany: {
-                                    data: (milestone?.attachments || []).map((attachment: any) => ({
-                                        link: attachment.link,
-                                        ...(attachment.name ? {name: attachment.name} : undefined),
-                                    })),
-                                },
+                                deleteMany: attachmentsDiff.toRemove.length ? { id: { in: attachmentsDiff.toRemove } } : undefined,
+                                create: milestone.attachments
+                                .filter(a => attachmentsDiff.toAdd.includes(a.id))
+                                .map(a => ({ link: a.link, name: a.name ?? undefined })),
                             },
+
                             contacts: {
-                                deleteMany: {},
-                                createMany: {
-                                    data: (milestone?.contacts || []).map((contact: any) => ({
-                                        name: contact.name,
-                                        email: contact.email,
-                                        ...(contact.role ? {role: contact.role} : undefined),
-                                        ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined),
-                                    })),
-                                },
+                                deleteMany: contactsDiff.toRemove.length ? { id: { in: contactsDiff.toRemove } } : undefined,
+                                create: milestone.contacts
+                                    .filter(c => contactsDiff.toAdd.includes(c.id))
+                                    .map(c => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
                             },
-                            openTo: milestone.openTo || [],
-                            status: milestone.status || "PLANNED",
-                            private: milestone.private ?? false, // <-- preserve explicit false
-                            notes: milestone.notes,
-                            nodeType: milestone.nodeType || "PROJECT",
-                            ...(milestone.metadata ? {metadata: milestone.metadata} : undefined),
                         },
+                    })
+                })
+
+                const justPublished =
+                    m.nodeType === "PROJECT" &&
+                    existing.private !== false &&
+                    m.private === false;
+
+                if (justPublished) {
+                    publishedProjects.push({
+                        projectId: m.id,
+                        title: m.title,
+                        startDate: m.startDate ? new Date(m.startDate).toISOString() : null,
+                        endDate: m.endDate ? new Date(m.endDate).toISOString() : null,
+                        private: m.private,
+                        status: m.status ?? null,
+                        budget: m.budget ?? null,
+                        openTo: m.openTo ?? [],
+                        otherTypeDetails: m.otherTypeDetails ?? null,
+                        timelineOrder: m.timelineOrder ?? null,
+                        updatedAt: m.updatedAt ? new Date(m.updatedAt).toISOString() : undefined,
+                        orgId: (m as any).organizationId,
                     });
+                }
 
-                    updatedMilestones = [...updatedMilestones, m];
-
-                    const justPublished =
-                        m.nodeType === "PROJECT" &&
-                        previousMilestone.private !== false &&
-                        m.private === false;
-
-                    if (justPublished) {
-                        publishedProjects.push({
-                            projectId: m.id,
-                            title: m.title,
-                            startDate: m.startDate ? new Date(m.startDate).toISOString() : null,
-                            endDate: m.endDate ? new Date(m.endDate).toISOString() : null,
-                            private: m.private,
-                            status: m.status ?? null,
-                            budget: m.budget ?? null,
-                            openTo: m.openTo ?? [],
-                            otherTypeDetails: m.otherTypeDetails ?? null,
-                            timelineOrder: m.timelineOrder ?? null,
-                            updatedAt: m.updatedAt ? new Date(m.updatedAt).toISOString() : undefined,
-                            orgId: (m as any).organizationId,
-                        });
-                    }
-                }),
-            );
+                updatedMilestones.push(m)
+            }
 
             // --- One batched raw event for all updated public projects ---
             if (publishedProjects.length) {

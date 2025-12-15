@@ -7,7 +7,7 @@ import AdminCROSearchBar from "~admin/components/admin-cro-searchbar";
 import { AdminResearcherSearchResults } from "~admin/components/admin-researcher-search-results";
 import AdminResearcherSearchBar from "~admin/components/researcher-searchbar";
 
-export default function AdminCompaniesPage() {
+export default function AdminResearchersDatabasePage() {
     return (
         <div className="mx-auto flex max-w-screen-xl flex-col space-y-12 p-8">
             <div className="flex flex-col space-y-6">
