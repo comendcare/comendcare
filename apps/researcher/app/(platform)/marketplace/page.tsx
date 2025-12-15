@@ -20,7 +20,7 @@ import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
 import { CROMarketplaceCard } from "@comend/components/marketplace/marketplace-cro-card"
 import { OrganizationMarketplaceCard } from "@comend/components/marketplace/marketplace-pag-card"
-import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeResearcherSearch, initializeRFPSearch } from "@comend/lib/initialize-client-state"
+import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeResearcherSearch, initializeRFPSearch } from "@comend/lib/initialize-client-state"
 import { RFPCard } from "@comend/components/rfp-card"
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
 import { Dialog, DialogContent, DialogTrigger } from "@comend/components/ui/dialog"
@@ -38,35 +38,31 @@ const organizationSelector = (state: OrganizationSearchState) => ({
 })
 
 const biosampleSelector = (state: BiosampleSearchState) => ({
-    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
     totalResults: state.totalResults
 })
 
 const diseaseModelSelector = (state: DiseaseModelSearchState) => ({
-    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
     totalResults: state.totalResults
 })
 
 const clinicalDatsetSelector = (state: ClinicalDatasetSearchState) => ({
-    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
     totalResults: state.totalResults
 })
 
 const rfpSelector = (state: RFPSearchState) => ({
-    initialized: state.initialized,
+    featured: state.featured,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
     totalResults: state.totalResults
 })
 
 const researcherSelector = (state: ResearcherSearchState) => ({
-    initialized: state.initialized,
     setSearchTerm: state.setSearchTerm,
     searchResults: state.searchResults,
     totalResults: state.totalResults
@@ -253,7 +249,7 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                (biosamplesInitialized && biosampleStore.initialized )
+                                (biosamplesInitialized && biosamplesInitialized)
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
@@ -304,7 +300,7 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                (diseaseModelsInitialized && diseaseModelStore.initialized) 
+                                (diseaseModelsInitialized && diseaseModelsInitialized) 
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
@@ -355,7 +351,7 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                (clinicalDatasetsInitialized && clinicalDatasetStore.initialized)
+                                (clinicalDatasetsInitialized && clinicalDatasetsInitialized)
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
@@ -400,33 +396,48 @@ export default function MarketplacePage() {
                         {(rfpsInitialized && rfpStore.searchResults && rfpStore.searchResults.length > 0 )
                             ? (
                                 <>
-                                    {rfpStore.searchResults?.slice(0, 3).map((rfp, index) => (
-                                        <Dialog>
-                                            <DialogTrigger
-                                                className="w-full max-w-full h-full"
-                                                onClick={() => {
-                                                    mixpanelTrack("RFP Details Viewed", {
-                                                        "ID": rfp.id,
-                                                        "Name": rfp.title,
-                                                        "Budget": rfp.budget,
-                                                        "Linked Projects": rfp.milestones.map(({milestone}: any) => milestone),
-                                                        // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
-                                                        // we flatten them into a single list that can be parsed
-                                                        "Linked Project Types": rfp.milestones.flatMap(({milestone}: any) =>
-                                                            (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
-                                                        ),
-                                                        "Location": "marketplace explore"
-                                                    })
-                                                }}
-                                                data-testid="rfp-card-trigger"
-                                            >
-                                                <RFPCard rfp={rfp} showOrganization={true}/>
-                                            </DialogTrigger>
-                                            <DialogContent className="overflow-hidden" data-testid="dialog">
-                                                <RFPDetails rfp={rfp}/>
-                                            </DialogContent>
-                                        </Dialog>
-                                    ))}
+                                    {(rfpsInitialized && ([...(rfpStore.featured || []), ...(rfpStore.searchResults || [])].length > 0))
+                                        ? (
+                                            <>
+                                                {[...(rfpStore.featured || []), ...(rfpStore.searchResults || [])]
+                                                    .slice(0, width < 1280 ? 2 : 3)
+                                                    .map((rfp, index) => (
+                                                        <Dialog>
+                                                            <DialogTrigger
+                                                                className="w-full max-w-full h-full"
+                                                                onClick={() => {
+                                                                    mixpanelTrack("RFP Details Viewed", {
+                                                                        "ID": rfp.id,
+                                                                        "Name": rfp.title,
+                                                                        "Budget": rfp.budget,
+                                                                        "Linked Projects": rfp.milestones.map(({milestone}: any) => milestone),
+                                                                        // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                                                                        // we flatten them into a single list that can be parsed
+                                                                        "Linked Project Types": rfp.milestones.flatMap(({milestone}: any) =>
+                                                                            (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                                                                        ),
+                                                                        "Location": "marketplace explore"
+                                                                    })
+                                                                }}
+                                                                data-testid="rfp-card-trigger"
+                                                            >
+                                                                <RFPCard rfp={rfp} showOrganization={true}/>
+                                                            </DialogTrigger>
+                                                            <DialogContent className="overflow-hidden" data-testid="dialog">
+                                                                <RFPDetails rfp={rfp}/>
+                                                            </DialogContent>
+                                                        </Dialog>
+                                                ))}
+                                            </>
+                                        )
+                                        : (
+                                            <>
+                                                <Skeleton className="h-[286px] w-full"/>
+                                                <Skeleton className="h-[286px] w-full"/>
+                                                {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
+                                            </>
+                                        )
+                                    }
                                 </>
                             )
                             : (

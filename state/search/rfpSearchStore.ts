@@ -178,6 +178,7 @@ const getUpdatedSearchResults = async (
 export interface RFPSearchState {
     initialized: boolean,
     initState: (filters: FiltersType) => Promise<void>,
+    featured: any[],
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string,
@@ -202,7 +203,30 @@ export const useRFPSearchStore = create<RFPSearchState>()(
     temporal((set, get) => ({
             initialized: false,
             initState: async (filters: FiltersType) => {
+                // set featured RFPs
+                const ids = 
+                    process.env.NEXT_PUBLIC_NODE_ENV === 'production' 
+                        ? [
+                            '79430614-19fb-4c4f-9595-76f652d031c1', // CTNNB1 Connect and Cure - The CTNNB1 Connect & Cure Research Grant
+                            '601e39a7-9cd0-414e-9874-c953d0533c9f', // Dup15q Alliance - Dup15q Alliance Research Grant Program
+                            '07341d6f-9b91-40da-b909-a1d00d36bb16', // The Rory Belle Foundation - Advance the Cure Grant Program: 2025
+                        ]
+                        : []
+
+                console.log(`IDS`, ids)
+                const prismaResponse = await fetch('/api/rfps', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ids}),
+                });
+                console.log(`prisma response`, prismaResponse)
+                const prismaResults = await prismaResponse.json();
+
+                console.log(`featured orgs`, prismaResults)
+                const featured = ids.map(id => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
+
                 set({ 
+                    featured,
                     filters, 
                     searchTerm: '', 
                     lastFetchedPage: 1, 
@@ -224,6 +248,7 @@ export const useRFPSearchStore = create<RFPSearchState>()(
                     totalPages: totalPages
                 })
             },
+            featured: [],
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
                 const { results, total, totalPages } = await getUpdatedSearchResults({
