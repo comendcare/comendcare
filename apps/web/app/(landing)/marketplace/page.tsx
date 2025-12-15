@@ -437,58 +437,45 @@ export default function MarketplacePage() {
                         <BrowseAllSignInButton count={rfpStore.totalResults}/>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        {(rfpsInitialized && rfpStore.searchResults && rfpStore.searchResults.length > 0 )
+                        {(rfpsInitialized && ([...(rfpStore.featured || []), ...(rfpStore.searchResults || [])].length > 0))
                             ? (
                                 <>
-                                    {(rfpsInitialized && ([...(rfpStore.featured || []), ...(rfpStore.searchResults || [])].length > 0))
-                                        ? (
-                                            <>
-                                                {[...(rfpStore.featured || []), ...(rfpStore.searchResults || [])]
-                                                    .slice(0, width < 1280 ? 2 : 3)
-                                                    .map((rfp, index) => (
-                                                        <Dialog>
-                                                            <DialogTrigger
-                                                                className="w-full max-w-full h-full"
-                                                                onClick={() => {
-                                                                    mixpanelTrack("RFP Details Viewed", {
-                                                                        "ID": rfp.id,
-                                                                        "Name": rfp.title,
-                                                                        "Budget": rfp.budget,
-                                                                        "Linked Projects": rfp.milestones.map(({milestone}: any) => milestone),
-                                                                        // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
-                                                                        // we flatten them into a single list that can be parsed
-                                                                        "Linked Project Types": rfp.milestones.flatMap(({milestone}: any) =>
-                                                                            (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
-                                                                        ),
-                                                                        "Location": "marketplace explore"
-                                                                    })
-                                                                }}
-                                                                data-testid="rfp-card-trigger"
-                                                            >
-                                                                <RFPCard rfp={rfp} showOrganization={true}/>
-                                                            </DialogTrigger>
-                                                            <DialogContent className="overflow-hidden" data-testid="dialog">
-                                                                <RFPDetails rfp={rfp}/>
-                                                            </DialogContent>
-                                                        </Dialog>
-                                                ))}
-                                            </>
-                                        )
-                                        : (
-                                            <>
-                                                <Skeleton className="h-[286px] w-full"/>
-                                                <Skeleton className="h-[286px] w-full"/>
-                                                {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
-                                            </>
-                                        )
-                                    }
+                                    {[...(rfpStore.featured || []), ...(rfpStore.searchResults || [])]
+                                        .slice(0, width < 1280 ? 2 : 3)
+                                        .map((rfp, index) => (
+                                            <Dialog>
+                                                <DialogTrigger
+                                                    className="w-full max-w-full h-full"
+                                                    onClick={() => {
+                                                        mixpanelTrack("RFP Details Viewed", {
+                                                            "ID": rfp.id,
+                                                            "Name": rfp.title,
+                                                            "Budget": rfp.budget,
+                                                            "Linked Projects": rfp.milestones.map(({milestone}: any) => milestone),
+                                                            // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                                                            // we flatten them into a single list that can be parsed
+                                                            "Linked Project Types": rfp.milestones.flatMap(({milestone}: any) =>
+                                                                (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                                                            ),
+                                                            "Location": "marketplace explore"
+                                                        })
+                                                    }}
+                                                    data-testid="rfp-card-trigger"
+                                                >
+                                                    <RFPCard rfp={rfp} showOrganization={true}/>
+                                                </DialogTrigger>
+                                                <DialogContent className="overflow-hidden" data-testid="dialog">
+                                                    <RFPDetails rfp={rfp}/>
+                                                </DialogContent>
+                                            </Dialog>
+                                    ))}
                                 </>
                             )
                             : (
                                 <>
                                     <Skeleton className="h-[286px] w-full"/>
                                     <Skeleton className="h-[286px] w-full"/>
-                                    <Skeleton className="h-[286px] w-full"/>
+                                    {width > 1280 && <Skeleton className="h-[286px] w-full"/>}
                                 </>
                             )
                         }
