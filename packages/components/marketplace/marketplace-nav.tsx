@@ -11,12 +11,6 @@ const links = [
         comingSoon: false
     },
     {
-        name: "Service providers",
-        href: "/marketplace/service-providers",
-        icon: Building2,
-        comingSoon: false
-    },
-    {
         name: "Patient groups",
         href: "/marketplace/patient-groups",
         icon: Users,
@@ -44,6 +38,12 @@ const links = [
         name: "RFPs",
         href: "/marketplace/rfps",
         icon: Megaphone,
+        comingSoon: false
+    },
+    {
+        name: "Service providers",
+        href: "/marketplace/service-providers",
+        icon: Building2,
         comingSoon: false
     },
     // {
