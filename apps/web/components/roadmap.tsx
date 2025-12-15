@@ -639,18 +639,6 @@ const NoMilestonesCard = ({setNewMilestoneIsOpen, setTab}: {setNewMilestoneIsOpe
                 `} 
             </p>
             <span className="flex gap-4">
-            <Button 
-                variant={"secondary"}
-                onClick={() => {
-                    if (pathname.includes('app/research-plan')) {
-                        setSelectedNodeIds([])
-                        setTab('projects')
-                    }
-                }}
-        >
-                <Wand2 aria-hidden={true} />
-                Take a tour
-            </Button>
 
             <Button 
                 variant={"cta"}  
