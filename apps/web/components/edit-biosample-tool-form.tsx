@@ -260,7 +260,6 @@ export function EditBiosampleToolForm({
         diagnoses: form.watch("diagnoses"),
         donorId: form.watch("donorId"),
         donor: form.watch("donor"),
-        internalDonorId: form.watch("internalDonorId")
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editBiosampleForm>, createFacilityRequests: CreateFacilityRequest[]) => {
@@ -275,14 +274,12 @@ export function EditBiosampleToolForm({
 
         await createOrUpdateBiosample(session, toolData, values, createFacilityRequests)
 
-        // setIsSaving(false)
         closeDialog()
     }
 
     const handleClose = () => {
         console.log(`form is dirty`, form.formState.dirtyFields)
         if (Object.keys(form.formState.dirtyFields).length > 0) {
-            console.log(`form is dirty`, form.formState.dirtyFields)
             closeDialog(form.getValues())
         } else {
             closeDialog()
@@ -320,42 +317,6 @@ export function EditBiosampleToolForm({
         form.setValue("donorId", donorData?.id, {shouldDirty: true, shouldValidate: true})
         form.setValue("internalDonorId", donorData?.internalId?.toString() ?? "", {shouldDirty: true, shouldValidate: true})
     }
-
-    // useEffect(() => {
-    //     async function fetchDonorData() {
-    //         console.log(`donor data changed`)
-    //         let donorData: any = undefined
-    //         if (formData.donor && formData.donor.length > 0) {            
-    //             const response = await getDonorData(formData.donor[0]?.value)
-    //             donorData = response.data
-    //         }
-
-    //         form.setValue("age", donorData?.age?.toString() ?? "", {shouldDirty: true})
-    //         form.setValue("sex", donorData?.sex ?? "", {shouldDirty: true})
-    //         form.setValue("gender", donorData?.gender ?? "", {shouldDirty: true})
-    //         form.setValue("race", donorData?.race ?? "", {shouldDirty: true})
-    //         form.setValue("ethnicity", donorData?.ethnicity ?? "", {shouldDirty: true})
-    //         form.setValue("treatments", donorData?.treatments || [], {shouldDirty: true})
-    //         form.setValue("diagnoses", donorData?.diagnoses?.map((diagnosis: any) => ({
-    //                 diagnosis: diagnosis.type ? [{label: diagnosis.type.label, value: diagnosis.type.id}] : [],
-    //                 severity: diagnosis.severity ?? ""
-    //             })) || [], {shouldDirty: true})
-    //         form.setValue("height", donorData?.height?.toString() ?? "", {shouldDirty: true})
-    //         form.setValue("weight", donorData?.weight?.toString() ?? "", {shouldDirty: true})
-    //         form.setValue("bmi", donorData?.bmi?.toString() ?? "", {shouldDirty: true})
-    //         form.setValue("medications", donorData?.medications || [], {shouldDirty: true})
-
-    //         form.setValue("donorId", donorData?.id, {shouldDirty: true, shouldValidate: true})
-    //         form.setValue("internalDonorId", donorData?.internalId?.toString() ?? "", {shouldDirty: true, shouldValidate: true})
-    //     }
-
-    //     console.log(`donor`, formData.donor)
-    //     fetchDonorData()
-    // }, [formData.donor])
-
-    useEffect(() => {
-        console.log(`internal donor id changed`, form.getValues('internalDonorId'))
-    }, [formData.internalDonorId])
 
     // Initialization - Allow update once form is initialized
     useEffect(() => {
@@ -410,13 +371,6 @@ export function EditBiosampleToolForm({
 
             // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away
             if (Object.keys(toolData).length > 0) form.trigger()
-
-            console.log(`donor data changed`)
-            let donorData = undefined
-            if (formData.donor && formData.donor.length > 0) {            
-                const response = await getDonorData(toolData.donorId)
-                donorData = response.data
-            }
 
             initializing.current = false
         }
@@ -920,14 +874,8 @@ export const DonorFormFields = ({
                                 value={field.value}
                                 onChange={async (newVal: Option[]) => {
                                     form.setValue('donor', newVal, {shouldDirty: true})
-                                    // if (formData.donor && formData.donor.length > 0) {            
-                                    //     const response = await getDonorData(formData.donor[0]?.value)
-                                    //     donorData = response.data
-                                    // }
-                                    // if (newVal.length > 0 && newVal[0]?.value) await updateDonorData(newVal[0].value)
                                     await updateDonorData(newVal[0]?.value)
                                 }}
-                                // {...field}
                                 onSearch={handleDonorAsyncSearch}
                                 placeholder="Search for donors..."
                                 triggerSearchOnFocus={true}
