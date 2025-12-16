@@ -19,7 +19,11 @@ import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
     DialogClose,
+    DialogContent,
     DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@comend/components/ui/dialog"
 import { BIOSAMPLE_TYPE_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, QUANTITY_OPTIONS } from "@comend/lib/types"
 import type {CreateFacilityRequest, Prisma} from "@prisma/client"
@@ -46,6 +50,7 @@ import LoadingDots from "@comend/components/icons/loading-dots"
 import { Badge } from "@comend/components/ui/badge"
 import { SubmitCreateRequest } from "./create-facility-request-button"
 import { badgeVariants } from "@comend/components/ui/badge"
+import { DialogDescription } from "@radix-ui/react-dialog"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -76,6 +81,7 @@ export function EditBiosampleToolForm({
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
+    const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(toolData.createFacilityRequests || [])
     const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
@@ -209,7 +215,7 @@ export function EditBiosampleToolForm({
                     )
                 })
 
-                if (closeDialog) closeDialog(updatedAsset)
+                closeDialog(updatedAsset)
 
                 toast.success(
                     "Tool updated successfully!",
@@ -240,7 +246,7 @@ export function EditBiosampleToolForm({
                     )
                 })
 
-                if (closeDialog) closeDialog(newAsset)
+                closeDialog(newAsset)
 
                 toast.success(
                     "Tool created successfully!",
@@ -254,6 +260,18 @@ export function EditBiosampleToolForm({
                 {position: "bottom-left"}
             )
         }
+    }
+
+    const handleClose = (newBiosample?: any) => {
+        console.log(`form is dirty`, form.formState.dirtyFields)
+
+        // if (form.formState.isDirty) {
+        //     // user has changed at least one value
+        //     setUnsavedChangesIsOpen(true)
+        // } else {
+        //     closeDialog(newBiosample)
+        // }
+        setUnsavedChangesIsOpen(true)
     }
 
     useEffect(() => {
@@ -384,7 +402,10 @@ export function EditBiosampleToolForm({
                                 <FormControl>
                                     <MultipleSelector
                                         value={field.value}
-                                        onChange={field.onChange}
+                                        onChange={(val) => {
+                                            field.onChange(val)
+                                            form.setValue("types", val, { shouldDirty: true })
+                                        }}
                                         badgeClassName={badgeVariants({variant: "lightBlue"})}
                                         options={BIOSAMPLE_TYPE_OPTIONS}
                                         hidePlaceholderWhenSelected={true}
@@ -432,7 +453,11 @@ export function EditBiosampleToolForm({
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
-                                            {...field}
+                                            value={field.value}
+                                            onChange={(val) => {
+                                                field.onChange(val)
+                                                form.setValue("genes", val, { shouldDirty: true })
+                                            }}
                                             onSearch={handleGeneAsyncSearch}
                                             badgeClassName={badgeVariants({variant: "teal"})}
                                             placeholder="Search for genes..."
@@ -511,12 +536,12 @@ export function EditBiosampleToolForm({
                                             onInput={(e) => {
                                                 const target = e.currentTarget;
                                                 if (Number(target.value) < 0) {
-                                                target.value = "0"; // reset to 0 if negative
+                                                    target.value = "0"; // reset to 0 if negative
                                                 }
                                             }}
                                             onKeyDown={(e) => {
                                                 if (e.key === "-" || e.key === "e") {
-                                                e.preventDefault(); // block typing "-" and "e" for exponent notation
+                                                    e.preventDefault(); // block typing "-" and "e" for exponent notation
                                                 }
                                             }}
                                             {...field}
@@ -533,7 +558,7 @@ export function EditBiosampleToolForm({
                                     <FormControl>
                                         <Select
                                             value={field.value} 
-                                            onValueChange={(newVal) => form.setValue("quantityUnit", newVal)}
+                                            onValueChange={(newVal) => form.setValue("quantityUnit", newVal, { shouldDirty: true })}
                                         >
                                             <SelectTrigger className="-mt-2 w-[100px] min-h-[40px]">
                                                 <SelectValue placeholder="Select a value" />
@@ -560,7 +585,11 @@ export function EditBiosampleToolForm({
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
-                                            {...field}
+                                            value={field.value}
+                                            onChange={(val) => {
+                                                field.onChange(val)
+                                                form.setValue("storageFacility", val, { shouldDirty: true })
+                                            }}
                                             ref={storageFacilityRef}
                                             creatable={true}
                                             createOnBlur={false}
@@ -679,21 +708,21 @@ export function EditBiosampleToolForm({
             </ScrollArea>
 
             <DialogFooter className="pt-1">
-                <DialogClose asChild>
-                    <Button 
-                        variant={"secondary"} 
-                        onClick={() => {if (closeDialog) closeDialog()}}
-                    >
-                        Cancel
-                    </Button>
-                </DialogClose>
+                <Button 
+                    variant={"secondary"} 
+                    onClick={() => {handleClose()}}
+                >
+                    Cancel
+                </Button>
 
                 <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
                     Delete tool
                 </Button>
+
                 <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                    <DeleteBiosampleDialog toolIds={[toolData.id]} closeDialog={closeDialog}/>
+                    <DeleteBiosampleDialog toolIds={[toolData.id]} closeDialog={handleClose}/>
                 </Dialog>
+
                 <div className="bg-white rounded-md p-0">
                     <Button
                         disabled={!form.formState.isValid || isSaving}
@@ -714,6 +743,44 @@ export function EditBiosampleToolForm({
                     </Button>
                 </div>
             </DialogFooter>
+
+            <Dialog open={unsavedChangesIsOpen} onOpenChange={setUnsavedChangesIsOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>You have unsaved changes.</DialogTitle>
+                        <DialogDescription>If you close this dialog your changes will not be saved.</DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button
+                                variant={'secondary'}
+                            >
+                                Back to edit
+                            </Button>
+                        </DialogClose>
+                        <Button
+                            variant={'destructive'}
+                            onClick={() => closeDialog()}
+                        >
+                            Discard changes
+                        </Button>
+                        <Button 
+                            disabled={!form.formState.isValid || isSaving}
+                            variant={'cta'}
+                            onClick={() => handleFormSubmit(form.getValues(), createRequests)}
+                        >
+                            {isSaving 
+                                ? (
+                                    <div className="w-[81px] flex justify-center items-center">
+                                        <LoadingDots/>
+                                    </div>
+                                ) 
+                                : ("Save changes")
+                            }
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </Form>
     )
 }
