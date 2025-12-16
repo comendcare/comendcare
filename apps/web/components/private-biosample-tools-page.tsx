@@ -18,11 +18,14 @@ import { Globe, Lock, Trash } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { setBiosamplesVisibility } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
-import { Dialog, DialogPortal, DialogTrigger } from "@comend/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogPortal, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import { Row } from "@tanstack/react-table";
-import { Asset } from "@comend/lib/types";
+import { Asset, editBiosampleForm } from "@comend/lib/types";
 import Image from "next/image";
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog";
+import z from "zod";
+import { createOrUpdateBiosample, EditBiosampleToolForm } from "./edit-biosample-tool-form";
+import LoadingDots from "@comend/components/icons/loading-dots";
 
 export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     data: Biosample[],
@@ -35,6 +38,8 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1160)
     const [editingTool, setEditingTool] = useState<Partial<Asset> | undefined>(undefined)
+    const [isClosing, setIsClosing] = useState(false)
+    const [unsavedChanges, setUnsavedChanges] = useState<z.infer<typeof editBiosampleForm> | undefined>(undefined)
     const parentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -133,7 +138,11 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                 </>
                             )}
                             <BiosampleBulkImportDialog/>
-                            <NewToolDialog type={"biosample"}/>
+                            <NewToolDialog 
+                                type={"biosample"} 
+                                setUnsavedChanges={setUnsavedChanges} 
+                                isClosing={isClosing}
+                            />
                         </>
                     )}
                 >
@@ -176,14 +185,32 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                         <p className="text-lg text-stone-500">
                                             A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                                         </p>
-                                        {<NewToolDialog type={"biosample"}/>}
+                                        {<NewToolDialog 
+                                            type={"biosample"} 
+                                            setUnsavedChanges={setUnsavedChanges} 
+                                            isClosing={isClosing}
+                                            // closeDialog={(formValues: any) => {
+                                            //     if (!!formValues) {
+                                            //         setUnsavedChanges(formValues)
+                                            //         setIsClosing(false)
+                                            //     } else {
+                                            //         setEditingTool(undefined)
+                                            //         setIsClosing(false)
+                                            //     }
+                                            // }}
+                                        />}
                                     </div>
                                 </div>
                             )}
                             interactiveDialog={(
+                                <>
                                 <Dialog 
                                     open={!!editingTool}
-                                    onOpenChange={(open) => !open && setEditingTool(undefined)}
+                                    onOpenChange={(open) => {
+                                        if (!open) {
+                                            setIsClosing(true)
+                                        }
+                                    }}
                                 >
                                     <DialogPortal>
                                         <div onClick={(e) => e.stopPropagation()}>
@@ -192,17 +219,107 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                                     key={editingTool?.id}
                                                     data={editingTool} 
                                                     type={'biosample'}
-                                                    closeDialog={() => {setEditingTool(undefined)}}
+                                                    isClosing={isClosing}
+                                                    closeDialog={(formValues: any) => {
+                                                        if (!!formValues) {
+                                                            setUnsavedChanges(formValues)
+                                                            setIsClosing(false)
+                                                        } else {
+                                                            setEditingTool(undefined)
+                                                            setIsClosing(false)
+                                                        }
+                                                    }}
                                                 />
                                             )}
                                         </div>
                                     </DialogPortal>
                                 </Dialog>
+
+                                <UnsavedChangesDialog 
+                                    setIsClosing={setIsClosing}
+                                    unsavedChanges={unsavedChanges}
+                                    setUnsavedChanges={setUnsavedChanges}
+                                    editingTool={editingTool}
+                                    setEditingTool={setEditingTool}
+                                />
+                                </>
                             )}
                         />
                     </React.Suspense>
                 </FeatureFlagsProvider>
             </Shell>
         </main>
+    )
+}
+
+const UnsavedChangesDialog = ({
+    setIsClosing,
+    unsavedChanges,
+    setUnsavedChanges,
+    editingTool,
+    setEditingTool,
+}: {
+    setIsClosing: React.Dispatch<React.SetStateAction<boolean>>,
+    unsavedChanges: any,
+    setUnsavedChanges: React.Dispatch<React.SetStateAction<z.infer<typeof editBiosampleForm> | undefined>>
+    editingTool: Partial<Asset> | undefined
+    setEditingTool: React.Dispatch<React.SetStateAction<Partial<Asset> | undefined>>
+}) => {
+    const {data: session} = useSession()
+    const [isSaving, setIsSaving] = useState(false)
+
+    return (
+        <Dialog 
+            open={!!unsavedChanges}
+            onOpenChange={(open) => {
+                if (!open) {
+                    setUnsavedChanges(undefined)
+                    setIsClosing(false)
+                }
+            }}
+        >
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>You have unsaved changes.</DialogTitle>
+                    <DialogDescription>Would you like to save or discard these changes?</DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button variant={'secondary'}>Back to edit</Button>
+                    </DialogClose>
+                    <DialogClose 
+                        asChild 
+                        onClick={() => {
+                            setUnsavedChanges(undefined)
+                            setEditingTool(undefined)
+                        }}
+                    >
+                        <Button variant={'destructive'}>Discard changes</Button>
+                    </DialogClose>
+                    <Button 
+                        disabled={isSaving}
+                        variant={'cta'}
+                        onClick={async () => {
+                            if (session && unsavedChanges) {
+                                setIsSaving(true)
+                                await createOrUpdateBiosample(session, editingTool, unsavedChanges, [])
+                                setEditingTool(undefined)
+                                setUnsavedChanges(undefined)
+                                setIsSaving(false)
+                            }
+                        }}
+                    >
+                        {isSaving 
+                            ? (
+                                <div className="w-[81px] flex justify-center items-center">
+                                    <LoadingDots/>
+                                </div>
+                            ) 
+                            : ("Save changes")
+                        }
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 }

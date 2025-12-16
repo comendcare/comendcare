@@ -51,6 +51,7 @@ import { Badge } from "@comend/components/ui/badge"
 import { SubmitCreateRequest } from "./create-facility-request-button"
 import { badgeVariants } from "@comend/components/ui/badge"
 import { DialogDescription } from "@radix-ui/react-dialog"
+import { Session } from "next-auth"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -69,12 +70,84 @@ const PRICE_OPTIONS: Option[] = [
     }
 ]
 
+export const createOrUpdateBiosample = async (
+    session: Session, 
+    toolData: any, 
+    values: z.infer<typeof editBiosampleForm>, 
+    createFacilityRequests: CreateFacilityRequest[]
+) => {
+    try {
+        if (toolData.id) {
+            const updatedAsset = await updateBiosample(session.user.organizationId, values, toolData.id)
+            await revalidate("/app/tools/biosample")
+            // router.refresh()
+            
+            mixpanelTrack("Biosample Updated", {
+                "ID": updatedAsset.id,
+                "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
+                // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                // we flatten them into a single list that can be parsed
+                "Linked Project Types": (updatedAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
+                    (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                )
+            })
+
+            // closeDialog()
+
+            toast.success(
+                "Tool updated successfully!",
+                {position: "bottom-left"}
+            )
+        } else {
+            const newAsset = await createBiosample(session.user.organizationId, values)
+            for (let i = 0; i < createFacilityRequests.length; i++) {
+                await updateCreateFacilityRequest(
+                    session?.user?.organizationId,
+                    {
+                        id: createFacilityRequests[i].id,
+                        name: createFacilityRequests[i].name,
+                        biosampleId: newAsset.id
+                    }
+                )
+            }
+            await revalidate("/app/tools/biosample")
+            // router.refresh()
+            
+            mixpanelTrack("Biosample Created", {
+                "ID": newAsset.id,
+                "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
+                // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                // we flatten them into a single list that can be parsed
+                "Linked Project Types": (newAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
+                    (milestone?.types || []).map((type: any)=> type.milestoneType.label || type.milestoneType.id)
+                )
+            })
+
+            // closeDialog()
+
+            toast.success(
+                "Tool created successfully!",
+                {position: "bottom-left"}
+            )
+        }
+
+    } catch (error) {
+        console.error("Error creating or updating tool:", error);
+        toast.error(
+            "Failed to create or update tool.",
+            {position: "bottom-left"}
+        )
+    }
+}
+
 export function EditBiosampleToolForm({
     toolData,
-    closeDialog
+    closeDialog,
+    isClosing,
 }: {
     toolData: any,
-    closeDialog: (newBiosample?: any) => void
+    closeDialog: (formValues?: any) => void, // if form values are provided, unsaved changes popup is shown
+    isClosing: boolean,
 }) {
     const initializing = useRef(true)
     const router = useRouter()
@@ -199,83 +272,26 @@ export function EditBiosampleToolForm({
             return;
         }
 
-        try {
-            if (toolData.id) {
-                const updatedAsset = await updateBiosample(session.user.organizationId, values, toolData.id)
-                await revalidate("/app/tools/biosample")
-                router.refresh()
-                
-                mixpanelTrack("Biosample Updated", {
-                    "ID": updatedAsset.id,
-                    "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
-                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
-                    // we flatten them into a single list that can be parsed
-                    "Linked Project Types": (updatedAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
-                        (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
-                    )
-                })
+        await createOrUpdateBiosample(session, toolData, values, createFacilityRequests)
 
-                closeDialog(updatedAsset)
+        // setIsSaving(false)
+        closeDialog()
+    }
 
-                toast.success(
-                    "Tool updated successfully!",
-                    {position: "bottom-left"}
-                )
-            } else {
-                const newAsset = await createBiosample(session.user.organizationId, values)
-                for (let i = 0; i < createFacilityRequests.length; i++) {
-                    await updateCreateFacilityRequest(
-                        session?.user?.organizationId,
-                        {
-                            id: createFacilityRequests[i].id,
-                            name: createFacilityRequests[i].name,
-                            biosampleId: newAsset.id
-                        }
-                    )
-                }
-                await revalidate("/app/tools/biosample")
-                router.refresh()
-                
-                mixpanelTrack("Biosample Created", {
-                    "ID": newAsset.id,
-                    "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
-                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
-                    // we flatten them into a single list that can be parsed
-                    "Linked Project Types": (newAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
-                        (milestone?.types || []).map((type: any)=> type.milestoneType.label || type.milestoneType.id)
-                    )
-                })
-
-                closeDialog(newAsset)
-
-                toast.success(
-                    "Tool created successfully!",
-                    {position: "bottom-left"}
-                )
-            }
-        } catch (error) {
-            console.error("Error creating or updating tool:", error);
-            toast.error(
-                "Failed to create or update tool.",
-                {position: "bottom-left"}
-            )
+    const handleClose = () => {
+        if (form.formState.isDirty) {
+            console.log(`form is dirty`, form.formState.dirtyFields)
+            closeDialog(form.getValues())
         }
     }
 
-    const handleClose = (newBiosample?: any) => {
-        console.log(`form is dirty`, form.formState.dirtyFields)
-
-        // if (form.formState.isDirty) {
-        //     // user has changed at least one value
-        //     setUnsavedChangesIsOpen(true)
-        // } else {
-        //     closeDialog(newBiosample)
-        // }
-        setUnsavedChangesIsOpen(true)
-    }
+    useEffect(() => {
+        handleClose()
+    }, [isClosing])
 
     useEffect(() => {
         async function fetchDonorData() {
+            console.log(`donor data changed`)
             let donorData: any = undefined
             if (formData.donor && formData.donor.length > 0) {            
                 const response = await getDonorData(formData.donor[0]?.value)
