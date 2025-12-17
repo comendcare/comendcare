@@ -1,11 +1,12 @@
 "use client";
 
-import {useState, ReactNode} from "react";
+import {useState, ReactNode, useEffect} from "react";
 import dynamic from "next/dynamic";
 import {Plus} from "lucide-react";
 import {Button} from "@comend/components/ui/button";
 import {
-    Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle
+    Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
+    DialogTrigger
 } from "@comend/components/ui/dialog";
 import type {Asset, editBiosampleForm} from "@comend/lib/types";
 import {Skeleton} from "@comend/components/ui/skeleton";
@@ -165,18 +166,19 @@ function LazyToolForm({
 }
 
 export const NewToolDialog = ({
+    trigger,
     type, 
-    setUnsavedChanges, 
-    isClosing,
-    setIsClosing,
 }: { 
+    trigger: React.ReactNode,
     type: ToolType, 
-    setUnsavedChanges: any, 
-    isClosing: boolean,
-    setIsClosing: React.Dispatch<React.SetStateAction<boolean>>,
 }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const closeDialog = () => setIsOpen(false);
+    const [isOpen, setIsOpen] = useState(false)
+    const [isClosing, setIsClosing] = useState(false)
+
+    const closeDialog = () => {
+        setIsOpen(false)
+        setIsClosing(false)
+    }
 
     const title =
         type === "biosample" ? "Create biosample" :
@@ -184,11 +186,17 @@ export const NewToolDialog = ({
                 "Create clinical dataset";
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <Button variant="cta" onClick={() => setIsOpen(true)}>
-                <Plus/>
-                {title}
-            </Button>
+        <Dialog 
+            open={isOpen} 
+            onOpenChange={(open) => {
+                if (!open) {
+                    setIsClosing(true)
+                }
+            }}
+        >
+            <DialogTrigger asChild onClick={() => setIsOpen(true)}>
+                {trigger}
+            </DialogTrigger>
 
             <DialogContent className="gap-0">
                 <DialogHeader className="pb-4">
@@ -199,7 +207,15 @@ export const NewToolDialog = ({
                 </DialogHeader>
 
                 {/* Only mount the heavy form when the dialog is actually open */}
-                {isOpen && <LazyToolForm type={type} toolData={{}} closeDialog={closeDialog} isClosing={isClosing} setIsClosing={setIsClosing}/>}
+                {isOpen && (
+                    <LazyToolForm 
+                        type={type} 
+                        toolData={{}} 
+                        closeDialog={closeDialog} 
+                        isClosing={isClosing} 
+                        setIsClosing={setIsClosing}
+                    />
+                )}
             </DialogContent>
         </Dialog>
     );

@@ -14,7 +14,7 @@ import {BiosampleBulkImportDialog} from "./biosample-bulk-import-dialog";
 import {SearchParams} from "@comend/components/types";
 import {useEffect, useRef, useState} from "react";
 import { Button } from "@comend/components/ui/button";
-import { Globe, Lock, Trash } from "lucide-react";
+import { Globe, Lock, Plus, Trash } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { setBiosamplesVisibility } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
@@ -138,9 +138,12 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                             <BiosampleBulkImportDialog/>
                             <NewToolDialog 
                                 type={"biosample"} 
-                                setUnsavedChanges={setUnsavedChanges} 
-                                isClosing={isClosing}
-                                setIsClosing={setIsClosing}
+                                trigger={(
+                                    <Button variant="cta">
+                                        <Plus/>
+                                        {"Create biosample"}
+                                    </Button>
+                                )}
                             />
                         </>
                     )}
@@ -186,9 +189,12 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                         </p>
                                         {<NewToolDialog 
                                             type={"biosample"} 
-                                            setUnsavedChanges={setUnsavedChanges} 
-                                            isClosing={isClosing}
-                                            setIsClosing={setIsClosing}
+                                            trigger={(
+                                                <Button variant="cta">
+                                                    <Plus/>
+                                                    {"Create biosample"}
+                                                </Button>
+                                            )}
                                         />}
                                     </div>
                                 </div>

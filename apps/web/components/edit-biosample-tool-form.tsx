@@ -98,6 +98,8 @@ export const createOrUpdateBiosample = async (
                 "Tool updated successfully!",
                 {position: "bottom-left"}
             )
+
+            return updatedAsset
         } else {
             const newAsset = await createBiosample(session.user.organizationId, values)
             for (let i = 0; i < createFacilityRequests.length; i++) {
@@ -129,6 +131,8 @@ export const createOrUpdateBiosample = async (
                 "Tool created successfully!",
                 {position: "bottom-left"}
             )
+
+            return newAsset
         }
 
     } catch (error) {
@@ -274,9 +278,9 @@ export function EditBiosampleToolForm({
             return;
         }
 
-        await createOrUpdateBiosample(session, toolData, values, createFacilityRequests)
+        const createdOrUpdatedBiosample = await createOrUpdateBiosample(session, toolData, values, createFacilityRequests)
 
-        closeDialog()
+        closeDialog(createdOrUpdatedBiosample)
     }
 
     const handleClose = () => {

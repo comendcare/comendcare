@@ -92,6 +92,7 @@ import {Separator} from "@comend/components/ui/separator"
 import dynamic from "next/dynamic";
 import { SubmitCreateRequest } from "./create-facility-request-button"
 import { createCreateFacilityRequest } from "@comend/lib/actions"
+import { NewToolDialog } from "./edit-tool-dialog"
 
 type PlateEditorProps = {
     value: any[];
@@ -724,6 +725,23 @@ export function EditMilestoneForm({
                                                                 >
                                                                     {`+ Create biosample`}
                                                                 </Button>
+                                                                {/* <NewToolDialog 
+                                                                    type={"biosample"}
+                                                                    trigger={(
+                                                                        <Button
+                                                                            value={undefined}
+                                                                            variant={'ghost'}
+                                                                            className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                            onMouseDown={(e) => {
+                                                                                e.preventDefault();
+                                                                                e.stopPropagation();
+                                                                            }}
+                                                                            // onClick={() => setCreateBiosampleIsOpen(true)}
+                                                                        >
+                                                                            {`+ Create biosample`}
+                                                                        </Button>
+                                                                    )}
+                                                                /> */}
                                                                 <Button
                                                                     value={undefined}
                                                                     variant={'ghost'}
@@ -1172,7 +1190,12 @@ export function EditMilestoneForm({
                 </form>
             </Form>
 
-            <Dialog open={createBiosampleIsOpen} onOpenChange={setCreateBiosampleIsOpen}>
+            <Dialog 
+                open={createBiosampleIsOpen} 
+                onOpenChange={(open) => {
+                    if (!open) setIsClosing(true)
+                }}
+            >
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
@@ -1188,9 +1211,8 @@ export function EditMilestoneForm({
                         setIsClosing={setIsClosing}
                         closeDialog={(formValues: any) => {
                             if (formValues) {
-                                setIsClosing(true)
-
-                                // setCreateBiosampleIsOpen(false)
+                                setCreateBiosampleIsOpen(false)
+                                setIsClosing(false)
 
                                 if (formValues) {
                                     form.setValue("tools", [
@@ -1206,7 +1228,8 @@ export function EditMilestoneForm({
                                     ])
                                 }
                             } else {
-                                
+                                setCreateBiosampleIsOpen(false)
+                                setIsClosing(false)
                             }
                         }}
                     />
