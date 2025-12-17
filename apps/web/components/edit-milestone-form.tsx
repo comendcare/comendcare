@@ -1313,7 +1313,12 @@ export function EditMilestoneForm({
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={createRFPIsOpen} onOpenChange={setCreateRFPIsOpen}>
+            <Dialog 
+                open={createRFPIsOpen} 
+                onOpenChange={(open) => {
+                    if (!open) setIsClosing(true)
+                }}
+            >
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
@@ -1333,15 +1338,18 @@ export function EditMilestoneForm({
                                 } as any
                             ]
                         }}
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
                         closeDialog={(newRFP) => {
-                            setCreateRFPIsOpen(false)
-
                             if (newRFP) {
                                 form.setValue("rfps", [
                                     ...(form.getValues("rfps") || []),
                                     newRFP as any
                                 ])
                             }
+
+                            setCreateRFPIsOpen(false)
+                            setIsClosing(false)
                         }}
                     />
                 </DialogContent>

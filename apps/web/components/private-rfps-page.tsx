@@ -1,3 +1,5 @@
+"use client"
+
 import { RFPCard } from "@comend/components/rfp-card"
 import { EditRFPDialog } from "./edit-rfp-dialog"
 import Image from "next/image"
@@ -5,6 +7,7 @@ import dynamic from "next/dynamic";
 import {Button} from "@comend/components/ui/button";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import { RFPActionsMenu } from "./rfp-actions-menu";
+import { useState } from "react";
 
 type Props = {
     initialRFPs: any[] // or RFP[] if you have the type locally
@@ -26,7 +29,6 @@ const NewRFPDialog = dynamic(
 );
 
 export function PrivateRFPsPage({ initialRFPs }: Props) {
-
     const renderRfps = initialRFPs
 
     return (
@@ -55,7 +57,10 @@ export function PrivateRFPsPage({ initialRFPs }: Props) {
             {renderRfps.length > 0 && (
                 <div className="w-full gap-4 flex flex-col">
                     {renderRfps.map((rfp) => (
-                        <EditRFPDialog key={rfp.id} data={rfp}>
+                        <EditRFPDialog 
+                            key={rfp.id} 
+                            data={rfp}
+                        >
                             <RFPCard 
                                 rfp={rfp} 
                                 isPrivate 
