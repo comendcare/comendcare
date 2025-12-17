@@ -119,7 +119,7 @@ export function EditableProfilePhoto({
         setIsCropping(false)
         setSelectedFileProfile(null)
 
-        // editOrgForm.reset(defaultOrganizationValues); // Reset form with fetched data
+        editOrgForm.reset(defaultOrganizationValues)
     }
 
     const handleClose = () => {
