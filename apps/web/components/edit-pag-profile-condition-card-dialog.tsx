@@ -45,15 +45,9 @@ import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area";
 export default function EditPAGProfileConditionCardDialog({
     condition,
     conditionTags,
-    // closeDialog,
-    // isClosing,
-    // setIsClosing,
 }: {
     condition?: ConditionForCard | null;
     conditionTags?: string[];
-    // closeDialog: (updatedValues?: any) => void,
-    // isClosing: boolean,
-    // setIsClosing: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const {data: session, status} = useSession()
     const [open, setOpen] = useState(false);

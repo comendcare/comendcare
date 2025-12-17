@@ -2,8 +2,10 @@
 
 import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger
@@ -32,6 +34,8 @@ import {Info, Pencil} from "lucide-react";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {MODALITIES, optionSchema} from "@comend/lib/types";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
+import LoadingDots from "@comend/components/icons/loading-dots";
+import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area";
 
 const editOrgFormSchema = z.object({
     description: z.string().max(500, {
@@ -49,9 +53,16 @@ const editOrgFormSchema = z.object({
     otherTherapeuticsOfInterest: z.string().optional(),
 });
 
-export default function EditPagProfileAboutCardDialog({organization}: { organization: Partial<Organization> }) {
+export default function EditPagProfileAboutCardDialog({
+    organization
+}: { 
+    organization: Partial<Organization>
+}) {
     const {data: session} = useSession();
     const [open, setOpen] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
+    const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
     const isOwner = ["owner", "support"].includes(session?.user?.membership?.role);
 
     const editOrgForm = useForm<z.infer<typeof editOrgFormSchema>>({
@@ -101,6 +112,7 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
     const formData = editOrgForm.watch()
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
+        setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error("You're not signed into an organization right now.");
             return;
@@ -137,6 +149,7 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
             await updateOrganization(session.user.organizationId, formData);
             toast.success("Organization profile updated successfully!");
             setOpen(false);
+            closeDialog()
             window.location.reload()
         } catch (error) {
             console.error("Error updating organization:", error);
@@ -144,34 +157,86 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
         }
     }
 
+    const closeDialog = () => {
+        setOpen(false)
+        setIsClosing(false)
+        setUnsavedChangesIsOpen(false)
+
+        editOrgForm.reset({
+            description: organization.description || "",
+            website: organization.website || "",
+            therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
+                label: ther,
+                value: ther
+            })) || [],
+            otherTherapeuticsInDevelopment:
+                typeof organization.metadata == "object"
+                    ? (organization.metadata as any)?.otherTherapeuticsInDevelopment
+                    : undefined,
+            therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({
+                label: ther,
+                value: ther
+            })) || [],
+            otherTherapeuticsOfInterest:
+                typeof organization.metadata == "object"
+                    ? (organization.metadata as any)?.otherTherapeuticsOfInterest
+                    : undefined,
+        });
+
+        // setDefaultResearchValues(defaultResearchValues);
+        // editResearchForm.reset(defaultResearchValues); // Reset form with fetched data
+    }
+
+    const handleClose = () => {
+        console.log(`form is dirty`, editOrgForm.formState.dirtyFields)
+        if (Object.keys(editOrgForm.formState.dirtyFields).length > 0) {
+            // form is dirty, give user the option to save/discard unsaved changes
+            setUnsavedChangesIsOpen(true)
+        } else {
+            // form is not dirty, close regularly
+            closeDialog()
+        }
+    }
+
+    useEffect(() => {
+        console.log(`handle isClosing changed`, isClosing)
+        if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
+    }, [isClosing])
+
+    useEffect(() => {
+        // if the user has closed the unsaved changes dialog, end the isClosing state of all other dialogs
+        // all dialogs should be either fully closed or fully open
+        if (!unsavedChangesIsOpen) setIsClosing(false)
+    }, [unsavedChangesIsOpen])
+
     return (
         <Dialog
             open={open}
-            onOpenChange={(state) => {
-                if (!state) {
-                    // Reset the form to original values when dialog closes (e.g. cancel)
-                    editOrgForm.reset({
-                        description: organization.description || "",
-                        website: organization.website || "",
-                        therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
-                            label: ther,
-                            value: ther
-                        })) || [],
-                        otherTherapeuticsInDevelopment:
-                            typeof organization.metadata == "object"
-                                ? (organization.metadata as any)?.otherTherapeuticsInDevelopment
-                                : undefined,
-                        therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({
-                            label: ther,
-                            value: ther
-                        })) || [],
-                        otherTherapeuticsOfInterest:
-                            typeof organization.metadata == "object"
-                                ? (organization.metadata as any)?.otherTherapeuticsOfInterest
-                                : undefined,
-                    });
-                }
-                setOpen(state);
+            onOpenChange={(open) => {
+                if (!open) setIsClosing(true)
+                else setOpen(true)
+
+                // Reset the form to original values when dialog closes (e.g. cancel)
+                // editOrgForm.reset({
+                //     description: organization.description || "",
+                //     website: organization.website || "",
+                //     therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
+                //         label: ther,
+                //         value: ther
+                //     })) || [],
+                //     otherTherapeuticsInDevelopment:
+                //         typeof organization.metadata == "object"
+                //             ? (organization.metadata as any)?.otherTherapeuticsInDevelopment
+                //             : undefined,
+                //     therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({
+                //         label: ther,
+                //         value: ther
+                //     })) || [],
+                //     otherTherapeuticsOfInterest:
+                //         typeof organization.metadata == "object"
+                //             ? (organization.metadata as any)?.otherTherapeuticsOfInterest
+                //             : undefined,
+                // });
             }}
         >
             <Tooltip>
@@ -197,7 +262,7 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                     </TooltipContent>
                 )}
             </Tooltip>
-            <DialogContent className="max-h-[80vh] overflow-y-auto" data-testid="dialog">
+            <DialogContent data-testid="dialog">
                 <DialogHeader>
                     <DialogTitle>Edit Organization Profile</DialogTitle>
                     <DialogDescription>
@@ -205,156 +270,219 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...editOrgForm}>
-                    <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
-                        <FormField
-                            control={editOrgForm.control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Description</FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            {...field}
-                                            placeholder="Tell us about your organization"
-                                            data-testid="about-description-input"
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={editOrgForm.control}
-                            name="website"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>{`Website`}</FormLabel>
-                                    <FormDescription>
-                                        {`Your patient group's website URL (with the URL extension like http or https).`}
-                                    </FormDescription>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            id="website"
-                                            data-testid="website-input"
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={editOrgForm.control}
-                            name="therapeuticsInDevelopment"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Therapeutics under development
-                                    </FormLabel>
-                                    <FormDescription className="flex items-center">
-                                        {`What types of treatments is your organization currently developing? Select all that apply.`}
-                                    </FormDescription>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            defaultOptions={MODALITIES}
-                                            placeholder="Select modalities you like..."
-                                            hidePlaceholderWhenSelected={true}
-                                            emptyIndicator={
-                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                    no results found.
-                                                </p>
-                                            }
-                                            showHoverCard={false}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        {formData.therapeuticsInDevelopment?.some((item) => item.value === "Other" || item.value === "OTHER") && (
+                    <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
+                        <ScrollBar />
+                        <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
                             <FormField
                                 control={editOrgForm.control}
-                                name="otherTherapeuticsInDevelopment"
+                                name="description"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormDescription className="flex items-center">
-                                            {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
-                                        </FormDescription>
+                                        <FormLabel>Description</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                type="text"
-                                                id="modalities-other"
+                                            <Textarea
                                                 {...field}
+                                                placeholder="Tell us about your organization"
+                                                data-testid="about-description-input"
                                             />
                                         </FormControl>
                                         <FormMessage/>
                                     </FormItem>
                                 )}
                             />
-                        )}
-
-                        <FormField
-                            control={editOrgForm.control}
-                            name="therapeuticsOfInterest"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Therapeutics of interest
-                                    </FormLabel>
-                                    <FormDescription className="flex items-center">
-                                        {`Select all treatment modalities your organization is interested in. This helps us match you with experts in those specific areas.`}
-                                    </FormDescription>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            defaultOptions={MODALITIES}
-                                            placeholder="Select modalities you like..."
-                                            hidePlaceholderWhenSelected={true}
-                                            emptyIndicator={
-                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                    no results found.
-                                                </p>
-                                            }
-                                            showHoverCard={false}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        {editOrgForm.watch("therapeuticsOfInterest")?.some((item) => item.value === "Other" || item.value === "OTHER") && (
                             <FormField
                                 control={editOrgForm.control}
-                                name="otherTherapeuticsOfInterest"
+                                name="website"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormDescription className="flex items-center">
-                                            {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                        <FormLabel>{`Website`}</FormLabel>
+                                        <FormDescription>
+                                            {`Your patient group's website URL (with the URL extension like http or https).`}
                                         </FormDescription>
                                         <FormControl>
                                             <Input
-                                                type="text"
-                                                id="modalities-other"
                                                 {...field}
+                                                id="website"
+                                                data-testid="website-input"
                                             />
                                         </FormControl>
                                         <FormMessage/>
                                     </FormItem>
                                 )}
                             />
-                        )}
 
-                        <Button
-                            type="submit"
-                            data-testid="dialog-save-btn"
-                        >
-                            Save
-                        </Button>
-                    </form>
+                            <FormField
+                                control={editOrgForm.control}
+                                name="therapeuticsInDevelopment"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            Therapeutics under development
+                                        </FormLabel>
+                                        <FormDescription className="flex items-center">
+                                            {`What types of treatments is your organization currently developing? Select all that apply.`}
+                                        </FormDescription>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={MODALITIES}
+                                                placeholder="Select modalities you like..."
+                                                hidePlaceholderWhenSelected={true}
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
+                                                showHoverCard={false}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            {formData.therapeuticsInDevelopment?.some((item) => item.value === "Other" || item.value === "OTHER") && (
+                                <FormField
+                                    control={editOrgForm.control}
+                                    name="otherTherapeuticsInDevelopment"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormDescription className="flex items-center">
+                                                {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                            </FormDescription>
+                                            <FormControl>
+                                                <Input
+                                                    type="text"
+                                                    id="modalities-other"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
+
+                            <FormField
+                                control={editOrgForm.control}
+                                name="therapeuticsOfInterest"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            Therapeutics of interest
+                                        </FormLabel>
+                                        <FormDescription className="flex items-center">
+                                            {`Select all treatment modalities your organization is interested in. This helps us match you with experts in those specific areas.`}
+                                        </FormDescription>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={MODALITIES}
+                                                placeholder="Select modalities you like..."
+                                                hidePlaceholderWhenSelected={true}
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
+                                                showHoverCard={false}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            {editOrgForm.watch("therapeuticsOfInterest")?.some((item) => item.value === "Other" || item.value === "OTHER") && (
+                                <FormField
+                                    control={editOrgForm.control}
+                                    name="otherTherapeuticsOfInterest"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormDescription className="flex items-center">
+                                                {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                            </FormDescription>
+                                            <FormControl>
+                                                <Input
+                                                    type="text"
+                                                    id="modalities-other"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
+
+                            <div className="absolute right-4 bottom-0 flex gap-2">
+                            <DialogClose asChild>
+                                <Button 
+                                    variant={"secondary"}
+                                    onClick={() => {handleClose()}}
+                                >
+                                    Cancel
+                                </Button>
+                            </DialogClose>
+
+                            <Button
+                                variant={"cta"}
+                                type="submit"
+                                data-testid="dialog-save-btn"
+                                disabled={!editOrgForm.formState.isValid || isSaving}
+                            >
+                                {isSaving 
+                                    ? (
+                                        <div className="w-[81px] flex justify-center items-center">
+                                            <LoadingDots/>
+                                        </div>
+                                    ) 
+                                    : ("Save changes")
+                                }
+                            </Button>
+                            </div>
+                        </form>
+                    </ScrollArea>
+
+                    <Dialog open={unsavedChangesIsOpen} onOpenChange={setUnsavedChangesIsOpen}>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>You have unsaved changes.</DialogTitle>
+                                <DialogDescription>If you close this dialog your changes will not be saved.</DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button
+                                        variant={'secondary'}
+                                        // set back to a non-closing state, so future closes can also trigger
+                                        onClick={() => setIsClosing(false)} 
+                                    >
+                                        Back to edit
+                                    </Button>
+                                </DialogClose>
+                                <Button
+                                    variant={'destructive'}
+                                    onClick={() => closeDialog()}
+                                >
+                                    Discard changes
+                                </Button>
+                                <Button 
+                                    disabled={!editOrgForm.formState.isValid || isSaving}
+                                    variant={'cta'}
+                                    onClick={() => onProfileFormSubmit(editOrgForm.getValues())}
+                                >
+                                    {isSaving 
+                                        ? (
+                                            <div className="w-[81px] flex justify-center items-center">
+                                                <LoadingDots/>
+                                            </div>
+                                        ) 
+                                        : ("Save changes")
+                                    }
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </Form>
             </DialogContent>
         </Dialog>
