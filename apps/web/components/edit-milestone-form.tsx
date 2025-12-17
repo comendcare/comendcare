@@ -1233,7 +1233,12 @@ export function EditMilestoneForm({
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={createDiseaseModelIsOpen} onOpenChange={setCreateDiseaseModelIsOpen}>
+            <Dialog 
+                open={createDiseaseModelIsOpen} 
+                onOpenChange={(open) => {
+                    if (!open) setIsClosing(true)
+                }}
+            >
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
@@ -1268,7 +1273,12 @@ export function EditMilestoneForm({
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={createClincalDatasetIsOpen} onOpenChange={setCreateClinicalDatasetIsOpen}>
+            <Dialog 
+                open={createClincalDatasetIsOpen}
+                onOpenChange={(open) => {
+                    if (!open) setIsClosing(true)
+                }}
+            >
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
@@ -1280,9 +1290,9 @@ export function EditMilestoneForm({
                     </DialogHeader>
                     <EditClincalDatasetForm
                         toolData={{}}
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
                         closeDialog={(newDatasample) => {
-                            setCreateClinicalDatasetIsOpen(false)
-
                             if (newDatasample) {
                                 form.setValue("tools", [
                                     ...(form.getValues("tools") || []),
@@ -1295,6 +1305,9 @@ export function EditMilestoneForm({
                                     }
                                 ])
                             }
+
+                            setCreateClinicalDatasetIsOpen(false)
+                            setIsClosing(false)
                         }}
                     />
                 </DialogContent>

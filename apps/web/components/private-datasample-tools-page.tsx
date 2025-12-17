@@ -190,7 +190,9 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                         interactiveDialog={(
                             <Dialog 
                                 open={!!editingTool}
-                                onOpenChange={(open) => !open && setEditingTool(undefined)}
+                                onOpenChange={(open) => {
+                                    if (!open) setIsClosing(true)
+                                }}
                             >
                                 <DialogPortal>
                                     <div onClick={(e) => e.stopPropagation()}>

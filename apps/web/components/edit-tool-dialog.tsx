@@ -162,7 +162,7 @@ function LazyToolForm({
 }) {
     if (type === "biosample") return <BiosampleForm toolData={toolData} closeDialog={closeDialog} isClosing={isClosing} setIsClosing={setIsClosing} />;
     if (type === "diseaseModel") return <DiseaseModelForm toolData={toolData} closeDialog={closeDialog} isClosing={isClosing} setIsClosing={setIsClosing}/>;
-    return <DataForm toolData={toolData} closeDialog={closeDialog}/>;
+    return <DataForm toolData={toolData} closeDialog={closeDialog} isClosing={isClosing} setIsClosing={setIsClosing}/>;
 }
 
 export const NewToolDialog = ({

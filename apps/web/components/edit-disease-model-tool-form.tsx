@@ -79,6 +79,8 @@ export const createOrUpdateDiseaseModel = async (
                 "Tool updated successfully!",
                 {position: "bottom-left"}
             )
+
+            return updatedAsset
         } else {
             const newAsset = await createDiseaseModel(session.user.organizationId, values)
             for (let i = 0; i < createFacilityRequests.length; i++) {
@@ -110,6 +112,8 @@ export const createOrUpdateDiseaseModel = async (
                 "Tool created successfully!",
                 {position: "bottom-left"}
             )
+
+            return newAsset
         }
     } catch (error) {
         console.error("Error creating or updating tool:", error);
@@ -583,7 +587,7 @@ export function EditDiseaseModelToolForm({
                 <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
                     Delete tool
                 </Button>
-                
+
                 <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
                     <DeleteDiseaseModelDialog toolIds={[toolData.id]} closeDialog={handleClose}/>
                 </Dialog>
