@@ -149,6 +149,7 @@ export function DataRequestDataTable<TData, TValue>({
         []
     )
     const [sorting, setSorting] = React.useState<SortingState>([])
+    const [isClosing, setIsClosing] = React.useState(false)
 
     const table = useReactTable({
         data,
@@ -198,12 +199,17 @@ export function DataRequestDataTable<TData, TValue>({
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <EditAssetDialog
-                                    closeDialog={() => {}}
-                                    key={row.id}
-                                    data={{...row.original} as Partial<Asset>} 
-                                    type={'data'}
-                                >
+                                // <EditAssetDialog
+                                //     key={row.id}
+                                //     data={{...row.original} as Partial<Asset>} 
+                                //     type={'data'}
+                                //     isClosing={isClosing}
+                                //     setIsClosing={setIsClosing}
+                                //     closeDialog={() => {
+                                //         setIsClosing(false)
+                                //     }}
+
+                                // >
                                     <TableRow
                                         key={row.id}
                                         data-state={row.getIsSelected() && "selected"}
@@ -217,7 +223,7 @@ export function DataRequestDataTable<TData, TValue>({
                                             </TableCell>
                                         ))}
                                     </TableRow>
-                                </EditAssetDialog>
+                                // </EditAssetDialog>
                             ))
                         ) : (
                             <TableRow>
