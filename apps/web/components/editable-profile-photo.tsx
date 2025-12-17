@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
     Dialog,
     DialogContent,
@@ -9,6 +9,7 @@ import {
     DialogTrigger,
     DialogDescription,
     DialogClose,
+    DialogFooter,
 } from "@comend/components/ui/dialog";
 import {Form} from "@comend/components/ui/form";
 import {useForm} from "react-hook-form";
@@ -25,6 +26,7 @@ import {Button} from "@comend/components/ui/button";
 import {Pencil} from "lucide-react";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 import LoadingDots from "@comend/components/icons/loading-dots";
+import { ScrollArea, Scrollbar } from "@radix-ui/react-scroll-area";
 
 const editOrgProfileImageSchema = z.object({
     image: z.string().nullable().optional(),
@@ -45,6 +47,9 @@ export function EditableProfilePhoto({
     const {data: session} = useSession();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
+    const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
     const [open, setOpen] = useState(false);
     const [selectedFileProfile, setSelectedFileProfile] = useState<FileWithPreview | null>(null);
     const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<
@@ -59,6 +64,7 @@ export function EditableProfilePhoto({
     });
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgProfileImageSchema>) {
+        setIsSaving(true)
         setLoading(true)
         try {
             if (!session?.user?.organizationId) {
@@ -96,6 +102,7 @@ export function EditableProfilePhoto({
             // setHasCropped(false);
             setIsCropping(false)
             setOpen(false);
+            closeDialog()
             window.location.reload()
         } catch (error) {
             console.error("Error updating organization:", error);
@@ -105,11 +112,50 @@ export function EditableProfilePhoto({
         }
     }
 
+    const closeDialog = () => {
+        setOpen(false)
+        setIsClosing(false)
+        setUnsavedChangesIsOpen(false)
+        setIsCropping(false)
+        setSelectedFileProfile(null)
+
+        // editOrgForm.reset(defaultOrganizationValues); // Reset form with fetched data
+    }
+
+    const handleClose = () => {
+        console.log(`form is dirty`, editOrgForm.formState.dirtyFields)
+        console.log(`form is cropping`, isCropping)
+        if (Object.keys(editOrgForm.formState.dirtyFields).length > 0 || isCropping) {
+            // form is dirty, give user the option to save/discard unsaved changes
+            setUnsavedChangesIsOpen(true)
+        } else {
+            // form is not dirty, close regularly
+            closeDialog()
+        }
+    }
+
+    useEffect(() => {
+        console.log(`handle isClosing changed`, isClosing)
+        if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
+    }, [isClosing])
+
+    useEffect(() => {
+        // if the user has closed the unsaved changes dialog, end the isClosing state of all other dialogs
+        // all dialogs should be either fully closed or fully open
+        if (!unsavedChangesIsOpen) setIsClosing(false)
+    }, [unsavedChangesIsOpen])
+
     return (
         <div className="relative inline-block">
             <ProfilePhoto img={img} name={name} textSize={textSize} className={className}/>
 
-            <Dialog open={open} onOpenChange={setOpen}>
+            <Dialog 
+                open={open} 
+                onOpenChange={(open) => {
+                    if (!open) setIsClosing(true)
+                    else setOpen(true)
+                }}
+            >
                 <DialogTrigger asChild>
                     <Button
                         size="icon"
@@ -120,7 +166,7 @@ export function EditableProfilePhoto({
                         <Pencil className="w-1 h-1"/>
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="max-h-[80vh] overflow-y-auto" data-testid="avatar-dialog">
+                <DialogContent data-testid="avatar-dialog">
                     <DialogHeader>
                         <DialogTitle>Edit organization profile picture</DialogTitle>
                         <DialogDescription>
@@ -129,28 +175,90 @@ export function EditableProfilePhoto({
                     </DialogHeader>
 
                     <Form {...editOrgForm}>
-                        <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-8">
-                            <FormImageSelector
-                                form={editOrgForm}
-                                name="image"
-                                title=""
-                                aspect={1}
-                                img={img}
-                                selectedFile={selectedFileProfile}
-                                setSelectedFile={setSelectedFileProfile}
-                                className="mx-auto"
-                                setIsCropping={setIsCropping}
-                                testIdPrefix="avatar"
-                            />
-                            <Button
-                                type="submit"
-                                className="w-fit"
-                                disabled={loading || isCropping}
-                                data-testid="dialog-save-btn"
-                            >
-                                {loading ? <LoadingDots color="#808080"/> : "Save"}
-                            </Button>
-                        </form>
+                        <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
+                            <Scrollbar />
+                            <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-8">
+                                <FormImageSelector
+                                    form={editOrgForm}
+                                    name="image"
+                                    title=""
+                                    aspect={1}
+                                    img={img}
+                                    selectedFile={selectedFileProfile}
+                                    setSelectedFile={setSelectedFileProfile}
+                                    className="mx-auto"
+                                    setIsCropping={setIsCropping}
+                                    testIdPrefix="avatar"
+                                />
+                                
+                                <div className="absolute right-4 bottom-0 flex gap-2">
+                                <DialogClose asChild>
+                                    <Button 
+                                        variant={"secondary"}
+                                        onClick={() => {handleClose()}}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </DialogClose>
+
+                                <Button
+                                    variant={"cta"}
+                                    type="submit"
+                                    data-testid="dialog-save-btn"
+                                    disabled={!editOrgForm.formState.isValid || isSaving}
+                                >
+                                    {isSaving 
+                                        ? (
+                                            <div className="w-[81px] flex justify-center items-center">
+                                                <LoadingDots/>
+                                            </div>
+                                        ) 
+                                        : ("Save changes")
+                                    }
+                                </Button>
+                                </div>
+                            </form>
+                        </ScrollArea>
+
+                        <Dialog open={unsavedChangesIsOpen} onOpenChange={setUnsavedChangesIsOpen}>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>You have unsaved changes.</DialogTitle>
+                                    <DialogDescription>If you close this dialog your changes will not be saved.</DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                    <DialogClose asChild>
+                                        <Button
+                                            variant={'secondary'}
+                                            // set back to a non-closing state, so future closes can also trigger
+                                            onClick={() => setIsClosing(false)} 
+                                        >
+                                            Back to edit
+                                        </Button>
+                                    </DialogClose>
+                                    <Button
+                                        variant={'destructive'}
+                                        onClick={() => closeDialog()}
+                                    >
+                                        Discard changes
+                                    </Button>
+                                    <Button 
+                                        disabled={!editOrgForm.formState.isValid || isSaving}
+                                        variant={'cta'}
+                                        onClick={() => onProfileFormSubmit(editOrgForm.getValues())}
+                                    >
+                                        {isSaving 
+                                            ? (
+                                                <div className="w-[81px] flex justify-center items-center">
+                                                    <LoadingDots/>
+                                                </div>
+                                            ) 
+                                            : ("Save changes")
+                                        }
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </Form>
                 </DialogContent>
             </Dialog>
