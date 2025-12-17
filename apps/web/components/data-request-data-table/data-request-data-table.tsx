@@ -199,31 +199,19 @@ export function DataRequestDataTable<TData, TValue>({
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                // <EditAssetDialog
-                                //     key={row.id}
-                                //     data={{...row.original} as Partial<Asset>} 
-                                //     type={'data'}
-                                //     isClosing={isClosing}
-                                //     setIsClosing={setIsClosing}
-                                //     closeDialog={() => {
-                                //         setIsClosing(false)
-                                //     }}
-
-                                // >
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={row.getIsSelected() && "selected"}
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                // </EditAssetDialog>
+                                <TableRow
+                                    key={row.id}
+                                    data-state={row.getIsSelected() && "selected"}
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
                             ))
                         ) : (
                             <TableRow>

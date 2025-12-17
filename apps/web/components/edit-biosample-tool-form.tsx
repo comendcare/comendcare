@@ -80,8 +80,6 @@ export const createOrUpdateBiosample = async (
         if (toolData.id) {
             const updatedAsset = await updateBiosample(session.user.organizationId, values, toolData.id)
             await revalidate("/app/tools/biosample")
-            // router.refresh()
-            
             mixpanelTrack("Biosample Updated", {
                 "ID": updatedAsset.id,
                 "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
@@ -91,8 +89,6 @@ export const createOrUpdateBiosample = async (
                     (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
                 )
             })
-
-            // closeDialog()
 
             toast.success(
                 "Tool updated successfully!",
@@ -113,8 +109,6 @@ export const createOrUpdateBiosample = async (
                 )
             }
             await revalidate("/app/tools/biosample")
-            // router.refresh()
-            
             mixpanelTrack("Biosample Created", {
                 "ID": newAsset.id,
                 "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
@@ -124,8 +118,6 @@ export const createOrUpdateBiosample = async (
                     (milestone?.types || []).map((type: any)=> type.milestoneType.label || type.milestoneType.id)
                 )
             })
-
-            // closeDialog()
 
             toast.success(
                 "Tool created successfully!",
@@ -156,7 +148,6 @@ export function EditBiosampleToolForm({
     setIsClosing: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const initializing = useRef(true)
-    const router = useRouter()
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
