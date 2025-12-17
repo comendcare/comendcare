@@ -211,6 +211,7 @@ export function EditMilestoneForm({
     const [hasBudget, setHasBudget] = useState(milestoneData?.budget !== undefined && milestoneData?.budget !== null)
     const [hasStartDate, setHasStartDate] = useState(milestoneData?.startDate || false)
     const [hasEndDate, setHasEndDate] = useState(milestoneData?.endDate || false)
+    const [isClosing, setIsClosing] = useState(false)
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -1183,21 +1184,29 @@ export function EditMilestoneForm({
                     </DialogHeader>
                     <EditBiosampleToolForm
                         toolData={{}}
-                        closeDialog={(newBiosample) => {
-                            setCreateBiosampleIsOpen(false)
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
+                        closeDialog={(formValues: any) => {
+                            if (formValues) {
+                                setIsClosing(true)
 
-                            if (newBiosample) {
-                                form.setValue("tools", [
-                                    ...(form.getValues("tools") || []),
-                                    {
-                                        value: newBiosample.id,
-                                        type: 'Biosamples',
-                                        // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
-                                        label: `${newBiosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => newBiosample?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
-                                        biosample: newBiosample,
-                                        icon: 'test-tube-diagonal',
-                                    }
-                                ])
+                                // setCreateBiosampleIsOpen(false)
+
+                                if (formValues) {
+                                    form.setValue("tools", [
+                                        ...(form.getValues("tools") || []),
+                                        {
+                                            value: formValues.id,
+                                            type: 'Biosamples',
+                                            // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
+                                            label: `${formValues.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => formValues?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
+                                            biosample: formValues,
+                                            icon: 'test-tube-diagonal',
+                                        }
+                                    ])
+                                }
+                            } else {
+                                
                             }
                         }}
                     />

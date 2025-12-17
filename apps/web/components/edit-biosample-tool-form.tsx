@@ -144,10 +144,12 @@ export function EditBiosampleToolForm({
     toolData,
     closeDialog,
     isClosing,
+    setIsClosing,
 }: {
     toolData: any,
     closeDialog: (formValues?: any) => void, // if form values are provided, unsaved changes popup is shown
     isClosing: boolean,
+    setIsClosing: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const initializing = useRef(true)
     const router = useRouter()
@@ -280,16 +282,24 @@ export function EditBiosampleToolForm({
     const handleClose = () => {
         console.log(`form is dirty`, form.formState.dirtyFields)
         if (Object.keys(form.formState.dirtyFields).length > 0) {
-            closeDialog(form.getValues())
+            // form is dirty, give user the option to save/discard unsaved changes
+            setUnsavedChangesIsOpen(true)
         } else {
+            // form is not dirty, close regularly
             closeDialog()
         }
     }
 
     useEffect(() => {
         console.log(`handle isClosing changed`, isClosing)
-        if (isClosing) handleClose()
+        if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
     }, [isClosing])
+
+    useEffect(() => {
+        // if the user has closed the unsaved changes dialog, end the isClosing state of all other dialogs
+        // all dialogs should be either fully closed or fully open
+        if (!unsavedChangesIsOpen) setIsClosing(false)
+    }, [unsavedChangesIsOpen])
 
     const updateDonorValues = async (donorId: string) => {
         console.log(`donor data changed`, donorId)
@@ -770,6 +780,8 @@ export function EditBiosampleToolForm({
                         <DialogClose asChild>
                             <Button
                                 variant={'secondary'}
+                                // set back to a non-closing state, so future closes can also trigger
+                                onClick={() => setIsClosing(false)} 
                             >
                                 Back to edit
                             </Button>
