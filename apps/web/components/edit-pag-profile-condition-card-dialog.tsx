@@ -24,8 +24,10 @@ import {useSession} from "next-auth/react";
 import {getConditionsFromOrganizationId, getTagsForEntity } from "@comend/lib/fetchers";
 import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader, DialogPortal,
     DialogTitle,
     DialogTrigger
@@ -37,17 +39,28 @@ import {Info, Pencil} from "lucide-react";
 import {researchFormSchema} from "./research-onboarding-form";
 import { badgeVariants } from "@comend/components/ui/badge";
 import {ConditionForCard} from "~web/components/pag-profile-conditions-card";
+import LoadingDots from "@comend/components/icons/loading-dots";
+import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area";
 
 export default function EditPAGProfileConditionCardDialog({
-                                                              condition,
-                                                              conditionTags,
-                                                          }: {
+    condition,
+    conditionTags,
+    // closeDialog,
+    // isClosing,
+    // setIsClosing,
+}: {
     condition?: ConditionForCard | null;
     conditionTags?: string[];
+    // closeDialog: (updatedValues?: any) => void,
+    // isClosing: boolean,
+    // setIsClosing: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const {data: session, status} = useSession()
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
+    const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
     const [defaultResearchValues, setDefaultResearchValues] = useState<z.infer<typeof researchFormSchema> | undefined>(undefined);
     const isOwner = ["owner", "support"].includes(session?.user?.membership?.role);
 
@@ -90,6 +103,7 @@ export default function EditPAGProfileConditionCardDialog({
     }, [condition, conditionTags, editResearchForm]);
 
     async function onResearchFormSubmit(values: z.infer<typeof researchFormSchema>) {
+        setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error("You're not signed into an organization right now.");
             return;
@@ -173,6 +187,7 @@ export default function EditPAGProfileConditionCardDialog({
 
                 toast.success("Condition updated successfully!");
                 setOpen(false);
+                closeDialog()
                 window.location.reload();
             } else {
                 console.error(response.error);
@@ -186,10 +201,36 @@ export default function EditPAGProfileConditionCardDialog({
         }
     }
 
-    const onCloseForm = () => {
+    const closeDialog = () => {
+        setOpen(false)
+        setIsClosing(false)
+        setUnsavedChangesIsOpen(false)
+
         setDefaultResearchValues(defaultResearchValues);
         editResearchForm.reset(defaultResearchValues); // Reset form with fetched data
     }
+
+    const handleClose = () => {
+        console.log(`form is dirty`, editResearchForm.formState.dirtyFields)
+        if (Object.keys(editResearchForm.formState.dirtyFields).length > 0) {
+            // form is dirty, give user the option to save/discard unsaved changes
+            setUnsavedChangesIsOpen(true)
+        } else {
+            // form is not dirty, close regularly
+            closeDialog()
+        }
+    }
+
+    useEffect(() => {
+        console.log(`handle isClosing changed`, isClosing)
+        if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
+    }, [isClosing])
+
+    useEffect(() => {
+        // if the user has closed the unsaved changes dialog, end the isClosing state of all other dialogs
+        // all dialogs should be either fully closed or fully open
+        if (!unsavedChangesIsOpen) setIsClosing(false)
+    }, [unsavedChangesIsOpen])
 
     const handleGeneAsyncSearch = async (query: string): Promise<Option[]> => {
         if (!query) return []; // Return empty if no input
@@ -230,12 +271,13 @@ export default function EditPAGProfileConditionCardDialog({
     };
 
     return (
-        <Dialog open={open} onOpenChange={(isOpen) => {
-            setOpen(isOpen);
-            if (!isOpen) {
-                onCloseForm();
-            }
-        }}>
+        <Dialog 
+            open={open} 
+            onOpenChange={(open) => {
+                if (!open) setIsClosing(true)
+                else setOpen(true)
+            }}
+        >
 
             <Tooltip>
                 <TooltipTrigger asChild>
@@ -261,7 +303,7 @@ export default function EditPAGProfileConditionCardDialog({
                 )}
             </Tooltip>
             <DialogPortal>
-                <DialogContent className="max-h-[80vh] overflow-y-auto overflow-x-visible" data-testid="dialog">
+                <DialogContent data-testid="dialog">
                     <DialogHeader>
                         <DialogTitle>
                             Edit condition
@@ -271,6 +313,8 @@ export default function EditPAGProfileConditionCardDialog({
                         </DialogDescription>
                     </DialogHeader>
                     <Form {...editResearchForm}>
+                        <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
+                            <ScrollBar />
                         <form
                             onSubmit={editResearchForm.handleSubmit(
                                 onResearchFormSubmit,
@@ -655,11 +699,76 @@ export default function EditPAGProfileConditionCardDialog({
                                     </FormItem>
                                 )}
                             />
+                            
 
-                            <Button type="submit" data-testid="dialog-save-btn">
-                                Save
+                            <div className="absolute right-4 bottom-0 flex gap-2">
+                            <DialogClose asChild>
+                                <Button 
+                                    variant={"secondary"}
+                                    onClick={() => {handleClose()}}
+                                >
+                                    Cancel
+                                </Button>
+                            </DialogClose>
+
+                            <Button
+                                variant={"cta"}
+                                type="submit"
+                                data-testid="dialog-save-btn"
+                                disabled={!editResearchForm.formState.isValid || isSaving}
+                            >
+                                {isSaving 
+                                    ? (
+                                        <div className="w-[81px] flex justify-center items-center">
+                                            <LoadingDots/>
+                                        </div>
+                                    ) 
+                                    : ("Save changes")
+                                }
                             </Button>
+                            </div>
                         </form>
+                        </ScrollArea>
+
+                        <Dialog open={unsavedChangesIsOpen} onOpenChange={setUnsavedChangesIsOpen}>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>You have unsaved changes.</DialogTitle>
+                                    <DialogDescription>If you close this dialog your changes will not be saved.</DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                    <DialogClose asChild>
+                                        <Button
+                                            variant={'secondary'}
+                                            // set back to a non-closing state, so future closes can also trigger
+                                            onClick={() => setIsClosing(false)} 
+                                        >
+                                            Back to edit
+                                        </Button>
+                                    </DialogClose>
+                                    <Button
+                                        variant={'destructive'}
+                                        onClick={() => closeDialog()}
+                                    >
+                                        Discard changes
+                                    </Button>
+                                    <Button 
+                                        disabled={!editResearchForm.formState.isValid || isSaving}
+                                        variant={'cta'}
+                                        onClick={() => onResearchFormSubmit(editResearchForm.getValues())}
+                                    >
+                                        {isSaving 
+                                            ? (
+                                                <div className="w-[81px] flex justify-center items-center">
+                                                    <LoadingDots/>
+                                                </div>
+                                            ) 
+                                            : ("Save changes")
+                                        }
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </Form>
                 </DialogContent>
             </DialogPortal>
