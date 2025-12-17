@@ -1211,9 +1211,6 @@ export function EditMilestoneForm({
                         setIsClosing={setIsClosing}
                         closeDialog={(formValues: any) => {
                             if (formValues) {
-                                setCreateBiosampleIsOpen(false)
-                                setIsClosing(false)
-
                                 if (formValues) {
                                     form.setValue("tools", [
                                         ...(form.getValues("tools") || []),
@@ -1227,10 +1224,10 @@ export function EditMilestoneForm({
                                         }
                                     ])
                                 }
-                            } else {
-                                setCreateBiosampleIsOpen(false)
-                                setIsClosing(false)
                             }
+
+                            setCreateBiosampleIsOpen(false)
+                            setIsClosing(false)
                         }}
                     />
                 </DialogContent>
@@ -1248,9 +1245,9 @@ export function EditMilestoneForm({
                     </DialogHeader>
                     <EditDiseaseModelToolForm
                         toolData={{}}
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
                         closeDialog={(newDiseaseModel) => {
-                            setCreateDiseaseModelIsOpen(false)
-
                             if (newDiseaseModel) {
                                 form.setValue("tools", [
                                     ...(form.getValues("tools") || []),
@@ -1263,6 +1260,9 @@ export function EditMilestoneForm({
                                     }
                                 ])
                             }
+
+                            setCreateDiseaseModelIsOpen(false)
+                            setIsClosing(false)
                         }}
                     />
                 </DialogContent>

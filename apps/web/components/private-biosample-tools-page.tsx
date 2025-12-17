@@ -37,7 +37,6 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1160)
     const [editingTool, setEditingTool] = useState<Partial<Asset> | undefined>(undefined)
     const [isClosing, setIsClosing] = useState(false)
-    const [unsavedChanges, setUnsavedChanges] = useState<z.infer<typeof editBiosampleForm> | undefined>(undefined)
     const parentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -204,9 +203,7 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                 <Dialog 
                                     open={!!editingTool}
                                     onOpenChange={(open) => {
-                                        if (!open) {
-                                            setIsClosing(true)
-                                        }
+                                        if (!open) setIsClosing(true)
                                     }}
                                 >
                                     <DialogPortal>
