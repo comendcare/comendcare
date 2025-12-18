@@ -14,7 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { Button } from "@comend/components/ui/button";
-import { Globe, Lock, Trash } from "lucide-react";
+import { Globe, Lock, Plus, Trash } from "lucide-react";
 import { setDataToolsVisibility } from "@comend/lib/actions";
 import { Dialog, DialogTrigger } from "@comend/components/ui/dialog";
 import { DialogPortal } from "@comend/components/plate-ui/dialog";
@@ -30,6 +30,7 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1100)
     const [editingTool, setEditingTool] = useState<Partial<Asset> | undefined>(undefined)
+    const [isClosing, setIsClosing] = useState(false)
     const parentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -124,7 +125,15 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                             </>
                         )}
                         <AssetBulkImportDialog />
-                        <NewToolDialog type={"data"}/>
+                        <NewToolDialog 
+                            type={"data"}
+                            trigger={(
+                                <Button variant="cta">
+                                    <Plus/>
+                                    {"Create clinical dataset"}
+                                </Button>
+                            )}
+                        />
                     </>
                 )}
             >
@@ -166,14 +175,24 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                                     <p className="text-lg text-stone-500">
                                         A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                                     </p>
-                                    <NewToolDialog type={"data"}/>
+                                    <NewToolDialog 
+                                        type={"data"}
+                                        trigger={(
+                                            <Button variant="cta">
+                                                <Plus/>
+                                                {"Create clinical dataset"}
+                                            </Button>
+                                        )}
+                                    />
                                 </div>
                             </div>
                         )}
                         interactiveDialog={(
                             <Dialog 
                                 open={!!editingTool}
-                                onOpenChange={(open) => !open && setEditingTool(undefined)}
+                                onOpenChange={(open) => {
+                                    if (!open) setIsClosing(true)
+                                }}
                             >
                                 <DialogPortal>
                                     <div onClick={(e) => e.stopPropagation()}>
@@ -182,7 +201,12 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                                                 key={editingTool?.id}
                                                 data={editingTool} 
                                                 type={'data'}
-                                                closeDialog={() => {setEditingTool(undefined)}}
+                                                isClosing={isClosing}
+                                                setIsClosing={setIsClosing}
+                                                closeDialog={() => {
+                                                    setEditingTool(undefined)
+                                                    setIsClosing(false)
+                                                }}
                                             />
                                         )}
                                     </div>

@@ -1,7 +1,7 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {Condition, Organization} from "@prisma/client";
 import {Badge} from "@comend/components/ui/badge";
-import React from "react";
+import React, { useState } from "react";
 import {formatNumberWithCommas} from "@comend/lib/utils";
 import type {Prisma} from "@prisma/client";
 import dynamic from "next/dynamic";

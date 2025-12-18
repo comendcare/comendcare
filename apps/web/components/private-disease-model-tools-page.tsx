@@ -15,7 +15,7 @@ import {useEffect, useRef, useState} from "react";
 import {useSession} from "next-auth/react";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import {Button} from "@comend/components/ui/button";
-import {Lock, Globe, Trash} from "lucide-react"
+import {Lock, Globe, Trash, Plus} from "lucide-react"
 import {setDiseaseModelsVisibility} from "@comend/lib/actions";
 import {DiseaseModelBulkImportDialog} from "./disease-model-bulk-import-dialog";
 import { Dialog, DialogPortal, DialogTrigger } from "@comend/components/ui/dialog";
@@ -34,6 +34,7 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1100)
     const [editingTool, setEditingTool] = useState<DiseaseModel | undefined>(undefined)
+    const [isClosing, setIsClosing] = useState(false)
     const parentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -128,7 +129,15 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                                 </>
                             )}
                             <DiseaseModelBulkImportDialog/>
-                            <NewToolDialog type={"diseaseModel"}/>
+                            <NewToolDialog 
+                                type={"diseaseModel"}
+                                trigger={(
+                                    <Button variant="cta">
+                                        <Plus/>
+                                        {"Create disease model"}
+                                    </Button>
+                                )}
+                            />
                         </>
                     )}
                 >
@@ -171,14 +180,24 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                                         <p className="text-lg text-stone-500">
                                             A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                                         </p>
-                                        <NewToolDialog type={"diseaseModel"}/>
+                                        <NewToolDialog 
+                                            type={"diseaseModel"}
+                                            trigger={(
+                                                <Button variant="cta">
+                                                    <Plus/>
+                                                    {"Create disease model"}
+                                                </Button>
+                                            )}
+                                        />
                                     </div>
                                 </div>
                             )}
                             interactiveDialog={(
                                 <Dialog 
                                     open={!!editingTool}
-                                    onOpenChange={(open) => !open && setEditingTool(undefined)}
+                                    onOpenChange={(open) => {
+                                        if (!open) setIsClosing(true)
+                                    }}
                                 >
                                     <DialogPortal>
                                         <div onClick={(e) => e.stopPropagation()}>
@@ -187,7 +206,12 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                                                     key={editingTool?.id}
                                                     data={editingTool} 
                                                     type={'diseaseModel'}
-                                                    closeDialog={() => {setEditingTool(undefined)}}
+                                                    isClosing={isClosing}
+                                                    setIsClosing={setIsClosing}
+                                                    closeDialog={() => {
+                                                        setEditingTool(undefined)
+                                                        setIsClosing(false)
+                                                    }}
                                                 />
                                             )}
                                         </div>

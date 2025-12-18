@@ -19,7 +19,11 @@ import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
     DialogClose,
+    DialogContent,
     DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@comend/components/ui/dialog"
 import { BIOSAMPLE_TYPE_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, QUANTITY_OPTIONS } from "@comend/lib/types"
 import type {CreateFacilityRequest, Prisma} from "@prisma/client"
@@ -46,6 +50,9 @@ import LoadingDots from "@comend/components/icons/loading-dots"
 import { Badge } from "@comend/components/ui/badge"
 import { SubmitCreateRequest } from "./create-facility-request-button"
 import { badgeVariants } from "@comend/components/ui/badge"
+import { DialogDescription } from "@radix-ui/react-dialog"
+import { Session } from "next-auth"
+import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -64,18 +71,88 @@ const PRICE_OPTIONS: Option[] = [
     }
 ]
 
+export const createOrUpdateBiosample = async (
+    session: Session, 
+    toolData: any, 
+    values: z.infer<typeof editBiosampleForm>, 
+    createFacilityRequests: CreateFacilityRequest[]
+) => {
+    try {
+        if (toolData.id) {
+            const updatedAsset = await updateBiosample(session.user.organizationId, values, toolData.id)
+            await revalidate("/app/tools/biosample")
+            mixpanelTrack("Biosample Updated", {
+                "ID": updatedAsset.id,
+                "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
+                // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                // we flatten them into a single list that can be parsed
+                "Linked Project Types": (updatedAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
+                    (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                )
+            })
+
+            toast.success(
+                "Tool updated successfully!",
+                {position: "bottom-left"}
+            )
+
+            return updatedAsset
+        } else {
+            const newAsset = await createBiosample(session.user.organizationId, values)
+            for (let i = 0; i < createFacilityRequests?.length; i++) {
+                await updateCreateFacilityRequest(
+                    session?.user?.organizationId,
+                    {
+                        id: createFacilityRequests[i].id,
+                        name: createFacilityRequests[i].name,
+                        biosampleId: newAsset.id
+                    }
+                )
+            }
+            await revalidate("/app/tools/biosample")
+            mixpanelTrack("Biosample Created", {
+                "ID": newAsset.id,
+                "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
+                // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                // we flatten them into a single list that can be parsed
+                "Linked Project Types": (newAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
+                    (milestone?.types || []).map((type: any)=> type.milestoneType.label || type.milestoneType.id)
+                )
+            })
+
+            toast.success(
+                "Tool created successfully!",
+                {position: "bottom-left"}
+            )
+
+            return newAsset
+        }
+
+    } catch (error) {
+        console.error("Error creating or updating tool:", error);
+        toast.error(
+            "Failed to create or update tool.",
+            {position: "bottom-left"}
+        )
+    }
+}
+
 export function EditBiosampleToolForm({
     toolData,
-    closeDialog
+    closeDialog,
+    isClosing,
+    setIsClosing,
 }: {
     toolData: any,
-    closeDialog: (newBiosample?: any) => void
+    closeDialog: (formValues?: any) => void, // if form values are provided, unsaved changes popup is shown
+    isClosing: boolean,
+    setIsClosing: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const initializing = useRef(true)
-    const router = useRouter()
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
+    const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(toolData.createFacilityRequests || [])
     const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
@@ -145,7 +222,7 @@ export function EditBiosampleToolForm({
 
             // donor properties
             donorId: toolData?.donorId || undefined,
-            internalDonorId: toolData?.internalId || undefined,
+            internalDonorId: toolData?.donor?.internalId || undefined,
             donor: toolData?.donorId ? [{
                 img: `https://api.dicebear.com/8.x/shapes/svg?seed=${toolData.donorId}`,
                 label: toolData.donorId, 
@@ -193,99 +270,56 @@ export function EditBiosampleToolForm({
             return;
         }
 
-        try {
-            if (toolData.id) {
-                const updatedAsset = await updateBiosample(session.user.organizationId, values, toolData.id)
-                await revalidate("/app/tools/biosample")
-                router.refresh()
-                
-                mixpanelTrack("Biosample Updated", {
-                    "ID": updatedAsset.id,
-                    "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
-                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
-                    // we flatten them into a single list that can be parsed
-                    "Linked Project Types": (updatedAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
-                        (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
-                    )
-                })
+        const createdOrUpdatedBiosample = await createOrUpdateBiosample(session, toolData, values, createFacilityRequests)
+        closeDialog(createdOrUpdatedBiosample)
+    }
 
-                if (closeDialog) closeDialog(updatedAsset)
-
-                toast.success(
-                    "Tool updated successfully!",
-                    {position: "bottom-left"}
-                )
-            } else {
-                const newAsset = await createBiosample(session.user.organizationId, values)
-                for (let i = 0; i < createFacilityRequests.length; i++) {
-                    await updateCreateFacilityRequest(
-                        session?.user?.organizationId,
-                        {
-                            id: createFacilityRequests[i].id,
-                            name: createFacilityRequests[i].name,
-                            biosampleId: newAsset.id
-                        }
-                    )
-                }
-                await revalidate("/app/tools/biosample")
-                router.refresh()
-                
-                mixpanelTrack("Biosample Created", {
-                    "ID": newAsset.id,
-                    "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
-                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
-                    // we flatten them into a single list that can be parsed
-                    "Linked Project Types": (newAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
-                        (milestone?.types || []).map((type: any)=> type.milestoneType.label || type.milestoneType.id)
-                    )
-                })
-
-                if (closeDialog) closeDialog(newAsset)
-
-                toast.success(
-                    "Tool created successfully!",
-                    {position: "bottom-left"}
-                )
-            }
-        } catch (error) {
-            console.error("Error creating or updating tool:", error);
-            toast.error(
-                "Failed to create or update tool.",
-                {position: "bottom-left"}
-            )
+    const handleClose = () => {
+        if (Object.keys(form.formState.dirtyFields)?.length > 0) {
+            // form is dirty, give user the option to save/discard unsaved changes
+            setUnsavedChangesIsOpen(true)
+        } else {
+            // form is not dirty, close regularly
+            closeDialog()
         }
     }
 
     useEffect(() => {
-        async function fetchDonorData() {
-            let donorData: any = undefined
-            if (formData.donor && formData.donor.length > 0) {            
-                const response = await getDonorData(formData.donor[0]?.value)
-                donorData = response.data
-            }
+        if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
+    }, [isClosing])
 
-            form.setValue("age", donorData?.age?.toString() ?? "", {shouldDirty: true})
-            form.setValue("sex", donorData?.sex ?? "", {shouldDirty: true})
-            form.setValue("gender", donorData?.gender ?? "", {shouldDirty: true})
-            form.setValue("race", donorData?.race ?? "", {shouldDirty: true})
-            form.setValue("ethnicity", donorData?.ethnicity ?? "", {shouldDirty: true})
-            form.setValue("treatments", donorData?.treatments || [], {shouldDirty: true})
-            form.setValue("diagnoses", donorData?.diagnoses?.map((diagnosis: any) => ({
-                    diagnosis: diagnosis.type ? [{label: diagnosis.type.label, value: diagnosis.type.id}] : [],
-                    severity: diagnosis.severity ?? ""
-                })) || [], {shouldDirty: true})
-            form.setValue("height", donorData?.height?.toString() ?? "", {shouldDirty: true})
-            form.setValue("weight", donorData?.weight?.toString() ?? "", {shouldDirty: true})
-            form.setValue("bmi", donorData?.bmi?.toString() ?? "", {shouldDirty: true})
-            form.setValue("medications", donorData?.medications || [], {shouldDirty: true})
+    useEffect(() => {
+        // if the user has closed the unsaved changes dialog, end the isClosing state of all other dialogs
+        // all dialogs should be either fully closed or fully open
+        if (!unsavedChangesIsOpen) setIsClosing(false)
+    }, [unsavedChangesIsOpen])
 
-            form.setValue("donorId", donorData?.id, {shouldDirty: true, shouldValidate: true})
-            form.setValue("internalDonorId", donorData?.internalId?.toString() ?? "", {shouldDirty: true, shouldValidate: true})
+    const updateDonorValues = async (donorId: string) => {
+        console.log(`donor data changed`, donorId)
+        let donorData = undefined
+        if (donorId) {            
+            const response = await getDonorData(donorId)
+            donorData = response.data
         }
 
-        console.log(`donor`, formData.donor)
-        fetchDonorData()
-    }, [formData.donor])
+        form.setValue("age", donorData?.age?.toString() ?? "", {shouldDirty: true})
+        form.setValue("sex", donorData?.sex ?? "", {shouldDirty: true})
+        form.setValue("gender", donorData?.gender ?? "", {shouldDirty: true})
+        form.setValue("race", donorData?.race ?? "", {shouldDirty: true})
+        form.setValue("ethnicity", donorData?.ethnicity ?? "", {shouldDirty: true})
+        form.setValue("treatments", donorData?.treatments || [], {shouldDirty: true})
+        form.setValue("diagnoses", donorData?.diagnoses?.map((diagnosis: any) => ({
+                diagnosis: diagnosis.type ? [{label: diagnosis.type.label, value: diagnosis.type.id}] : [],
+                severity: diagnosis.severity ?? ""
+            })) || [], {shouldDirty: true})
+        form.setValue("height", donorData?.height?.toString() ?? "", {shouldDirty: true})
+        form.setValue("weight", donorData?.weight?.toString() ?? "", {shouldDirty: true})
+        form.setValue("bmi", donorData?.bmi?.toString() ?? "", {shouldDirty: true})
+        form.setValue("medications", donorData?.medications || [], {shouldDirty: true})
+
+        form.setValue("donorId", donorData?.id, {shouldDirty: true, shouldValidate: true})
+        form.setValue("internalDonorId", donorData?.internalId?.toString() ?? "", {shouldDirty: true, shouldValidate: true})
+    }
 
     // Initialization - Allow update once form is initialized
     useEffect(() => {
@@ -339,7 +373,7 @@ export function EditBiosampleToolForm({
             }
 
             // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away
-            if (Object.keys(toolData).length > 0) form.trigger()
+            if (Object.keys(toolData)?.length > 0) form.trigger()
 
             initializing.current = false
         }
@@ -384,7 +418,10 @@ export function EditBiosampleToolForm({
                                 <FormControl>
                                     <MultipleSelector
                                         value={field.value}
-                                        onChange={field.onChange}
+                                        onChange={(val) => {
+                                            field.onChange(val)
+                                            form.setValue("types", val, { shouldDirty: true })
+                                        }}
                                         badgeClassName={badgeVariants({variant: "lightBlue"})}
                                         options={BIOSAMPLE_TYPE_OPTIONS}
                                         hidePlaceholderWhenSelected={true}
@@ -432,7 +469,11 @@ export function EditBiosampleToolForm({
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
-                                            {...field}
+                                            value={field.value}
+                                            onChange={(val) => {
+                                                field.onChange(val)
+                                                form.setValue("genes", val, { shouldDirty: true })
+                                            }}
                                             onSearch={handleGeneAsyncSearch}
                                             badgeClassName={badgeVariants({variant: "teal"})}
                                             placeholder="Search for genes..."
@@ -511,12 +552,12 @@ export function EditBiosampleToolForm({
                                             onInput={(e) => {
                                                 const target = e.currentTarget;
                                                 if (Number(target.value) < 0) {
-                                                target.value = "0"; // reset to 0 if negative
+                                                    target.value = "0"; // reset to 0 if negative
                                                 }
                                             }}
                                             onKeyDown={(e) => {
                                                 if (e.key === "-" || e.key === "e") {
-                                                e.preventDefault(); // block typing "-" and "e" for exponent notation
+                                                    e.preventDefault(); // block typing "-" and "e" for exponent notation
                                                 }
                                             }}
                                             {...field}
@@ -533,7 +574,7 @@ export function EditBiosampleToolForm({
                                     <FormControl>
                                         <Select
                                             value={field.value} 
-                                            onValueChange={(newVal) => form.setValue("quantityUnit", newVal)}
+                                            onValueChange={(newVal) => form.setValue("quantityUnit", newVal, { shouldDirty: true })}
                                         >
                                             <SelectTrigger className="-mt-2 w-[100px] min-h-[40px]">
                                                 <SelectValue placeholder="Select a value" />
@@ -560,7 +601,11 @@ export function EditBiosampleToolForm({
                                 <div className="w-full">
                                     <FormControl className="w-full">
                                         <MultipleSelector
-                                            {...field}
+                                            value={field.value}
+                                            onChange={(val) => {
+                                                field.onChange(val)
+                                                form.setValue("storageFacility", val, { shouldDirty: true })
+                                            }}
                                             ref={storageFacilityRef}
                                             creatable={true}
                                             createOnBlur={false}
@@ -674,26 +719,29 @@ export function EditBiosampleToolForm({
                 </div>
 
                     <Separator className="w-full"/>
-                    <DonorFormFields form={form} />
+                    <DonorFormFields 
+                        form={form} 
+                        updateDonorData={updateDonorValues}
+                    />
                 </form>
             </ScrollArea>
 
             <DialogFooter className="pt-1">
-                <DialogClose asChild>
-                    <Button 
-                        variant={"secondary"} 
-                        onClick={() => {if (closeDialog) closeDialog()}}
-                    >
-                        Cancel
-                    </Button>
-                </DialogClose>
+                <Button 
+                    variant={"secondary"} 
+                    onClick={() => {handleClose()}}
+                >
+                    Cancel
+                </Button>
 
                 <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
                     Delete tool
                 </Button>
+
                 <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                    <DeleteBiosampleDialog toolIds={[toolData.id]} closeDialog={closeDialog}/>
+                    <DeleteBiosampleDialog toolIds={[toolData.id]} closeDialog={handleClose}/>
                 </Dialog>
+
                 <div className="bg-white rounded-md p-0">
                     <Button
                         disabled={!form.formState.isValid || isSaving}
@@ -714,11 +762,28 @@ export function EditBiosampleToolForm({
                     </Button>
                 </div>
             </DialogFooter>
+
+            <UnsavedChangesDialog 
+                isSaving={isSaving}
+                isClosing={isClosing}
+                setIsClosing={setIsClosing}
+                isOpen={unsavedChangesIsOpen}
+                setIsOpen={setUnsavedChangesIsOpen}
+                closeDialog={closeDialog}
+                form={form}
+                formSubmit={handleFormSubmit}
+            />
         </Form>
     )
 }
 
-export const DonorFormFields = ({form}: {form: any}) => {
+export const DonorFormFields = ({
+    form, 
+    updateDonorData
+}: {
+    form: any, 
+    updateDonorData: (donorId: string) => void
+}) => {
     const {data: session} = useSession()
     const [createNewDonor, setCreateNewDonor] = useState(false)
 
@@ -782,7 +847,11 @@ export const DonorFormFields = ({form}: {form: any}) => {
                     {!createNewDonor && (
                         <FormControl>
                             <MultipleSelector
-                                {...field}
+                                value={field.value}
+                                onChange={async (newVal: Option[]) => {
+                                    form.setValue('donor', newVal, {shouldDirty: true})
+                                    await updateDonorData(newVal[0]?.value)
+                                }}
                                 onSearch={handleDonorAsyncSearch}
                                 placeholder="Search for donors..."
                                 triggerSearchOnFocus={true}
@@ -1048,7 +1117,7 @@ export const DonorFormFields = ({form}: {form: any}) => {
                             </Tooltip>
                         </div>
 
-                        {field?.value && field.value.length > 0 && (
+                        {field?.value && field?.value?.length > 0 && (
                             <ol className="flex flex-col gap-2">
                                 {field.value.map((value: any, index: number) => (
                                     <span key={index} className="flex gap-2 w-full items-center">
