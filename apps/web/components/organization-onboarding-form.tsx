@@ -31,6 +31,7 @@ import {handleImageUpload} from "@comend/lib/upload";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
+import { Organization } from "@prisma/client";
 
 const joinOrgFormSchema = z.object({
     org: z.array(optionSchema).min(0).optional(),
@@ -83,11 +84,13 @@ export const newOrgFormSchema = z.object({
 
 export default function OrganizationOnboardingForm(
     {
+        organizationData,
         previousLink,
         nextLink,
         showSkip,
     }:
     {
+        organizationData?: any,
         previousLink: string,
         nextLink: string,
         showSkip: boolean,
@@ -104,6 +107,8 @@ export default function OrganizationOnboardingForm(
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<z.infer<typeof newOrgFormSchema> | undefined>(undefined);
+
+    console.log(`organization data`, organizationData)
 
     const onDrop = useCallback(
         (acceptedFiles: FileWithPath[]) => {
@@ -135,7 +140,6 @@ export default function OrganizationOnboardingForm(
     });
 
     useEffect(() => {
-
         const fetchOrganizations = async () => {
             try {
                 await getAllNonMemberOrganizations({
@@ -306,68 +310,68 @@ export default function OrganizationOnboardingForm(
     useEffect(() => {
         async function fetchOrganizationData() {
             if (session?.user?.organizationId && pathname === "/onboarding/organization") {
-                let organizationData
-                const response = await getOrganizationFromOrganizationId(session.user.organizationId, {
-                    id: true,
-                    public: true,
-                    verified: true,
-                    published: true,
-                    name: true,
-                    description: true,
-                    contactEmail: true,
-                    logo: true,
-                    image: true,
-                    headerImage: true,
-                    biopharmaConsentSettings: true,
-                    subdomain: true,
-                    customDomain: true,
-                    statedGoal: true,
-                    yearFounded: true,
-                    incorporationStatus: true,
-                    therapeuticsOfInterest: true,
-                    therapeuticsInDevelopment: true,
-                    website: true,
-                    moneyRaised: true,
-                    moneyDeployed: true,
-                    researchBudget: true,
-                    // address1                  String?
-                    // address2                  String?
-                    // formattedAddress          String?
-                    // city                      String?
-                    // region                    String?
-                    // postalCode                String?
-                    // country                   String?
-                    // lat                       String?
-                    // lng                       String?
-                    createdAt: true,
-                    updatedAt: true,
-                    user: true,
-                    userId: true,
-                    roadmaps: true,
-                    members: true,
-                    clients: true,
-                    invitations: true,
-                    membershipRequests: true,
-                    conditions: true,
-                    kanban: true,
-                    milestones: true,
-                    platformNotifications: true,
-                    reviews: true,
-                    savedCompanies: true,
-                    tools: true,
-                    rfps: true,
-                    metadata: true
-                });
-                if (response.success) {
-                    organizationData = response.data
-                } else {
-                    console.error(response.error)
-                    toast.error(response.error)
-                }
+                // let organizationData
+                // const response = await getOrganizationFromOrganizationId(session.user.organizationId, {
+                //     id: true,
+                //     public: true,
+                //     verified: true,
+                //     published: true,
+                //     name: true,
+                //     description: true,
+                //     contactEmail: true,
+                //     logo: true,
+                //     image: true,
+                //     headerImage: true,
+                //     biopharmaConsentSettings: true,
+                //     subdomain: true,
+                //     customDomain: true,
+                //     statedGoal: true,
+                //     yearFounded: true,
+                //     incorporationStatus: true,
+                //     therapeuticsOfInterest: true,
+                //     therapeuticsInDevelopment: true,
+                //     website: true,
+                //     moneyRaised: true,
+                //     moneyDeployed: true,
+                //     researchBudget: true,
+                //     // address1                  String?
+                //     // address2                  String?
+                //     // formattedAddress          String?
+                //     // city                      String?
+                //     // region                    String?
+                //     // postalCode                String?
+                //     // country                   String?
+                //     // lat                       String?
+                //     // lng                       String?
+                //     createdAt: true,
+                //     updatedAt: true,
+                //     user: true,
+                //     userId: true,
+                //     roadmaps: true,
+                //     members: true,
+                //     clients: true,
+                //     invitations: true,
+                //     membershipRequests: true,
+                //     conditions: true,
+                //     kanban: true,
+                //     milestones: true,
+                //     platformNotifications: true,
+                //     reviews: true,
+                //     savedCompanies: true,
+                //     tools: true,
+                //     rfps: true,
+                //     metadata: true
+                // });
+                // if (response.success) {
+                //     organizationData = response.data
+                // } else {
+                //     console.error(response.error)
+                //     toast.error(response.error)
+                // }
 
                 if (organizationData) {
                     // Find the current user's title from the members list
-                    const currentUserMember = organizationData.members?.find(
+                    const currentUserMember = organizationData?.members?.find(
                         (member: any) => member.userId === session.user.id
                     );
                     const currentUserTitle = currentUserMember?.title || "";

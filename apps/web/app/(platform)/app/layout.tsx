@@ -9,7 +9,6 @@ import {Button} from "@comend/components/ui/button";
 import Link from "next/link";
 import * as React from "react";
 import dynamic from "next/dynamic";
-import ClaimInvitationBlocker from "~web/components/claim-invitation-blocker";
 import ClaimInvitationGate from "~web/components/claim-invitation-gate";
 
 const NavUser = dynamic(

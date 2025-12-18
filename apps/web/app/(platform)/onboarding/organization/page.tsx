@@ -1,7 +1,68 @@
 import OrganizationOnboardingForm from "~web/components/organization-onboarding-form";
 import {Separator} from "@comend/components/ui/separator";
+import { getOrganizationFromOrganizationId } from "@comend/lib/fetchers";
 
-export default function OrganizationOnboardingPage() {
+export default async function OrganizationOnboardingPage({
+    searchParams,
+}: {
+    searchParams: { [key: string]: string | string[] | undefined }
+}) {
+    let organization = undefined
+    console.log(`search params`, searchParams)
+    if (typeof searchParams.id === 'string') {
+        organization = await getOrganizationFromOrganizationId(searchParams.id, {
+            id: true,
+            public: true,
+            verified: true,
+            published: true,
+            name: true,
+            description: true,
+            contactEmail: true,
+            logo: true,
+            image: true,
+            headerImage: true,
+            biopharmaConsentSettings: true,
+            subdomain: true,
+            customDomain: true,
+            statedGoal: true,
+            yearFounded: true,
+            incorporationStatus: true,
+            therapeuticsOfInterest: true,
+            therapeuticsInDevelopment: true,
+            website: true,
+            moneyRaised: true,
+            moneyDeployed: true,
+            researchBudget: true,
+            // address1                  String?
+            // address2                  String?
+            // formattedAddress          String?
+            // city                      String?
+            // region                    String?
+            // postalCode                String?
+            // country                   String?
+            // lat                       String?
+            // lng                       String?
+            createdAt: true,
+            updatedAt: true,
+            user: true,
+            userId: true,
+            roadmaps: true,
+            members: true,
+            clients: true,
+            invitations: true,
+            membershipRequests: true,
+            conditions: true,
+            kanban: true,
+            milestones: true,
+            platformNotifications: true,
+            reviews: true,
+            savedCompanies: true,
+            tools: true,
+            rfps: true,
+            metadata: true
+        })
+    }
+
     return (
         <main className="flex flex-row space-x-8 w-full max-w-7xl mx-auto">
             <div className="space-y-4 w-full">
@@ -22,6 +83,7 @@ export default function OrganizationOnboardingPage() {
 
                 <Separator/>
                 <OrganizationOnboardingForm
+                    organizationData={organization?.data}
                     previousLink={"/onboarding/user"}
                     nextLink={"/onboarding/research"}
                     showSkip={false}

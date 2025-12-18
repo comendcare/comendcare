@@ -11,7 +11,7 @@ import {
 } from "@comend/components/ui/alert-dialog";
 import {Button} from "@comend/components/ui/button";
 import {toast} from "sonner";
-import {acceptInvitation, declineAndDeleteInvitation} from "@comend/lib/actions";
+import {acceptClaimOrganizationInvitation, declineAndDeleteClaimOrganizationInvitation} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
 import type {Organization} from "@prisma/client";
 import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
@@ -33,14 +33,14 @@ export default function ClaimInvitationBlocker({
     const onAccept = async (invId: string) => {
         try {
             setWorking(true);
-            // const res = await acceptInvitation(invId);
-            // if (res?.success) {
-            //     toast.success("Invitation accepted.");
-            //     update({});
-            //     router.push("/app/profile");
-            // } else {
-            //     toast.error(res?.error ?? "Failed to accept invitation.");
-            // }
+            const res = await acceptClaimOrganizationInvitation(invId);
+            if (res?.success) {
+                toast.success("Invitation accepted.");
+                update({});
+                router.push(`/onboarding/organization?id=${res?.data?.organizationId}`)
+            } else {
+                toast.error(res?.error ?? "Failed to accept invitation.");
+            }
         } finally {
             setWorking(false);
         }
@@ -49,13 +49,13 @@ export default function ClaimInvitationBlocker({
     const onDecline = async (invId: string, organizationId: string) => {
         try {
             setWorking(true);
-            // const res = await declineAndDeleteInvitation(invId);
-            // if (res?.success) {
-            //     toast.success("Invitation declined.");
-            //     router.refresh();
-            // } else {
-            //     toast.error(res?.error ?? "Failed to decline invitation.");
-            // }
+            const res = await declineAndDeleteClaimOrganizationInvitation(invId);
+            if (res?.success) {
+                toast.success("Invitation declined.");
+                router.refresh();
+            } else {
+                toast.error(res?.error ?? "Failed to decline invitation.");
+            }
         } finally {
             setWorking(false);
         }
