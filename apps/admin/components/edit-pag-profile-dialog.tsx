@@ -678,14 +678,14 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                     name="subdomain"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
+                                            <FormLabel>{`Custom Comend URL (required)`}</FormLabel>
                                             <FormDescription>
-                                                {`Enter an acronym, short form, or nickname for your organization.`}
-                                                <br/>
+                                                {/* {`This will create your organization's unique Comend profile link (e.g., yourname.comend.io). Use a short name or abbreviation. This is not your external website.`} */}
+                                                {/* <br/> */}
                                                 {editOrgForm.watch("subdomain") &&
                                                     !editOrgForm.formState.errors.subdomain && (
                                                         <>
-                                                            {`The custom site for your organization’s profile will be found at ${editOrgForm
+                                                            {`Your profile URL will be: ${editOrgForm
                                                                 .watch("subdomain")
                                                                 .toLowerCase()
                                                                 .replace(/\s+/g, "-")}.comend.io`}

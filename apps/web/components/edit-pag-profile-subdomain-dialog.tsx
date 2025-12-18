@@ -211,10 +211,10 @@ export default function EditPagProfileSubdomainDialog({organization}: { organiza
             </Tooltip>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Organization Abbreviation (required)</DialogTitle>
+                    <DialogTitle>Custom Comend URL (required)</DialogTitle>
                     <DialogDescription>
-                        {`Choose the URL for your custom profile site.`}
-                        <br/>
+                        {/* {`This will create your organization's unique Comend profile link (e.g., yourname.comend.io). Use a short name or abbreviation. This is not your external website.`} */}
+                        {/* <br/> */}
                         {editOrgForm.watch("subdomain") &&
                             !editOrgForm.formState.errors.subdomain && (
                                 <>

@@ -13,6 +13,7 @@ import {
 import {
     Form,
     FormControl,
+    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -292,7 +293,20 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                 name="subdomain"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Public URL</FormLabel>
+                                        <FormLabel>Custom Comend URL</FormLabel>
+                                        <FormDescription>
+                                            {/* {`This will create your organization's unique Comend profile link (e.g., yourname.comend.io). Use a short name or abbreviation. This is not your external website.`} */}
+                                            {/* <br/> */}
+                                            {editOrgForm.watch("subdomain") &&
+                                                !editOrgForm.formState.errors.subdomain && (
+                                                    <>
+                                                        {`Your profile URL will be: ${editOrgForm
+                                                            .watch("subdomain")
+                                                            .toLowerCase()
+                                                            .replace(/\s+/g, "-")}.comend.io`}
+                                                    </>
+                                                )}
+                                        </FormDescription>
                                         <FormControl>
                                             <Input
                                                 type="text"
