@@ -682,6 +682,7 @@ export default function OrganizationOnboardingForm(
                                                     field.onChange(`${value}-01-01`);
                                                 }}
                                                 defaultValue={field.value?.split("-")[0]}
+                                                value={field.value?.split("-")[0]}
                                             >
                                                 <FormControl>
                                                     <SelectTrigger data-testid="founded-select-trigger">
