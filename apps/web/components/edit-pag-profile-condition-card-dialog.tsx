@@ -206,7 +206,6 @@ export default function EditPAGProfileConditionCardDialog({
     }
 
     const handleClose = () => {
-        console.log(`form is dirty`, editResearchForm.formState.dirtyFields)
         if (Object.keys(editResearchForm.formState.dirtyFields).length > 0) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
@@ -217,7 +216,6 @@ export default function EditPAGProfileConditionCardDialog({
     }
 
     useEffect(() => {
-        console.log(`handle isClosing changed`, isClosing)
         if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
     }, [isClosing])
 

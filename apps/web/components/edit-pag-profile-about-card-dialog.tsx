@@ -183,13 +183,9 @@ export default function EditPagProfileAboutCardDialog({
                     ? (organization.metadata as any)?.otherTherapeuticsOfInterest
                     : undefined,
         });
-
-        // setDefaultResearchValues(defaultResearchValues);
-        // editResearchForm.reset(defaultResearchValues); // Reset form with fetched data
     }
 
     const handleClose = () => {
-        console.log(`form is dirty`, editOrgForm.formState.dirtyFields)
         if (Object.keys(editOrgForm.formState.dirtyFields).length > 0) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
@@ -200,7 +196,6 @@ export default function EditPagProfileAboutCardDialog({
     }
 
     useEffect(() => {
-        console.log(`handle isClosing changed`, isClosing)
         if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
     }, [isClosing])
 

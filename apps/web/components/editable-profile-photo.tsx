@@ -124,8 +124,6 @@ export function EditableProfilePhoto({
     }
 
     const handleClose = () => {
-        console.log(`form is dirty`, editOrgForm.formState.dirtyFields)
-        console.log(`form is cropping`, isCropping)
         if (Object.keys(editOrgForm.formState.dirtyFields).length > 0 || isCropping) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
@@ -136,7 +134,6 @@ export function EditableProfilePhoto({
     }
 
     useEffect(() => {
-        console.log(`handle isClosing changed`, isClosing)
         if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
     }, [isClosing])
 

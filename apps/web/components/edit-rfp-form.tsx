@@ -327,7 +327,6 @@ export function EditRFPForm({
     }
 
     const handleClose = () => {
-        console.log(`form is dirty`, form.formState.dirtyFields)
         if (Object.keys(form.formState.dirtyFields).length > 0) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
@@ -338,7 +337,6 @@ export function EditRFPForm({
     }
 
     useEffect(() => {
-        console.log(`handle isClosing changed`, isClosing)
         if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
     }, [isClosing])
 
