@@ -14,11 +14,133 @@ import { companyFormSchema, institutionFormSchema } from "./types"
 import { ApiResponse } from "@comend/lib/types"
 import { validateEmailDomain } from "@comend/lib/server-utils"
 import { sendInviteEmail } from "@comend/lib/emails"
+import { customerIOTrack } from "@comend/lib/customer-io-track"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
     return session
 }
+
+export const createClaimInvitation = withAdminAuth(
+    async (
+        organization: Organization,
+        email: string,
+        role: string = "owner",
+        ip: string,
+    ): Promise<ApiResponse<any>> => {
+        const session = await getSession();
+
+        try {
+            if (!session) {
+                throw new Error("You must be signed in to perform this action")
+            }
+
+            const lowerCaseEmail = email.toLowerCase()
+
+            const isDomainValid = await validateEmailDomain(lowerCaseEmail);
+            if (!isDomainValid) {
+                return {success: false, error: "Email domain is invalid or cannot receive emails."};
+            }
+
+            // Check if the user is already a member of the organization
+            const existingMember = await prisma.member.findFirst({
+                where: {
+                    email: lowerCaseEmail,
+                    organizationId: organization.id
+                }
+            });
+
+            if (existingMember) {
+                return {success: false, error: "User is already a member of this organization."}
+            }
+
+            // Check if an invitation has already been sent to this email for the same organization
+            const existingInvitation = await prisma.invitation.findFirst({
+                where: {
+                    email: lowerCaseEmail,
+                    organizationId: organization.id
+                }
+            });
+
+            if (existingInvitation) {
+                return {success: false, error: "An invitation has already been sent to this email."}
+            }
+
+            // 1. Create claim invitiation ----------------------------------------------------------------------
+            const claimInvitation = await prisma.claimOrganizationInvitation.create({
+                data: {
+                    email: lowerCaseEmail,
+                    role: role,
+                    organizationId: organization.id
+                }
+            }).then((res) => {
+                return res
+            })
+
+            // await customerIOTrack({
+            //     userId: session.user.id,
+            //     event: 'claim_organization_invitation_sent',
+            //     timestamp: new Date(),
+            //     // Keep org / invite-specific data on the EVENT, not person traits (users can have multiple invites)
+            //     properties: {
+            //         invitation_id: claimInvitation.id,
+            //         organization_id: organization.id,
+            //         organization_name: organization.name,
+            //         invitee_email: lowerCaseEmail,
+            //         role: role,
+            //         inviter_user_id: session.user.id,
+            //     },
+            // });
+
+            // 2. whitelist user email so they can join and claim their organiztion -----------------------------
+            // Upsert so that if it already is whitelisted, nothing changes, and if not, they are whitelisted
+            await prisma.whitelist.upsert({
+                where: {email: lowerCaseEmail},
+                update: {}, // No fields to update
+                create: {email: lowerCaseEmail},
+            }); 
+
+            // const inviter = await prisma.user.findUnique({
+            //     where: {id: session?.user.id}
+            // })
+
+            // await sendInviteEmail(
+            //     {
+            //         invitee: {
+            //             name: "",
+            //             email: email,
+            //             image: ""
+            //         },
+            //         inviter: {
+            //             name: inviter?.name || session?.user.name,
+            //             email: inviter?.email || session?.user.email,
+            //             image: inviter?.image || session?.user.image,
+            //             organizationName: organization.name || undefined,
+            //             organizationImage: organization.image || undefined,
+            //             ip: ip,
+            //         },
+            //         inviteLink: `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login`
+            //     }
+            // ).then(() => {
+            //     console.log("email sent")
+            // })
+
+            if (!claimInvitation) {
+                console.error("Error inviting user to claim.")
+                return {success: false, error: "Database error. please try again later."}
+            }
+
+            revalidatePath("/app/team")
+            revalidatePath("/app/profile")
+
+            return {success: true, data: claimInvitation}
+
+        } catch (error) {
+            console.error("Error inviting user to claim organization:", error)
+            return {success: false, error: "Database error. please try again later."}
+        }
+    }
+)
 
 export const deleteResearcherOnly = withAdminAuth(
     async (researcher: Researcher, text: string) => {
