@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {createMemberRequest, createOrganization} from "@comend/lib/actions";
+import {createMemberRequest, createOrganization, updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {usePathname, useRouter} from "next/navigation";
@@ -37,49 +37,90 @@ const joinOrgFormSchema = z.object({
     org: z.array(optionSchema).min(0).optional(),
 })
 
-export const newOrgFormSchema = z.object({
-    orgName: z.string().min(2, {
-        message: "Your organization's name must be at least 2 characters."
-    }).max(60, {
-        message: "Your organization's name must be a maximum of 60 characters."
-    }),
+// export const newOrgFormSchema = z.object({
+//     orgName: z.string().min(2, {
+//         message: "Your organization's name must be at least 2 characters."
+//     }).max(60, {
+//         message: "Your organization's name must be a maximum of 60 characters."
+//     }),
+//     subdomain: z.string().min(2, {
+//         message: "Your organization's nickname must be at least 2 characters."
+//     }).max(60, {
+//         message: "Your organization's nickname must be a maximum of 50 characters."
+//     }),
+//     contactEmail: z.string().email({
+//         message: "Please enter a valid email address.",
+//     }).optional(),
+//     title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
+//     looking: z.string().min(0).optional(),
+//     founded: z.string().optional(),
+//     description: z.string().min(2, {
+//         message: "Your organization's description must be at least 2 characters long.",
+//     }).max(500, {
+//         message: "Your organization's description must less than 500 characters long.",
+//     }).optional(),
+//     website: z.string().min(2, {
+//         message: "Your organization's website.",
+//     }).optional(),
+//     incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"], {
+//         required_error: "You need to select a 501(c)(3) status.",
+//     }).optional(),
+//     therapeuticsInDevelopment: z.array(optionSchema).min(0).optional(),
+//     otherTherapeuticsInDevelopment: z.string().optional(),
+//     therapeuticsOfInterest: z.array(optionSchema).min(0).optional(),
+//     otherTherapeuticsOfInterest: z.string().optional(),
+//     address1: z.string().optional(),
+//     address2: z.string().optional(),
+//     formattedAddress: z.string().optional(),
+//     city: z.string().optional(),
+//     region: z.string().optional(),
+//     postalCode: z.string().optional(),
+//     country: z.string().optional(),
+//     lat: z.number().optional(),
+//     lng: z.number().optional(),
+//     image: z.string().nullable().optional(),
+//     metadata: z.string().optional()
+// })
+
+const moneyField = z.preprocess(
+    (v) => (v === "" || v === null || typeof v === "undefined" ? undefined : Number(v)),
+    z.number().min(0).optional()
+);
+
+const editOrgFormSchema = z.object({
+    name: z.string().min(2).max(60),
     subdomain: z.string().min(2, {
         message: "Your organization's nickname must be at least 2 characters."
     }).max(60, {
         message: "Your organization's nickname must be a maximum of 50 characters."
     }),
-    contactEmail: z.string().email({
-        message: "Please enter a valid email address.",
+    contactEmail: z.preprocess(
+        (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+        z.string().email({ message: "Please enter a valid email address." }).optional()
+    ),
+    yearFounded: z.string().optional(),
+    incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"]).optional(),
+    // moneyRaised: moneyField,
+    // moneyDeployed: moneyField,
+    // researchBudget: moneyField,
+
+    description: z.string().max(500, {
+        message: "Your organization's description must be less than 500 characters long."
     }).optional(),
-    title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
-    looking: z.string().min(0).optional(),
-    founded: z.string().optional(),
-    description: z.string().min(2, {
-        message: "Your organization's description must be at least 2 characters long.",
-    }).max(500, {
-        message: "Your organization's description must less than 500 characters long.",
-    }).optional(),
-    website: z.string().min(2, {
-        message: "Your organization's website.",
-    }).optional(),
-    incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"], {
-        required_error: "You need to select a 501(c)(3) status.",
-    }).optional(),
+    website: z.preprocess(
+        (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+        z.string().url({
+            message: "Enter a valid URL for your organization's website."
+        }).optional()
+    ),
     therapeuticsInDevelopment: z.array(optionSchema).min(0).optional(),
     otherTherapeuticsInDevelopment: z.string().optional(),
     therapeuticsOfInterest: z.array(optionSchema).min(0).optional(),
     otherTherapeuticsOfInterest: z.string().optional(),
-    address1: z.string().optional(),
-    address2: z.string().optional(),
-    formattedAddress: z.string().optional(),
-    city: z.string().optional(),
-    region: z.string().optional(),
-    postalCode: z.string().optional(),
-    country: z.string().optional(),
-    lat: z.number().optional(),
-    lng: z.number().optional(),
+
     image: z.string().nullable().optional(),
-    metadata: z.string().optional()
+    headerImage: z.string().nullable().optional(),
+
 })
 
 export default function OrganizationOnboardingForm(
@@ -106,7 +147,7 @@ export default function OrganizationOnboardingForm(
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null)
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<z.infer<typeof newOrgFormSchema> | undefined>(undefined);
+    const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<z.infer<typeof editOrgFormSchema> | undefined>(undefined);
 
     console.log(`organization data`, organizationData)
 
@@ -174,9 +215,9 @@ export default function OrganizationOnboardingForm(
         resolver: zodResolver(joinOrgFormSchema),
     })
 
-    const newOrgForm = useForm<z.infer<typeof newOrgFormSchema>>({
+    const newOrgForm = useForm<z.infer<typeof editOrgFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(newOrgFormSchema),
+        resolver: zodResolver(editOrgFormSchema),
         defaultValues: defaultOrganizationValues
     })
 
@@ -234,7 +275,7 @@ export default function OrganizationOnboardingForm(
         }
     }
 
-    async function newOrgOnSubmit(values: z.infer<typeof newOrgFormSchema>) {
+    async function newOrgOnSubmit(values: z.infer<typeof editOrgFormSchema>) {
         setLoading(true)
         try {
             const formData = new FormData()
@@ -279,27 +320,51 @@ export default function OrganizationOnboardingForm(
                 }
             });
 
-            console.log(`create organization with metadata`, values.metadata)
+            // console.log(`create organization with metadata`, values.metadata)
 
-            createOrganization(formData).then((res: any) => {
-                if (res.error) {
-                    toast.error(res.error)
-                } else {
-                    va.track("Created Organization")
+            if (organizationData.id) {
+                // organization already exists, just update data, don't create a new org
+                updateOrganization(organizationData.id, formData).then((res: any) => {
+                    if (res.error) {
+                        toast.error(res.error)
+                    } else {
+                        va.track("Updated Organization")
 
-                    if (newOrgForm.watch("looking")) {
-                        mixpanelTrack(`User is looking for`, {
-                            orgName: newOrgForm.watch("orgName"),
-                            looking: newOrgForm.watch("looking")
-                        })
+                        // if (newOrgForm.watch("looking")) {
+                        //     mixpanelTrack(`User is looking for`, {
+                        //         orgName: newOrgForm.watch("orgName"),
+                        //         looking: newOrgForm.watch("looking")
+                        //     })
+                        // }
+
+                        // Update the session object with the newly created organizationId
+                        router.refresh()
+                        router.push(nextLink)
+                        toast.success(`Successfully updated organization!`)
                     }
+                })
 
-                    // Update the session object with the newly created organizationId
-                    router.refresh()
-                    router.push(nextLink)
-                    toast.success(`Successfully created organization!`)
-                }
-            })
+            } else {
+                createOrganization(formData).then((res: any) => {
+                    if (res.error) {
+                        toast.error(res.error)
+                    } else {
+                        va.track("Created Organization")
+
+                        // if (newOrgForm.watch("looking")) {
+                        //     mixpanelTrack(`User is looking for`, {
+                        //         orgName: newOrgForm.watch("orgName"),
+                        //         looking: newOrgForm.watch("looking")
+                        //     })
+                        // }
+
+                        // Update the session object with the newly created organizationId
+                        router.refresh()
+                        router.push(nextLink)
+                        toast.success(`Successfully created organization!`)
+                    }
+                })
+            }
         } catch (error) {
             toast.error("An error occurred while creating your organization.");
         } finally {
@@ -379,12 +444,16 @@ export default function OrganizationOnboardingForm(
                     const fetchedValues = {
                         id: organizationData.id || "",
                         description: organizationData.description || "",
-                        orgName: organizationData.name || "", // Map `name` to `orgName`
-                        founded: organizationData.yearFounded ? organizationData.yearFounded.toString() : "",
-                        title: currentUserTitle,  // Title of the user at the org
-                        subdomain: organizationData.subdomain || "",
-                        website: organizationData.website || "",
+                        name: organizationData.name || "",
+                        yearFounded: organizationData.yearFounded || "",
                         contactEmail: organizationData.contactEmail || "",
+                        subdomain: organizationData.subdomain || "",
+                        incorporationStatus: organizationData.incorporationStatus || undefined,
+                        // moneyRaised: organizationData.moneyRaised || 0,
+                        // moneyDeployed: organizationData.moneyDeployed || 0,
+                        // researchBudget: organizationData.researchBudget || 0,
+                        // title: currentUserTitle,  // Title of the user at the org
+                        website: organizationData.website || "",
                         therapeuticsInDevelopment: organizationData.therapeuticsInDevelopment?.map((therapeutic: any) => ({
                             label: therapeutic,
                             value: therapeutic
@@ -409,11 +478,10 @@ export default function OrganizationOnboardingForm(
                         lat: parseFloat(organizationData.lat || "0"),
                         lng: parseFloat(organizationData.lng || "0"),
                         image: organizationData.image || "",
-                        name: organizationData.name || "",
+                        // name: organizationData.name || "",
                         logo: organizationData.logo || "",
                         imageBlurhash: organizationData.imageBlurhash || "",
                         statedGoal: organizationData.statedGoal || null,
-                        incorporationStatus: organizationData.incorporationStatus || undefined
                     };
 
                     if (organizationData.image) {
@@ -480,7 +548,7 @@ export default function OrganizationOnboardingForm(
 
                                 <FormField
                                     control={newOrgForm.control}
-                                    name="orgName"
+                                    name="name"
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel>{`Organization Name (required)`}</FormLabel>
@@ -586,7 +654,7 @@ export default function OrganizationOnboardingForm(
                                     )}
                                 />
 
-                                <FormField
+                                {/* <FormField
                                     control={newOrgForm.control}
                                     name="title"
                                     render={({field}) => (
@@ -600,38 +668,41 @@ export default function OrganizationOnboardingForm(
                                             <FormMessage/>
                                         </FormItem>
                                     )}
-                                />
+                                /> */}
 
                                 <FormField
                                     control={newOrgForm.control}
-                                    name="founded"
-                                    render={({field}) => (
+                                    name="yearFounded"
+                                    render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Year Founded</FormLabel>
-                                            {/*<FormDescription>*/}
-                                            {/*    Select the year your organization was founded.*/}
-                                            {/*</FormDescription>*/}
                                             <Select
-                                                onValueChange={(value) => field.onChange(`${value}-01-01`)} // Convert year to a date string
-                                                defaultValue={field.value?.split("-")[0]} // Extract the year from the date string for the default value
+                                                onValueChange={(value) => {
+                                                    console.log("Year selected:", value);
+                                                    field.onChange(`${value}-01-01`);
+                                                }}
+                                                defaultValue={field.value?.split("-")[0]}
                                             >
                                                 <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a year"/>
+                                                    <SelectTrigger data-testid="founded-select-trigger">
+                                                        <SelectValue placeholder="Select a year" />
                                                     </SelectTrigger>
                                                 </FormControl>
-                                                <SelectContent>
+
+                                                {/* Radix renders this in a portal */}
+                                                <SelectContent data-testid="founded-select-content">
                                                     {years.map((year) => (
                                                         <SelectItem
                                                             key={year}
                                                             value={year.toString()}
+                                                            data-testid={`founded-option-${year}`}
                                                         >
                                                             {year}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
-                                            <FormMessage/>
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
