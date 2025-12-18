@@ -20,7 +20,11 @@ import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
     DialogClose,
+    DialogContent,
+    DialogDescription,
     DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@comend/components/ui/dialog"
 import {TOOL_TYPE_OPTIONS} from "@comend/lib/types"
 import {CreateFacilityRequest, Prisma} from "@prisma/client"
@@ -43,21 +47,103 @@ import { cn } from "@comend/lib/utils"
 import LoadingDots from "@comend/components/icons/loading-dots"
 import { mixpanelTrack } from "@comend/lib/mixpanel"
 import { SubmitCreateRequest } from "./create-facility-request-button"
+import { Session } from "next-auth"
+import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
+export const createOrUpdateClinicalDataset = async (
+    session: Session, 
+    toolData: any, 
+    values: z.infer<typeof editDataToolForm>, 
+    createFacilityRequests: CreateFacilityRequest[]
+) => {
+    try {
+        if (toolData.id) {
+            // const updatedTool = await updateTool(updateData, session.user.organizationId)
+            const updatedTool = await updateClinicalDataset(session.user.organizationId, values, toolData.id)
+            await revalidate('/app/tools/data')
+            // router.refresh() // call refresh to update UI after revalidatePath() call marks cache as stale
+
+            mixpanelTrack("Clinical Dataset Updated", {
+                "ID": updatedTool.id,
+                // "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
+                // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                // we flatten them into a single list that can be parsed
+                // "Linked Project Types": (updatedAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
+                //     (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                // )
+            })
+            
+            // if (closeDialog) closeDialog(updatedTool)
+
+            toast.success(
+                "Clinical Dataset updated successfully!",
+                {position: "bottom-left"}
+            )
+
+            return updatedTool
+        } else {
+            // const newTool = await createTool(updateData, session.user.organizationId)
+            const newTool = await createClinicalDataset(session.user.organizationId, values)
+            for (let i = 0; i < createFacilityRequests?.length; i++) {
+                await updateCreateFacilityRequest(
+                    session?.user?.organizationId,
+                    {
+                        id: createFacilityRequests[i].id,
+                        name: createFacilityRequests[i].name,
+                        clinicalDatasetId: newTool.id
+                    }
+                )
+            }
+            await revalidate('/app/tools/data')
+            // router.refresh() // call refresh to update UI after revalidatePath() call marks cache as stale
+            
+            mixpanelTrack("Clinical Dataset Created", {
+                "ID": newTool.id,
+                // "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
+                // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                // we flatten them into a single list that can be parsed
+                // "Linked Project Types": (newAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
+                //     (milestone?.types || []).map((type: any)=> type.milestoneType.label || type.milestoneType.id)
+                // )
+            })
+
+            // if (closeDialog) closeDialog(newTool)
+
+            toast.success(
+                "Clinical Dataset created successfully!",
+                {position: "bottom-left"}
+            )
+
+            return newTool
+        }
+    } catch (error) {
+        console.error("Error creating or updating tool:", error);
+        toast.error(
+            "Failed to create or update tool.",
+            {position: "bottom-left"}
+        )
+    }
+}
+
 export function EditClincalDatasetForm({
     toolData,
-    closeDialog
+    closeDialog,
+    isClosing,
+    setIsClosing,
 }: {
     toolData: any,
-    closeDialog: (newAsset?: any) => void
+    closeDialog: (newAsset?: any) => void,
+    isClosing: boolean,
+    setIsClosing: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const initializing = useRef(true)
     const router = useRouter()
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
+    const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(toolData.createFacilityRequests || [])
     const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
@@ -119,71 +205,29 @@ export function EditClincalDatasetForm({
             return;
         }
 
-        try {
-            if (toolData.id) {
-                // const updatedTool = await updateTool(updateData, session.user.organizationId)
-                const updatedTool = await updateClinicalDataset(session.user.organizationId, values, toolData.id)
-                await revalidate('/app/tools/data')
-                router.refresh() // call refresh to update UI after revalidatePath() call marks cache as stale
-
-                mixpanelTrack("Clinical Dataset Updated", {
-                    "ID": updatedTool.id,
-                    // "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
-                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
-                    // we flatten them into a single list that can be parsed
-                    // "Linked Project Types": (updatedAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
-                    //     (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
-                    // )
-                })
-                
-                if (closeDialog) closeDialog(updatedTool)
-
-                toast.success(
-                    "Clinical Dataset updated successfully!",
-                    {position: "bottom-left"}
-                )
-            } else {
-                // const newTool = await createTool(updateData, session.user.organizationId)
-                const newTool = await createClinicalDataset(session.user.organizationId, values)
-                for (let i = 0; i < createFacilityRequests.length; i++) {
-                    await updateCreateFacilityRequest(
-                        session?.user?.organizationId,
-                        {
-                            id: createFacilityRequests[i].id,
-                            name: createFacilityRequests[i].name,
-                            clinicalDatasetId: newTool.id
-                        }
-                    )
-                }
-                await revalidate('/app/tools/data')
-                router.refresh() // call refresh to update UI after revalidatePath() call marks cache as stale
-                
-                mixpanelTrack("Clinical Dataset Created", {
-                    "ID": newTool.id,
-                    // "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
-                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
-                    // we flatten them into a single list that can be parsed
-                    // "Linked Project Types": (newAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
-                    //     (milestone?.types || []).map((type: any)=> type.milestoneType.label || type.milestoneType.id)
-                    // )
-                })
-
-                if (closeDialog) closeDialog(newTool)
-
-                toast.success(
-                    "Clinical Dataset created successfully!",
-                    {position: "bottom-left"}
-                )
-            }
-        } catch (error) {
-            console.error("Error creating or updating tool:", error);
-            toast.error(
-                "Failed to create or update tool.",
-                {position: "bottom-left"}
-            )
-        }
-
+        const createdOrUpdatedClinicalDataset = await createOrUpdateClinicalDataset(session, toolData, values, createFacilityRequests)
+        closeDialog(createdOrUpdatedClinicalDataset)
     }
+
+    const handleClose = () => {
+        if (Object.keys(form.formState.dirtyFields)?.length > 0) {
+            // form is dirty, give user the option to save/discard unsaved changes
+            setUnsavedChangesIsOpen(true)
+        } else {
+            // form is not dirty, close regularly
+            closeDialog()
+        }
+    }
+
+    useEffect(() => {
+        if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
+    }, [isClosing])
+
+    useEffect(() => {
+        // if the user has closed the unsaved changes dialog, end the isClosing state of all other dialogs
+        // all dialogs should be either fully closed or fully open
+        if (!unsavedChangesIsOpen) setIsClosing(false)
+    }, [unsavedChangesIsOpen])
 
     const handleGeneAsyncSearch = async (query: string) => {
         const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
@@ -262,7 +306,7 @@ export function EditClincalDatasetForm({
             }
 
             // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away
-            if (Object.keys(toolData).length > 0) form.trigger()
+            if (Object.keys(toolData)?.length > 0) form.trigger()
 
             initializing.current = false
         }
@@ -544,7 +588,7 @@ export function EditClincalDatasetForm({
                 <DialogClose asChild>
                     <Button 
                         variant={"secondary"} 
-                        onClick={() => {if (closeDialog) closeDialog()}}
+                        onClick={() => {handleClose()}}
                     >
                         Cancel
                     </Button>
@@ -554,7 +598,7 @@ export function EditClincalDatasetForm({
                     Delete tool
                 </Button>
                 <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                    <DeleteClinicalDatasetDialog toolIds={[toolData.id]} closeDialog={closeDialog}/>
+                    <DeleteClinicalDatasetDialog toolIds={[toolData.id]} closeDialog={handleClose}/>
                 </Dialog>
                 <div className="bg-white rounded-md p-0">
                     <Button
@@ -576,6 +620,17 @@ export function EditClincalDatasetForm({
                     </Button>
                 </div>
             </DialogFooter>
+
+            <UnsavedChangesDialog 
+                isSaving={isSaving}
+                isClosing={isClosing}
+                setIsClosing={setIsClosing}
+                isOpen={unsavedChangesIsOpen}
+                setIsOpen={setUnsavedChangesIsOpen}
+                closeDialog={closeDialog}
+                form={form}
+                formSubmit={handleFormSubmit}
+            />
         </Form>
     )
 }

@@ -47,6 +47,8 @@ import ProjectMultipleSelector from "./project-multiple-selector"
 import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@comend/components/ui/separator"
 import { Checkbox } from "@comend/components/ui/checkbox"
+import LoadingDots from "@comend/components/icons/loading-dots"
+import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -180,10 +182,14 @@ export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
 export function EditRFPForm({
     rfpData,
-    closeDialog
+    closeDialog,
+    isClosing,
+    setIsClosing,
 }: {
     rfpData: Partial<RFP>,
-    closeDialog?: (updatedOrNewRFP?: RFP | undefined) => void
+    closeDialog: (updatedOrNewRFP?: any) => void,
+    isClosing: boolean,
+    setIsClosing: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const router = useRouter()
     const initializing = useRef(true)
@@ -193,15 +199,9 @@ export function EditRFPForm({
         createRFP, 
         updateRFP, 
         deleteRFP, 
-        // saveState 
     } = useRFPStore(useShallow(rfpSelector))
-    // const { undo } = useRFPStore.temporal.getState()
-
-    // const handleUndo = () => {
-    //     undo()
-    //     saveState(session?.user.organizationId)
-    //     toast.dismiss("undo-toast")
-    // }
+    const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
+    const [isSaving, setIsSaving] = useState(false)
 
     const form = useForm<z.infer<typeof editRFPForm>>({
         mode: "onChange",
@@ -245,6 +245,7 @@ export function EditRFPForm({
 
     const handleFormSubmit = async (values: z.infer<typeof editRFPForm>) => {
         console.log(`handle form submit`, values)
+        setIsSaving(true)
         const {
             headerImage,
             title,
@@ -315,7 +316,7 @@ export function EditRFPForm({
             }
             revalidate('/app/rfps') // update page contents
 
-            if (closeDialog) closeDialog(updatedOrNewRFP)
+            closeDialog(updatedOrNewRFP)
         } catch (error) {
             console.error("Error updating or createing RFP:", error);
             toast.error(
@@ -324,6 +325,26 @@ export function EditRFPForm({
             )
         }
     }
+
+    const handleClose = () => {
+        if (Object.keys(form.formState.dirtyFields).length > 0) {
+            // form is dirty, give user the option to save/discard unsaved changes
+            setUnsavedChangesIsOpen(true)
+        } else {
+            // form is not dirty, close regularly
+            closeDialog()
+        }
+    }
+
+    useEffect(() => {
+        if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
+    }, [isClosing])
+
+    useEffect(() => {
+        // if the user has closed the unsaved changes dialog, end the isClosing state of all other dialogs
+        // all dialogs should be either fully closed or fully open
+        if (!unsavedChangesIsOpen) setIsClosing(false)
+    }, [unsavedChangesIsOpen])
 
     const handleDeleteRFP = async () => {
         if (!session?.user?.organizationId) {
@@ -662,7 +683,7 @@ export function EditRFPForm({
                         <DialogClose asChild>
                             <Button 
                                 variant={"secondary"}
-                                onClick={() => {if (closeDialog) closeDialog()}}
+                                onClick={() => {handleClose()}}
                             >
                                 Cancel
                             </Button>
@@ -684,7 +705,7 @@ export function EditRFPForm({
                                         </DialogDescription>
                                         <DialogFooter>
                                             <DialogClose>
-                                                <Button type="button">
+                                                <Button type="button" variant="secondary">
                                                     Cancel
                                                 </Button>
                                             </DialogClose>
@@ -705,10 +726,29 @@ export function EditRFPForm({
                         <Button
                             variant={"cta"}
                             type="submit"
+                            disabled={!form.formState.isValid || isSaving}
                         >
-                            Save changes
+                            {isSaving 
+                                ? (
+                                    <div className="w-[81px] flex justify-center items-center">
+                                        <LoadingDots/>
+                                    </div>
+                                ) 
+                                : ("Save changes")
+                            }
                         </Button>
                     </div>
+
+                    <UnsavedChangesDialog 
+                        isSaving={isSaving}
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
+                        isOpen={unsavedChangesIsOpen}
+                        setIsOpen={setUnsavedChangesIsOpen}
+                        closeDialog={closeDialog}
+                        form={form}
+                        formSubmit={handleFormSubmit}
+                    />
                 </form>
             </ScrollArea>
         </Form>

@@ -73,7 +73,7 @@ export function PublishOrganizationSwitch({organization}: { organization: Organi
                                                 <Info className="h-4 w-4"/>
                                             </TooltipTrigger>
                                             <TooltipContent className="max-w-80 text-wrap text-left">
-                                                {`Published profiles are viewable to visitors and users via your public URL and in our marketplace.`}
+                                                {`Published profiles are viewable to visitors and users via your custom Comend URL and in our marketplace.`}
                                             </TooltipContent>
                                         </Tooltip>
                                     </FormLabel>

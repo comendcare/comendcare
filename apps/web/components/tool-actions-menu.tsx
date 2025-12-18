@@ -24,6 +24,7 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
     const [isOpen, setIsOpen] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [editIsOpen, setEditIsOpen] = useState(false)
+    const [isClosing, setIsClosing] = useState(false)
     const popoverRef = useRef<HTMLInputElement>(null)
 
     // const handleDuplicate = async () => {
@@ -126,7 +127,12 @@ export const AssetActionsMenu = ({tool, type}: {tool: Asset, type: 'biosample' |
                             key={tool.id}
                             data={tool} 
                             type={type}
-                            closeDialog={() => setEditIsOpen(false)}
+                            isClosing={isClosing}
+                            setIsClosing={setIsClosing}
+                            closeDialog={() => {
+                                setEditIsOpen(false)
+                                setIsClosing(false)
+                            }}
                         />
                     </div>
                 </DialogPortal>

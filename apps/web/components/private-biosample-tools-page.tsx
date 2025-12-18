@@ -14,15 +14,16 @@ import {BiosampleBulkImportDialog} from "./biosample-bulk-import-dialog";
 import {SearchParams} from "@comend/components/types";
 import {useEffect, useRef, useState} from "react";
 import { Button } from "@comend/components/ui/button";
-import { Globe, Lock, Trash } from "lucide-react";
+import { Globe, Lock, Plus, Trash } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { setBiosamplesVisibility } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
-import { Dialog, DialogPortal, DialogTrigger } from "@comend/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogPortal, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import { Row } from "@tanstack/react-table";
-import { Asset } from "@comend/lib/types";
+import { Asset, editBiosampleForm } from "@comend/lib/types";
 import Image from "next/image";
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog";
+import z from "zod";
 
 export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     data: Biosample[],
@@ -35,6 +36,7 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1160)
     const [editingTool, setEditingTool] = useState<Partial<Asset> | undefined>(undefined)
+    const [isClosing, setIsClosing] = useState(false)
     const parentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -133,7 +135,15 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                 </>
                             )}
                             <BiosampleBulkImportDialog/>
-                            <NewToolDialog type={"biosample"}/>
+                            <NewToolDialog 
+                                type={"biosample"} 
+                                trigger={(
+                                    <Button variant="cta">
+                                        <Plus/>
+                                        {"Create biosample"}
+                                    </Button>
+                                )}
+                            />
                         </>
                     )}
                 >
@@ -176,14 +186,25 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                         <p className="text-lg text-stone-500">
                                             A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                                         </p>
-                                        {<NewToolDialog type={"biosample"}/>}
+                                        {<NewToolDialog 
+                                            type={"biosample"} 
+                                            trigger={(
+                                                <Button variant="cta">
+                                                    <Plus/>
+                                                    {"Create biosample"}
+                                                </Button>
+                                            )}
+                                        />}
                                     </div>
                                 </div>
                             )}
                             interactiveDialog={(
+                                <>
                                 <Dialog 
                                     open={!!editingTool}
-                                    onOpenChange={(open) => !open && setEditingTool(undefined)}
+                                    onOpenChange={(open) => {
+                                        if (!open) setIsClosing(true)
+                                    }}
                                 >
                                     <DialogPortal>
                                         <div onClick={(e) => e.stopPropagation()}>
@@ -192,12 +213,18 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                                     key={editingTool?.id}
                                                     data={editingTool} 
                                                     type={'biosample'}
-                                                    closeDialog={() => {setEditingTool(undefined)}}
+                                                    isClosing={isClosing}
+                                                    setIsClosing={setIsClosing}
+                                                    closeDialog={() => {
+                                                        setEditingTool(undefined)
+                                                        setIsClosing(false)
+                                                    }}
                                                 />
                                             )}
                                         </div>
                                     </DialogPortal>
                                 </Dialog>
+                                </>
                             )}
                         />
                     </React.Suspense>

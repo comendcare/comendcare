@@ -1,13 +1,14 @@
 "use client";
 
-import {useState, ReactNode} from "react";
+import {useState, ReactNode, useEffect} from "react";
 import dynamic from "next/dynamic";
 import {Plus} from "lucide-react";
 import {Button} from "@comend/components/ui/button";
 import {
-    Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle
+    Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
+    DialogTrigger
 } from "@comend/components/ui/dialog";
-import type {Asset} from "@comend/lib/types";
+import type {Asset, editBiosampleForm} from "@comend/lib/types";
 import {Skeleton} from "@comend/components/ui/skeleton";
 
 /** Individual form chunks (named exports) */
@@ -149,20 +150,35 @@ type ToolType = "biosample" | "data" | "diseaseModel";
 function LazyToolForm({
                           type,
                           toolData,
+                          isClosing,
+                          setIsClosing,
                           closeDialog,
                       }: {
     type: ToolType;
     toolData: Partial<Asset> | {};
-    closeDialog: () => void;
+    isClosing: boolean;
+    setIsClosing: React.Dispatch<React.SetStateAction<boolean>>;
+    closeDialog: (formValues?: any) => void;
 }) {
-    if (type === "biosample") return <BiosampleForm toolData={toolData} closeDialog={closeDialog}/>;
-    if (type === "diseaseModel") return <DiseaseModelForm toolData={toolData} closeDialog={closeDialog}/>;
-    return <DataForm toolData={toolData} closeDialog={closeDialog}/>;
+    if (type === "biosample") return <BiosampleForm toolData={toolData} closeDialog={closeDialog} isClosing={isClosing} setIsClosing={setIsClosing} />;
+    if (type === "diseaseModel") return <DiseaseModelForm toolData={toolData} closeDialog={closeDialog} isClosing={isClosing} setIsClosing={setIsClosing}/>;
+    return <DataForm toolData={toolData} closeDialog={closeDialog} isClosing={isClosing} setIsClosing={setIsClosing}/>;
 }
 
-export const NewToolDialog = ({type}: { type: ToolType }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const closeDialog = () => setIsOpen(false);
+export const NewToolDialog = ({
+    trigger,
+    type, 
+}: { 
+    trigger: React.ReactNode,
+    type: ToolType, 
+}) => {
+    const [isOpen, setIsOpen] = useState(false)
+    const [isClosing, setIsClosing] = useState(false)
+
+    const closeDialog = () => {
+        setIsOpen(false)
+        setIsClosing(false)
+    }
 
     const title =
         type === "biosample" ? "Create biosample" :
@@ -170,11 +186,17 @@ export const NewToolDialog = ({type}: { type: ToolType }) => {
                 "Create clinical dataset";
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <Button variant="cta" onClick={() => setIsOpen(true)}>
-                <Plus/>
-                {title}
-            </Button>
+        <Dialog 
+            open={isOpen} 
+            onOpenChange={(open) => {
+                if (!open) {
+                    setIsClosing(true)
+                }
+            }}
+        >
+            <DialogTrigger asChild onClick={() => setIsOpen(true)}>
+                {trigger}
+            </DialogTrigger>
 
             <DialogContent className="gap-0">
                 <DialogHeader className="pb-4">
@@ -185,7 +207,15 @@ export const NewToolDialog = ({type}: { type: ToolType }) => {
                 </DialogHeader>
 
                 {/* Only mount the heavy form when the dialog is actually open */}
-                {isOpen && <LazyToolForm type={type} toolData={{}} closeDialog={closeDialog}/>}
+                {isOpen && (
+                    <LazyToolForm 
+                        type={type} 
+                        toolData={{}} 
+                        closeDialog={closeDialog} 
+                        isClosing={isClosing} 
+                        setIsClosing={setIsClosing}
+                    />
+                )}
             </DialogContent>
         </Dialog>
     );
@@ -195,12 +225,16 @@ export const EditAssetDialog = ({
                                     children,
                                     data,
                                     type,
+                                    isClosing,
+                                    setIsClosing,
                                     closeDialog,
                                 }: {
     children?: ReactNode;
     data: Partial<Asset>;
     type: ToolType;
-    closeDialog: () => void;
+    isClosing: boolean;
+    setIsClosing: React.Dispatch<React.SetStateAction<boolean>>,
+    closeDialog: (formValues?: any) => void;
 }) => {
     // This component is meant to be rendered *inside* a <Dialog> already.
     // If you prefer this to control its own open state, wrap with <Dialog> + trigger like NewToolDialog.
@@ -212,7 +246,7 @@ export const EditAssetDialog = ({
                     {`Edit your Tool here. Click save when you're done.`}
                 </DialogDescription>
             </DialogHeader>
-            <LazyToolForm type={type} toolData={data} closeDialog={closeDialog}/>
+            <LazyToolForm type={type} toolData={data} closeDialog={closeDialog} isClosing={isClosing} setIsClosing={setIsClosing}/>
         </DialogContent>
     );
 };

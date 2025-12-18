@@ -378,13 +378,19 @@ export default function NewOrganizationForm({invitations, organizations}: {
                             name="subdomain"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>Organization Abbreviation (required)</FormLabel>
+                                    <FormLabel>Custom Comend URL (required)</FormLabel>
                                     <FormDescription>
-                                        Choose the URL for your custom profile site.
-                                        {form.watch("subdomain") && !form.formState.errors.subdomain && (
-                                            <div className="font-semibold">Your site will
-                                                be {form.watch("subdomain")?.toLowerCase()?.replace(/\s+/g, "-")}.comend.io</div>
-                                        )}
+                                        {`This will create your organization's unique Comend profile link (e.g., yourname.comend.io). Use a short name or abbreviation. This is not your external website.`}
+                                        <br/>
+                                        {form.watch("subdomain") &&
+                                            !form.formState.errors.subdomain && (
+                                                <>
+                                                    {`Your profile URL will be: ${form
+                                                        .watch("subdomain")
+                                                        .toLowerCase()
+                                                        .replace(/\s+/g, "-")}.comend.io`}
+                                                </>
+                                            )}
                                     </FormDescription>
                                     <FormControl>
                                         <Input {...field}

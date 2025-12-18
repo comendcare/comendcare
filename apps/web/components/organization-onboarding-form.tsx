@@ -506,19 +506,19 @@ export default function OrganizationOnboardingForm(
                                     name="subdomain"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
+                                            <FormLabel>{`Custom Comend URL (required)`}</FormLabel>
                                             {/*<div className="w-full flex flex-row justify-between">*/}
                                             <FormDescription>
-                                                {`Choose the URL for your custom profile site.`}
+                                                {`This will create your organization's unique Comend profile link (e.g., yourname.comend.io). Use a short name or abbreviation. This is not your external website.`}
                                                 <br/>
                                                 {newOrgForm.watch("subdomain") &&
                                                     !newOrgForm.formState.errors.subdomain && (
-                                                        <div className="font-semibold">
-                                                            {`The custom site for your organization’s profile will be found at ${newOrgForm
+                                                        <>
+                                                            {`Your profile URL will be: ${newOrgForm
                                                                 .watch("subdomain")
                                                                 .toLowerCase()
                                                                 .replace(/\s+/g, "-")}.comend.io`}
-                                                        </div>
+                                                        </>
                                                     )}
                                             </FormDescription>
                                             {/*    <FormDescription>*/}

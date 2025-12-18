@@ -149,6 +149,7 @@ export function DataRequestDataTable<TData, TValue>({
         []
     )
     const [sorting, setSorting] = React.useState<SortingState>([])
+    const [isClosing, setIsClosing] = React.useState(false)
 
     const table = useReactTable({
         data,
@@ -198,26 +199,19 @@ export function DataRequestDataTable<TData, TValue>({
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <EditAssetDialog
-                                    closeDialog={() => {}}
+                                <TableRow
                                     key={row.id}
-                                    data={{...row.original} as Partial<Asset>} 
-                                    type={'data'}
+                                    data-state={row.getIsSelected() && "selected"}
                                 >
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={row.getIsSelected() && "selected"}
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                </EditAssetDialog>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
                             ))
                         ) : (
                             <TableRow>

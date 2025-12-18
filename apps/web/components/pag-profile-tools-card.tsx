@@ -82,10 +82,6 @@ export const PAGProfileToolsCard = ({
     }, [])
 
     useEffect(() => {
-        console.log(`input data changed`)
-        console.log(biosamples)
-        console.log(diseaseModels)
-        console.log(clinicalDatasets)
         setIsInitialized(true)
     }, [biosamples, diseaseModels, clinicalDatasets])
 

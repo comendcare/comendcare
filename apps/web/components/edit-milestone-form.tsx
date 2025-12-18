@@ -92,6 +92,7 @@ import {Separator} from "@comend/components/ui/separator"
 import dynamic from "next/dynamic";
 import { SubmitCreateRequest } from "./create-facility-request-button"
 import { createCreateFacilityRequest } from "@comend/lib/actions"
+import { NewToolDialog } from "./edit-tool-dialog"
 
 type PlateEditorProps = {
     value: any[];
@@ -211,6 +212,7 @@ export function EditMilestoneForm({
     const [hasBudget, setHasBudget] = useState(milestoneData?.budget !== undefined && milestoneData?.budget !== null)
     const [hasStartDate, setHasStartDate] = useState(milestoneData?.startDate || false)
     const [hasEndDate, setHasEndDate] = useState(milestoneData?.endDate || false)
+    const [isClosing, setIsClosing] = useState(false)
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -723,6 +725,23 @@ export function EditMilestoneForm({
                                                                 >
                                                                     {`+ Create biosample`}
                                                                 </Button>
+                                                                {/* <NewToolDialog 
+                                                                    type={"biosample"}
+                                                                    trigger={(
+                                                                        <Button
+                                                                            value={undefined}
+                                                                            variant={'ghost'}
+                                                                            className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
+                                                                            onMouseDown={(e) => {
+                                                                                e.preventDefault();
+                                                                                e.stopPropagation();
+                                                                            }}
+                                                                            // onClick={() => setCreateBiosampleIsOpen(true)}
+                                                                        >
+                                                                            {`+ Create biosample`}
+                                                                        </Button>
+                                                                    )}
+                                                                /> */}
                                                                 <Button
                                                                     value={undefined}
                                                                     variant={'ghost'}
@@ -1171,7 +1190,12 @@ export function EditMilestoneForm({
                 </form>
             </Form>
 
-            <Dialog open={createBiosampleIsOpen} onOpenChange={setCreateBiosampleIsOpen}>
+            <Dialog 
+                open={createBiosampleIsOpen} 
+                onOpenChange={(open) => {
+                    if (!open) setIsClosing(true)
+                }}
+            >
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
@@ -1183,28 +1207,38 @@ export function EditMilestoneForm({
                     </DialogHeader>
                     <EditBiosampleToolForm
                         toolData={{}}
-                        closeDialog={(newBiosample) => {
-                            setCreateBiosampleIsOpen(false)
-
-                            if (newBiosample) {
-                                form.setValue("tools", [
-                                    ...(form.getValues("tools") || []),
-                                    {
-                                        value: newBiosample.id,
-                                        type: 'Biosamples',
-                                        // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
-                                        label: `${newBiosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => newBiosample?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
-                                        biosample: newBiosample,
-                                        icon: 'test-tube-diagonal',
-                                    }
-                                ])
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
+                        closeDialog={(formValues: any) => {
+                            if (formValues) {
+                                if (formValues) {
+                                    form.setValue("tools", [
+                                        ...(form.getValues("tools") || []),
+                                        {
+                                            value: formValues.id,
+                                            type: 'Biosamples',
+                                            // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
+                                            label: `${formValues.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => formValues?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
+                                            biosample: formValues,
+                                            icon: 'test-tube-diagonal',
+                                        }
+                                    ])
+                                }
                             }
+
+                            setCreateBiosampleIsOpen(false)
+                            setIsClosing(false)
                         }}
                     />
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={createDiseaseModelIsOpen} onOpenChange={setCreateDiseaseModelIsOpen}>
+            <Dialog 
+                open={createDiseaseModelIsOpen} 
+                onOpenChange={(open) => {
+                    if (!open) setIsClosing(true)
+                }}
+            >
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
@@ -1216,9 +1250,9 @@ export function EditMilestoneForm({
                     </DialogHeader>
                     <EditDiseaseModelToolForm
                         toolData={{}}
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
                         closeDialog={(newDiseaseModel) => {
-                            setCreateDiseaseModelIsOpen(false)
-
                             if (newDiseaseModel) {
                                 form.setValue("tools", [
                                     ...(form.getValues("tools") || []),
@@ -1231,12 +1265,20 @@ export function EditMilestoneForm({
                                     }
                                 ])
                             }
+
+                            setCreateDiseaseModelIsOpen(false)
+                            setIsClosing(false)
                         }}
                     />
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={createClincalDatasetIsOpen} onOpenChange={setCreateClinicalDatasetIsOpen}>
+            <Dialog 
+                open={createClincalDatasetIsOpen}
+                onOpenChange={(open) => {
+                    if (!open) setIsClosing(true)
+                }}
+            >
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
@@ -1248,9 +1290,9 @@ export function EditMilestoneForm({
                     </DialogHeader>
                     <EditClincalDatasetForm
                         toolData={{}}
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
                         closeDialog={(newDatasample) => {
-                            setCreateClinicalDatasetIsOpen(false)
-
                             if (newDatasample) {
                                 form.setValue("tools", [
                                     ...(form.getValues("tools") || []),
@@ -1263,12 +1305,20 @@ export function EditMilestoneForm({
                                     }
                                 ])
                             }
+
+                            setCreateClinicalDatasetIsOpen(false)
+                            setIsClosing(false)
                         }}
                     />
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={createRFPIsOpen} onOpenChange={setCreateRFPIsOpen}>
+            <Dialog 
+                open={createRFPIsOpen} 
+                onOpenChange={(open) => {
+                    if (!open) setIsClosing(true)
+                }}
+            >
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
@@ -1288,15 +1338,18 @@ export function EditMilestoneForm({
                                 } as any
                             ]
                         }}
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
                         closeDialog={(newRFP) => {
-                            setCreateRFPIsOpen(false)
-
                             if (newRFP) {
                                 form.setValue("rfps", [
                                     ...(form.getValues("rfps") || []),
                                     newRFP as any
                                 ])
                             }
+
+                            setCreateRFPIsOpen(false)
+                            setIsClosing(false)
                         }}
                     />
                 </DialogContent>
