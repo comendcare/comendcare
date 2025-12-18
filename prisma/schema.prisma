@@ -776,7 +776,7 @@ model Organization {
   metadata                      Json?
   diseaseModel                  DiseaseModel[]
   subscriptions                 Subscription[]
-  claimOrganizationInvitation   ClaimOrganizationInvitation[]
+  claimOrganizationInvitations   ClaimOrganizationInvitation[]
 
   @@index([userId])
 }

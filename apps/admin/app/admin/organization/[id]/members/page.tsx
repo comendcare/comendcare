@@ -1,8 +1,11 @@
+import { Separator } from "@comend/components/ui/separator"
 import { TooltipProvider } from "@comend/components/ui/tooltip"
 import { getSession } from "@comend/lib/auth"
 import prisma from "@comend/lib/prisma"
 import { notFound, redirect } from "next/navigation"
+import InviteToClaimOrgDialog from "~admin/components/invite-to-claim-org-dialog copy"
 import InviteUserToOrgDialog from "~admin/components/invite-user-to-org-dialog"
+import PAGSettingsClaimOrganizationInvitationsTab from "~admin/components/pag-settings-claim-invitations-tab"
 import PAGSettingsInvitationsTab from "~admin/components/pag-settings-invitations-tab"
 import PAGSettingsMembersTab from "~admin/components/pag-settings-members-tab"
 
@@ -21,7 +24,8 @@ export default async function OrganizationMembersPage({
         },
         include: {
             members: {include: {user: true}},
-            invitations: true
+            invitations: true,
+            claimOrganizationInvitations: true,
         }
     })
 
@@ -46,13 +50,17 @@ export default async function OrganizationMembersPage({
                     >
                         {url} ↗
                     </a>
-                    <InviteUserToOrgDialog organization={data}/>
+                    <InviteUserToOrgDialog organization={data} />
+                    <InviteToClaimOrgDialog organization={data} />
                 </div>
             </div>
             <TooltipProvider>
-                <div className="flex flex-col space-y-4 justify-start items-start w-full h-full max-w-7xl mx-auto p-8">
+                <div className="flex flex-col space-y-4 justify-start items-start w-full h-full max-w-7xl mx-auto p-8 gap-8">
                     <PAGSettingsMembersTab members={data.members}/>
+                    <Separator />
                     <PAGSettingsInvitationsTab organization={data}/>
+                    <Separator />
+                    <PAGSettingsClaimOrganizationInvitationsTab organization={data} />
                 </div>
             </TooltipProvider>
         </>
