@@ -21,6 +21,48 @@ export const getSessionInfo = async () => {
     return session
 }
 
+export const revokeClaimInvitation = withAdminAuth(
+    async (email: string): Promise<ApiResponse<any>> => {
+        try {
+            // const claimInvitation = await prisma.claimOrganizationInvitation({
+            //     where: {email}
+            // })
+
+            // if (!claimInvitation) {
+            //     throw new Error("Claim organization invitation not found")
+            // }
+
+            // const lowerCaseEmail = claimInvitation.email.toLowerCase()
+            const lowerCaseEmail = email.toLowerCase()
+
+            // 1. remove user email from whitelist
+            await prisma.whitelist.delete({
+                where: {email: lowerCaseEmail},
+            })
+
+            const deletedClaimInvitation = await prisma.claimOrganizationInvitation.deleteMany({
+                where: {email}
+            }).then((res) => {
+                return res
+            })
+
+            if (!deletedClaimInvitation) {
+                console.error("Error deleting claim invitation.")
+                return {success: false, error: "Database error. please try again later."}
+            }
+
+            revalidatePath("/app/team")
+            revalidatePath("/app/profile")
+
+            return {success: true, data: deletedClaimInvitation}
+
+        } catch (error) {
+            console.error("Error revoking claim organization invitation:", error)
+            return {success: false, error: "Database error. please try again later."}
+        }
+    }
+)
+
 export const createClaimInvitation = withAdminAuth(
     async (
         organization: Organization,

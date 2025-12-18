@@ -1,13 +1,17 @@
+"use client"
+
 import Image from "next/image"
 import { ProfilePhoto } from "@comend/components/profile-photo"
 import {Invitation, Prisma} from "@prisma/client";
-import {getSession} from "@comend/lib/auth";
+import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
+import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@comend/components/ui/dropdown-menu";
+import { Button } from "@comend/components/ui/button";
+import { Ellipsis, X } from "lucide-react";
+import { revokeClaimInvitation } from "~admin/lib/actions";
 
-export default async function PAGSettingsClaimOrganizationInvitationsTab({organization}: {organization: Prisma.OrganizationGetPayload<{
+export default function PAGSettingsClaimOrganizationInvitationsTab({organization}: {organization: Prisma.OrganizationGetPayload<{
         include: { invitations: true, claimOrganizationInvitations: true };
     }>}) {
-    const session = await getSession()
-
     const invitees = organization.claimOrganizationInvitations.filter((inv: Invitation) => !inv.accepted);
 
     if (invitees.length === 0) {
@@ -67,6 +71,9 @@ export default async function PAGSettingsClaimOrganizationInvitationsTab({organi
                                 <th className="relative py-3.5 pl-3 pr-4 sm:pr-0">
                                     <span className="sr-only">Edit</span>
                                 </th>
+                                <th>
+
+                                </th>
                             </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200 bg-white">
@@ -91,6 +98,26 @@ export default async function PAGSettingsClaimOrganizationInvitationsTab({organi
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
                                         {new Date(person.createdAt).toLocaleDateString()}
+                                    </td>
+                                    <td>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    className="p-2 justify-end h-full"
+                                                >
+                                                    <Ellipsis/>
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent>
+                                                <DropdownMenuItem
+                                                    onClick={() => revokeClaimInvitation(person.email)}
+                                                >
+                                                    <X />
+                                                    Revoke
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </td>
                                 </tr>
                             ))}
