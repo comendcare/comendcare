@@ -45,6 +45,7 @@ import {checkSubdomainAvailability} from "@comend/lib/fetchers";
 import {useDebounce} from "use-debounce";
 import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area";
 import LoadingDots from "@comend/components/icons/loading-dots";
+import { UnsavedChangesDialog } from "./unsaved-changes-dialog";
 
 const moneyField = z.preprocess(
     (v) => (v === "" || v === null || typeof v === "undefined" ? undefined : Number(v)),
@@ -465,45 +466,16 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                         </form>
                     </ScrollArea>
 
-                    <Dialog open={unsavedChangesIsOpen} onOpenChange={setUnsavedChangesIsOpen}>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>You have unsaved changes.</DialogTitle>
-                                <DialogDescription>If you close this dialog your changes will not be saved.</DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button
-                                        variant={'secondary'}
-                                        // set back to a non-closing state, so future closes can also trigger
-                                        onClick={() => setIsClosing(false)} 
-                                    >
-                                        Back to edit
-                                    </Button>
-                                </DialogClose>
-                                <Button
-                                    variant={'destructive'}
-                                    onClick={() => closeDialog()}
-                                >
-                                    Discard changes
-                                </Button>
-                                <Button 
-                                    disabled={!editOrgForm.formState.isValid || isSaving}
-                                    variant={'cta'}
-                                    onClick={() => onProfileFormSubmit(editOrgForm.getValues())}
-                                >
-                                    {isSaving 
-                                        ? (
-                                            <div className="w-[81px] flex justify-center items-center">
-                                                <LoadingDots/>
-                                            </div>
-                                        ) 
-                                        : ("Save changes")
-                                    }
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                    <UnsavedChangesDialog 
+                        isSaving={isSaving}
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
+                        isOpen={unsavedChangesIsOpen}
+                        setIsOpen={setUnsavedChangesIsOpen}
+                        closeDialog={closeDialog}
+                        form={editOrgForm}
+                        formSubmit={onProfileFormSubmit}
+                    />
                 </Form>
                 {/*</TabsContent>*/}
                 {/*    <TabsContent value="finances">*/}

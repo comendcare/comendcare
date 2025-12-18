@@ -48,6 +48,7 @@ import LoadingDots from "@comend/components/icons/loading-dots"
 import { mixpanelTrack } from "@comend/lib/mixpanel"
 import { SubmitCreateRequest } from "./create-facility-request-button"
 import { Session } from "next-auth"
+import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
@@ -85,7 +86,7 @@ export const createOrUpdateClinicalDataset = async (
         } else {
             // const newTool = await createTool(updateData, session.user.organizationId)
             const newTool = await createClinicalDataset(session.user.organizationId, values)
-            for (let i = 0; i < createFacilityRequests.length; i++) {
+            for (let i = 0; i < createFacilityRequests?.length; i++) {
                 await updateCreateFacilityRequest(
                     session?.user?.organizationId,
                     {
@@ -210,7 +211,7 @@ export function EditClincalDatasetForm({
 
     const handleClose = () => {
         console.log(`form is dirty`, form.formState.dirtyFields)
-        if (Object.keys(form.formState.dirtyFields).length > 0) {
+        if (Object.keys(form.formState.dirtyFields)?.length > 0) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
         } else {
@@ -307,7 +308,7 @@ export function EditClincalDatasetForm({
             }
 
             // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away
-            if (Object.keys(toolData).length > 0) form.trigger()
+            if (Object.keys(toolData)?.length > 0) form.trigger()
 
             initializing.current = false
         }
@@ -622,45 +623,16 @@ export function EditClincalDatasetForm({
                 </div>
             </DialogFooter>
 
-            <Dialog open={unsavedChangesIsOpen} onOpenChange={setUnsavedChangesIsOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>You have unsaved changes.</DialogTitle>
-                        <DialogDescription>If you close this dialog your changes will not be saved.</DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button
-                                variant={'secondary'}
-                                // set back to a non-closing state, so future closes can also trigger
-                                onClick={() => setIsClosing(false)} 
-                            >
-                                Back to edit
-                            </Button>
-                        </DialogClose>
-                        <Button
-                            variant={'destructive'}
-                            onClick={() => closeDialog()}
-                        >
-                            Discard changes
-                        </Button>
-                        <Button 
-                            disabled={!form.formState.isValid || isSaving}
-                            variant={'cta'}
-                            onClick={() => handleFormSubmit(form.getValues(), createRequests)}
-                        >
-                            {isSaving 
-                                ? (
-                                    <div className="w-[81px] flex justify-center items-center">
-                                        <LoadingDots/>
-                                    </div>
-                                ) 
-                                : ("Save changes")
-                            }
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <UnsavedChangesDialog 
+                isSaving={isSaving}
+                isClosing={isClosing}
+                setIsClosing={setIsClosing}
+                isOpen={unsavedChangesIsOpen}
+                setIsOpen={setUnsavedChangesIsOpen}
+                closeDialog={closeDialog}
+                form={form}
+                formSubmit={handleFormSubmit}
+            />
         </Form>
     )
 }

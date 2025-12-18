@@ -48,6 +48,7 @@ import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@comend/components/ui/separator"
 import { Checkbox } from "@comend/components/ui/checkbox"
 import LoadingDots from "@comend/components/icons/loading-dots"
+import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -706,7 +707,7 @@ export function EditRFPForm({
                                         </DialogDescription>
                                         <DialogFooter>
                                             <DialogClose>
-                                                <Button type="button">
+                                                <Button type="button" variant="secondary">
                                                     Cancel
                                                 </Button>
                                             </DialogClose>
@@ -739,48 +740,19 @@ export function EditRFPForm({
                             }
                         </Button>
                     </div>
+
+                    <UnsavedChangesDialog 
+                        isSaving={isSaving}
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
+                        isOpen={unsavedChangesIsOpen}
+                        setIsOpen={setUnsavedChangesIsOpen}
+                        closeDialog={closeDialog}
+                        form={form}
+                        formSubmit={handleFormSubmit}
+                    />
                 </form>
             </ScrollArea>
-
-            <Dialog open={unsavedChangesIsOpen} onOpenChange={setUnsavedChangesIsOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>You have unsaved changes.</DialogTitle>
-                        <DialogDescription>If you close this dialog your changes will not be saved.</DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button
-                                variant={'secondary'}
-                                // set back to a non-closing state, so future closes can also trigger
-                                onClick={() => setIsClosing(false)} 
-                            >
-                                Back to edit
-                            </Button>
-                        </DialogClose>
-                        <Button
-                            variant={'destructive'}
-                            onClick={() => closeDialog()}
-                        >
-                            Discard changes
-                        </Button>
-                        <Button 
-                            disabled={!form.formState.isValid || isSaving}
-                            variant={'cta'}
-                            onClick={() => handleFormSubmit(form.getValues())}
-                        >
-                            {isSaving 
-                                ? (
-                                    <div className="w-[81px] flex justify-center items-center">
-                                        <LoadingDots/>
-                                    </div>
-                                ) 
-                                : ("Save changes")
-                            }
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </Form>
     )
 }
