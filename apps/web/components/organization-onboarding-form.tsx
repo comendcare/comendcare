@@ -5,27 +5,23 @@ import {Button} from "@comend/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {useSession} from "next-auth/react"
 import {createMemberRequest, createOrganization, updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
-import {usePathname, useRouter} from "next/navigation";
+import {useRouter} from "next/navigation";
 import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useOnboardingStore} from "@/state/onboarding/onboardingStore";
 import {editOrgFormSchema, MODALITIES, Option, optionSchema} from "@comend/lib/types";
 import {useDebounce} from "use-debounce";
 import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group";
-import {FileWithPreview} from "@comend/components/image-selector";
-import {FileWithPath, useDropzone} from "react-dropzone";
-import {acceptedFiletypes, getPublicFile, years} from "@comend/lib/utils";
+import {years} from "@comend/lib/utils";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
 import {
     checkSubdomainAvailability,
     getAllNonMemberOrganizations,
 } from "@comend/lib/fetchers";
-import {handleImageUpload} from "@comend/lib/upload";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import {TooltipProvider} from "@comend/components/ui/tooltip";
 
@@ -33,20 +29,17 @@ const joinOrgFormSchema = z.object({
     org: z.array(optionSchema).min(0).optional(),
 })
 
-export default function OrganizationOnboardingForm(
-    {
-        organizationData,
-        previousLink,
-        nextLink,
-        showSkip,
-    }:
-    {
-        organizationData?: any,
-        previousLink: string,
-        nextLink: string,
-        showSkip: boolean,
-    }
-) {
+export default function OrganizationOnboardingForm({
+    organizationData,
+    previousLink,
+    nextLink,
+    showSkip,
+} : {
+    organizationData?: any,
+    previousLink: string,
+    nextLink: string,
+    showSkip: boolean,
+}) {
     const router = useRouter()
     const [organizations, setOrganizations] = useState<Option[]>([])
     const {isNewOrganization, toggleIsNewOrganization} = useOnboardingStore();
@@ -207,14 +200,6 @@ export default function OrganizationOnboardingForm(
                         toast.error(res.error)
                     } else {
                         va.track("Updated Organization")
-
-                        // if (newOrgForm.watch("looking")) {
-                        //     mixpanelTrack(`User is looking for`, {
-                        //         orgName: newOrgForm.watch("orgName"),
-                        //         looking: newOrgForm.watch("looking")
-                        //     })
-                        // }
-
                         // Update the session object with the newly created organizationId
                         router.refresh()
                         router.push(nextLink)
@@ -228,14 +213,6 @@ export default function OrganizationOnboardingForm(
                         toast.error(res.error)
                     } else {
                         va.track("Created Organization")
-
-                        // if (newOrgForm.watch("looking")) {
-                        //     mixpanelTrack(`User is looking for`, {
-                        //         orgName: newOrgForm.watch("orgName"),
-                        //         looking: newOrgForm.watch("looking")
-                        //     })
-                        // }
-
                         // Update the session object with the newly created organizationId
                         router.refresh()
                         router.push(nextLink)
@@ -246,8 +223,6 @@ export default function OrganizationOnboardingForm(
         } catch (error) {
             console.error(error)
             toast.error("An error occurred while creating your organization.");
-        } finally {
-            setLoading(false);
         }
     }
 
@@ -296,14 +271,6 @@ export default function OrganizationOnboardingForm(
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel>{`Organization Name (required)`}</FormLabel>
-                                            {/*<div className="w-full flex flex-row justify-between">*/}
-                                            {/*    <FormDescription>*/}
-                                            {/*        {`The name of your organization.`}*/}
-                                            {/*    </FormDescription>*/}
-                                            {/*    <FormDescription>*/}
-                                            {/*        {`60 characters max.`}*/}
-                                            {/*    </FormDescription>*/}
-                                            {/*</div>*/}
                                             <FormControl>
                                                 <Input
                                                     type="text"
@@ -323,7 +290,6 @@ export default function OrganizationOnboardingForm(
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel>{`Custom Comend URL (required)`}</FormLabel>
-                                            {/*<div className="w-full flex flex-row justify-between">*/}
                                             <FormDescription>
                                                 {`This will create your organization's unique Comend profile link (e.g., yourname.comend.io). Use a short name or abbreviation. This is not your external website.`}
                                                 <br/>
@@ -337,10 +303,6 @@ export default function OrganizationOnboardingForm(
                                                         </>
                                                     )}
                                             </FormDescription>
-                                            {/*    <FormDescription>*/}
-                                            {/*        50 characters max.*/}
-                                            {/*    </FormDescription>*/}
-                                            {/*</div>*/}
                                             <FormControl>
                                                 <Input
                                                     type="text"
@@ -560,7 +522,6 @@ export default function OrganizationOnboardingForm(
                                     render={({field}) => (
                                         <FormItem className="space-y-3">
                                             <FormLabel>{`What is your 501(c)(3) status?`}</FormLabel>
-                                            {/*<FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>*/}
                                             <FormControl>
                                                 <RadioGroup
                                                     onValueChange={field.onChange}
