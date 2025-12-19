@@ -45,6 +45,8 @@ export default function OrganizationOnboardingForm({
     const {isNewOrganization, toggleIsNewOrganization} = useOnboardingStore();
     const [loading, setLoading] = useState(false);
 
+    console.log(`organization data`, organizationData)
+
     useEffect(() => {
         const fetchOrganizations = async () => {
             try {
@@ -84,13 +86,13 @@ export default function OrganizationOnboardingForm({
         mode: "onChange",
         resolver: zodResolver(editOrgFormSchema),
         defaultValues: {
-            description: organizationData.description || "",
-            name: organizationData.name || "",
-            yearFounded: organizationData.yearFounded || "",
-            contactEmail: organizationData.contactEmail || "",
-            subdomain: organizationData.subdomain || "",
-            incorporationStatus: organizationData.incorporationStatus || undefined,
-            website: organizationData.website || "",
+            description: organizationData.description,
+            name: organizationData.name,
+            yearFounded: organizationData.yearFounded?.split("-")?.[0],
+            contactEmail: organizationData.contactEmail,
+            subdomain: organizationData.subdomain,
+            incorporationStatus: organizationData.incorporationStatus,
+            website: organizationData.website,
             therapeuticsInDevelopment: organizationData.therapeuticsInDevelopment?.map((therapeutic: any) => ({
                 label: therapeutic,
                 value: therapeutic
@@ -567,7 +569,11 @@ export default function OrganizationOnboardingForm({
                                                 Previous
                                             </Button>
                                         }
-                                        <Button type="submit" disabled={loading}>
+                                        <Button 
+                                            // type="submit" 
+                                            disabled={loading} 
+                                            onClick={() => newOrgOnSubmit(newOrgForm.getValues())}
+                                        >
                                             {loading ? <LoadingDots color="#808080"/> : "Next"}
                                         </Button>
                                     </div>
