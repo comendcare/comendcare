@@ -1,6 +1,6 @@
 import {Separator} from "@comend/components/ui/separator";
 import {TooltipProvider} from "@comend/components/ui/tooltip";
-import { getConditionsDataFromOrgId, getOrganizationFromOrganizationId } from "@comend/lib/fetchers";
+import { getConditionsDataFromOrgId } from "@comend/lib/fetchers";
 import ResearchOnboardingForm from "~web/components/research-onboarding-form";
 
 export default async function OrganizationOnboardingResearchPage({
@@ -12,17 +12,10 @@ export default async function OrganizationOnboardingResearchPage({
     const orgId: string | undefined = typeof searchParams.id === 'string' ? searchParams.id : undefined
     if (orgId) {
         condition = await getConditionsDataFromOrgId(orgId, {
-            id: true,
             name: true,
-            summary: true,
-            prevalenceNumerator: true,
-            prevalenceDenominator: true,
-            numberOfPatientsEngaged: true,
-            nationalEstimatedPopulation: true,
-            globalEstimatedPopulation: true,
             diseaseCategories: true,
             causalGenes: true,
-            associatedGenes: true,
+            numberOfPatientsEngaged: true,
         })
     }
 
@@ -35,32 +28,7 @@ export default async function OrganizationOnboardingResearchPage({
                             <h1 className="text-xl font-semibold">
                                 Condition onboarding
                             </h1>
-
-                            {/*<p*/}
-                            {/*    className="inline-flex flex-row justify-center items-center gap-x-2 w-min text-base truncate rounded-md bg-stone-100 px-4 py-2 font-medium text-stone-600 transition-colors dark:bg-stone-800 dark:text-stone-400"*/}
-                            {/*>*/}
-                            {/*    <Timer/>*/}
-                            {/*    {`3 min`}*/}
-                            {/*</p>*/}
                         </div>
-                        {/*<p>*/}
-                        {/*    {`*/}
-                        {/*We have some questions about the nature of your disorder, it's demographic, and the ongoing efforts towards treatments and cures.*/}
-                        {/*`}*/}
-                        {/*    {`Hover over the `}*/}
-                        {/*    <span className="inline-flex items-center">*/}
-                        {/*        {" "}*/}
-                        {/*        <Tooltip>*/}
-                        {/*            <TooltipTrigger>*/}
-                        {/*                <Info className="h-4 inline-block align-baseline mx-1"/>*/}
-                        {/*            </TooltipTrigger>*/}
-                        {/*            <TooltipContent>*/}
-                        {/*                <p>Hello there!</p>*/}
-                        {/*            </TooltipContent>*/}
-                        {/*        </Tooltip>*/}
-                        {/*    </span>*/}
-                        {/*    {` if you're wondering why we need to know something.`}*/}
-                        {/*</p>*/}
                     </div>
 
                     <Separator/>

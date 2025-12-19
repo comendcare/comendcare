@@ -98,28 +98,9 @@ export default function ResearchOnboardingForm(
         resolver: zodResolver(researchFormSchema),
         defaultValues: {
             disorder: conditionData.name ? [{ label: conditionData.name, value: conditionData.name }] : [],
-            // associatedConditions: (conditionData.associatedConditions ?? []).map((name: string) => ({
-            //     label: name,
-            //     value: name,
-            // })),
-            // summary: conditionData.summary ?? "",
             categories: (conditionData.diseaseCategories ?? []).map((cat: string) => ({ label: cat, value: cat })),
             causal: (conditionData.causalGenes ?? []).map((gene: string) => ({ label: gene, value: gene })),
-            // genes: (conditionData.associatedGenes ?? []).map((gene: string) => ({ label: gene, value: gene })),
-            // systems: (conditionData.associatedSystems ?? []).map((system: string) => ({
-            //     label: system,
-            //     value: system,
-            // })),
-            // tags are stored as comma-separated string in your form:
-            // tags: conditionTags.join(", "),
-            // prevalenceNumerator: conditionData.prevalenceNumerator?.toString() ?? "",
-            // prevalenceDenominator: conditionData.prevalenceDenominator?.toString() ?? "",
             engaged: conditionData.numberOfPatientsEngaged?.toString() ?? "",
-            // national: conditionData.nationalEstimatedPopulation?.toString() ?? "",
-            // global: conditionData.globalEstimatedPopulation?.toString() ?? "",
-            otherCategories: undefined,
-            // otherMechanisms: undefined,
-            // otherSystems: undefined,
         }
     })
 
@@ -133,29 +114,9 @@ export default function ResearchOnboardingForm(
 
             const mappedData: Record<string, any> = {
                 name: values.disorder?.[0]?.label || "",
-                // Normalize to slugs even for creatable values
-                // associatedConditions: (values.associatedConditions ?? []).map(o =>
-                //     String(o.label || o.value || "").trim()
-                // ),
-                // summary: values.summary ?? "",
                 diseaseCategories: (values.categories ?? []).map(i => i.label),
-                // prevalenceNumerator: numOrNull(values.prevalenceNumerator),
-                // prevalenceDenominator: numOrNull(values.prevalenceDenominator),
                 numberOfPatientsEngaged: numOrNull(values.engaged),
-                // nationalEstimatedPopulation: numOrNull(values.national),
-                // globalEstimatedPopulation: numOrNull(values.global),
-                // relevantDiseaseMechanisms: values.mechanisms ?? [],
                 causalGenes: (values.causal ?? []).map(i => i.label),
-                // associatedGenes: (values.genes ?? []).map(i => i.label),
-                // associatedSystems: (values.systems ?? []).map(i => i.label),
-                // associatedSignsAndSymptoms: (values.symptoms ?? []).map(i => i.label),
-                // existingDatabasesAndStudies: (values.studies ?? []).map(i => i.label),
-                // toolsUnderDevelopment: (values.tools ?? []).map(i => i.label),
-                // metadata: {
-                //     otherCategories: values.otherCategories ?? null,
-                //     otherMechanisms: values.otherMechanisms ?? null,
-                //     otherSystems: values.otherSystems ?? null,
-                // },
             };
 
             const formData = new FormData();

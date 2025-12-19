@@ -11,46 +11,16 @@ export default async function OrganizationOnboardingPage({
     const orgId: string | undefined = typeof searchParams.id === 'string' ? searchParams.id : undefined
     if (orgId) {
         organization = await getOrganizationFromOrganizationId(orgId, {
-            id: true,
-            public: true,
-            verified: true,
-            published: true,
-            name: true,
             description: true,
-            contactEmail: true,
-            logo: true,
-            image: true,
-            headerImage: true,
-            biopharmaConsentSettings: true,
-            subdomain: true,
-            customDomain: true,
-            statedGoal: true,
+            name: true,
             yearFounded: true,
-            incorporationStatus: true,
-            therapeuticsOfInterest: true,
-            therapeuticsInDevelopment: true,
+            contactEmail: true,
+            subdomain: true,
+            IncorporationStatus: true,
             website: true,
-            moneyRaised: true,
-            moneyDeployed: true,
-            researchBudget: true,
-            createdAt: true,
-            updatedAt: true,
-            user: true,
-            userId: true,
-            roadmaps: true,
-            members: true,
-            clients: true,
-            invitations: true,
-            membershipRequests: true,
-            conditions: true,
-            kanban: true,
-            milestones: true,
-            platformNotifications: true,
-            reviews: true,
-            savedCompanies: true,
-            tools: true,
-            rfps: true,
-            metadata: true
+            therapeuticsInDevelopment: true,
+            therapeuticsOfInterest: true,
+            metadata: true,
         })
     }
 
@@ -62,13 +32,6 @@ export default async function OrganizationOnboardingPage({
                         <h1 className="text-xl font-semibold">
                             Organization Onboarding
                         </h1>
-
-                        {/*<p*/}
-                        {/*    className="inline-flex flex-row justify-center items-center gap-x-2 w-min text-base truncate rounded-md bg-stone-100 px-4 py-2 font-medium text-stone-600 transition-colors dark:bg-stone-800 dark:text-stone-400"*/}
-                        {/*>*/}
-                        {/*    <Timer/>*/}
-                        {/*    {`< 2 min`}*/}
-                        {/*</p>*/}
                     </div>
                 </div>
 
