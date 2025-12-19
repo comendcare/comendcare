@@ -16,7 +16,7 @@ export default async function OrganizationOnboardingPage({
             yearFounded: true,
             contactEmail: true,
             subdomain: true,
-            IncorporationStatus: true,
+            incorporationStatus: true,
             website: true,
             therapeuticsInDevelopment: true,
             therapeuticsOfInterest: true,

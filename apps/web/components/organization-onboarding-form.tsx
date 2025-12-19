@@ -56,10 +56,10 @@ export default function OrganizationOnboardingForm({
                     description: true
                 }).then((response) => {
                     if (response.success && response.data) {
-                        const options: Option[] = response.data.map((org, index) => ({
-                            value: org.id || index.toString(),
-                            label: org.name || "",
-                            description: org.description || "",
+                        const options: Option[] = response?.data?.map((org, index) => ({
+                            value: org?.id || index.toString(),
+                            label: org?.name || "",
+                            description: org?.description || "",
                         }))
 
                         setOrganizations(options)
@@ -86,21 +86,21 @@ export default function OrganizationOnboardingForm({
         mode: "onChange",
         resolver: zodResolver(editOrgFormSchema),
         defaultValues: {
-            description: organizationData.description,
-            name: organizationData.name,
-            yearFounded: organizationData.yearFounded?.split("-")?.[0],
-            contactEmail: organizationData.contactEmail,
-            subdomain: organizationData.subdomain,
-            incorporationStatus: organizationData.incorporationStatus,
-            website: organizationData.website,
-            therapeuticsInDevelopment: organizationData.therapeuticsInDevelopment?.map((therapeutic: any) => ({
+            description: organizationData?.description,
+            name: organizationData?.name,
+            yearFounded: organizationData?.yearFounded?.split("-")?.[0],
+            contactEmail: organizationData?.contactEmail,
+            subdomain: organizationData?.subdomain,
+            incorporationStatus: organizationData?.incorporationStatus,
+            website: organizationData?.website,
+            therapeuticsInDevelopment: organizationData?.therapeuticsInDevelopment?.map((therapeutic: any) => ({
                 label: therapeutic,
                 value: therapeutic
             })),
             otherTherapeuticsInDevelopment: typeof organizationData?.metadata == 'object' ? (organizationData?.metadata as {
                 [key: string]: any
             })?.otherTherapeuticsInDevelopment : undefined,
-            therapeuticsOfInterest: organizationData.therapeuticsOfInterest?.map((modality: any) => ({
+            therapeuticsOfInterest: organizationData?.therapeuticsOfInterest?.map((modality: any) => ({
                 label: modality,
                 value: modality
             })),
