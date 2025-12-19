@@ -1,8 +1,31 @@
 import {Separator} from "@comend/components/ui/separator";
 import {TooltipProvider} from "@comend/components/ui/tooltip";
+import { getConditionsDataFromOrgId, getOrganizationFromOrganizationId } from "@comend/lib/fetchers";
 import ResearchOnboardingForm from "~web/components/research-onboarding-form";
 
-export default function OrganizationOnboardingResearchPage() {
+export default async function OrganizationOnboardingResearchPage({
+    searchParams,
+}: {
+    searchParams: { [key: string]: string | string[] | undefined }
+}) {
+    let condition = undefined
+    const orgId: string | undefined = typeof searchParams.id === 'string' ? searchParams.id : undefined
+    if (orgId) {
+        condition = await getConditionsDataFromOrgId(orgId, {
+            id: true,
+            name: true,
+            summary: true,
+            prevalenceNumerator: true,
+            prevalenceDenominator: true,
+            numberOfPatientsEngaged: true,
+            nationalEstimatedPopulation: true,
+            globalEstimatedPopulation: true,
+            diseaseCategories: true,
+            causalGenes: true,
+            associatedGenes: true,
+        })
+    }
+
     return (
         <TooltipProvider>
             <main className="w-full max-w-7xl mx-auto">
@@ -42,8 +65,10 @@ export default function OrganizationOnboardingResearchPage() {
 
                     <Separator/>
                     <ResearchOnboardingForm
-                        nextLink={"/onboarding/finances"}
-                        previousLink={"/onboarding/organization"}
+                        organizationId={orgId}
+                        conditionData={condition?.success && condition?.data?.length > 0 ? condition?.data[0] : undefined}
+                        nextLink={orgId ? `/onboarding/finances?id=${orgId}` : `/onboarding/finances`}
+                        previousLink={orgId ? `/onboarding/organization?id=${orgId}` : `/onboarding/organization`}
                         showSkip={false}
                     />
                 </div>

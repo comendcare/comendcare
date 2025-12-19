@@ -7,9 +7,9 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {connectOrganizationToCondition, createCondition} from "@comend/lib/actions";
+import {connectOrganizationToCondition, createCondition, updateCondition} from "@comend/lib/actions";
 import {toast} from "sonner";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import React, {useEffect, useState} from "react";
@@ -25,6 +25,32 @@ export const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
         (v) => (v === "" || v === null ? undefined : v),
         schema.optional()
     );
+
+// export const researchFormSchema = z.object({
+//     disorder: z.array(optionSchema).optional(),     // MultipleSelector; empty array = cleared
+//     associatedConditions: z.array(optionSchema).optional(),
+//     summary: emptyToUndefined(z.string().max(500)),
+//     categories: z.array(optionSchema).optional(),
+//     otherCategories: emptyToUndefined(z.string()),
+//     tags: z.string().optional(),
+//     engaged: emptyToUndefined(
+//         z.string().regex(/^\d+$/, "Must be a positive integer")
+//     ),
+//     national: emptyToUndefined(z.string().regex(/^\d+$/, "Must be a positive integer")),
+//     global: emptyToUndefined(z.string().regex(/^\d+$/, "Must be a positive integer")),
+//     prevalenceNumerator: emptyToUndefined(z.string().regex(/^\d+$/, "Must be a positive integer")),
+//     prevalenceDenominator: emptyToUndefined(z.string().regex(/^\d+$/, "Must be a positive integer")),
+//     mechanisms: z.array(z.string()).optional(),     // treat [] as cleared
+//     otherMechanisms: emptyToUndefined(z.string()),
+//     causal: z.array(optionSchema).optional(),
+//     genes: z.array(optionSchema).optional(),
+//     biomarkers: z.array(optionSchema).optional(),
+//     systems: z.array(optionSchema).optional(),
+//     otherSystems: emptyToUndefined(z.string()),
+//     symptoms: z.array(optionSchema).optional(),
+//     studies: z.array(optionSchema).optional(),
+//     tools: z.array(optionSchema).optional(),
+// });
 
 export const researchFormSchema = z.object({
     disorder: z.array(optionSchema).optional(),     // MultipleSelector; empty array = cleared
@@ -54,11 +80,15 @@ export const researchFormSchema = z.object({
 
 export default function ResearchOnboardingForm(
     {
+        organizationId,
+        conditionData,
         previousLink,
         nextLink,
         showSkip,
     }:
     {
+        organizationId?: string | undefined,
+        conditionData?: any,
         previousLink: string,
         nextLink: string,
         showSkip: boolean,
@@ -67,59 +97,122 @@ export default function ResearchOnboardingForm(
     faker.seed(123)
     const {data: session, status} = useSession()
     const router = useRouter()
+    const pathname = usePathname()
     const [loading, setLoading] = useState(false);
-    const [organization, setOrganization] = useState<Organization | null>();
+    // const [organization, setOrganization] = useState<Organization | null>();
+    const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<z.infer<typeof researchFormSchema> | undefined>(undefined);
 
     const form = useForm<z.infer<typeof researchFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(researchFormSchema),
     })
 
+    console.log(`condition data`, conditionData)
+
     async function onSubmit(values: z.infer<typeof researchFormSchema>) {
         setLoading(true)
 
         try {
 
-            // Create FormData object
-            const formData = new FormData();
+            // // Create FormData object
+            // const formData = new FormData();
 
-            // Map form values into FormData
-            const data = {
-                name: values.disorder?.[0]?.label || "", // Assume there is only one condition selected
-                summary: values.summary || "",
-                diseaseCategories: values.categories?.map((category) => category.label).join(",") || "",
-                prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator.toString() : "",
-                prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator.toString() : "",
-                numberOfPatientsEngaged: values.engaged ? values.engaged.toString() : "",
-                nationalEstimatedPopulation: values.national ? values.national.toString() : "",
-                globalEstimatedPopulation: values.global ? values.global.toString() : "",
-                relevantDiseaseMechanisms: values.mechanisms?.join(",") || "",
-                causalGenes: values.causal?.map((gene) => gene.label).join(",") || "",
-                associatedGenes: values.genes?.map((gene) => gene.label).join(",") || "",
-                associatedSystems: values.systems?.map((symptom) => symptom.label).join(",") || "",
-                metadata: JSON.stringify({
-                    otherCategories: values.otherCategories
-                })
+            // // Map form values into FormData
+            // const data = {
+            //     name: values.disorder?.[0]?.label || "", // Assume there is only one condition selected
+            //     summary: values.summary || "",
+            //     categories: values.categories?.map((category) => category.label).join(",") || "",
+            //     prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator.toString() : "",
+            //     prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator.toString() : "",
+            //     numberOfPatientsEngaged: values.engaged ? values.engaged.toString() : "",
+            //     nationalEstimatedPopulation: values.national ? values.national.toString() : "",
+            //     globalEstimatedPopulation: values.global ? values.global.toString() : "",
+            //     relevantDiseaseMechanisms: values.mechanisms?.join(",") || "",
+            //     causalGenes: values.causal?.map((gene) => gene.label).join(",") || "",
+            //     associatedGenes: values.genes?.map((gene) => gene.label).join(",") || "",
+            //     associatedSystems: values.systems?.map((symptom) => symptom.label).join(",") || "",
+            //     metadata: JSON.stringify({
+            //         otherCategories: values.otherCategories
+            //     })
+            // };
+
+            // // Append data to FormData
+            // Object.entries(data).forEach(([key, value]) => {
+            //     if (value) {
+            //         formData.append(key, value)
+            //     }
+            // });
+
+            const numOrNull = (s?: string | null) =>
+                s && String(s).trim() !== "" ? parseInt(String(s), 10) : null;
+
+            const mappedData: Record<string, any> = {
+                name: values.disorder?.[0]?.label || "",
+                // Normalize to slugs even for creatable values
+                associatedConditions: (values.associatedConditions ?? []).map(o =>
+                    String(o.label || o.value || "").trim()
+                ),
+                summary: values.summary ?? "",
+                diseaseCategories: (values.categories ?? []).map(i => i.label),
+                prevalenceNumerator: numOrNull(values.prevalenceNumerator),
+                prevalenceDenominator: numOrNull(values.prevalenceDenominator),
+                numberOfPatientsEngaged: numOrNull(values.engaged),
+                nationalEstimatedPopulation: numOrNull(values.national),
+                globalEstimatedPopulation: numOrNull(values.global),
+                relevantDiseaseMechanisms: values.mechanisms ?? [],
+                causalGenes: (values.causal ?? []).map(i => i.label),
+                associatedGenes: (values.genes ?? []).map(i => i.label),
+                associatedSystems: (values.systems ?? []).map(i => i.label),
+                associatedSignsAndSymptoms: (values.symptoms ?? []).map(i => i.label),
+                existingDatabasesAndStudies: (values.studies ?? []).map(i => i.label),
+                toolsUnderDevelopment: (values.tools ?? []).map(i => i.label),
+                metadata: {
+                    otherCategories: values.otherCategories ?? null,
+                    otherMechanisms: values.otherMechanisms ?? null,
+                    otherSystems: values.otherSystems ?? null,
+                },
             };
 
-            // Append data to FormData
-            Object.entries(data).forEach(([key, value]) => {
-                if (value) {
-                    formData.append(key, value)
+            const formData = new FormData();
+            Object.entries(mappedData).forEach(([key, value]) => {
+                if (key === "metadata") {
+                    formData.append(key, JSON.stringify(value ?? {}));
+                } else if (Array.isArray(value)) {
+                    formData.append(key, JSON.stringify(value));
+                } else if (value === null) {
+                    formData.append(key, "null"); // tell the server to clear
+                } else {
+                    formData.append(key, String(value));
                 }
             });
 
             try {
-                await createCondition(formData).then(async (response) => {
-                    if (response.success && response.data) {
-                        const conditionOrg = await connectOrganizationToCondition(session?.user.organizationId, response.data.id)
-                        toast.success("Successfully created condition.")
-                        router.push(nextLink)
-                    } else {
-                        console.error(response.error)
-                        toast.error(response.error)
-                    }
-                })
+                if (conditionData?.id && organizationId) {
+                    await updateCondition(organizationId, formData).then(async (response) => {
+                        if (response.success && response.data) {
+                            // const conditionOrg = await connectOrganizationToCondition(session?.user.organizationId, response.data.id)
+                            toast.success("Successfully updated condition.")
+                            router.push(nextLink)
+                        } else {
+                            console.error(response.error)
+                            toast.error(response.error)
+                        }
+                    })
+                } else {
+                    await createCondition(formData).then(async (response) => {
+                        if (response.success && response.data) {
+                            const conditionOrg = await connectOrganizationToCondition(
+                                organizationId ? organizationId : session?.user.organizationId, 
+                                response.data.id
+                            )
+                            toast.success("Successfully created condition.")
+                            router.push(nextLink)
+                        } else {
+                            console.error(response.error)
+                            toast.error(response.error)
+                        }
+                    })
+                }
 
             } catch (error) {
                 console.error("Failed to create condition:", error)
@@ -146,84 +239,139 @@ export default function ResearchOnboardingForm(
                 return;
             }
 
-            if (session?.user?.organizationId && status === "authenticated") {
-                try {
-                    console.log('Fetching organization data...');
-                    const response = await getOrganizationFromOrganizationId(session?.user.organizationId, {
-                        id: true,
-                        public: true,
-                        verified: true,
-                        published: true,
-                        name: true,
-                        description: true,
-                        contactEmail: true,
-                        logo: true,
-                        image: true,
-                        headerImage: true,
-                        biopharmaConsentSettings: true,
-                        subdomain: true,
-                        customDomain: true,
-                        statedGoal: true,
-                        yearFounded: true,
-                        incorporationStatus: true,
-                        therapeuticsOfInterest: true,
-                        therapeuticsInDevelopment: true,
-                        website: true,
-                        moneyRaised: true,
-                        moneyDeployed: true,
-                        researchBudget: true,
-                        // address1                  String?
-                        // address2                  String?
-                        // formattedAddress          String?
-                        // city                      String?
-                        // region                    String?
-                        // postalCode                String?
-                        // country                   String?
-                        // lat                       String?
-                        // lng                       String?
-                        createdAt: true,
-                        updatedAt: true,
-                        user: true,
-                        userId: true,
-                        roadmaps: true,
-                        members: true,
-                        clients: true,
-                        invitations: true,
-                        membershipRequests: true,
-                        conditions: true,
-                        kanban: true,
-                        milestones: true,
-                        platformNotifications: true,
-                        reviews: true,
-                        savedCompanies: true,
-                        tools: true,
-                        rfps: true,
-                        metadata: true
-                    });
-                    console.log('API response:', response);
+            // if (session?.user?.organizationId && status === "authenticated") {
+            //     try {
+            //         console.log('Fetching organization data...');
+            //         const response = await getOrganizationFromOrganizationId(session?.user.organizationId, {
+            //             id: true,
+            //             public: true,
+            //             verified: true,
+            //             published: true,
+            //             name: true,
+            //             description: true,
+            //             contactEmail: true,
+            //             logo: true,
+            //             image: true,
+            //             headerImage: true,
+            //             biopharmaConsentSettings: true,
+            //             subdomain: true,
+            //             customDomain: true,
+            //             statedGoal: true,
+            //             yearFounded: true,
+            //             incorporationStatus: true,
+            //             therapeuticsOfInterest: true,
+            //             therapeuticsInDevelopment: true,
+            //             website: true,
+            //             moneyRaised: true,
+            //             moneyDeployed: true,
+            //             researchBudget: true,
+            //             // address1                  String?
+            //             // address2                  String?
+            //             // formattedAddress          String?
+            //             // city                      String?
+            //             // region                    String?
+            //             // postalCode                String?
+            //             // country                   String?
+            //             // lat                       String?
+            //             // lng                       String?
+            //             createdAt: true,
+            //             updatedAt: true,
+            //             user: true,
+            //             userId: true,
+            //             roadmaps: true,
+            //             members: true,
+            //             clients: true,
+            //             invitations: true,
+            //             membershipRequests: true,
+            //             conditions: true,
+            //             kanban: true,
+            //             milestones: true,
+            //             platformNotifications: true,
+            //             reviews: true,
+            //             savedCompanies: true,
+            //             tools: true,
+            //             rfps: true,
+            //             metadata: true
+            //         });
+            //         console.log('API response:', response);
 
-                    if (response.success) {
-                        setOrganization(response.data);
-                        console.log('Organization set:', response.data);
-                    } else {
-                        console.error('Error fetching organization:', response.error);
-                        toast.error(response.error);
-                    }
-                } catch (error) {
-                    console.error('Failed to fetch organization:', error);
-                    toast.error('An error occurred while fetching organization data.');
+            //         if (response.success) {
+            //             setOrganization(response.data);
+            //             console.log('Organization set:', response.data);
+            //         } else {
+            //             console.error('Error fetching organization:', response.error);
+            //             toast.error(response.error);
+            //         }
+            //     } catch (error) {
+            //         console.error('Failed to fetch organization:', error);
+            //         toast.error('An error occurred while fetching organization data.');
+            //     }
+            // }
+
+            if (session?.user?.organizationId && pathname === "/onboarding/research") {
+                if (conditionData) {
+                    // Find the current user's title from the members list
+                    // const currentUserMember = organizationData?.members?.find(
+                    //     (member: any) => member.userId === session.user.id
+                    // );
+                    // const currentUserTitle = currentUserMember?.title || "";
+
+                    const fetchedValues = {
+                        disorder: conditionData.name ? [{ label: conditionData.name, value: conditionData.name }] : [],
+                        associatedConditions: (conditionData.associatedConditions ?? []).map((name: string) => ({
+                            label: name,
+                            value: name,
+                        })),
+                        summary: conditionData.summary ?? "",
+                        categories: (conditionData.diseaseCategories ?? []).map((cat: string) => ({ label: cat, value: cat })),
+                        causal: (conditionData.causalGenes ?? []).map((gene: string) => ({ label: gene, value: gene })),
+                        genes: (conditionData.associatedGenes ?? []).map((gene: string) => ({ label: gene, value: gene })),
+                        systems: (conditionData.associatedSystems ?? []).map((system: string) => ({
+                            label: system,
+                            value: system,
+                        })),
+                        // tags are stored as comma-separated string in your form:
+                        // tags: conditionTags.join(", "),
+                        prevalenceNumerator: conditionData.prevalenceNumerator?.toString() ?? "",
+                        prevalenceDenominator: conditionData.prevalenceDenominator?.toString() ?? "",
+                        engaged: conditionData.numberOfPatientsEngaged?.toString() ?? "",
+                        national: conditionData.nationalEstimatedPopulation?.toString() ?? "",
+                        global: conditionData.globalEstimatedPopulation?.toString() ?? "",
+                        otherCategories: undefined,
+                        otherMechanisms: undefined,
+                        otherSystems: undefined,
+                    };
+
+                    // if (organizationData.image) {
+                    //     try {
+                    //         const orgPhoto: File = await getPublicFile(organizationData.image)
+                    //         if (orgPhoto) {
+                    //             const fileWithPreview = Object.assign(orgPhoto, {
+                    //                 preview: URL.createObjectURL(orgPhoto),
+                    //             })
+                    //             setSelectedFile(fileWithPreview)
+                    //         }
+                    //     } catch (e) {
+                    //         console.error(e)
+                    //     }
+                    // }
+
+                    setDefaultOrganizationValues(fetchedValues);
+                    form.reset(fetchedValues); // Reset form with fetched data
                 }
-            } else if (status === "unauthenticated") {
-                console.error('User is unauthenticated.');
-                toast.error('User is unauthenticated.');
-            } else {
-                console.error('No organizationId provided in session.');
-                toast.error('No organizationId provided.');
             }
+            
+            // if (status === "unauthenticated") {
+            //     console.error('User is unauthenticated.');
+            //     toast.error('User is unauthenticated.');
+            // } else {
+            //     console.error('No organizationId provided in session.');
+            //     toast.error('No organizationId provided.');
+            // }
         };
 
         fetchOrganization();
-    }, [setOrganization, session?.user?.organizationId, status])
+    }, [session?.user?.organizationId, status])
 
     const handleConditionAsyncSearch = async (query: string): Promise<Option[]> => {
         if (!query) return []; // Return empty if no input
@@ -327,6 +475,7 @@ export default function ResearchOnboardingForm(
                                                         no results found.
                                                     </p>
                                                 }
+                                                showHoverCard={false}
                                             />
                                         </FormControl>
                                         <FormMessage/>

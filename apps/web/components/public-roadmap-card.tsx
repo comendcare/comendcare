@@ -54,7 +54,7 @@ export const RoadmapsCard = ({
                         isPrivate={false}
                         roadmaps={roadmaps}
                         rowClickCallback={(roadmap) =>
-                            router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}` : '#')
+                            router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap?.id}` : '#')
                         }
                     />
                     : (pathname === "/app/profile"
@@ -246,7 +246,7 @@ export const RoadmapRow = ({roadmap, rowClickCallback, isPrivate}: {roadmap: any
 
     return (
         <TableRow 
-            key={roadmap.id} 
+            key={roadmap?.id} 
             className="cursor-pointer px-0"
             onClick={() => rowClickCallback(roadmap)}
         >

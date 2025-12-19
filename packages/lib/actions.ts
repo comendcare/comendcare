@@ -364,7 +364,7 @@ export const createOrganization = withAuth(
             }
         }
 
-        const name = formData.get("orgName") as string;
+        const name = formData.get("name") as string;
         const description = formData.get("description") as string;
         const subdomain = formData.get("subdomain") as string;
         const website = formData.get("website") as string | null;

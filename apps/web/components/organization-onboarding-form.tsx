@@ -322,7 +322,7 @@ export default function OrganizationOnboardingForm(
 
             // console.log(`create organization with metadata`, values.metadata)
 
-            if (organizationData.id) {
+            if (organizationData?.id) {
                 // organization already exists, just update data, don't create a new org
                 updateOrganization(organizationData.id, formData).then((res: any) => {
                     if (res.error) {
@@ -366,6 +366,7 @@ export default function OrganizationOnboardingForm(
                 })
             }
         } catch (error) {
+            console.error(error)
             toast.error("An error occurred while creating your organization.");
         } finally {
             setLoading(false);
@@ -375,65 +376,6 @@ export default function OrganizationOnboardingForm(
     useEffect(() => {
         async function fetchOrganizationData() {
             if (session?.user?.organizationId && pathname === "/onboarding/organization") {
-                // let organizationData
-                // const response = await getOrganizationFromOrganizationId(session.user.organizationId, {
-                //     id: true,
-                //     public: true,
-                //     verified: true,
-                //     published: true,
-                //     name: true,
-                //     description: true,
-                //     contactEmail: true,
-                //     logo: true,
-                //     image: true,
-                //     headerImage: true,
-                //     biopharmaConsentSettings: true,
-                //     subdomain: true,
-                //     customDomain: true,
-                //     statedGoal: true,
-                //     yearFounded: true,
-                //     incorporationStatus: true,
-                //     therapeuticsOfInterest: true,
-                //     therapeuticsInDevelopment: true,
-                //     website: true,
-                //     moneyRaised: true,
-                //     moneyDeployed: true,
-                //     researchBudget: true,
-                //     // address1                  String?
-                //     // address2                  String?
-                //     // formattedAddress          String?
-                //     // city                      String?
-                //     // region                    String?
-                //     // postalCode                String?
-                //     // country                   String?
-                //     // lat                       String?
-                //     // lng                       String?
-                //     createdAt: true,
-                //     updatedAt: true,
-                //     user: true,
-                //     userId: true,
-                //     roadmaps: true,
-                //     members: true,
-                //     clients: true,
-                //     invitations: true,
-                //     membershipRequests: true,
-                //     conditions: true,
-                //     kanban: true,
-                //     milestones: true,
-                //     platformNotifications: true,
-                //     reviews: true,
-                //     savedCompanies: true,
-                //     tools: true,
-                //     rfps: true,
-                //     metadata: true
-                // });
-                // if (response.success) {
-                //     organizationData = response.data
-                // } else {
-                //     console.error(response.error)
-                //     toast.error(response.error)
-                // }
-
                 if (organizationData) {
                     // Find the current user's title from the members list
                     const currentUserMember = organizationData?.members?.find(

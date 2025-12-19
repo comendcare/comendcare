@@ -8,9 +8,9 @@ export default async function OrganizationOnboardingPage({
     searchParams: { [key: string]: string | string[] | undefined }
 }) {
     let organization = undefined
-    console.log(`search params`, searchParams)
-    if (typeof searchParams.id === 'string') {
-        organization = await getOrganizationFromOrganizationId(searchParams.id, {
+    const orgId: string | undefined = typeof searchParams.id === 'string' ? searchParams.id : undefined
+    if (orgId) {
+        organization = await getOrganizationFromOrganizationId(orgId, {
             id: true,
             public: true,
             verified: true,
@@ -33,15 +33,6 @@ export default async function OrganizationOnboardingPage({
             moneyRaised: true,
             moneyDeployed: true,
             researchBudget: true,
-            // address1                  String?
-            // address2                  String?
-            // formattedAddress          String?
-            // city                      String?
-            // region                    String?
-            // postalCode                String?
-            // country                   String?
-            // lat                       String?
-            // lng                       String?
             createdAt: true,
             updatedAt: true,
             user: true,
@@ -85,7 +76,7 @@ export default async function OrganizationOnboardingPage({
                 <OrganizationOnboardingForm
                     organizationData={organization?.data}
                     previousLink={"/onboarding/user"}
-                    nextLink={"/onboarding/research"}
+                    nextLink={orgId ? `/onboarding/research?id=${orgId}` : `/onboarding/research`}
                     showSkip={false}
                 />
             </div>
