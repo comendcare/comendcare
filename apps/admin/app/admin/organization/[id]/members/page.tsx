@@ -1,9 +1,10 @@
+import { Badge } from "@comend/components/ui/badge"
 import { Separator } from "@comend/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { getSession } from "@comend/lib/auth"
 import prisma from "@comend/lib/prisma"
 import { Member } from "@prisma/client"
-import { CircleCheck } from "lucide-react"
+import { CircleCheck, CircleX } from "lucide-react"
 import { notFound, redirect } from "next/navigation"
 import InviteToClaimOrgDialog from "~admin/components/invite-to-claim-org-dialog copy"
 import InviteUserToOrgDialog from "~admin/components/invite-user-to-org-dialog"
@@ -52,20 +53,19 @@ export default async function OrganizationMembersPage({
                     >
                         {url} ↗
                     </a>
-                    {data.members.filter((member: Member) => !member.email.includes('comendcare.com')).length > 0 && (
-                        <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <CircleCheck className={'text-green-800 h-8 w-8'} />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>Claimed</p>
-                            </TooltipContent>
-                        </Tooltip>
-                        </TooltipProvider>
-                    )}
                     <InviteUserToOrgDialog organization={data} />
                     <InviteToClaimOrgDialog organization={data} />
+                    {data.members.filter((member: Member) => !member.email.includes('comendcare.com')).length > 0 
+                        ? (
+                            <Badge variant={'green'}>
+                                Claimed
+                            </Badge>
+                        ): (
+                            <Badge variant={'red'}>
+                                Unclaimed
+                            </Badge>
+                        )
+                    }
                 </div>
             </div>
             <TooltipProvider>
