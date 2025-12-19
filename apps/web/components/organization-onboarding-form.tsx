@@ -45,8 +45,6 @@ export default function OrganizationOnboardingForm({
     const {isNewOrganization, toggleIsNewOrganization} = useOnboardingStore();
     const [loading, setLoading] = useState(false);
 
-    console.log(`organization data`, organizationData)
-
     useEffect(() => {
         const fetchOrganizations = async () => {
             try {

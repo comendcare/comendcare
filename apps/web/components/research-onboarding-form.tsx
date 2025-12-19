@@ -104,8 +104,6 @@ export default function ResearchOnboardingForm(
         }
     })
 
-    console.log(`condition data`, conditionData)
-
     async function onSubmit(values: z.infer<typeof researchFormSchema>) {
         setLoading(true)
         try {

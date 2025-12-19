@@ -42,7 +42,12 @@ export default async function AppLayoutServer({children}: { children: React.Reac
         }),
         prisma.claimOrganizationInvitation.findMany({
             where: { email: session!.user!.email!, accepted: false },
-            select: { id: true, role: true, organizationId: true, organization: true },
+            select: { 
+                id: true, 
+                role: true, 
+                organizationId: true, 
+                organization: true,
+            },
             orderBy: { createdAt: "asc" },
         }),
         prisma.user.findUnique({

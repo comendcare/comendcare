@@ -13,10 +13,11 @@ import {Button} from "@comend/components/ui/button";
 import {toast} from "sonner";
 import {acceptClaimOrganizationInvitation, declineAndDeleteClaimOrganizationInvitation} from "@comend/lib/actions";
 import {useRouter} from "next/navigation";
-import type {Organization} from "@prisma/client";
+import type {Member, Organization} from "@prisma/client";
 import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar";
 import {useSession} from "next-auth/react";
 import LoadingDots from "@comend/components/icons/loading-dots";
+import { getOrganizationData, getOrganizationFromOrganizationId } from "@comend/lib/fetchers";
 
 export default function ClaimInvitationBlocker({
                                               invitations,
@@ -30,14 +31,33 @@ export default function ClaimInvitationBlocker({
     const [open] = useState(true); // permanently open until handled
     const [working, setWorking] = useState(false);
 
-    const onAccept = async (invId: string) => {
+    const onAccept = async (invId: string, organizationId: string) => {
         try {
             setWorking(true);
+            const org = await getOrganizationFromOrganizationId(organizationId, {
+                verified: true,
+                members: true,
+            })
+
+            let firstToClaim = true
+            // if there is a non-comend member OR the profile is verified, we consider the profile claimed
+            if (
+                org.success && 
+                (
+                    org.data.members.filter((member: Member) => !member.email.includes('comendcare.com')) || 
+                    org.data.verified
+                )
+            ) {
+                firstToClaim = false
+            }
+
             const res = await acceptClaimOrganizationInvitation(invId);
             if (res?.success) {
                 toast.success("Invitation accepted.");
                 update({});
-                router.push(`/onboarding/organization?id=${res?.data?.organizationId}`)
+                // if this is the first user to claim, forward them to the claim forms (onboarding edit)
+                // otherwise the default add membership & delete invitation suffices
+                if (firstToClaim) router.push(`/onboarding/organization?id=${res?.data?.organizationId}`)
             } else {
                 toast.error(res?.error ?? "Failed to accept invitation.");
             }
@@ -122,7 +142,7 @@ export default function ClaimInvitationBlocker({
                                         </Button>
                                         <Button
                                             disabled={working}
-                                            onClick={() => onAccept(inv.id)}
+                                            onClick={() => onAccept(inv.id, inv.organizationId)}
                                         >
                                             {working ? <LoadingDots color="#ffffff" /> : "Claim"}
                                         </Button>

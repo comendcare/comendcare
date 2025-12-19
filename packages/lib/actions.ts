@@ -2076,6 +2076,8 @@ export const acceptClaimOrganizationInvitation = withAuth(
                             name: true,
                             image: true,
                             subdomain: true,
+                            members: true,
+                            verified: true,
                         },
                     }
                 }
