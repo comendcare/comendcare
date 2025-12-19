@@ -7,41 +7,38 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
 import {updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
-import {useRouter} from "next/navigation";
-import {useState} from "react";
+import {usePathname, useRouter} from "next/navigation";
+import {useEffect, useState} from "react";
 import MoneyInput from "@comend/components/money-input";
-
-export const financesFormSchema = z.object({
-    // raising: z.enum(["yes", "no-but", "no"]).optional(),
-    raised: z.number().optional(),
-    budget: z.number().optional(),
-    deployed: z.number().optional(),
-})
+import { editOrgFormSchema } from "@comend/lib/types";
 
 export default function FinancesOnboardingForm(
     {
+        organizationData,
         previousLink,
         nextLink,
         showSkip,
     }:
     {
+        organizationData?: any,
         previousLink: string,
         nextLink: string,
         showSkip: boolean,
     }
 ) {
-    const session = useSession()
+    const {data: session} = useSession()
     const router = useRouter()
-    const [defaultValues, setDefaultValues] = useState<z.infer<typeof financesFormSchema> | undefined>(undefined);
+    const pathname = usePathname()
+    const [defaultValues, setDefaultValues] = useState<z.infer<typeof editOrgFormSchema> | undefined>(undefined);
 
-    const form = useForm<z.infer<typeof financesFormSchema>>({
+    const form = useForm<z.infer<typeof editOrgFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(financesFormSchema),
+        resolver: zodResolver(editOrgFormSchema),
         defaultValues,
     })
 
-    async function onSubmit(values: z.infer<typeof financesFormSchema>) {
-        if (!session.data?.user.organizationId) {
+    async function onSubmit(values: z.infer<typeof editOrgFormSchema>) {
+        if (!session?.user.organizationId) {
             toast.error("You're not signed into an organization right now.");
             return;
         }
@@ -52,25 +49,45 @@ export default function FinancesOnboardingForm(
             raised: "moneyRaised",
             budget: "researchBudget",
             deployed: "moneyDeployed",
-            // raising: "raising",
         };
 
         Object.entries(values).forEach(([key, value]) => {
             const mappedKey = databaseMap[key as keyof typeof databaseMap]; // Explicitly cast key
-            if (mappedKey && value !== undefined) {
+            if (mappedKey && value !== undefined && value !== null) {
                 formData.append(mappedKey, value.toString());
             }
         });
 
         try {
-            const response = await updateOrganization(session.data.user.organizationId, formData);
+            const response = await updateOrganization(organizationData?.id || session?.user.organizationId, formData);
             // mixpanelTrack("Onboarding Completed")
             toast.success("Organization updated successfully!");
-            router.push("/app/marketplace/service-providers");
+            router.push(nextLink);
         } catch (error) {
             toast.error("Failed to update organization.");
         }
     }
+
+    useEffect(() => {
+        async function fetchOrganizationData() {
+            if (session?.user?.organizationId && pathname === "/onboarding/organization") {
+                if (organizationData) {
+                    const fetchedValues = {
+                        name: organizationData.name, // required in form schema
+                        subdomain: organizationData.subdomain, // required in form schema
+                        raised: organizationData.moneyRaised || 0,
+                        deployed: organizationData.moneyDeployed || 0,
+                        budget: organizationData.researchBudget || 0,
+                    };
+
+                    setDefaultValues(fetchedValues);
+                    form.reset(fetchedValues); // Reset form with fetched data
+                }
+            }
+        }
+
+        fetchOrganizationData();
+    }, [session, form]);
 
     return (
         <Form {...form}>

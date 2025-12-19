@@ -14,113 +14,23 @@ import {RadioGroup, RadioGroupItem} from "@comend/components/ui/radio-group";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import React, {useCallback, useEffect, useState} from "react";
 import {useOnboardingStore} from "@/state/onboarding/onboardingStore";
-import {AddressType, MODALITIES, Option, optionSchema} from "@comend/lib/types";
+import {editOrgFormSchema, MODALITIES, Option, optionSchema} from "@comend/lib/types";
 import {useDebounce} from "use-debounce";
 import {ToggleGroup, ToggleGroupItem} from "@comend/components/ui/toggle-group";
-import {Bold, Info, Italic} from "lucide-react";
 import {FileWithPreview} from "@comend/components/image-selector";
 import {FileWithPath, useDropzone} from "react-dropzone";
-import {acceptedFiletypes, getPublicFile, nameToInitials, years} from "@comend/lib/utils";
+import {acceptedFiletypes, getPublicFile, years} from "@comend/lib/utils";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@comend/components/ui/select";
 import {
     checkSubdomainAvailability,
     getAllNonMemberOrganizations,
-    getOrganizationFromOrganizationId
 } from "@comend/lib/fetchers";
 import {handleImageUpload} from "@comend/lib/upload";
 import LoadingDots from "@comend/components/icons/loading-dots";
-import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
-import { mixpanelTrack } from "@comend/lib/mixpanel";
-import { Organization } from "@prisma/client";
+import {TooltipProvider} from "@comend/components/ui/tooltip";
 
 const joinOrgFormSchema = z.object({
     org: z.array(optionSchema).min(0).optional(),
-})
-
-// export const newOrgFormSchema = z.object({
-//     orgName: z.string().min(2, {
-//         message: "Your organization's name must be at least 2 characters."
-//     }).max(60, {
-//         message: "Your organization's name must be a maximum of 60 characters."
-//     }),
-//     subdomain: z.string().min(2, {
-//         message: "Your organization's nickname must be at least 2 characters."
-//     }).max(60, {
-//         message: "Your organization's nickname must be a maximum of 50 characters."
-//     }),
-//     contactEmail: z.string().email({
-//         message: "Please enter a valid email address.",
-//     }).optional(),
-//     title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
-//     looking: z.string().min(0).optional(),
-//     founded: z.string().optional(),
-//     description: z.string().min(2, {
-//         message: "Your organization's description must be at least 2 characters long.",
-//     }).max(500, {
-//         message: "Your organization's description must less than 500 characters long.",
-//     }).optional(),
-//     website: z.string().min(2, {
-//         message: "Your organization's website.",
-//     }).optional(),
-//     incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"], {
-//         required_error: "You need to select a 501(c)(3) status.",
-//     }).optional(),
-//     therapeuticsInDevelopment: z.array(optionSchema).min(0).optional(),
-//     otherTherapeuticsInDevelopment: z.string().optional(),
-//     therapeuticsOfInterest: z.array(optionSchema).min(0).optional(),
-//     otherTherapeuticsOfInterest: z.string().optional(),
-//     address1: z.string().optional(),
-//     address2: z.string().optional(),
-//     formattedAddress: z.string().optional(),
-//     city: z.string().optional(),
-//     region: z.string().optional(),
-//     postalCode: z.string().optional(),
-//     country: z.string().optional(),
-//     lat: z.number().optional(),
-//     lng: z.number().optional(),
-//     image: z.string().nullable().optional(),
-//     metadata: z.string().optional()
-// })
-
-const moneyField = z.preprocess(
-    (v) => (v === "" || v === null || typeof v === "undefined" ? undefined : Number(v)),
-    z.number().min(0).optional()
-);
-
-const editOrgFormSchema = z.object({
-    name: z.string().min(2).max(60),
-    subdomain: z.string().min(2, {
-        message: "Your organization's nickname must be at least 2 characters."
-    }).max(60, {
-        message: "Your organization's nickname must be a maximum of 50 characters."
-    }),
-    contactEmail: z.preprocess(
-        (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
-        z.string().email({ message: "Please enter a valid email address." }).optional()
-    ),
-    yearFounded: z.string().optional(),
-    incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"]).optional(),
-    // moneyRaised: moneyField,
-    // moneyDeployed: moneyField,
-    // researchBudget: moneyField,
-
-    description: z.string().max(500, {
-        message: "Your organization's description must be less than 500 characters long."
-    }).optional(),
-    website: z.preprocess(
-        (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
-        z.string().url({
-            message: "Enter a valid URL for your organization's website."
-        }).optional()
-    ),
-    therapeuticsInDevelopment: z.array(optionSchema).min(0).optional(),
-    otherTherapeuticsInDevelopment: z.string().optional(),
-    therapeuticsOfInterest: z.array(optionSchema).min(0).optional(),
-    otherTherapeuticsOfInterest: z.string().optional(),
-
-    image: z.string().nullable().optional(),
-    headerImage: z.string().nullable().optional(),
-
 })
 
 export default function OrganizationOnboardingForm(
@@ -137,48 +47,10 @@ export default function OrganizationOnboardingForm(
         showSkip: boolean,
     }
 ) {
-    const {data: session} = useSession()
     const router = useRouter()
-    const pathname = usePathname()
-    // const [isNewOrganization, setIsNewOrganization] = useState(true)
     const [organizations, setOrganizations] = useState<Option[]>([])
-    const [searchInput, setSearchInput] = useState("");
     const {isNewOrganization, toggleIsNewOrganization} = useOnboardingStore();
-    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null)
-    const [isDialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<z.infer<typeof editOrgFormSchema> | undefined>(undefined);
-
-    console.log(`organization data`, organizationData)
-
-    const onDrop = useCallback(
-        (acceptedFiles: FileWithPath[]) => {
-            const file = acceptedFiles[0];
-            if (!file) {
-                toast.error("No file selected!");
-                return;
-            }
-
-            // Additional check to exclude SVG
-            if (file.type === "image/svg+xml") {
-                toast.error("SVG files are not allowed. Please select a valid image.");
-                return;
-            }
-
-            const fileWithPreview = Object.assign(file, {
-                preview: URL.createObjectURL(file),
-            });
-
-            setSelectedFile(fileWithPreview);
-            setDialogOpen(true);
-        },
-        []
-    );
-
-    const {getRootProps, getInputProps} = useDropzone({
-        onDrop,
-        accept: acceptedFiletypes,
-    });
 
     useEffect(() => {
         const fetchOrganizations = async () => {
@@ -218,14 +90,36 @@ export default function OrganizationOnboardingForm(
     const newOrgForm = useForm<z.infer<typeof editOrgFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(editOrgFormSchema),
-        defaultValues: defaultOrganizationValues
+        defaultValues: {
+            description: organizationData.description || "",
+            name: organizationData.name || "",
+            yearFounded: organizationData.yearFounded || "",
+            contactEmail: organizationData.contactEmail || "",
+            subdomain: organizationData.subdomain || "",
+            incorporationStatus: organizationData.incorporationStatus || undefined,
+            website: organizationData.website || "",
+            therapeuticsInDevelopment: organizationData.therapeuticsInDevelopment?.map((therapeutic: any) => ({
+                label: therapeutic,
+                value: therapeutic
+            })),
+            otherTherapeuticsInDevelopment: typeof organizationData?.metadata == 'object' ? (organizationData?.metadata as {
+                [key: string]: any
+            })?.otherTherapeuticsInDevelopment : undefined,
+            therapeuticsOfInterest: organizationData.therapeuticsOfInterest?.map((modality: any) => ({
+                label: modality,
+                value: modality
+            })),
+            otherTherapeuticsOfInterest: typeof organizationData?.metadata == 'object' ? (organizationData?.metadata as {
+                [key: string]: any
+            })?.otherTherapeuticsOfInterest : undefined,
+        }
     })
 
     const [debouncedNickname] = useDebounce(newOrgForm.watch("subdomain"), 500); // Extract just the debounced value
 
     useEffect(() => {
         // Trigger validation whenever the debounced nickname changes
-        const currentSubdomain = defaultOrganizationValues?.subdomain; // The current subdomain of the organization
+        const currentSubdomain = organizationData?.subdomain; // The current subdomain of the organization
 
         if (debouncedNickname === currentSubdomain) {
             // Clear errors since it's the same subdomain as before
@@ -235,7 +129,8 @@ export default function OrganizationOnboardingForm(
 
         if (debouncedNickname) {
             checkSubdomainAvailability(debouncedNickname).then((isAvailable) => {
-                if (!isAvailable) {
+                // if the subdomain is taken by an org that is not the current org
+                if (!isAvailable && debouncedNickname !== currentSubdomain) {
                     newOrgForm.setError("subdomain", {
                         type: "manual",
                         message: "This nickname is already taken. Please choose another.",
@@ -291,25 +186,10 @@ export default function OrganizationOnboardingForm(
                 }
             });
 
-            // only upload image if it is not the same as the previous one
-            if (selectedFile && values.image && values.image !== defaultOrganizationValues?.image) {
-                try {
-                    const imgUrl = await handleImageUpload(selectedFile as File, values.image)
-                    if (imgUrl) {
-                        formData.set('image', imgUrl)
-                    }
-                } catch (error) {
-                    console.error("Failed to upload image:", error)
-                    toast.error("Image upload failed")
-                    return
-                }
-            }
-
             const data = {
                 therapeuticsInDevelopment: values.therapeuticsInDevelopment?.map((therapeutic) => therapeutic.label).join(",") || "",
                 therapeuticsOfInterest: values.therapeuticsOfInterest?.map((therapeutic) => therapeutic.label).join(",") || "",
                 metadata: JSON.stringify({
-                    // ...(organization?.metadata ? JSON.parse(JSON.stringify(organization.metadata)) : undefined),
                     otherTherapeuticsInDevelopment: values.otherTherapeuticsInDevelopment,
                     otherTherapeuticsOfInterest: values.otherTherapeuticsOfInterest
                 })
@@ -319,8 +199,6 @@ export default function OrganizationOnboardingForm(
                     formData.append(key, value)
                 }
             });
-
-            // console.log(`create organization with metadata`, values.metadata)
 
             if (organizationData?.id) {
                 // organization already exists, just update data, don't create a new org
@@ -372,82 +250,6 @@ export default function OrganizationOnboardingForm(
             setLoading(false);
         }
     }
-
-    useEffect(() => {
-        async function fetchOrganizationData() {
-            if (session?.user?.organizationId && pathname === "/onboarding/organization") {
-                if (organizationData) {
-                    // Find the current user's title from the members list
-                    const currentUserMember = organizationData?.members?.find(
-                        (member: any) => member.userId === session.user.id
-                    );
-                    const currentUserTitle = currentUserMember?.title || "";
-
-                    const fetchedValues = {
-                        id: organizationData.id || "",
-                        description: organizationData.description || "",
-                        name: organizationData.name || "",
-                        yearFounded: organizationData.yearFounded || "",
-                        contactEmail: organizationData.contactEmail || "",
-                        subdomain: organizationData.subdomain || "",
-                        incorporationStatus: organizationData.incorporationStatus || undefined,
-                        // moneyRaised: organizationData.moneyRaised || 0,
-                        // moneyDeployed: organizationData.moneyDeployed || 0,
-                        // researchBudget: organizationData.researchBudget || 0,
-                        // title: currentUserTitle,  // Title of the user at the org
-                        website: organizationData.website || "",
-                        therapeuticsInDevelopment: organizationData.therapeuticsInDevelopment?.map((therapeutic: any) => ({
-                            label: therapeutic,
-                            value: therapeutic
-                        })),
-                        otherTherapeuticsInDevelopment: typeof organizationData?.metadata == 'object' ? (organizationData?.metadata as {
-                            [key: string]: any
-                        })?.otherTherapeuticsInDevelopment : undefined,
-                        therapeuticsOfInterest: organizationData.therapeuticsOfInterest?.map((modality: any) => ({
-                            label: modality,
-                            value: modality
-                        })),
-                        otherTherapeuticsOfInterest: typeof organizationData?.metadata == 'object' ? (organizationData?.metadata as {
-                            [key: string]: any
-                        })?.otherTherapeuticsOfInterest : undefined,
-                        address1: organizationData.address1 || "",
-                        address2: organizationData.address2 || "",
-                        formattedAddress: organizationData.formattedAddress || "",
-                        city: organizationData.city || "",
-                        region: organizationData.region || "",
-                        postalCode: organizationData.postalCode || "",
-                        country: organizationData.country || "",
-                        lat: parseFloat(organizationData.lat || "0"),
-                        lng: parseFloat(organizationData.lng || "0"),
-                        image: organizationData.image || "",
-                        // name: organizationData.name || "",
-                        logo: organizationData.logo || "",
-                        imageBlurhash: organizationData.imageBlurhash || "",
-                        statedGoal: organizationData.statedGoal || null,
-                    };
-
-                    if (organizationData.image) {
-                        try {
-                            const orgPhoto: File = await getPublicFile(organizationData.image)
-                            if (orgPhoto) {
-                                const fileWithPreview = Object.assign(orgPhoto, {
-                                    preview: URL.createObjectURL(orgPhoto),
-                                })
-                                setSelectedFile(fileWithPreview)
-                            }
-                        } catch (e) {
-                            console.error(e)
-                        }
-                    }
-
-                    setDefaultOrganizationValues(fetchedValues);
-                    newOrgForm.reset(fetchedValues); // Reset form with fetched data
-                }
-            }
-        }
-
-        fetchOrganizationData();
-    }, [session, newOrgForm]);
 
     return (
         <TooltipProvider>

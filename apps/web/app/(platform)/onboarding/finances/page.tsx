@@ -1,8 +1,60 @@
 import {Separator} from "@comend/components/ui/separator";
 import {TooltipProvider} from "@comend/components/ui/tooltip";
+import { getOrganizationFromOrganizationId } from "@comend/lib/fetchers";
 import FinancesOnboardingForm from "~web/components/finances-onboarding-form";
 
-export default function FinancesOnboardingPage() {
+export default async function FinancesOnboardingPage({
+    searchParams,
+}: {
+    searchParams: { [key: string]: string | string[] | undefined }
+}) {
+    let organization = undefined
+    const orgId: string | undefined = typeof searchParams.id === 'string' ? searchParams.id : undefined
+    if (orgId) {
+        organization = await getOrganizationFromOrganizationId(orgId, {
+            id: true,
+            public: true,
+            verified: true,
+            published: true,
+            name: true,
+            description: true,
+            contactEmail: true,
+            logo: true,
+            image: true,
+            headerImage: true,
+            biopharmaConsentSettings: true,
+            subdomain: true,
+            customDomain: true,
+            statedGoal: true,
+            yearFounded: true,
+            incorporationStatus: true,
+            therapeuticsOfInterest: true,
+            therapeuticsInDevelopment: true,
+            website: true,
+            moneyRaised: true,
+            moneyDeployed: true,
+            researchBudget: true,
+            createdAt: true,
+            updatedAt: true,
+            user: true,
+            userId: true,
+            roadmaps: true,
+            members: true,
+            clients: true,
+            invitations: true,
+            membershipRequests: true,
+            conditions: true,
+            kanban: true,
+            milestones: true,
+            platformNotifications: true,
+            reviews: true,
+            savedCompanies: true,
+            tools: true,
+            rfps: true,
+            metadata: true
+        })
+    }
+
     return (
         <TooltipProvider>
             <main className="w-full max-w-7xl mx-auto">
@@ -25,8 +77,9 @@ export default function FinancesOnboardingPage() {
                     <Separator/>
 
                     <FinancesOnboardingForm
-                        nextLink={"/app/marketplace/service-providers"}
-                        previousLink={"/onboarding/research"}
+                        organizationData={organization}
+                        nextLink={"/app/dashboard"}
+                        previousLink={orgId ? `/onboarding/research?id=${orgId}` : `/onboarding/research`}
                         showSkip={false}
                     />
                 </div>

@@ -47,6 +47,7 @@ import {
     editBiosampleForm,
     editDataToolForm,
     editDiseaseModelForm,
+    editOrgFormSchema,
     MemberRequestWithUserAndOrganization,
     Milestone,
     Option,
