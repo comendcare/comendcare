@@ -51,7 +51,7 @@ export default async function FinancesOnboardingPage({
             savedCompanies: true,
             tools: true,
             rfps: true,
-            metadata: true
+            metadata: true,
         })
     }
 
@@ -77,7 +77,7 @@ export default async function FinancesOnboardingPage({
                     <Separator/>
 
                     <FinancesOnboardingForm
-                        organizationData={organization}
+                        organizationData={organization?.data}
                         nextLink={"/app/dashboard"}
                         previousLink={orgId ? `/onboarding/research?id=${orgId}` : `/onboarding/research`}
                         showSkip={false}

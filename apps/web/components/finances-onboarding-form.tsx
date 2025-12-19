@@ -7,10 +7,11 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
 import {updateOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
-import {usePathname, useRouter} from "next/navigation";
-import {useEffect, useState} from "react";
+import {useRouter} from "next/navigation";
+import {useState} from "react";
 import MoneyInput from "@comend/components/money-input";
 import { editOrgFormSchema } from "@comend/lib/types";
+import LoadingDots from "@comend/components/icons/loading-dots";
 
 export default function FinancesOnboardingForm(
     {
@@ -28,16 +29,22 @@ export default function FinancesOnboardingForm(
 ) {
     const {data: session} = useSession()
     const router = useRouter()
-    const pathname = usePathname()
-    const [defaultValues, setDefaultValues] = useState<z.infer<typeof editOrgFormSchema> | undefined>(undefined);
+    const [loading, setLoading] = useState(false);
 
     const form = useForm<z.infer<typeof editOrgFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(editOrgFormSchema),
-        defaultValues,
+        defaultValues: {
+            name: organizationData.name, // required in form schema
+            subdomain: organizationData.subdomain, // required in form schema
+            raised: organizationData.moneyRaised,
+            // deployed: organizationData.moneyDeployed, 
+            // budget: organizationData.researchBudget,
+        }
     })
 
     async function onSubmit(values: z.infer<typeof editOrgFormSchema>) {
+        setLoading(true)
         if (!session?.user.organizationId) {
             toast.error("You're not signed into an organization right now.");
             return;
@@ -47,8 +54,8 @@ export default function FinancesOnboardingForm(
 
         const databaseMap: Partial<Record<keyof typeof values, string>> = {
             raised: "moneyRaised",
-            budget: "researchBudget",
-            deployed: "moneyDeployed",
+            // budget: "researchBudget",
+            // deployed: "moneyDeployed",
         };
 
         Object.entries(values).forEach(([key, value]) => {
@@ -68,27 +75,6 @@ export default function FinancesOnboardingForm(
         }
     }
 
-    useEffect(() => {
-        async function fetchOrganizationData() {
-            if (session?.user?.organizationId && pathname === "/onboarding/organization") {
-                if (organizationData) {
-                    const fetchedValues = {
-                        name: organizationData.name, // required in form schema
-                        subdomain: organizationData.subdomain, // required in form schema
-                        raised: organizationData.moneyRaised || 0,
-                        deployed: organizationData.moneyDeployed || 0,
-                        budget: organizationData.researchBudget || 0,
-                    };
-
-                    setDefaultValues(fetchedValues);
-                    form.reset(fetchedValues); // Reset form with fetched data
-                }
-            }
-        }
-
-        fetchOrganizationData();
-    }, [session, form]);
-
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -105,12 +91,12 @@ export default function FinancesOnboardingForm(
                         <Button type="button" onClick={() => router.push(previousLink)}>
                             Previous
                         </Button>
-                        <Button type="submit">
-                            Finish
+                        <Button type="submit" disabled={loading} onClick={() => onSubmit(form.getValues())}>
+                            {loading ? <LoadingDots color="#808080"/> : "Finish"}
                         </Button>
                     </div>
                     {showSkip &&
-                        <Button variant="ghost" onClick={() => router.push("/app/profile")}>
+                        <Button variant="ghost" onClick={() => router.push(nextLink)}>
                             Skip for now
                         </Button>
                     }
