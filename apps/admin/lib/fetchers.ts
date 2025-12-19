@@ -511,6 +511,32 @@ export const getOrganizationRFPsAnalytics = withAdminAuth(
     }
 )
 
+export const getClaimedOrganizationsAnalytics = withAdminAuth(
+    async () => {
+        const totalOrganizations = await prisma.organization.count({})
+        const unclaimedOrganizations = await prisma.organization.count({
+            where: {
+                members: {
+                    some: {
+                        email: {
+                            not: {
+                                contains: "@comendcare.com",
+                                // case: "insensitive",
+                            },
+                        },
+                    },
+                },
+            }
+        })
+        const claimedOrganizations = totalOrganizations - unclaimedOrganizations
+
+        return {
+            totalOrganizations,
+            claimedOrganizations
+        }
+    }
+)
+
 export const getClaimedGenesAnalytics = withAdminAuth(
     async () => {
         const totalGenes = await prisma.gene.count({})
