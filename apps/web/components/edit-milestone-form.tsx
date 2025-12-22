@@ -183,7 +183,8 @@ export function EditMilestoneForm({
                                       clinicalDatasetOptions,
                                       rfpOptions,
                                       milestoneTypeOptions,
-                                      onClose
+                                      onClose,
+                                      className,
                                   }: {
     organization: Organization | undefined
     milestoneData: Milestone
@@ -193,7 +194,8 @@ export function EditMilestoneForm({
     clinicalDatasetOptions: Partial<Tool>[],
     rfpOptions: Partial<RFP>[],
     milestoneTypeOptions: Partial<MilestoneType>[],
-    onClose: () => void
+    onClose: () => void,
+    className?: string,
 }) {
     const {setMilestone, savingList} = useRoadmapStore(useShallow(selector))
     const initializing = useRef(true)
@@ -559,7 +561,7 @@ export function EditMilestoneForm({
                 <form
                     onKeyDown={handleKeyDown}
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
-                    className="h-full max-h-full flex flex-col gap-2 2xl:gap-4 p-4 2xl:p-8"
+                    className={cn("h-full max-h-full flex flex-col gap-2 2xl:gap-4 p-4 2xl:p-8", className)}
                 >
                     <Tabs 
                         value={tab} 
@@ -596,7 +598,7 @@ export function EditMilestoneForm({
                                 {/*<TabsTrigger className="relative data-[state=active]:bg-secondary" value="publications">*/}
                                 {/*    Publications*/}
                                 {/*</TabsTrigger>*/}
-                                <TabsTrigger className="relative data-[state=active]:bg-secondary" value="projects">
+                                <TabsTrigger className="relative data-[state=active]:bg-secondary onborda-recommendations" value="projects">
                                     Similar projects
                                 </TabsTrigger>
                             </TabsList>

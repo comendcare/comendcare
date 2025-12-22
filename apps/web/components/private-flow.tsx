@@ -284,6 +284,7 @@ export const PrivateFlowView = ({
     }, [width, selectedNodeIds, fitView])
 
     useEffect(() => {
+        console.log(`GOT HERE!!!`)
         const startOnbordaAndRemoveToast = () => {
             setSelectedNodeIds([])
             startOnborda('research-plan-tour')
@@ -292,7 +293,7 @@ export const PrivateFlowView = ({
         }
 
         // Only start tour if user is new and is on the /app/research-plan page
-        if (pathname === '/app/research-plan' && !isOnboarded('research-plan-tour')) {
+        if (!isOnboarded('research-plan-tour')) {
             toast("Welcome to Comend!", {
                 id: "onborda",
                 duration: 300000,
