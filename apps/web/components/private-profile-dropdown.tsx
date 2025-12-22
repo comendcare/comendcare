@@ -7,10 +7,12 @@ import {
 } from "@comend/components/ui/dropdown-menu";
 import {Button} from "@comend/components/ui/button";
 import { Ellipsis, Globe } from "lucide-react";
+import { MagicWandIcon } from "@radix-ui/react-icons";
+import { useOnborda } from "./onborda/OnbordaContext";
 
 
 export default function PrivateProfileDropdown({subdomain}: { subdomain: string | null }) {
-
+    const { startOnborda } = useOnborda()
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -42,7 +44,7 @@ export default function PrivateProfileDropdown({subdomain}: { subdomain: string 
                         startOnborda('organization-profile-tour')
                     }}
                 >
-                    <FaWandMagicSparkles/>
+                    <MagicWandIcon/>
                     <span>Take a tour</span>
                 </DropdownMenuItem> */}
             </DropdownMenuContent>

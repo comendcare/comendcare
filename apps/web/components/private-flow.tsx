@@ -284,7 +284,6 @@ export const PrivateFlowView = ({
     }, [width, selectedNodeIds, fitView])
 
     useEffect(() => {
-        console.log(`GOT HERE!!!`)
         const startOnbordaAndRemoveToast = () => {
             setSelectedNodeIds([])
             startOnborda('research-plan-tour')
