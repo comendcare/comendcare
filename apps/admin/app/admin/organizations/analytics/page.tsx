@@ -4,6 +4,7 @@ import {AdminOrganizationsAnalyticsCards} from "~admin/components/admin-organiza
 import {AdminOrganizationsNav} from "~admin/components/admin-organizations-nav";
 import {AdminOrganizationsAnalyticsChart} from "~admin/components/admin-organizations-analytics-chart";
 import { AdminGenesClaimedChart } from "~admin/components/admin-genes-claimed-chart";
+import { AdminOrganizationsClaimedChart } from "~admin/components/admin-organizations-claimed-chart";
 
 export default function AllOrganizations() {
     return (
@@ -26,6 +27,9 @@ export default function AllOrganizations() {
                         </div>
                         <div className="px-4 lg:px-6">
                             <AdminGenesClaimedChart />
+                        </div>
+                        <div className="px-4 lg:px-6">
+                            <AdminOrganizationsClaimedChart />
                         </div>
                     </div>
                 </Suspense>

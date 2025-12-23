@@ -70,12 +70,12 @@ export default async function AdminOrganizationPage({
                     >
                         {url} ↗
                     </a>
-                    <VerifyOrganizationSwitch organization={data}/>
+                    {/* <VerifyOrganizationSwitch organization={data}/> */}
                 </div>
-
-                <EditPAGProfileDialog organization={data} />
-
-                <DeleteOrganizationAlertDialog organization={data} />
+                <div className="flex gap-2">
+                    <EditPAGProfileDialog organization={data} />
+                    <DeleteOrganizationAlertDialog organization={data} />
+                </div>
             </div>
             <OrganizationRoadmaps organizationId={decodeURIComponent(params.id)} />
         </>

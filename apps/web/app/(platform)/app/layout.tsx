@@ -9,6 +9,7 @@ import {Button} from "@comend/components/ui/button";
 import Link from "next/link";
 import * as React from "react";
 import dynamic from "next/dynamic";
+import ClaimInvitationGate from "~web/components/claim-invitation-gate";
 
 const NavUser = dynamic(
     () => import("~web/components/nav-user").then(m => m.NavUser),
@@ -24,7 +25,7 @@ export default async function AppLayoutServer({children}: { children: React.Reac
     const session = await getServerSession(authOptions);
     const userId = session?.user?.id;
 
-    const [memberships, invitations, user, memberRequests] = await Promise.all([
+    const [memberships, invitations, claimOrgInvitations, user, memberRequests] = await Promise.all([
         prisma.member.findMany({
             where: { userId },
             include: {
@@ -37,6 +38,16 @@ export default async function AppLayoutServer({children}: { children: React.Reac
         prisma.invitation.findMany({
             where: { email: session!.user!.email!, accepted: false },
             select: { id: true, role: true, organizationId: true, organization: true },
+            orderBy: { createdAt: "asc" },
+        }),
+        prisma.claimOrganizationInvitation.findMany({
+            where: { email: session!.user!.email!, accepted: false },
+            select: { 
+                id: true, 
+                role: true, 
+                organizationId: true, 
+                organization: true,
+            },
             orderBy: { createdAt: "asc" },
         }),
         prisma.user.findUnique({
@@ -70,6 +81,7 @@ export default async function AppLayoutServer({children}: { children: React.Reac
     if (memberships.length === 0) {
         return (
             <InvitationGate invitations={invitations}>
+            <ClaimInvitationGate claimInvitations={claimOrgInvitations}>
                 <div className="min-h-screen h-full flex flex-col items-center">
                     <header
                         className="px-4 bg-white sticky top-0 flex justify-end h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full z-50 overflow-hidden"
@@ -91,12 +103,14 @@ export default async function AppLayoutServer({children}: { children: React.Reac
                         </Link>
                     </main>
                 </div>
+            </ClaimInvitationGate>
             </InvitationGate>
         )
     }
 
     return (
         <InvitationGate invitations={invitations}>
+        <ClaimInvitationGate claimInvitations={claimOrgInvitations}>
             <AppClientShell
                 user={user}
                 memberships={memberships}
@@ -104,6 +118,7 @@ export default async function AppLayoutServer({children}: { children: React.Reac
             >
                 {children}
             </AppClientShell>
+        </ClaimInvitationGate>
         </InvitationGate>
     );
 }

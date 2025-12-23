@@ -125,6 +125,21 @@ model Member {
   @@unique([userId, organizationId])
 }
 
+model ClaimOrganizationInvitation {
+  id             String       @id @default(cuid())
+  email          String /// @encrypted
+  emailHash      String? /// @encryption:hash(email)
+  role           String       @default("owner") @db.VarChar
+  organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now()) @updatedAt
+  accepted       Boolean      @default(false)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  metadata       Json?
+
+  @@unique([emailHash, organizationId])
+}
+
 model Invitation {
   id             String       @id @default(cuid())
   email          String /// @encrypted
@@ -761,6 +776,7 @@ model Organization {
   metadata                      Json?
   diseaseModel                  DiseaseModel[]
   subscriptions                 Subscription[]
+  claimOrganizationInvitations   ClaimOrganizationInvitation[]
 
   @@index([userId])
 }
