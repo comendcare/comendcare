@@ -3,6 +3,7 @@ import { Separator } from "@comend/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@comend/components/ui/tooltip"
 import { getSession } from "@comend/lib/auth"
 import prisma from "@comend/lib/prisma"
+import { isClaimed } from "@comend/lib/utils"
 import { Member } from "@prisma/client"
 import { CircleCheck, CircleX } from "lucide-react"
 import { notFound, redirect } from "next/navigation"
@@ -55,7 +56,7 @@ export default async function OrganizationMembersPage({
                     </a>
                     <InviteUserToOrgDialog organization={data} />
                     <InviteToClaimOrgDialog organization={data} />
-                    {data.members.filter((member: Member) => !member.email.includes('comendcare.com')).length > 0 
+                    {isClaimed(data.members)
                         ? (
                             <Badge variant={'green'}>
                                 Claimed

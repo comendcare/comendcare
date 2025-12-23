@@ -248,7 +248,7 @@ export default function OrganizationOnboardingForm({
                             aria-label="Create a new organization"
                             className={isNewOrganization ? "bg-gray-200" : ""}
                         >
-                            Create a new organization
+                            {organizationData?.id ? 'Update Organization' : 'Create a new organization'}
                         </ToggleGroupItem>
                         <ToggleGroupItem
                             value="existing"

@@ -18,6 +18,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@comend/components/ui/avatar"
 import {useSession} from "next-auth/react";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import { getOrganizationData, getOrganizationFromOrganizationId } from "@comend/lib/fetchers";
+import { isClaimed } from "@comend/lib/utils";
 
 export default function ClaimInvitationBlocker({
                                               invitations,
@@ -26,7 +27,7 @@ export default function ClaimInvitationBlocker({
     invitations: { id: string; organizationId: string; role: string; organization: Organization }[];
     children: React.ReactNode;
 }) {
-    const {update} = useSession();
+    const {data: session, update} = useSession();
     const router = useRouter();
     const [open] = useState(true); // permanently open until handled
     const [working, setWorking] = useState(false);
@@ -34,27 +35,22 @@ export default function ClaimInvitationBlocker({
     const onAccept = async (invId: string, organizationId: string) => {
         try {
             setWorking(true);
-            const org = await getOrganizationFromOrganizationId(organizationId, {
-                verified: true,
-                members: true,
-            })
-
-            let firstToClaim = true
-            // if there is a non-comend member OR the profile is verified, we consider the profile claimed
-            if (
-                org.success && 
-                (
-                    org.data.members.filter((member: Member) => !member.email.includes('comendcare.com')) || 
-                    org.data.verified
-                )
-            ) {
-                firstToClaim = false
-            }
-
             const res = await acceptClaimOrganizationInvitation(invId);
             if (res?.success) {
                 toast.success("Invitation accepted.");
                 update({});
+
+                // this must happen after the user has been added as a member to the org
+                // otherwise they don't have permissions to access the members list
+                const org = await getOrganizationFromOrganizationId(organizationId, {
+                    verified: true,
+                    members: true,
+                })
+
+                // members that are not the current user
+                const preExistingMembers: Member[] = (org?.data?.members || []).filter((member: Member) => member.email !== session?.user?.email)
+                let firstToClaim = !isClaimed(preExistingMembers)
+
                 // if this is the first user to claim, forward them to the claim forms (onboarding edit)
                 // otherwise the default add membership & delete invitation suffices
                 if (firstToClaim) router.push(`/onboarding/organization?id=${res?.data?.organizationId}`)
@@ -136,7 +132,7 @@ export default function ClaimInvitationBlocker({
                                         <Button
                                             variant="outline"
                                             disabled={working}
-                                            onClick={() => onDecline(inv.id, inv.organizationId)}
+                                            onClick={() => onDecline(inv.id, inv.organization?.id || inv.organizationId)}
                                         >
                                             {working ? <LoadingDots color="#ffffff" /> : "Decline"}
                                         </Button>

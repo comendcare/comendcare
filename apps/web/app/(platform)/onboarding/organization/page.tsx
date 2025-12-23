@@ -11,6 +11,7 @@ export default async function OrganizationOnboardingPage({
     const orgId: string | undefined = typeof searchParams.id === 'string' ? searchParams.id : undefined
     if (orgId) {
         organization = await getOrganizationFromOrganizationId(orgId, {
+            id: true,
             description: true,
             name: true,
             yearFounded: true,

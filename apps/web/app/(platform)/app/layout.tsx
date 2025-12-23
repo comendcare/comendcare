@@ -75,7 +75,6 @@ export default async function AppLayoutServer({children}: { children: React.Reac
         }),
     ]);
 
-
     // If not logged in, render a loading or redirect logic as you already do.
     if (!user) return <div/>;
 
