@@ -2299,6 +2299,46 @@ export const REQUEST_STATUS_TYPE_OPTIONS: any[] = [
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
 
+const moneyField = z.preprocess(
+    (v) => (v === "" || v === null || typeof v === "undefined" ? undefined : Number(v)),
+    z.number().min(0).optional()
+);
+
+export const editOrgFormSchema = z.object({
+    name: z.string().min(2).max(60),
+    subdomain: z.string().min(2, {
+        message: "Your organization's nickname must be at least 2 characters."
+    }).max(60, {
+        message: "Your organization's nickname must be a maximum of 50 characters."
+    }),
+    contactEmail: z.preprocess(
+        (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+        z.string().email({ message: "Please enter a valid email address." }).optional()
+    ),
+    yearFounded: z.string().optional(),
+    incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"]).optional(),
+    raised: moneyField,
+    deployed: moneyField,
+    budget: moneyField,
+
+    description: z.string().max(500, {
+        message: "Your organization's description must be less than 500 characters long."
+    }).optional(),
+    website: z.preprocess(
+        (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+        z.string().url({
+            message: "Enter a valid URL for your organization's website."
+        }).optional()
+    ),
+    therapeuticsInDevelopment: z.array(optionSchema).min(0).optional(),
+    otherTherapeuticsInDevelopment: z.string().optional(),
+    therapeuticsOfInterest: z.array(optionSchema).min(0).optional(),
+    otherTherapeuticsOfInterest: z.string().optional(),
+
+    image: z.string().nullable().optional(),
+    headerImage: z.string().nullable().optional(),
+})
+
 export const diagnosisSchema = z.object({
     diagnosis: z.array(optionSchema)
         .min(1, "A diagnosis type is required")

@@ -47,6 +47,7 @@ import {
     editBiosampleForm,
     editDataToolForm,
     editDiseaseModelForm,
+    editOrgFormSchema,
     MemberRequestWithUserAndOrganization,
     Milestone,
     Option,
@@ -364,7 +365,7 @@ export const createOrganization = withAuth(
             }
         }
 
-        const name = formData.get("orgName") as string;
+        const name = formData.get("name") as string;
         const description = formData.get("description") as string;
         const subdomain = formData.get("subdomain") as string;
         const website = formData.get("website") as string | null;
@@ -1477,6 +1478,67 @@ export const deleteInvitation = withOrganizationAuth(
     ['owner', 'support']
 )
 
+export const declineAndDeleteClaimOrganizationInvitation = withAuth(
+    async (invitationId: string) => {
+        try {
+            const session = await getSession();
+            if (!session?.user?.id) {
+                throw new Error("You must be signed in to perform this action");
+            }
+
+            // Check if the invitation exists and is not already accepted
+            const invitation = await prisma.claimOrganizationInvitation.findUnique({
+                where: {
+                    id: invitationId,
+                },
+            });
+
+            if (invitation?.email !== session.user.email) {
+                return {
+                    success: false,
+                    error: "Error declining invitation: active user email does not match the invite email."
+                }
+            }
+
+            // try {
+            //     await customerIOTrack({
+            //         userId: session.user.id, // the person performing the decline
+            //         event: 'organization_invitation_declined',
+            //         timestamp: new Date(),
+            //         properties: {
+            //             invitation_id: invitation.id,
+            //             organization_id: invitation.organizationId,
+            //             invitee_email: invitation.email,
+            //             role: invitation.role,
+            //         },
+            //     });
+            // } catch (e) {
+            //     console.error('[CIO] track organization_invitation_declined failed:', e);
+            // }
+
+            // Ensure the composite key is valid or fallback to another unique identifier like `id`
+            const deletedInvitation = await prisma.claimOrganizationInvitation.delete({
+                where: {
+                    id: invitation.id
+                },
+            });
+
+            if (!deletedInvitation) {
+                return {success: false, error: "Failed to delete claim organization invitation. Request not found."};
+            }
+
+            revalidatePath("/app/team")
+            revalidatePath("/app/profile")
+
+            return {success: true, data: deletedInvitation};
+
+        } catch (error) {
+            console.error("Error deleting claim organization invitation:", error);
+            return {success: false, error: "Failed to delete claim organization invitation."};
+        }
+    }
+)
+
 export const declineAndDeleteInvitation = withAuth(
     async (invitationId: string) => {
         try {
@@ -1990,6 +2052,105 @@ export const createFollow = withAuth(
         } catch (error: any) {
             logError("Error following organization", error);
             return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
+export const acceptClaimOrganizationInvitation = withAuth(
+    async (invitationId: string) => {
+        try {
+            const session = await getSession();
+            if (!session?.user?.id) {
+                throw new Error("You must be signed in to perform this action");
+            }
+
+            // Check if the invitation exists and is not already accepted
+            const invitation = await prisma.claimOrganizationInvitation.findUnique({
+                where: {
+                    id: invitationId,
+                },
+                include: {
+                    organization: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                            subdomain: true,
+                            members: true,
+                            verified: true,
+                        },
+                    }
+                }
+            });
+
+            // extra auth logic
+            if (invitation?.email !== session.user.email) {
+                return {
+                    success: false,
+                    error: "Error accepting claim organization invitation: active user email does not match the invite email."
+                }
+            }
+
+            if (!invitation || invitation.accepted) {
+                console.log("No valid claim invitation found or it has already been accepted.");
+                return {success: false, error: "failed to follow organization"};
+            }
+
+            // Process invitation: create membership and delete memebership (mark invitation as accepted)
+            await prisma.$transaction([
+                prisma.member.create({
+                    data: {
+                        email: invitation.email,
+                        organizationId: invitation.organization.id,
+                        role: invitation.role || "member",
+                        userId: session.user.id,
+                    },
+                }),
+                prisma.claimOrganizationInvitation.delete({
+                    where: {
+                        id: invitationId,
+                    },
+                }),
+                prisma.user.update({
+                    where: {id: session.user.id},
+                    data: {activeOrganizationId: invitation.organization.id},
+                })
+            ]);
+
+            // await customerIOTrack({
+            //     userId: session.user.id ?? undefined,   // if you have it
+            //     event: 'claim_organization_invitation_accepted',
+            //     timestamp: new Date(),
+            //     properties: {
+            //         invitation_id: invitation.id,        // 🔑 must match the “sent” event
+            //         organization_id: invitation.organizationId,
+            //         invitee_email: invitation.email,
+            //     },
+            // });
+
+            // await writeRawEvent({
+            //     provider: "app",
+            //     eventType: "user_accepted_claim_organization_invitation", // batch payload handled by your register
+            //     occurredAt: new Date(),
+            //     payload: {
+            //         orgId: invitation.organization.id,
+            //         orgName: invitation.organization.name,
+            //         orgSubdomain: invitation.organization.subdomain,
+            //         orgImage: invitation.organization.image,
+            //         userId: session.user.id,
+            //         userName: session.user.name,
+            //         userEmail: session.user.email,
+            //     },
+            // });
+
+            revalidatePath("/app/team")
+            revalidatePath("/app/profile")
+
+            return {success: true, data: invitation};
+        } catch (error) {
+            console.error();
+            logError("Error accepting claim organization invitation:", error);
+            return {success: false, error: "Failed to accept claim organization invitation. Please try again."};
         }
     }
 )

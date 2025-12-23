@@ -7,16 +7,14 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {connectOrganizationToCondition, createCondition} from "@comend/lib/actions";
+import {connectOrganizationToCondition, createCondition, updateCondition} from "@comend/lib/actions";
 import {toast} from "sonner";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import React, {useEffect, useState} from "react";
+import {TooltipProvider} from "@comend/components/ui/tooltip";
+import React, {useState} from "react";
 import {faker} from "@faker-js/faker";
 import LoadingDots from "@comend/components/icons/loading-dots";
-import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
-import type {Organization} from "@prisma/client";
 import {MOLECULAR_MECHANISMS, Option, optionSchema} from "@comend/lib/types";
 import { badgeVariants } from "@comend/components/ui/badge";
 
@@ -52,74 +50,113 @@ export const researchFormSchema = z.object({
     tools: z.array(optionSchema).optional(),
 });
 
+const handleAsyncSearch = async (query: string) => {
+    const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
+    const genes = await res.json();
+
+    return genes; // should be [{ label: "TP53", value: "TP53" }, ...]
+};
+
+const handleConditionAsyncSearch = async (query: string): Promise<Option[]> => {
+    if (!query) return []; // Return empty if no input
+
+    try {
+        const response = await fetch(`/api/conditions?search=${query}`);
+        const data = await response.json();
+
+        // Return the fetched options
+        return data;
+    } catch (error) {
+        console.error("Failed to fetch conditions:", error);
+        return [];
+    }
+};
+
 export default function ResearchOnboardingForm(
     {
+        organizationId,
+        conditionData,
         previousLink,
         nextLink,
         showSkip,
     }:
     {
+        organizationId?: string | undefined,
+        conditionData?: any,
         previousLink: string,
         nextLink: string,
         showSkip: boolean,
     }
 ) {
     faker.seed(123)
-    const {data: session, status} = useSession()
+    const {data: session} = useSession()
     const router = useRouter()
     const [loading, setLoading] = useState(false);
-    const [organization, setOrganization] = useState<Organization | null>();
 
     const form = useForm<z.infer<typeof researchFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(researchFormSchema),
+        defaultValues: {
+            disorder: conditionData?.name ? [{ label: conditionData.name, value: conditionData.name }] : [],
+            categories: (conditionData?.diseaseCategories ?? []).map((cat: string) => ({ label: cat, value: cat })),
+            causal: (conditionData?.causalGenes ?? []).map((gene: string) => ({ label: gene, value: gene })),
+            engaged: conditionData?.numberOfPatientsEngaged?.toString() ?? "",
+        }
     })
 
     async function onSubmit(values: z.infer<typeof researchFormSchema>) {
         setLoading(true)
-
         try {
+            const numOrNull = (s?: string | null) =>
+                s && String(s).trim() !== "" ? parseInt(String(s), 10) : null;
 
-            // Create FormData object
-            const formData = new FormData();
-
-            // Map form values into FormData
-            const data = {
-                name: values.disorder?.[0]?.label || "", // Assume there is only one condition selected
-                summary: values.summary || "",
-                diseaseCategories: values.categories?.map((category) => category.label).join(",") || "",
-                prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator.toString() : "",
-                prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator.toString() : "",
-                numberOfPatientsEngaged: values.engaged ? values.engaged.toString() : "",
-                nationalEstimatedPopulation: values.national ? values.national.toString() : "",
-                globalEstimatedPopulation: values.global ? values.global.toString() : "",
-                relevantDiseaseMechanisms: values.mechanisms?.join(",") || "",
-                causalGenes: values.causal?.map((gene) => gene.label).join(",") || "",
-                associatedGenes: values.genes?.map((gene) => gene.label).join(",") || "",
-                associatedSystems: values.systems?.map((symptom) => symptom.label).join(",") || "",
-                metadata: JSON.stringify({
-                    otherCategories: values.otherCategories
-                })
+            const mappedData: Record<string, any> = {
+                name: values.disorder?.[0]?.label || "",
+                diseaseCategories: (values.categories ?? []).map(i => i.label),
+                numberOfPatientsEngaged: numOrNull(values.engaged),
+                causalGenes: (values.causal ?? []).map(i => i.label),
             };
 
-            // Append data to FormData
-            Object.entries(data).forEach(([key, value]) => {
-                if (value) {
-                    formData.append(key, value)
+            const formData = new FormData();
+            Object.entries(mappedData).forEach(([key, value]) => {
+                if (key === "metadata") {
+                    formData.append(key, JSON.stringify(value ?? {}));
+                } else if (Array.isArray(value)) {
+                    formData.append(key, JSON.stringify(value));
+                } else if (value === null) {
+                    formData.append(key, "null"); // tell the server to clear
+                } else {
+                    formData.append(key, String(value));
                 }
             });
 
             try {
-                await createCondition(formData).then(async (response) => {
-                    if (response.success && response.data) {
-                        const conditionOrg = await connectOrganizationToCondition(session?.user.organizationId, response.data.id)
-                        toast.success("Successfully created condition.")
-                        router.push(nextLink)
-                    } else {
-                        console.error(response.error)
-                        toast.error(response.error)
-                    }
-                })
+                if (conditionData?.id && organizationId) {
+                    await updateCondition(organizationId, formData).then(async (response) => {
+                        if (response.success && response.data) {
+                            // const conditionOrg = await connectOrganizationToCondition(session?.user.organizationId, response.data.id)
+                            toast.success("Successfully updated condition.")
+                            router.push(nextLink)
+                        } else {
+                            console.error(response.error)
+                            toast.error(response.error)
+                        }
+                    })
+                } else {
+                    await createCondition(formData).then(async (response) => {
+                        if (response.success && response.data) {
+                            const conditionOrg = await connectOrganizationToCondition(
+                                organizationId ? organizationId : session?.user.organizationId, 
+                                response.data.id
+                            )
+                            toast.success("Successfully created condition.")
+                            router.push(nextLink)
+                        } else {
+                            console.error(response.error)
+                            toast.error(response.error)
+                        }
+                    })
+                }
 
             } catch (error) {
                 console.error("Failed to create condition:", error)
@@ -127,122 +164,8 @@ export default function ResearchOnboardingForm(
             }
         } catch (error) {
             toast.error("An error occurred while creating the condition.")
-        } finally {
-            setLoading(false)
         }
     }
-
-    const handleAsyncSearch = async (query: string) => {
-        const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
-        const genes = await res.json();
-
-        return genes; // should be [{ label: "TP53", value: "TP53" }, ...]
-    };
-
-    useEffect(() => {
-        const fetchOrganization = async () => {
-            if (status === "loading") {
-                // Wait until status is no longer "loading"
-                return;
-            }
-
-            if (session?.user?.organizationId && status === "authenticated") {
-                try {
-                    console.log('Fetching organization data...');
-                    const response = await getOrganizationFromOrganizationId(session?.user.organizationId, {
-                        id: true,
-                        public: true,
-                        verified: true,
-                        published: true,
-                        name: true,
-                        description: true,
-                        contactEmail: true,
-                        logo: true,
-                        image: true,
-                        headerImage: true,
-                        biopharmaConsentSettings: true,
-                        subdomain: true,
-                        customDomain: true,
-                        statedGoal: true,
-                        yearFounded: true,
-                        incorporationStatus: true,
-                        therapeuticsOfInterest: true,
-                        therapeuticsInDevelopment: true,
-                        website: true,
-                        moneyRaised: true,
-                        moneyDeployed: true,
-                        researchBudget: true,
-                        // address1                  String?
-                        // address2                  String?
-                        // formattedAddress          String?
-                        // city                      String?
-                        // region                    String?
-                        // postalCode                String?
-                        // country                   String?
-                        // lat                       String?
-                        // lng                       String?
-                        createdAt: true,
-                        updatedAt: true,
-                        user: true,
-                        userId: true,
-                        roadmaps: true,
-                        members: true,
-                        clients: true,
-                        invitations: true,
-                        membershipRequests: true,
-                        conditions: true,
-                        kanban: true,
-                        milestones: true,
-                        platformNotifications: true,
-                        reviews: true,
-                        savedCompanies: true,
-                        tools: true,
-                        rfps: true,
-                        metadata: true
-                    });
-                    console.log('API response:', response);
-
-                    if (response.success) {
-                        setOrganization(response.data);
-                        console.log('Organization set:', response.data);
-                    } else {
-                        console.error('Error fetching organization:', response.error);
-                        toast.error(response.error);
-                    }
-                } catch (error) {
-                    console.error('Failed to fetch organization:', error);
-                    toast.error('An error occurred while fetching organization data.');
-                }
-            } else if (status === "unauthenticated") {
-                console.error('User is unauthenticated.');
-                toast.error('User is unauthenticated.');
-            } else {
-                console.error('No organizationId provided in session.');
-                toast.error('No organizationId provided.');
-            }
-        };
-
-        fetchOrganization();
-    }, [setOrganization, session?.user?.organizationId, status])
-
-    const handleConditionAsyncSearch = async (query: string): Promise<Option[]> => {
-        if (!query) return []; // Return empty if no input
-
-        setLoading(true);
-
-        try {
-            const response = await fetch(`/api/conditions?search=${query}`);
-            const data = await response.json();
-
-            // Return the fetched options
-            return data;
-        } catch (error) {
-            console.error("Failed to fetch conditions:", error);
-            return [];
-        } finally {
-            setLoading(false);
-        }
-    };
 
     return (
         <TooltipProvider>
@@ -327,6 +250,7 @@ export default function ResearchOnboardingForm(
                                                         no results found.
                                                     </p>
                                                 }
+                                                showHoverCard={false}
                                             />
                                         </FormControl>
                                         <FormMessage/>
