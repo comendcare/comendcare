@@ -75,6 +75,7 @@ export default async function AppLayoutServer({children}: { children: React.Reac
         }),
     ]);
 
+
     // If not logged in, render a loading or redirect logic as you already do.
     if (!user) return <div/>;
 
@@ -110,6 +111,7 @@ export default async function AppLayoutServer({children}: { children: React.Reac
 
     return (
         <InvitationGate invitations={invitations}>
+        <ClaimInvitationGate claimInvitations={claimOrgInvitations}>
             <AppClientShell
                 user={user}
                 memberships={memberships}
@@ -117,6 +119,7 @@ export default async function AppLayoutServer({children}: { children: React.Reac
             >
                 {children}
             </AppClientShell>
+        </ClaimInvitationGate>
         </InvitationGate>
     );
 }

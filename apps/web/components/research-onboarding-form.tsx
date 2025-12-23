@@ -97,10 +97,10 @@ export default function ResearchOnboardingForm(
         mode: "onChange",
         resolver: zodResolver(researchFormSchema),
         defaultValues: {
-            disorder: conditionData.name ? [{ label: conditionData.name, value: conditionData.name }] : [],
-            categories: (conditionData.diseaseCategories ?? []).map((cat: string) => ({ label: cat, value: cat })),
-            causal: (conditionData.causalGenes ?? []).map((gene: string) => ({ label: gene, value: gene })),
-            engaged: conditionData.numberOfPatientsEngaged?.toString() ?? "",
+            disorder: conditionData?.name ? [{ label: conditionData.name, value: conditionData.name }] : [],
+            categories: (conditionData?.diseaseCategories ?? []).map((cat: string) => ({ label: cat, value: cat })),
+            causal: (conditionData?.causalGenes ?? []).map((gene: string) => ({ label: gene, value: gene })),
+            engaged: conditionData?.numberOfPatientsEngaged?.toString() ?? "",
         }
     })
 
