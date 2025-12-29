@@ -588,7 +588,7 @@ export type ImportSchemaEntry = {
     required: boolean,
     defaultValue: any,
     isValid: (entry: string) => boolean,
-    fetchDatabaseValue?: (entry: string) => any,
+    fetchDatabaseValue?: (entry: string) => Promise<any>,
 }
 
 export type AssetTableData = Asset & {
