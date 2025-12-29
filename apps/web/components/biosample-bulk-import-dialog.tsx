@@ -86,6 +86,7 @@ export async function formatBiosampleData(biosample: any): Promise<{
     })))
 
     console.log(`data`, data)
+    console.log(`errors`, errors)
 
     return {data: data as z.infer<typeof editBiosampleForm>, errors}
 }
@@ -98,8 +99,8 @@ const biosampleImportSchema: ImportSchemaEntry[] = [
         defaultValue: true, 
         isValid: (entry) => typeof entry === 'string',
         fetchDatabaseValue: async (entry) => {
-            if (entry == 'Published') return false
-            if (entry == 'Private') return true
+            if (entry?.trim() == 'Published') return false
+            if (entry?.trim() == 'Private') return true
 
             return true
         }
@@ -123,9 +124,9 @@ const biosampleImportSchema: ImportSchemaEntry[] = [
         databaseKey: 'types',
         required: true,
         defaultValue: [],
-        isValid: (entry) => !!BIOSAMPLE_TYPE_OPTIONS.find(option => option.label === entry),
+        isValid: (entry) => !!BIOSAMPLE_TYPE_OPTIONS.find(option => option.label === entry?.trim()),
         fetchDatabaseValue: async (entry) => {
-            const foundOption = BIOSAMPLE_TYPE_OPTIONS.find(option => option.label === entry)
+            const foundOption = BIOSAMPLE_TYPE_OPTIONS.find(option => option.label === entry?.trim())
             if (foundOption) return [foundOption]
             return []
         }
@@ -164,9 +165,9 @@ const biosampleImportSchema: ImportSchemaEntry[] = [
         databaseKey: 'sex',
         required: false,
         defaultValue: undefined,
-        isValid: (entry) => !!DONOR_SEX_OPTIONS.find(option => option.label === entry),
+        isValid: (entry) => !!DONOR_SEX_OPTIONS.find(option => option.label === entry?.trim()),
         fetchDatabaseValue: async (entry) => {
-            const foundOption = DONOR_SEX_OPTIONS.find(option => option.label === entry)
+            const foundOption = DONOR_SEX_OPTIONS.find(option => option.label === entry?.trim())
             if (foundOption) return foundOption.value
             return undefined
         }
@@ -176,9 +177,9 @@ const biosampleImportSchema: ImportSchemaEntry[] = [
         databaseKey: 'race',
         required: false,
         defaultValue: undefined,
-        isValid: (entry) => !!DONOR_RACE_OPTIONS.find(option => option.label === entry),
+        isValid: (entry) => !!DONOR_RACE_OPTIONS.find(option => option.label === entry?.trim()),
         fetchDatabaseValue: async (entry) => {
-            const foundOption = DONOR_RACE_OPTIONS.find(option => option.label === entry)
+            const foundOption = DONOR_RACE_OPTIONS.find(option => option.label === entry?.trim())
             if (foundOption) return foundOption.value
             return undefined
         }
@@ -214,9 +215,9 @@ const biosampleImportSchema: ImportSchemaEntry[] = [
         databaseKey: 'quantityUnit',
         required: false,
         defaultValue: 'ml',
-        isValid: (entry) => !!QUANTITY_OPTIONS.find(option => option.label === entry),
+        isValid: (entry) => !!QUANTITY_OPTIONS.find(option => option.label === entry?.trim()),
         fetchDatabaseValue: async (entry) => {
-            const foundOption = QUANTITY_OPTIONS.find(option => option.label === entry)
+            const foundOption = QUANTITY_OPTIONS.find(option => option.label === entry?.trim())
             if (foundOption) return foundOption.value
             return 'ml'
         }
@@ -253,7 +254,7 @@ const biosampleImportSchema: ImportSchemaEntry[] = [
         defaultValue: undefined,
         isValid: (entry) => {
             try {
-                const isDate = new Date(entry)
+                const isDate = new Date(entry?.trim())
                 return (isDate instanceof Date && !isNaN(isDate.getTime()))
             } catch (e) {
                 return false
@@ -261,7 +262,7 @@ const biosampleImportSchema: ImportSchemaEntry[] = [
         },
         fetchDatabaseValue: async (entry) => {
             if (entry) {
-                const d = new Date(entry)
+                const d = new Date(entry?.trim())
                 // strip time, only store date (midnight, EST is stored as time in DB)
                 return new Date(d.getFullYear(), d.getMonth(), d.getDate())
             }
