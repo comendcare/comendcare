@@ -10,7 +10,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createBiosample } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
-import { cn, parseCSV } from "@comend/lib/utils";
+import { cn, parseCSV, sleep } from "@comend/lib/utils";
 import { 
     ANATOMICAL_SITE_OPTIONS, 
     AVAILABILITY_OPTIONS, 
@@ -42,7 +42,7 @@ export async function formatBiosampleData(project: any): Promise<{
     const errors: {
         message: string,
         value: any,
-        milestoneTitle: string,
+        id: string,
     }[] = []
 
     let data = Object.fromEntries(await Promise.all(biosampleImportSchema.map(async (option: ImportSchemaEntry) => {
@@ -50,7 +50,7 @@ export async function formatBiosampleData(project: any): Promise<{
             errors.push({
                 message: `Field ${option.spreadsheetKey} is required, and is missing a value.`,
                 value: project[option.spreadsheetKey],
-                milestoneTitle: project['Title'] || 'New project'
+                id: project['Title'] || 'New project'
             })
 
             return [option.databaseKey, option.defaultValue]
@@ -58,7 +58,7 @@ export async function formatBiosampleData(project: any): Promise<{
             errors.push({
                 message: `Field ${option.spreadsheetKey} is formatted incorrectly. This field may not import properly.`,
                 value: project[option.spreadsheetKey],
-                milestoneTitle: project['Title'] || 'New project'
+                id: project['Title'] || 'New project'
             })
 
             return [option.databaseKey, option.defaultValue]
@@ -76,7 +76,7 @@ export async function formatBiosampleData(project: any): Promise<{
             errors.push({
                 message: `Field ${option.spreadsheetKey} encountered an error.`,
                 value: project[option.spreadsheetKey],
-                milestoneTitle: project['Title'] || 'New project'
+                id: project['Title'] || 'New project'
             })
 
             return [option.databaseKey, option.defaultValue]
@@ -87,54 +87,54 @@ export async function formatBiosampleData(project: any): Promise<{
 
     console.log(`data`, data)
 
-    const contactsLength = Math.max((data.contactNames || []).length, (data.contactEmails || []).length)
-    const contacts = []
-    for (let i = 0; i < contactsLength; i++) {
-        if (data.contactNames[i] && data.contactEmails[i]) {
-            contacts.push({
-                name: data.contactNames[i] || "", 
-                email: data.contactEmails[i] || "", 
-                role: null
-            })
-        } else if (data.contactNames[i]) {
-            contacts.push({
-                name: data.contactNames[i] || "", 
-                email: "", 
-                role: null
-            })
-        } else if (data.contactEmails[i]) {
-            contacts.push({
-                name: "", 
-                email: data.contactEmails[i] || "", 
-                role: null
-            })
-        }
-    }
+    // const contactsLength = Math.max((data.contactNames || []).length, (data.contactEmails || []).length)
+    // const contacts = []
+    // for (let i = 0; i < contactsLength; i++) {
+    //     if (data.contactNames[i] && data.contactEmails[i]) {
+    //         contacts.push({
+    //             name: data.contactNames[i] || "", 
+    //             email: data.contactEmails[i] || "", 
+    //             role: null
+    //         })
+    //     } else if (data.contactNames[i]) {
+    //         contacts.push({
+    //             name: data.contactNames[i] || "", 
+    //             email: "", 
+    //             role: null
+    //         })
+    //     } else if (data.contactEmails[i]) {
+    //         contacts.push({
+    //             name: "", 
+    //             email: data.contactEmails[i] || "", 
+    //             role: null
+    //         })
+    //     }
+    // }
 
-    data.contacts = contacts
+    // data.contacts = contacts
 
-    const linksLength = Math.max((data.linkNames || []).length, (data.linkURLs || []).length)
-    const links = []
-    for (let i = 0; i < linksLength; i++) {
-        if (data.linkNames [i] && data.linkURLs[i]) {
-            links.push({
-                name: data.linkNames [i],
-                link: data.linkURLs[i]
-            })
-        } else if (data.linkNames [i]) {
-            links.push({
-                name: data.linkNames [i],
-                link: ""
-            })
-        } else if (data.linkURLs[i]) {
-            links.push({
-                name: "",
-                link: data.linkURLs[i]
-            })
-        }
-    }
+    // const linksLength = Math.max((data.linkNames || []).length, (data.linkURLs || []).length)
+    // const links = []
+    // for (let i = 0; i < linksLength; i++) {
+    //     if (data.linkNames [i] && data.linkURLs[i]) {
+    //         links.push({
+    //             name: data.linkNames [i],
+    //             link: data.linkURLs[i]
+    //         })
+    //     } else if (data.linkNames [i]) {
+    //         links.push({
+    //             name: data.linkNames [i],
+    //             link: ""
+    //         })
+    //     } else if (data.linkURLs[i]) {
+    //         links.push({
+    //             name: "",
+    //             link: data.linkURLs[i]
+    //         })
+    //     }
+    // }
 
-    data.attachments = links
+    // data.attachments = links
 
     return {data: data as z.infer<typeof editBiosampleForm>, errors}
 }
@@ -210,6 +210,8 @@ const biosampleImportSchema: ImportSchemaEntry[] = [
         defaultValue: undefined,
         isValid: (entry) => typeof entry === 'string',
         fetchDatabaseValue: async (entry) => {
+            if (!entry) return []
+
             const res = await fetch(`/api/genes?search=${encodeURIComponent(entry?.trim() || "")}`);
             const foundGenes = await res.json();
 
@@ -230,6 +232,8 @@ const biosampleImportSchema: ImportSchemaEntry[] = [
         defaultValue: undefined,
         isValid: (entry) => typeof entry === 'string',
         fetchDatabaseValue: async (entry) => {
+            if (!entry) return []
+            
             const companiesResponse = await fetch(`/api/companies?search=${encodeURIComponent(entry?.trim() || '')}`)
             const foundCompanies = await companiesResponse.json()
 
@@ -239,22 +243,22 @@ const biosampleImportSchema: ImportSchemaEntry[] = [
             return foundCompanies.concat(foundInstitutions)
         },
     },
-    {
-        spreadsheetKey: 'Diagnoses',
-        databaseKey: 'diagnoses',
-        required: false,
-        defaultValue: undefined,
-        isValid: (entry) => typeof entry === 'string',
-        fetchDatabaseValue: async (entry) => entry.split(","),
-    },
-    {
-        spreadsheetKey: 'Diagnoses Severity',
-        databaseKey: 'diagnosesSeverity',
-        required: false,
-        defaultValue: undefined,
-        isValid: (entry) => typeof entry === 'string',
-        fetchDatabaseValue: async (entry) => entry.split(","),
-    },
+    // {
+    //     spreadsheetKey: 'Diagnoses',
+    //     databaseKey: 'diagnoses',
+    //     required: false,
+    //     defaultValue: undefined,
+    //     isValid: (entry) => typeof entry === 'string',
+    //     fetchDatabaseValue: async (entry) => entry.split(","),
+    // },
+    // {
+    //     spreadsheetKey: 'Diagnoses Severity',
+    //     databaseKey: 'diagnosesSeverity',
+    //     required: false,
+    //     defaultValue: undefined,
+    //     isValid: (entry) => typeof entry === 'string',
+    //     fetchDatabaseValue: async (entry) => entry.split(","),
+    // },
 ]
 
 // export async function formatBiosampleData(biosample: any): Promise<z.infer<typeof editBiosampleForm>> {
@@ -357,7 +361,7 @@ const biosampleImportSchema: ImportSchemaEntry[] = [
 //     return data
 // }
 
-export function ProjectBulkImportDialog({
+export function BiosampleBulkImportDialog({
     isCollapsed = false
 }: {
     isCollapsed?: boolean
@@ -407,8 +411,15 @@ export function ProjectBulkImportDialog({
                 let newNodes: any[] = []
                 let errors: any[] = []
 
+                setImportState('importing')
+                setImportCount(0)
+
                 for (let i = 0; i < result.values.length; i++) {
                     const {data: formattedBiosample, errors: formattedErrors} = await formatBiosampleData(result.values[i])
+                    const newBiosample = await createBiosample(session?.user.organizationId, formattedBiosample)
+                    console.log(`new biosample`, newBiosample)
+                    await sleep(2000)
+                    setImportCount(prev => prev + 1)
 
                     // newNodes.push({
                     //     private: formattedProject.isPrivate,
@@ -438,7 +449,7 @@ export function ProjectBulkImportDialog({
                 // await addMilestones(newNodes)
 
                 setTotalErrors(errors)
-                setImportCount(newNodes.length)
+                // setImportCount(newNodes.length)
 
             } catch (e) {
                 toast('Error!', {
@@ -446,7 +457,7 @@ export function ProjectBulkImportDialog({
                     duration: 6000,
                     description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
                 })
-                console.error("Error: failed to import projects", e)
+                console.error("Error: failed to import biosamples", e)
             }
         } else {
             console.error("Please upload a valid CSV file.");
@@ -480,10 +491,10 @@ export function ProjectBulkImportDialog({
                 <>
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
-                        Import projects
+                        Import biosamples
                     </DialogTitle>
                     <DialogDescription>
-                        Import multiple projects at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1wHQ5TasGlQQF7OsvmK0VRaib8o2rFleZmL4NU5s4w8w/edit?usp=sharing">Project input template</Link>, filling it out, downloading it as a CSV, and uploading it.
+                        Copy our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1O5NOlRhC-qagsIP_Zk_5_CEdMWAy5VEPoCCu3_2WJoE/edit?usp=sharing">Biosample input template</Link>, fill it out, download it as a CSV, and upload it back into the platform. Any optional details you include are stored securely and help us optimize the platform experience.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -495,14 +506,14 @@ export function ProjectBulkImportDialog({
             )} 
             {importState === 'importing' && (
                 <>
-                <DialogHeader>
-                    <DialogTitle className="text-2xl">
-                        Importing... please keep this tab open
-                    </DialogTitle>
-                    <DialogDescription>
-                        We’re processing your file. This can take a few minutes.
-                    </DialogDescription>
-                </DialogHeader>
+                 <DialogHeader>
+                     <DialogTitle className="text-2xl">
+                         Import biosamples
+                     </DialogTitle>
+                     <DialogDescription>
+                         Copy our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1O5NOlRhC-qagsIP_Zk_5_CEdMWAy5VEPoCCu3_2WJoE/edit?usp=sharing">Biosample input template</Link>, fill it out, download it as a CSV, and upload it back into the platform. Any optional details you include are stored securely and help us optimize the platform experience.
+                     </DialogDescription>
+                 </DialogHeader>
                 <div className="h-[180px] w-full flex gap-4 justify-center items-center">
                     <LoaderCircle className={cn("h-[40px] w-[40px] animate-spin")}/>
                     <p>{importCount > 0 ? `${importCount} of ${totalItems} samples imported` : `Processing file...`}</p>
@@ -513,10 +524,10 @@ export function ProjectBulkImportDialog({
                 <>
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
-                        Finished importing
+                        Import biosamples
                     </DialogTitle>
                     <DialogDescription>
-                        We've finished processing your file, it is now safe to close this tab.
+                        Copy our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1O5NOlRhC-qagsIP_Zk_5_CEdMWAy5VEPoCCu3_2WJoE/edit?usp=sharing">Biosample input template</Link>, fill it out, download it as a CSV, and upload it back into the platform. Any optional details you include are stored securely and help us optimize the platform experience.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="w-full flex flex-col gap-4 justify-center">
@@ -524,19 +535,19 @@ export function ProjectBulkImportDialog({
                     {totalErrors.length > 0 
                         ? (
                             <div className="w-full flex flex-col justify-start gap-4">
-                            <p>⚠️ A few details didn’t import for the projects below. Please review them and add any missing information.</p>
+                            <p>⚠️ A few details didn’t import for the biosamples below. Please review them and add any missing information.</p>
                             <ul className="w-full flex flex-col gap-2">
                                 {totalErrors.map((error, index) => (
                                     <Badge variant={"red"} key={index} className="w-full">
                                         <CircleX className="h-4 w-4 min-h-4 min-w-4"/>
-                                        {error?.[0]?.milestoneTitle}
+                                        {error?.[0]?.id}
                                     </Badge>
                                 ))}
                             </ul>
                             </div>
                         ) 
                         : (
-                            <p>Successfully imported all projects!</p>
+                            <p>Successfully imported all biosamples!</p>
                         )
                     }
                     <div className="w-full flex justify-end">
