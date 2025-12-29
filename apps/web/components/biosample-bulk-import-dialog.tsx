@@ -35,7 +35,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/t
 import { Badge } from "@comend/components/ui/badge";
 import Papa from "papaparse";
 
-export async function formatBiosampleData(project: any): Promise<{
+export async function formatBiosampleData(biosample: any): Promise<{
     data: z.infer<typeof editBiosampleForm>,
     errors: any[]
 }> {
@@ -46,19 +46,19 @@ export async function formatBiosampleData(project: any): Promise<{
     }[] = []
 
     let data = Object.fromEntries(await Promise.all(biosampleImportSchema.map(async (option: ImportSchemaEntry) => {
-        if (!project[option.spreadsheetKey] && option.required) {
+        if (!biosample[option.spreadsheetKey] && option.required) {
             errors.push({
                 message: `Field ${option.spreadsheetKey} is required, and is missing a value.`,
-                value: project[option.spreadsheetKey],
-                id: project['Title'] || 'New project'
+                value: biosample[option.spreadsheetKey],
+                id: biosample['Title'] || 'New biosample'
             })
 
             return [option.databaseKey, option.defaultValue]
-        } else if (project[option.spreadsheetKey] && !option.isValid(project[option.spreadsheetKey])) {
+        } else if (biosample[option.spreadsheetKey] && !option.isValid(biosample[option.spreadsheetKey])) {
             errors.push({
                 message: `Field ${option.spreadsheetKey} is formatted incorrectly. This field may not import properly.`,
-                value: project[option.spreadsheetKey],
-                id: project['Title'] || 'New project'
+                value: biosample[option.spreadsheetKey],
+                id: biosample['Title'] || 'New biosample'
             })
 
             return [option.databaseKey, option.defaultValue]
@@ -68,15 +68,15 @@ export async function formatBiosampleData(project: any): Promise<{
 
         try {
             if (option.fetchDatabaseValue) {
-                val = await option.fetchDatabaseValue(project[option.spreadsheetKey])
-            } else if (project[option.spreadsheetKey]) {
-                val = project[option.spreadsheetKey]
+                val = await option.fetchDatabaseValue(biosample[option.spreadsheetKey])
+            } else if (biosample[option.spreadsheetKey]) {
+                val = biosample[option.spreadsheetKey]
             }
         } catch (error) {
             errors.push({
                 message: `Field ${option.spreadsheetKey} encountered an error.`,
-                value: project[option.spreadsheetKey],
-                id: project['Title'] || 'New project'
+                value: biosample[option.spreadsheetKey],
+                id: biosample['Title'] || 'New biosample'
             })
 
             return [option.databaseKey, option.defaultValue]
@@ -444,7 +444,7 @@ export function BiosampleBulkImportDialog({
                                 setTotalItems(0)
                             }}
                         >
-                            Import more projects
+                            Import more biosamples
                         </Button>
                     </div>
                 </div>
