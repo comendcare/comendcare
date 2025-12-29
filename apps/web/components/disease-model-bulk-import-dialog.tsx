@@ -505,8 +505,8 @@ export function DiseaseModelBulkImportDialog({
                 let errors: any[] = []
 
                 for (let i = 0; i < result.values.length; i++) {
-                    const {data: formattedBiosample, errors: formattedErrors} = await formatDiseaseModelData(result.values[i])
-                    const newDiseaseModel = await createDiseaseModel(session?.user.organizationId, formattedBiosample)
+                    const {data: formattedDiseaseModel, errors: formattedErrors} = await formatDiseaseModelData(result.values[i])
+                    const newDiseaseModel = await createDiseaseModel(session?.user.organizationId, formattedDiseaseModel)
                     setImportCount(prev => prev + 1)
                     if (formattedErrors.length > 0) errors.push(formattedErrors)
                 }
@@ -518,7 +518,7 @@ export function DiseaseModelBulkImportDialog({
                     duration: 6000,
                     description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
                 })
-                console.error("Error: failed to import biosamples", e)
+                console.error("Error: failed to import disease models", e)
             }
         } else {
             console.error("Please upload a valid CSV file.");
@@ -598,7 +598,7 @@ export function DiseaseModelBulkImportDialog({
                     {totalErrors.length > 0 
                         ? (
                             <div className="w-full flex flex-col justify-start gap-4">
-                            <p>⚠️ A few details didn’t import for the biosamples below. Please review them and add any missing information.</p>
+                            <p>⚠️ A few details didn’t import for the disease models below. Please review them and add any missing information.</p>
                             <ul className="w-full flex flex-col gap-2">
                                 {totalErrors.map((error, index) => (
                                     <Badge variant={"red"} key={index} className="w-full">
@@ -610,7 +610,7 @@ export function DiseaseModelBulkImportDialog({
                             </div>
                         ) 
                         : (
-                            <p>Successfully imported all biosamples!</p>
+                            <p>Successfully imported all disease models!</p>
                         )
                     }
                     <div className="w-full flex justify-end">
@@ -622,7 +622,7 @@ export function DiseaseModelBulkImportDialog({
                                 setTotalItems(0)
                             }}
                         >
-                            Import more biosamples
+                            Import more disease models
                         </Button>
                     </div>
                 </div>
