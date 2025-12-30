@@ -22,6 +22,7 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<{
     errors: any[]
 }> {
     const errors: {
+        key: 'REQUIRED_MISSING' | 'INCORRECT_FORMAT' | 'ERROR',
         message: string,
         value: any,
         id: string,
@@ -30,7 +31,8 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<{
     let data = Object.fromEntries(await Promise.all(diseaseModelImportSchema.map(async (option: ImportSchemaEntry) => {
         if (!diseaseModel[option.spreadsheetKey] && option.required) {
             errors.push({
-                message: `Field ${option.spreadsheetKey} is required, and is missing a value.`,
+                key: 'REQUIRED_MISSING',
+                message: `Field '${option.spreadsheetKey}' is required, and is missing a value.`,
                 value: diseaseModel[option.spreadsheetKey],
                 id: diseaseModel['Title'] || 'New disease model'
             })
@@ -38,7 +40,8 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<{
             return [option.databaseKey, option.defaultValue]
         } else if (diseaseModel[option.spreadsheetKey] && !option.isValid(diseaseModel[option.spreadsheetKey])) {
             errors.push({
-                message: `Field ${option.spreadsheetKey} is formatted incorrectly. This field may not import properly.`,
+                key: 'INCORRECT_FORMAT',
+                message: `Field '${option.spreadsheetKey}' is formatted incorrectly. This field may not import properly.`,
                 value: diseaseModel[option.spreadsheetKey],
                 id: diseaseModel['Title'] || 'New disease model'
             })
@@ -56,7 +59,8 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<{
             }
         } catch (error) {
             errors.push({
-                message: `Field ${option.spreadsheetKey} encountered an error.`,
+                key: 'ERROR',
+                message: `Field '${option.spreadsheetKey}' encountered an error.`,
                 value: diseaseModel[option.spreadsheetKey],
                 id: diseaseModel['Title'] || 'New disease model'
             })
@@ -115,9 +119,6 @@ export async function formatDiseaseModelData(diseaseModel: any): Promise<{
     }
 
     data.attachments = links
-
-    console.log(`data`, data)
-    console.log(`errors`, errors)
 
     return {data: data as z.infer<typeof editDiseaseModelForm>, errors}
 }
@@ -293,8 +294,13 @@ export function DiseaseModelBulkImportDialog({
 
                 for (let i = 0; i < result.values.length; i++) {
                     const {data: formattedDiseaseModel, errors: formattedErrors} = await formatDiseaseModelData(result.values[i])
-                    const newDiseaseModel = await createDiseaseModel(session?.user.organizationId, formattedDiseaseModel)
-                    setImportCount(prev => prev + 1)
+
+                    // only create if it has all required fields
+                    if (!formattedErrors.map(error => error.key).includes('REQUIRED_MISSING')) {
+                        const newDiseaseModel = await createDiseaseModel(session?.user.organizationId, formattedDiseaseModel)
+                        setImportCount(prev => prev + 1)
+                    }
+
                     if (formattedErrors.length > 0) errors.push(formattedErrors)
                 }
 

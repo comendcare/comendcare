@@ -18,136 +18,12 @@ import Papa from "papaparse";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { Badge } from "@comend/components/ui/badge";
 
-// export async function formatClinicalDatasetData(biosample: any): Promise<z.infer<typeof editDataToolForm>> {
-
-//     const data: z.infer<typeof editDataToolForm> = {
-//         title: biosample['Title']?.trim(),
-//         description: biosample['Description']?.trim(),
-//         isPrivate: true,
-//         types: []
-//         // isPrivate: biosample['Visibility'] ? (biosample['Visibility'] === 'Published' ? false : true) : true
-//     }
-//     return data
-// }
-
-// export function AssetBulkImportDialog() {
-//     const router = useRouter()
-//     const pathname = usePathname()
-//     const {data: session} = useSession()
-//     const [isOpen, setIsOpen] = useState(false)
-//     const [isImporting, setIsImporting] = useState(false)
-//     const [importCount, setImportCount] = useState(0)
-//     const [totalItems, setTotalItems] = useState(0)
-
-//     const handleImport = async (file: File | undefined) => {
-//         setIsImporting(true)
-//         if (file && file.name.endsWith(".csv")) {
-//             // parse CSV file
-//             try {
-//                 const result = await parseCSV(
-//                     file,
-//                     [
-//                         {key: 'Title', required: false, defaultValue: 'Untitled Tool', isValid: (entry) => typeof entry === 'string' && entry.length > 0},
-//                         {key: 'Description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'}
-//                     ]
-//                 )
-
-//                 setTotalItems(result.values.length)
-//                 setImportCount(0)
-    
-//                 if (result.errors.length > 0) {
-//                     toast('Warning!', {
-//                         position: "bottom-left",
-//                         duration: 6000,
-//                         description: `Missing fields in import file: A title is required for each Tool. Edit the tool to add title.`
-//                     })
-//                     console.error("Error: imported tools are missing required fields", result.errors)
-//                 }
-
-//                 for (let i = 0; i < result.values.length; i++) {
-//                     const clinicalDataset = result.values[i]
-
-//                     let formattedClinicalDataset = await formatClinicalDatasetData(clinicalDataset)
-//                     console.log(`create clinical dataset with data`, formattedClinicalDataset)
-
-//                     const newDataset = await createClinicalDataset(session?.user.organizationId, formattedClinicalDataset)
-//                     setImportCount((prev) => prev + 1)
-//                 }
-//             } catch (e) {
-//                 toast('Error!', {
-//                     position: "bottom-left",
-//                     duration: 6000,
-//                     description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
-//                 })
-//                 console.error("Error: failed to import tools", e)
-//             }
-//         } else {
-//             console.error("Please upload a valid CSV file.");
-//         }
-
-//         await revalidate(pathname)
-//         setIsOpen(false)
-//         setIsImporting(false)
-//         setImportCount(0)
-//         setTotalItems(0)
-
-//         router.refresh()
-//     }
-    
-//     return (
-//         <Dialog open={isOpen} onOpenChange={(open: boolean) => setIsOpen(open)}>
-//             <DialogTrigger asChild>
-//                 <Button 
-//                     variant={"ghost"}
-//                     onClick={() => setIsOpen(true)}
-//                 >
-//                     <Import />
-//                     <p>{`Import clinical datasets`}</p>
-//                 </Button>
-//             </DialogTrigger>
-//             <DialogContent className="flex flex-col justify-start">
-//             {isImporting ? (
-//                 <>
-//                 <DialogHeader>
-//                     <DialogTitle className="text-2xl">
-//                         Importing... please keep this tab open
-//                     </DialogTitle>
-//                     <DialogDescription>
-//                         We’re processing your file. This can take a few minutes.
-//                     </DialogDescription>
-//                 </DialogHeader>
-//                 <div className="h-[180px] w-full flex gap-4 justify-center items-center">
-//                     <LoaderCircle className={cn("h-[40px] w-[40px] animate-spin")}/>
-//                     <p>{importCount > 0 ? `${importCount} of ${totalItems} datasets imported` : `Processing file...`}</p>
-//                 </div>
-//                 </>
-//             ) : (
-//                 <>
-//                 <DialogHeader>
-//                     <DialogTitle className="text-2xl">
-//                         Import clinical datasets
-//                     </DialogTitle>
-//                     <DialogDescription>
-//                         Import multiple clinical datasets at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1AJYdnvlPTYRR5nx2xz65lpQnK9RfCpkouEtshEsKSb0/edit?usp=sharing">clinical dataset input template</Link>, filling it out, downloading it as a CSV, and uploading it.
-//                     </DialogDescription>
-//                 </DialogHeader>
-
-//                 <FileUploadForm 
-//                     accept=".csv" 
-//                     onSubmit={handleImport}
-//                 />
-//                 </>
-//             )}
-//             </DialogContent>
-//         </Dialog>
-//     )
-// }
-
 export async function formatClinicalDatasetData(clinicalDataset: any): Promise<{
     data: z.infer<typeof editDataToolForm>,
     errors: any[]
 }> {
     const errors: {
+        key: 'REQUIRED_MISSING' | 'INCORRECT_FORMAT' | 'ERROR',
         message: string,
         value: any,
         id: string,
@@ -156,7 +32,8 @@ export async function formatClinicalDatasetData(clinicalDataset: any): Promise<{
     let data = Object.fromEntries(await Promise.all(clinicalDatasetImportSchema.map(async (option: ImportSchemaEntry) => {
         if (!clinicalDataset[option.spreadsheetKey] && option.required) {
             errors.push({
-                message: `Field ${option.spreadsheetKey} is required, and is missing a value.`,
+                key: 'REQUIRED_MISSING',
+                message: `Field '${option.spreadsheetKey}' is required, and is missing a value.`,
                 value: clinicalDataset[option.spreadsheetKey],
                 id: clinicalDataset['Title'] || 'New clinical dataset'
             })
@@ -164,7 +41,8 @@ export async function formatClinicalDatasetData(clinicalDataset: any): Promise<{
             return [option.databaseKey, option.defaultValue]
         } else if (clinicalDataset[option.spreadsheetKey] && !option.isValid(clinicalDataset[option.spreadsheetKey])) {
             errors.push({
-                message: `Field ${option.spreadsheetKey} is formatted incorrectly. This field may not import properly.`,
+                key: 'INCORRECT_FORMAT',
+                message: `Field '${option.spreadsheetKey}' is formatted incorrectly. This field may not import properly.`,
                 value: clinicalDataset[option.spreadsheetKey],
                 id: clinicalDataset['Title'] || 'New clinical dataset'
             })
@@ -182,7 +60,8 @@ export async function formatClinicalDatasetData(clinicalDataset: any): Promise<{
             }
         } catch (error) {
             errors.push({
-                message: `Field ${option.spreadsheetKey} encountered an error.`,
+                key: 'ERROR',
+                message: `Field '${option.spreadsheetKey}' encountered an error.`,
                 value: clinicalDataset[option.spreadsheetKey],
                 id: clinicalDataset['Title'] || 'New clinical dataset'
             })
@@ -192,9 +71,6 @@ export async function formatClinicalDatasetData(clinicalDataset: any): Promise<{
 
         return [option.databaseKey, val]
     })))
-
-    console.log(`data`, data)
-    console.log(`errors`, errors)
 
     return {data: data as z.infer<typeof editDataToolForm>, errors}
 }
@@ -266,8 +142,13 @@ export function AssetBulkImportDialog({
 
                 for (let i = 0; i < result.values.length; i++) {
                     const {data: formattedClinicalDataset, errors: formattedErrors} = await formatClinicalDatasetData(result.values[i])
-                    const newClinicalDataset = await createClinicalDataset(session?.user.organizationId, formattedClinicalDataset)
-                    setImportCount(prev => prev + 1)
+
+                    // only crate if it has all required fields
+                    if (!formattedErrors.map(error => error.key).includes('REQUIRED_MISSING')) {
+                        const newClinicalDataset = await createClinicalDataset(session?.user.organizationId, formattedClinicalDataset)
+                        setImportCount(prev => prev + 1)
+                    }
+
                     if (formattedErrors.length > 0) errors.push(formattedErrors)
                 }
 
