@@ -54,24 +54,6 @@ export function MilestoneTemplateCardMultiSelect({ milestoneData, selectedMilest
     )
 }
 
-export function EmptyResearchPlanCard() {
-    const router = useRouter()
-
-    return (
-        <button onClick={() => {
-            router.refresh()
-        }}>
-            <Card className="h-full relative bg-white shadow-sm rounded-lg text-left hover:bg-secondary cursor-pointer pt-6">
-                <CardContent className="h-full flex flex-col justify-center items-center gap-2">
-                    <CardTitle>{"Start from scratch"}</CardTitle>
-                    <Plus className="h-20 w-20"/>
-                    <CardDescription>{`Create an empty research plan`}</CardDescription>
-                </CardContent>
-            </Card>
-        </button>
-    )
-}
-
 export function ResearchPlanTemplateCardSelect({ researchPlanData, selectedResearchPlanId, setSelectedResearchPlanId }: {researchPlanData: any, selectedResearchPlanId: string | undefined, setSelectedResearchPlanId: (value: SetStateAction<string | undefined>) => void}) {
     return (
         <button onClick={() => {selectedResearchPlanId !== researchPlanData.title ? setSelectedResearchPlanId(researchPlanData.title) : setSelectedResearchPlanId(undefined)}}>
