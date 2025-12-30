@@ -47,9 +47,9 @@ const EditRFPFormLazy = dynamic(
 const preloadEditRFPForm = () => { void import("./edit-rfp-form"); };
 
 export const NewRFPDialog = ({
-    iconOnly = false,
+    trigger,
 }: {
-    iconOnly?: boolean,
+    trigger: React.ReactNode,
 }) => {
     const [isOpen, setIsOpen] = useState(false)
     const [isClosing, setIsClosing] = useState(false)
@@ -67,23 +67,10 @@ export const NewRFPDialog = ({
                 else setIsOpen(open)
             }}
         >
-            {iconOnly ? (
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button variant={"cta"} size={"icon"} onClick={() => setIsOpen(true)}>
-                            <Plus />
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        Create RFP
-                    </TooltipContent>
-                </Tooltip>
-            ) : (
-                <Button variant={"cta"} onClick={() => setIsOpen(true)}>
-                    <Plus />
-                    {`Create RFP`}
-                </Button>
-            )}
+            <DialogTrigger asChild onClick={() => setIsOpen(true)}>
+                {trigger}
+            </DialogTrigger>
+
             <DialogContent className="gap-0">
                 <DialogHeader className="pb-4">
                     <DialogTitle>
