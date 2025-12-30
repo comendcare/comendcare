@@ -210,10 +210,10 @@ export function AssetBulkImportDialog({
                 <>
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
-                        Import clinical datasets
+                        Importing... please keep this tab open
                     </DialogTitle>
                     <DialogDescription>
-                        Import multiple clinical datasets at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1AJYdnvlPTYRR5nx2xz65lpQnK9RfCpkouEtshEsKSb0/edit?usp=sharing">clinical dataset input template</Link>, filling it out, downloading it as a CSV, and uploading it.
+                        We’re processing your file. This can take a few minutes.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -227,11 +227,8 @@ export function AssetBulkImportDialog({
                 <>
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
-                        Import clinical datasets
+                        Clinical datasets imported
                     </DialogTitle>
-                    <DialogDescription>
-                        Import multiple clinical datasets at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1AJYdnvlPTYRR5nx2xz65lpQnK9RfCpkouEtshEsKSb0/edit?usp=sharing">clinical dataset input template</Link>, filling it out, downloading it as a CSV, and uploading it.
-                    </DialogDescription>
                 </DialogHeader>
                 
                 <div className="w-full flex flex-col gap-4 justify-center">

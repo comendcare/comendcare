@@ -362,10 +362,10 @@ export function DiseaseModelBulkImportDialog({
                 <>
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
-                        Import disease models
+                        Importing... please keep this tab open
                     </DialogTitle>
                     <DialogDescription>
-                        Import multiple disease models at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1Hwdh6LOwWhiK3lEt3gLnURLmQgfsy59CXbxYCqm5uxs/edit?usp=sharing">Disease model input template</Link>, filling it out, downloading it as a CSV, and uploading it.
+                        We’re processing your file. This can take a few minutes.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -379,11 +379,8 @@ export function DiseaseModelBulkImportDialog({
                 <>
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
-                        Import disease models
+                        Disease models imported
                     </DialogTitle>
-                    <DialogDescription>
-                        Import multiple disease models at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1Hwdh6LOwWhiK3lEt3gLnURLmQgfsy59CXbxYCqm5uxs/edit?usp=sharing">Disease model input template</Link>, filling it out, downloading it as a CSV, and uploading it.
-                    </DialogDescription>
                 </DialogHeader>
                 
                 <div className="w-full flex flex-col gap-4 justify-center">
