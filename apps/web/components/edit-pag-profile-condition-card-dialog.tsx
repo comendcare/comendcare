@@ -81,6 +81,10 @@ export default function EditPAGProfileConditionCardDialog({
                 label: system,
                 value: system,
             })),
+            symptoms: (condition.associatedSignsAndSymptoms ?? []).map((s) => ({
+                label: s,
+                value: s,
+            })),
             // tags are stored as comma-separated string in your form:
             tags: conditionTags.join(", "),
             prevalenceNumerator: condition.prevalenceNumerator?.toString() ?? "",
@@ -224,6 +228,22 @@ export default function EditPAGProfileConditionCardDialog({
         // all dialogs should be either fully closed or fully open
         if (!unsavedChangesIsOpen) setIsClosing(false)
     }, [unsavedChangesIsOpen])
+
+    const handleHpoAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return [];
+        setLoading(true);
+        try {
+            // Best: proxy through your own API route (see next section)
+            const res = await fetch(`/api/hpo/search?search=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            return data; // expected: Option[]
+        } catch (e) {
+            console.error("Failed to fetch HPO terms:", e);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleGeneAsyncSearch = async (query: string): Promise<Option[]> => {
         if (!query) return []; // Return empty if no input
@@ -629,6 +649,32 @@ export default function EditPAGProfileConditionCardDialog({
                                                 </div>
                                             </FormControl>
                                             <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={editResearchForm.control}
+                                    name="symptoms"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Symptoms</FormLabel>
+                                            <FormDescription>
+                                                Search Human Phenotype Ontology (HPO) terms and select all that apply.
+                                            </FormDescription>
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    {...field}
+                                                    creatable={false}
+                                                    onSearch={handleHpoAsyncSearch}
+                                                    placeholder="Search HPO symptoms..."
+                                                    hidePlaceholderWhenSelected
+                                                    loadingIndicator={<p>Searching HPO...</p>}
+                                                    emptyIndicator={<p>No symptoms found.</p>}
+                                                    showHoverCard={false}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />

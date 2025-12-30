@@ -48,6 +48,7 @@ export const researchFormSchema = z.object({
     symptoms: z.array(optionSchema).optional(),
     studies: z.array(optionSchema).optional(),
     tools: z.array(optionSchema).optional(),
+    associatedSignsAndSymptoms: z.array(optionSchema).optional(),
 });
 
 const handleAsyncSearch = async (query: string) => {

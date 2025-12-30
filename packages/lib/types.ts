@@ -28,6 +28,17 @@ import type {
 import {Prisma} from "@prisma/client";
 import {z} from "zod";
 
+export const BIOMARKER_TYPES = [
+    "Diagnostic",
+    "Monitoring",
+    "Predictive",
+    "Prognostic",
+    "Response",
+    "Safety",
+    "Susceptibility/Risk",
+    "Multicomponent"
+];
+
 export const ACADEMIC_ROLES = [
     {
         id: "PI",
