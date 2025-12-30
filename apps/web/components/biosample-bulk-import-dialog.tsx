@@ -40,6 +40,7 @@ export async function formatBiosampleData(biosample: any): Promise<{
     errors: any[]
 }> {
     const errors: {
+        key: 'REQUIRED_MISSING' | 'INCORRECT_FORMAT' | 'ERROR',
         message: string,
         value: any,
         id: string,
@@ -48,7 +49,8 @@ export async function formatBiosampleData(biosample: any): Promise<{
     let data = Object.fromEntries(await Promise.all(biosampleImportSchema.map(async (option: ImportSchemaEntry) => {
         if (!biosample[option.spreadsheetKey] && option.required) {
             errors.push({
-                message: `Field ${option.spreadsheetKey} is required, and is missing a value.`,
+                key: 'REQUIRED_MISSING',
+                message: `Field '${option.spreadsheetKey}' is required, and is missing a value.`,
                 value: biosample[option.spreadsheetKey],
                 id: biosample['Title'] || 'New biosample'
             })
@@ -56,7 +58,8 @@ export async function formatBiosampleData(biosample: any): Promise<{
             return [option.databaseKey, option.defaultValue]
         } else if (biosample[option.spreadsheetKey] && !option.isValid(biosample[option.spreadsheetKey])) {
             errors.push({
-                message: `Field ${option.spreadsheetKey} is formatted incorrectly. This field may not import properly.`,
+                key: 'INCORRECT_FORMAT',
+                message: `Field '${option.spreadsheetKey}' is formatted incorrectly. This field may not import properly.`,
                 value: biosample[option.spreadsheetKey],
                 id: biosample['Title'] || 'New biosample'
             })
@@ -74,7 +77,8 @@ export async function formatBiosampleData(biosample: any): Promise<{
             }
         } catch (error) {
             errors.push({
-                message: `Field ${option.spreadsheetKey} encountered an error.`,
+                key: 'ERROR',
+                message: `Field '${option.spreadsheetKey}' encountered an error.`,
                 value: biosample[option.spreadsheetKey],
                 id: biosample['Title'] || 'New biosample'
             })
@@ -84,9 +88,6 @@ export async function formatBiosampleData(biosample: any): Promise<{
 
         return [option.databaseKey, val]
     })))
-
-    console.log(`data`, data)
-    console.log(`errors`, errors)
 
     return {data: data as z.infer<typeof editBiosampleForm>, errors}
 }
@@ -331,8 +332,13 @@ export function BiosampleBulkImportDialog({
 
                 for (let i = 0; i < result.values.length; i++) {
                     const {data: formattedBiosample, errors: formattedErrors} = await formatBiosampleData(result.values[i])
-                    const newBiosample = await createBiosample(session?.user.organizationId, formattedBiosample)
-                    setImportCount(prev => prev + 1)
+
+                    // only create if it has all required fields
+                    if (!formattedErrors.map(error => error.key).includes('REQUIRED_MISSING')) {
+                        const newBiosample = await createBiosample(session?.user.organizationId, formattedBiosample)
+                        setImportCount(prev => prev + 1)
+                    }
+
                     if (formattedErrors.length > 0) errors.push(formattedErrors)
                 }
 
@@ -426,7 +432,7 @@ export function BiosampleBulkImportDialog({
                                 {totalErrors.map((error, index) => (
                                     <Badge variant={"red"} key={index} className="w-full">
                                         <CircleX className="h-4 w-4 min-h-4 min-w-4"/>
-                                        {error?.[0]?.id}
+                                        {`${error?.[0]?.id} - ${error?.[0]?.message}`}
                                     </Badge>
                                 ))}
                             </ul>
