@@ -399,12 +399,12 @@ export function BiosampleBulkImportDialog({
             {importState === 'importing' && (
                 <>
                  <DialogHeader>
-                     <DialogTitle className="text-2xl">
-                         Import biosamples
-                     </DialogTitle>
-                     <DialogDescription>
-                         Copy our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1O5NOlRhC-qagsIP_Zk_5_CEdMWAy5VEPoCCu3_2WJoE/edit?usp=sharing">Biosample input template</Link>, fill it out, download it as a CSV, and upload it back into the platform. Any optional details you include are stored securely and help us optimize the platform experience.
-                     </DialogDescription>
+                    <DialogTitle className="text-2xl">
+                        Importing... please keep this tab open
+                    </DialogTitle>
+                    <DialogDescription>
+                        We’re processing your file. This can take a few minutes.
+                    </DialogDescription>
                  </DialogHeader>
                 <div className="h-[180px] w-full flex gap-4 justify-center items-center">
                     <LoaderCircle className={cn("h-[40px] w-[40px] animate-spin")}/>
@@ -416,11 +416,8 @@ export function BiosampleBulkImportDialog({
                 <>
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
-                        Import biosamples
+                        Biosamples imported
                     </DialogTitle>
-                    <DialogDescription>
-                        Copy our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1O5NOlRhC-qagsIP_Zk_5_CEdMWAy5VEPoCCu3_2WJoE/edit?usp=sharing">Biosample input template</Link>, fill it out, download it as a CSV, and upload it back into the platform. Any optional details you include are stored securely and help us optimize the platform experience.
-                    </DialogDescription>
                 </DialogHeader>
                 <div className="w-full flex flex-col gap-4 justify-center">
                     <p className="w-full justify-start">{`Finished importing ${importCount} of ${totalItems}.`}</p>
