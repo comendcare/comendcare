@@ -14,7 +14,7 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import React, {useEffect, useState} from "react";
 import {updateCondition, updateEntityTags} from "@comend/lib/actions";
-import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@comend/lib/types";
+import {ASSOCIATED_SYSTEMS, BIOMARKER_TYPES, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@comend/lib/types";
 import {Input} from "@comend/components/ui/input";
 import {Textarea} from "@comend/components/ui/textarea";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
@@ -36,7 +36,7 @@ import {formatNumberWithCommas, toKebabCase} from "@comend/lib/utils"; // ← ad
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import {TaggableType} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
-import {researchFormSchema} from "./research-onboarding-form";
+import {BiomarkersFormField, researchFormSchema} from "./research-onboarding-form";
 import { badgeVariants } from "@comend/components/ui/badge";
 import {ConditionForCard} from "~web/components/pag-profile-conditions-card";
 import LoadingDots from "@comend/components/icons/loading-dots";
@@ -84,6 +84,13 @@ export default function EditPAGProfileConditionCardDialog({
             associatedSignsAndSymptoms: (condition.associatedSignsAndSymptoms ?? []).map((s) => ({
                 label: s,
                 value: s,
+            })),
+            biomarkers: (condition.biomarkers ?? []).map((b) => ({
+                name: b.name ?? "",
+                type: (condition.associatedSignsAndSymptoms ?? []).map((s) => ({
+                    label: s,
+                    value: s,
+                })),
             })),
             // tags are stored as comma-separated string in your form:
             tags: conditionTags.join(", "),
@@ -144,6 +151,12 @@ export default function EditPAGProfileConditionCardDialog({
                     otherMechanisms: values.otherMechanisms ?? null,
                     otherSystems: values.otherSystems ?? null,
                 },
+                biomarkers: (values.biomarkers ?? [])
+                    .map((b) => ({
+                        name: (b.name ?? "").trim(),
+                        type: b.type?.[0]?.value ?? null, // or `.label` if backend expects label
+                    }))
+                    .filter(b => b.name),
             };
 
             const formData = new FormData();
@@ -678,6 +691,8 @@ export default function EditPAGProfileConditionCardDialog({
                                         </FormItem>
                                     )}
                                 />
+
+                                <BiomarkersFormField form={editResearchForm} />
 
                                 <FormField
                                     control={editResearchForm.control}

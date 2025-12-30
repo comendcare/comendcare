@@ -29,15 +29,15 @@ import {Prisma} from "@prisma/client";
 import {z} from "zod";
 
 export const BIOMARKER_TYPES = [
-    "Diagnostic",
-    "Monitoring",
-    "Predictive",
-    "Prognostic",
-    "Response",
-    "Safety",
-    "Susceptibility/Risk",
-    "Multicomponent"
-];
+    { id: "DIAGNOSTIC", label: "Diagnostic Biomarker", value: "diagnostic" },
+    { id: "MONITORING", label: "Monitoring Biomarker", value: "monitoring" },
+    { id: "PREDICTIVE", label: "Predictive Biomarker", value: "predictive" },
+    { id: "PROGNOSTIC", label: "Prognostic Biomarker", value: "prognostic" },
+    { id: "RESPONSE", label: "Response Biomarker", value: "response" },
+    { id: "SAFETY", label: "Safety Biomarker", value: "safety" },
+    { id: "SUSCEPTIBILITY_RISK", label: "Susceptibility/Risk Biomarker", value: "susceptibility_risk" },
+    { id: "MULTICOMPONENT", label: "Multicomponent Biomarker", value: "multicomponent" },
+]
 
 export const ACADEMIC_ROLES = [
     {

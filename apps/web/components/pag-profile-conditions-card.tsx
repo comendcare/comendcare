@@ -39,7 +39,8 @@ export type ConditionForCard = Prisma.ConditionGetPayload<{
         associatedGenes: true;
         associatedConditions: true;
         associatedSignsAndSymptoms: true;
-        symptoms: true
+        symptoms: true;
+        biomarkers: true;
     };
 }>;
 
