@@ -90,6 +90,7 @@ export default async function ProfilePage(props: IndexPageProps) {
         description: true,
         associatedSystems: true,
         associatedConditions: true,
+        associatedSignsAndSymptoms: true,
     });
 
     const [organization, conditions] = await Promise.all([

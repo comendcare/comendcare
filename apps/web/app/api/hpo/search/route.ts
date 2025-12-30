@@ -21,7 +21,7 @@ export async function GET(req: Request) {
 
     // Normalize into what your multiselect wants
     const items = (data?.results ?? data?.terms ?? []).map((t: any) => ({
-        id: t.id ?? t.curie,          // e.g. "HP:0001250"
+        value: t.id ?? t.curie,          // e.g. "HP:0001250"
         label: t.name ?? t.label,     // e.g. "Seizures"
     }));
 

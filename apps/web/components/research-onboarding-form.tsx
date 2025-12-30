@@ -45,7 +45,6 @@ export const researchFormSchema = z.object({
     biomarkers: z.array(optionSchema).optional(),
     systems: z.array(optionSchema).optional(),
     otherSystems: emptyToUndefined(z.string()),
-    symptoms: z.array(optionSchema).optional(),
     studies: z.array(optionSchema).optional(),
     tools: z.array(optionSchema).optional(),
     associatedSignsAndSymptoms: z.array(optionSchema).optional(),

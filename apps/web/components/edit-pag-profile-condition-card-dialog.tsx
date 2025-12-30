@@ -81,7 +81,7 @@ export default function EditPAGProfileConditionCardDialog({
                 label: system,
                 value: system,
             })),
-            symptoms: (condition.associatedSignsAndSymptoms ?? []).map((s) => ({
+            associatedSignsAndSymptoms: (condition.associatedSignsAndSymptoms ?? []).map((s) => ({
                 label: s,
                 value: s,
             })),
@@ -136,7 +136,7 @@ export default function EditPAGProfileConditionCardDialog({
                 causalGenes: (values.causal ?? []).map(i => i.label),
                 associatedGenes: (values.genes ?? []).map(i => i.label),
                 associatedSystems: (values.systems ?? []).map(i => i.label),
-                associatedSignsAndSymptoms: (values.symptoms ?? []).map(i => i.label),
+                associatedSignsAndSymptoms: (values.associatedSignsAndSymptoms ?? []).map(i => i.label),
                 existingDatabasesAndStudies: (values.studies ?? []).map(i => i.label),
                 toolsUnderDevelopment: (values.tools ?? []).map(i => i.label),
                 metadata: {
@@ -233,10 +233,10 @@ export default function EditPAGProfileConditionCardDialog({
         if (!query) return [];
         setLoading(true);
         try {
-            // Best: proxy through your own API route (see next section)
-            const res = await fetch(`/api/hpo/search?search=${encodeURIComponent(query)}`);
+            const res = await fetch(`/api/hpo/search?q=${encodeURIComponent(query)}`);
+            if (!res.ok) return [];
             const data = await res.json();
-            return data; // expected: Option[]
+            return Array.isArray(data?.items) ? data.items : [];
         } catch (e) {
             console.error("Failed to fetch HPO terms:", e);
             return [];
@@ -655,12 +655,12 @@ export default function EditPAGProfileConditionCardDialog({
 
                                 <FormField
                                     control={editResearchForm.control}
-                                    name="symptoms"
+                                    name="associatedSignsAndSymptoms"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Symptoms</FormLabel>
                                             <FormDescription>
-                                                Search Human Phenotype Ontology (HPO) terms and select all that apply.
+                                                Search Symptoms and select all that apply.
                                             </FormDescription>
                                             <FormControl>
                                                 <MultipleSelector
