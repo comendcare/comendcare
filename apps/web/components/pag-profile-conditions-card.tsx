@@ -96,6 +96,7 @@ export const PAGProfileConditionsCard = ({
 
         // Cleaned arrays
         const symptoms = cleanBadges(condition?.associatedSignsAndSymptoms);
+        const biomarkers = cleanBadges(condition?.biomarkers?.map(b => b.type));
         const diseaseCategories = cleanBadges(condition?.diseaseCategories);
         const associatedSystems = cleanBadges(condition?.associatedSystems);
         const causalGenes = cleanBadges(condition?.causalGenes);
@@ -260,6 +261,24 @@ export const PAGProfileConditionsCard = ({
 
                         {/* Badge sections: render ONLY when there are cleaned items */}
                         {symptoms.length > 0 && (
+                            <div className="space-y-2" data-testid="disease-categories-section">
+                                <div className="flex flex-row items-center justify-between w-full">
+                                    <h4 className="scroll-m-20 text-base font-semibold" data-testid="disease-categories-heading">
+                                        Symptoms
+                                    </h4>
+                                </div>
+                                <div className="flex flex-wrap gap-1 sm:gap-2">
+                                    {symptoms.map((item, index) => (
+                                        <Badge data-testid="categories-badge" key={`${item}-${index}`} className="text-sm">
+                                            {item.charAt(0).toUpperCase() + item.slice(1)}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Badge sections: render ONLY when there are cleaned items */}
+                        {biomarkers.length > 0 && (
                             <div className="space-y-2" data-testid="disease-categories-section">
                                 <div className="flex flex-row items-center justify-between w-full">
                                     <h4 className="scroll-m-20 text-base font-semibold" data-testid="disease-categories-heading">

@@ -334,7 +334,7 @@ export default function ResearchOnboardingForm(
 
 type BiomarkerType = {
     name: string;
-    types: Option[]; // max 1
+    type: Option[]; // max 1
 };
 
 export const BiomarkersFormField = ({ form, title }: { form: any; title?: string }) => {
@@ -359,7 +359,7 @@ export const BiomarkersFormField = ({ form, title }: { form: any; title?: string
                                 e.preventDefault();
                                 form.setValue("biomarkers", [
                                     ...(field.value || []),
-                                    { name: "", types: [] } satisfies BiomarkerType,
+                                    { name: "", type: [] } satisfies BiomarkerType,
                                 ], { shouldDirty: true, shouldValidate: true });
                             }}
                         >
@@ -428,8 +428,8 @@ export const BiomarkerRow = ({
                         <FormLabel>Biomarker type</FormLabel>
                         <FormControl>
                             <MultipleSelector
-                                value={value.types ?? []}
-                                onChange={(next) => onValueChange({ ...value, types: next })}
+                                value={value.type ?? []}
+                                onChange={(next) => onValueChange({ ...value, type: next })}
                                 defaultOptions={BIOMARKER_TYPES}
                                 maxSelected={1}
                                 creatable={false}

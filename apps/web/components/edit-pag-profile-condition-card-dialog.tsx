@@ -87,10 +87,7 @@ export default function EditPAGProfileConditionCardDialog({
             })),
             biomarkers: (condition.biomarkers ?? []).map((b) => ({
                 name: b.name ?? "",
-                type: (condition.associatedSignsAndSymptoms ?? []).map((s) => ({
-                    label: s,
-                    value: s,
-                })),
+                type: b.type ? [{ label: b.type, value: b.type }] : [],
             })),
             // tags are stored as comma-separated string in your form:
             tags: conditionTags.join(", "),
@@ -107,6 +104,13 @@ export default function EditPAGProfileConditionCardDialog({
         setDefaultResearchValues(defaultValues);
         editResearchForm.reset(defaultValues);
     }, [condition, conditionTags, editResearchForm]);
+
+    const normalizeType = (t: any): string => {
+        if (!t) return "";
+        if (typeof t === "string") return t;
+        if (Array.isArray(t)) return t[0]?.value ?? t[0]?.label ?? "";
+        return t.value ?? t.label ?? "";
+    };
 
     async function onResearchFormSubmit(values: z.infer<typeof researchFormSchema>) {
         setIsSaving(true)
@@ -154,9 +158,9 @@ export default function EditPAGProfileConditionCardDialog({
                 biomarkers: (values.biomarkers ?? [])
                     .map((b) => ({
                         name: (b.name ?? "").trim(),
-                        type: b.type?.[0]?.value ?? null, // or `.label` if backend expects label
+                        type: normalizeType(b.type),
                     }))
-                    .filter(b => b.name),
+                    .filter((b) => b.name && b.type),
             };
 
             const formData = new FormData();
