@@ -91,6 +91,7 @@ export default async function ProfilePage(props: IndexPageProps) {
         associatedSystems: true,
         associatedConditions: true,
         associatedSignsAndSymptoms: true,
+        biomarkers: true,
     });
 
     const [organization, conditions] = await Promise.all([

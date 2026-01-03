@@ -97,6 +97,8 @@ export const PAGProfileConditionsCard = ({
         // Cleaned arrays
         const symptoms = cleanBadges(condition?.associatedSignsAndSymptoms);
         const biomarkers = cleanBadges(condition?.biomarkers?.map(b => b.type));
+        console.log(condition?.biomarkers)
+        console.log(biomarkers)
         const diseaseCategories = cleanBadges(condition?.diseaseCategories);
         const associatedSystems = cleanBadges(condition?.associatedSystems);
         const causalGenes = cleanBadges(condition?.causalGenes);
@@ -282,11 +284,11 @@ export const PAGProfileConditionsCard = ({
                             <div className="space-y-2" data-testid="disease-categories-section">
                                 <div className="flex flex-row items-center justify-between w-full">
                                     <h4 className="scroll-m-20 text-base font-semibold" data-testid="disease-categories-heading">
-                                        Symptoms
+                                        Biomarkers
                                     </h4>
                                 </div>
                                 <div className="flex flex-wrap gap-1 sm:gap-2">
-                                    {symptoms.map((item, index) => (
+                                    {biomarkers.map((item, index) => (
                                         <Badge data-testid="categories-badge" key={`${item}-${index}`} className="text-sm">
                                             {item.charAt(0).toUpperCase() + item.slice(1)}
                                         </Badge>
