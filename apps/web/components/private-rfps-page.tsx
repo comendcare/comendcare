@@ -4,10 +4,13 @@ import { RFPCard } from "@comend/components/rfp-card"
 import { EditRFPDialog } from "./edit-rfp-dialog"
 import Image from "next/image"
 import dynamic from "next/dynamic";
-import {Button} from "@comend/components/ui/button";
+import {Button, buttonVariants} from "@comend/components/ui/button";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import { RFPActionsMenu } from "./rfp-actions-menu";
 import { useState } from "react";
+import { Plus } from "lucide-react";
+import { PulsatingButton } from "@comend/components/ui/pulsating-button";
+import { cn } from "@comend/lib/utils";
 
 type Props = {
     initialRFPs: any[] // or RFP[] if you have the type locally
@@ -35,7 +38,25 @@ export function PrivateRFPsPage({ initialRFPs }: Props) {
         <main className="flex gap-4 flex-col w-full max-w-7xl p-4 h-full items-center mx-auto">
             <div className="flex gap-2 w-full justify-between items-center">
                 <h1 className="text-3xl font-semibold">Requests for proposals (RFPs)</h1>
-                <NewRFPDialog />
+                <NewRFPDialog 
+                    trigger={(
+                        initialRFPs.length > 0 
+                            ? (
+                                <Button variant="cta">
+                                    <Plus/>
+                                    {"Create biosample"}
+                                </Button>
+                            )
+                            : (
+                                <PulsatingButton
+                                    className={cn(buttonVariants({variant: 'cta'}))}
+                                >
+                                    <Plus/>
+                                    {"Create biosample"}
+                                </PulsatingButton>
+                            )
+                    )}
+                />
             </div>
 
             {renderRfps.length <= 0 && (
@@ -50,7 +71,6 @@ export function PrivateRFPsPage({ initialRFPs }: Props) {
                     <p className="text-lg text-stone-500">
                         An RFP is a milestone you want to support through funding and/or other resources.
                     </p>
-                    <NewRFPDialog />
                 </div>
             )}
 

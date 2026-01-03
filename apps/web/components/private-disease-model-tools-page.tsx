@@ -14,7 +14,7 @@ import {SearchParams} from "typesense/lib/Typesense/Documents";
 import {useEffect, useRef, useState} from "react";
 import {useSession} from "next-auth/react";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
-import {Button} from "@comend/components/ui/button";
+import {Button, buttonVariants} from "@comend/components/ui/button";
 import {Lock, Globe, Trash, Plus} from "lucide-react"
 import {setDiseaseModelsVisibility} from "@comend/lib/actions";
 import {DiseaseModelBulkImportDialog} from "./disease-model-bulk-import-dialog";
@@ -22,6 +22,8 @@ import { Dialog, DialogPortal, DialogTrigger } from "@comend/components/ui/dialo
 import { Row } from "@tanstack/react-table";
 import Image from "next/image";
 import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog";
+import { cn } from "@comend/lib/utils";
+import { PulsatingButton } from "@comend/components/ui/pulsating-button";
 
 export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
     data: DiseaseModel[],
@@ -132,10 +134,21 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                             <NewToolDialog 
                                 type={"diseaseModel"}
                                 trigger={(
-                                    <Button variant="cta">
-                                        <Plus/>
-                                        {"Create disease model"}
-                                    </Button>
+                                    data.length > 0
+                                        ? (
+                                            <Button variant="cta">
+                                                <Plus/>
+                                                {"Create disease model"}
+                                            </Button>
+                                        ) 
+                                        : (
+                                            <PulsatingButton
+                                                className={cn(buttonVariants({variant: 'cta'}))}
+                                            >
+                                                <Plus/>
+                                                {"Create disease model"}
+                                            </PulsatingButton>
+                                        )
                                 )}
                             />
                         </>
@@ -180,15 +193,6 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                                         <p className="text-lg text-stone-500">
                                             A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                                         </p>
-                                        <NewToolDialog 
-                                            type={"diseaseModel"}
-                                            trigger={(
-                                                <Button variant="cta">
-                                                    <Plus/>
-                                                    {"Create disease model"}
-                                                </Button>
-                                            )}
-                                        />
                                     </div>
                                 </div>
                             )}

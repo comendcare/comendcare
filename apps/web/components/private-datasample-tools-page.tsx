@@ -13,7 +13,7 @@ import { SearchParams } from "@comend/components/types";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
-import { Button } from "@comend/components/ui/button";
+import { Button, buttonVariants } from "@comend/components/ui/button";
 import { Globe, Lock, Plus, Trash } from "lucide-react";
 import { setDataToolsVisibility } from "@comend/lib/actions";
 import { Dialog, DialogTrigger } from "@comend/components/ui/dialog";
@@ -22,6 +22,8 @@ import { Asset } from "@comend/lib/types";
 import { Row } from "@tanstack/react-table";
 import Image from "next/image";
 import { DeleteClinicalDatasetDialog } from "./delete-clinical-dataset-dialog";
+import { PulsatingButton } from "@comend/components/ui/pulsating-button";
+import { cn } from "@comend/lib/utils";
 
 export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
     const {data: session} = useSession()
@@ -128,10 +130,21 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                         <NewToolDialog 
                             type={"data"}
                             trigger={(
-                                <Button variant="cta">
-                                    <Plus/>
-                                    {"Create clinical dataset"}
-                                </Button>
+                                data.length > 0 
+                                    ? (
+                                        <Button variant="cta">
+                                            <Plus/>
+                                            {"Create clinical dataset"}
+                                        </Button>
+                                    )
+                                    : (
+                                        <PulsatingButton
+                                            className={cn(buttonVariants({variant: 'cta'}))}
+                                        >
+                                            <Plus/>
+                                            {"Create clinical dataset"}
+                                        </PulsatingButton>
+                                    )
                             )}
                         />
                     </>
@@ -175,15 +188,6 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                                     <p className="text-lg text-stone-500">
                                         A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                                     </p>
-                                    <NewToolDialog 
-                                        type={"data"}
-                                        trigger={(
-                                            <Button variant="cta">
-                                                <Plus/>
-                                                {"Create clinical dataset"}
-                                            </Button>
-                                        )}
-                                    />
                                 </div>
                             </div>
                         )}

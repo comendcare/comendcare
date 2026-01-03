@@ -161,20 +161,6 @@ export const MilestoneTemplates = ({
     )
 }
 
-// export const ResearchPlanTemplates = ({ milestoneTypes }: {milestoneTypes: any[]}) => {
-//     return(
-//         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
-//             <EmptyResearchPlanCard />
-//             {templateResearchPlans.map(template => (
-//                 <ResearchPlanTemplateCardSelect
-//                     milestoneTypes={milestoneTypes} 
-//                     researchPlanData={template}
-//                 />
-//             ))}
-//         </div>
-//     )
-// }
-
 export const ResearchPlanTemplates = ({
                                           selectedResearchPlanTemplate,
                                           setSelectedResearchPlanTemplate,
@@ -303,43 +289,13 @@ export const ResearchPlanTemplatesCard = ({orgId, setIsLoading}: {
                     </TooltipContent>
                 </Tooltip>
             </CardHeader>
-            <CardContent className="grid gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-                <CreateEmptyResearchPlanCard setIsLoading={setIsLoading}/>
+            <CardContent className="grid gap-4 grid-cols-2 md:grid-cols-3">
                 {templateResearchPlans.map(plan => (
                     <CreateResearchPlanFromTemplateCard key={plan.id} plan={plan} orgId={orgId}
                                                         setIsLoading={setIsLoading}/>
                 ))}
             </CardContent>
         </Card>
-    )
-}
-
-export const CreateEmptyResearchPlanCard = ({setIsLoading}: {
-    setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>
-}) => {
-    const router = useRouter()
-
-    return (
-        <CreateResearchPlanDialog
-            trigger={
-                <button
-                    // onClick={() => {
-                    //     if (setIsLoading) setIsLoading(true)
-                    //     router.push(`/app/research-plan/create`)
-                    // }}
-                    className="hover:cursor-pointer"
-                >
-                    <Card className="h-full hover:border-black">
-                        <CardContent
-                            className="h-full flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
-                            <CardTitle className="text-xl font-normal">{`Create an empty research plan`}</CardTitle>
-                            <Plus/>
-                        </CardContent>
-                    </Card>
-                </button>
-            }
-            setIsLoading={setIsLoading}
-        />
     )
 }
 
