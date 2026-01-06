@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@comend/lib/prisma";
 import crypto from "node:crypto";
-import {cioTrackServer} from "@comend/lib/customer-io";
+import {cioTrackServer} from "../../../../../../../packages/lib/customerio/customer-io";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
