@@ -58,9 +58,10 @@ import {InputJsonObject, JsonObject} from "@prisma/client/runtime/library"
 import z from "zod"
 import {writeRawEvent} from "./raw-events";
 import crypto from "node:crypto";
-import {customerIOTrack} from "./customer-io-track";
-import {cioDeleteUser} from "./customer-io";
+import {customerIOTrack} from "./customerio/customer-io-track";
+import {cioDeleteUser} from "./customerio/customer-io";
 import {withResearcherAuth} from "comend-researcher-hub/lib/auth";
+import {cioRemoveOrgMember, cioSyncOrg, cioUpsertOrgMember} from "./customerio/cio-sync-org";
 
 const PATHS = [
     "/app",
@@ -445,6 +446,28 @@ export const createOrganization = withAuth(
 
                 return {organization, membership};
             });
+
+            // Sync Customer.io custom object + relationships (best-effort, do not throw)
+            try {
+                await cioSyncOrg({
+                    subdomain: result.organization.subdomain,
+                    name: result.organization.name,
+                    description: result.organization.description,
+                });
+
+                await cioUpsertOrgMember({
+                    orgSubdomain: result.organization.subdomain!,
+                    userId: result.membership.userId,
+                    role: result.membership.role,
+                    joinedAt: result.membership.createdAt,
+                });
+            } catch (e: any) {
+                console.error("[CIO] org sync failed (createOrganization)", {
+                    orgId: result.organization.id,
+                    subdomain: result.organization.subdomain,
+                    error: String(e?.message || e),
+                });
+            }
 
             if (result.organization.verified && result.organization.published) {
                 await addTypeSenseDocument(
@@ -1325,6 +1348,29 @@ export const approveMemberRequestAndCreateMember = withOrganizationAuth(
             }
 
             if (createdMember && organization) {
+                try {
+                    await cioSyncOrg({
+                        subdomain: organization.subdomain,
+                        name: organization.name,
+                        description: organization.description ?? undefined, // if Organization includes it here; otherwise omit
+                    });
+
+                    await cioUpsertOrgMember({
+                        orgSubdomain: organization.subdomain!, // should exist if you rely on it
+                        userId: createdMember.userId,
+                        role: createdMember.role,
+                        joinedAt: createdMember.createdAt ?? new Date(), // if Member has createdAt
+                        // title: createdMember.title ?? null, // if you have it
+                    });
+                } catch (e: any) {
+                    console.error("[CIO] org membership sync failed (approveMemberRequestAndCreateMember)", {
+                        orgId: organization.id,
+                        subdomain: organization.subdomain,
+                        userId: createdMember.userId,
+                        error: String(e?.message || e),
+                    });
+                }
+
                 await sendMemberRequestApprovedEmail(
                     {
                         name: memberRequest.user.name,
@@ -1675,6 +1721,22 @@ export const leaveOrganization = withOrganizationAuth(
                     : []),
             ]);
 
+            try {
+                if (organization.subdomain) {
+                    await cioRemoveOrgMember({
+                        orgSubdomain: organization.subdomain,
+                        userId,
+                    });
+                }
+            } catch (e: any) {
+                console.error("[CIO] remove org member failed (leaveOrganization)", {
+                    orgId: organization.id,
+                    subdomain: organization.subdomain,
+                    userId,
+                    error: String(e?.message || e),
+                });
+            }
+
             // Revalidate org-scoped pages and any UI that reflects org state
             for (const p of PATHS) {
                 revalidatePath(p);
@@ -1800,7 +1862,7 @@ export const deleteMember = withOrganizationAuth(
                 where: {id: membershipId},
                 include: {
                     user: {select: {id: true, activeOrganizationId: true, name: true, email: true}},
-                    organization: {select: {id: true, name: true, image: true}},
+                    organization: {select: {id: true, name: true, image: true, subdomain: true}},
                 },
             });
 
@@ -1820,6 +1882,27 @@ export const deleteMember = withOrganizationAuth(
                 await prisma.user.update({
                     where: {id: member.user.id},
                     data: {activeOrganizationId: nextMembership?.organizationId ?? null},
+                });
+            }
+
+            try {
+                if (member.organization?.subdomain) {
+                    await cioRemoveOrgMember({
+                        orgSubdomain: member.organization.subdomain,
+                        userId: member.user.id,
+                    });
+                } else {
+                    // If you didn't select subdomain, add it to the include/select.
+                    console.warn("[CIO] deleteMember: missing organization.subdomain; cannot remove relationship", {
+                        orgId: member.organization.id,
+                        userId: member.user.id,
+                    });
+                }
+            } catch (e: any) {
+                console.error("[CIO] remove org member failed (deleteMember)", {
+                    orgId: member.organization.id,
+                    userId: member.user.id,
+                    error: String(e?.message || e),
                 });
             }
 
@@ -2117,6 +2200,29 @@ export const acceptClaimOrganizationInvitation = withAuth(
                 })
             ]);
 
+            try {
+                // Optional but good: ensure org object exists / updated
+                await cioSyncOrg({
+                    subdomain: invitation.organization.subdomain,
+                    name: invitation.organization.name,
+                    description: undefined, // you didn't select it here
+                });
+
+                await cioUpsertOrgMember({
+                    orgSubdomain: invitation.organization.subdomain!, // should exist
+                    userId: session.user.id,
+                    role: invitation.role || "member",
+                    joinedAt: new Date(), // since you didn't fetch membership.createdAt here
+                });
+            } catch (e: any) {
+                console.error("[CIO] org membership sync failed (acceptInvitation)", {
+                    orgId: invitation.organization.id,
+                    subdomain: invitation.organization.subdomain,
+                    userId: session.user.id,
+                    error: String(e?.message || e),
+                });
+            }
+
             // await customerIOTrack({
             //     userId: session.user.id ?? undefined,   // if you have it
             //     event: 'claim_organization_invitation_accepted',
@@ -2193,7 +2299,7 @@ export const acceptInvitation = withAuth(
                 return {success: false, error: "failed to follow organization"};
             }
 
-            // Process invitation: create membership and delete memebership (mark invitation as accepted)
+            // Process invitation: create membership and delete invitation (mark invitation as accepted)
             await prisma.$transaction([
                 prisma.member.create({
                     data: {
@@ -2213,6 +2319,28 @@ export const acceptInvitation = withAuth(
                     data: {activeOrganizationId: invitation.organization.id},
                 })
             ]);
+
+            try {
+                await cioSyncOrg({
+                    subdomain: invitation.organization.subdomain,
+                    name: invitation.organization.name,
+                    description: undefined, // you didn't select it here
+                });
+
+                await cioUpsertOrgMember({
+                    orgSubdomain: invitation.organization.subdomain!, // should exist
+                    userId: session.user.id,
+                    role: invitation.role || "member",
+                    joinedAt: new Date(), // since you didn't fetch membership.createdAt here
+                });
+            } catch (e: any) {
+                console.error("[CIO] org membership sync failed (acceptInvitation)", {
+                    orgId: invitation.organization.id,
+                    subdomain: invitation.organization.subdomain,
+                    userId: session.user.id,
+                    error: String(e?.message || e),
+                });
+            }
 
             await customerIOTrack({
                 userId: session.user.id ?? undefined,   // if you have it
