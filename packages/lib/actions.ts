@@ -2678,10 +2678,10 @@ export const updateDiseaseModel = withOrganizationAuth(
                             },
                         }
                     ) : undefined),
-                    ...(diseaseModelData.institution 
+                    ...(diseaseModelData.institution
                         ? {institution: {connect: {id: diseaseModelData.institution.id}}} // if institution exists in database, connect
                         : {institution: {disconnect: true}}), // if institution does not exist in database, disconnect
-                    ...(diseaseModelData.company 
+                    ...(diseaseModelData.company
                         ? {company: {connect: {id: diseaseModelData.company.id}}} // if company exists in database, connect
                         : {company: {disconnect: true}}), // if company does not exist in database, disconnect
                 },
@@ -2765,10 +2765,10 @@ export const createDiseaseModel = withOrganizationAuth(
                     ...(diseaseModelData.gene
                         ? ({gene: {connect: {symbol: diseaseModelData.gene.value.toUpperCase()}}})
                         : undefined),
-                    ...(diseaseModelData.institution 
+                    ...(diseaseModelData.institution
                         ? ({institution: {connect: {id: diseaseModelData.institution.id}}}) // if institution exists in database, connect
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
-                    ...(diseaseModelData.company 
+                    ...(diseaseModelData.company
                         ? ({company: {connect: {id: diseaseModelData.company.id}}}) // if company exists in database, connect
                         : ({company: undefined})), // if company does not exist in database, don't connect
                     attachments: {
@@ -2924,10 +2924,10 @@ export const createClinicalDataset = withOrganizationAuth(
                     )
                         ? {cohortSize: data.cohortSize !== '' ? JSON.parse(data.cohortSize) : null}
                         : undefined),
-                    ...(dataToolData.institution 
+                    ...(dataToolData.institution
                         ? ({institution: {connect: {id: dataToolData.institution.id}}}) // if institution exists in database, connect
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
-                    ...(dataToolData.company 
+                    ...(dataToolData.company
                         ? ({company: {connect: {id: dataToolData.company.id}}}) // if company exists in database, connect
                         : ({company: undefined})), // if company does not exist in database, don't connect
                 }
@@ -3103,10 +3103,10 @@ export const updateClinicalDataset = withOrganizationAuth(
                             connect: {symbol: dataToolData.gene.value.toUpperCase()}
                         }
                     }) : {gene: {disconnect: true}}),
-                    ...(dataToolData.institution 
+                    ...(dataToolData.institution
                         ? {institution: {connect: {id: dataToolData.institution.id}}} // if institution exists in database, connect
                         : {institution: {disconnect: true}}), // if institution does not exist in database, disconnect
-                    ...(dataToolData.company 
+                    ...(dataToolData.company
                         ? {company: {connect: {id: dataToolData.company.id}}} // if company exists in database, connect
                         : {company: {disconnect: true}}), // if company does not exist in database, disconnect
                 },
@@ -3154,13 +3154,13 @@ export const updateCreateFacilityRequest = withOrganizationAuth(
                     ? ({milestone: {connect: {id: data.milestoneId}}})
                     : undefined),
                 ...(data.biosampleId
-                    ? ({biosample: {connect: {id: data.biosampleId}}}) 
+                    ? ({biosample: {connect: {id: data.biosampleId}}})
                     : undefined),
                 ...(data.diseaseModelId
-                    ? ({diseaseModel: {connect: {id: data.diseaseModelId}}}) 
+                    ? ({diseaseModel: {connect: {id: data.diseaseModelId}}})
                     : undefined),
                 ...(data.clinicalDatasetId
-                    ? ({clinicalDataset: {connect: {id: data.clinicalDatasetId}}}) 
+                    ? ({clinicalDataset: {connect: {id: data.clinicalDatasetId}}})
                     : undefined)
             }
         })
@@ -3191,13 +3191,13 @@ export const createCreateFacilityRequest = withOrganizationAuth(
                     ? ({milestone: {connect: {id: data.milestoneId}}})
                     : undefined),
                 ...(data.biosampleId
-                    ? ({biosample: {connect: {id: data.biosampleId}}}) 
+                    ? ({biosample: {connect: {id: data.biosampleId}}})
                     : undefined),
                 ...(data.diseaseModelId
-                    ? ({diseaseModel: {connect: {id: data.diseaseModelId}}}) 
+                    ? ({diseaseModel: {connect: {id: data.diseaseModelId}}})
                     : undefined),
                 ...(data.clinicalDatasetId
-                    ? ({clinicalDataset: {connect: {id: data.clinicalDatasetId}}}) 
+                    ? ({clinicalDataset: {connect: {id: data.clinicalDatasetId}}})
                     : undefined)
             }
         })
@@ -3322,10 +3322,10 @@ export const createBiosample = withOrganizationAuth(
                         // transform symbol to uppercase because all genes are uppercase in our database
                         ? ({gene: {connect: {symbol: biosampleData.gene.value.toUpperCase() }}})
                         : undefined),
-                    ...(biosampleData.institution 
+                    ...(biosampleData.institution
                         ? ({institution: {connect: {id: biosampleData.institution.id}}}) // if institution exists in database, connect
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
-                    ...(biosampleData.company 
+                    ...(biosampleData.company
                         ? ({company: {connect: {id: biosampleData.company.id}}}) // if company exists in database, connect
                         : ({company: undefined})), // if company does not exist in database, don't connect
                     donor: {
@@ -3581,10 +3581,10 @@ export const updateBiosample = withOrganizationAuth(
                     ...(biosampleData.gene
                         ? {gene: {connect: {symbol: biosampleData.gene.value.toUpperCase()}}}
                         : {gene: {disconnect: true}}),
-                    ...(biosampleData.institution 
+                    ...(biosampleData.institution
                         ? {institution: {connect: {id: biosampleData.institution.id}}} // if institution exists in database, connect
                         : {institution: {disconnect: true}}), // if institution does not exist in database, disconnect
-                    ...(biosampleData.company 
+                    ...(biosampleData.company
                         ? {company: {connect: {id: biosampleData.company.id}}} // if company exists in database, connect
                         : {company: {disconnect: true}}), // if company does not exist in database, disconnect
                     ...(data.donorId
@@ -4434,11 +4434,11 @@ export const updateDBFlow = withOrganizationAuth(
                 if (nodesToCreate.length > 0) {
                     await tx.node.createMany({
                         data: nodesToCreate.map(node => ({
-                        id: node.id,
-                        roadmapId,
-                        positionX: node.position?.x,
-                        positionY: node.position?.y,
-                        origin: node.origin,
+                            id: node.id,
+                            roadmapId,
+                            positionX: node.position?.x,
+                            positionY: node.position?.y,
+                            origin: node.origin,
                         })),
                     })
                 }
@@ -4447,9 +4447,9 @@ export const updateDBFlow = withOrganizationAuth(
                     await tx.node.update({
                         where: { id: node.id },
                         data: {
-                        positionX: node.position?.x,
-                        positionY: node.position?.y,
-                        origin: node.origin,
+                            positionX: node.position?.x,
+                            positionY: node.position?.y,
+                            origin: node.origin,
                         },
                     })
                 }
@@ -4480,8 +4480,8 @@ export const updateDBFlow = withOrganizationAuth(
                                 status: node.data.status || "PLANNED",
                                 private: node.data.private ?? false,
                                 attachments: {
-                                deleteMany: {}, // optionally diff like updateMilestones
-                                createMany: { data: attachments },
+                                    deleteMany: {}, // optionally diff like updateMilestones
+                                    createMany: { data: attachments },
                                 },
                             },
                         })
@@ -4508,10 +4508,10 @@ export const updateDBFlow = withOrganizationAuth(
                 if (edgesToCreate.length > 0) {
                     await tx.edge.createMany({
                         data: edgesToCreate.map(e => ({
-                        id: e.id,
-                        roadmapId,
-                        source: e.source,
-                        target: e.target,
+                            id: e.id,
+                            roadmapId,
+                            source: e.source,
+                            target: e.target,
                         })),
                     })
                 }
@@ -4520,8 +4520,8 @@ export const updateDBFlow = withOrganizationAuth(
                     await tx.edge.update({
                         where: { id: edge.id },
                         data: {
-                        source: edge.source,
-                        target: edge.target,
+                            source: edge.source,
+                            target: edge.target,
                         },
                     })
                 }
@@ -4822,13 +4822,13 @@ export const createNodes = withOrganizationAuth(
             //         }))
             //         console.log(`Add typesense document`, document)
             //         await addTypeSenseDocument(
-            //              `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+            //              `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
             //              (
             //                 process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
             //                     ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
             //                     : process.env.TYPESENSE_ADMIN_API_KEY
-            //             )!, 
-            //              document, 
+            //             )!,
+            //              document,
             //              'milestones'
             //         )
             //     })
@@ -4882,13 +4882,13 @@ export const deleteNode = withOrganizationAuth(
             // Typesense - delete milestone documents here...
             // console.log(`Delete typesense document`, deletedNode.data.id)
             // await deleteTypeSenseDocument(
-            //     `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+            //     `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
             //     (
             //         process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
             //             ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
             //             : process.env.TYPESENSE_ADMIN_API_KEY
-            //     )!, 
-            //     deletedNode.data.id, 
+            //     )!,
+            //     deletedNode.data.id,
             //     'milestones'
             // )
 
@@ -5205,8 +5205,8 @@ export const updateMilestones = withOrganizationAuth(
                             attachments: {
                                 deleteMany: attachmentsDiff.toRemove.length ? { id: { in: attachmentsDiff.toRemove } } : undefined,
                                 create: milestone.attachments
-                                .filter(a => attachmentsDiff.toAdd.includes(a.id))
-                                .map(a => ({ link: a.link, name: a.name ?? undefined })),
+                                    .filter(a => attachmentsDiff.toAdd.includes(a.id))
+                                    .map(a => ({ link: a.link, name: a.name ?? undefined })),
                             },
 
                             contacts: {
