@@ -7,7 +7,7 @@ import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "./prisma"
 import {PrismaClient} from "@prisma/client";
 import sgMail from "@sendgrid/mail";
-import {cioIdentify} from "./customer-io-identify";
+import {cioIdentify} from "./customerio/customer-io-identify";
 
 const isProd =
     process.env.NODE_ENV === 'production' ||
