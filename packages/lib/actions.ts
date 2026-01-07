@@ -1800,7 +1800,7 @@ export const deleteMember = withOrganizationAuth(
                 where: {id: membershipId},
                 include: {
                     user: {select: {id: true, activeOrganizationId: true, name: true, email: true}},
-                    organization: {select: {id: true, name: true, image: true}},
+                    organization: {select: {id: true, name: true, image: true, subdomain: true}},
                 },
             });
 
