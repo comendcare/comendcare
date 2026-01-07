@@ -6,7 +6,7 @@ import {PrismaClient} from "@prisma/client";
 import {OAuthConfig} from "next-auth/providers/oauth";
 import {CustomPrismaAdapter} from "./custom-prisma-adapter";
 import sgMail from "@sendgrid/mail";
-import {cioIdentify} from "@comend/lib/customer-io-identify";
+import {cioIdentify} from "../../../packages/lib/customerio/customer-io-identify";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL

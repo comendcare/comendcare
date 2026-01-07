@@ -9,7 +9,7 @@ import FAQFeedbackRadioButtons, {
 import FAQFeedbackThumbs from "./faq-feedback-thumbs"
 import FAQFeedbackForm from "./faq-feedback-form"
 import { toast } from "sonner"
-import {customerIOTrack} from "@comend/lib/customer-io-track";
+import {customerIOTrack} from "../../../../../../../packages/lib/customerio/customer-io-track";
 import { mixpanelTrack, useMixpanelContext } from "@comend/lib/mixpanel"
 import { createGuidesFeedbackTicket } from "@comend/lib/notion"
 

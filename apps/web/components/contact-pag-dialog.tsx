@@ -19,7 +19,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
 import type {Organization} from "@prisma/client";
 import { mixpanelTrack, useMixpanelContext } from "@comend/lib/mixpanel";
-import {customerIOTrack} from "@comend/lib/customer-io-track";
+import {customerIOTrack} from "../../../packages/lib/customerio/customer-io-track";
 
 // Validation schema
 const contactSchema = z.object({
