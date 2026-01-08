@@ -181,7 +181,7 @@ export const NewToolDialog = ({
     }
 
     const title =
-        type === "biosample" ? "Create biosample" :
+        type === "biosample" ? "Create patient biosample" :
             type === "diseaseModel" ? "Create disease model" :
                 "Create clinical dataset";
 

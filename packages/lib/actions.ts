@@ -5101,8 +5101,8 @@ export const updateMilestones = withOrganizationAuth(
                 if (!existing) continue
 
                 const diffIds = (incoming: string[], existingIds: string[]) => ({
-                    toAdd: incoming.filter(id => !existingIds.includes(id)),
-                    toRemove: existingIds.filter(id => !incoming.includes(id)),
+                    toAdd: (incoming || []).filter(id => !existingIds.includes(id)),
+                    toRemove: (existingIds || []).filter(id => !incoming.includes(id)),
                 })
 
                 const typesDiff = diffIds(
@@ -5204,14 +5204,14 @@ export const updateMilestones = withOrganizationAuth(
 
                             attachments: {
                                 deleteMany: attachmentsDiff.toRemove.length ? { id: { in: attachmentsDiff.toRemove } } : undefined,
-                                create: milestone.attachments
+                                create: (milestone.attachments || [])
                                     .filter(a => attachmentsDiff.toAdd.includes(a.id))
                                     .map(a => ({ link: a.link, name: a.name ?? undefined })),
                             },
 
                             contacts: {
                                 deleteMany: contactsDiff.toRemove.length ? { id: { in: contactsDiff.toRemove } } : undefined,
-                                create: milestone.contacts
+                                create: (milestone.contacts || [])
                                     .filter(c => contactsDiff.toAdd.includes(c.id))
                                     .map(c => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
                             },

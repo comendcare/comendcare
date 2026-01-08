@@ -725,25 +725,8 @@ export function EditMilestoneForm({
                                                                     }}
                                                                     onClick={() => setCreateBiosampleIsOpen(true)}
                                                                 >
-                                                                    {`+ Create biosample`}
+                                                                    {`+ Create patient biosample`}
                                                                 </Button>
-                                                                {/* <NewToolDialog 
-                                                                    type={"biosample"}
-                                                                    trigger={(
-                                                                        <Button
-                                                                            value={undefined}
-                                                                            variant={'ghost'}
-                                                                            className="hover:cursor-pointer w-full justify-start max-h-8 p-0 text-left relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50"
-                                                                            onMouseDown={(e) => {
-                                                                                e.preventDefault();
-                                                                                e.stopPropagation();
-                                                                            }}
-                                                                            // onClick={() => setCreateBiosampleIsOpen(true)}
-                                                                        >
-                                                                            {`+ Create biosample`}
-                                                                        </Button>
-                                                                    )}
-                                                                /> */}
                                                                 <Button
                                                                     value={undefined}
                                                                     variant={'ghost'}
@@ -754,7 +737,7 @@ export function EditMilestoneForm({
                                                                     }}
                                                                     onClick={() => setCreateDiseaseModelIsOpen(true)}
                                                                 >
-                                                                    {`+ Create Disease Model`}
+                                                                    {`+ Create disease model`}
                                                                 </Button>
                                                                 <Button
                                                                     value={undefined}
@@ -766,7 +749,7 @@ export function EditMilestoneForm({
                                                                     }}
                                                                     onClick={() => setCreateClinicalDatasetIsOpen(true)}
                                                                 >
-                                                                    {`+ Create Clinical Dataset`}
+                                                                    {`+ Create clinical dataset`}
                                                                 </Button>
                                                             </div>
                                                         )}
@@ -1201,7 +1184,7 @@ export function EditMilestoneForm({
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
-                            Create biosample tool
+                            Create patient biosample
                         </DialogTitle>
                         <DialogDescription>
                             {`Create your Tool here. Click save when you're done.`}
@@ -1244,7 +1227,7 @@ export function EditMilestoneForm({
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
-                            Create Disease Model Tool
+                            Create disease model
                         </DialogTitle>
                         <DialogDescription>
                             {`Create your Tool here. Click save when you're done.`}
@@ -1284,7 +1267,7 @@ export function EditMilestoneForm({
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
-                            Create Data Tool
+                            Create clinical dataset
                         </DialogTitle>
                         <DialogDescription>
                             {`Create your Tool here. Click save when you're done.`}
