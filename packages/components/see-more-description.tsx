@@ -6,16 +6,16 @@ import { Button } from "./ui/button"
 
 export function SeeMoreDescription({ description }: { description: string }) {
     const [isExpanded, setIsExpanded] = useState(false)
-    const [isTruncated, setIsTruncated] = useState(false)
+    const [isOverflowing, setIsOverflowing] = useState(false)
     const textRef = useRef<HTMLParagraphElement>(null)
 
     useEffect(() => {
         const el = textRef.current
         if (!el) return
 
-        // Only check truncation when collapsed
+        // Only check overflow when collapsed
         if (!isExpanded) {
-            setIsTruncated(el.scrollHeight > el.clientHeight)
+            setIsOverflowing(el.scrollHeight > el.clientHeight)
         }
     }, [description, isExpanded])
 
@@ -32,24 +32,14 @@ export function SeeMoreDescription({ description }: { description: string }) {
                 {description}
             </p>
 
-            {isTruncated && (
-                isExpanded ? (
-                    <Button
-                        variant="link"
-                        onClick={() => setIsExpanded(false)}
-                        className="p-0 h-fit underline"
-                    >
-                        See less
-                    </Button>
-                ) : (
-                    <Button
-                        variant="link"
-                        onClick={() => setIsExpanded(true)}
-                        className="p-0 h-fit underline"
-                    >
-                        See more
-                    </Button>
-                )
+            {isOverflowing && (
+                <Button
+                    variant="link"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="p-0 h-fit underline"
+                >
+                    {isExpanded ? "See less" : "See more"}
+                </Button>
             )}
         </div>
     )

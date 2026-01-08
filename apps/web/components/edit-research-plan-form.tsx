@@ -272,8 +272,8 @@ export function EditResearchPlanForm({
                                                 disabled={!["owner", "support"].includes(session?.user?.membership?.role)}
                                             >
                                                 <Button
-                                                    type="button"
-                                                    variant="destructive"
+                                                    type="submit"
+                                                    variant={"destructive"}
                                                     onClick={async () => {
                                                         if (researchPlanData?.id) {
                                                             setIsLoading(true)

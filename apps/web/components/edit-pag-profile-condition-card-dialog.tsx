@@ -14,7 +14,7 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import React, {useEffect, useState} from "react";
 import {updateCondition, updateEntityTags} from "@comend/lib/actions";
-import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@comend/lib/types";
+import {ASSOCIATED_SYSTEMS, BIOMARKER_TYPES, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@comend/lib/types";
 import {Input} from "@comend/components/ui/input";
 import {Textarea} from "@comend/components/ui/textarea";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
@@ -36,7 +36,7 @@ import {formatNumberWithCommas, toKebabCase} from "@comend/lib/utils"; // ← ad
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import {TaggableType} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
-import {researchFormSchema} from "./research-onboarding-form";
+import {BiomarkersFormField, researchFormSchema} from "./research-onboarding-form";
 import { badgeVariants } from "@comend/components/ui/badge";
 import {ConditionForCard} from "~web/components/pag-profile-conditions-card";
 import LoadingDots from "@comend/components/icons/loading-dots";
@@ -81,6 +81,14 @@ export default function EditPAGProfileConditionCardDialog({
                 label: system,
                 value: system,
             })),
+            associatedSignsAndSymptoms: (condition.associatedSignsAndSymptoms ?? []).map((s) => ({
+                label: s,
+                value: s,
+            })),
+            biomarkers: (condition.biomarkers ?? []).map((b) => ({
+                name: b.name ?? "",
+                type: b.type ? [{ label: b.type, value: b.type }] : [],
+            })),
             // tags are stored as comma-separated string in your form:
             tags: conditionTags.join(", "),
             prevalenceNumerator: condition.prevalenceNumerator?.toString() ?? "",
@@ -96,6 +104,13 @@ export default function EditPAGProfileConditionCardDialog({
         setDefaultResearchValues(defaultValues);
         editResearchForm.reset(defaultValues);
     }, [condition, conditionTags, editResearchForm]);
+
+    const normalizeType = (t: any): string => {
+        if (!t) return "";
+        if (typeof t === "string") return t;
+        if (Array.isArray(t)) return t[0]?.value ?? t[0]?.label ?? "";
+        return t.value ?? t.label ?? "";
+    };
 
     async function onResearchFormSubmit(values: z.infer<typeof researchFormSchema>) {
         setIsSaving(true)
@@ -132,7 +147,7 @@ export default function EditPAGProfileConditionCardDialog({
                 causalGenes: (values.causal ?? []).map(i => i.label),
                 associatedGenes: (values.genes ?? []).map(i => i.label),
                 associatedSystems: (values.systems ?? []).map(i => i.label),
-                associatedSignsAndSymptoms: (values.symptoms ?? []).map(i => i.label),
+                associatedSignsAndSymptoms: (values.associatedSignsAndSymptoms ?? []).map(i => i.label),
                 existingDatabasesAndStudies: (values.studies ?? []).map(i => i.label),
                 toolsUnderDevelopment: (values.tools ?? []).map(i => i.label),
                 metadata: {
@@ -140,6 +155,12 @@ export default function EditPAGProfileConditionCardDialog({
                     otherMechanisms: values.otherMechanisms ?? null,
                     otherSystems: values.otherSystems ?? null,
                 },
+                biomarkers: (values.biomarkers ?? [])
+                    .map((b) => ({
+                        name: (b.name ?? "").trim(),
+                        type: normalizeType(b.type),
+                    }))
+                    .filter((b) => b.name && b.type),
             };
 
             const formData = new FormData();
@@ -224,6 +245,22 @@ export default function EditPAGProfileConditionCardDialog({
         // all dialogs should be either fully closed or fully open
         if (!unsavedChangesIsOpen) setIsClosing(false)
     }, [unsavedChangesIsOpen])
+
+    const handleHpoAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return [];
+        setLoading(true);
+        try {
+            const res = await fetch(`/api/hpo/search?q=${encodeURIComponent(query)}`);
+            if (!res.ok) return [];
+            const data = await res.json();
+            return Array.isArray(data?.items) ? data.items : [];
+        } catch (e) {
+            console.error("Failed to fetch HPO terms:", e);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleGeneAsyncSearch = async (query: string): Promise<Option[]> => {
         if (!query) return []; // Return empty if no input
@@ -632,6 +669,34 @@ export default function EditPAGProfileConditionCardDialog({
                                         </FormItem>
                                     )}
                                 />
+
+                                <FormField
+                                    control={editResearchForm.control}
+                                    name="associatedSignsAndSymptoms"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Symptoms</FormLabel>
+                                            <FormDescription>
+                                                Search Symptoms and select all that apply.
+                                            </FormDescription>
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    {...field}
+                                                    creatable={false}
+                                                    onSearch={handleHpoAsyncSearch}
+                                                    placeholder="Search HPO symptoms..."
+                                                    hidePlaceholderWhenSelected
+                                                    loadingIndicator={<p>Searching HPO...</p>}
+                                                    emptyIndicator={<p>No symptoms found.</p>}
+                                                    showHoverCard={false}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <BiomarkersFormField form={editResearchForm} />
 
                                 <FormField
                                     control={editResearchForm.control}

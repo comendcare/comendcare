@@ -17,12 +17,20 @@ import {faker} from "@faker-js/faker";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import {MOLECULAR_MECHANISMS, Option, optionSchema} from "@comend/lib/types";
 import { badgeVariants } from "@comend/components/ui/badge";
+import {Plus} from "lucide-react";
+import { Trash2 } from "lucide-react";
+import { BIOMARKER_TYPES } from "@comend/lib/types";
 
 export const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
     z.preprocess(
         (v) => (v === "" || v === null ? undefined : v),
         schema.optional()
     );
+
+const biomarkerSchema = z.object({
+    name: z.string().optional(),
+    type: z.array(optionSchema).optional(), // single-select via maxSelected=1
+});
 
 export const researchFormSchema = z.object({
     disorder: z.array(optionSchema).optional(),     // MultipleSelector; empty array = cleared
@@ -42,12 +50,12 @@ export const researchFormSchema = z.object({
     otherMechanisms: emptyToUndefined(z.string()),
     causal: z.array(optionSchema).optional(),
     genes: z.array(optionSchema).optional(),
-    biomarkers: z.array(optionSchema).optional(),
+    biomarkers: z.array(biomarkerSchema).optional(),
     systems: z.array(optionSchema).optional(),
     otherSystems: emptyToUndefined(z.string()),
-    symptoms: z.array(optionSchema).optional(),
     studies: z.array(optionSchema).optional(),
     tools: z.array(optionSchema).optional(),
+    associatedSignsAndSymptoms: z.array(optionSchema).optional(),
 });
 
 const handleAsyncSearch = async (query: string) => {
@@ -322,3 +330,123 @@ export default function ResearchOnboardingForm(
         </TooltipProvider>
     );
 }
+
+
+type BiomarkerType = {
+    name: string;
+    type: Option[]; // max 1
+};
+
+export const BiomarkersFormField = ({ form, title }: { form: any; title?: string }) => {
+    return (
+        <FormField
+            control={form.control}
+            name="biomarkers"
+            render={({ field }) => (
+                <FormItem>
+                    <div className="flex flex-row justify-between gap-2 items-center">
+                        <div className="flex flex-col">
+                            <FormLabel>{title || `Biomarkers`}</FormLabel>
+                            <FormDescription>{`Any available biomarkers for your condition that you are aware of.`}</FormDescription>
+                            <FormMessage />
+                        </div>
+
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            size="icon"
+                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                e.preventDefault();
+                                form.setValue("biomarkers", [
+                                    ...(field.value || []),
+                                    { name: "", type: [] } satisfies BiomarkerType,
+                                ], { shouldDirty: true, shouldValidate: true });
+                            }}
+                        >
+                            <Plus />
+                        </Button>
+                    </div>
+
+                    {field?.value && field.value.length > 0 && (
+                        <ol className="flex flex-col gap-4 mt-4">
+                            {field.value.map((bm: BiomarkerType, index: number) => (
+                                <BiomarkerRow
+                                    key={index}
+                                    value={bm}
+                                    onDelete={() => {
+                                        form.setValue(
+                                            "biomarkers",
+                                            field.value.filter((_: BiomarkerType, i: number) => i !== index),
+                                            { shouldDirty: true, shouldValidate: true }
+                                        );
+                                    }}
+                                    onValueChange={(newValue) => {
+                                        form.setValue(
+                                            "biomarkers",
+                                            field.value.map((curr: BiomarkerType, i: number) => (i === index ? newValue : curr)),
+                                            { shouldDirty: true, shouldValidate: true }
+                                        );
+                                    }}
+                                />
+                            ))}
+                        </ol>
+                    )}
+                </FormItem>
+            )}
+        />
+    );
+};
+
+export const BiomarkerRow = ({
+                                 value,
+                                 onDelete,
+                                 onValueChange,
+                             }: {
+    value: BiomarkerType;
+    onDelete: () => void;
+    onValueChange: (next: BiomarkerType) => void;
+}) => {
+    return (
+        <li className="flex flex-col gap-3 rounded-md border p-3">
+            <div className="flex items-start justify-between gap-2">
+                <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-3">
+                    {/* Biomarker name */}
+                    <FormItem>
+                        <FormLabel>Biomarker name</FormLabel>
+                        <FormControl>
+                            <Input
+                                value={value.name ?? ""}
+                                placeholder="e.g., Creatine (CSF), CK, Lactate..."
+                                onChange={(e) => onValueChange({ ...value, name: e.target.value })}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+
+                    {/* Biomarker type (single select) */}
+                    <FormItem>
+                        <FormLabel>Biomarker type</FormLabel>
+                        <FormControl>
+                            <MultipleSelector
+                                value={value.type ?? []}
+                                onChange={(next) => onValueChange({ ...value, type: next })}
+                                defaultOptions={BIOMARKER_TYPES}
+                                maxSelected={1}
+                                creatable={false}
+                                placeholder="Select a type..."
+                                hidePlaceholderWhenSelected
+                                showHoverCard={false}
+                                emptyIndicator={<p className="text-center text-sm text-muted-foreground">no results found.</p>}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                </div>
+
+                <Button type="button" variant="ghost" size="icon" onClick={onDelete} aria-label="Remove biomarker">
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            </div>
+        </li>
+    );
+};

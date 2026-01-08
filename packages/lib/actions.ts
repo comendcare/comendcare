@@ -78,9 +78,26 @@ const PATHS = [
     "/app/research-plan",
 ]
 
-export const getSessionInfo = async () => {
-    const session = await getSession()
-    return session
+function toBiomarkersNested(raw: any) {
+    if (raw === undefined) return undefined; // field not sent => don't touch relation
+    if (raw === null) {
+        // explicit clear
+        return { deleteMany: {} as const };
+    }
+
+    if (!Array.isArray(raw)) return undefined;
+
+    const rows = raw
+        .map((b) => ({
+            name: String(b?.name ?? "").trim(),
+            type: String(b?.type ?? "").trim(),
+        }))
+        .filter((b) => b.name && b.type); // IMPORTANT: Biomarker.type is required in schema
+
+    return {
+        deleteMany: {} as const,           // replace-all semantics
+        createMany: { data: rows } as const,
+    };
 }
 
 export type Node = Prisma.NodeGetPayload<{}>
@@ -2431,16 +2448,30 @@ export const updateCondition = withOrganizationAuth(
                     condition = await prisma.condition.findUnique({ where: { slug: requestedSlug } });
                 }
 
+                const { biomarkers, name: incomingName, slug: incomingSlug, ...rest } = data ?? {};
+                const biomarkersNested = toBiomarkersNested(biomarkers);
+
+                const slug = incomingSlug ?? toKebabCase(String(incomingName || ""));
+                const name = incomingName ?? slug.replace(/-/g, " ");
+
                 if (condition) {
                     condition = await prisma.condition.update({
                         where: { id: condition.id },
-                        data,
+                        data: {
+                            ...rest,
+                            ...(biomarkersNested ? { biomarkers: biomarkersNested } : {}),
+                        },
                     });
                 } else {
-                    const slug = requestedSlug ?? toKebabCase(String(data.name || ""));
-                    const name = data.name ?? slug.replace(/-/g, " ");
                     condition = await prisma.condition.create({
-                        data: { ...data, slug, name },
+                        data: {
+                            ...rest,
+                            slug,
+                            name,
+                            ...(biomarkersNested?.createMany
+                                ? { biomarkers: { createMany: biomarkersNested.createMany } }
+                                : {}),
+                        },
                     });
                 }
 
@@ -2457,8 +2488,14 @@ export const updateCondition = withOrganizationAuth(
             const conditionId = link.conditionId;
 
             // Keep name/slug safety if you want; or simplify further
-            const { name: incomingName, slug: incomingSlug, ...restData } = data ?? {};
+            const {
+                name: incomingName,
+                slug: incomingSlug,
+                biomarkers,
+                ...restData
+            } = data ?? {};
 
+            const biomarkersNested = toBiomarkersNested(biomarkers);
             let targetConditionId = conditionId;
 
             if (incomingName) {
@@ -2482,14 +2519,18 @@ export const updateCondition = withOrganizationAuth(
 
             const safeScalarData: Record<string, any> = { ...restData };
 
-            if (incomingName && targetConditionId === conditionId) {
-                safeScalarData.name = incomingName;
-            }
-
             // ignore incomingSlug unless you explicitly want to allow changing it
             // if (incomingSlug && targetConditionId === conditionId) {
             //   safeScalarData.slug = incomingSlug;
             // }
+
+            if (incomingName && targetConditionId === conditionId) {
+                safeScalarData.name = incomingName;
+            }
+
+            if (biomarkersNested) {
+                safeScalarData.biomarkers = biomarkersNested;
+            }
 
             const updated = await prisma.condition.update({
                 where: { id: targetConditionId },

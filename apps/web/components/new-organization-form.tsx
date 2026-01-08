@@ -315,6 +315,19 @@ export default function NewOrganizationForm({invitations, organizations}: {
         }
     }
 
+    const handleHpoAsyncSearch = useCallback(async (query: string): Promise<Option[]> => {
+        if (!query) return [];
+        try {
+            const res = await fetch(`/api/hpo/search?q=${encodeURIComponent(query)}`);
+            if (!res.ok) return [];
+            const data = await res.json();
+            return Array.isArray(data?.items) ? data.items : [];
+        } catch (e) {
+            console.error("Failed to fetch HPO terms:", e);
+            return [];
+        }
+    }, []);
+
     /**************************************
      * Async gene + condition search (examples)
      **************************************/
@@ -856,6 +869,31 @@ export default function NewOrganizationForm({invitations, organizations}: {
                                 )
                             }}
                         />
+
+                        <FormField
+                            control={form.control}
+                            name="symptoms"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Symptoms</FormLabel>
+                                    <FormDescription>Search symptoms (HPO) and select all that apply.</FormDescription>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            creatable={false}
+                                            onSearch={handleHpoAsyncSearch}
+                                            placeholder="Search HPO symptoms..."
+                                            hidePlaceholderWhenSelected
+                                            loadingIndicator={<p>Searching HPO...</p>}
+                                            emptyIndicator={<p>No symptoms found.</p>}
+                                            showHoverCard={false}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
                     </section>
 
                     <Separator/>
