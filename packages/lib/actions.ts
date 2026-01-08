@@ -58,9 +58,10 @@ import {InputJsonObject, JsonObject} from "@prisma/client/runtime/library"
 import z from "zod"
 import {writeRawEvent} from "./raw-events";
 import crypto from "node:crypto";
-import {customerIOTrack} from "./customer-io-track";
-import {cioDeleteUser} from "./customer-io";
+import {customerIOTrack} from "./customerio/customer-io-track";
+import {cioDeleteUser} from "./customerio/customer-io";
 import {withResearcherAuth} from "comend-researcher-hub/lib/auth";
+import {cioRemoveOrgMember, cioSyncOrg, cioUpsertOrgMember} from "./customerio/cio-sync-org";
 
 const PATHS = [
     "/app",
@@ -462,6 +463,28 @@ export const createOrganization = withAuth(
 
                 return {organization, membership};
             });
+
+            // Sync Customer.io custom object + relationships (best-effort, do not throw)
+            try {
+                await cioSyncOrg({
+                    subdomain: result.organization.subdomain,
+                    name: result.organization.name,
+                    description: result.organization.description,
+                });
+
+                await cioUpsertOrgMember({
+                    orgSubdomain: result.organization.subdomain!,
+                    userId: result.membership.userId,
+                    role: result.membership.role,
+                    joinedAt: result.membership.createdAt,
+                });
+            } catch (e: any) {
+                console.error("[CIO] org sync failed (createOrganization)", {
+                    orgId: result.organization.id,
+                    subdomain: result.organization.subdomain,
+                    error: String(e?.message || e),
+                });
+            }
 
             if (result.organization.verified && result.organization.published) {
                 await addTypeSenseDocument(
@@ -1342,6 +1365,29 @@ export const approveMemberRequestAndCreateMember = withOrganizationAuth(
             }
 
             if (createdMember && organization) {
+                try {
+                    await cioSyncOrg({
+                        subdomain: organization.subdomain,
+                        name: organization.name,
+                        description: organization.description ?? undefined, // if Organization includes it here; otherwise omit
+                    });
+
+                    await cioUpsertOrgMember({
+                        orgSubdomain: organization.subdomain!, // should exist if you rely on it
+                        userId: createdMember.userId,
+                        role: createdMember.role,
+                        joinedAt: createdMember.createdAt ?? new Date(), // if Member has createdAt
+                        // title: createdMember.title ?? null, // if you have it
+                    });
+                } catch (e: any) {
+                    console.error("[CIO] org membership sync failed (approveMemberRequestAndCreateMember)", {
+                        orgId: organization.id,
+                        subdomain: organization.subdomain,
+                        userId: createdMember.userId,
+                        error: String(e?.message || e),
+                    });
+                }
+
                 await sendMemberRequestApprovedEmail(
                     {
                         name: memberRequest.user.name,
@@ -1692,6 +1738,22 @@ export const leaveOrganization = withOrganizationAuth(
                     : []),
             ]);
 
+            try {
+                if (organization.subdomain) {
+                    await cioRemoveOrgMember({
+                        orgSubdomain: organization.subdomain,
+                        userId,
+                    });
+                }
+            } catch (e: any) {
+                console.error("[CIO] remove org member failed (leaveOrganization)", {
+                    orgId: organization.id,
+                    subdomain: organization.subdomain,
+                    userId,
+                    error: String(e?.message || e),
+                });
+            }
+
             // Revalidate org-scoped pages and any UI that reflects org state
             for (const p of PATHS) {
                 revalidatePath(p);
@@ -1817,7 +1879,7 @@ export const deleteMember = withOrganizationAuth(
                 where: {id: membershipId},
                 include: {
                     user: {select: {id: true, activeOrganizationId: true, name: true, email: true}},
-                    organization: {select: {id: true, name: true, image: true}},
+                    organization: {select: {id: true, name: true, image: true, subdomain: true}},
                 },
             });
 
@@ -1837,6 +1899,27 @@ export const deleteMember = withOrganizationAuth(
                 await prisma.user.update({
                     where: {id: member.user.id},
                     data: {activeOrganizationId: nextMembership?.organizationId ?? null},
+                });
+            }
+
+            try {
+                if (member.organization?.subdomain) {
+                    await cioRemoveOrgMember({
+                        orgSubdomain: member.organization.subdomain,
+                        userId: member.user.id,
+                    });
+                } else {
+                    // If you didn't select subdomain, add it to the include/select.
+                    console.warn("[CIO] deleteMember: missing organization.subdomain; cannot remove relationship", {
+                        orgId: member.organization.id,
+                        userId: member.user.id,
+                    });
+                }
+            } catch (e: any) {
+                console.error("[CIO] remove org member failed (deleteMember)", {
+                    orgId: member.organization.id,
+                    userId: member.user.id,
+                    error: String(e?.message || e),
                 });
             }
 
@@ -2134,6 +2217,29 @@ export const acceptClaimOrganizationInvitation = withAuth(
                 })
             ]);
 
+            try {
+                // Optional but good: ensure org object exists / updated
+                await cioSyncOrg({
+                    subdomain: invitation.organization.subdomain,
+                    name: invitation.organization.name,
+                    description: undefined, // you didn't select it here
+                });
+
+                await cioUpsertOrgMember({
+                    orgSubdomain: invitation.organization.subdomain!, // should exist
+                    userId: session.user.id,
+                    role: invitation.role || "member",
+                    joinedAt: new Date(), // since you didn't fetch membership.createdAt here
+                });
+            } catch (e: any) {
+                console.error("[CIO] org membership sync failed (acceptInvitation)", {
+                    orgId: invitation.organization.id,
+                    subdomain: invitation.organization.subdomain,
+                    userId: session.user.id,
+                    error: String(e?.message || e),
+                });
+            }
+
             // await customerIOTrack({
             //     userId: session.user.id ?? undefined,   // if you have it
             //     event: 'claim_organization_invitation_accepted',
@@ -2210,7 +2316,7 @@ export const acceptInvitation = withAuth(
                 return {success: false, error: "failed to follow organization"};
             }
 
-            // Process invitation: create membership and delete memebership (mark invitation as accepted)
+            // Process invitation: create membership and delete invitation (mark invitation as accepted)
             await prisma.$transaction([
                 prisma.member.create({
                     data: {
@@ -2230,6 +2336,28 @@ export const acceptInvitation = withAuth(
                     data: {activeOrganizationId: invitation.organization.id},
                 })
             ]);
+
+            try {
+                await cioSyncOrg({
+                    subdomain: invitation.organization.subdomain,
+                    name: invitation.organization.name,
+                    description: undefined, // you didn't select it here
+                });
+
+                await cioUpsertOrgMember({
+                    orgSubdomain: invitation.organization.subdomain!, // should exist
+                    userId: session.user.id,
+                    role: invitation.role || "member",
+                    joinedAt: new Date(), // since you didn't fetch membership.createdAt here
+                });
+            } catch (e: any) {
+                console.error("[CIO] org membership sync failed (acceptInvitation)", {
+                    orgId: invitation.organization.id,
+                    subdomain: invitation.organization.subdomain,
+                    userId: session.user.id,
+                    error: String(e?.message || e),
+                });
+            }
 
             await customerIOTrack({
                 userId: session.user.id ?? undefined,   // if you have it
@@ -2591,10 +2719,10 @@ export const updateDiseaseModel = withOrganizationAuth(
                             },
                         }
                     ) : undefined),
-                    ...(diseaseModelData.institution 
+                    ...(diseaseModelData.institution
                         ? {institution: {connect: {id: diseaseModelData.institution.id}}} // if institution exists in database, connect
                         : {institution: {disconnect: true}}), // if institution does not exist in database, disconnect
-                    ...(diseaseModelData.company 
+                    ...(diseaseModelData.company
                         ? {company: {connect: {id: diseaseModelData.company.id}}} // if company exists in database, connect
                         : {company: {disconnect: true}}), // if company does not exist in database, disconnect
                 },
@@ -2678,10 +2806,10 @@ export const createDiseaseModel = withOrganizationAuth(
                     ...(diseaseModelData.gene
                         ? ({gene: {connect: {symbol: diseaseModelData.gene.value.toUpperCase()}}})
                         : undefined),
-                    ...(diseaseModelData.institution 
+                    ...(diseaseModelData.institution
                         ? ({institution: {connect: {id: diseaseModelData.institution.id}}}) // if institution exists in database, connect
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
-                    ...(diseaseModelData.company 
+                    ...(diseaseModelData.company
                         ? ({company: {connect: {id: diseaseModelData.company.id}}}) // if company exists in database, connect
                         : ({company: undefined})), // if company does not exist in database, don't connect
                     attachments: {
@@ -2837,10 +2965,10 @@ export const createClinicalDataset = withOrganizationAuth(
                     )
                         ? {cohortSize: data.cohortSize !== '' ? JSON.parse(data.cohortSize) : null}
                         : undefined),
-                    ...(dataToolData.institution 
+                    ...(dataToolData.institution
                         ? ({institution: {connect: {id: dataToolData.institution.id}}}) // if institution exists in database, connect
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
-                    ...(dataToolData.company 
+                    ...(dataToolData.company
                         ? ({company: {connect: {id: dataToolData.company.id}}}) // if company exists in database, connect
                         : ({company: undefined})), // if company does not exist in database, don't connect
                 }
@@ -3016,10 +3144,10 @@ export const updateClinicalDataset = withOrganizationAuth(
                             connect: {symbol: dataToolData.gene.value.toUpperCase()}
                         }
                     }) : {gene: {disconnect: true}}),
-                    ...(dataToolData.institution 
+                    ...(dataToolData.institution
                         ? {institution: {connect: {id: dataToolData.institution.id}}} // if institution exists in database, connect
                         : {institution: {disconnect: true}}), // if institution does not exist in database, disconnect
-                    ...(dataToolData.company 
+                    ...(dataToolData.company
                         ? {company: {connect: {id: dataToolData.company.id}}} // if company exists in database, connect
                         : {company: {disconnect: true}}), // if company does not exist in database, disconnect
                 },
@@ -3067,13 +3195,13 @@ export const updateCreateFacilityRequest = withOrganizationAuth(
                     ? ({milestone: {connect: {id: data.milestoneId}}})
                     : undefined),
                 ...(data.biosampleId
-                    ? ({biosample: {connect: {id: data.biosampleId}}}) 
+                    ? ({biosample: {connect: {id: data.biosampleId}}})
                     : undefined),
                 ...(data.diseaseModelId
-                    ? ({diseaseModel: {connect: {id: data.diseaseModelId}}}) 
+                    ? ({diseaseModel: {connect: {id: data.diseaseModelId}}})
                     : undefined),
                 ...(data.clinicalDatasetId
-                    ? ({clinicalDataset: {connect: {id: data.clinicalDatasetId}}}) 
+                    ? ({clinicalDataset: {connect: {id: data.clinicalDatasetId}}})
                     : undefined)
             }
         })
@@ -3104,13 +3232,13 @@ export const createCreateFacilityRequest = withOrganizationAuth(
                     ? ({milestone: {connect: {id: data.milestoneId}}})
                     : undefined),
                 ...(data.biosampleId
-                    ? ({biosample: {connect: {id: data.biosampleId}}}) 
+                    ? ({biosample: {connect: {id: data.biosampleId}}})
                     : undefined),
                 ...(data.diseaseModelId
-                    ? ({diseaseModel: {connect: {id: data.diseaseModelId}}}) 
+                    ? ({diseaseModel: {connect: {id: data.diseaseModelId}}})
                     : undefined),
                 ...(data.clinicalDatasetId
-                    ? ({clinicalDataset: {connect: {id: data.clinicalDatasetId}}}) 
+                    ? ({clinicalDataset: {connect: {id: data.clinicalDatasetId}}})
                     : undefined)
             }
         })
@@ -3235,10 +3363,10 @@ export const createBiosample = withOrganizationAuth(
                         // transform symbol to uppercase because all genes are uppercase in our database
                         ? ({gene: {connect: {symbol: biosampleData.gene.value.toUpperCase() }}})
                         : undefined),
-                    ...(biosampleData.institution 
+                    ...(biosampleData.institution
                         ? ({institution: {connect: {id: biosampleData.institution.id}}}) // if institution exists in database, connect
                         : ({institution: undefined})), // if institution does not exist in database, don't connect
-                    ...(biosampleData.company 
+                    ...(biosampleData.company
                         ? ({company: {connect: {id: biosampleData.company.id}}}) // if company exists in database, connect
                         : ({company: undefined})), // if company does not exist in database, don't connect
                     donor: {
@@ -3494,10 +3622,10 @@ export const updateBiosample = withOrganizationAuth(
                     ...(biosampleData.gene
                         ? {gene: {connect: {symbol: biosampleData.gene.value.toUpperCase()}}}
                         : {gene: {disconnect: true}}),
-                    ...(biosampleData.institution 
+                    ...(biosampleData.institution
                         ? {institution: {connect: {id: biosampleData.institution.id}}} // if institution exists in database, connect
                         : {institution: {disconnect: true}}), // if institution does not exist in database, disconnect
-                    ...(biosampleData.company 
+                    ...(biosampleData.company
                         ? {company: {connect: {id: biosampleData.company.id}}} // if company exists in database, connect
                         : {company: {disconnect: true}}), // if company does not exist in database, disconnect
                     ...(data.donorId
@@ -4347,11 +4475,11 @@ export const updateDBFlow = withOrganizationAuth(
                 if (nodesToCreate.length > 0) {
                     await tx.node.createMany({
                         data: nodesToCreate.map(node => ({
-                        id: node.id,
-                        roadmapId,
-                        positionX: node.position?.x,
-                        positionY: node.position?.y,
-                        origin: node.origin,
+                            id: node.id,
+                            roadmapId,
+                            positionX: node.position?.x,
+                            positionY: node.position?.y,
+                            origin: node.origin,
                         })),
                     })
                 }
@@ -4360,9 +4488,9 @@ export const updateDBFlow = withOrganizationAuth(
                     await tx.node.update({
                         where: { id: node.id },
                         data: {
-                        positionX: node.position?.x,
-                        positionY: node.position?.y,
-                        origin: node.origin,
+                            positionX: node.position?.x,
+                            positionY: node.position?.y,
+                            origin: node.origin,
                         },
                     })
                 }
@@ -4393,8 +4521,8 @@ export const updateDBFlow = withOrganizationAuth(
                                 status: node.data.status || "PLANNED",
                                 private: node.data.private ?? false,
                                 attachments: {
-                                deleteMany: {}, // optionally diff like updateMilestones
-                                createMany: { data: attachments },
+                                    deleteMany: {}, // optionally diff like updateMilestones
+                                    createMany: { data: attachments },
                                 },
                             },
                         })
@@ -4421,10 +4549,10 @@ export const updateDBFlow = withOrganizationAuth(
                 if (edgesToCreate.length > 0) {
                     await tx.edge.createMany({
                         data: edgesToCreate.map(e => ({
-                        id: e.id,
-                        roadmapId,
-                        source: e.source,
-                        target: e.target,
+                            id: e.id,
+                            roadmapId,
+                            source: e.source,
+                            target: e.target,
                         })),
                     })
                 }
@@ -4433,8 +4561,8 @@ export const updateDBFlow = withOrganizationAuth(
                     await tx.edge.update({
                         where: { id: edge.id },
                         data: {
-                        source: edge.source,
-                        target: edge.target,
+                            source: edge.source,
+                            target: edge.target,
                         },
                     })
                 }
@@ -4735,13 +4863,13 @@ export const createNodes = withOrganizationAuth(
             //         }))
             //         console.log(`Add typesense document`, document)
             //         await addTypeSenseDocument(
-            //              `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+            //              `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
             //              (
             //                 process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
             //                     ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
             //                     : process.env.TYPESENSE_ADMIN_API_KEY
-            //             )!, 
-            //              document, 
+            //             )!,
+            //              document,
             //              'milestones'
             //         )
             //     })
@@ -4795,13 +4923,13 @@ export const deleteNode = withOrganizationAuth(
             // Typesense - delete milestone documents here...
             // console.log(`Delete typesense document`, deletedNode.data.id)
             // await deleteTypeSenseDocument(
-            //     `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+            //     `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
             //     (
             //         process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
             //             ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
             //             : process.env.TYPESENSE_ADMIN_API_KEY
-            //     )!, 
-            //     deletedNode.data.id, 
+            //     )!,
+            //     deletedNode.data.id,
             //     'milestones'
             // )
 
@@ -5014,8 +5142,8 @@ export const updateMilestones = withOrganizationAuth(
                 if (!existing) continue
 
                 const diffIds = (incoming: string[], existingIds: string[]) => ({
-                    toAdd: incoming.filter(id => !existingIds.includes(id)),
-                    toRemove: existingIds.filter(id => !incoming.includes(id)),
+                    toAdd: (incoming || []).filter(id => !existingIds.includes(id)),
+                    toRemove: (existingIds || []).filter(id => !incoming.includes(id)),
                 })
 
                 const typesDiff = diffIds(
@@ -5117,14 +5245,14 @@ export const updateMilestones = withOrganizationAuth(
 
                             attachments: {
                                 deleteMany: attachmentsDiff.toRemove.length ? { id: { in: attachmentsDiff.toRemove } } : undefined,
-                                create: milestone.attachments
-                                .filter(a => attachmentsDiff.toAdd.includes(a.id))
-                                .map(a => ({ link: a.link, name: a.name ?? undefined })),
+                                create: (milestone.attachments || [])
+                                    .filter(a => attachmentsDiff.toAdd.includes(a.id))
+                                    .map(a => ({ link: a.link, name: a.name ?? undefined })),
                             },
 
                             contacts: {
                                 deleteMany: contactsDiff.toRemove.length ? { id: { in: contactsDiff.toRemove } } : undefined,
-                                create: milestone.contacts
+                                create: (milestone.contacts || [])
                                     .filter(c => contactsDiff.toAdd.includes(c.id))
                                     .map(c => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
                             },

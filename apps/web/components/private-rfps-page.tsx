@@ -44,7 +44,7 @@ export function PrivateRFPsPage({ initialRFPs }: Props) {
                             ? (
                                 <Button variant="cta">
                                     <Plus/>
-                                    {"Create biosample"}
+                                    {"Create RFP"}
                                 </Button>
                             )
                             : (
@@ -52,7 +52,7 @@ export function PrivateRFPsPage({ initialRFPs }: Props) {
                                     className={cn(buttonVariants({variant: 'cta'}))}
                                 >
                                     <Plus/>
-                                    {"Create biosample"}
+                                    {"Create RFP"}
                                 </PulsatingButton>
                             )
                     )}

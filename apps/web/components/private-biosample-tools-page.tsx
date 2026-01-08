@@ -144,7 +144,7 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                         ? (
                                             <Button variant="cta">
                                                 <Plus/>
-                                                {"Create biosample"}
+                                                {"Create patient biosample"}
                                             </Button>
                                         )
                                         : (
@@ -152,7 +152,7 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                                 className={cn(buttonVariants({variant: 'cta'}))}
                                             >
                                                 <Plus/>
-                                                {"Create biosample"}
+                                                {"Create patient biosample"}
                                             </PulsatingButton>
                                         )
                                 )}

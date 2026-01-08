@@ -137,6 +137,7 @@ export default function ClaimInvitationBlocker({
                                             {working ? <LoadingDots color="#ffffff" /> : "Decline"}
                                         </Button>
                                         <Button
+                                            variant={'cta'}
                                             disabled={working}
                                             onClick={() => onAccept(inv.id, inv.organizationId)}
                                         >
