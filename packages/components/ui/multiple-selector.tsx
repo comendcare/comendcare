@@ -757,14 +757,6 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
 MultipleSelector.displayName = 'MultipleSelector';
 export default MultipleSelector;
 
-export interface Option {
-    value: string;
-    label: string;
-    disable?: boolean;
-    fixed?: boolean;
-    // [key: string]: string | boolean | undefined | null;
-}
-
 
 interface TagTextareaProps {
     /** The currently selected options (rendered as badges). */

@@ -166,7 +166,7 @@ export const getResearchPlansAnalytics = withAdminAuth(
             ? projectsBudgets.reduce((prev, curr) => prev + curr)
             : 0
 
-        const statuses = ['TODO', 'INPROGRESS', 'COMPLETED']
+        const statuses = ['PLANNED', 'INPROGRESS', 'COMPLETED']
 
         let projectsByStatus: {type: string, num: number}[] = statuses.map(status => ({
             type: status,

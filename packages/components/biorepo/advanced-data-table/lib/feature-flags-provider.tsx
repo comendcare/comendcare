@@ -76,7 +76,7 @@ export function FeatureFlagsProvider({ additionalButtons, children, showFilters 
 
   return (
     <FeatureFlagsContext.Provider value={contextValue}>
-      <div className={cn("w-full overflow-x-auto p-1", !showFilters && "hidden")}>
+      <div className={cn("w-full p-1", !showFilters && "hidden")}>
         <div className="flex gap-2 w-full">
           <Tabs 
             value={filterFlag || flagConfig.featureFlags[0].value }

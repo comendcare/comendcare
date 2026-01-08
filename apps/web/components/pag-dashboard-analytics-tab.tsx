@@ -43,7 +43,7 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="flex flex-row items-center justify-start gap-x-2">
                             <Workflow className="h-5 w-5"/>
-                            Research plans
+                            {organization.roadmaps.length > 0 ? 'Research plans' : 'No Research Plans'}
                             <Button
                                 asChild
                                 variant="ghost"
@@ -55,20 +55,25 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                                 </Link>
                             </Button>
                         </CardTitle>
-                        {/* <Workflow className="h-4 w-4 text-muted-foreground"/> */}
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl font-semibold">{organization.roadmaps.length}</div>
-                        {/*<p className="text-xs text-muted-foreground">*/}
-                        {/*    +20.1% from last month*/}
-                        {/*</p>*/}
+                        {organization.roadmaps.length > 0 
+                            ? (<p className="text-xl font-semibold">{organization.roadmaps.length}</p>) 
+                            : (
+                                <Link href={'/app/research-plan'}>
+                                    <Button variant="cta">
+                                        Create a research plan
+                                    </Button>
+                                </Link>
+                            )
+                        }
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="flex flex-row items-center justify-start gap-x-2">
                             <Microscope className="h-5 w-5"/>
-                            Tools
+                            {organization.roadmaps.length > 0 ? 'Tools' : 'No Tools'}
                             <Button
                                 asChild
                                 variant="ghost"
@@ -80,22 +85,25 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                                 </Link>
                             </Button>
                         </CardTitle>
-                        {/* <Microscope className="h-4 w-4 text-muted-foreground"/> */}
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl font-semibold">
-                            {organization.tools.length + organization.biosamples.length + organization.diseaseModel.length}
-                        </div>
-                        {/*<p className="text-xs text-muted-foreground">*/}
-                        {/*    +201 since last hour*/}
-                        {/*</p>*/}
+                        {organization.tools.length > 0 
+                            ? (<p className="text-xl font-semibold">{organization.tools.length}</p>) 
+                            : (
+                                <Link href={'/app/tools/biosample'}>
+                                    <Button variant="cta">
+                                        Add pre-clinical tools
+                                    </Button>
+                                </Link>
+                            )
+                        }
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="flex flex-row items-center justify-start gap-x-2">
                             <Megaphone className="h-5 w-5 min-w-5"/>
-                            RFPs
+                            {organization.roadmaps.length > 0 ? 'RFPs' : 'No RFPs'}
                             <Button
                                 asChild
                                 variant="ghost"
@@ -107,13 +115,18 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                                 </Link>
                             </Button>
                         </CardTitle>
-                        {/* <Megaphone className="h-4 w-4 text-muted-foreground"/> */}
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl font-semibold">{organization.rfps.length}</div>
-                        {/*<p className="text-xs text-muted-foreground">*/}
-                        {/*    +180.1% from last month*/}
-                        {/*</p>*/}
+                        {organization.rfps.length > 0 
+                            ? (<p className="text-xl font-semibold">{organization.rfps.length}</p>) 
+                            : (
+                                <Link href={'/app/rfps'}>
+                                    <Button variant="cta">
+                                        Create an RFP
+                                    </Button>
+                                </Link>
+                            )
+                        }
                     </CardContent>
                 </Card>
             </div>

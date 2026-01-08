@@ -85,42 +85,42 @@ export default function PAGProfilePage({
 }: PAGProfilePageProps) {
     const { startOnborda } = useOnborda()
     
-    useEffect(() => {
-        const startOnbordaAndRemoveToast = () => {
-            startOnborda('organization-profile-tour')
-            setOnboarded('organization-profile-tour')
-            toast.dismiss()
-        }
+    // useEffect(() => {
+    //     const startOnbordaAndRemoveToast = () => {
+    //         startOnborda('organization-profile-tour')
+    //         setOnboarded('organization-profile-tour')
+    //         toast.dismiss()
+    //     }
 
-        // Only start tour if user is new and is on the /app/research-plan page
-        if (!isOnboarded('organization-profile-tour')) {
-            toast("Welcome to Comend!", {
-                id: "onborda",
-                duration: 300000,
-                position: "bottom-left",
-                description: `Would you like to take a quick tour?`,
-                action: (
-                    <div className="flex flex-col space-y-2 ml-4">
-                        <Button
-                            onClick={() => startOnbordaAndRemoveToast()}
-                            variant="secondary"
-                        >
-                            {`Yes please!`}
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                toast.dismiss()
-                                setOnboarded('organization-profile-tour')
-                            }}
-                            variant="ghost"
-                        >
-                            {`No thanks!`}
-                        </Button>
-                    </div>
-                )
-            })
-        }
-    }, [startOnborda])
+    //     // Only start tour if user is new and is on the /app/research-plan page
+    //     if (!isOnboarded('organization-profile-tour')) {
+    //         toast("Welcome to Comend!", {
+    //             id: "onborda",
+    //             duration: 300000,
+    //             position: "bottom-left",
+    //             description: `Would you like to take a quick tour?`,
+    //             action: (
+    //                 <div className="flex flex-col space-y-2 ml-4">
+    //                     <Button
+    //                         onClick={() => startOnbordaAndRemoveToast()}
+    //                         variant="secondary"
+    //                     >
+    //                         {`Yes please!`}
+    //                     </Button>
+    //                     <Button
+    //                         onClick={() => {
+    //                             toast.dismiss()
+    //                             setOnboarded('organization-profile-tour')
+    //                         }}
+    //                         variant="ghost"
+    //                     >
+    //                         {`No thanks!`}
+    //                     </Button>
+    //                 </div>
+    //             )
+    //         })
+    //     }
+    // }, [startOnborda])
 
     return (
         <div className="grid grid-cols-5 px-4 w-full max-w-7xl my-4 mx-auto gap-4">

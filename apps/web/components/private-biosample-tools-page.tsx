@@ -13,7 +13,7 @@ import type {Biosample} from "@prisma/client";
 import {BiosampleBulkImportDialog} from "./biosample-bulk-import-dialog";
 import {SearchParams} from "@comend/components/types";
 import {useEffect, useRef, useState} from "react";
-import { Button } from "@comend/components/ui/button";
+import { Button, buttonVariants } from "@comend/components/ui/button";
 import { Globe, Lock, Plus, Trash } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { setBiosamplesVisibility } from "@comend/lib/actions";
@@ -24,6 +24,8 @@ import { Asset, editBiosampleForm } from "@comend/lib/types";
 import Image from "next/image";
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog";
 import z from "zod";
+import { cn } from "@comend/lib/utils";
+import { PulsatingButton } from "@comend/components/ui/pulsating-button";
 
 export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     data: Biosample[],
@@ -138,10 +140,21 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                             <NewToolDialog 
                                 type={"biosample"} 
                                 trigger={(
-                                    <Button variant="cta">
-                                        <Plus/>
-                                        {"Create biosample"}
-                                    </Button>
+                                    data.length > 0 
+                                        ? (
+                                            <Button variant="cta">
+                                                <Plus/>
+                                                {"Create patient biosample"}
+                                            </Button>
+                                        )
+                                        : (
+                                            <PulsatingButton
+                                                className={cn(buttonVariants({variant: 'cta'}))}
+                                            >
+                                                <Plus/>
+                                                {"Create patient biosample"}
+                                            </PulsatingButton>
+                                        )
                                 )}
                             />
                         </>
@@ -186,15 +199,6 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                         <p className="text-lg text-stone-500">
                                             A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                                         </p>
-                                        {<NewToolDialog 
-                                            type={"biosample"} 
-                                            trigger={(
-                                                <Button variant="cta">
-                                                    <Plus/>
-                                                    {"Create biosample"}
-                                                </Button>
-                                            )}
-                                        />}
                                     </div>
                                 </div>
                             )}

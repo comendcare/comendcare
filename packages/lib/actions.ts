@@ -78,9 +78,26 @@ const PATHS = [
     "/app/research-plan",
 ]
 
-export const getSessionInfo = async () => {
-    const session = await getSession()
-    return session
+function toBiomarkersNested(raw: any) {
+    if (raw === undefined) return undefined; // field not sent => don't touch relation
+    if (raw === null) {
+        // explicit clear
+        return { deleteMany: {} as const };
+    }
+
+    if (!Array.isArray(raw)) return undefined;
+
+    const rows = raw
+        .map((b) => ({
+            name: String(b?.name ?? "").trim(),
+            type: String(b?.type ?? "").trim(),
+        }))
+        .filter((b) => b.name && b.type); // IMPORTANT: Biomarker.type is required in schema
+
+    return {
+        deleteMany: {} as const,           // replace-all semantics
+        createMany: { data: rows } as const,
+    };
 }
 
 export type Node = Prisma.NodeGetPayload<{}>
@@ -2200,6 +2217,29 @@ export const acceptClaimOrganizationInvitation = withAuth(
                 })
             ]);
 
+            try {
+                // Optional but good: ensure org object exists / updated
+                await cioSyncOrg({
+                    subdomain: invitation.organization.subdomain,
+                    name: invitation.organization.name,
+                    description: undefined, // you didn't select it here
+                });
+
+                await cioUpsertOrgMember({
+                    orgSubdomain: invitation.organization.subdomain!, // should exist
+                    userId: session.user.id,
+                    role: invitation.role || "member",
+                    joinedAt: new Date(), // since you didn't fetch membership.createdAt here
+                });
+            } catch (e: any) {
+                console.error("[CIO] org membership sync failed (acceptInvitation)", {
+                    orgId: invitation.organization.id,
+                    subdomain: invitation.organization.subdomain,
+                    userId: session.user.id,
+                    error: String(e?.message || e),
+                });
+            }
+
             // await customerIOTrack({
             //     userId: session.user.id ?? undefined,   // if you have it
             //     event: 'claim_organization_invitation_accepted',
@@ -2408,16 +2448,30 @@ export const updateCondition = withOrganizationAuth(
                     condition = await prisma.condition.findUnique({ where: { slug: requestedSlug } });
                 }
 
+                const { biomarkers, name: incomingName, slug: incomingSlug, ...rest } = data ?? {};
+                const biomarkersNested = toBiomarkersNested(biomarkers);
+
+                const slug = incomingSlug ?? toKebabCase(String(incomingName || ""));
+                const name = incomingName ?? slug.replace(/-/g, " ");
+
                 if (condition) {
                     condition = await prisma.condition.update({
                         where: { id: condition.id },
-                        data,
+                        data: {
+                            ...rest,
+                            ...(biomarkersNested ? { biomarkers: biomarkersNested } : {}),
+                        },
                     });
                 } else {
-                    const slug = requestedSlug ?? toKebabCase(String(data.name || ""));
-                    const name = data.name ?? slug.replace(/-/g, " ");
                     condition = await prisma.condition.create({
-                        data: { ...data, slug, name },
+                        data: {
+                            ...rest,
+                            slug,
+                            name,
+                            ...(biomarkersNested?.createMany
+                                ? { biomarkers: { createMany: biomarkersNested.createMany } }
+                                : {}),
+                        },
                     });
                 }
 
@@ -2434,8 +2488,14 @@ export const updateCondition = withOrganizationAuth(
             const conditionId = link.conditionId;
 
             // Keep name/slug safety if you want; or simplify further
-            const { name: incomingName, slug: incomingSlug, ...restData } = data ?? {};
+            const {
+                name: incomingName,
+                slug: incomingSlug,
+                biomarkers,
+                ...restData
+            } = data ?? {};
 
+            const biomarkersNested = toBiomarkersNested(biomarkers);
             let targetConditionId = conditionId;
 
             if (incomingName) {
@@ -2459,14 +2519,18 @@ export const updateCondition = withOrganizationAuth(
 
             const safeScalarData: Record<string, any> = { ...restData };
 
-            if (incomingName && targetConditionId === conditionId) {
-                safeScalarData.name = incomingName;
-            }
-
             // ignore incomingSlug unless you explicitly want to allow changing it
             // if (incomingSlug && targetConditionId === conditionId) {
             //   safeScalarData.slug = incomingSlug;
             // }
+
+            if (incomingName && targetConditionId === conditionId) {
+                safeScalarData.name = incomingName;
+            }
+
+            if (biomarkersNested) {
+                safeScalarData.biomarkers = biomarkersNested;
+            }
 
             const updated = await prisma.condition.update({
                 where: { id: targetConditionId },
@@ -5078,8 +5142,8 @@ export const updateMilestones = withOrganizationAuth(
                 if (!existing) continue
 
                 const diffIds = (incoming: string[], existingIds: string[]) => ({
-                    toAdd: incoming.filter(id => !existingIds.includes(id)),
-                    toRemove: existingIds.filter(id => !incoming.includes(id)),
+                    toAdd: (incoming || []).filter(id => !existingIds.includes(id)),
+                    toRemove: (existingIds || []).filter(id => !incoming.includes(id)),
                 })
 
                 const typesDiff = diffIds(
@@ -5181,14 +5245,14 @@ export const updateMilestones = withOrganizationAuth(
 
                             attachments: {
                                 deleteMany: attachmentsDiff.toRemove.length ? { id: { in: attachmentsDiff.toRemove } } : undefined,
-                                create: milestone.attachments
+                                create: (milestone.attachments || [])
                                     .filter(a => attachmentsDiff.toAdd.includes(a.id))
                                     .map(a => ({ link: a.link, name: a.name ?? undefined })),
                             },
 
                             contacts: {
                                 deleteMany: contactsDiff.toRemove.length ? { id: { in: contactsDiff.toRemove } } : undefined,
-                                create: milestone.contacts
+                                create: (milestone.contacts || [])
                                     .filter(c => contactsDiff.toAdd.includes(c.id))
                                     .map(c => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
                             },

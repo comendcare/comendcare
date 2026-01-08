@@ -7,10 +7,13 @@ import Loading from "./../../../loading";
 import { initializeRoadmapState } from "@comend/lib/initialize-client-state";
 import { useRouter } from "next/navigation";
 import { RoadmapsTable } from "./public-roadmap-card";
-import { Button } from "@comend/components/ui/button";
-import { Share } from "lucide-react";
+import { Button, buttonVariants } from "@comend/components/ui/button";
+import { Plus, Share } from "lucide-react";
 import { Dialog, DialogContent } from "@comend/components/ui/dialog";
 import ShareDialog from "./share-dialog";
+import { PulsatingButton } from "@comend/components/ui/pulsating-button";
+import { cn } from "@comend/lib/utils";
+import CreateResearchPlanDialog from "./create-research-plan-dialog";
 
 type Props = {
     orgId: string;
@@ -49,17 +52,43 @@ export default function RoadmapsPage({ orgId, organization, roadmaps }: Props) {
             <div className="p-6 w-full onborda-existing-research-plans-section">
                 <div className="w-full flex justify-between items-center gap-4">
                     <h2 className="col-span-full font-semibold text-2xl">My research plans</h2>
-                    <Button
-                        onClick={(e) => {
-                            e.preventDefault()
-                            handleShare()
-                        }}
-                        variant={'secondary'}
-                        className="onborda-share-research-plan"
-                    >
-                        <Share />
-                        Share
-                    </Button>
+                    <div className="flex gap-4 ">
+                        {roadmaps.length > 0 
+                            ? (
+                                <CreateResearchPlanDialog 
+                                    trigger={
+                                    <Button variant="cta">
+                                        <Plus />
+                                        Create an empty research plan
+                                    </Button>
+                                    }
+                                />
+                            ) 
+                            : (
+                                <CreateResearchPlanDialog 
+                                    trigger={
+                                        <PulsatingButton
+                                            className={cn(buttonVariants({variant: 'cta'}))}
+                                        >
+                                            <Plus />
+                                            Create an empty research plan
+                                        </PulsatingButton>
+                                    }
+                                />
+                            )
+                        }
+                        <Button
+                            onClick={(e) => {
+                                e.preventDefault()
+                                handleShare()
+                            }}
+                            variant={'secondary'}
+                            className="onborda-share-research-plan"
+                        >
+                            <Share />
+                            Share
+                        </Button>
+                    </div>
                 </div>
                 <RoadmapsTable 
                     isPrivate={true}

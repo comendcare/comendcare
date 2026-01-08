@@ -776,7 +776,7 @@ model Organization {
   metadata                      Json?
   diseaseModel                  DiseaseModel[]
   subscriptions                 Subscription[]
-  claimOrganizationInvitations   ClaimOrganizationInvitation[]
+  claimOrganizationInvitations  ClaimOrganizationInvitation[]
 
   @@index([userId])
 }
@@ -851,6 +851,18 @@ model Condition {
   metadata                    Json?
   diseaseModel                DiseaseModel[]
   associatedConditions        String[]
+  biomarkers                  Biomarker[]
+}
+
+model Biomarker {
+  id   String @id @default(uuid())
+  name String
+  type String
+
+  conditionId String
+  condition   Condition @relation(fields: [conditionId], references: [id], onDelete: Cascade)
+
+  @@index([conditionId])
 }
 
 model ConditionToOrganization {

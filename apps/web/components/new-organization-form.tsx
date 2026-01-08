@@ -54,7 +54,7 @@ const unifiedSchema = z.object({
     // join existing
     org: z.array(optionSchema).optional(), // id,label (max 1)
     // create new
-    orgName: z.string({
+    name: z.string({
         required_error: "Please enter your organization's name."
     }).min(2).max(60),
     description: z.string().min(2, {
@@ -183,7 +183,7 @@ export default function NewOrganizationForm({invitations, organizations}: {
 
             // Create/update org
             const formData = new FormData();
-            if (values.orgName) formData.append("orgName", values.orgName);
+            if (values.name) formData.append("name", values.name);
             if (values.description) formData.append("description", values.description);
             if (values.subdomain) formData.append("subdomain", values.subdomain);
             if (values.website) formData.append("website", values.website);
@@ -217,7 +217,7 @@ export default function NewOrganizationForm({invitations, organizations}: {
             }
             toast.success("Successfully created organization!");
             mixpanelTrack("Created Organization", {
-                orgName: values.orgName,
+                name: values.name,
                 looking: values.therapeuticsOfInterest?.map((x) => x.label).join(",")
             });
 
@@ -315,6 +315,19 @@ export default function NewOrganizationForm({invitations, organizations}: {
         }
     }
 
+    const handleHpoAsyncSearch = useCallback(async (query: string): Promise<Option[]> => {
+        if (!query) return [];
+        try {
+            const res = await fetch(`/api/hpo/search?q=${encodeURIComponent(query)}`);
+            if (!res.ok) return [];
+            const data = await res.json();
+            return Array.isArray(data?.items) ? data.items : [];
+        } catch (e) {
+            console.error("Failed to fetch HPO terms:", e);
+            return [];
+        }
+    }, []);
+
     /**************************************
      * Async gene + condition search (examples)
      **************************************/
@@ -345,7 +358,7 @@ export default function NewOrganizationForm({invitations, organizations}: {
                     <div className="space-y-6">
                         <FormField
                             control={form.control}
-                            name="orgName"
+                            name="name"
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Organization Name (required)</FormLabel>
@@ -856,6 +869,31 @@ export default function NewOrganizationForm({invitations, organizations}: {
                                 )
                             }}
                         />
+
+                        <FormField
+                            control={form.control}
+                            name="symptoms"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Symptoms</FormLabel>
+                                    <FormDescription>Search symptoms (HPO) and select all that apply.</FormDescription>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            creatable={false}
+                                            onSearch={handleHpoAsyncSearch}
+                                            placeholder="Search HPO symptoms..."
+                                            hidePlaceholderWhenSelected
+                                            loadingIndicator={<p>Searching HPO...</p>}
+                                            emptyIndicator={<p>No symptoms found.</p>}
+                                            showHoverCard={false}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
                     </section>
 
                     <Separator/>

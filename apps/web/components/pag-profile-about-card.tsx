@@ -61,6 +61,11 @@ export const PagProfileAboutCard = ({
                         {/* <p data-testid="about-description-value">{organization?.description}</p> */}
                         <SeeMoreDescription description={organization?.description ?? ""} />
 
+                        <div className="flex flex-row items-center justify-between w-full">
+                            <h4 className="scroll-m-20 text-base font-semibold" data-testid="toi-heading">
+                                Website
+                            </h4>
+                        </div>
                         <div className="max-w-full overflow-hidden" data-testid="about-website-section">
                             {(isPrivate || (!isPrivate && organization?.website)) &&
                                 (organization?.website ? (

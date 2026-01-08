@@ -168,6 +168,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
             diseaseCategories: true,
             causalGenes: true,
             associatedGenes: true,
+            biomarkers: true,
         })
         if (response.success) {
             conditions = response.data

@@ -14,7 +14,7 @@ import { companyFormSchema, institutionFormSchema } from "./types"
 import { ApiResponse } from "@comend/lib/types"
 import { validateEmailDomain } from "@comend/lib/server-utils"
 import { sendInviteEmail } from "@comend/lib/emails"
-import { customerIOTrack } from "@comend/lib/customer-io-track"
+import { customerIOTrack } from "../../../packages/lib/customerio/customer-io-track"
 
 export const getSessionInfo = async () => {
     const session = await getSession()
