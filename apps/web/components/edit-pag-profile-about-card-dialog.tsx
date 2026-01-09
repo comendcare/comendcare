@@ -409,7 +409,6 @@ export default function EditPagProfileAboutCardDialog({
                                 variant={"cta"}
                                 type="submit"
                                 data-testid="dialog-save-btn"
-                                disabled={!editOrgForm.formState.isValid || isSaving}
                             >
                                 {isSaving 
                                     ? (

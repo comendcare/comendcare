@@ -713,7 +713,6 @@ export default function EditPAGProfileConditionCardDialog({
                                     variant={"cta"}
                                     type="submit"
                                     data-testid="dialog-save-btn"
-                                    // disabled={!editResearchForm.formState.isValid || isSaving}
                                 >
                                     {isSaving 
                                         ? (
