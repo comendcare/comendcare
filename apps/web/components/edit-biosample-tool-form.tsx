@@ -772,43 +772,6 @@ export function EditBiosampleToolForm({
                     formSubmit={handleFormSubmit}
                 />
             </form>
-
-            {/* <DialogFooter className="pt-1">
-                <Button 
-                    variant={"secondary"} 
-                    onClick={() => {handleClose()}}
-                >
-                    Cancel
-                </Button>
-
-                <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
-                    Delete tool
-                </Button>
-
-                <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                    <DeleteBiosampleDialog toolIds={[toolData.id]} closeDialog={handleClose}/>
-                </Dialog>
-
-                <div className="bg-white rounded-md p-0">
-                    <Button
-                        variant={"cta"}
-                        type="submit"
-                        onClick={(e) => {
-                            e.preventDefault()
-                            handleFormSubmit(form.getValues(), createRequests)
-                        }}
-                    >
-                        {isSaving 
-                            ? (
-                                <div className="w-[81px] flex justify-center items-center">
-                                    <LoadingDots/>
-                                </div>
-                            ) 
-                            : ("Save changes")
-                        }
-                    </Button>
-                </div>
-            </DialogFooter> */}
         </Form>
     )
 }
