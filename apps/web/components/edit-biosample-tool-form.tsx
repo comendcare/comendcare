@@ -392,7 +392,7 @@ export function EditBiosampleToolForm({
         <Form {...form}>
             <form
                 onSubmit={form.handleSubmit((values) => handleFormSubmit(values, createRequests))}
-                className="flex h-[80vh] flex-col overflow-hidden"
+                className="flex max-h-[80vh] flex-col overflow-hidden"
             >
                 <ScrollArea type={"always"}>
                 <ScrollBar />
