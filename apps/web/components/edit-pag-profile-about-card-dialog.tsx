@@ -119,32 +119,16 @@ export default function EditPagProfileAboutCardDialog({
             return;
         }
 
+        // Create/update org
         const formData = new FormData();
-        Object.entries(values).forEach(([key, value]) => {
-            if (key === "therapeuticsInDevelopment") return
-            if (key === "otherTherapeuticsInDevelopment") return
-            if (key === "therapeuticsOfInterest") return
-            if (key === "otherTherapeuticsOfInterest") return
-
-            if (value !== undefined) {
-                formData.append(key, value.toString());
-            }
-        });
-
-        const data = {
-            therapeuticsInDevelopment: values.therapeuticsInDevelopment?.map((therapeutic) => therapeutic.label).join(",") || "",
-            therapeuticsOfInterest: values.therapeuticsOfInterest?.map((therapeutic) => therapeutic.label).join(",") || "",
-            metadata: JSON.stringify({
-                ...(organization?.metadata ? JSON.parse(JSON.stringify(organization.metadata)) : undefined),
-                otherTherapeuticsInDevelopment: values.otherTherapeuticsInDevelopment,
-                otherTherapeuticsOfInterest: values.otherTherapeuticsOfInterest
-            })
-        }
-        Object.entries(data).forEach(([key, value]) => {
-            if (value) {
-                formData.append(key, value)
-            }
-        });
+        formData.append("description", values.description || "");
+        formData.append("website", values.website || "");
+        formData.append("therapeuticsInDevelopment", values.therapeuticsInDevelopment?.map((t) => t.label).join(",") || "")
+        formData.append("therapeuticsOfInterest", values.therapeuticsOfInterest?.map((t) => t.label).join(",") || "")
+        formData.append("metadata", JSON.stringify({
+            otherTherapeuticsInDevelopment: values.otherTherapeuticsInDevelopment,
+            otherTherapeuticsOfInterest: values.otherTherapeuticsOfInterest,
+        }))
 
         try {
             await updateOrganization(session.user.organizationId, formData);
