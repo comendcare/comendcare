@@ -60,7 +60,8 @@ export default function EditPAGProfileConditionCardDialog({
     const isOwner = ["owner", "support"].includes(session?.user?.membership?.role);
 
     const editResearchForm = useForm<z.infer<typeof researchFormSchema>>({
-        mode: "onChange",
+        mode: "onSubmit",
+        reValidateMode: "onSubmit",
         resolver: zodResolver(researchFormSchema),
     })
 
@@ -98,6 +99,9 @@ export default function EditPAGProfileConditionCardDialog({
     }, [condition, conditionTags, editResearchForm]);
 
     async function onResearchFormSubmit(values: z.infer<typeof researchFormSchema>) {
+        const isValid = editResearchForm.trigger()
+        if (!isValid) return // stops submission
+        
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error("You're not signed into an organization right now.");
@@ -306,22 +310,22 @@ export default function EditPAGProfileConditionCardDialog({
                         </DialogDescription>
                     </DialogHeader>
                     <Form {...editResearchForm}>
-                        <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
-                            <ScrollBar />
-                            <form
-                                onSubmit={editResearchForm.handleSubmit(
-                                    onResearchFormSubmit,
-                                    (errors) => {
-                                        console.error("Form validation errors:", errors);
-                                        // surface the first error so it's visible
-                                        const first = Object.values(errors)[0] as any;
-                                        const msg = first?.message || first?.root?.message || "Please fix the highlighted fields.";
-                                        toast.error(msg);
-                                    }
-                                )}
-                                className="space-y-8"
-                            >
-
+                        <form
+                            onSubmit={editResearchForm.handleSubmit(
+                                onResearchFormSubmit,
+                                (errors) => {
+                                    console.error("Form validation errors:", errors);
+                                    // surface the first error so it's visible
+                                    const first = Object.values(errors)[0] as any;
+                                    const msg = first?.message || first?.root?.message || "Please fix the highlighted fields.";
+                                    toast.error(msg);
+                                }
+                            )}
+                            className="flex max-h-[80vh] flex-col overflow-hidden"
+                        >
+                            <ScrollArea type={"always"}>
+                                <ScrollBar />
+                                <div className="flex flex-col gap-4 pr-4 space-y-8">
                                 <FormField
                                     control={editResearchForm.control}
                                     name="disorder"
@@ -692,9 +696,10 @@ export default function EditPAGProfileConditionCardDialog({
                                         </FormItem>
                                     )}
                                 />
+                                </div>
+                            </ScrollArea>
                                 
-
-                                <div className="absolute right-4 bottom-0 flex gap-2">
+                            <DialogFooter className="pt-4">
                                 <DialogClose asChild>
                                     <Button 
                                         variant={"secondary"}
@@ -708,7 +713,7 @@ export default function EditPAGProfileConditionCardDialog({
                                     variant={"cta"}
                                     type="submit"
                                     data-testid="dialog-save-btn"
-                                    disabled={!editResearchForm.formState.isValid || isSaving}
+                                    // disabled={!editResearchForm.formState.isValid || isSaving}
                                 >
                                     {isSaving 
                                         ? (
@@ -719,20 +724,19 @@ export default function EditPAGProfileConditionCardDialog({
                                         : ("Save changes")
                                     }
                                 </Button>
-                                </div>
-                            </form>
-                        </ScrollArea>
+                            </DialogFooter>
 
-                        <UnsavedChangesDialog 
-                            isSaving={isSaving}
-                            isClosing={isClosing}
-                            setIsClosing={setIsClosing}
-                            isOpen={unsavedChangesIsOpen}
-                            setIsOpen={setUnsavedChangesIsOpen}
-                            closeDialog={closeDialog}
-                            form={editResearchForm}
-                            formSubmit={onResearchFormSubmit}
-                        />
+                            <UnsavedChangesDialog 
+                                isSaving={isSaving}
+                                isClosing={isClosing}
+                                setIsClosing={setIsClosing}
+                                isOpen={unsavedChangesIsOpen}
+                                setIsOpen={setUnsavedChangesIsOpen}
+                                closeDialog={closeDialog}
+                                form={editResearchForm}
+                                formSubmit={onResearchFormSubmit}
+                            />
+                        </form>
                     </Form>
                 </DialogContent>
             </DialogPortal>
