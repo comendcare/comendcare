@@ -925,8 +925,15 @@ export default function NewOrganizationForm({invitations, organizations}: {
                 </>
                 <div className="flex justify-between">
                     <div/>
-                    <Button type="submit" disabled={loading || isCropping}>
-                        {loading ? <LoadingDots color="#808080"/> : "Complete sign-up"}
+                    <Button type="submit" variant="cta" disabled={loading || isCropping}>
+                        {loading 
+                            ? (
+                                <div className="w-[81px] flex justify-center items-center">
+                                    <LoadingDots />
+                                </div>
+                            ) 
+                            : ("Complete sign-up")
+                        }
                     </Button>
                 </div>
             </form>
