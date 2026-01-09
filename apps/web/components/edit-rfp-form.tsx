@@ -195,7 +195,6 @@ export function EditRFPForm({
     const [isSaving, setIsSaving] = useState(false)
 
     const form = useForm<z.infer<typeof editRFPForm>>({
-        // mode: "onChange",
         mode: "onSubmit",
         reValidateMode: "onSubmit",
         resolver: zodResolver(editRFPForm),
