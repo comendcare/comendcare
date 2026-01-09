@@ -262,6 +262,9 @@ export function EditBiosampleToolForm({
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editBiosampleForm>, createFacilityRequests: CreateFacilityRequest[]) => {
+        const isValid = form.trigger()
+        if (!isValid) return // stops submission
+        
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(

@@ -50,8 +50,7 @@ export const UnsavedChangesDialog = ({
                         type="submit"
                         variant={'cta'}
                         onClick={() => {
-                            form.trigger()
-                            if (form.isValid) formSubmit(form.getValues())
+                            formSubmit(form.getValues())
                             setIsOpen(false)
                         }}
                     >
