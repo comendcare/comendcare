@@ -171,6 +171,7 @@ export function EditablePAGBannerPhoto({
                                     selectedFile={selectedFileHeader}
                                     setSelectedFile={setSelectedFileHeader}
                                     className="rounded h-[100px] w-[400px] mx-auto"
+                                    isCropping={isCropping}
                                     setIsCropping={setIsCropping}
                                     testIdPrefix="cover"
                                 />

@@ -355,6 +355,7 @@ export default function OnboardingPage() {
                             img={form.watch("userImage") || undefined}
                             selectedFile={selectedFile}
                             setSelectedFile={setSelectedFile}
+                            isCropping={isCropping}
                             setIsCropping={setIsCropping}
                         />
                     </section>
