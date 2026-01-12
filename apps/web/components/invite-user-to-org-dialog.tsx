@@ -92,7 +92,7 @@ export default function InviteUserToOrgDialog({organization}: {organization: Org
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button className="gap-x-2" disabled={disabled}>
+                <Button className="gap-x-2" disabled={disabled} variant={'cta'}>
                     <UserPlus />
                     Invite user
                 </Button>
@@ -146,9 +146,11 @@ export default function InviteUserToOrgDialog({organization}: {organization: Org
                             )}
                         />
 
-                        <Button type="submit" disabled={loading || !organization}>
-                            {loading ? <LoadingDots color="#808080" /> : "Submit"}
-                        </Button>
+                        <div className="w-full flex justify-end">
+                            <Button type="submit" disabled={loading || !organization} variant={'cta'}>
+                                {loading ? <LoadingDots /> : "Submit"}
+                            </Button>
+                        </div>
                     </form>
                 </Form>
             </DialogContent>
