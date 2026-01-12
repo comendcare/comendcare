@@ -61,9 +61,6 @@ export function EditablePAGBannerPhoto({
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgProfileImageSchema>) {
         const newSelectedFile = await onCrop()
-        console.log(`new selected file`, newSelectedFile)
-        console.log(`values`, values)
-        console.log(`value is default`, values.image == defaultOrganizationValues?.image)
         setIsSaving(true)
         try {
             if (!session?.user?.organizationId) {
@@ -93,7 +90,6 @@ export function EditablePAGBannerPhoto({
 
             if ((!newSelectedFile || newSelectedFile.preview !== defaultOrganizationValues?.headerImage) && img) {
                 // if the image is being changed or deleted, delete the old image in our google cloud storage bucket
-                console.log(`handle delete`)
                 await handleImageDelete(img)
             }
 
