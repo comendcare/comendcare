@@ -11,23 +11,33 @@ import {
     DialogClose,
     DialogFooter,
 } from "@comend/components/ui/dialog";
-import {Form} from "@comend/components/ui/form";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@comend/components/ui/form";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {FormImageSelector} from "@comend/components/form-image-selector";
-import {FileWithPreview} from "@comend/components/image-selector";
+// import {FormImageSelector} from "@comend/components/form-image-selector";
+import {centerAspectCrop, DialogImageSelector, FileWithPreview} from "@comend/components/image-selector";
 import {toast} from "sonner";
 import {handleImageDelete, handleImageUpload} from "@comend/lib/upload";
 import {updateOrganization} from "@comend/lib/actions";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {Button} from "@comend/components/ui/button";
-import {Pencil} from "lucide-react";
+import {Pencil, Trash2Icon, Upload, Image} from "lucide-react";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import { ScrollArea, Scrollbar } from "@radix-ui/react-scroll-area";
 import { UnsavedChangesDialog } from "./unsaved-changes-dialog";
+import { acceptedFiletypes, cn, sleep, getPublicFile } from "@comend/lib/utils";
+import { FileWithPath, useDropzone } from "react-dropzone";
+import ReactCrop, {
+    centerCrop,
+    convertToPixelCrop,
+    makeAspectCrop,
+    type Crop,
+    type PixelCrop,
+} from "react-image-crop"
+import { Avatar, AvatarFallback, AvatarImage } from "@comend/components/ui/avatar";
 
 const editOrgProfileImageSchema = z.object({
     image: z.string().nullable().optional(),
@@ -46,8 +56,6 @@ export function EditableProfilePhoto({
     className?: string | null | undefined;
 }) {
     const {data: session} = useSession();
-    const router = useRouter();
-    const [loading, setLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
@@ -57,6 +65,8 @@ export function EditableProfilePhoto({
         z.infer<typeof editOrgProfileImageSchema> | undefined
     >(undefined);
     const [isCropping, setIsCropping] = useState(false)
+    const [croppedImageUrl, setCroppedImageUrl] = React.useState<string>("")
+    const [cropFile, setCropFile] = React.useState<FileWithPreview | null>(selectedFileProfile)
 
     const editOrgForm = useForm<z.infer<typeof editOrgProfileImageSchema>>({
         mode: "onChange",
@@ -65,8 +75,8 @@ export function EditableProfilePhoto({
     });
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgProfileImageSchema>) {
+        const newSelectedFile = await onCrop()
         setIsSaving(true)
-        setLoading(true)
         try {
             if (!session?.user?.organizationId) {
                 toast.error("You're not signed into an organization right now.");
@@ -75,9 +85,9 @@ export function EditableProfilePhoto({
 
             const formData = new FormData();
 
-            if (selectedFileProfile && values.image && values.image !== defaultOrganizationValues?.image) {
+            if (newSelectedFile && newSelectedFile.preview && newSelectedFile.preview !== defaultOrganizationValues?.image) {
                 try {
-                    const imgUrl = await handleImageUpload(selectedFileProfile as File, values.image);
+                    const imgUrl = await handleImageUpload(newSelectedFile as File, newSelectedFile.preview);
                     if (imgUrl) {
                         formData.set("image", imgUrl);
                     }
@@ -88,28 +98,25 @@ export function EditableProfilePhoto({
                 }
             }
 
-            if (!selectedFileProfile) {
+            if (!newSelectedFile) {
                 // no file selected, set profile image to null, allow deleting profile photo
                 formData.set("image", "")
             }
 
-            if (values.image !== img && img) {
-                // if the image is being changed, delete the old image in our google cloud storage bucket
+            if ((!newSelectedFile || newSelectedFile.preview !== defaultOrganizationValues?.image) && img) {
+                // if the image is being changed or deleted, delete the old image in our google cloud storage bucket
                 await handleImageDelete(img)
             }
 
             await updateOrganization(session.user.organizationId, formData);
             toast.success("Organization profile updated successfully!");
             // setHasCropped(false);
-            setIsCropping(false)
             setOpen(false);
             closeDialog()
             window.location.reload()
         } catch (error) {
             console.error("Error updating organization:", error);
             toast.error("Failed to update organization profile.");
-        } finally {
-            setLoading(false)
         }
     }
 
@@ -118,7 +125,7 @@ export function EditableProfilePhoto({
         setIsClosing(false)
         setUnsavedChangesIsOpen(false)
         setIsCropping(false)
-        setSelectedFileProfile(null)
+        // setSelectedFileProfile(null)
 
         editOrgForm.reset(defaultOrganizationValues)
     }
@@ -142,6 +149,50 @@ export function EditableProfilePhoto({
         // all dialogs should be either fully closed or fully open
         if (!unsavedChangesIsOpen) setIsClosing(false)
     }, [unsavedChangesIsOpen])
+
+    async function onCrop() {
+        try {
+            setIsCropping(false)
+
+            if (!cropFile) {
+                // throw Error('No file selected to crop')
+                console.error(`No file selected to crop`)
+                return undefined
+            }
+
+            const newSelectedFile = Object.assign(cropFile, {
+                preview: croppedImageUrl
+            })
+
+            console.log(`onCrop, setSelectedFile`, newSelectedFile)
+            setSelectedFileProfile(newSelectedFile)
+            return newSelectedFile
+        } catch (error) {
+            console.error(`Error`, error)
+            alert("Something went wrong!")
+        }
+    }
+
+
+    useEffect(() => {
+        const init = async () => {
+            if (img) {
+                try {
+                    const userPhoto: File = await getPublicFile(img)
+                    if (userPhoto) {
+                        const fileWithPreview = Object.assign(userPhoto, {
+                            preview: URL.createObjectURL(userPhoto),
+                        })
+                        setSelectedFileProfile(fileWithPreview)
+                    }
+                } catch (e) {
+                    console.error(e)
+                }
+            }
+        }
+
+        init()
+    }, [])
 
     return (
         <div className="relative inline-block">
@@ -176,17 +227,42 @@ export function EditableProfilePhoto({
                         <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
                             <Scrollbar />
                             <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-8">
-                                <FormImageSelector
-                                    form={editOrgForm}
-                                    name="image"
-                                    title=""
-                                    aspect={1}
-                                    img={img}
-                                    selectedFile={selectedFileProfile}
-                                    setSelectedFile={setSelectedFileProfile}
-                                    className="mx-auto"
-                                    setIsCropping={setIsCropping}
-                                    testIdPrefix="avatar"
+                                <FormField
+                                    control={editOrgForm.control}
+                                    name={'image'}
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <div className="flex flex-col items-start space-y-4">
+                                                    <DialogImageSelector
+                                                        aspect={1}
+                                                        selectedFile={selectedFileProfile}
+                                                        setSelectedFile={(file: FileWithPreview | null) => {
+                                                            if (!file) {
+                                                                setSelectedFileProfile(null);
+                                                                field.onChange(null);
+                                                            } else {
+                                                                setSelectedFileProfile(file);
+                                                                field.onChange(file.preview);
+                                                            }
+                                                        }}
+                                                        className={"mx-auto"}
+                                                        parentIsCropping={isCropping}
+                                                        setParentIsCropping={setIsCropping}
+                                                        fileInputTestId={`avatar-file-input`}
+                                                        cropToolbarTestId="crop-toolbar"
+                                                        cropButtonTestId="crop-btn"
+                                                        onCrop={onCrop}
+                                                        croppedImageUrl={croppedImageUrl}
+                                                        setCroppedImageUrl={setCroppedImageUrl}
+                                                        cropFile={cropFile}
+                                                        setCropFile={setCropFile}
+                                                    />
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
                                 />
                                 
                                 <div className="absolute right-4 bottom-0 flex gap-2">

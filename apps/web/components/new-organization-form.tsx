@@ -623,6 +623,7 @@ export default function NewOrganizationForm({invitations, organizations}: {
                             selectedFile={selectedFile}
                             setSelectedFile={setSelectedFile}
                             className=""
+                            isCropping={isCropping}
                             setIsCropping={setIsCropping}
                         />
 

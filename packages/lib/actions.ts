@@ -754,13 +754,19 @@ export const updateOrganization = withOrganizationAuth(
             }
 
             if (key === "therapeuticsInDevelopment" || key === "therapeuticsOfInterest") {
-                data[key] = value.toString().split(",");
+                data[key] = value ? value.toString().split(",") : [];
                 return;
             }
 
             if (key === "metadata") {
                 data[key] = JSON.parse(value.toString());
                 return;
+            }
+
+            // allow removing values for string values
+            if (value === "") {
+                data[key] = null;
+                return
             }
 
             const n = Number(value);

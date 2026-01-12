@@ -11,12 +11,12 @@ import {
     DialogClose,
     DialogFooter,
 } from "@comend/components/ui/dialog";
-import {Form} from "@comend/components/ui/form";
+import {Form, FormControl, FormField, FormItem, FormMessage} from "@comend/components/ui/form";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {FormImageSelector} from "@comend/components/form-image-selector";
-import {FileWithPreview} from "@comend/components/image-selector";
+import {DialogImageSelector, FileWithPreview} from "@comend/components/image-selector";
 import {toast} from "sonner";
 import {handleImageDelete, handleImageUpload} from "@comend/lib/upload";
 import {updateOrganization} from "@comend/lib/actions";
@@ -28,6 +28,7 @@ import { PAGBannerPhoto } from "@comend/components/pag-banner-photo";
 import { ScrollArea, Scrollbar } from "@radix-ui/react-scroll-area";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import { UnsavedChangesDialog } from "./unsaved-changes-dialog";
+import { getPublicFile } from "@comend/lib/utils";
 
 const editOrgProfileImageSchema = z.object({
     image: z.string().nullable().optional(),
@@ -40,7 +41,6 @@ export function EditablePAGBannerPhoto({
     img: string | null | undefined;
 }) {
     const {data: session} = useSession();
-    const router = useRouter();
     const [isSaving, setIsSaving] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
@@ -50,6 +50,8 @@ export function EditablePAGBannerPhoto({
         z.infer<typeof editOrgProfileImageSchema> | undefined
     >(undefined);
     const [isCropping, setIsCropping] = useState(false)
+    const [croppedImageUrl, setCroppedImageUrl] = React.useState<string>("")
+    const [cropFile, setCropFile] = React.useState<FileWithPreview | null>(selectedFileHeader)
 
     const editOrgForm = useForm<z.infer<typeof editOrgProfileImageSchema>>({
         mode: "onChange",
@@ -58,35 +60,42 @@ export function EditablePAGBannerPhoto({
     });
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgProfileImageSchema>) {
+        const newSelectedFile = await onCrop()
         setIsSaving(true)
-        if (!session?.user?.organizationId) {
-            toast.error("You're not signed into an organization right now.");
-            return;
-        }
-
-        const formData = new FormData();
-
-        if (selectedFileHeader && values.headerImage && values.headerImage !== defaultOrganizationValues?.headerImage) {
-            try {
-                const imgUrl = await handleImageUpload(selectedFileHeader as File, values.headerImage);
-                if (imgUrl) {
-                    formData.set("headerImage", imgUrl);
-                }
-            } catch (error) {
-                console.error("Failed to upload header image:", error);
-                toast.error("Image upload failed.");
+        try {
+            if (!session?.user?.organizationId) {
+                toast.error("You're not signed into an organization right now.");
                 return;
             }
-        }
 
-        if (values.headerImage !== img && img) {
-            await handleImageDelete(img)
-        }
+            const formData = new FormData();
 
-        try {
+            if (newSelectedFile && newSelectedFile.preview && newSelectedFile.preview !== defaultOrganizationValues?.headerImage) {
+                try {
+                    const imgUrl = await handleImageUpload(newSelectedFile as File, newSelectedFile.preview);
+                    if (imgUrl) {
+                        formData.set("headerImage", imgUrl);
+                    }
+                } catch (error) {
+                    console.error("Failed to upload header image:", error);
+                    toast.error("Image upload failed.");
+                    return;
+                }
+            }
+
+            if (!newSelectedFile) {
+                // no file selected, set header image to null, allow deleting profile photo
+                formData.set("headerImage", "")
+            }
+
+            if ((!newSelectedFile || newSelectedFile.preview !== defaultOrganizationValues?.headerImage) && img) {
+                // if the image is being changed or deleted, delete the old image in our google cloud storage bucket
+                await handleImageDelete(img)
+            }
+
             await updateOrganization(session.user.organizationId, formData);
             toast.success("Organization profile updated successfully!");
-            setIsCropping(false)
+            // setIsCropping(false)
             setOpen(false);
             closeDialog()
             window.location.reload();
@@ -101,7 +110,7 @@ export function EditablePAGBannerPhoto({
         setIsClosing(false)
         setUnsavedChangesIsOpen(false)
         setIsCropping(false)
-        setSelectedFileHeader(null)
+        // setSelectedFileHeader(null)
 
         editOrgForm.reset(defaultOrganizationValues)
     }
@@ -125,6 +134,49 @@ export function EditablePAGBannerPhoto({
         // all dialogs should be either fully closed or fully open
         if (!unsavedChangesIsOpen) setIsClosing(false)
     }, [unsavedChangesIsOpen])
+
+    async function onCrop() {
+        try {
+            setIsCropping(false)
+
+            if (!cropFile) {
+                // throw Error('No file selected to crop')
+                console.error(`No file selected to crop`)
+                return undefined
+            }
+
+            const newSelectedFile = Object.assign(cropFile, {
+                preview: croppedImageUrl
+            })
+
+            console.log(`onCrop, setSelectedFile`, newSelectedFile)
+            setSelectedFileHeader(newSelectedFile)
+            return newSelectedFile
+        } catch (error) {
+            console.error(`Error`, error)
+            alert("Something went wrong!")
+        }
+    }
+
+    useEffect(() => {
+        const init = async () => {
+            if (img) {
+                try {
+                    const userPhoto: File = await getPublicFile(img)
+                    if (userPhoto) {
+                        const fileWithPreview = Object.assign(userPhoto, {
+                            preview: URL.createObjectURL(userPhoto),
+                        })
+                        setSelectedFileHeader(fileWithPreview)
+                    }
+                } catch (e) {
+                    console.error(e)
+                }
+            }
+        }
+
+        init()
+    }, [])
 
     return (
         <div className="relative w-full">
@@ -161,18 +213,42 @@ export function EditablePAGBannerPhoto({
                         <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
                             <Scrollbar />
                             <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-8">
-                                <FormImageSelector
-                                    form={editOrgForm}
-                                    name="headerImage"
-                                    title=""
-                                    description=""
-                                    aspect={16 / 4}
-                                    img={img}
-                                    selectedFile={selectedFileHeader}
-                                    setSelectedFile={setSelectedFileHeader}
-                                    className="rounded h-[100px] w-[400px] mx-auto"
-                                    setIsCropping={setIsCropping}
-                                    testIdPrefix="cover"
+                                <FormField
+                                    control={editOrgForm.control}
+                                    name={'headerImage'}
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <div className="flex flex-col items-start space-y-4">
+                                                    <DialogImageSelector
+                                                        aspect={16 / 4}
+                                                        selectedFile={selectedFileHeader}
+                                                        setSelectedFile={(file: FileWithPreview | null) => {
+                                                            if (!file) {
+                                                                setSelectedFileHeader(null);
+                                                                field.onChange(null);
+                                                            } else {
+                                                                setSelectedFileHeader(file);
+                                                                field.onChange(file.preview);
+                                                            }
+                                                        }}
+                                                        className="rounded h-[100px] w-[400px] mx-auto"
+                                                        parentIsCropping={isCropping}
+                                                        setParentIsCropping={setIsCropping}
+                                                        fileInputTestId={`cover-file-input`}
+                                                        cropToolbarTestId="crop-toolbar"
+                                                        cropButtonTestId="crop-btn"
+                                                        onCrop={onCrop}
+                                                        croppedImageUrl={croppedImageUrl}
+                                                        setCroppedImageUrl={setCroppedImageUrl}
+                                                        cropFile={cropFile}
+                                                        setCropFile={setCropFile}
+                                                    />
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
                                 />
                                 
                                 <div className="absolute right-4 bottom-0 flex gap-2">

@@ -67,7 +67,8 @@ export default function EditPagProfileAboutCardDialog({
     const isOwner = ["owner", "support"].includes(session?.user?.membership?.role);
 
     const editOrgForm = useForm<z.infer<typeof editOrgFormSchema>>({
-        mode: "onChange",
+        mode: "onSubmit",
+        reValidateMode: "onSubmit",
         resolver: zodResolver(editOrgFormSchema),
         defaultValues: {
             description: organization.description || "",
@@ -113,38 +114,25 @@ export default function EditPagProfileAboutCardDialog({
     const formData = editOrgForm.watch()
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
+        const isValid = editOrgForm.trigger()
+        if (!isValid) return // stops submission
+
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error("You're not signed into an organization right now.");
             return;
         }
 
+        // Create/update org
         const formData = new FormData();
-        Object.entries(values).forEach(([key, value]) => {
-            if (key === "therapeuticsInDevelopment") return
-            if (key === "otherTherapeuticsInDevelopment") return
-            if (key === "therapeuticsOfInterest") return
-            if (key === "otherTherapeuticsOfInterest") return
-
-            if (value !== undefined) {
-                formData.append(key, value.toString());
-            }
-        });
-
-        const data = {
-            therapeuticsInDevelopment: values.therapeuticsInDevelopment?.map((therapeutic) => therapeutic.label).join(",") || "",
-            therapeuticsOfInterest: values.therapeuticsOfInterest?.map((therapeutic) => therapeutic.label).join(",") || "",
-            metadata: JSON.stringify({
-                ...(organization?.metadata ? JSON.parse(JSON.stringify(organization.metadata)) : undefined),
-                otherTherapeuticsInDevelopment: values.otherTherapeuticsInDevelopment,
-                otherTherapeuticsOfInterest: values.otherTherapeuticsOfInterest
-            })
-        }
-        Object.entries(data).forEach(([key, value]) => {
-            if (value) {
-                formData.append(key, value)
-            }
-        });
+        formData.append("description", values.description || "");
+        formData.append("website", values.website || "");
+        formData.append("therapeuticsInDevelopment", values.therapeuticsInDevelopment?.map((t) => t.label).join(",") || "")
+        formData.append("therapeuticsOfInterest", values.therapeuticsOfInterest?.map((t) => t.label).join(",") || "")
+        formData.append("metadata", JSON.stringify({
+            otherTherapeuticsInDevelopment: values.otherTherapeuticsInDevelopment,
+            otherTherapeuticsOfInterest: values.otherTherapeuticsOfInterest,
+        }))
 
         try {
             await updateOrganization(session.user.organizationId, formData);
@@ -266,152 +254,160 @@ export default function EditPagProfileAboutCardDialog({
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...editOrgForm}>
-                    <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
-                        <ScrollBar />
-                        <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
-                            <FormField
-                                control={editOrgForm.control}
-                                name="description"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Description</FormLabel>
-                                        <FormControl>
-                                            <Textarea
-                                                {...field}
-                                                placeholder="Tell us about your organization"
-                                                data-testid="about-description-input"
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={editOrgForm.control}
-                                name="website"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>{`Website`}</FormLabel>
-                                        <FormDescription>
-                                            {`Your patient group's website URL (with the URL extension like http or https).`}
-                                        </FormDescription>
-                                        <FormControl>
-                                            <Input
-                                                {...field}
-                                                id="website"
-                                                data-testid="website-input"
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                        <form 
+                            onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)}
+                            className="flex max-h-[80vh] flex-col overflow-hidden"
+                        >
 
-                            <FormField
-                                control={editOrgForm.control}
-                                name="therapeuticsInDevelopment"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Therapeutics under development
-                                        </FormLabel>
-                                        <FormDescription className="flex items-center">
-                                            {`What types of treatments is your organization currently developing? Select all that apply.`}
-                                        </FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={MODALITIES}
-                                                placeholder="Select modalities you like..."
-                                                hidePlaceholderWhenSelected={true}
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                                showHoverCard={false}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            {formData.therapeuticsInDevelopment?.some((item) => item.value === "Other" || item.value === "OTHER") && (
+                        <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
+                            <ScrollBar />   
+                            <div className="flex flex-col gap-4 pr-4 space-y-8">
                                 <FormField
                                     control={editOrgForm.control}
-                                    name="otherTherapeuticsInDevelopment"
+                                    name="description"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormDescription className="flex items-center">
-                                                {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
-                                            </FormDescription>
+                                            <FormLabel>Description</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    type="text"
-                                                    id="modalities-other"
+                                                <Textarea
                                                     {...field}
+                                                    placeholder="Tell us about your organization"
+                                                    data-testid="about-description-input"
                                                 />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
-                            )}
-
-                            <FormField
-                                control={editOrgForm.control}
-                                name="therapeuticsOfInterest"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Therapeutics of interest
-                                        </FormLabel>
-                                        <FormDescription className="flex items-center">
-                                            {`Select all treatment modalities your organization is interested in. This helps us match you with experts in those specific areas.`}
-                                        </FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={MODALITIES}
-                                                placeholder="Select modalities you like..."
-                                                hidePlaceholderWhenSelected={true}
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                                showHoverCard={false}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            {editOrgForm.watch("therapeuticsOfInterest")?.some((item) => item.value === "Other" || item.value === "OTHER") && (
                                 <FormField
                                     control={editOrgForm.control}
-                                    name="otherTherapeuticsOfInterest"
+                                    name="website"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormDescription className="flex items-center">
-                                                {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                            <FormLabel>{`Website`}</FormLabel>
+                                            <FormDescription>
+                                                {`Your patient group's website URL (with the URL extension like http or https).`}
                                             </FormDescription>
                                             <FormControl>
                                                 <Input
-                                                    type="text"
-                                                    id="modalities-other"
                                                     {...field}
+                                                    id="website"
+                                                    data-testid="website-input"
                                                 />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
-                            )}
 
-                            <div className="absolute right-4 bottom-0 flex gap-2">
+                                <FormField
+                                    control={editOrgForm.control}
+                                    name="therapeuticsInDevelopment"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>
+                                                Therapeutics under development
+                                            </FormLabel>
+                                            <FormDescription className="flex items-center">
+                                                {`What types of treatments is your organization currently developing? Select all that apply.`}
+                                            </FormDescription>
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    {...field}
+                                                    defaultOptions={MODALITIES}
+                                                    placeholder="Select modalities you like..."
+                                                    hidePlaceholderWhenSelected={true}
+                                                    emptyIndicator={
+                                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                            no results found.
+                                                        </p>
+                                                    }
+                                                    showHoverCard={false}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {formData.therapeuticsInDevelopment?.some((item) => item.value === "Other" || item.value === "OTHER") && (
+                                    <FormField
+                                        control={editOrgForm.control}
+                                        name="otherTherapeuticsInDevelopment"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormDescription className="flex items-center">
+                                                    {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        type="text"
+                                                        id="modalities-other"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+
+                                <FormField
+                                    control={editOrgForm.control}
+                                    name="therapeuticsOfInterest"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>
+                                                Therapeutics of interest
+                                            </FormLabel>
+                                            <FormDescription className="flex items-center">
+                                                {`Select all treatment modalities your organization is interested in. This helps us match you with experts in those specific areas.`}
+                                            </FormDescription>
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    {...field}
+                                                    defaultOptions={MODALITIES}
+                                                    placeholder="Select modalities you like..."
+                                                    hidePlaceholderWhenSelected={true}
+                                                    emptyIndicator={
+                                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                            no results found.
+                                                        </p>
+                                                    }
+                                                    showHoverCard={false}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {editOrgForm.watch("therapeuticsOfInterest")?.some((item) => item.value === "Other" || item.value === "OTHER") && (
+                                    <FormField
+                                        control={editOrgForm.control}
+                                        name="otherTherapeuticsOfInterest"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormDescription className="flex items-center">
+                                                    {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        type="text"
+                                                        id="modalities-other"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+
+                            </div>
+                            </ScrollArea>
+
+                            <DialogFooter className="pt-4">
                             <DialogClose asChild>
                                 <Button 
                                     variant={"secondary"}
@@ -425,7 +421,6 @@ export default function EditPagProfileAboutCardDialog({
                                 variant={"cta"}
                                 type="submit"
                                 data-testid="dialog-save-btn"
-                                disabled={!editOrgForm.formState.isValid || isSaving}
                             >
                                 {isSaving 
                                     ? (
@@ -436,20 +431,19 @@ export default function EditPagProfileAboutCardDialog({
                                     : ("Save changes")
                                 }
                             </Button>
-                            </div>
-                        </form>
-                    </ScrollArea>
+                            </DialogFooter>
 
-                    <UnsavedChangesDialog 
-                        isSaving={isSaving}
-                        isClosing={isClosing}
-                        setIsClosing={setIsClosing}
-                        isOpen={unsavedChangesIsOpen}
-                        setIsOpen={setUnsavedChangesIsOpen}
-                        closeDialog={closeDialog}
-                        form={editOrgForm}
-                        formSubmit={onProfileFormSubmit}
-                    />
+                            <UnsavedChangesDialog 
+                                isSaving={isSaving}
+                                isClosing={isClosing}
+                                setIsClosing={setIsClosing}
+                                isOpen={unsavedChangesIsOpen}
+                                setIsOpen={setUnsavedChangesIsOpen}
+                                closeDialog={closeDialog}
+                                form={editOrgForm}
+                                formSubmit={onProfileFormSubmit}
+                            />
+                        </form>
                 </Form>
             </DialogContent>
         </Dialog>

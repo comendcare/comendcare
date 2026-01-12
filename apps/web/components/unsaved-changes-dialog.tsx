@@ -47,9 +47,14 @@ export const UnsavedChangesDialog = ({
                         Discard changes
                     </Button>
                     <Button 
-                        disabled={!form.formState.isValid || isSaving}
+                        type="submit"
                         variant={'cta'}
-                        onClick={() => formSubmit(form.getValues())}
+                        onClick={async () => {
+                            const isValid = await form.trigger()
+                            console.log(`isValid`, isValid)
+                            if (isValid) formSubmit(form.getValues())
+                            setIsOpen(false)
+                        }}
                     >
                         {isSaving 
                             ? (

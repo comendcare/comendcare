@@ -128,6 +128,7 @@ export function EditableProfilePhoto({
                                 selectedFile={selectedFileProfile}
                                 setSelectedFile={setSelectedFileProfile}
                                 className="mx-auto"
+                                isCropping={isCropping}
                                 setIsCropping={setIsCropping}
                             />
                             <Button
