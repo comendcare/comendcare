@@ -213,21 +213,6 @@ export function EditablePAGBannerPhoto({
                         <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
                             <Scrollbar />
                             <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-8">
-                                {/* <FormImageSelector
-                                    form={editOrgForm}
-                                    name="headerImage"
-                                    title=""
-                                    description=""
-                                    aspect={16 / 4}
-                                    img={img}
-                                    selectedFile={selectedFileHeader}
-                                    setSelectedFile={setSelectedFileHeader}
-                                    className="rounded h-[100px] w-[400px] mx-auto"
-                                    isCropping={isCropping}
-                                    setIsCropping={setIsCropping}
-                                    testIdPrefix="cover"
-                                /> */}
-
                                 <FormField
                                     control={editOrgForm.control}
                                     name={'headerImage'}

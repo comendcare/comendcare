@@ -410,6 +410,7 @@ export default function EditResearcherProfileDialog({researcher}: { researcher: 
                             img={defaultValues?.image || undefined}
                             selectedFile={selectedFile}
                             setSelectedFile={setSelectedFile}
+                            isCropping={isCropping}
                             setIsCropping={setIsCropping}
                         />
 
