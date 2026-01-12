@@ -15,6 +15,7 @@ export const FormImageSelector = ({
                                       img,
                                       selectedFile,
                                       setSelectedFile,
+                                      isCropping,
                                       setIsCropping,
                                       testIdPrefix
                                   }: {
@@ -27,6 +28,7 @@ export const FormImageSelector = ({
     img: string | undefined | null,
     selectedFile: FileWithPreview | null,
     setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>,
+    isCropping: boolean,
     setIsCropping: React.Dispatch<React.SetStateAction<boolean>>
     testIdPrefix?: string,
 }) => {
@@ -80,6 +82,7 @@ export const FormImageSelector = ({
                                     }
                                 }}
                                 className={className}
+                                parentIsCropping={isCropping}
                                 setParentIsCropping={setIsCropping}
                                 fileInputTestId={
                                     testIdPrefix ? `${testIdPrefix}-file-input` : undefined

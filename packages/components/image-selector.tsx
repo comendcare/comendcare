@@ -25,6 +25,7 @@ interface ImageSelectorProps {
     setSelectedFile: (file: FileWithPreview | null) => void,
     aspect: number,
     className?: string,
+    parentIsCropping: boolean,
     setParentIsCropping: React.Dispatch<React.SetStateAction<boolean>>
     fileInputTestId?: string
     cropToolbarTestId?: string
@@ -36,6 +37,7 @@ export function ImageSelector({
                                   setSelectedFile,
                                   aspect,
                                   className = "",
+                                  parentIsCropping,
                                   setParentIsCropping,
                                   fileInputTestId,
                                   cropToolbarTestId,
@@ -53,6 +55,13 @@ export function ImageSelector({
     useEffect(() => {
         setParentIsCropping(isCropping)
     }, [isCropping])
+
+    useEffect(() => {
+        if (isCropping && !parentIsCropping) {
+            // if the parent is exiting the cropping state, save the crop
+            onCrop()
+        }
+    }, [parentIsCropping])
 
     const handleClick = async () => {
         // setSelectedFile(null) // de-select any previously selected file
