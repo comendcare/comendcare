@@ -8,6 +8,7 @@ import { MilestoneMarketplaceCard } from "@comend/components/marketplace/marketp
 import InfiniteScroll from "@comend/components/ui/infinite-scroll";
 import Image from "next/image";
 import ComendLoadingSpinner from "../../../packages/components/comend-loading-spinner";
+import { NoResultsTemplate } from "@comend/components/no-results";
 
 const selector = (state: MilestoneSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -47,25 +48,12 @@ export function MilestoneSearchResults() {
     
     const NoResultsView = () => {
         return (
-            <div className="h-full w-full flex flex-col mx-auto justify-center items-center align-center">
-                <Image
-                    alt="No organization"
-                    src="https://illustrations.popsy.co/gray/question-mark.svg"
-                    width={400}
-                    height={400}
-                    className="dark:hidden"
-                />
-                <Image
-                    alt="No organization"
+            <NoResultsTemplate 
+                    imgAlt="No results"
                     src="https://illustrations.popsy.co/white/question-mark.svg"
-                    width={400}
-                    height={400}
-                    className="hidden dark:block"
-                />
-                <p className="text-3xl p-10">
-                    {`Sorry, we don't have any results for that search`}
-                </p>
-            </div>
+                    title="Sorry, we don't have any results for that search"
+                    description="Please try another search."
+            />
         )
     }
 

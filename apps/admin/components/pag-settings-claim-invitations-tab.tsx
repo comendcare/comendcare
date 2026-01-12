@@ -8,6 +8,7 @@ import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@com
 import { Button } from "@comend/components/ui/button";
 import { Ellipsis, X } from "lucide-react";
 import { revokeClaimInvitation } from "~admin/lib/actions";
+import { NoResultsTemplate } from "@comend/components/no-results"
 
 export default function PAGSettingsClaimOrganizationInvitationsTab({organization}: {organization: Prisma.OrganizationGetPayload<{
         include: { invitations: true, claimOrganizationInvitations: true };
@@ -16,31 +17,11 @@ export default function PAGSettingsClaimOrganizationInvitationsTab({organization
 
     if (invitees.length === 0) {
         return (
-            <div className="h-full w-full flex flex-col mx-auto justify-center items-center">
-                <div className="p-4 w-full sm:flex sm:items-center">
-                    <div className="space-y-2 sm:flex-auto">
-                        <h2 className="text-xl font-semibold leading-6 text-gray-900">Claim Organization Invitations</h2>
-                        <p className="text-sm text-gray-700">All open claim organization invitations sent.</p>
-                    </div>
-                </div>
-                <Image
-                    alt="No open claim invitations"
-                    src="https://illustrations.popsy.co/gray/paper-plane.svg"
-                    width={300}
-                    height={300}
-                    className="dark:hidden"
-                />
-                <Image
-                    alt="No open claim invitations"
-                    src="https://illustrations.popsy.co/white/paper-plane.svg"
-                    width={300}
-                    height={300}
-                    className="hidden dark:block"
-                />
-                <p className="font-title text-xl text-stone-600 dark:text-stone-400">
-                    {`Your organization doesn't have any open invitations.`}
-                </p>
-            </div>
+            <NoResultsTemplate 
+                imgAlt="No open claim invitations"
+                src="https://illustrations.popsy.co/white/paper-plane.svg"
+                title={`Your organization doesn't have any open invitations.`}
+            />
         )
     }
 

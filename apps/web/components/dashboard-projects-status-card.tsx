@@ -22,6 +22,7 @@ import {Button} from "@comend/components/ui/button";
 import {ExternalLink} from "lucide-react"
 import {useRouter} from "next/navigation";
 import Image from "next/image"
+import { NoResultsTemplate } from "@comend/components/no-results"
 
 
 const STATUS_LABELS: Record<StatusType, string> = {
@@ -119,27 +120,11 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
                 <div
                     className="mx-auto aspect-square max-h-[250px]"
                 >
-                    <div className="h-full flex flex-col items-center justify-center py-20">
-                        <Image
-                            alt="No projects"
-                            src="https://illustrations.popsy.co/gray/cute-smiling-cat.svg"
-                            width={150}
-                            height={150}
-                            className="dark:hidden"
-                        />
-                        <Image
-                            alt="No projects"
-                            src="https://illustrations.popsy.co/white/cute-smiling-cat.svg"
-                            width={200}
-                            height={200}
-                            className="hidden dark:block"
-                        />
-                        <div className="flex flex-col justify-center items-center text-center space-y-8">
-                            <p className="font-title text-base text-stone-600 dark:text-stone-400">
-                                {`Your organization doesn't have any projects yet.`}
-                            </p>
-                        </div>
-                    </div>
+                    <NoResultsTemplate 
+                        imgAlt="No projects"
+                        src="https://illustrations.popsy.co/white/cute-smiling-cat.svg"
+                        description={`Your organization doesn't have any projects yet.`}
+                    />
                 </div>
             </CardContent>
         </Card>

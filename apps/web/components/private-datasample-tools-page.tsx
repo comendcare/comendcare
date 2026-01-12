@@ -24,6 +24,7 @@ import Image from "next/image";
 import { DeleteClinicalDatasetDialog } from "./delete-clinical-dataset-dialog";
 import { PulsatingButton } from "@comend/components/ui/pulsating-button";
 import { cn } from "@comend/lib/utils";
+import { NoResultsTemplate } from "@comend/components/no-results";
 
 export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
     const {data: session} = useSession()
@@ -176,20 +177,12 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                         onSelectionChange={setRowSelection}
                         onRowClickCallback={(e: any, row: Row<any> | undefined) => setEditingTool(row?.original)}
                         noResultsOverride={(
-                            <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
-                                <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
-                                    <h1 className="font-cal text-4xl">You do not have any Data Tools</h1>
-                                    <Image
-                                        alt="No Data Tools"
-                                        src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                                        width={300}
-                                        height={300}
-                                    />
-                                    <p className="text-lg text-stone-500">
-                                        A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
-                                    </p>
-                                </div>
-                            </div>
+                            <NoResultsTemplate 
+                                imgAlt="No Data Tools"
+                                src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                                title="You do not have any clinical datasets"
+                                description="A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers."
+                            />
                         )}
                         interactiveDialog={(
                             <Dialog 
