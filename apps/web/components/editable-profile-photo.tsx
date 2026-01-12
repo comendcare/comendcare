@@ -56,8 +56,6 @@ export function EditableProfilePhoto({
     className?: string | null | undefined;
 }) {
     const {data: session} = useSession();
-    const router = useRouter();
-    const [loading, setLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
@@ -77,14 +75,11 @@ export function EditableProfilePhoto({
     });
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgProfileImageSchema>) {
-        // setIsCropping(false)
-        // await sleep(500)
         const newSelectedFile = await onCrop()
         console.log(`new selected file`, newSelectedFile)
         console.log(`values`, values)
         console.log(`value is default`, values.image == defaultOrganizationValues?.image)
         setIsSaving(true)
-        setLoading(true)
         try {
             if (!session?.user?.organizationId) {
                 toast.error("You're not signed into an organization right now.");
@@ -112,7 +107,7 @@ export function EditableProfilePhoto({
             }
 
             if ((!newSelectedFile || newSelectedFile.preview !== defaultOrganizationValues?.image) && img) {
-                // if the image is being changed, delete the old image in our google cloud storage bucket
+                // if the image is being changed or deleted, delete the old image in our google cloud storage bucket
                 console.log(`handle delete`)
                 await handleImageDelete(img)
             }
@@ -126,8 +121,6 @@ export function EditableProfilePhoto({
         } catch (error) {
             console.error("Error updating organization:", error);
             toast.error("Failed to update organization profile.");
-        } finally {
-            setLoading(false)
         }
     }
 
