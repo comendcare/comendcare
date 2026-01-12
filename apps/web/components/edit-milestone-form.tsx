@@ -1454,7 +1454,7 @@ export const PrivatePublicFormField = ({
                         <RadioGroup
                             onValueChange={(value) => {
                                 if (mixpanelTrackCallback) mixpanelTrackCallback(value === "PRIVATE")
-                                form.setValue("isPrivate", value === "PRIVATE")
+                                form.setValue("isPrivate", value === "PRIVATE", {shouldDirty: true})
                             }}
                             value={field.value ? "PRIVATE" : "PUBLIC"}
                             className={cn("flex flex-wrap space-y-0")}
