@@ -136,7 +136,7 @@ export function EditableProfilePhoto({
         setIsClosing(false)
         setUnsavedChangesIsOpen(false)
         setIsCropping(false)
-        setSelectedFileProfile(null)
+        // setSelectedFileProfile(null)
 
         editOrgForm.reset(defaultOrganizationValues)
     }
