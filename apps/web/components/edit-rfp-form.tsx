@@ -239,7 +239,6 @@ export function EditRFPForm({
         const isValid = validateOnSubmit(values, form.setError)
         if (!isValid) return // stops submission
 
-        console.log(`handle form submit`, values)
         setIsSaving(true)
         const {
             headerImage,
@@ -323,6 +322,7 @@ export function EditRFPForm({
 
     const handleClose = () => {
         // if (isDirty) {
+        console.log(`is dirty`, form.formState.dirtyFields)
         if (Object.keys(form.formState.dirtyFields).length > 0) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)

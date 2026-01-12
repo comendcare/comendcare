@@ -1454,7 +1454,7 @@ export const PrivatePublicFormField = ({
                         <RadioGroup
                             onValueChange={(value) => {
                                 if (mixpanelTrackCallback) mixpanelTrackCallback(value === "PRIVATE")
-                                form.setValue("isPrivate", value === "PRIVATE")
+                                form.setValue("isPrivate", value === "PRIVATE", {shouldDirty: true})
                             }}
                             value={field.value ? "PRIVATE" : "PUBLIC"}
                             className={cn("flex flex-wrap space-y-0")}
@@ -1714,9 +1714,7 @@ export const OpenToFormField = ({form}: { form: any }) => {
                             type="multiple"
                             variant="outline"
                             value={field.value}
-                            onValueChange={
-                                field.onChange
-                            }
+                            onValueChange={field.onChange}
                             className="w-fit flex flex-wrap gap-2 justify-start"
                         >
                             {RFP_OPEN_TO_TYPE_OPTIONS.map(type => (
@@ -1755,10 +1753,14 @@ export function AttachmentsFormField({form}: { form: UseFormReturn<any> }) {
                                     variant="secondary"
                                     onClick={(e: any) => {
                                         e.preventDefault()
-                                        form.setValue("attachments", [
-                                            ...(field?.value || []),
-                                            {name: '', link: ''}
-                                        ])
+                                        form.setValue(
+                                            "attachments", 
+                                            [
+                                                ...(field?.value || []),
+                                                {name: '', link: ''}
+                                            ],
+                                            {shouldDirty: true}
+                                        )
                                     }}
                                 >
                                     <Plus/>
@@ -1775,13 +1777,15 @@ export function AttachmentsFormField({form}: { form: UseFormReturn<any> }) {
                                             onDelete={() => {
                                                 form.setValue(
                                                     "attachments",
-                                                    field?.value?.filter((t: AttachmentType, i: number) => i !== index)
+                                                    field?.value?.filter((t: AttachmentType, i: number) => i !== index),
+                                                    {shouldDirty: true}
                                                 )
                                             }}
                                             onValueChange={newValue => {
                                                 form.setValue(
                                                     "attachments",
-                                                    field?.value?.map((currentValue: AttachmentType, i: number) => i === index ? newValue : currentValue)
+                                                    field?.value?.map((currentValue: AttachmentType, i: number) => i === index ? newValue : currentValue),
+                                                    {shouldDirty: true}
                                                 )
                                             }}
                                         />
@@ -1815,10 +1819,14 @@ export const ContactsFormField = ({form, title}: { form: any, title?: string }) 
                             size={"icon"}
                             onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                 e.preventDefault()
-                                form.setValue("contacts", [
-                                    ...(field.value || []),
-                                    {name: "", email: "", role: null}
-                                ])
+                                form.setValue(
+                                    "contacts", 
+                                    [
+                                        ...(field.value || []),
+                                        {name: "", email: "", role: null}
+                                    ],
+                                    {shouldDirty: true}
+                                )
                             }}
                         >
                             <Plus/>
@@ -1835,13 +1843,15 @@ export const ContactsFormField = ({form, title}: { form: any, title?: string }) 
                                     onDelete={() => {
                                         form.setValue(
                                             "contacts",
-                                            field?.value?.filter((t: ContactType, i: number) => i !== index)
+                                            field?.value?.filter((t: ContactType, i: number) => i !== index),
+                                            {shouldDirty: true}
                                         )
                                     }}
                                     onValueChange={newValue => {
                                         form.setValue(
                                             "contacts",
-                                            field?.value?.map((currentValue: ContactType, i: number) => i === index ? newValue : currentValue)
+                                            field?.value?.map((currentValue: ContactType, i: number) => i === index ? newValue : currentValue),
+                                            {shouldDirty: true}
                                         )
                                     }}
                                 />

@@ -911,7 +911,7 @@ export const DonorFormFields = ({
                             <FormControl className="w-full">
                                 <Select
                                     value={field.value} 
-                                    onValueChange={(newVal) => form.setValue("sex", newVal)}
+                                    onValueChange={(newVal) => form.setValue("sex", newVal, {shouldDirty: true})}
                                 >
                                 <SelectTrigger className="-mt-2 w-full min-h-[40px]">
                                     <SelectValue placeholder="Select a value" />
@@ -940,7 +940,7 @@ export const DonorFormFields = ({
                             <FormControl className="w-full">
                                 <Select
                                     value={field.value} 
-                                    onValueChange={(newVal) => form.setValue("gender", newVal)}
+                                    onValueChange={(newVal) => form.setValue("gender", newVal, {shouldDirty: true})}
                                 >
                                 <SelectTrigger className="-mt-2 w-full min-h-[40px]">
                                     <SelectValue placeholder="Select a value" />
@@ -971,7 +971,7 @@ export const DonorFormFields = ({
                             <FormControl className="w-full">
                                 <Select
                                     value={field.value} 
-                                    onValueChange={(newVal) => form.setValue("race", newVal)}
+                                    onValueChange={(newVal) => form.setValue("race", newVal, {shouldDirty: true})}
                                 >
                                 <SelectTrigger className="-mt-2 w-full min-h-[40px]">
                                     <SelectValue placeholder="Select a value" />
@@ -1002,7 +1002,7 @@ export const DonorFormFields = ({
                             <FormControl className="w-full">
                                 <Select
                                     value={field.value} 
-                                    onValueChange={(newVal) => form.setValue("ethnicity", newVal)}
+                                    onValueChange={(newVal) => form.setValue("ethnicity", newVal, {shouldDirty: true})}
                                 >
                                 <SelectTrigger className="-mt-2 w-full min-h-[40px]">
                                     <SelectValue placeholder="Select a value" />
@@ -1104,7 +1104,7 @@ export const DonorFormFields = ({
                                         className="h-[40px] w-[40px]"
                                         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                             e.preventDefault()
-                                            form.setValue("diagnoses", [...(field.value || []), {diagnosis: undefined, severity: undefined}])
+                                            form.setValue("diagnoses", [...(field.value || []), {diagnosis: undefined, severity: undefined}], {shouldDirty: true})
                                         }}
                                     >
                                         <Plus/>
@@ -1132,7 +1132,7 @@ export const DonorFormFields = ({
                                                             value: val?.value?.toUpperCase()?.replace(/[^0-9a-z]/gi, '')
                                                         }))
                                                     }
-                                                    form.setValue("diagnoses", newValue)
+                                                    form.setValue("diagnoses", newValue, {shouldDirty: true})
                                                 }}
                                                 creatable={true}
                                                 maxSelected={1}
@@ -1152,7 +1152,7 @@ export const DonorFormFields = ({
                                                     ...newValue[index],
                                                     severity: value
                                                 }
-                                                form.setValue("diagnoses", newValue)
+                                                form.setValue("diagnoses", newValue, {shouldDirty: true})
                                             }}
                                         >
                                         <SelectTrigger className="w-[200px] min-h-[40px]">
@@ -1171,7 +1171,7 @@ export const DonorFormFields = ({
                                                 e.preventDefault()
                                                 const newValue = field.value
                                                 newValue.splice(index, 1)
-                                                form.setValue("diagnoses", newValue)
+                                                form.setValue("diagnoses", newValue, {shouldDirty: true})
                                             }}
                                         >
                                             <Trash />
@@ -1202,7 +1202,7 @@ export const DonorFormFields = ({
                                         className="h-[40px] w-[40px]"
                                         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                             e.preventDefault()
-                                            form.setValue("treatments", [...(field.value || []),""])
+                                            form.setValue("treatments", [...(field.value || []),""], {shouldDirty: true})
                                         }}
                                     >
                                         <Plus/>
@@ -1227,7 +1227,7 @@ export const DonorFormFields = ({
                                             onChange={(event: React.FormEvent<HTMLInputElement>) => {
                                                 let newValue = field.value
                                                 newValue[index] = event.currentTarget.value
-                                                form.setValue("treatments", newValue)
+                                                form.setValue("treatments", newValue, {shouldDirty: true})
                                             }}
                                         />
                                         </div>
@@ -1238,7 +1238,7 @@ export const DonorFormFields = ({
                                                 e.preventDefault()
                                                 const newValue = field.value
                                                 newValue.splice(index, 1)
-                                                form.setValue("treatments", newValue)
+                                                form.setValue("treatments", newValue, {shouldDirty: true})
                                             }}
                                         >
                                             <Trash />
@@ -1269,7 +1269,7 @@ export const DonorFormFields = ({
                                         // size={"icon"}
                                         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                             e.preventDefault()
-                                            form.setValue("medications", [...(field.value || []),""])
+                                            form.setValue("medications", [...(field.value || []),""], {shouldDirty: true})
                                         }}
                                     >
                                         <Plus/>
@@ -1294,7 +1294,7 @@ export const DonorFormFields = ({
                                             onChange={(event: React.FormEvent<HTMLInputElement>) => {
                                                 let newValue = field.value
                                                 newValue[index] = event.currentTarget.value
-                                                form.setValue("medications", newValue)
+                                                form.setValue("medications", newValue, {shouldDirty: true})
                                             }}
                                         />
                                         </div>
@@ -1305,7 +1305,7 @@ export const DonorFormFields = ({
                                                 e.preventDefault()
                                                 const newValue = field.value
                                                 newValue.splice(index, 1)
-                                                form.setValue("medications", newValue)
+                                                form.setValue("medications", newValue, {shouldDirty: true})
                                             }}
                                         >
                                             <Trash />
