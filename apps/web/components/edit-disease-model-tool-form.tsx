@@ -147,7 +147,8 @@ export function EditDiseaseModelToolForm({
     const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
     
     const form = useForm<z.infer<typeof editDiseaseModelForm>>({
-        mode: "onChange",
+        mode: "onSubmit",
+        reValidateMode: "onSubmit",
         resolver: zodResolver(editDiseaseModelForm),
         defaultValues: {
             id: toolData?.id || undefined,
@@ -192,6 +193,9 @@ export function EditDiseaseModelToolForm({
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editDiseaseModelForm>, createFacilityRequests: CreateFacilityRequest[]) => {
+        const isValid = form.trigger()
+        if (!isValid) return // stops submission
+        
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(
@@ -306,12 +310,13 @@ export function EditDiseaseModelToolForm({
 
     return (
         <Form {...form}>
-            <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
+            <form
+                onSubmit={form.handleSubmit((values) => handleFormSubmit(values, createRequests))}
+                className="flex max-h-[80vh] flex-col overflow-hidden"
+            >
+                <ScrollArea type={"always"}>
                 <ScrollBar />
-                <form
-                    // onSubmit={form.handleSubmit(handleFormSubmit)}
-                    className="space-y-6 m-1 pb-12"
-                >
+                <div className="flex flex-col gap-4 pr-4">
                     <FormItem className="flex gap-2 items-center">
                         <FormLabel className="flex items-center gap-1 grow">
                             Visibility
@@ -569,58 +574,53 @@ export function EditDiseaseModelToolForm({
                             </FormItem>
                         )}
                     />
-                </form>
-            </ScrollArea>
+                </div>
+                </ScrollArea>
 
-            <DialogFooter className="pt-1">
-                <DialogClose asChild>
+                <DialogFooter className="pt-4">
                     <Button 
                         variant={"secondary"} 
                         onClick={() => {handleClose()}}
                     >
                         Cancel
                     </Button>
-                </DialogClose>
 
-                <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
-                    Delete tool
-                </Button>
-
-                <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                    <DeleteDiseaseModelDialog toolIds={[toolData.id]} closeDialog={handleClose}/>
-                </Dialog>
-
-                <div className="bg-white rounded-md p-0">
-                    <Button
-                        disabled={!form.formState.isValid || isSaving}
-                        variant={"cta"}
-                        onClick={(e) => {
-                            e.preventDefault()
-                            handleFormSubmit(form.getValues(), createRequests)
-                        }}
-                    >
-                        {isSaving 
-                            ? (
-                                <div className="w-[81px] flex justify-center items-center">
-                                    <LoadingDots/>
-                                </div>
-                            ) 
-                            : ("Save changes")
-                        }
+                    <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
+                        Delete tool
                     </Button>
-                </div>
-            </DialogFooter>
 
-            <UnsavedChangesDialog 
-                isSaving={isSaving}
-                isClosing={isClosing}
-                setIsClosing={setIsClosing}
-                isOpen={unsavedChangesIsOpen}
-                setIsOpen={setUnsavedChangesIsOpen}
-                closeDialog={closeDialog}
-                form={form}
-                formSubmit={handleFormSubmit}
-            />
+                    <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+                        <DeleteDiseaseModelDialog toolIds={[toolData.id]} closeDialog={handleClose}/>
+                    </Dialog>
+
+                    <div className="bg-white rounded-md p-0">
+                        <Button
+                            variant={"cta"}
+                            type="submit"
+                        >
+                            {isSaving 
+                                ? (
+                                    <div className="w-[81px] flex justify-center items-center">
+                                        <LoadingDots/>
+                                    </div>
+                                ) 
+                                : ("Save changes")
+                            }
+                        </Button>
+                    </div>
+                </DialogFooter>
+
+                <UnsavedChangesDialog 
+                    isSaving={isSaving}
+                    isClosing={isClosing}
+                    setIsClosing={setIsClosing}
+                    isOpen={unsavedChangesIsOpen}
+                    setIsOpen={setUnsavedChangesIsOpen}
+                    closeDialog={closeDialog}
+                    form={form}
+                    formSubmit={handleFormSubmit}
+                />
+            </form>
         </Form>
     )
 }

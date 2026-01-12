@@ -80,7 +80,8 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
     const isOwner = ["owner", "support"].includes(session?.user?.membership?.role);
 
     const editOrgForm = useForm<z.infer<typeof editOrgFormSchema>>({
-        mode: "onChange",
+        mode: "onSubmit",
+        reValidateMode: "onSubmit",
         resolver: zodResolver(editOrgFormSchema),
         defaultValues: {
             name: organization.name || "",
@@ -111,6 +112,9 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
     }, [organization, editOrgForm]);
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
+        const isValid = editOrgForm.trigger()
+        if (!isValid) return // stops submission
+        
         setIsSaving(true)
         console.log("Form submitted with values:", values);
 
@@ -266,16 +270,14 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                     <DialogTitle>Edit Organization Profile</DialogTitle>
                     <DialogDescription>{`Update your organization's details.`}</DialogDescription>
                 </DialogHeader>
-                {/*<Tabs defaultValue="organization">*/}
-                {/*    <TabsList>*/}
-                {/*        <TabsTrigger value="organization">Organization</TabsTrigger>*/}
-                {/*        <TabsTrigger value="finances">Finances</TabsTrigger>*/}
-                {/*    </TabsList>*/}
-                {/*    <TabsContent value="organization">*/}
                 <Form {...editOrgForm}>
-                    <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
+                    <form 
+                        onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} 
+                        className="flex max-h-[80vh] flex-col overflow-hidden"
+                    >
+                        <ScrollArea type={"always"}>
                         <ScrollBar />
-                        <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
+                            <div className="flex flex-col gap-4 pr-4 space-y-8">
                             <FormField
                                 control={editOrgForm.control}
                                 name="name"
@@ -446,78 +448,47 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                 description="The total amount of funding budgeted for research by your patient group."
                                 name="budget"
                             />
-
-                            {/*<BiopharmaConsentSwitch organization={organization}/>*/}
-
-                            <div className="absolute right-4 bottom-0 flex gap-2">
-                            <DialogClose asChild>
-                                <Button 
-                                    variant={"secondary"}
-                                    onClick={() => {handleClose()}}
-                                >
-                                    Cancel
-                                </Button>
-                            </DialogClose>
-
-                            <Button
-                                variant={"cta"}
-                                type="submit"
-                                data-testid="dialog-save-btn"
-                                disabled={!editOrgForm.formState.isValid || isSaving}
-                            >
-                                {isSaving 
-                                    ? (
-                                        <div className="w-[81px] flex justify-center items-center">
-                                            <LoadingDots/>
-                                        </div>
-                                    ) 
-                                    : ("Save changes")
-                                }
-                            </Button>
                             </div>
-                        </form>
-                    </ScrollArea>
+                        </ScrollArea>
 
-                    <UnsavedChangesDialog 
-                        isSaving={isSaving}
-                        isClosing={isClosing}
-                        setIsClosing={setIsClosing}
-                        isOpen={unsavedChangesIsOpen}
-                        setIsOpen={setUnsavedChangesIsOpen}
-                        closeDialog={closeDialog}
-                        form={editOrgForm}
-                        formSubmit={onProfileFormSubmit}
-                    />
+                        <DialogFooter className="pt-4">
+                        <DialogClose asChild>
+                            <Button 
+                                variant={"secondary"}
+                                onClick={() => {handleClose()}}
+                            >
+                                Cancel
+                            </Button>
+                        </DialogClose>
+
+                        <Button
+                            variant={"cta"}
+                            type="submit"
+                            data-testid="dialog-save-btn"
+                        >
+                            {isSaving 
+                                ? (
+                                    <div className="w-[81px] flex justify-center items-center">
+                                        <LoadingDots/>
+                                    </div>
+                                ) 
+                                : ("Save changes")
+                            }
+                        </Button>
+                        </DialogFooter>
+
+                        <UnsavedChangesDialog 
+                            isSaving={isSaving}
+                            isClosing={isClosing}
+                            setIsClosing={setIsClosing}
+                            isOpen={unsavedChangesIsOpen}
+                            setIsOpen={setUnsavedChangesIsOpen}
+                            closeDialog={closeDialog}
+                            form={editOrgForm}
+                            formSubmit={onProfileFormSubmit}
+                        />
+                    </form>
                 </Form>
-                {/*</TabsContent>*/}
-                {/*    <TabsContent value="finances">*/}
-                {/*        <Form {...editOrgForm}>*/}
-                {/*            <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">*/}
-                {/*                <MoneyInput*/}
-                {/*                    form={editOrgForm}*/}
-                {/*                    label="Total funds raised to date"*/}
-                {/*                    description="The total amount of funding raised to date by your patient group."*/}
-                {/*                    name="raised"*/}
-                {/*                />*/}
-                {/*                <MoneyInput*/}
-                {/*                    form={editOrgForm}*/}
-                {/*                    label="Total funds deployed to research"*/}
-                {/*                    description="The total amount of money deployed to research to date."*/}
-                {/*                    name="deployed"*/}
-                {/*                />*/}
-                {/*                <MoneyInput*/}
-                {/*                    form={editOrgForm}*/}
-                {/*                    label="Annual research budget"*/}
-                {/*                    description="The amount of money allocated to advancing research this year."*/}
-                {/*                    name="budget"*/}
-                {/*                />*/}
-                {/*                <Button type="submit" onClick={() => console.log("Save (Finances tab) clicked")}>*/}
-                {/*                    Save*/}
-                {/*                </Button>*/}
-                {/*            </form>*/}
-                {/*        </Form>*/}
-                {/*    </TabsContent>*/}
-                {/*</Tabs>*/}
             </DialogContent>
         </Dialog>
     );

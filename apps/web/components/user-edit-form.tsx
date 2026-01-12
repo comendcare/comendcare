@@ -347,6 +347,7 @@ export default function UserEditForm() {
                             img={defaultValues?.image}
                             selectedFile={selectedFile}
                             setSelectedFile={setSelectedFile}
+                            isCropping={isCropping}
                             setIsCropping={setIsCropping}
                         />
 
