@@ -49,6 +49,7 @@ import { Separator } from "@comend/components/ui/separator"
 import { Checkbox } from "@comend/components/ui/checkbox"
 import LoadingDots from "@comend/components/icons/loading-dots"
 import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
+import { stubFalse } from "lodash"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -320,10 +321,8 @@ export function EditRFPForm({
         }
     }
 
-    const handleClose = () => {
-        // if (isDirty) {
-        console.log(`is dirty`, form.formState.dirtyFields)
-        if (Object.keys(form.formState.dirtyFields).length > 0) {
+    const handleClose = ({isDelete}: {isDelete?: boolean}) => {
+        if (!isDelete && Object.keys(form.formState.dirtyFields).length > 0) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
         } else {
@@ -333,7 +332,7 @@ export function EditRFPForm({
     }
 
     useEffect(() => {
-        if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
+        if (isClosing) handleClose({isDelete: false}) // external close, handle closing with option for saving unsaved changes
     }, [isClosing])
 
     useEffect(() => {
@@ -687,10 +686,10 @@ export function EditRFPForm({
                         <DialogClose asChild>
                             <Button 
                                 variant={"secondary"}
-                                onClick={() => {handleClose()}}
+                                onClick={() => {handleClose({isDelete: false})}}
                             >
                                 Cancel
-                            </Button>
+                            </Button> 
                         </DialogClose>
                         {rfpData.id && (
                             <Dialog>

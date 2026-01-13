@@ -209,8 +209,8 @@ export function EditDiseaseModelToolForm({
         closeDialog(createdOrUpdatedDiseaseModel)
     }
 
-    const handleClose = () => {
-        if (Object.keys(form.formState.dirtyFields)?.length > 0) {
+    const handleClose = ({isDelete}: {isDelete?: boolean}) => {
+        if (!isDelete && Object.keys(form.formState.dirtyFields)?.length > 0) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
         } else {
@@ -220,7 +220,7 @@ export function EditDiseaseModelToolForm({
     }
 
     useEffect(() => {
-        if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
+        if (isClosing) handleClose({isDelete: false}) // external close, handle closing with option for saving unsaved changes
     }, [isClosing])
 
     useEffect(() => {
@@ -580,18 +580,22 @@ export function EditDiseaseModelToolForm({
                 <DialogFooter className="pt-4">
                     <Button 
                         variant={"secondary"} 
-                        onClick={() => {handleClose()}}
+                        onClick={() => {handleClose({isDelete: false})}}
                     >
                         Cancel
                     </Button>
 
-                    <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
-                        Delete tool
-                    </Button>
+                    {toolData.id && (
+                        <>
+                        <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
+                            Delete tool
+                        </Button>
 
-                    <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                        <DeleteDiseaseModelDialog toolIds={[toolData.id]} closeDialog={handleClose}/>
-                    </Dialog>
+                        <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+                            <DeleteDiseaseModelDialog toolIds={[toolData.id]} closeDialog={() => handleClose({isDelete: true})}/>
+                        </Dialog>
+                        </>
+                    )}
 
                     <div className="bg-white rounded-md p-0">
                         <Button
