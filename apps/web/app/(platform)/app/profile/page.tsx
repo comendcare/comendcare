@@ -52,6 +52,7 @@ export default async function ProfilePage(props: IndexPageProps) {
             published: true,
             name: true,
             description: true,
+            patientPriorities: true,
             contactEmail: true,
             logo: true,
             image: true,
