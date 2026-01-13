@@ -55,6 +55,7 @@ export const UnsavedChangesDialog = ({
                             if (isValid) formSubmit(form.getValues())
                             setIsOpen(false)
                         }}
+                        disabled={isSaving}
                     >
                         {isSaving 
                             ? (

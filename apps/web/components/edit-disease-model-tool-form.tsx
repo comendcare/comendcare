@@ -602,6 +602,7 @@ export function EditDiseaseModelToolForm({
                         <Button
                             variant={"cta"}
                             type="submit"
+                            disabled={isSaving}
                         >
                             {isSaving 
                                 ? (

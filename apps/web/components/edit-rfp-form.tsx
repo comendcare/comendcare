@@ -728,6 +728,7 @@ export function EditRFPForm({
                         <Button
                             variant={"cta"}
                             type="submit"
+                            disabled={isSaving}
                         >
                             {isSaving 
                                 ? (
