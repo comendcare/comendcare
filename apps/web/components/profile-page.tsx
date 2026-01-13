@@ -139,7 +139,7 @@ export default function PAGProfilePage({
                             )}
 
                             <div
-                                className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start justify-between">
+                                className="w-full flex flex-col md:flex-row mx-auto px-8 gap-2 items-start justify-between">
                                 <div className="w-full flex flex-row gap-4 items-start">
                                     <div className="h-fit w-fit -mt-16" data-testid="avatar-image">
                                         {isOwner ? (
@@ -158,8 +158,8 @@ export default function PAGProfilePage({
                                             />
                                         )}
                                     </div>
-                                    <div className="flex flex-col">
-                                        <div className="flex gap-4 justify-between">
+                                    <div className="w-full flex flex-col">
+                                        <div className="w-full flex gap-4 justify-between">
                                             <h1 className="text-wrap text-2xl lg:text-3xl font-semibold" data-testid="org-name-heading">
                                                 {organization?.name ?? "No name organization"}
                                             </h1>
