@@ -213,7 +213,7 @@ export function EditBiosampleToolForm({
             collectionDate: toolData?.collectionDate ? new Date(toolData?.collectionDate) : undefined,
 
             quantity: toolData?.quantity?.toString() || undefined,
-            quantityUnit: toolData?.quantityUnit || 'ml',
+            quantityUnit: toolData?.quantityUnit || 'microliters',
             bsiId: toolData?.bsiId || undefined,
 
             price: toolData?.price?.toString() || undefined,

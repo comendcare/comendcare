@@ -178,8 +178,8 @@ export default function EditPagProfileAboutCardDialog({
         });
     }
 
-    const handleClose = () => {
-        if (Object.keys(editOrgForm.formState.dirtyFields).length > 0) {
+    const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
+        if (showUnsavedChanges && Object.keys(editOrgForm.formState.dirtyFields).length > 0) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
         } else {
@@ -189,7 +189,7 @@ export default function EditPagProfileAboutCardDialog({
     }
 
     useEffect(() => {
-        if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
+        if (isClosing) handleClose({showUnsavedChanges: true}) // external close, handle closing with option for saving unsaved changes
     }, [isClosing])
 
     useEffect(() => {
@@ -432,14 +432,13 @@ export default function EditPagProfileAboutCardDialog({
                             </ScrollArea>
 
                             <DialogFooter className="pt-4">
-                            <DialogClose asChild>
-                                <Button 
-                                    variant={"secondary"}
-                                    onClick={() => {handleClose()}}
-                                >
-                                    Cancel
-                                </Button>
-                            </DialogClose>
+                            <Button 
+                                type="button"
+                                variant={"secondary"}
+                                onClick={() => {handleClose({showUnsavedChanges: false})}}
+                            >
+                                Cancel
+                            </Button>
 
                             <Button
                                 variant={"cta"}
