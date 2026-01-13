@@ -264,7 +264,7 @@ export default function EditPagProfileAboutCardDialog({
                             className="flex max-h-[80vh] flex-col overflow-hidden"
                         >
 
-                        <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
+                        <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
                             <ScrollBar />   
                             <div className="flex flex-col gap-4 pr-4 space-y-8">
                                 <FormField
