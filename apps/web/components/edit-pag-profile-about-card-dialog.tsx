@@ -75,7 +75,7 @@ export default function EditPagProfileAboutCardDialog({
         resolver: zodResolver(editOrgFormSchema),
         defaultValues: {
             description: organization.description || "",
-            patientPriorities: organization.description || "",
+            patientPriorities: organization.patientPriorities || "",
             website: organization.website || "",
             therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
                 label: ther,
@@ -97,7 +97,7 @@ export default function EditPagProfileAboutCardDialog({
     useEffect(() => {
         editOrgForm.reset({
             description: organization.description || "",
-            patientPriorities: organization.description || "",
+            patientPriorities: organization.patientPriorities || "",
             website: organization.website || "",
             therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
                 label: ther,
