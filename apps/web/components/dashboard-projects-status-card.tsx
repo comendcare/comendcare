@@ -123,7 +123,7 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
                 >
                     <NoResultsTemplate 
                         imgAlt="No projects"
-                        src="https://illustrations.popsy.co/white/cute-smiling-cat.svg"
+                        src="https://illustrations.popsy.co/gray/graphic-design.svg"
                         description={`Your organization doesn't have any projects yet.`}
                         imgSize={150}
                     />
