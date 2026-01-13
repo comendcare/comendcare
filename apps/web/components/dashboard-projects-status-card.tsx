@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import {TrendingUp} from "lucide-react"
+import {TrendingUp, Workflow} from "lucide-react"
 import {Label, Pie, PieChart} from "recharts"
 import {
     Card,
@@ -91,6 +91,7 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
         <Card className="col-span-3 flex flex-col">
             <CardHeader className="items-start pb-0">
                 <CardTitle className="flex flex-row items-center justify-start gap-x-2">
+                    <Workflow className="h-5 w-5"/>
                     <h1 className="text-2xl font-normal">Project overview</h1>
                     <Button
                         onClick={() => router.push("/app/research-plan")}
@@ -118,12 +119,13 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
             </CardHeader>
             <CardContent className="flex-1 pb-0">
                 <div
-                    className="mx-auto aspect-square max-h-[250px]"
+                    className="mx-auto max-h-[250px]"
                 >
                     <NoResultsTemplate 
                         imgAlt="No projects"
                         src="https://illustrations.popsy.co/white/cute-smiling-cat.svg"
                         description={`Your organization doesn't have any projects yet.`}
+                        imgSize={150}
                     />
                 </div>
             </CardContent>
@@ -134,6 +136,7 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
         <Card className="col-span-3 flex flex-col">
             <CardHeader className="items-start pb-0">
                 <CardTitle className="flex flex-row items-center justify-start gap-x-2">
+                    <Workflow className="h-5 w-5"/>
                     <h1 className="text-2xl font-normal">Project overview</h1>
                     <Button
                         onClick={() => router.push("/app/research-plan")}

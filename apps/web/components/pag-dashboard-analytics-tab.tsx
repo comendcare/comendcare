@@ -15,10 +15,10 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
     return (
         <div className="space-y-4 w-full">
             <div className="space-y-2 sm:flex-auto">
-                <h2 className="text-4xl font-semibold leading-6 text-gray-900">
+                <h2 className="text-3xl font-semibold leading-6 text-gray-900">
                     {session?.user?.name ? `Hello, ${session.user.name.split(" ")[0]}` : `Hello`}
                 </h2>
-                <p className="text-sm text-gray-700">
+                <p className="pt-1 text-sm text-gray-700">
                     {`Here's ${organization.name} at a glance.`}
                 </p>
             </div>

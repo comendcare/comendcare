@@ -4,27 +4,29 @@ export function NoResultsTemplate({
     imgAlt,
     src,
     title,
-    description
+    description,
+    imgSize
 }: {
     imgAlt: string,
     src: string,
     title?: string,
-    description?: string
+    description?: string,
+    imgSize?: number
 }) {
     return (
         <div className="p-6 max-w-4xl flex items-center justify-center gap-8 flex-col md:flex-row">
             <Image
                 alt={imgAlt}
                 src={src}
-                width={200}
-                height={200}
+                width={imgSize || 200}
+                height={imgSize || 200}
                 className="dark:hidden"
             />
             <Image
                 alt={imgAlt}
                 src={src}
-                width={200}
-                height={200}
+                width={imgSize || 200}
+                height={imgSize || 200}
                 className="hidden dark:block"
             />
             <div className="flex flex-col space-y-4">
