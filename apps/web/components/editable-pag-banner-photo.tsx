@@ -115,8 +115,8 @@ export function EditablePAGBannerPhoto({
         editOrgForm.reset(defaultOrganizationValues)
     }
 
-    const handleClose = () => {
-        if (Object.keys(editOrgForm.formState.dirtyFields).length > 0 || isCropping) {
+    const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
+        if (showUnsavedChanges && Object.keys(editOrgForm.formState.dirtyFields).length > 0 || isCropping) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
         } else {
@@ -126,7 +126,7 @@ export function EditablePAGBannerPhoto({
     }
 
     useEffect(() => {
-        if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
+        if (isClosing) handleClose({showUnsavedChanges: true}) // external close, handle closing with option for saving unsaved changes
     }, [isClosing])
 
     useEffect(() => {
@@ -252,14 +252,13 @@ export function EditablePAGBannerPhoto({
                                 />
                                 
                                 <div className="absolute right-4 bottom-0 flex gap-2">
-                                <DialogClose asChild>
-                                    <Button 
-                                        variant={"secondary"}
-                                        onClick={() => {handleClose()}}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </DialogClose>
+                                <Button 
+                                    type="button"
+                                    variant={"secondary"}
+                                    onClick={() => {handleClose({showUnsavedChanges: true})}}
+                                >
+                                    Cancel
+                                </Button>
 
                                 <Button
                                     variant={"cta"}
