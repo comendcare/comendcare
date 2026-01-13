@@ -175,8 +175,10 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
             }}
         >
             <DropdownMenu modal={false}>
-                <DropdownMenuTrigger>
-                    <Ellipsis/>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="p-2 h-fit">
+                        <Ellipsis />
+                    </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     {
