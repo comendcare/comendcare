@@ -464,6 +464,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                             variant={"cta"}
                             type="submit"
                             data-testid="dialog-save-btn"
+                            disabled={isSaving}
                         >
                             {isSaving 
                                 ? (

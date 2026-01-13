@@ -277,7 +277,7 @@ export function EditableProfilePhoto({
                                     variant={"cta"}
                                     type="submit"
                                     data-testid="dialog-save-btn"
-                                    disabled={!editOrgForm.formState.isValid || isSaving}
+                                    disabled={isSaving}
                                 >
                                     {isSaving 
                                         ? (

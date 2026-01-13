@@ -777,6 +777,7 @@ export default function EditPAGProfileConditionCardDialog({
                                     variant={"cta"}
                                     type="submit"
                                     data-testid="dialog-save-btn"
+                                    disabled={isSaving}
                                 >
                                     {isSaving 
                                         ? (
