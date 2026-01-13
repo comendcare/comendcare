@@ -85,7 +85,7 @@ export default function PAGAnalyticsLineChartCard({organization}: { organization
         <Card className="col-span-4">
             <CardHeader>
                 <CardTitle className="flex flex-row items-center justify-start gap-x-2">
-                    Profile views
+                    <h1 className="text-2xl font-normal">Profile views</h1>
 
                     <Button
                         asChild
