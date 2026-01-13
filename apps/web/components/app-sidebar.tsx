@@ -49,7 +49,7 @@ const data = {
         //     url: "/app/saved/service-providers"
         // },
         {
-            title: "Research Planner",
+            title: "Research planner",
             icon: Workflow,
             variant: "ghost",
             url: `/app/research-plan`,
@@ -89,14 +89,14 @@ const data = {
             subPages: []
         },
         {
-            title: "Requests for Proposals",
+            title: "Requests for proposals",
             icon: Megaphone,
             variant: "ghost",
             url: `/app/rfps`,
             subPages: []
         },
         {
-            title: "Organization Profile",
+            title: "Organization profile",
             icon: User,
             variant: "ghost",
             url: "/app/profile",
@@ -248,19 +248,19 @@ export function AppSidebar({memberships}: { memberships: MembershipWithOrganizat
                             <p className="text-md">{'\u00B7'}</p>
                             <Link href="https://www.comend.io/terms-of-service"
                                   className="text-xs hover:underline hover:text-primary">
-                                Terms of Services
+                                Terms of services
                             </Link>
                             <p className="text-md">{'\u00B7'}</p>
                             <Link
                                 // href="https://comend.notion.site/Comend-s-Policies-241801a6fddc801fb582d5d1b260c673?source=copy_link"
                                 href="https://comend.io/privacy-policy"
                                 className="text-xs hover:underline hover:text-primary">
-                                Privacy Policy
+                                Privacy policy
                             </Link>
                             {/* <p className="text-md">{'\u00B7'}</p> */}
                             <Link href="https://comend.io/security"
                                   className="text-xs hover:underline hover:text-primary">
-                                Security Promise
+                                Security promise
                             </Link>
                             {/* <Button
                             variant="ghost"
