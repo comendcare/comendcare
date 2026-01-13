@@ -108,15 +108,14 @@ export function EditablePAGBannerPhoto({
     const closeDialog = () => {
         setOpen(false)
         setIsClosing(false)
-        setUnsavedChangesIsOpen(false)
         setIsCropping(false)
-        // setSelectedFileHeader(null)
+        setUnsavedChangesIsOpen(false)
 
         editOrgForm.reset(defaultOrganizationValues)
     }
 
     const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
-        if (showUnsavedChanges && Object.keys(editOrgForm.formState.dirtyFields).length > 0 || isCropping) {
+        if (showUnsavedChanges && (Object.keys(editOrgForm.formState.dirtyFields).length > 0 || isCropping)) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
         } else {
@@ -255,7 +254,7 @@ export function EditablePAGBannerPhoto({
                                 <Button 
                                     type="button"
                                     variant={"secondary"}
-                                    onClick={() => {handleClose({showUnsavedChanges: true})}}
+                                    onClick={() => {handleClose({showUnsavedChanges: false})}}
                                 >
                                     Cancel
                                 </Button>

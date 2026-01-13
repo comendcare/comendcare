@@ -123,16 +123,14 @@ export function EditableProfilePhoto({
     const closeDialog = () => {
         setOpen(false)
         setIsClosing(false)
-        setUnsavedChangesIsOpen(false)
         setIsCropping(false)
-        // setSelectedFileProfile(null)
+        setUnsavedChangesIsOpen(false)
 
         editOrgForm.reset(defaultOrganizationValues)
     }
 
     const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
-        console.log(`handle close`, showUnsavedChanges)
-        if (showUnsavedChanges && Object.keys(editOrgForm.formState.dirtyFields).length > 0 || isCropping) {
+        if (showUnsavedChanges && (Object.keys(editOrgForm.formState.dirtyFields).length > 0 || isCropping)) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
         } else {
