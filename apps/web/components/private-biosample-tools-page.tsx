@@ -18,12 +18,10 @@ import { Globe, Lock, Plus, Trash } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { setBiosamplesVisibility } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogPortal, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
+import { Dialog, DialogPortal, DialogTrigger } from "@comend/components/ui/dialog";
 import { Row } from "@tanstack/react-table";
-import { Asset, editBiosampleForm } from "@comend/lib/types";
-import Image from "next/image";
+import { Asset } from "@comend/lib/types";
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog";
-import z from "zod";
 import { cn } from "@comend/lib/utils";
 import { PulsatingButton } from "@comend/components/ui/pulsating-button";
 import {NoResultsTemplate} from "@comend/components/no-results"

@@ -209,8 +209,8 @@ export function EditDiseaseModelToolForm({
         closeDialog(createdOrUpdatedDiseaseModel)
     }
 
-    const handleClose = ({isDelete}: {isDelete?: boolean}) => {
-        if (!isDelete && Object.keys(form.formState.dirtyFields)?.length > 0) {
+    const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
+        if (showUnsavedChanges && Object.keys(form.formState.dirtyFields)?.length > 0) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
         } else {
@@ -220,7 +220,7 @@ export function EditDiseaseModelToolForm({
     }
 
     useEffect(() => {
-        if (isClosing) handleClose({isDelete: false}) // external close, handle closing with option for saving unsaved changes
+        if (isClosing) handleClose({showUnsavedChanges: true}) // external close, handle closing with option for saving unsaved changes
     }, [isClosing])
 
     useEffect(() => {
@@ -580,7 +580,7 @@ export function EditDiseaseModelToolForm({
                 <DialogFooter className="pt-4">
                     <Button 
                         variant={"secondary"} 
-                        onClick={() => {handleClose({isDelete: false})}}
+                        onClick={() => {handleClose({showUnsavedChanges: false})}}
                     >
                         Cancel
                     </Button>
@@ -592,7 +592,7 @@ export function EditDiseaseModelToolForm({
                         </Button>
 
                         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                            <DeleteDiseaseModelDialog toolIds={[toolData.id]} closeDialog={() => handleClose({isDelete: true})}/>
+                            <DeleteDiseaseModelDialog toolIds={[toolData.id]} closeDialog={() => handleClose({showUnsavedChanges: false})}/>
                         </Dialog>
                         </>
                     )}

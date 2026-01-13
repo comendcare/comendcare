@@ -321,8 +321,8 @@ export function EditRFPForm({
         }
     }
 
-    const handleClose = ({isDelete}: {isDelete?: boolean}) => {
-        if (!isDelete && Object.keys(form.formState.dirtyFields).length > 0) {
+    const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
+        if (showUnsavedChanges && Object.keys(form.formState.dirtyFields).length > 0) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
         } else {
@@ -332,7 +332,7 @@ export function EditRFPForm({
     }
 
     useEffect(() => {
-        if (isClosing) handleClose({isDelete: false}) // external close, handle closing with option for saving unsaved changes
+        if (isClosing) handleClose({showUnsavedChanges: true}) // external close, handle closing with option for saving unsaved changes
     }, [isClosing])
 
     useEffect(() => {
@@ -503,7 +503,7 @@ export function EditRFPForm({
                     <OpenToFormField form={form}/>
 
                     <div className="flex flex-col gap-4 rounded-md border p-4">
-                        <FormLabel>{`Funding amount`}</FormLabel>
+                        <FormLabel>{`Funding amount (required)`}</FormLabel>
                         <FormField
                             control={form.control}
                             name="fundingIsFlexible"
@@ -683,14 +683,12 @@ export function EditRFPForm({
                     />
 
                     <div className="absolute right-4 bottom-0 flex gap-2">
-                        <DialogClose asChild>
-                            <Button 
-                                variant={"secondary"}
-                                onClick={() => {handleClose({isDelete: false})}}
-                            >
-                                Cancel
-                            </Button> 
-                        </DialogClose>
+                        <Button 
+                            variant={"secondary"}
+                            onClick={() => {handleClose({showUnsavedChanges: false})}}
+                        >
+                            Cancel
+                        </Button> 
                         {rfpData.id && (
                             <Dialog>
                                 <DialogTrigger asChild>
