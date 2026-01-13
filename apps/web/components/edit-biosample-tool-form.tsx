@@ -377,7 +377,7 @@ export function EditBiosampleToolForm({
             }
 
             // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away
-            if (Object.keys(toolData)?.length > 0) form.trigger()
+            if (toolData.id && Object.keys(toolData)?.length > 0) form.trigger()
 
             initializing.current = false
         }
@@ -1106,6 +1106,7 @@ export const DonorFormFields = ({
                             <Tooltip>
                                 <TooltipTrigger>
                                     <Button
+                                        type="button"
                                         variant="secondary"
                                         className="h-[40px] w-[40px]"
                                         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
@@ -1171,6 +1172,7 @@ export const DonorFormFields = ({
                                         </SelectContent>
                                         </Select>
                                         <Button 
+                                            type="button"
                                             className="row-start-1 col-start-3 lg:col-start-4 h-[40px] w-[40px]" 
                                             variant="ghost"
                                             onClick={(e) => {
