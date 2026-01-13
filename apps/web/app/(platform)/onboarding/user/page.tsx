@@ -8,7 +8,7 @@ export default function UserOnboardingPage() {
                 <div className="space-y-2">
                     <div className="flex flex-row justify-between">
                         <h1 className="text-xl font-semibold">
-                            Profile Onboarding: About You
+                            Profile onboarding: about you
                         </h1>
                     </div>
                 </div>
