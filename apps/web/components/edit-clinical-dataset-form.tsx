@@ -591,6 +591,7 @@ export function EditClincalDatasetForm({
 
                 <DialogFooter className="pt-4">
                     <Button 
+                        type="button"
                         variant={"secondary"} 
                         onClick={() => {handleClose({showUnsavedChanges: false})}}
                     >

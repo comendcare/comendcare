@@ -684,6 +684,7 @@ export function EditRFPForm({
 
                     <div className="absolute right-4 bottom-0 flex gap-2">
                         <Button 
+                            type="button"
                             variant={"secondary"}
                             onClick={() => {handleClose({showUnsavedChanges: false})}}
                         >

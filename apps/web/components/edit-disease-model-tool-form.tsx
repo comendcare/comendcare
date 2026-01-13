@@ -579,6 +579,7 @@ export function EditDiseaseModelToolForm({
 
                 <DialogFooter className="pt-4">
                     <Button 
+                        type="button"
                         variant={"secondary"} 
                         onClick={() => {handleClose({showUnsavedChanges: false})}}
                     >
