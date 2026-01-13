@@ -62,27 +62,28 @@ export const PAGProfileRFPsHoverableCard = ({rfps, isPrivate}: { rfps: any[], is
                         {current} of {count}
                     </div>
                 </CardHeader>
-                <CardContent className="w-full max-w-full px-16">
+                <CardContent>
                     {rfps.length > 0
                         ? (
+                            <div className="w-full max-w-full px-16">
                             <Carousel opts={{loop: true}} setApi={setApi} className="w-full">
                                 <CarouselContent>
                                     {rfps.map((rfp: any, index: number) => (
                                         <CarouselItem key={index}>
                                             <div className="h-full p-1">
-                                                <Dialog defaultOpen={searchParams.get("rfp") == rfp.id}>
+                                                <Dialog defaultOpen={searchParams.get("rfp") == rfp?.id}>
                                                     <DialogTrigger
                                                         className="w-full max-w-full h-full"
                                                         onClick={() => {
                                                             mixpanelTrack("RFP Details Viewed", {
-                                                                "ID": rfp.id,
+                                                                "ID": rfp?.id,
                                                                 "Name": rfp.title,
                                                                 "Budget": rfp.budget,
                                                                 "Linked Projects": rfp.milestones.map(({milestone}: any) => milestone),
                                                                 // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
                                                                 // we flatten them into a single list that can be parsed
                                                                 "Linked Project Types": rfp.milestones.flatMap(({milestone}: any) =>
-                                                                    (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                                                                    (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType?.id)
                                                                 )
                                                             })
                                                         }}
@@ -101,6 +102,7 @@ export const PAGProfileRFPsHoverableCard = ({rfps, isPrivate}: { rfps: any[], is
                                 <CarouselPrevious/>
                                 <CarouselNext/>
                             </Carousel>
+                            </div>
                         )
                         : (<NoRFPs isPrivate={isPrivate}/>)
                     }

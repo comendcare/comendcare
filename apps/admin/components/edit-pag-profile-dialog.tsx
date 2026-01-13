@@ -44,6 +44,11 @@ export const financesFormSchema = z.object({
     deployed: z.number().optional(),
 })
 
+const biomarkerSchema = z.object({
+    name: z.string().optional(),
+    type: z.array(optionSchema).optional(), // single-select via maxSelected=1
+});
+
 export const researchFormSchema = z.object({
     disorder: z.array(optionSchema).optional(),
     summary: z.string()
@@ -72,12 +77,12 @@ export const researchFormSchema = z.object({
     otherMechanisms: z.string().optional(),
     causal: z.array(optionSchema).optional(),
     genes: z.array(optionSchema).optional(),
-    biomarkers: z.array(optionSchema).optional(),
     systems: z.array(optionSchema).optional(),
     otherSystems: z.string().optional(),
     symptoms: z.array(optionSchema).optional(),
     studies: z.array(optionSchema).optional(),
     tools: z.array(optionSchema).optional(),
+    biomarkers: z.array(biomarkerSchema).optional(),
 })
 
 const editOrgFormSchema = z.object({
@@ -678,14 +683,14 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                     name="subdomain"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
+                                            <FormLabel>{`Custom Comend URL (required)`}</FormLabel>
                                             <FormDescription>
-                                                {`Enter an acronym, short form, or nickname for your organization.`}
-                                                <br/>
+                                                {/* {`This will create your organization's unique Comend profile link (e.g., yourname.comend.io). Use a short name or abbreviation. This is not your external website.`} */}
+                                                {/* <br/> */}
                                                 {editOrgForm.watch("subdomain") &&
                                                     !editOrgForm.formState.errors.subdomain && (
                                                         <>
-                                                            {`The custom site for your organization’s profile will be found at ${editOrgForm
+                                                            {`Your profile URL will be: ${editOrgForm
                                                                 .watch("subdomain")
                                                                 .toLowerCase()
                                                                 .replace(/\s+/g, "-")}.comend.io`}

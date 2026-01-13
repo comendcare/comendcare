@@ -5,6 +5,7 @@ import { ProfilePhoto } from "@comend/components/profile-photo"
 import InvitationsDropdown from "~web/components/invitations-dropdown"
 import {Invitation, Prisma} from "@prisma/client";
 import {getSession} from "@comend/lib/auth";
+import { NoResultsTemplate } from "@comend/components/no-results"
 
 export default async function PAGSettingsInvitationsTab({organization}: {organization: Prisma.OrganizationGetPayload<{
         include: { invitations: true };
@@ -42,7 +43,7 @@ export default async function PAGSettingsInvitationsTab({organization}: {organiz
 
     if (invitees.length === 0) {
         return (
-            <div className="h-full w-full flex flex-col mx-auto justify-center items-center">
+            <div className="h-full w-full flex flex-col mx-auto justify-start items-center">
                 <div className="p-4 w-full sm:flex sm:items-center">
                     <div className="space-y-2 sm:flex-auto">
                         <h2 className="text-xl font-semibold leading-6 text-gray-900">Invitations</h2>
@@ -50,23 +51,11 @@ export default async function PAGSettingsInvitationsTab({organization}: {organiz
                     </div>
                     <InviteUserToOrgDialog organization={organization}/>
                 </div>
-                <Image
-                    alt="No open invitations"
-                    src="https://illustrations.popsy.co/gray/paper-plane.svg"
-                    width={300}
-                    height={300}
-                    className="dark:hidden"
-                />
-                <Image
-                    alt="No open invitations"
+                <NoResultsTemplate 
+                    imgAlt="No open invitations"
                     src="https://illustrations.popsy.co/white/paper-plane.svg"
-                    width={300}
-                    height={300}
-                    className="hidden dark:block"
+                    title={`Your organization doesn't have any open invitations.`}
                 />
-                <p className="font-title text-xl text-stone-600 dark:text-stone-400">
-                    {`Your organization doesn't have any open invitations.`}
-                </p>
             </div>
         )
     }

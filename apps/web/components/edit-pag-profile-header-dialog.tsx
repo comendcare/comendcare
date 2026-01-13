@@ -2,8 +2,10 @@
 
 import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger
@@ -11,6 +13,7 @@ import {
 import {
     Form,
     FormControl,
+    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -41,6 +44,9 @@ import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@comend/
 import {BiopharmaConsentSwitch} from "~web/components/biopharma-consent-switch";
 import {checkSubdomainAvailability} from "@comend/lib/fetchers";
 import {useDebounce} from "use-debounce";
+import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area";
+import LoadingDots from "@comend/components/icons/loading-dots";
+import { UnsavedChangesDialog } from "./unsaved-changes-dialog";
 
 const moneyField = z.preprocess(
     (v) => (v === "" || v === null || typeof v === "undefined" ? undefined : Number(v)),
@@ -68,10 +74,14 @@ const editOrgFormSchema = z.object({
 export default function EditPAGProfileHeaderDialog({organization}: { organization: Organization }) {
     const {data: session} = useSession();
     const [open, setOpen] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
+    const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
     const isOwner = ["owner", "support"].includes(session?.user?.membership?.role);
 
     const editOrgForm = useForm<z.infer<typeof editOrgFormSchema>>({
-        mode: "onChange",
+        mode: "onSubmit",
+        reValidateMode: "onSubmit",
         resolver: zodResolver(editOrgFormSchema),
         defaultValues: {
             name: organization.name || "",
@@ -102,6 +112,10 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
     }, [organization, editOrgForm]);
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
+        const isValid = editOrgForm.trigger()
+        if (!isValid) return // stops submission
+        
+        setIsSaving(true)
         console.log("Form submitted with values:", values);
 
         if (!session?.user?.organizationId) {
@@ -142,12 +156,49 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             console.log("Organization update success");
             toast.success("Organization profile updated successfully!");
             setOpen(false);
+            closeDialog()
             window.location.reload()
         } catch (error) {
             console.error("Error updating organization:", error);
             toast.error("Failed to update organization profile.");
         }
     }
+
+    const closeDialog = () => {
+        setOpen(false)
+        setIsClosing(false)
+        setUnsavedChangesIsOpen(false)
+
+        editOrgForm.reset({
+            name: organization.name || "",
+            founded: organization.yearFounded || "",
+            subdomain: organization.subdomain || "",
+            incorporationStatus: organization.incorporationStatus || undefined,
+            raised: organization.moneyRaised || 0,
+            deployed: organization.moneyDeployed || 0,
+            budget: organization.researchBudget || 0
+        });
+    }
+
+    const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
+        if (showUnsavedChanges && Object.keys(editOrgForm.formState.dirtyFields).length > 0) {
+            // form is dirty, give user the option to save/discard unsaved changes
+            setUnsavedChangesIsOpen(true)
+        } else {
+            // form is not dirty, close regularly
+            closeDialog()
+        }
+    }
+
+    useEffect(() => {
+        if (isClosing) handleClose({showUnsavedChanges: true}) // external close, handle closing with option for saving unsaved changes
+    }, [isClosing])
+
+    useEffect(() => {
+        // if the user has closed the unsaved changes dialog, end the isClosing state of all other dialogs
+        // all dialogs should be either fully closed or fully open
+        if (!unsavedChangesIsOpen) setIsClosing(false)
+    }, [unsavedChangesIsOpen])
 
     useEffect(() => {
         if (debouncedNickname) {
@@ -177,20 +228,9 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
     return (
         <Dialog
             open={open}
-            onOpenChange={(state) => {
-                if (!state) {
-                    // Reset the form when dialog is closing (user didn't save)
-                    editOrgForm.reset({
-                        name: organization.name || "",
-                        founded: organization.yearFounded || "",
-                        subdomain: organization.subdomain || "",
-                        incorporationStatus: organization.incorporationStatus || undefined,
-                        raised: organization.moneyRaised || 0,
-                        deployed: organization.moneyDeployed || 0,
-                        budget: organization.researchBudget || 0
-                    });
-                }
-                setOpen(state);
+            onOpenChange={(open) => {
+                if (!open) setIsClosing(true)
+                else setOpen(true)
             }}
         >
             {isOwner ? (
@@ -225,217 +265,230 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                     </TooltipContent>
                 </Tooltip>
             )}
-            <DialogContent className="max-h-[80vh] overflow-y-auto" data-testid="dialog">
+            <DialogContent data-testid="dialog">
                 <DialogHeader>
                     <DialogTitle>Edit Organization Profile</DialogTitle>
                     <DialogDescription>{`Update your organization's details.`}</DialogDescription>
                 </DialogHeader>
-                {/*<Tabs defaultValue="organization">*/}
-                {/*    <TabsList>*/}
-                {/*        <TabsTrigger value="organization">Organization</TabsTrigger>*/}
-                {/*        <TabsTrigger value="finances">Finances</TabsTrigger>*/}
-                {/*    </TabsList>*/}
-                {/*    <TabsContent value="organization">*/}
                 <Form {...editOrgForm}>
-                    <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
-                        <FormField
-                            control={editOrgForm.control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Organization Name</FormLabel>
-                                    <FormControl><Input {...field} data-testid="org-name-input" /></FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                    <form 
+                        onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} 
+                        className="flex max-h-[80vh] flex-col overflow-hidden"
+                    >
+                        <ScrollArea type={"always"}>
+                        <ScrollBar />
+                            <div className="flex flex-col gap-4 pr-4 space-y-8">
+                            <FormField
+                                control={editOrgForm.control}
+                                name="name"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Organization Name</FormLabel>
+                                        <FormControl><Input {...field} data-testid="org-name-input" /></FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
-                        <FormField
-                            control={editOrgForm.control}
-                            name="subdomain"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Public URL</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="text"
-                                            id="name"
-                                            autoComplete="name"
-                                            {...field}
-                                            onChange={(e) => {
-                                                const value = e.target.value.toLowerCase().replace(/\s+/g, "-");
-                                                field.onChange(value); // Update the form state with processed value
-                                            }}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={editOrgForm.control}
-                            name="contactEmail"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Contact Email</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="email"
-                                            placeholder="name@example.com"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={editOrgForm.control}
-                            name="founded"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Year Founded</FormLabel>
-                                    <Select
-                                        onValueChange={(value) => {
-                                            console.log("Year selected:", value);
-                                            field.onChange(`${value}-01-01`);
-                                        }}
-                                        defaultValue={field.value?.split("-")[0]}
-                                    >
+                            <FormField
+                                control={editOrgForm.control}
+                                name="subdomain"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Custom Comend URL</FormLabel>
+                                        <FormDescription>
+                                            {/* {`This will create your organization's unique Comend profile link (e.g., yourname.comend.io). Use a short name or abbreviation. This is not your external website.`} */}
+                                            {/* <br/> */}
+                                            {editOrgForm.watch("subdomain") &&
+                                                !editOrgForm.formState.errors.subdomain && (
+                                                    <>
+                                                        {`Your profile URL will be: ${editOrgForm
+                                                            .watch("subdomain")
+                                                            .toLowerCase()
+                                                            .replace(/\s+/g, "-")}.comend.io`}
+                                                    </>
+                                                )}
+                                        </FormDescription>
                                         <FormControl>
-                                            <SelectTrigger data-testid="founded-select-trigger">
-                                                <SelectValue placeholder="Select a year" />
-                                            </SelectTrigger>
+                                            <Input
+                                                type="text"
+                                                id="name"
+                                                autoComplete="name"
+                                                {...field}
+                                                onChange={(e) => {
+                                                    const value = e.target.value.toLowerCase().replace(/\s+/g, "-");
+                                                    field.onChange(value); // Update the form state with processed value
+                                                }}
+                                            />
                                         </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
-                                        {/* Radix renders this in a portal */}
-                                        <SelectContent data-testid="founded-select-content">
-                                            {years.map((year) => (
-                                                <SelectItem
-                                                    key={year}
-                                                    value={year.toString()}
-                                                    data-testid={`founded-option-${year}`}
-                                                >
-                                                    {year}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                            <FormField
+                                control={editOrgForm.control}
+                                name="contactEmail"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Contact Email</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="email"
+                                                placeholder="name@example.com"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
-                        <FormField
-                            control={editOrgForm.control}
-                            name="incorporationStatus"
-                            render={({field}) => (
-                                <FormItem className="space-y-3">
-                                    <FormLabel>What is your 501(c)(3) status?</FormLabel>
-                                    <FormControl>
-                                        <RadioGroup
+                            <FormField
+                                control={editOrgForm.control}
+                                name="founded"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Year Founded</FormLabel>
+                                        <Select
                                             onValueChange={(value) => {
-                                                console.log("Radio selected:", value);
-                                                field.onChange(value);
+                                                console.log("Year selected:", value);
+                                                field.onChange(`${value}-01-01`);
                                             }}
-                                            defaultValue={field.value}
-                                            value={field.value}
-                                            className="flex flex-col space-y-1"
+                                            defaultValue={field.value?.split("-")[0]}
                                         >
-                                            <FormItem className="flex items-center space-x-3 space-y-0">
-                                                <FormControl>
-                                                    <RadioGroupItem value="YES"/>
-                                                </FormControl>
-                                                <FormLabel className="font-normal">
-                                                    Yes, I have a 501(c)(3)
-                                                </FormLabel>
-                                            </FormItem>
-                                            <FormItem className="flex items-center space-x-3 space-y-0">
-                                                <FormControl>
-                                                    <RadioGroupItem value="INPROGRESS"/>
-                                                </FormControl>
-                                                <FormLabel className="font-normal">
-                                                    {`No, but I'm working on it`}
-                                                </FormLabel>
-                                            </FormItem>
-                                            <FormItem className="flex items-center space-x-3 space-y-0">
-                                                <FormControl>
-                                                    <RadioGroupItem value="NO"/>
-                                                </FormControl>
-                                                <FormLabel className="font-normal">
-                                                    {`No, I don't have a 501(c)(3)`}
-                                                </FormLabel>
-                                            </FormItem>
-                                        </RadioGroup>
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                                            <FormControl>
+                                                <SelectTrigger data-testid="founded-select-trigger">
+                                                    <SelectValue placeholder="Select a year" />
+                                                </SelectTrigger>
+                                            </FormControl>
 
-                        <MoneyInput
-                            form={editOrgForm}
-                            label="Total funds raised to date"
-                            description="The total amount of funding raised to date by your patient group."
-                            name="raised"
-                        />
+                                            {/* Radix renders this in a portal */}
+                                            <SelectContent data-testid="founded-select-content">
+                                                {years.map((year) => (
+                                                    <SelectItem
+                                                        key={year}
+                                                        value={year.toString()}
+                                                        data-testid={`founded-option-${year}`}
+                                                    >
+                                                        {year}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                        <MoneyInput
-                            form={editOrgForm}
-                            label="Total funds deployed to date"
-                            description="The total amount of funds deployed to research by your patient group."
-                            name="deployed"
-                        />
+                            <FormField
+                                control={editOrgForm.control}
+                                name="incorporationStatus"
+                                render={({field}) => (
+                                    <FormItem className="space-y-3">
+                                        <FormLabel>What is your 501(c)(3) status?</FormLabel>
+                                        <FormControl>
+                                            <RadioGroup
+                                                onValueChange={(value) => {
+                                                    console.log("Radio selected:", value);
+                                                    field.onChange(value);
+                                                }}
+                                                defaultValue={field.value}
+                                                value={field.value}
+                                                className="flex flex-col space-y-1"
+                                            >
+                                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <RadioGroupItem value="YES"/>
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">
+                                                        Yes, I have a 501(c)(3)
+                                                    </FormLabel>
+                                                </FormItem>
+                                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <RadioGroupItem value="INPROGRESS"/>
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">
+                                                        {`No, but I'm working on it`}
+                                                    </FormLabel>
+                                                </FormItem>
+                                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <RadioGroupItem value="NO"/>
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">
+                                                        {`No, I don't have a 501(c)(3)`}
+                                                    </FormLabel>
+                                                </FormItem>
+                                            </RadioGroup>
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
-                        <MoneyInput
-                            form={editOrgForm}
-                            label="Total annual research budget"
-                            description="The total amount of funding budgeted for research by your patient group."
-                            name="budget"
-                        />
+                            <MoneyInput
+                                form={editOrgForm}
+                                label="Total funds raised to date"
+                                description="The total amount of funding raised to date by your patient group."
+                                name="raised"
+                            />
 
-                        {/*<BiopharmaConsentSwitch organization={organization}/>*/}
+                            <MoneyInput
+                                form={editOrgForm}
+                                label="Total funds deployed to date"
+                                description="The total amount of funds deployed to research by your patient group."
+                                name="deployed"
+                            />
+
+                            <MoneyInput
+                                form={editOrgForm}
+                                label="Total annual research budget"
+                                description="The total amount of funding budgeted for research by your patient group."
+                                name="budget"
+                            />
+                            </div>
+                        </ScrollArea>
+
+                        <DialogFooter className="pt-4">
+                        <Button 
+                            type="button"
+                            variant={"secondary"}
+                            onClick={() => {handleClose({showUnsavedChanges: false})}}
+                        >
+                            Cancel
+                        </Button>
 
                         <Button
+                            variant={"cta"}
                             type="submit"
-                            onClick={() => console.log("Save (Org tab) clicked")}
                             data-testid="dialog-save-btn"
+                            disabled={isSaving}
                         >
-                            Save
+                            {isSaving 
+                                ? (
+                                    <div className="w-[81px] flex justify-center items-center">
+                                        <LoadingDots/>
+                                    </div>
+                                ) 
+                                : ("Save changes")
+                            }
                         </Button>
+                        </DialogFooter>
+
+                        <UnsavedChangesDialog 
+                            isSaving={isSaving}
+                            isClosing={isClosing}
+                            setIsClosing={setIsClosing}
+                            isOpen={unsavedChangesIsOpen}
+                            setIsOpen={setUnsavedChangesIsOpen}
+                            closeDialog={closeDialog}
+                            form={editOrgForm}
+                            formSubmit={onProfileFormSubmit}
+                        />
                     </form>
                 </Form>
-                {/*</TabsContent>*/}
-                {/*    <TabsContent value="finances">*/}
-                {/*        <Form {...editOrgForm}>*/}
-                {/*            <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">*/}
-                {/*                <MoneyInput*/}
-                {/*                    form={editOrgForm}*/}
-                {/*                    label="Total funds raised to date"*/}
-                {/*                    description="The total amount of funding raised to date by your patient group."*/}
-                {/*                    name="raised"*/}
-                {/*                />*/}
-                {/*                <MoneyInput*/}
-                {/*                    form={editOrgForm}*/}
-                {/*                    label="Total funds deployed to research"*/}
-                {/*                    description="The total amount of money deployed to research to date."*/}
-                {/*                    name="deployed"*/}
-                {/*                />*/}
-                {/*                <MoneyInput*/}
-                {/*                    form={editOrgForm}*/}
-                {/*                    label="Annual research budget"*/}
-                {/*                    description="The amount of money allocated to advancing research this year."*/}
-                {/*                    name="budget"*/}
-                {/*                />*/}
-                {/*                <Button type="submit" onClick={() => console.log("Save (Finances tab) clicked")}>*/}
-                {/*                    Save*/}
-                {/*                </Button>*/}
-                {/*            </form>*/}
-                {/*        </Form>*/}
-                {/*    </TabsContent>*/}
-                {/*</Tabs>*/}
             </DialogContent>
         </Dialog>
     );

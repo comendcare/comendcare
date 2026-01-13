@@ -11,7 +11,7 @@ import {Button} from "@comend/components/ui/button";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import React from "react";
 import {Badge} from "@comend/components/ui/badge";
-import { SeeMoreDescription } from "@comend/components/see-more-description";
+import {SeeMoreDescription} from "@comend/components/see-more-description";
 
 const EditPagProfileAboutCardDialog = dynamic(
     () => import("~web/components/edit-pag-profile-about-card-dialog"),
@@ -19,7 +19,7 @@ const EditPagProfileAboutCardDialog = dynamic(
         ssr: false,
         loading: () =>
             <Button variant="ghost" size="icon" aria-label="Owners only" disabled>
-                <LoadingDots color="#808080" />
+                <LoadingDots color="#808080"/>
             </Button>
     }
 );
@@ -52,21 +52,35 @@ export const PagProfileAboutCard = ({
                 <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="about-title">
                     About us
                 </CardTitle>
-                {organization && editable && <EditPagProfileAboutCardDialog organization={organization} />}
+                {organization && editable && <EditPagProfileAboutCardDialog organization={organization}/>}
             </CardHeader>
 
             <CardContent>
                 <div className="flex flex-col space-y-4">
                     <div className="space-y-2">
                         {/* <p data-testid="about-description-value">{organization?.description}</p> */}
-                        <SeeMoreDescription description={organization?.description ?? ""} />
+                        <SeeMoreDescription description={organization?.description ?? ""}/>
 
+                        {organization?.patientPriorities &&
+                            <>
+                                <h4 className="scroll-m-20 text-base font-semibold" data-testid="toi-heading">
+                                    Patient priorities
+                                </h4>
+                                <SeeMoreDescription description={organization?.patientPriorities ?? ""}/>
+                            </>
+                        }
+
+                        <div className="flex flex-row items-center justify-between w-full">
+                            <h4 className="scroll-m-20 text-base font-semibold" data-testid="toi-heading">
+                                Website
+                            </h4>
+                        </div>
                         <div className="max-w-full overflow-hidden" data-testid="about-website-section">
                             {(isPrivate || (!isPrivate && organization?.website)) &&
                                 (organization?.website ? (
                                     <Link
                                         onClick={() =>
-                                            mixpanelTrack("Organization Website Visited", { Website: organization.website! })
+                                            mixpanelTrack("Organization Website Visited", {Website: organization.website!})
                                         }
                                         href={
                                             organization.website!.startsWith("http")
@@ -126,7 +140,8 @@ export const PagProfileAboutCard = ({
                         <div className="flex flex-wrap justify-between items-baseline gap-x-2 gap-y-1">
                             <h4 className="scroll-m-20 text-base font-semibold">Members</h4>
                             {editable && (
-                                <Link href="/app/team" className="font-normal text-base hover:underline" data-testid="members-view-all-link">
+                                <Link href="/app/team" className="font-normal text-base hover:underline"
+                                      data-testid="members-view-all-link">
                                     View all
                                 </Link>
                             )}
@@ -136,7 +151,7 @@ export const PagProfileAboutCard = ({
                             visibleMembers.map((member, index) => (
                                 <div key={index} className="flex items-center space-x-4" data-testid="member-item">
                                     <Avatar>
-                                        <AvatarImage src={member.user.image || ""} />
+                                        <AvatarImage src={member.user.image || ""}/>
                                         <AvatarFallback>{nameToInitials(member.user.name ?? member.user.email)}</AvatarFallback>
                                     </Avatar>
                                     <div className="space-y-1">
@@ -145,7 +160,8 @@ export const PagProfileAboutCard = ({
                                         </h4>
                                         {member.title && (
                                             <div className="flex items-center">
-                                                <div className="text-xs text-muted-foreground" data-testid="member-title">
+                                                <div className="text-xs text-muted-foreground"
+                                                     data-testid="member-title">
                                                     {member.title}
                                                 </div>
                                             </div>

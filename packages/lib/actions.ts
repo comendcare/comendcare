@@ -47,6 +47,7 @@ import {
     editBiosampleForm,
     editDataToolForm,
     editDiseaseModelForm,
+    editOrgFormSchema,
     MemberRequestWithUserAndOrganization,
     Milestone,
     Option,
@@ -77,9 +78,26 @@ const PATHS = [
     "/app/research-plan",
 ]
 
-export const getSessionInfo = async () => {
-    const session = await getSession()
-    return session
+function toBiomarkersNested(raw: any) {
+    if (raw === undefined) return undefined; // field not sent => don't touch relation
+    if (raw === null) {
+        // explicit clear
+        return { deleteMany: {} as const };
+    }
+
+    if (!Array.isArray(raw)) return undefined;
+
+    const rows = raw
+        .map((b) => ({
+            name: String(b?.name ?? "").trim(),
+            type: String(b?.type ?? "").trim(),
+        }))
+        .filter((b) => b.name && b.type); // IMPORTANT: Biomarker.type is required in schema
+
+    return {
+        deleteMany: {} as const,           // replace-all semantics
+        createMany: { data: rows } as const,
+    };
 }
 
 export type Node = Prisma.NodeGetPayload<{}>
@@ -365,7 +383,7 @@ export const createOrganization = withAuth(
             }
         }
 
-        const name = formData.get("orgName") as string;
+        const name = formData.get("name") as string;
         const description = formData.get("description") as string;
         const subdomain = formData.get("subdomain") as string;
         const website = formData.get("website") as string | null;
@@ -736,13 +754,19 @@ export const updateOrganization = withOrganizationAuth(
             }
 
             if (key === "therapeuticsInDevelopment" || key === "therapeuticsOfInterest") {
-                data[key] = value.toString().split(",");
+                data[key] = value ? value.toString().split(",") : [];
                 return;
             }
 
             if (key === "metadata") {
                 data[key] = JSON.parse(value.toString());
                 return;
+            }
+
+            // allow removing values for string values
+            if (value === "") {
+                data[key] = null;
+                return
             }
 
             const n = Number(value);
@@ -1523,6 +1547,67 @@ export const deleteInvitation = withOrganizationAuth(
     ['owner', 'support']
 )
 
+export const declineAndDeleteClaimOrganizationInvitation = withAuth(
+    async (invitationId: string) => {
+        try {
+            const session = await getSession();
+            if (!session?.user?.id) {
+                throw new Error("You must be signed in to perform this action");
+            }
+
+            // Check if the invitation exists and is not already accepted
+            const invitation = await prisma.claimOrganizationInvitation.findUnique({
+                where: {
+                    id: invitationId,
+                },
+            });
+
+            if (invitation?.email !== session.user.email) {
+                return {
+                    success: false,
+                    error: "Error declining invitation: active user email does not match the invite email."
+                }
+            }
+
+            // try {
+            //     await customerIOTrack({
+            //         userId: session.user.id, // the person performing the decline
+            //         event: 'organization_invitation_declined',
+            //         timestamp: new Date(),
+            //         properties: {
+            //             invitation_id: invitation.id,
+            //             organization_id: invitation.organizationId,
+            //             invitee_email: invitation.email,
+            //             role: invitation.role,
+            //         },
+            //     });
+            // } catch (e) {
+            //     console.error('[CIO] track organization_invitation_declined failed:', e);
+            // }
+
+            // Ensure the composite key is valid or fallback to another unique identifier like `id`
+            const deletedInvitation = await prisma.claimOrganizationInvitation.delete({
+                where: {
+                    id: invitation.id
+                },
+            });
+
+            if (!deletedInvitation) {
+                return {success: false, error: "Failed to delete claim organization invitation. Request not found."};
+            }
+
+            revalidatePath("/app/team")
+            revalidatePath("/app/profile")
+
+            return {success: true, data: deletedInvitation};
+
+        } catch (error) {
+            console.error("Error deleting claim organization invitation:", error);
+            return {success: false, error: "Failed to delete claim organization invitation."};
+        }
+    }
+)
+
 export const declineAndDeleteInvitation = withAuth(
     async (invitationId: string) => {
         try {
@@ -2077,6 +2162,128 @@ export const createFollow = withAuth(
     }
 )
 
+export const acceptClaimOrganizationInvitation = withAuth(
+    async (invitationId: string) => {
+        try {
+            const session = await getSession();
+            if (!session?.user?.id) {
+                throw new Error("You must be signed in to perform this action");
+            }
+
+            // Check if the invitation exists and is not already accepted
+            const invitation = await prisma.claimOrganizationInvitation.findUnique({
+                where: {
+                    id: invitationId,
+                },
+                include: {
+                    organization: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                            subdomain: true,
+                            members: true,
+                            verified: true,
+                        },
+                    }
+                }
+            });
+
+            // extra auth logic
+            if (invitation?.email !== session.user.email) {
+                return {
+                    success: false,
+                    error: "Error accepting claim organization invitation: active user email does not match the invite email."
+                }
+            }
+
+            if (!invitation || invitation.accepted) {
+                console.log("No valid claim invitation found or it has already been accepted.");
+                return {success: false, error: "failed to follow organization"};
+            }
+
+            // Process invitation: create membership and delete memebership (mark invitation as accepted)
+            await prisma.$transaction([
+                prisma.member.create({
+                    data: {
+                        email: invitation.email,
+                        organizationId: invitation.organization.id,
+                        role: invitation.role || "member",
+                        userId: session.user.id,
+                    },
+                }),
+                prisma.claimOrganizationInvitation.delete({
+                    where: {
+                        id: invitationId,
+                    },
+                }),
+                prisma.user.update({
+                    where: {id: session.user.id},
+                    data: {activeOrganizationId: invitation.organization.id},
+                })
+            ]);
+
+            try {
+                // Optional but good: ensure org object exists / updated
+                await cioSyncOrg({
+                    subdomain: invitation.organization.subdomain,
+                    name: invitation.organization.name,
+                    description: undefined, // you didn't select it here
+                });
+
+                await cioUpsertOrgMember({
+                    orgSubdomain: invitation.organization.subdomain!, // should exist
+                    userId: session.user.id,
+                    role: invitation.role || "member",
+                    joinedAt: new Date(), // since you didn't fetch membership.createdAt here
+                });
+            } catch (e: any) {
+                console.error("[CIO] org membership sync failed (acceptInvitation)", {
+                    orgId: invitation.organization.id,
+                    subdomain: invitation.organization.subdomain,
+                    userId: session.user.id,
+                    error: String(e?.message || e),
+                });
+            }
+
+            // await customerIOTrack({
+            //     userId: session.user.id ?? undefined,   // if you have it
+            //     event: 'claim_organization_invitation_accepted',
+            //     timestamp: new Date(),
+            //     properties: {
+            //         invitation_id: invitation.id,        // 🔑 must match the “sent” event
+            //         organization_id: invitation.organizationId,
+            //         invitee_email: invitation.email,
+            //     },
+            // });
+
+            // await writeRawEvent({
+            //     provider: "app",
+            //     eventType: "user_accepted_claim_organization_invitation", // batch payload handled by your register
+            //     occurredAt: new Date(),
+            //     payload: {
+            //         orgId: invitation.organization.id,
+            //         orgName: invitation.organization.name,
+            //         orgSubdomain: invitation.organization.subdomain,
+            //         orgImage: invitation.organization.image,
+            //         userId: session.user.id,
+            //         userName: session.user.name,
+            //         userEmail: session.user.email,
+            //     },
+            // });
+
+            revalidatePath("/app/team")
+            revalidatePath("/app/profile")
+
+            return {success: true, data: invitation};
+        } catch (error) {
+            console.error();
+            logError("Error accepting claim organization invitation:", error);
+            return {success: false, error: "Failed to accept claim organization invitation. Please try again."};
+        }
+    }
+)
+
 export const acceptInvitation = withAuth(
     async (invitationId: string) => {
         try {
@@ -2247,16 +2454,30 @@ export const updateCondition = withOrganizationAuth(
                     condition = await prisma.condition.findUnique({ where: { slug: requestedSlug } });
                 }
 
+                const { biomarkers, name: incomingName, slug: incomingSlug, ...rest } = data ?? {};
+                const biomarkersNested = toBiomarkersNested(biomarkers);
+
+                const slug = incomingSlug ?? toKebabCase(String(incomingName || ""));
+                const name = incomingName ?? slug.replace(/-/g, " ");
+
                 if (condition) {
                     condition = await prisma.condition.update({
                         where: { id: condition.id },
-                        data,
+                        data: {
+                            ...rest,
+                            ...(biomarkersNested ? { biomarkers: biomarkersNested } : {}),
+                        },
                     });
                 } else {
-                    const slug = requestedSlug ?? toKebabCase(String(data.name || ""));
-                    const name = data.name ?? slug.replace(/-/g, " ");
                     condition = await prisma.condition.create({
-                        data: { ...data, slug, name },
+                        data: {
+                            ...rest,
+                            slug,
+                            name,
+                            ...(biomarkersNested?.createMany
+                                ? { biomarkers: { createMany: biomarkersNested.createMany } }
+                                : {}),
+                        },
                     });
                 }
 
@@ -2273,8 +2494,14 @@ export const updateCondition = withOrganizationAuth(
             const conditionId = link.conditionId;
 
             // Keep name/slug safety if you want; or simplify further
-            const { name: incomingName, slug: incomingSlug, ...restData } = data ?? {};
+            const {
+                name: incomingName,
+                slug: incomingSlug,
+                biomarkers,
+                ...restData
+            } = data ?? {};
 
+            const biomarkersNested = toBiomarkersNested(biomarkers);
             let targetConditionId = conditionId;
 
             if (incomingName) {
@@ -2298,14 +2525,18 @@ export const updateCondition = withOrganizationAuth(
 
             const safeScalarData: Record<string, any> = { ...restData };
 
-            if (incomingName && targetConditionId === conditionId) {
-                safeScalarData.name = incomingName;
-            }
-
             // ignore incomingSlug unless you explicitly want to allow changing it
             // if (incomingSlug && targetConditionId === conditionId) {
             //   safeScalarData.slug = incomingSlug;
             // }
+
+            if (incomingName && targetConditionId === conditionId) {
+                safeScalarData.name = incomingName;
+            }
+
+            if (biomarkersNested) {
+                safeScalarData.biomarkers = biomarkersNested;
+            }
 
             const updated = await prisma.condition.update({
                 where: { id: targetConditionId },
@@ -4917,8 +5148,8 @@ export const updateMilestones = withOrganizationAuth(
                 if (!existing) continue
 
                 const diffIds = (incoming: string[], existingIds: string[]) => ({
-                    toAdd: incoming.filter(id => !existingIds.includes(id)),
-                    toRemove: existingIds.filter(id => !incoming.includes(id)),
+                    toAdd: (incoming || []).filter(id => !existingIds.includes(id)),
+                    toRemove: (existingIds || []).filter(id => !incoming.includes(id)),
                 })
 
                 const typesDiff = diffIds(
@@ -5020,14 +5251,14 @@ export const updateMilestones = withOrganizationAuth(
 
                             attachments: {
                                 deleteMany: attachmentsDiff.toRemove.length ? { id: { in: attachmentsDiff.toRemove } } : undefined,
-                                create: milestone.attachments
+                                create: (milestone.attachments || [])
                                     .filter(a => attachmentsDiff.toAdd.includes(a.id))
                                     .map(a => ({ link: a.link, name: a.name ?? undefined })),
                             },
 
                             contacts: {
                                 deleteMany: contactsDiff.toRemove.length ? { id: { in: contactsDiff.toRemove } } : undefined,
-                                create: milestone.contacts
+                                create: (milestone.contacts || [])
                                     .filter(c => contactsDiff.toAdd.includes(c.id))
                                     .map(c => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
                             },

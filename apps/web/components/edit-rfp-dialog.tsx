@@ -46,32 +46,31 @@ const EditRFPFormLazy = dynamic(
 // (optional) warm the chunk on hover/focus
 const preloadEditRFPForm = () => { void import("./edit-rfp-form"); };
 
-export const NewRFPDialog = ({iconOnly = false}: {iconOnly?: boolean}) => {
+export const NewRFPDialog = ({
+    trigger,
+}: {
+    trigger: React.ReactNode,
+}) => {
     const [isOpen, setIsOpen] = useState(false)
+    const [isClosing, setIsClosing] = useState(false)
 
     const closeDialog = () => {
         setIsOpen(false)
+        setIsClosing(false)
     }
     
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            {iconOnly ? (
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button variant={"cta"} size={"icon"} onClick={() => setIsOpen(true)}>
-                            <Plus />
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        Create RFP
-                    </TooltipContent>
-                </Tooltip>
-            ) : (
-                <Button variant={"cta"} onClick={() => setIsOpen(true)}>
-                    <Plus />
-                    {`Create RFP`}
-                </Button>
-            )}
+        <Dialog 
+            open={isOpen} 
+            onOpenChange={(open) => {
+                if (!open) setIsClosing(true)
+                else setIsOpen(open)
+            }}
+        >
+            <DialogTrigger asChild onClick={() => setIsOpen(true)}>
+                {trigger}
+            </DialogTrigger>
+
             <DialogContent className="gap-0">
                 <DialogHeader className="pb-4">
                     <DialogTitle>
@@ -81,21 +80,42 @@ export const NewRFPDialog = ({iconOnly = false}: {iconOnly?: boolean}) => {
                         {`Create your RFP here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
-                {isOpen && <EditRFPFormLazy rfpData={{}} closeDialog={closeDialog} />}
+                {isOpen && (
+                    <EditRFPFormLazy 
+                        rfpData={{}} 
+                        closeDialog={closeDialog} 
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
+                    />
+                )}
             </DialogContent>
         </Dialog>
     )
 }
 
-export const EditRFPDialog = ({children, data}: {children: ReactNode, data: Partial<RFP>}) => {
+export const EditRFPDialog = ({
+    children, 
+    data,
+}: {
+    children: ReactNode, 
+    data: Partial<RFP>,
+}) => {
     const [isOpen, setIsOpen] = useState(false)
+    const [isClosing, setIsClosing] = useState(false)
 
     const closeDialog = () => {
         setIsOpen(false)
+        setIsClosing(false)
     }
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog 
+            open={isOpen} 
+            onOpenChange={(open) => {
+                if (!open) setIsClosing(true)
+                else setIsOpen(open)
+            }}
+        >
             <DialogTrigger asChild className="cursor-pointer">
                 <button className="cursor-pointer">{children}</button>
             </DialogTrigger>
@@ -109,7 +129,14 @@ export const EditRFPDialog = ({children, data}: {children: ReactNode, data: Part
                         {`Edit your RFP here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
-                {isOpen && <EditRFPFormLazy rfpData={data} closeDialog={closeDialog} />}
+                {isOpen && (
+                    <EditRFPFormLazy 
+                        rfpData={data} 
+                        closeDialog={closeDialog} 
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
+                    />
+                )}
             </DialogContent>
         </Dialog>
     )

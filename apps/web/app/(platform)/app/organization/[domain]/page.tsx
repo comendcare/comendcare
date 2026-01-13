@@ -75,6 +75,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
             published: true,
             name: true,
             description: true,
+            patientPriorities: true,
             contactEmail: true,
             logo: true,
             image: true,
@@ -168,6 +169,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
             diseaseCategories: true,
             causalGenes: true,
             associatedGenes: true,
+            biomarkers: true,
         })
         if (response.success) {
             conditions = response.data

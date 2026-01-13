@@ -166,7 +166,7 @@ export const getResearchPlansAnalytics = withAdminAuth(
             ? projectsBudgets.reduce((prev, curr) => prev + curr)
             : 0
 
-        const statuses = ['TODO', 'INPROGRESS', 'COMPLETED']
+        const statuses = ['PLANNED', 'INPROGRESS', 'COMPLETED']
 
         let projectsByStatus: {type: string, num: number}[] = statuses.map(status => ({
             type: status,
@@ -508,6 +508,32 @@ export const getOrganizationRFPsAnalytics = withAdminAuth(
             RFPsByOpenTo,
             RFPsByBudget
         };
+    }
+)
+
+export const getClaimedOrganizationsAnalytics = withAdminAuth(
+    async () => {
+        const totalOrganizations = await prisma.organization.count({})
+        const unclaimedOrganizations = await prisma.organization.count({
+            where: {
+                members: {
+                    some: {
+                        email: {
+                            not: {
+                                contains: "@comendcare.com",
+                                // case: "insensitive",
+                            },
+                        },
+                    },
+                },
+            }
+        })
+        const claimedOrganizations = totalOrganizations - unclaimedOrganizations
+
+        return {
+            totalOrganizations,
+            claimedOrganizations
+        }
     }
 )
 

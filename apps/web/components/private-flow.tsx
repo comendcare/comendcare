@@ -283,43 +283,43 @@ export const PrivateFlowView = ({
         return () => clearTimeout(timer)
     }, [width, selectedNodeIds, fitView])
 
-    useEffect(() => {
-        const startOnbordaAndRemoveToast = () => {
-            setSelectedNodeIds([])
-            startOnborda('research-plan-tour')
-            setOnboarded('research-plan-tour')
-            toast.dismiss()
-        }
+    // useEffect(() => {
+    //     const startOnbordaAndRemoveToast = () => {
+    //         setSelectedNodeIds([])
+    //         startOnborda('research-plan-tour')
+    //         setOnboarded('research-plan-tour')
+    //         toast.dismiss()
+    //     }
 
-        // Only start tour if user is new and is on the /app/research-plan page
-        if (pathname === '/app/research-plan' && !isOnboarded('research-plan-tour')) {
-            toast("Welcome to Comend!", {
-                id: "onborda",
-                duration: 300000,
-                position: "bottom-left",
-                description: `Would you like to take a quick tour?`,
-                action: (
-                    <div className="flex flex-col space-y-2 ml-4">
-                        <Button
-                            onClick={() => startOnbordaAndRemoveToast()}
-                            variant="secondary"
-                        >
-                            {`Yes please!`}
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                toast.dismiss()
-                                setOnboarded('research-plan-tour')
-                            }}
-                            variant="ghost"
-                        >
-                            {`No thanks!`}
-                        </Button>
-                    </div>
-                )
-            })
-        }
-    }, [localNodes, pathname, setSelectedNodeIds, startOnborda])
+    //     // Only start tour if user is new and is on the /app/research-plan page
+    //     if (!isOnboarded('research-plan-tour')) {
+    //         toast("Welcome to Comend!", {
+    //             id: "onborda",
+    //             duration: 300000,
+    //             position: "bottom-left",
+    //             description: `Would you like to take a quick tour?`,
+    //             action: (
+    //                 <div className="flex flex-col space-y-2 ml-4">
+    //                     <Button
+    //                         onClick={() => startOnbordaAndRemoveToast()}
+    //                         variant="secondary"
+    //                     >
+    //                         {`Yes please!`}
+    //                     </Button>
+    //                     <Button
+    //                         onClick={() => {
+    //                             toast.dismiss()
+    //                             setOnboarded('research-plan-tour')
+    //                         }}
+    //                         variant="ghost"
+    //                     >
+    //                         {`No thanks!`}
+    //                     </Button>
+    //                 </div>
+    //             )
+    //         })
+    //     }
+    // }, [localNodes, pathname, setSelectedNodeIds, startOnborda])
 
     const gridSize = 15
 

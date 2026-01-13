@@ -14,14 +14,17 @@ import {SearchParams} from "typesense/lib/Typesense/Documents";
 import {useEffect, useRef, useState} from "react";
 import {useSession} from "next-auth/react";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
-import {Button} from "@comend/components/ui/button";
-import {Lock, Globe, Trash} from "lucide-react"
+import {Button, buttonVariants} from "@comend/components/ui/button";
+import {Lock, Globe, Trash, Plus} from "lucide-react"
 import {setDiseaseModelsVisibility} from "@comend/lib/actions";
 import {DiseaseModelBulkImportDialog} from "./disease-model-bulk-import-dialog";
 import { Dialog, DialogPortal, DialogTrigger } from "@comend/components/ui/dialog";
 import { Row } from "@tanstack/react-table";
 import Image from "next/image";
 import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog";
+import { cn } from "@comend/lib/utils";
+import { PulsatingButton } from "@comend/components/ui/pulsating-button";
+import { NoResultsTemplate } from "@comend/components/no-results";
 
 export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
     data: DiseaseModel[],
@@ -34,6 +37,7 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1100)
     const [editingTool, setEditingTool] = useState<DiseaseModel | undefined>(undefined)
+    const [isClosing, setIsClosing] = useState(false)
     const parentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -128,7 +132,26 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                                 </>
                             )}
                             <DiseaseModelBulkImportDialog/>
-                            <NewToolDialog type={"diseaseModel"}/>
+                            <NewToolDialog 
+                                type={"diseaseModel"}
+                                trigger={(
+                                    data.length > 0
+                                        ? (
+                                            <Button variant="cta">
+                                                <Plus/>
+                                                {"Create disease model"}
+                                            </Button>
+                                        ) 
+                                        : (
+                                            <PulsatingButton
+                                                className={cn(buttonVariants({variant: 'cta'}))}
+                                            >
+                                                <Plus/>
+                                                {"Create disease model"}
+                                            </PulsatingButton>
+                                        )
+                                )}
+                            />
                         </>
                     )}
                 >
@@ -159,26 +182,19 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                             onRowClickCallback={(e: any, row: Row<any> | undefined) => setEditingTool(row?.original)}
                             showPagination={true}
                             noResultsOverride={(
-                                <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
-                                    <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
-                                        <h1 className="font-cal text-4xl">You do not have any Disease Model Tools</h1>
-                                        <Image
-                                            alt="No Disease Model Tools"
-                                            src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                                            width={300}
-                                            height={300}
-                                        />
-                                        <p className="text-lg text-stone-500">
-                                            A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
-                                        </p>
-                                        <NewToolDialog type={"diseaseModel"}/>
-                                    </div>
-                                </div>
+                                <NoResultsTemplate 
+                                    imgAlt="No Disease Model Tools"
+                                    src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                                    title="You do not have any disease models"
+                                    description="A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers."
+                                />
                             )}
                             interactiveDialog={(
                                 <Dialog 
                                     open={!!editingTool}
-                                    onOpenChange={(open) => !open && setEditingTool(undefined)}
+                                    onOpenChange={(open) => {
+                                        if (!open) setIsClosing(true)
+                                    }}
                                 >
                                     <DialogPortal>
                                         <div onClick={(e) => e.stopPropagation()}>
@@ -187,7 +203,12 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                                                     key={editingTool?.id}
                                                     data={editingTool} 
                                                     type={'diseaseModel'}
-                                                    closeDialog={() => {setEditingTool(undefined)}}
+                                                    isClosing={isClosing}
+                                                    setIsClosing={setIsClosing}
+                                                    closeDialog={() => {
+                                                        setEditingTool(undefined)
+                                                        setIsClosing(false)
+                                                    }}
                                                 />
                                             )}
                                         </div>

@@ -20,7 +20,11 @@ import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
     DialogClose,
+    DialogContent,
+    DialogDescription,
     DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@comend/components/ui/dialog"
 import { DISEASE_MODEL_TYPE_OPTIONS, editDiseaseModelForm } from "@comend/lib/types"
 import type {CreateFacilityRequest, Prisma} from "@prisma/client"
@@ -44,15 +48,93 @@ import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog"
 import { SubmitCreateRequest } from "./create-facility-request-button"
 import { Badge } from "@comend/components/ui/badge"
 import { badgeVariants } from "@comend/components/ui/badge"
+import { Session } from "next-auth"
+import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
 
 export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
+export const createOrUpdateDiseaseModel = async (
+    session: Session, 
+    toolData: any, 
+    values: z.infer<typeof editDiseaseModelForm>, 
+    createFacilityRequests: CreateFacilityRequest[]
+) => {
+    try {
+        if (toolData.id) {
+            const updatedAsset = await updateDiseaseModel(session.user.organizationId, values, toolData.id)
+            await revalidate("/app/tools/disease-model")
+            // router.refresh()
+
+            mixpanelTrack("Disease Model Updated", {
+                "ID": updatedAsset.id,
+                // "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
+                // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                // we flatten them into a single list that can be parsed
+                // "Linked Project Types": (updatedAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
+                //     (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
+                // )
+            })
+
+            // if (closeDialog) closeDialog(updatedAsset)
+            toast.success(
+                "Tool updated successfully!",
+                {position: "bottom-left"}
+            )
+
+            return updatedAsset
+        } else {
+            const newAsset = await createDiseaseModel(session.user.organizationId, values)
+            for (let i = 0; i < createFacilityRequests?.length; i++) {
+                await updateCreateFacilityRequest(
+                    session?.user?.organizationId,
+                    {
+                        id: createFacilityRequests[i].id,
+                        name: createFacilityRequests[i].name,
+                        diseaseModelId: newAsset.id
+                    }
+                )
+            }
+            await revalidate("/app/tools/disease-model")
+            // router.refresh()
+
+            mixpanelTrack("Disease Model Created", {
+                "ID": newAsset.id,
+                // "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
+                // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
+                // we flatten them into a single list that can be parsed
+                // "Linked Project Types": (newAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
+                //     (milestone?.types || []).map((type: any)=> type.milestoneType.label || type.milestoneType.id)
+                // )
+            })
+
+            // if (closeDialog) closeDialog(newAsset)
+
+            toast.success(
+                "Tool created successfully!",
+                {position: "bottom-left"}
+            )
+
+            return newAsset
+        }
+    } catch (error) {
+        console.error("Error creating or updating tool:", error);
+        toast.error(
+            "Failed to create or update tool.",
+            {position: "bottom-left"}
+        )
+    }
+}
+
 export function EditDiseaseModelToolForm({
     toolData,
-    closeDialog
+    closeDialog,
+    isClosing,
+    setIsClosing,
 }: {
     toolData: any,
-    closeDialog: (newDiseaseModel?: any) => void
+    closeDialog: (newDiseaseModel?: any) => void,
+    isClosing: boolean,
+    setIsClosing: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const initializing = useRef(true)
     const router = useRouter()
@@ -62,9 +144,11 @@ export function EditDiseaseModelToolForm({
     const [isSaving, setIsSaving] = useState(false)
     const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(toolData.createFacilityRequests || [])
     const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
-
+    const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
+    
     const form = useForm<z.infer<typeof editDiseaseModelForm>>({
-        mode: "onChange",
+        mode: "onSubmit",
+        reValidateMode: "onSubmit",
         resolver: zodResolver(editDiseaseModelForm),
         defaultValues: {
             id: toolData?.id || undefined,
@@ -109,6 +193,9 @@ export function EditDiseaseModelToolForm({
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editDiseaseModelForm>, createFacilityRequests: CreateFacilityRequest[]) => {
+        const isValid = form.trigger()
+        if (!isValid) return // stops submission
+        
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(
@@ -118,67 +205,29 @@ export function EditDiseaseModelToolForm({
             return;
         }
 
-        try {
-            if (toolData.id) {
-                const updatedAsset = await updateDiseaseModel(session.user.organizationId, values, toolData.id)
-                await revalidate("/app/tools/disease-model")
-                router.refresh()
+        const createdOrUpdatedDiseaseModel = await createOrUpdateDiseaseModel(session, toolData, values, createFacilityRequests)
+        closeDialog(createdOrUpdatedDiseaseModel)
+    }
 
-                mixpanelTrack("Disease Model Updated", {
-                    "ID": updatedAsset.id,
-                    // "Linked Projects": (updatedAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
-                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
-                    // we flatten them into a single list that can be parsed
-                    // "Linked Project Types": (updatedAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
-                    //     (milestone?.types || []).map((type: any) => type.milestoneType.label || type.milestoneType.id)
-                    // )
-                })
-
-                if (closeDialog) closeDialog(updatedAsset)
-                toast.success(
-                    "Tool updated successfully!",
-                    {position: "bottom-left"}
-                )
-            } else {
-                const newAsset = await createDiseaseModel(session.user.organizationId, values)
-                for (let i = 0; i < createFacilityRequests.length; i++) {
-                    await updateCreateFacilityRequest(
-                        session?.user?.organizationId,
-                        {
-                            id: createFacilityRequests[i].id,
-                            name: createFacilityRequests[i].name,
-                            diseaseModelId: newAsset.id
-                        }
-                    )
-                }
-                await revalidate("/app/tools/disease-model")
-                router.refresh()
-
-                mixpanelTrack("Disease Model Created", {
-                    "ID": newAsset.id,
-                    // "Linked Projects": (newAsset?.milestones || []).map(({ milestone }: {milestone: any}) => milestone),
-                    // NOTE: Mixpanel doesn't support parsing nested objects, so in order to access types properly
-                    // we flatten them into a single list that can be parsed
-                    // "Linked Project Types": (newAsset?.milestones || []).flatMap(({ milestone }: {milestone: any}) =>
-                    //     (milestone?.types || []).map((type: any)=> type.milestoneType.label || type.milestoneType.id)
-                    // )
-                })
-
-                if (closeDialog) closeDialog(newAsset)
-
-                toast.success(
-                    "Tool created successfully!",
-                    {position: "bottom-left"}
-                )
-            }
-        } catch (error) {
-            console.error("Error creating or updating tool:", error);
-            toast.error(
-                "Failed to create or update tool.",
-                {position: "bottom-left"}
-            )
+    const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
+        if (showUnsavedChanges && Object.keys(form.formState.dirtyFields)?.length > 0) {
+            // form is dirty, give user the option to save/discard unsaved changes
+            setUnsavedChangesIsOpen(true)
+        } else {
+            // form is not dirty, close regularly
+            closeDialog()
         }
     }
+
+    useEffect(() => {
+        if (isClosing) handleClose({showUnsavedChanges: true}) // external close, handle closing with option for saving unsaved changes
+    }, [isClosing])
+
+    useEffect(() => {
+        // if the user has closed the unsaved changes dialog, end the isClosing state of all other dialogs
+        // all dialogs should be either fully closed or fully open
+        if (!unsavedChangesIsOpen) setIsClosing(false)
+    }, [unsavedChangesIsOpen])
 
     const handleGeneAsyncSearch = async (query: string) => {
         const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
@@ -248,7 +297,7 @@ export function EditDiseaseModelToolForm({
             }
 
             // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away
-            if (Object.keys(toolData).length > 0) form.trigger()
+            if (toolData.id && Object.keys(toolData)?.length > 0) form.trigger()
 
             initializing.current = false
         }
@@ -261,12 +310,13 @@ export function EditDiseaseModelToolForm({
 
     return (
         <Form {...form}>
-            <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
+            <form
+                onSubmit={form.handleSubmit((values) => handleFormSubmit(values, createRequests))}
+                className="flex max-h-[80vh] flex-col overflow-hidden"
+            >
+                <ScrollArea type={"always"}>
                 <ScrollBar />
-                <form
-                    // onSubmit={form.handleSubmit(handleFormSubmit)}
-                    className="space-y-6 m-1 pb-12"
-                >
+                <div className="flex flex-col gap-4 pr-4">
                     <FormItem className="flex gap-2 items-center">
                         <FormLabel className="flex items-center gap-1 grow">
                             Visibility
@@ -524,45 +574,59 @@ export function EditDiseaseModelToolForm({
                             </FormItem>
                         )}
                     />
-                </form>
-            </ScrollArea>
+                </div>
+                </ScrollArea>
 
-            <DialogFooter className="pt-1">
-                <DialogClose asChild>
+                <DialogFooter className="pt-4">
                     <Button 
+                        type="button"
                         variant={"secondary"} 
-                        onClick={() => {if (closeDialog) closeDialog()}}
+                        onClick={() => {handleClose({showUnsavedChanges: false})}}
                     >
                         Cancel
                     </Button>
-                </DialogClose>
 
-                <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
-                    Delete tool
-                </Button>
-                <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                    <DeleteDiseaseModelDialog toolIds={[toolData.id]} closeDialog={closeDialog}/>
-                </Dialog>
-                <div className="bg-white rounded-md p-0">
-                    <Button
-                        disabled={!form.formState.isValid || isSaving}
-                        variant={"cta"}
-                        onClick={(e) => {
-                            e.preventDefault()
-                            handleFormSubmit(form.getValues(), createRequests)
-                        }}
-                    >
-                        {isSaving 
-                            ? (
-                                <div className="w-[81px] flex justify-center items-center">
-                                    <LoadingDots/>
-                                </div>
-                            ) 
-                            : ("Save changes")
-                        }
-                    </Button>
-                </div>
-            </DialogFooter>
+                    {toolData.id && (
+                        <>
+                        <Button type="button" variant="destructive" onClick={() => setDeleteIsOpen(true)}>
+                            Delete tool
+                        </Button>
+
+                        <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+                            <DeleteDiseaseModelDialog toolIds={[toolData.id]} closeDialog={() => handleClose({showUnsavedChanges: false})}/>
+                        </Dialog>
+                        </>
+                    )}
+
+                    <div className="bg-white rounded-md p-0">
+                        <Button
+                            variant={"cta"}
+                            type="submit"
+                            disabled={isSaving}
+                        >
+                            {isSaving 
+                                ? (
+                                    <div className="w-[81px] flex justify-center items-center">
+                                        <LoadingDots/>
+                                    </div>
+                                ) 
+                                : ("Save changes")
+                            }
+                        </Button>
+                    </div>
+                </DialogFooter>
+
+                <UnsavedChangesDialog 
+                    isSaving={isSaving}
+                    isClosing={isClosing}
+                    setIsClosing={setIsClosing}
+                    isOpen={unsavedChangesIsOpen}
+                    setIsOpen={setUnsavedChangesIsOpen}
+                    closeDialog={closeDialog}
+                    form={form}
+                    formSubmit={handleFormSubmit}
+                />
+            </form>
         </Form>
     )
 }

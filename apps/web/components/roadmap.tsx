@@ -389,7 +389,7 @@ export function Roadmap({
                             // onClick={(e) => {e.stopPropagation(); e.preventDefault()}}
                             defaultSize={40}
                             minSize={25}
-                            className="bg-white h-full flex flex-col min-w-[400px]"
+                            className="bg-white h-full flex flex-col min-w-[400px] onborda-editing-project-details"
                         >
                             <MilestoneDetailsPanel
                                 organization={organization}
@@ -569,7 +569,8 @@ const MilestoneDetailsPanel = ({
     clinicalDatasetOptions,
     rfpOptions,
     milestoneTypeOptions,
-    handlePanelChange
+    handlePanelChange,
+    className,
 }: {
     organization: Organization | undefined,
     remountKey: number,
@@ -580,7 +581,8 @@ const MilestoneDetailsPanel = ({
     clinicalDatasetOptions: Partial<Tool>[],
     rfpOptions: Partial<RFP>[],
     milestoneTypeOptions: Partial<MilestoneType>[],
-    handlePanelChange: (open: boolean) => void
+    handlePanelChange: (open: boolean) => void,
+    className?: string,
 }) => {
     const { 
         selectedNodeIds, 
@@ -612,6 +614,7 @@ const MilestoneDetailsPanel = ({
                 rfpOptions={rfpOptions}
                 milestoneTypeOptions={milestoneTypeOptions}
                 onClose={handleClose}
+                className={className}
             />
         )
     }
@@ -816,6 +819,7 @@ const RoadmapHeader = ({
                                 setNewMilestoneIsOpen(true)
                             }}
                             size={isCollapsed ? "icon" : "default"}
+                            className="onborda-select-a-template"
                         >
                             <LayoutTemplate />
                             {!isCollapsed && <p>{`Templates`}</p>}
@@ -842,6 +846,7 @@ const RoadmapHeader = ({
                             }} 
                             variant={"cta"}
                             size={isCollapsed ? "icon" : "default"}
+                            className="onborda-create-a-project"
                         >
                             <Plus />
                             {/* If the header is < size MD, collapse the button to just the icon (hide text) */}

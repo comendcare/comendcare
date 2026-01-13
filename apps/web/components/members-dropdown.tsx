@@ -175,8 +175,10 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
             }}
         >
             <DropdownMenu modal={false}>
-                <DropdownMenuTrigger>
-                    <Ellipsis/>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="p-2 h-fit">
+                        <Ellipsis />
+                    </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     {
@@ -291,7 +293,9 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                                 />
                             }
 
-                            <Button type="submit">Save</Button>
+                            <div className="w-full flex justify-end">
+                                <Button type="submit" variant={'cta'}>Save</Button>
+                            </div>
                         </form>
                     </Form>
                 </DialogHeader>

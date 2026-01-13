@@ -125,6 +125,21 @@ model Member {
   @@unique([userId, organizationId])
 }
 
+model ClaimOrganizationInvitation {
+  id             String       @id @default(cuid())
+  email          String /// @encrypted
+  emailHash      String? /// @encryption:hash(email)
+  role           String       @default("owner") @db.VarChar
+  organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now()) @updatedAt
+  accepted       Boolean      @default(false)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  metadata       Json?
+
+  @@unique([emailHash, organizationId])
+}
+
 model Invitation {
   id             String       @id @default(cuid())
   email          String /// @encrypted
@@ -707,6 +722,7 @@ model Organization {
   published                     Boolean                        @default(true)
   name                          String?
   description                   String?                        @db.Text
+  patientPriorities             String?                        @db.Text
   contactEmail                  String? /// @encrypted
   contactEmailHash              String? /// @encryption:hash(contactEmail)
   logo                          String?                        @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
@@ -761,6 +777,7 @@ model Organization {
   metadata                      Json?
   diseaseModel                  DiseaseModel[]
   subscriptions                 Subscription[]
+  claimOrganizationInvitations  ClaimOrganizationInvitation[]
 
   @@index([userId])
 }
@@ -835,6 +852,18 @@ model Condition {
   metadata                    Json?
   diseaseModel                DiseaseModel[]
   associatedConditions        String[]
+  biomarkers                  Biomarker[]
+}
+
+model Biomarker {
+  id   String @id @default(uuid())
+  name String
+  type String
+
+  conditionId String
+  condition   Condition @relation(fields: [conditionId], references: [id], onDelete: Cascade)
+
+  @@index([conditionId])
 }
 
 model ConditionToOrganization {

@@ -15,6 +15,7 @@ import { FeatureFlagsProvider } from "@comend/components/biorepo/advanced-data-t
 import { ToolCounts } from "./profile-page";
 import { useRouter } from "next/navigation";
 import Image from "next/image"
+import {NoResultsTemplate} from "@comend/components/no-results"
 
 const getInitState = (
     counts: {
@@ -82,10 +83,6 @@ export const PAGProfileToolsCard = ({
     }, [])
 
     useEffect(() => {
-        console.log(`input data changed`)
-        console.log(biosamples)
-        console.log(diseaseModels)
-        console.log(clinicalDatasets)
         setIsInitialized(true)
     }, [biosamples, diseaseModels, clinicalDatasets])
 
@@ -220,20 +217,12 @@ export const PAGProfileToolsCard = ({
                 }
 
                 {(toolCounts.biosampleCount === 0 && toolCounts.diseaseModelCount === 0 && toolCounts.clinicalDatasetCount == 0) && (
-                    <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8 px-auto">
-                        <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
-                            <h1 className="font-cal text-4xl">You do not have any Tools</h1>
-                            <Image
-                                alt="No Data Tools"
-                                src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                                width={300}
-                                height={300}
-                            />
-                            <p className="text-lg text-stone-500">
-                                A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, biosamples.
-                            </p>
-                        </div>
-                    </div>
+                    <NoResultsTemplate 
+                        imgAlt="No Data Tools"
+                        src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                        title="Your organization does not have any public tools"
+                        description="A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, biosamples."
+                    />
                 )}
             </CardContent>
         </Card>

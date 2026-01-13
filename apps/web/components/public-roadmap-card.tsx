@@ -7,16 +7,16 @@ import {PublicFlowView} from "./public-flow";
 import {PublicTimelineView} from "./public-timeline";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/tabs";
 import {Button} from "@comend/components/ui/button";
-import {ChevronsUpDown, FileText, Globe, Lock, Megaphone, Microscope, Pencil, Plus, Variable} from "lucide-react";
+import {ChevronsUpDown, FileText, Globe, Lock, Pencil} from "lucide-react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@comend/components/ui/table";
-import {Milestone, milestoneCategories, MODALITIES, Option, RESEARCH_PLAN_TYPES, Roadmap} from "@comend/lib/types";
+import {Milestone, Option, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
 import {Badge} from "@comend/components/ui/badge";
 import type {Organization} from "@prisma/client";
-import {PrivateNoResearchPlansColumn, PrivateNoResearchPlansRow, PublicNoResearchPlans} from "./no-research-plans";
 import {NoProjects} from "./no-projects";
-import {FunctionComponent, ReactElement, useState} from "react";
+import {useState} from "react";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import { PropertyBadge } from "@comend/components/property-badge";
+import { NoResultsTemplate } from "@comend/components/no-results";
 
 export const RoadmapsCard = ({
                                  roadmaps,
@@ -54,12 +54,25 @@ export const RoadmapsCard = ({
                         isPrivate={false}
                         roadmaps={roadmaps}
                         rowClickCallback={(roadmap) =>
-                            router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap.id}` : '#')
+                            router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap?.id}` : '#')
                         }
                     />
                     : (pathname === "/app/profile"
-                            ? <PrivateNoResearchPlansColumn/>
-                            : <PublicNoResearchPlans organizationName={organization.name}/>
+                            ? (
+                                <NoResultsTemplate 
+                                    imgAlt="No research plans"
+                                    src="https://illustrations.popsy.co/gray/studying.svg"
+                                    title="Your organization does not have any public research plans yet."
+                                />
+                            )
+                            : (
+                                <NoResultsTemplate 
+                                    imgAlt="No research plans"
+                                    src="https://illustrations.popsy.co/gray/studying.svg"
+                                    title="No research plans yet"
+                                    description={organization.name ? `${organization.name} doesn't have any public research plans yet.`: `This organization doesn't have any public research plans yet.`}
+                                />
+                            )
                     )
                 }
             </CardContent>
@@ -90,7 +103,14 @@ export const RoadmapCard = ({
 }) => {
     const params = useSearchParams()
     if (!roadmap) {
-        return <PublicNoResearchPlans/>
+        return (
+            <NoResultsTemplate 
+                imgAlt="No research plans"
+                src="https://illustrations.popsy.co/gray/studying.svg"
+                title="No research plans yet"
+                description={`This organization doesn't have any public research plans yet.`}
+            />
+        )
     }
 
     if (roadmap?.milestones && roadmap.milestones.length <= 0) {
@@ -230,8 +250,13 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback, isPrivate}: {
                     </CollapsibleTableGroup>
                 )}
                 {roadmaps.length <= 0 && (
-                    <div className="p-4">
-                        <PrivateNoResearchPlansRow/>
+                    <div className="w-full flex justify-center p-4">
+                        <NoResultsTemplate 
+                            imgAlt="No research plans"
+                            src="https://illustrations.popsy.co/gray/studying.svg"
+                            title="No research plans yet!"
+                            description="Your organization does not have any public research plans yet."
+                        />
                     </div>
                 )}
             </TableBody>
@@ -246,7 +271,7 @@ export const RoadmapRow = ({roadmap, rowClickCallback, isPrivate}: {roadmap: any
 
     return (
         <TableRow 
-            key={roadmap.id} 
+            key={roadmap?.id} 
             className="cursor-pointer px-0"
             onClick={() => rowClickCallback(roadmap)}
         >

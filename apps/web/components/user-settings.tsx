@@ -53,7 +53,7 @@ export default function UserSettings() {
         <div className="flex flex-col space-y-4">
             <div>
                 <h2 className="text-md font-semibold leading-6 text-gray-900">
-                    Permanent Settings
+                    Permanent settings
                 </h2>
                 <p className="text-sm leading-6 text-gray-500">
                     Anything you change here cannot be undone.
@@ -105,7 +105,7 @@ export default function UserSettings() {
             <div className="border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between gap-4">
                 <span className="flex flex-grow flex-col">
                     <span className="text-sm font-medium leading-6 text-gray-900">
-                        Delete Account
+                        Delete account
                     </span>
                     <span className="text-sm text-gray-500">
                         You will be logged out and logging in with the same account will

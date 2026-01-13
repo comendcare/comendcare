@@ -92,6 +92,7 @@ import {Separator} from "@comend/components/ui/separator"
 import dynamic from "next/dynamic";
 import { SubmitCreateRequest } from "./create-facility-request-button"
 import { createCreateFacilityRequest } from "@comend/lib/actions"
+import { NewToolDialog } from "./edit-tool-dialog"
 
 type PlateEditorProps = {
     value: any[];
@@ -182,7 +183,8 @@ export function EditMilestoneForm({
                                       clinicalDatasetOptions,
                                       rfpOptions,
                                       milestoneTypeOptions,
-                                      onClose
+                                      onClose,
+                                      className,
                                   }: {
     organization: Organization | undefined
     milestoneData: Milestone
@@ -192,7 +194,8 @@ export function EditMilestoneForm({
     clinicalDatasetOptions: Partial<Tool>[],
     rfpOptions: Partial<RFP>[],
     milestoneTypeOptions: Partial<MilestoneType>[],
-    onClose: () => void
+    onClose: () => void,
+    className?: string,
 }) {
     const {setMilestone, savingList} = useRoadmapStore(useShallow(selector))
     const initializing = useRef(true)
@@ -211,6 +214,7 @@ export function EditMilestoneForm({
     const [hasBudget, setHasBudget] = useState(milestoneData?.budget !== undefined && milestoneData?.budget !== null)
     const [hasStartDate, setHasStartDate] = useState(milestoneData?.startDate || false)
     const [hasEndDate, setHasEndDate] = useState(milestoneData?.endDate || false)
+    const [isClosing, setIsClosing] = useState(false)
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -557,7 +561,7 @@ export function EditMilestoneForm({
                 <form
                     onKeyDown={handleKeyDown}
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
-                    className="h-full max-h-full flex flex-col gap-2 2xl:gap-4 p-4 2xl:p-8"
+                    className={cn("h-full max-h-full flex flex-col gap-2 2xl:gap-4 p-4 2xl:p-8", className)}
                 >
                     <Tabs 
                         value={tab} 
@@ -594,7 +598,7 @@ export function EditMilestoneForm({
                                 {/*<TabsTrigger className="relative data-[state=active]:bg-secondary" value="publications">*/}
                                 {/*    Publications*/}
                                 {/*</TabsTrigger>*/}
-                                <TabsTrigger className="relative data-[state=active]:bg-secondary" value="projects">
+                                <TabsTrigger className="relative data-[state=active]:bg-secondary onborda-recommendations" value="projects">
                                     Similar projects
                                 </TabsTrigger>
                             </TabsList>
@@ -721,7 +725,7 @@ export function EditMilestoneForm({
                                                                     }}
                                                                     onClick={() => setCreateBiosampleIsOpen(true)}
                                                                 >
-                                                                    {`+ Create biosample`}
+                                                                    {`+ Create patient biosample`}
                                                                 </Button>
                                                                 <Button
                                                                     value={undefined}
@@ -733,7 +737,7 @@ export function EditMilestoneForm({
                                                                     }}
                                                                     onClick={() => setCreateDiseaseModelIsOpen(true)}
                                                                 >
-                                                                    {`+ Create Disease Model`}
+                                                                    {`+ Create disease model`}
                                                                 </Button>
                                                                 <Button
                                                                     value={undefined}
@@ -745,7 +749,7 @@ export function EditMilestoneForm({
                                                                     }}
                                                                     onClick={() => setCreateClinicalDatasetIsOpen(true)}
                                                                 >
-                                                                    {`+ Create Clinical Dataset`}
+                                                                    {`+ Create clinical dataset`}
                                                                 </Button>
                                                             </div>
                                                         )}
@@ -1171,54 +1175,87 @@ export function EditMilestoneForm({
                 </form>
             </Form>
 
-            <Dialog open={createBiosampleIsOpen} onOpenChange={setCreateBiosampleIsOpen}>
+            <Dialog 
+                open={createBiosampleIsOpen} 
+                onOpenChange={(open) => {
+                    if (!open) setIsClosing(true)
+                }}
+            >
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
-                            Create biosample tool
+                            Create patient biosample
                         </DialogTitle>
                         <DialogDescription>
                             {`Create your Tool here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
                     <EditBiosampleToolForm
-                        toolData={{}}
-                        closeDialog={(newBiosample) => {
-                            setCreateBiosampleIsOpen(false)
-
-                            if (newBiosample) {
-                                form.setValue("tools", [
-                                    ...(form.getValues("tools") || []),
-                                    {
-                                        value: newBiosample.id,
-                                        type: 'Biosamples',
-                                        // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
-                                        label: `${newBiosample.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => newBiosample?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
-                                        biosample: newBiosample,
-                                        icon: 'test-tube-diagonal',
-                                    }
-                                ])
+                        // toolData={{}}
+                        toolData={{
+                            milestones: [
+                                {
+                                    milestoneId: milestoneData.id,
+                                    rfpId: nanoid(),
+                                    milestone: milestoneData
+                                } as any
+                            ]
+                        }}
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
+                        closeDialog={(formValues: any) => {
+                            if (formValues) {
+                                if (formValues) {
+                                    form.setValue("tools", [
+                                        ...(form.getValues("tools") || []),
+                                        {
+                                            value: formValues.id,
+                                            type: 'Biosamples',
+                                            // img: `https://api.dicebear.com/8.x/shapes/svg?seed=${newBiosample.donorId}`,
+                                            label: `${formValues.id} - ${(BIOSAMPLE_TYPE_OPTIONS.filter(option => formValues?.types?.includes(option.value)))?.map(option => option?.label)?.join(', ')}`,
+                                            biosample: formValues,
+                                            icon: 'test-tube-diagonal',
+                                        }
+                                    ])
+                                }
                             }
+
+                            setCreateBiosampleIsOpen(false)
+                            setIsClosing(false)
                         }}
                     />
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={createDiseaseModelIsOpen} onOpenChange={setCreateDiseaseModelIsOpen}>
+            <Dialog 
+                open={createDiseaseModelIsOpen} 
+                onOpenChange={(open) => {
+                    if (!open) setIsClosing(true)
+                }}
+            >
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
-                            Create Disease Model Tool
+                            Create disease model
                         </DialogTitle>
                         <DialogDescription>
                             {`Create your Tool here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
                     <EditDiseaseModelToolForm
-                        toolData={{}}
+                        // toolData={{}}
+                        toolData={{
+                            milestones: [
+                                {
+                                    milestoneId: milestoneData.id,
+                                    rfpId: nanoid(),
+                                    milestone: milestoneData
+                                } as any
+                            ]
+                        }}
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
                         closeDialog={(newDiseaseModel) => {
-                            setCreateDiseaseModelIsOpen(false)
-
                             if (newDiseaseModel) {
                                 form.setValue("tools", [
                                     ...(form.getValues("tools") || []),
@@ -1231,26 +1268,43 @@ export function EditMilestoneForm({
                                     }
                                 ])
                             }
+
+                            setCreateDiseaseModelIsOpen(false)
+                            setIsClosing(false)
                         }}
                     />
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={createClincalDatasetIsOpen} onOpenChange={setCreateClinicalDatasetIsOpen}>
+            <Dialog 
+                open={createClincalDatasetIsOpen}
+                onOpenChange={(open) => {
+                    if (!open) setIsClosing(true)
+                }}
+            >
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
-                            Create Data Tool
+                            Create clinical dataset
                         </DialogTitle>
                         <DialogDescription>
                             {`Create your Tool here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
                     <EditClincalDatasetForm
-                        toolData={{}}
+                        // toolData={{}}
+                        toolData={{
+                            milestones: [
+                                {
+                                    milestoneId: milestoneData.id,
+                                    rfpId: nanoid(),
+                                    milestone: milestoneData
+                                } as any
+                            ]
+                        }}
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
                         closeDialog={(newDatasample) => {
-                            setCreateClinicalDatasetIsOpen(false)
-
                             if (newDatasample) {
                                 form.setValue("tools", [
                                     ...(form.getValues("tools") || []),
@@ -1263,12 +1317,20 @@ export function EditMilestoneForm({
                                     }
                                 ])
                             }
+
+                            setCreateClinicalDatasetIsOpen(false)
+                            setIsClosing(false)
                         }}
                     />
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={createRFPIsOpen} onOpenChange={setCreateRFPIsOpen}>
+            <Dialog 
+                open={createRFPIsOpen} 
+                onOpenChange={(open) => {
+                    if (!open) setIsClosing(true)
+                }}
+            >
                 <DialogContent className="gap-0">
                     <DialogHeader className="pb-4">
                         <DialogTitle>
@@ -1288,15 +1350,18 @@ export function EditMilestoneForm({
                                 } as any
                             ]
                         }}
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
                         closeDialog={(newRFP) => {
-                            setCreateRFPIsOpen(false)
-
                             if (newRFP) {
                                 form.setValue("rfps", [
                                     ...(form.getValues("rfps") || []),
                                     newRFP as any
                                 ])
                             }
+
+                            setCreateRFPIsOpen(false)
+                            setIsClosing(false)
                         }}
                     />
                 </DialogContent>
@@ -1416,7 +1481,7 @@ export const PrivatePublicFormField = ({
                         <RadioGroup
                             onValueChange={(value) => {
                                 if (mixpanelTrackCallback) mixpanelTrackCallback(value === "PRIVATE")
-                                form.setValue("isPrivate", value === "PRIVATE")
+                                form.setValue("isPrivate", value === "PRIVATE", {shouldDirty: true})
                             }}
                             value={field.value ? "PRIVATE" : "PUBLIC"}
                             className={cn("flex flex-wrap space-y-0")}
@@ -1676,9 +1741,7 @@ export const OpenToFormField = ({form}: { form: any }) => {
                             type="multiple"
                             variant="outline"
                             value={field.value}
-                            onValueChange={
-                                field.onChange
-                            }
+                            onValueChange={field.onChange}
                             className="w-fit flex flex-wrap gap-2 justify-start"
                         >
                             {RFP_OPEN_TO_TYPE_OPTIONS.map(type => (
@@ -1717,10 +1780,14 @@ export function AttachmentsFormField({form}: { form: UseFormReturn<any> }) {
                                     variant="secondary"
                                     onClick={(e: any) => {
                                         e.preventDefault()
-                                        form.setValue("attachments", [
-                                            ...(field?.value || []),
-                                            {name: '', link: ''}
-                                        ])
+                                        form.setValue(
+                                            "attachments", 
+                                            [
+                                                ...(field?.value || []),
+                                                {name: '', link: ''}
+                                            ],
+                                            {shouldDirty: true}
+                                        )
                                     }}
                                 >
                                     <Plus/>
@@ -1737,13 +1804,15 @@ export function AttachmentsFormField({form}: { form: UseFormReturn<any> }) {
                                             onDelete={() => {
                                                 form.setValue(
                                                     "attachments",
-                                                    field?.value?.filter((t: AttachmentType, i: number) => i !== index)
+                                                    field?.value?.filter((t: AttachmentType, i: number) => i !== index),
+                                                    {shouldDirty: true}
                                                 )
                                             }}
                                             onValueChange={newValue => {
                                                 form.setValue(
                                                     "attachments",
-                                                    field?.value?.map((currentValue: AttachmentType, i: number) => i === index ? newValue : currentValue)
+                                                    field?.value?.map((currentValue: AttachmentType, i: number) => i === index ? newValue : currentValue),
+                                                    {shouldDirty: true}
                                                 )
                                             }}
                                         />
@@ -1777,10 +1846,14 @@ export const ContactsFormField = ({form, title}: { form: any, title?: string }) 
                             size={"icon"}
                             onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                 e.preventDefault()
-                                form.setValue("contacts", [
-                                    ...(field.value || []),
-                                    {name: "", email: "", role: null}
-                                ])
+                                form.setValue(
+                                    "contacts", 
+                                    [
+                                        ...(field.value || []),
+                                        {name: "", email: "", role: null}
+                                    ],
+                                    {shouldDirty: true}
+                                )
                             }}
                         >
                             <Plus/>
@@ -1797,13 +1870,15 @@ export const ContactsFormField = ({form, title}: { form: any, title?: string }) 
                                     onDelete={() => {
                                         form.setValue(
                                             "contacts",
-                                            field?.value?.filter((t: ContactType, i: number) => i !== index)
+                                            field?.value?.filter((t: ContactType, i: number) => i !== index),
+                                            {shouldDirty: true}
                                         )
                                     }}
                                     onValueChange={newValue => {
                                         form.setValue(
                                             "contacts",
-                                            field?.value?.map((currentValue: ContactType, i: number) => i === index ? newValue : currentValue)
+                                            field?.value?.map((currentValue: ContactType, i: number) => i === index ? newValue : currentValue),
+                                            {shouldDirty: true}
                                         )
                                     }}
                                 />

@@ -19,7 +19,11 @@ import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
 import Papa from "papaparse";
-import type {RFP} from "@prisma/client";
+import type {Member, RFP} from "@prisma/client";
+
+export const isClaimed = (members: Member[]) => {
+    return (members.filter((member: Member) => !member.email.includes('comendcare.com'))?.length > 0)
+}
 
 export const getStatusColor = (status: string) => {
     switch (status) {

@@ -2,31 +2,18 @@ import Image from "next/image"
 import { ProfilePhoto } from "@comend/components/profile-photo"
 import {getSession} from "@comend/lib/auth";
 import {MemberWithUser} from "@comend/lib/types";
+import { NoResultsTemplate } from "@comend/components/no-results";
 
 export default async function PAGSettingsMembersTab({members}: {members: MemberWithUser[]}) {
     const session = await getSession()
 
     if (!session?.user?.organizationId) {
         return (
-            <div className="w-full h-full flex flex-col items-center justify-center py-20">
-                <Image
-                    alt="missing organization"
-                    src="https://illustrations.popsy.co/gray/success.svg"
-                    width={300}
-                    height={300}
-                    className="dark:hidden"
-                />
-                <Image
-                    alt="missing organization"
-                    src="https://illustrations.popsy.co/white/success.svg"
-                    width={300}
-                    height={300}
-                    className="hidden dark:block"
-                />
-                <p className="font-title text-xl text-stone-600 dark:text-stone-400">
-                    {`You're not part of an organization yet.`}
-                </p>
-            </div>
+            <NoResultsTemplate 
+                imgAlt="missing organization"
+                src="https://illustrations.popsy.co/white/success.svg"
+                title={`You're not part of an organization yet.`}
+            />
         )
     }
 
@@ -43,7 +30,7 @@ export default async function PAGSettingsMembersTab({members}: {members: MemberW
                 <div className="mt-8 flow-root">
                     <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                         <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                            <table className="min-w-full divide-y divide-gray-300">
+                            <table className="min-w-full">
                                 <thead>
                                 <tr>
                                     <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
@@ -100,25 +87,11 @@ export default async function PAGSettingsMembersTab({members}: {members: MemberW
                     </div>
                 </div>
             ) : (
-                <div className="h-full flex flex-col items-center justify-center py-8">
-                    <Image
-                        alt="no members"
-                        src="https://illustrations.popsy.co/gray/success.svg"
-                        width={300}
-                        height={300}
-                        className="dark:hidden"
-                    />
-                    <Image
-                        alt="no members"
-                        src="https://illustrations.popsy.co/white/success.svg"
-                        width={300}
-                        height={300}
-                        className="hidden dark:block"
-                    />
-                    <p className="font-title text-xl text-stone-600 dark:text-stone-400">
-                        No members yet.
-                    </p>
-                </div>
+                <NoResultsTemplate 
+                    imgAlt="no members"
+                    src="https://illustrations.popsy.co/gray/success.svg"
+                    title={`No members yet.`}
+                />
             )}
         </div>
     )

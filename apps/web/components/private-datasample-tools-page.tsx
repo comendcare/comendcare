@@ -13,8 +13,8 @@ import { SearchParams } from "@comend/components/types";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
-import { Button } from "@comend/components/ui/button";
-import { Globe, Lock, Trash } from "lucide-react";
+import { Button, buttonVariants } from "@comend/components/ui/button";
+import { Globe, Lock, Plus, Trash } from "lucide-react";
 import { setDataToolsVisibility } from "@comend/lib/actions";
 import { Dialog, DialogTrigger } from "@comend/components/ui/dialog";
 import { DialogPortal } from "@comend/components/plate-ui/dialog";
@@ -22,6 +22,9 @@ import { Asset } from "@comend/lib/types";
 import { Row } from "@tanstack/react-table";
 import Image from "next/image";
 import { DeleteClinicalDatasetDialog } from "./delete-clinical-dataset-dialog";
+import { PulsatingButton } from "@comend/components/ui/pulsating-button";
+import { cn } from "@comend/lib/utils";
+import { NoResultsTemplate } from "@comend/components/no-results";
 
 export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {data: Tool[], pageCount: number, searchParams: SearchParams}) => {
     const {data: session} = useSession()
@@ -30,6 +33,7 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1100)
     const [editingTool, setEditingTool] = useState<Partial<Asset> | undefined>(undefined)
+    const [isClosing, setIsClosing] = useState(false)
     const parentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -124,7 +128,26 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                             </>
                         )}
                         <AssetBulkImportDialog />
-                        <NewToolDialog type={"data"}/>
+                        <NewToolDialog 
+                            type={"data"}
+                            trigger={(
+                                data.length > 0 
+                                    ? (
+                                        <Button variant="cta">
+                                            <Plus/>
+                                            {"Create clinical dataset"}
+                                        </Button>
+                                    )
+                                    : (
+                                        <PulsatingButton
+                                            className={cn(buttonVariants({variant: 'cta'}))}
+                                        >
+                                            <Plus/>
+                                            {"Create clinical dataset"}
+                                        </PulsatingButton>
+                                    )
+                            )}
+                        />
                     </>
                 )}
             >
@@ -154,26 +177,19 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                         onSelectionChange={setRowSelection}
                         onRowClickCallback={(e: any, row: Row<any> | undefined) => setEditingTool(row?.original)}
                         noResultsOverride={(
-                            <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
-                                <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
-                                    <h1 className="font-cal text-4xl">You do not have any Data Tools</h1>
-                                    <Image
-                                        alt="No Data Tools"
-                                        src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                                        width={300}
-                                        height={300}
-                                    />
-                                    <p className="text-lg text-stone-500">
-                                        A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
-                                    </p>
-                                    <NewToolDialog type={"data"}/>
-                                </div>
-                            </div>
+                            <NoResultsTemplate 
+                                imgAlt="No Data Tools"
+                                src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                                title="You do not have any clinical datasets"
+                                description="A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers."
+                            />
                         )}
                         interactiveDialog={(
                             <Dialog 
                                 open={!!editingTool}
-                                onOpenChange={(open) => !open && setEditingTool(undefined)}
+                                onOpenChange={(open) => {
+                                    if (!open) setIsClosing(true)
+                                }}
                             >
                                 <DialogPortal>
                                     <div onClick={(e) => e.stopPropagation()}>
@@ -182,7 +198,12 @@ export const PrivateDatasampleToolsPage = ({data, pageCount, searchParams}: {dat
                                                 key={editingTool?.id}
                                                 data={editingTool} 
                                                 type={'data'}
-                                                closeDialog={() => {setEditingTool(undefined)}}
+                                                isClosing={isClosing}
+                                                setIsClosing={setIsClosing}
+                                                closeDialog={() => {
+                                                    setEditingTool(undefined)
+                                                    setIsClosing(false)
+                                                }}
                                             />
                                         )}
                                     </div>

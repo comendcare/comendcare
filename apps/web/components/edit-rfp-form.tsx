@@ -2,7 +2,7 @@
 
 import {zodResolver} from "@hookform/resolvers/zod"
 import React, {useEffect, useRef, useState} from "react"
-import {useForm} from "react-hook-form"
+import {useForm, UseFormSetError} from "react-hook-form"
 import {z} from "zod"
 import {
     Form,
@@ -47,6 +47,9 @@ import ProjectMultipleSelector from "./project-multiple-selector"
 import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@comend/components/ui/separator"
 import { Checkbox } from "@comend/components/ui/checkbox"
+import LoadingDots from "@comend/components/icons/loading-dots"
+import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
+import { stubFalse } from "lodash"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -87,87 +90,78 @@ const HEADER_IMAGE_OPTIONS = [
 ]
 
 const editRFPForm = z.object({
-    headerImage: z.string().optional(),
-    title: z
-        .string({
-            required_error: "Please provide a title"
-        })
-        .min(1, "Title is required")
-        .max(200, "Title must be less than 200 characters"),
-    description: z.string({
-        required_error: "Please provide a scope"
-    }).min(1, "Scope is required"),
-    eligibility: z.string().optional(),
-    instructions: z.string().optional(),
-    evaluationProcess: z.string().optional(),
-    attachments: z.array(z.custom<AttachmentType>()).optional(),
-    isPrivate: z.boolean(),
-    // hack, contacts are actuall required, but in order to keep all error messages working we verify this later.
-    contacts: z.array(z.custom<any>()).optional(),
-    openTo: z.array(z.string()).min(1, "At least one applicable party is required."),
-    startDate: z.date().optional(),
-    endDate: z.date().optional(),
-    milestones: z.array(z.custom<Milestone>()).optional(),
-    budget: z.number().max(2147483647).min(0).optional(),
-    notes: z.string().optional(),
-    isRolling: z.boolean(),
-    fundingIsFlexible: z.boolean(),
-}).superRefine((rfp, ctx) => {
-    if (rfp.startDate && rfp.endDate) {
-        if (rfp.startDate?.getTime() >= rfp.endDate?.getTime()) {
-            ctx.addIssue({
-                code: "custom",
-                message: "Please adjust the dates so the acceptance date comes before the deadline.",
-                path: ["endDate"]
-            })
-        }
-    }
-
-    if (!rfp.fundingIsFlexible) {
-        if (!rfp.budget) {
-            ctx.addIssue({
-                code: "custom",
-                message: "A funding value is required.",
-                path: ["budget"]
-            })
-        }
-    }
-
-    if (!rfp.isRolling) {
-        if (!rfp.startDate) {
-            ctx.addIssue({
-                code: "custom",
-                message: "Start date is required for non-rolling RFPs.",
-                path: ["startDate"],
-            });
-        }
-        if (!rfp.endDate) {
-            ctx.addIssue({
-                code: "custom",
-                message: "End date is required for non-rolling RFPs.",
-                path: ["endDate"],
-            });
-        }
-    }
-
-    if (!rfp.contacts || rfp.contacts.length <= 0) {
-        ctx.addIssue({
-            code: "custom",
-            message: "At least one contact is required.",
-            path: ["contacts"]
-        })
-    } else {
-        rfp.contacts.map(contact => {
-            if (!contact.email) {
-                ctx.addIssue({
-                    code: "custom",
-                    message: "All contacts require an email address.",
-                    path: ["contacts"]
-                })
-            }
-        })
-    }
+  headerImage: z.string().optional(),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  eligibility: z.string().optional(),
+  instructions: z.string().optional(),
+  evaluationProcess: z.string().optional(),
+  attachments: z.array(z.custom<AttachmentType>()).optional(),
+  isPrivate: z.boolean(),
+  contacts: z.array(z.custom<any>()).optional(),
+  openTo: z.array(z.string()).optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
+  milestones: z.array(z.custom<Milestone>()).optional(),
+  budget: z.number().optional(),
+  notes: z.string().optional(),
+  isRolling: z.boolean(),
+  fundingIsFlexible: z.boolean(),
 })
+
+function validateOnSubmit(
+    values: z.infer<typeof editRFPForm>,
+    setError: UseFormSetError<any>
+) {
+    let hasError = false;
+
+    // Field-level required checks
+    if (!values.title?.trim()) {
+        setError("title", { message: "Please provide a title" });
+        hasError = true;
+    }
+
+    if (!values.description?.trim()) {
+        setError("description", { message: "Scope is required" });
+        hasError = true;
+    }
+
+    if (!values.openTo || values.openTo.length === 0) {
+        setError("openTo", { message: "At least one applicable party is required." });
+        hasError = true;
+    }
+
+    // Cross-field validations
+    if (!values.isRolling && !values.startDate) {
+        setError("startDate", { message: "Start date is required for non-rolling RFPs." });
+        hasError = true;
+    }
+
+    if (!values.isRolling && !values.endDate) {
+        setError("endDate", { message: "End date is required for non-rolling RFPs." });
+        hasError = true;
+    }
+
+    if (values.startDate && values.endDate && values.startDate >= values.endDate) {
+        setError("endDate", { message: "Acceptance date must come before the deadline." });
+        hasError = true;
+    }
+
+    if (!values.fundingIsFlexible && !values.budget) {
+        setError("budget", { message: "A funding value is required." });
+        hasError = true;
+    }
+
+    if (!values.contacts || values.contacts.length === 0) {
+        setError("contacts", { message: "At least one contact is required." });
+        hasError = true;
+    } else if (values.contacts.some(c => !c.email)) {
+        setError("contacts", { message: "All contacts require an email address." });
+        hasError = true;
+    }
+
+    return !hasError;
+}
 
 const rfpSelector = (state: RFPState) => ({
     createRFP: state.createRFP,
@@ -180,10 +174,14 @@ export type Milestone = Prisma.MilestoneGetPayload<{include: {roadmap: true}}>
 
 export function EditRFPForm({
     rfpData,
-    closeDialog
+    closeDialog,
+    isClosing,
+    setIsClosing,
 }: {
     rfpData: Partial<RFP>,
-    closeDialog?: (updatedOrNewRFP?: RFP | undefined) => void
+    closeDialog: (updatedOrNewRFP?: any) => void,
+    isClosing: boolean,
+    setIsClosing: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const router = useRouter()
     const initializing = useRef(true)
@@ -193,18 +191,13 @@ export function EditRFPForm({
         createRFP, 
         updateRFP, 
         deleteRFP, 
-        // saveState 
     } = useRFPStore(useShallow(rfpSelector))
-    // const { undo } = useRFPStore.temporal.getState()
-
-    // const handleUndo = () => {
-    //     undo()
-    //     saveState(session?.user.organizationId)
-    //     toast.dismiss("undo-toast")
-    // }
+    const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
+    const [isSaving, setIsSaving] = useState(false)
 
     const form = useForm<z.infer<typeof editRFPForm>>({
-        mode: "onChange",
+        mode: "onSubmit",
+        reValidateMode: "onSubmit",
         resolver: zodResolver(editRFPForm),
         defaultValues: {
             headerImage: rfpData?.headerImage || "https://storage.googleapis.com/comend-app-public-permanent/zebra-light-blue.png",
@@ -244,7 +237,10 @@ export function EditRFPForm({
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editRFPForm>) => {
-        console.log(`handle form submit`, values)
+        const isValid = validateOnSubmit(values, form.setError)
+        if (!isValid) return // stops submission
+
+        setIsSaving(true)
         const {
             headerImage,
             title,
@@ -315,7 +311,7 @@ export function EditRFPForm({
             }
             revalidate('/app/rfps') // update page contents
 
-            if (closeDialog) closeDialog(updatedOrNewRFP)
+            closeDialog(updatedOrNewRFP)
         } catch (error) {
             console.error("Error updating or createing RFP:", error);
             toast.error(
@@ -324,6 +320,31 @@ export function EditRFPForm({
             )
         }
     }
+
+    const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
+        if (showUnsavedChanges && Object.keys(form.formState.dirtyFields).length > 0) {
+            // form is dirty, give user the option to save/discard unsaved changes
+            setUnsavedChangesIsOpen(true)
+        } else {
+            // form is not dirty, close regularly
+            closeDialog()
+        }
+    }
+
+    useEffect(() => {
+        if (isClosing) handleClose({showUnsavedChanges: true}) // external close, handle closing with option for saving unsaved changes
+    }, [isClosing])
+
+    useEffect(() => {
+        // if the user has closed the unsaved changes dialog, end the isClosing state of all other dialogs
+        // all dialogs should be either fully closed or fully open
+        if (!unsavedChangesIsOpen) setIsClosing(false)
+    }, [unsavedChangesIsOpen])
+
+    // useEffect(() => {
+    //     const subscription = form.watch(() => setIsDirty(true))
+    //     return () => subscription.unsubscribe()
+    // }, [form])
 
     const handleDeleteRFP = async () => {
         if (!session?.user?.organizationId) {
@@ -440,7 +461,10 @@ export function EditRFPForm({
         <Form {...form}>
             <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
                 <ScrollBar />
-                <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6 m-1 pb-12">
+                <form 
+                    onSubmit={form.handleSubmit(handleFormSubmit)}
+                    className="space-y-6 m-1 pb-12"
+                >
                     <FormField
                         control={form.control}
                         name="title"
@@ -479,7 +503,7 @@ export function EditRFPForm({
                     <OpenToFormField form={form}/>
 
                     <div className="flex flex-col gap-4 rounded-md border p-4">
-                        <FormLabel>{`Funding amount`}</FormLabel>
+                        <FormLabel>{`Funding amount (required)`}</FormLabel>
                         <FormField
                             control={form.control}
                             name="fundingIsFlexible"
@@ -659,14 +683,13 @@ export function EditRFPForm({
                     />
 
                     <div className="absolute right-4 bottom-0 flex gap-2">
-                        <DialogClose asChild>
-                            <Button 
-                                variant={"secondary"}
-                                onClick={() => {if (closeDialog) closeDialog()}}
-                            >
-                                Cancel
-                            </Button>
-                        </DialogClose>
+                        <Button 
+                            type="button"
+                            variant={"secondary"}
+                            onClick={() => {handleClose({showUnsavedChanges: false})}}
+                        >
+                            Cancel
+                        </Button> 
                         {rfpData.id && (
                             <Dialog>
                                 <DialogTrigger asChild>
@@ -684,7 +707,7 @@ export function EditRFPForm({
                                         </DialogDescription>
                                         <DialogFooter>
                                             <DialogClose>
-                                                <Button type="button">
+                                                <Button type="button" variant="secondary">
                                                     Cancel
                                                 </Button>
                                             </DialogClose>
@@ -705,10 +728,29 @@ export function EditRFPForm({
                         <Button
                             variant={"cta"}
                             type="submit"
+                            disabled={isSaving}
                         >
-                            Save changes
+                            {isSaving 
+                                ? (
+                                    <div className="w-[81px] flex justify-center items-center">
+                                        <LoadingDots/>
+                                    </div>
+                                ) 
+                                : ("Save changes")
+                            }
                         </Button>
                     </div>
+
+                    <UnsavedChangesDialog 
+                        isSaving={isSaving}
+                        isClosing={isClosing}
+                        setIsClosing={setIsClosing}
+                        isOpen={unsavedChangesIsOpen}
+                        setIsOpen={setUnsavedChangesIsOpen}
+                        closeDialog={closeDialog}
+                        form={form}
+                        formSubmit={handleFormSubmit}
+                    />
                 </form>
             </ScrollArea>
         </Form>

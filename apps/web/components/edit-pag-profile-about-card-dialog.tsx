@@ -2,8 +2,10 @@
 
 import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger
@@ -32,10 +34,16 @@ import {Info, Pencil} from "lucide-react";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {MODALITIES, optionSchema} from "@comend/lib/types";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
+import LoadingDots from "@comend/components/icons/loading-dots";
+import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area";
+import {UnsavedChangesDialog} from "./unsaved-changes-dialog";
 
 const editOrgFormSchema = z.object({
     description: z.string().max(500, {
         message: "Your organization's description must be less than 500 characters long."
+    }).optional(),
+    patientPriorities: z.string().max(500, {
+        message: "Your organization's patient priorities must be less than 500 characters long."
     }).optional(),
     website: z.preprocess(
         (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
@@ -49,16 +57,25 @@ const editOrgFormSchema = z.object({
     otherTherapeuticsOfInterest: z.string().optional(),
 });
 
-export default function EditPagProfileAboutCardDialog({organization}: { organization: Partial<Organization> }) {
+export default function EditPagProfileAboutCardDialog({
+                                                          organization
+                                                      }: {
+    organization: Partial<Organization>
+}) {
     const {data: session} = useSession();
     const [open, setOpen] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
+    const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
     const isOwner = ["owner", "support"].includes(session?.user?.membership?.role);
 
     const editOrgForm = useForm<z.infer<typeof editOrgFormSchema>>({
-        mode: "onChange",
+        mode: "onSubmit",
+        reValidateMode: "onSubmit",
         resolver: zodResolver(editOrgFormSchema),
         defaultValues: {
             description: organization.description || "",
+            patientPriorities: organization.patientPriorities || "",
             website: organization.website || "",
             therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
                 label: ther,
@@ -80,6 +97,7 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
     useEffect(() => {
         editOrgForm.reset({
             description: organization.description || "",
+            patientPriorities: organization.patientPriorities || "",
             website: organization.website || "",
             therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
                 label: ther,
@@ -101,42 +119,32 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
     const formData = editOrgForm.watch()
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
+        const isValid = editOrgForm.trigger()
+        if (!isValid) return // stops submission
+
+        setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error("You're not signed into an organization right now.");
             return;
         }
 
+        // Create/update org
         const formData = new FormData();
-        Object.entries(values).forEach(([key, value]) => {
-            if (key === "therapeuticsInDevelopment") return
-            if (key === "otherTherapeuticsInDevelopment") return
-            if (key === "therapeuticsOfInterest") return
-            if (key === "otherTherapeuticsOfInterest") return
-
-            if (value !== undefined) {
-                formData.append(key, value.toString());
-            }
-        });
-
-        const data = {
-            therapeuticsInDevelopment: values.therapeuticsInDevelopment?.map((therapeutic) => therapeutic.label).join(",") || "",
-            therapeuticsOfInterest: values.therapeuticsOfInterest?.map((therapeutic) => therapeutic.label).join(",") || "",
-            metadata: JSON.stringify({
-                ...(organization?.metadata ? JSON.parse(JSON.stringify(organization.metadata)) : undefined),
-                otherTherapeuticsInDevelopment: values.otherTherapeuticsInDevelopment,
-                otherTherapeuticsOfInterest: values.otherTherapeuticsOfInterest
-            })
-        }
-        Object.entries(data).forEach(([key, value]) => {
-            if (value) {
-                formData.append(key, value)
-            }
-        });
+        formData.append("description", values.description || "");
+        formData.append("patientPriorities", values.patientPriorities || "");
+        formData.append("website", values.website || "");
+        formData.append("therapeuticsInDevelopment", values.therapeuticsInDevelopment?.map((t) => t.label).join(",") || "")
+        formData.append("therapeuticsOfInterest", values.therapeuticsOfInterest?.map((t) => t.label).join(",") || "")
+        formData.append("metadata", JSON.stringify({
+            otherTherapeuticsInDevelopment: values.otherTherapeuticsInDevelopment,
+            otherTherapeuticsOfInterest: values.otherTherapeuticsOfInterest,
+        }))
 
         try {
             await updateOrganization(session.user.organizationId, formData);
             toast.success("Organization profile updated successfully!");
             setOpen(false);
+            closeDialog()
             window.location.reload()
         } catch (error) {
             console.error("Error updating organization:", error);
@@ -144,34 +152,81 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
         }
     }
 
+    const closeDialog = () => {
+        setOpen(false)
+        setIsClosing(false)
+        setUnsavedChangesIsOpen(false)
+
+        editOrgForm.reset({
+            description: organization.description || "",
+            website: organization.website || "",
+            therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
+                label: ther,
+                value: ther
+            })) || [],
+            otherTherapeuticsInDevelopment:
+                typeof organization.metadata == "object"
+                    ? (organization.metadata as any)?.otherTherapeuticsInDevelopment
+                    : undefined,
+            therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({
+                label: ther,
+                value: ther
+            })) || [],
+            otherTherapeuticsOfInterest:
+                typeof organization.metadata == "object"
+                    ? (organization.metadata as any)?.otherTherapeuticsOfInterest
+                    : undefined,
+        });
+    }
+
+    const handleClose = ({showUnsavedChanges}: { showUnsavedChanges?: boolean }) => {
+        if (showUnsavedChanges && Object.keys(editOrgForm.formState.dirtyFields).length > 0) {
+            // form is dirty, give user the option to save/discard unsaved changes
+            setUnsavedChangesIsOpen(true)
+        } else {
+            // form is not dirty, close regularly
+            closeDialog()
+        }
+    }
+
+    useEffect(() => {
+        if (isClosing) handleClose({showUnsavedChanges: true}) // external close, handle closing with option for saving unsaved changes
+    }, [isClosing])
+
+    useEffect(() => {
+        // if the user has closed the unsaved changes dialog, end the isClosing state of all other dialogs
+        // all dialogs should be either fully closed or fully open
+        if (!unsavedChangesIsOpen) setIsClosing(false)
+    }, [unsavedChangesIsOpen])
+
     return (
         <Dialog
             open={open}
-            onOpenChange={(state) => {
-                if (!state) {
-                    // Reset the form to original values when dialog closes (e.g. cancel)
-                    editOrgForm.reset({
-                        description: organization.description || "",
-                        website: organization.website || "",
-                        therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
-                            label: ther,
-                            value: ther
-                        })) || [],
-                        otherTherapeuticsInDevelopment:
-                            typeof organization.metadata == "object"
-                                ? (organization.metadata as any)?.otherTherapeuticsInDevelopment
-                                : undefined,
-                        therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({
-                            label: ther,
-                            value: ther
-                        })) || [],
-                        otherTherapeuticsOfInterest:
-                            typeof organization.metadata == "object"
-                                ? (organization.metadata as any)?.otherTherapeuticsOfInterest
-                                : undefined,
-                    });
-                }
-                setOpen(state);
+            onOpenChange={(open) => {
+                if (!open) setIsClosing(true)
+                else setOpen(true)
+
+                // Reset the form to original values when dialog closes (e.g. cancel)
+                // editOrgForm.reset({
+                //     description: organization.description || "",
+                //     website: organization.website || "",
+                //     therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
+                //         label: ther,
+                //         value: ther
+                //     })) || [],
+                //     otherTherapeuticsInDevelopment:
+                //         typeof organization.metadata == "object"
+                //             ? (organization.metadata as any)?.otherTherapeuticsInDevelopment
+                //             : undefined,
+                //     therapeuticsOfInterest: organization.therapeuticsOfInterest?.map((ther) => ({
+                //         label: ther,
+                //         value: ther
+                //     })) || [],
+                //     otherTherapeuticsOfInterest:
+                //         typeof organization.metadata == "object"
+                //             ? (organization.metadata as any)?.otherTherapeuticsOfInterest
+                //             : undefined,
+                // });
             }}
         >
             <Tooltip>
@@ -197,7 +252,7 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                     </TooltipContent>
                 )}
             </Tooltip>
-            <DialogContent className="max-h-[80vh] overflow-y-auto" data-testid="dialog">
+            <DialogContent data-testid="dialog">
                 <DialogHeader>
                     <DialogTitle>Edit Organization Profile</DialogTitle>
                     <DialogDescription>
@@ -205,155 +260,216 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...editOrgForm}>
-                    <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-6">
-                        <FormField
-                            control={editOrgForm.control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Description</FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            {...field}
-                                            placeholder="Tell us about your organization"
-                                            data-testid="about-description-input"
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={editOrgForm.control}
-                            name="website"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>{`Website`}</FormLabel>
-                                    <FormDescription>
-                                        {`Your patient group's website URL (with the URL extension like http or https).`}
-                                    </FormDescription>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            id="website"
-                                            data-testid="website-input"
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                    <form
+                        onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)}
+                        className="flex max-h-[80vh] flex-col overflow-hidden"
+                    >
 
-                        <FormField
-                            control={editOrgForm.control}
-                            name="therapeuticsInDevelopment"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Therapeutics under development
-                                    </FormLabel>
-                                    <FormDescription className="flex items-center">
-                                        {`What types of treatments is your organization currently developing? Select all that apply.`}
-                                    </FormDescription>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            defaultOptions={MODALITIES}
-                                            placeholder="Select modalities you like..."
-                                            hidePlaceholderWhenSelected={true}
-                                            emptyIndicator={
-                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                    no results found.
-                                                </p>
-                                            }
-                                            showHoverCard={false}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                        <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
+                            <ScrollBar />   
+                            <div className="flex flex-col gap-4 pr-4 space-y-8">
+                                <FormField
+                                    control={editOrgForm.control}
+                                    name="description"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Description</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    {...field}
+                                                    placeholder="Tell us about your organization"
+                                                    data-testid="about-description-input"
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
 
-                        {formData.therapeuticsInDevelopment?.some((item) => item.value === "Other" || item.value === "OTHER") && (
-                            <FormField
-                                control={editOrgForm.control}
-                                name="otherTherapeuticsInDevelopment"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormDescription className="flex items-center">
-                                            {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
-                                        </FormDescription>
-                                        <FormControl>
-                                            <Input
-                                                type="text"
-                                                id="modalities-other"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
+                                <FormField
+                                    control={editOrgForm.control}
+                                    name="patientPriorities"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Patient priorities</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    {...field}
+                                                    placeholder="Tell us about your organization's patient priorities"
+                                                    data-testid="about-patient-priorities-input"
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={editOrgForm.control}
+                                    name="website"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>{`Website`}</FormLabel>
+                                            <FormDescription>
+                                                {`Your patient group's website URL (with the URL extension like http or https).`}
+                                            </FormDescription>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    id="website"
+                                                    data-testid="website-input"
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={editOrgForm.control}
+                                    name="therapeuticsInDevelopment"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>
+                                                Therapeutics under development
+                                            </FormLabel>
+                                            <FormDescription className="flex items-center">
+                                                {`What types of treatments is your organization currently developing? Select all that apply.`}
+                                            </FormDescription>
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    {...field}
+                                                    defaultOptions={MODALITIES}
+                                                    placeholder="Select modalities you like..."
+                                                    hidePlaceholderWhenSelected={true}
+                                                    emptyIndicator={
+                                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                            no results found.
+                                                        </p>
+                                                    }
+                                                    showHoverCard={false}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {formData.therapeuticsInDevelopment?.some((item) => item.value === "Other" || item.value === "OTHER") && (
+                                    <FormField
+                                        control={editOrgForm.control}
+                                        name="otherTherapeuticsInDevelopment"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormDescription className="flex items-center">
+                                                    {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        type="text"
+                                                        id="modalities-other"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
                                 )}
-                            />
-                        )}
 
-                        <FormField
-                            control={editOrgForm.control}
-                            name="therapeuticsOfInterest"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Therapeutics of interest
-                                    </FormLabel>
-                                    <FormDescription className="flex items-center">
-                                        {`Select all treatment modalities your organization is interested in. This helps us match you with experts in those specific areas.`}
-                                    </FormDescription>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            defaultOptions={MODALITIES}
-                                            placeholder="Select modalities you like..."
-                                            hidePlaceholderWhenSelected={true}
-                                            emptyIndicator={
-                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                    no results found.
-                                                </p>
-                                            }
-                                            showHoverCard={false}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                                <FormField
+                                    control={editOrgForm.control}
+                                    name="therapeuticsOfInterest"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>
+                                                Therapeutics of interest
+                                            </FormLabel>
+                                            <FormDescription className="flex items-center">
+                                                {`Select all treatment modalities your organization is interested in. This helps us match you with experts in those specific areas.`}
+                                            </FormDescription>
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    {...field}
+                                                    defaultOptions={MODALITIES}
+                                                    placeholder="Select modalities you like..."
+                                                    hidePlaceholderWhenSelected={true}
+                                                    emptyIndicator={
+                                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                            no results found.
+                                                        </p>
+                                                    }
+                                                    showHoverCard={false}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
 
-                        {editOrgForm.watch("therapeuticsOfInterest")?.some((item) => item.value === "Other" || item.value === "OTHER") && (
-                            <FormField
-                                control={editOrgForm.control}
-                                name="otherTherapeuticsOfInterest"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormDescription className="flex items-center">
-                                            {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
-                                        </FormDescription>
-                                        <FormControl>
-                                            <Input
-                                                type="text"
-                                                id="modalities-other"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
+                                {editOrgForm.watch("therapeuticsOfInterest")?.some((item) => item.value === "Other" || item.value === "OTHER") && (
+                                    <FormField
+                                        control={editOrgForm.control}
+                                        name="otherTherapeuticsOfInterest"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormDescription className="flex items-center">
+                                                    {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        type="text"
+                                                        id="modalities-other"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
                                 )}
-                            />
-                        )}
 
-                        <Button
-                            type="submit"
-                            data-testid="dialog-save-btn"
-                        >
-                            Save
-                        </Button>
+                            </div>
+                        </ScrollArea>
+
+                        <DialogFooter className="pt-4">
+                            <Button
+                                type="button"
+                                variant={"secondary"}
+                                onClick={() => {
+                                    handleClose({showUnsavedChanges: false})
+                                }}
+                            >
+                                Cancel
+                            </Button>
+
+                            <Button
+                                variant={"cta"}
+                                type="submit"
+                                data-testid="dialog-save-btn"
+                                disabled={isSaving}
+                            >
+                                {isSaving
+                                    ? (
+                                        <div className="w-[81px] flex justify-center items-center">
+                                            <LoadingDots/>
+                                        </div>
+                                    )
+                                    : ("Save changes")
+                                }
+                            </Button>
+                        </DialogFooter>
+
+                        <UnsavedChangesDialog
+                            isSaving={isSaving}
+                            isClosing={isClosing}
+                            setIsClosing={setIsClosing}
+                            isOpen={unsavedChangesIsOpen}
+                            setIsOpen={setUnsavedChangesIsOpen}
+                            closeDialog={closeDialog}
+                            form={editOrgForm}
+                            formSubmit={onProfileFormSubmit}
+                        />
                     </form>
                 </Form>
             </DialogContent>

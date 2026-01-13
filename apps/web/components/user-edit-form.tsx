@@ -308,7 +308,7 @@ export default function UserEditForm() {
                             name="name"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>Your Full Name (required)</FormLabel>
+                                    <FormLabel>Your full name (required)</FormLabel>
                                     <FormControl>
                                         <Input type="text" {...field} />
                                     </FormControl>
@@ -341,12 +341,13 @@ export default function UserEditForm() {
                         <FormImageSelector
                             form={form}
                             name="image"
-                            title="Your Profile Picture"
+                            title="Your profile picture"
                             description="PNG/JPG only (no SVG)."
                             aspect={1}
                             img={defaultValues?.image}
                             selectedFile={selectedFile}
                             setSelectedFile={setSelectedFile}
+                            isCropping={isCropping}
                             setIsCropping={setIsCropping}
                         />
 
@@ -400,9 +401,11 @@ export default function UserEditForm() {
                             />
                         </div>
 
-                        <Button type="submit" disabled={isCropping || loading}>
-                            {loading ? <LoadingDots color="#808080"/> : "Save"}
-                        </Button>
+                        <div className="w-full flex justify-end">
+                            <Button type="submit" variant="cta" disabled={isCropping || loading}>
+                                {loading ? <LoadingDots /> : "Save"}
+                            </Button>
+                        </div>
                     </form>
                 </Form>
             )}

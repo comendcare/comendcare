@@ -1,5 +1,6 @@
+"use client"
 import {PagProfileAboutCard} from "~web/components/pag-profile-about-card";
-import {formatMoney, standardizeYear} from "@comend/lib/utils";
+import {formatMoney, isOnboarded, setOnboarded, standardizeYear} from "@comend/lib/utils";
 import {Card} from "@comend/components/ui/card";
 import {PAGProfileConditionsCard} from "~web/components/pag-profile-conditions-card";
 import {PAGProfileRFPsHoverableCard} from "@comend/components/pag-profile-rfps-card";
@@ -19,6 +20,9 @@ import { SearchParams } from "@comend/components/types";
 import dynamic from "next/dynamic";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import type { Biosample, DiseaseModel, Tool } from "@prisma/client";
+import { useEffect } from "react";
+import { toast } from "sonner";
+import { useOnborda } from "./onborda/OnbordaContext";
 
 export type ToolCounts = {
     biosampleCount: number;
@@ -63,22 +67,61 @@ const EditPAGProfileHeaderDialog = dynamic(
 );
 
 export default function PAGProfilePage({
-                                        organization,
-                                        conditions,
-                                        roadmaps,
-                                        toolCounts,
-                                        biosamples,
-                                        biosamplesPageCount,
-                                        diseaseModels,
-                                        diseaseModelsPageCount,
-                                        clinicalDatasets,
-                                        clinicalDatasetsPageCount,
-                                        rfps,
-                                        isOwner,
-                                        rootDomain,
-                                        searchParams,
-                                        conditionTags
-                                       }: PAGProfilePageProps) {
+    organization,
+    conditions,
+    roadmaps,
+    toolCounts,
+    biosamples,
+    biosamplesPageCount,
+    diseaseModels,
+    diseaseModelsPageCount,
+    clinicalDatasets,
+    clinicalDatasetsPageCount,
+    rfps,
+    isOwner,
+    rootDomain,
+    searchParams,
+    conditionTags
+}: PAGProfilePageProps) {
+    const { startOnborda } = useOnborda()
+    
+    // useEffect(() => {
+    //     const startOnbordaAndRemoveToast = () => {
+    //         startOnborda('organization-profile-tour')
+    //         setOnboarded('organization-profile-tour')
+    //         toast.dismiss()
+    //     }
+
+    //     // Only start tour if user is new and is on the /app/research-plan page
+    //     if (!isOnboarded('organization-profile-tour')) {
+    //         toast("Welcome to Comend!", {
+    //             id: "onborda",
+    //             duration: 300000,
+    //             position: "bottom-left",
+    //             description: `Would you like to take a quick tour?`,
+    //             action: (
+    //                 <div className="flex flex-col space-y-2 ml-4">
+    //                     <Button
+    //                         onClick={() => startOnbordaAndRemoveToast()}
+    //                         variant="secondary"
+    //                     >
+    //                         {`Yes please!`}
+    //                     </Button>
+    //                     <Button
+    //                         onClick={() => {
+    //                             toast.dismiss()
+    //                             setOnboarded('organization-profile-tour')
+    //                         }}
+    //                         variant="ghost"
+    //                     >
+    //                         {`No thanks!`}
+    //                     </Button>
+    //                 </div>
+    //             )
+    //         })
+    //     }
+    // }, [startOnborda])
+
     return (
         <div className="grid grid-cols-5 px-4 w-full max-w-7xl my-4 mx-auto gap-4">
             <main className="col-span-5 flex flex-col items-center" data-testid="pag-profile-main">
@@ -96,7 +139,7 @@ export default function PAGProfilePage({
                             )}
 
                             <div
-                                className="w-full flex flex-col md:flex-row mx-auto px-8 gap-4 items-start justify-between">
+                                className="w-full flex flex-col md:flex-row mx-auto px-8 gap-2 items-start justify-between">
                                 <div className="w-full flex flex-row gap-4 items-start">
                                     <div className="h-fit w-fit -mt-16" data-testid="avatar-image">
                                         {isOwner ? (
@@ -115,8 +158,8 @@ export default function PAGProfilePage({
                                             />
                                         )}
                                     </div>
-                                    <div className="flex flex-col">
-                                        <div className="flex gap-4 justify-between">
+                                    <div className="w-full flex flex-col">
+                                        <div className="w-full flex gap-4 justify-between">
                                             <h1 className="text-wrap text-2xl lg:text-3xl font-semibold" data-testid="org-name-heading">
                                                 {organization?.name ?? "No name organization"}
                                             </h1>
@@ -243,3 +286,4 @@ export default function PAGProfilePage({
         </div>
     )
 }
+
