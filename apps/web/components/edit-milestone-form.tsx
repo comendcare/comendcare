@@ -1191,7 +1191,16 @@ export function EditMilestoneForm({
                         </DialogDescription>
                     </DialogHeader>
                     <EditBiosampleToolForm
-                        toolData={{}}
+                        // toolData={{}}
+                        toolData={{
+                            milestones: [
+                                {
+                                    milestoneId: milestoneData.id,
+                                    rfpId: nanoid(),
+                                    milestone: milestoneData
+                                } as any
+                            ]
+                        }}
                         isClosing={isClosing}
                         setIsClosing={setIsClosing}
                         closeDialog={(formValues: any) => {
@@ -1234,7 +1243,16 @@ export function EditMilestoneForm({
                         </DialogDescription>
                     </DialogHeader>
                     <EditDiseaseModelToolForm
-                        toolData={{}}
+                        // toolData={{}}
+                        toolData={{
+                            milestones: [
+                                {
+                                    milestoneId: milestoneData.id,
+                                    rfpId: nanoid(),
+                                    milestone: milestoneData
+                                } as any
+                            ]
+                        }}
                         isClosing={isClosing}
                         setIsClosing={setIsClosing}
                         closeDialog={(newDiseaseModel) => {
@@ -1274,7 +1292,16 @@ export function EditMilestoneForm({
                         </DialogDescription>
                     </DialogHeader>
                     <EditClincalDatasetForm
-                        toolData={{}}
+                        // toolData={{}}
+                        toolData={{
+                            milestones: [
+                                {
+                                    milestoneId: milestoneData.id,
+                                    rfpId: nanoid(),
+                                    milestone: milestoneData
+                                } as any
+                            ]
+                        }}
                         isClosing={isClosing}
                         setIsClosing={setIsClosing}
                         closeDialog={(newDatasample) => {
