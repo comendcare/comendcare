@@ -297,7 +297,7 @@ export function EditDiseaseModelToolForm({
             }
 
             // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away
-            if (Object.keys(toolData)?.length > 0) form.trigger()
+            if (toolData.id && Object.keys(toolData)?.length > 0) form.trigger()
 
             initializing.current = false
         }
