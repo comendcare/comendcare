@@ -42,6 +42,9 @@ const editOrgFormSchema = z.object({
     description: z.string().max(500, {
         message: "Your organization's description must be less than 500 characters long."
     }).optional(),
+    patientPriorities: z.string().max(500, {
+        message: "Your organization's patient priorities must be less than 500 characters long."
+    }).optional(),
     website: z.preprocess(
         (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
         z.string().url({
@@ -72,6 +75,7 @@ export default function EditPagProfileAboutCardDialog({
         resolver: zodResolver(editOrgFormSchema),
         defaultValues: {
             description: organization.description || "",
+            patientPriorities: organization.description || "",
             website: organization.website || "",
             therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
                 label: ther,
@@ -93,6 +97,7 @@ export default function EditPagProfileAboutCardDialog({
     useEffect(() => {
         editOrgForm.reset({
             description: organization.description || "",
+            patientPriorities: organization.description || "",
             website: organization.website || "",
             therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
                 label: ther,
@@ -279,6 +284,25 @@ export default function EditPagProfileAboutCardDialog({
                                         </FormItem>
                                     )}
                                 />
+
+                                <FormField
+                                    control={editOrgForm.control}
+                                    name="patientPriorities"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Patient priorities</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    {...field}
+                                                    placeholder="Tell us about your organization's patient priorities"
+                                                    data-testid="about-patient-priorities-input"
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+
                                 <FormField
                                     control={editOrgForm.control}
                                     name="website"
