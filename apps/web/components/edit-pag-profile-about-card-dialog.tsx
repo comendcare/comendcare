@@ -35,8 +35,8 @@ import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {MODALITIES, optionSchema} from "@comend/lib/types";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
 import LoadingDots from "@comend/components/icons/loading-dots";
-import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area";
-import { UnsavedChangesDialog } from "./unsaved-changes-dialog";
+import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area";
+import {UnsavedChangesDialog} from "./unsaved-changes-dialog";
 
 const editOrgFormSchema = z.object({
     description: z.string().max(500, {
@@ -58,8 +58,8 @@ const editOrgFormSchema = z.object({
 });
 
 export default function EditPagProfileAboutCardDialog({
-    organization
-}: { 
+                                                          organization
+                                                      }: {
     organization: Partial<Organization>
 }) {
     const {data: session} = useSession();
@@ -131,6 +131,7 @@ export default function EditPagProfileAboutCardDialog({
         // Create/update org
         const formData = new FormData();
         formData.append("description", values.description || "");
+        formData.append("patientPriorities", values.patientPriorities || "");
         formData.append("website", values.website || "");
         formData.append("therapeuticsInDevelopment", values.therapeuticsInDevelopment?.map((t) => t.label).join(",") || "")
         formData.append("therapeuticsOfInterest", values.therapeuticsOfInterest?.map((t) => t.label).join(",") || "")
@@ -178,7 +179,7 @@ export default function EditPagProfileAboutCardDialog({
         });
     }
 
-    const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
+    const handleClose = ({showUnsavedChanges}: { showUnsavedChanges?: boolean }) => {
         if (showUnsavedChanges && Object.keys(editOrgForm.formState.dirtyFields).length > 0) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
@@ -259,13 +260,13 @@ export default function EditPagProfileAboutCardDialog({
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...editOrgForm}>
-                        <form 
-                            onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)}
-                            className="flex max-h-[80vh] flex-col overflow-hidden"
-                        >
+                    <form
+                        onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)}
+                        className="flex max-h-[80vh] flex-col overflow-hidden"
+                    >
 
                         <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
-                            <ScrollBar />   
+                            <ScrollBar/>
                             <div className="flex flex-col gap-4 pr-4 space-y-8">
                                 <FormField
                                     control={editOrgForm.control}
@@ -429,13 +430,15 @@ export default function EditPagProfileAboutCardDialog({
                                 )}
 
                             </div>
-                            </ScrollArea>
+                        </ScrollArea>
 
-                            <DialogFooter className="pt-4">
-                            <Button 
+                        <DialogFooter className="pt-4">
+                            <Button
                                 type="button"
                                 variant={"secondary"}
-                                onClick={() => {handleClose({showUnsavedChanges: false})}}
+                                onClick={() => {
+                                    handleClose({showUnsavedChanges: false})
+                                }}
                             >
                                 Cancel
                             </Button>
@@ -445,28 +448,28 @@ export default function EditPagProfileAboutCardDialog({
                                 type="submit"
                                 data-testid="dialog-save-btn"
                             >
-                                {isSaving 
+                                {isSaving
                                     ? (
                                         <div className="w-[81px] flex justify-center items-center">
                                             <LoadingDots/>
                                         </div>
-                                    ) 
+                                    )
                                     : ("Save changes")
                                 }
                             </Button>
-                            </DialogFooter>
+                        </DialogFooter>
 
-                            <UnsavedChangesDialog 
-                                isSaving={isSaving}
-                                isClosing={isClosing}
-                                setIsClosing={setIsClosing}
-                                isOpen={unsavedChangesIsOpen}
-                                setIsOpen={setUnsavedChangesIsOpen}
-                                closeDialog={closeDialog}
-                                form={editOrgForm}
-                                formSubmit={onProfileFormSubmit}
-                            />
-                        </form>
+                        <UnsavedChangesDialog
+                            isSaving={isSaving}
+                            isClosing={isClosing}
+                            setIsClosing={setIsClosing}
+                            isOpen={unsavedChangesIsOpen}
+                            setIsOpen={setUnsavedChangesIsOpen}
+                            closeDialog={closeDialog}
+                            form={editOrgForm}
+                            formSubmit={onProfileFormSubmit}
+                        />
+                    </form>
                 </Form>
             </DialogContent>
         </Dialog>

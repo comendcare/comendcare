@@ -1,10 +1,10 @@
 "use client"
 
-import { cn } from "@udecode/cn"
-import { useEffect, useRef, useState } from "react"
-import { Button } from "./ui/button"
+import {cn} from "@udecode/cn"
+import {useEffect, useRef, useState} from "react"
+import {Button} from "./ui/button"
 
-export function SeeMoreDescription({ description }: { description: string }) {
+export function SeeMoreDescription({description}: { description: string }) {
     const [isExpanded, setIsExpanded] = useState(false)
     const [isOverflowing, setIsOverflowing] = useState(false)
     const textRef = useRef<HTMLParagraphElement>(null)

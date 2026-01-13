@@ -21,7 +21,7 @@ import MultipleSelector from "@comend/components/ui/multiple-selector";
 import {Button} from "@comend/components/ui/button";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
-import {getConditionsFromOrganizationId, getTagsForEntity } from "@comend/lib/fetchers";
+import {getConditionsFromOrganizationId, getTagsForEntity} from "@comend/lib/fetchers";
 import {
     Dialog,
     DialogClose,
@@ -37,16 +37,16 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/
 import {TaggableType} from "@prisma/client";
 import {Info, Pencil} from "lucide-react";
 import {BiomarkersFormField, researchFormSchema} from "./research-onboarding-form";
-import { badgeVariants } from "@comend/components/ui/badge";
+import {badgeVariants} from "@comend/components/ui/badge";
 import {ConditionForCard} from "~web/components/pag-profile-conditions-card";
 import LoadingDots from "@comend/components/icons/loading-dots";
-import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area";
-import { UnsavedChangesDialog } from "./unsaved-changes-dialog";
+import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area";
+import {UnsavedChangesDialog} from "./unsaved-changes-dialog";
 
 export default function EditPAGProfileConditionCardDialog({
-    condition,
-    conditionTags,
-}: {
+                                                              condition,
+                                                              conditionTags,
+                                                          }: {
     condition?: ConditionForCard | null;
     conditionTags?: string[];
 }) {
@@ -69,15 +69,15 @@ export default function EditPAGProfileConditionCardDialog({
         if (!condition || !conditionTags) return;
 
         const defaultValues: z.infer<typeof researchFormSchema> = {
-            disorder: condition.name ? [{ label: condition.name, value: condition.name }] : [],
+            disorder: condition.name ? [{label: condition.name, value: condition.name}] : [],
             associatedConditions: (condition.associatedConditions ?? []).map((name) => ({
                 label: name,
                 value: name,
             })),
             summary: condition.summary ?? "",
-            categories: (condition.diseaseCategories ?? []).map((cat) => ({ label: cat, value: cat })),
-            causal: (condition.causalGenes ?? []).map((gene) => ({ label: gene, value: gene })),
-            genes: (condition.associatedGenes ?? []).map((gene) => ({ label: gene, value: gene })),
+            categories: (condition.diseaseCategories ?? []).map((cat) => ({label: cat, value: cat})),
+            causal: (condition.causalGenes ?? []).map((gene) => ({label: gene, value: gene})),
+            genes: (condition.associatedGenes ?? []).map((gene) => ({label: gene, value: gene})),
             systems: (condition.associatedSystems ?? []).map((system) => ({
                 label: system,
                 value: system,
@@ -88,7 +88,7 @@ export default function EditPAGProfileConditionCardDialog({
             })),
             biomarkers: (condition.biomarkers ?? []).map((b) => ({
                 name: b.name ?? "",
-                type: b.type ? [{ label: b.type, value: b.type }] : [],
+                type: b.type ? [{label: b.type, value: b.type}] : [],
             })),
             // tags are stored as comma-separated string in your form:
             tags: conditionTags.join(", "),
@@ -116,7 +116,7 @@ export default function EditPAGProfileConditionCardDialog({
     async function onResearchFormSubmit(values: z.infer<typeof researchFormSchema>) {
         const isValid = editResearchForm.trigger()
         if (!isValid) return // stops submission
-        
+
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error("You're not signed into an organization right now.");
@@ -188,14 +188,14 @@ export default function EditPAGProfileConditionCardDialog({
 
                 // Only call the tag action if we have a Condition id
                 if (conditionId && tagStrings.length > 0) {
-                    const tagResult =   await updateEntityTags(
+                    const tagResult = await updateEntityTags(
                         TaggableType.CONDITION,
                         conditionId,
                         tagStrings
                     );
 
 
-                if (!tagResult.success) {
+                    if (!tagResult.success) {
                         console.error(tagResult.error);
                         // optional: toast a softer warning instead of erroring the whole flow
                         toast.error(tagResult.error || "Tags were not saved.");
@@ -230,7 +230,7 @@ export default function EditPAGProfileConditionCardDialog({
         editResearchForm.reset(defaultResearchValues); // Reset form with fetched data
     }
 
-    const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
+    const handleClose = ({showUnsavedChanges}: { showUnsavedChanges?: boolean }) => {
         if (showUnsavedChanges && Object.keys(editResearchForm.formState.dirtyFields).length > 0) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
@@ -305,8 +305,8 @@ export default function EditPAGProfileConditionCardDialog({
     };
 
     return (
-        <Dialog 
-            open={open} 
+        <Dialog
+            open={open}
             onOpenChange={(open) => {
                 if (!open) setIsClosing(true)
                 else setOpen(true)
@@ -361,414 +361,417 @@ export default function EditPAGProfileConditionCardDialog({
                             className="flex max-h-[80vh] flex-col overflow-hidden"
                         >
                             <ScrollArea type={"always"}>
-                                <ScrollBar />
+                                <ScrollBar/>
                                 <div className="flex flex-col gap-4 pr-4 space-y-8">
-                                <FormField
-                                    control={editResearchForm.control}
-                                    name="disorder"
-                                    render={({field}) => {
-                                        const id = "ms-disorder";
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="disorder"
+                                        render={({field}) => {
+                                            const id = "ms-disorder";
 
-                                        return (
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel htmlFor={id} id={`${id}-label`}>
+                                                        Name of condition (required)
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <MultipleSelector
+                                                            {...field}
+                                                            creatable={true}
+                                                            maxSelected={1}
+                                                            onSearch={handleConditionAsyncSearch}
+                                                            placeholder="Search for conditions..."
+                                                            hidePlaceholderWhenSelected={true}
+                                                            loadingIndicator={<p>Loading conditions...</p>}
+                                                            emptyIndicator={<p>No conditions found.</p>}
+                                                            showHoverCard={false}
+                                                            inputProps={{
+                                                                id,
+                                                                "aria-labelledby": `${id}-label`,
+                                                                "aria-label": "Name of condition",
+                                                                "data-testid": id,
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="associatedConditions"
+                                        render={({field}) => (
                                             <FormItem>
-                                                <FormLabel htmlFor={id} id={`${id}-label`}>
-                                                    Name of condition (required)
-                                                </FormLabel>
+                                                <FormLabel>Associated conditions</FormLabel>
+                                                <FormDescription>Select any related conditions.</FormDescription>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        creatable
+                                                        maxSelected={5}
+                                                        onSearch={handleConditionAsyncSearch}
+                                                        placeholder="Search for conditions..."
+                                                        hidePlaceholderWhenSelected
+                                                        loadingIndicator={<p>Loading conditions...</p>}
+                                                        emptyIndicator={<p>No conditions found.</p>}
+                                                        showHoverCard={false}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="summary"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>{`Summary of condition`}</FormLabel>
+                                                {/*<div className="w-full flex flex-row justify-between">*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        {`A few lines describing your condition and what makes it unique`}*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        500 characters max.*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*</div>*/}
+                                                <FormControl>
+                                                    <Textarea
+                                                        id="summary"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="causal"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Causal genes</FormLabel>
+                                                <FormDescription className="flex flex-row items-baseline">
+                                                    {`Causal genes are those that directly cause your disorder. Select all that apply.`}
+                                                </FormDescription>
                                                 <FormControl>
                                                     <MultipleSelector
                                                         {...field}
                                                         creatable={true}
-                                                        maxSelected={1}
-                                                        onSearch={handleConditionAsyncSearch}
-                                                        placeholder="Search for conditions..."
+                                                        badgeClassName={badgeVariants({variant: "teal"})}
+                                                        onSearch={handleGeneAsyncSearch}
+                                                        placeholder="Search for genes..."
                                                         hidePlaceholderWhenSelected={true}
-                                                        loadingIndicator={<p>Loading conditions...</p>}
-                                                        emptyIndicator={<p>No conditions found.</p>}
+                                                        loadingIndicator={<p>Loading genes...</p>}
+                                                        emptyIndicator={<p>No genes found.</p>}
                                                         showHoverCard={false}
-                                                        inputProps={{
-                                                            id,
-                                                            "aria-labelledby": `${id}-label`,
-                                                            "aria-label": "Name of condition",
-                                                            "data-testid": id,
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )
-                                    }}
-                                />
-
-                                <FormField
-                                    control={editResearchForm.control}
-                                    name="associatedConditions"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Associated conditions</FormLabel>
-                                            <FormDescription>Select any related conditions.</FormDescription>
-                                            <FormControl>
-                                                <MultipleSelector
-                                                    {...field}
-                                                    creatable
-                                                    maxSelected={5}
-                                                    onSearch={handleConditionAsyncSearch}
-                                                    placeholder="Search for conditions..."
-                                                    hidePlaceholderWhenSelected
-                                                    loadingIndicator={<p>Loading conditions...</p>}
-                                                    emptyIndicator={<p>No conditions found.</p>}
-                                                    showHoverCard={false}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={editResearchForm.control}
-                                    name="summary"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>{`Summary of condition`}</FormLabel>
-                                            {/*<div className="w-full flex flex-row justify-between">*/}
-                                            {/*    <FormDescription>*/}
-                                            {/*        {`A few lines describing your condition and what makes it unique`}*/}
-                                            {/*    </FormDescription>*/}
-                                            {/*    <FormDescription>*/}
-                                            {/*        500 characters max.*/}
-                                            {/*    </FormDescription>*/}
-                                            {/*</div>*/}
-                                            <FormControl>
-                                                <Textarea
-                                                    id="summary"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={editResearchForm.control}
-                                    name="causal"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Causal genes</FormLabel>
-                                            <FormDescription className="flex flex-row items-baseline">
-                                                {`Causal genes are those that directly cause your disorder. Select all that apply.`}
-                                            </FormDescription>
-                                            <FormControl>
-                                                <MultipleSelector
-                                                    {...field}
-                                                    creatable={true}
-                                                    badgeClassName={badgeVariants({variant: "teal"})}
-                                                    onSearch={handleGeneAsyncSearch}
-                                                    placeholder="Search for genes..."
-                                                    hidePlaceholderWhenSelected={true}
-                                                    loadingIndicator={<p>Loading genes...</p>}
-                                                    emptyIndicator={<p>No genes found.</p>}
-                                                    showHoverCard={false}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={editResearchForm.control}
-                                    name="genes"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Associated genes</FormLabel>
-                                            <FormDescription className="flex flex-row items-baseline">
-                                                {`Associated genes are those that may be indirectly related to your disorder. Select all that apply.`}
-                                            </FormDescription>
-                                            <FormControl>
-                                                <MultipleSelector
-                                                    {...field}
-                                                    creatable={true}
-                                                    badgeClassName={badgeVariants({variant: "teal"})}
-                                                    onSearch={handleGeneAsyncSearch}
-                                                    placeholder="Search for genes..."
-                                                    hidePlaceholderWhenSelected={true}
-                                                    loadingIndicator={<p>Loading genes...</p>}
-                                                    emptyIndicator={<p>No genes found.</p>}
-                                                    showHoverCard={false}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={editResearchForm.control}
-                                    name="categories"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                Mechanisms of action
-                                            </FormLabel>
-                                            <FormDescription className="flex items-center">
-                                                {`What types of genetic effects are you investigating? Select all that apply.`}
-                                            </FormDescription>
-                                            <FormControl>
-                                                <MultipleSelector
-                                                    {...field}
-                                                    defaultOptions={MOLECULAR_MECHANISMS}
-                                                    placeholder="Select categories that apply to you..."
-                                                    hidePlaceholderWhenSelected={true}
-                                                    emptyIndicator={
-                                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                            no results found.
-                                                        </p>
-                                                    }
-                                                    showHoverCard={false}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-
-                                {editResearchForm.watch("categories")?.some((item) => item.value === "OTHER" || item.value === "Other") && (
-                                    <FormField
-                                        control={editResearchForm.control}
-                                        name="otherCategories"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormDescription className="flex items-center">
-                                                    {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
-                                                </FormDescription>
-                                                <FormControl>
-                                                    <Input
-                                                        type="text"
-                                                        id="categories-other"
-                                                        {...field}
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
-                                )}
 
-                                <FormField
-                                    control={editResearchForm.control}
-                                    name="systems"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Associated systems</FormLabel>
-                                            <FormDescription>
-                                                {`The systems affected by your condition. Select all that apply.`}
-                                            </FormDescription>
-                                            <FormControl>
-                                                <MultipleSelector
-                                                    {...field}
-                                                    defaultOptions={ASSOCIATED_SYSTEMS}
-                                                    hidePlaceholderWhenSelected={true}
-                                                    placeholder="Select the associated systems of your condition..."
-                                                    emptyIndicator={
-                                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                            no results found.
-                                                        </p>
-                                                    }
-                                                    showHoverCard={false}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-
-                                {editResearchForm.watch("systems")?.some((item) => item.value === "OTHER" || item.value === "Other") && (
                                     <FormField
                                         control={editResearchForm.control}
-                                        name="otherSystems"
+                                        name="genes"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormDescription className="flex items-center">
-                                                    {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                                <FormLabel>Associated genes</FormLabel>
+                                                <FormDescription className="flex flex-row items-baseline">
+                                                    {`Associated genes are those that may be indirectly related to your disorder. Select all that apply.`}
                                                 </FormDescription>
                                                 <FormControl>
-                                                    <Input
-                                                        type="text"
-                                                        id="systems-other"
+                                                    <MultipleSelector
                                                         {...field}
+                                                        creatable={true}
+                                                        badgeClassName={badgeVariants({variant: "teal"})}
+                                                        onSearch={handleGeneAsyncSearch}
+                                                        placeholder="Search for genes..."
+                                                        hidePlaceholderWhenSelected={true}
+                                                        loadingIndicator={<p>Loading genes...</p>}
+                                                        emptyIndicator={<p>No genes found.</p>}
+                                                        showHoverCard={false}
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
-                                )}
 
-                                <FormField
-                                    control={editResearchForm.control}
-                                    name="tags"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Tags</FormLabel>
-                                            <FormDescription>
-                                                Enter tags separated by commas. Example: <code>#neuro, #rare, metabolism</code>
-                                            </FormDescription>
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="categories"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Mechanisms of action
+                                                </FormLabel>
+                                                <FormDescription className="flex items-center">
+                                                    {`What types of genetic effects are you investigating? Select all that apply.`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        defaultOptions={MOLECULAR_MECHANISMS}
+                                                        placeholder="Select categories that apply to you..."
+                                                        hidePlaceholderWhenSelected={true}
+                                                        emptyIndicator={
+                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                                no results found.
+                                                            </p>
+                                                        }
+                                                        showHoverCard={false}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
 
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    placeholder="#neuro, #ultrarare, #rna"
-                                                />
-                                            </FormControl>
-
-                                            <FormMessage />
-                                        </FormItem>
+                                    {editResearchForm.watch("categories")?.some((item) => item.value === "OTHER" || item.value === "Other") && (
+                                        <FormField
+                                            control={editResearchForm.control}
+                                            name="otherCategories"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormDescription className="flex items-center">
+                                                        {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                                    </FormDescription>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="text"
+                                                            id="categories-other"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
                                     )}
-                                />
 
-                                <FormField
-                                    control={editResearchForm.control}
-                                    name="prevalenceNumerator"
-                                    render={({field: numeratorField}) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                {`Estimated total prevalence`} –{" "}
-                                                {formatNumberWithCommas(numeratorField.value)}
-                                                {editResearchForm.watch("prevalenceDenominator") && (
-                                                    <> in {formatNumberWithCommas(editResearchForm.watch("prevalenceDenominator"))}</>
-                                                )}
-                                            </FormLabel>
-                                            <FormDescription>
-                                                {`The estimated global prevalence ratio of your condition.`}
-                                            </FormDescription>
-                                            <FormControl>
-                                                <div className="flex flex-row items-end justify-start space-x-2">
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="systems"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Associated systems</FormLabel>
+                                                <FormDescription>
+                                                    {`The systems affected by your condition. Select all that apply.`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        defaultOptions={ASSOCIATED_SYSTEMS}
+                                                        hidePlaceholderWhenSelected={true}
+                                                        placeholder="Select the associated systems of your condition..."
+                                                        emptyIndicator={
+                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                                no results found.
+                                                            </p>
+                                                        }
+                                                        showHoverCard={false}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    {editResearchForm.watch("systems")?.some((item) => item.value === "OTHER" || item.value === "Other") && (
+                                        <FormField
+                                            control={editResearchForm.control}
+                                            name="otherSystems"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormDescription className="flex items-center">
+                                                        {`(Optional) Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}
+                                                    </FormDescription>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="text"
+                                                            id="systems-other"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    )}
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="tags"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Tags</FormLabel>
+                                                <FormDescription>
+                                                    Enter tags separated by commas. Example: <code>#neuro, #rare,
+                                                    metabolism</code>
+                                                </FormDescription>
+
+                                                <FormControl>
+                                                    <Input
+                                                        {...field}
+                                                        placeholder="#neuro, #ultrarare, #rna"
+                                                    />
+                                                </FormControl>
+
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="prevalenceNumerator"
+                                        render={({field: numeratorField}) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    {`Estimated total prevalence`} –{" "}
+                                                    {formatNumberWithCommas(numeratorField.value)}
+                                                    {editResearchForm.watch("prevalenceDenominator") && (
+                                                        <> in {formatNumberWithCommas(editResearchForm.watch("prevalenceDenominator"))}</>
+                                                    )}
+                                                </FormLabel>
+                                                <FormDescription>
+                                                    {`The estimated global prevalence ratio of your condition.`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <div className="flex flex-row items-end justify-start space-x-2">
+                                                        <Input
+                                                            type="number"
+                                                            id="prevalenceNumerator"
+                                                            {...numeratorField}
+                                                            className="w-16"
+                                                            min={0}
+                                                        />
+                                                        <span>in</span>
+                                                        <FormField
+                                                            control={editResearchForm.control}
+                                                            name="prevalenceDenominator"
+                                                            render={({field: denominatorField}) => (
+                                                                <FormControl>
+                                                                    <Input
+                                                                        type="number"
+                                                                        id="prevalenceDenominator"
+                                                                        {...denominatorField}
+                                                                        className="w-32"
+                                                                        min={0}
+                                                                    />
+                                                                </FormControl>
+                                                            )}
+                                                        />
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="associatedSignsAndSymptoms"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Symptoms</FormLabel>
+                                                <FormDescription>
+                                                    Search Symptoms and select all that apply.
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        creatable={false}
+                                                        onSearch={handleHpoAsyncSearch}
+                                                        placeholder="Search HPO symptoms..."
+                                                        hidePlaceholderWhenSelected
+                                                        loadingIndicator={<p>Searching HPO...</p>}
+                                                        emptyIndicator={<p>No symptoms found.</p>}
+                                                        showHoverCard={false}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <BiomarkersFormField form={editResearchForm}/>
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="engaged"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>{`Number of patients engaged`}</FormLabel>
+                                                <FormDescription>{`The number of patients your organization has been in touch with.`}</FormDescription>
+                                                <FormControl>
                                                     <Input
                                                         type="number"
-                                                        id="prevalenceNumerator"
-                                                        {...numeratorField}
-                                                        className="w-16"
+                                                        id="engaged"
+                                                        {...field}
                                                         min={0}
                                                     />
-                                                    <span>in</span>
-                                                    <FormField
-                                                        control={editResearchForm.control}
-                                                        name="prevalenceDenominator"
-                                                        render={({field: denominatorField}) => (
-                                                            <FormControl>
-                                                                <Input
-                                                                    type="number"
-                                                                    id="prevalenceDenominator"
-                                                                    {...denominatorField}
-                                                                    className="w-32"
-                                                                    min={0}
-                                                                />
-                                                            </FormControl>
-                                                        )}
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="national"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>{`Estimated number of patients in the US`}</FormLabel>
+                                                {/*<FormDescription>{`The estimated number of patients in the US.`}</FormDescription>*/}
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        id="national"
+                                                        {...field}
+                                                        min={0}
                                                     />
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
 
-                                <FormField
-                                    control={editResearchForm.control}
-                                    name="associatedSignsAndSymptoms"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Symptoms</FormLabel>
-                                            <FormDescription>
-                                                Search Symptoms and select all that apply.
-                                            </FormDescription>
-                                            <FormControl>
-                                                <MultipleSelector
-                                                    {...field}
-                                                    creatable={false}
-                                                    onSearch={handleHpoAsyncSearch}
-                                                    placeholder="Search HPO symptoms..."
-                                                    hidePlaceholderWhenSelected
-                                                    loadingIndicator={<p>Searching HPO...</p>}
-                                                    emptyIndicator={<p>No symptoms found.</p>}
-                                                    showHoverCard={false}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <BiomarkersFormField form={editResearchForm} />
-
-                                <FormField
-                                    control={editResearchForm.control}
-                                    name="engaged"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>{`Number of patients engaged`}</FormLabel>
-                                            <FormDescription>{`The number of patients your organization has been in touch with.`}</FormDescription>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    id="engaged"
-                                                    {...field}
-                                                    min={0}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={editResearchForm.control}
-                                    name="national"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>{`Estimated number of patients in the US`}</FormLabel>
-                                            {/*<FormDescription>{`The estimated number of patients in the US.`}</FormDescription>*/}
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    id="national"
-                                                    {...field}
-                                                    min={0}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={editResearchForm.control}
-                                    name="global"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>{`Estimated number of patients in the world`}</FormLabel>
-                                            {/*<FormDescription>{`The estimated number of patients in the world.`}</FormDescription>*/}
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    id="global"
-                                                    {...field}
-                                                    min={0}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="global"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>{`Estimated number of patients in the world`}</FormLabel>
+                                                {/*<FormDescription>{`The estimated number of patients in the world.`}</FormDescription>*/}
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        id="global"
+                                                        {...field}
+                                                        min={0}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
                                 </div>
                             </ScrollArea>
-                                
+
                             <DialogFooter className="pt-4">
-                                <Button 
+                                <Button
                                     type="button"
                                     variant={"secondary"}
-                                    onClick={() => {handleClose({showUnsavedChanges: false})}}
+                                    onClick={() => {
+                                        handleClose({showUnsavedChanges: false})
+                                    }}
                                 >
                                     Cancel
                                 </Button>
@@ -778,18 +781,18 @@ export default function EditPAGProfileConditionCardDialog({
                                     type="submit"
                                     data-testid="dialog-save-btn"
                                 >
-                                    {isSaving 
+                                    {isSaving
                                         ? (
                                             <div className="w-[81px] flex justify-center items-center">
                                                 <LoadingDots/>
                                             </div>
-                                        ) 
+                                        )
                                         : ("Save changes")
                                     }
                                 </Button>
                             </DialogFooter>
 
-                            <UnsavedChangesDialog 
+                            <UnsavedChangesDialog
                                 isSaving={isSaving}
                                 isClosing={isClosing}
                                 setIsClosing={setIsClosing}
