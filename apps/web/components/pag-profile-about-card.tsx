@@ -60,8 +60,14 @@ export const PagProfileAboutCard = ({
                     <div className="space-y-2">
                         {/* <p data-testid="about-description-value">{organization?.description}</p> */}
                         <SeeMoreDescription description={organization?.description ?? ""}/>
+
                         {organization?.patientPriorities &&
-                            <SeeMoreDescription description={organization?.patientPriorities ?? ""}/>
+                            <>
+                                <h4 className="scroll-m-20 text-base font-semibold" data-testid="toi-heading">
+                                    Patient priorities
+                                </h4>
+                                <SeeMoreDescription description={organization?.patientPriorities ?? ""}/>
+                            </>
                         }
 
                         <div className="flex flex-row items-center justify-between w-full">
