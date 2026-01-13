@@ -18,14 +18,13 @@ import { Globe, Lock, Plus, Trash } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip";
 import { setBiosamplesVisibility } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogPortal, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
+import { Dialog, DialogPortal, DialogTrigger } from "@comend/components/ui/dialog";
 import { Row } from "@tanstack/react-table";
-import { Asset, editBiosampleForm } from "@comend/lib/types";
-import Image from "next/image";
+import { Asset } from "@comend/lib/types";
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog";
-import z from "zod";
 import { cn } from "@comend/lib/utils";
 import { PulsatingButton } from "@comend/components/ui/pulsating-button";
+import {NoResultsTemplate} from "@comend/components/no-results"
 
 export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     data: Biosample[],
@@ -187,20 +186,12 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                             onRowClickCallback={(e: any, row: Row<any> | undefined) => setEditingTool(row?.original)}
                             showPagination={true}
                             noResultsOverride={(
-                                <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
-                                    <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
-                                        <h1 className="font-cal text-4xl">You do not have any Biosample Tools</h1>
-                                        <Image
-                                            alt="No Biosample Tools"
-                                            src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                                            width={300}
-                                            height={300}
-                                        />
-                                        <p className="text-lg text-stone-500">
-                                            A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
-                                        </p>
-                                    </div>
-                                </div>
+                                <NoResultsTemplate 
+                                    imgAlt="No biosample tools"
+                                    src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                                    title="You do not have any patient biosamples"
+                                    description="A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers."
+                                />
                             )}
                             interactiveDialog={(
                                 <>

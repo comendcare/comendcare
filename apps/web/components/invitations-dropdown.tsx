@@ -6,6 +6,7 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import {useSession} from "next-auth/react";
 import {Invitation} from "@prisma/client";
 import { Ellipsis, UserX } from "lucide-react";
+import { Button } from "@comend/components/ui/button";
 
 export default function InvitationsDropdown({invitation}: { invitation: Invitation }) {
     const session = useSession()
@@ -26,8 +27,10 @@ export default function InvitationsDropdown({invitation}: { invitation: Invitati
 
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger>
-                <Ellipsis />
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="p-2 h-fit">
+                    <Ellipsis />
+                </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <DropdownMenuItem

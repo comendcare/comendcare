@@ -24,6 +24,7 @@ import Image from "next/image";
 import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog";
 import { cn } from "@comend/lib/utils";
 import { PulsatingButton } from "@comend/components/ui/pulsating-button";
+import { NoResultsTemplate } from "@comend/components/no-results";
 
 export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
     data: DiseaseModel[],
@@ -181,20 +182,12 @@ export const PrivateDiseaseModelToolsPage = ({data, pageCount, searchParams}: {
                             onRowClickCallback={(e: any, row: Row<any> | undefined) => setEditingTool(row?.original)}
                             showPagination={true}
                             noResultsOverride={(
-                                <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center py-8">
-                                    <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
-                                        <h1 className="font-cal text-4xl">You do not have any Disease Model Tools</h1>
-                                        <Image
-                                            alt="No Disease Model Tools"
-                                            src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                                            width={300}
-                                            height={300}
-                                        />
-                                        <p className="text-lg text-stone-500">
-                                            A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
-                                        </p>
-                                    </div>
-                                </div>
+                                <NoResultsTemplate 
+                                    imgAlt="No Disease Model Tools"
+                                    src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                                    title="You do not have any disease models"
+                                    description="A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers."
+                                />
                             )}
                             interactiveDialog={(
                                 <Dialog 

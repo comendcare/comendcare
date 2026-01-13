@@ -42,6 +42,9 @@ const editOrgFormSchema = z.object({
     description: z.string().max(500, {
         message: "Your organization's description must be less than 500 characters long."
     }).optional(),
+    patientPriorities: z.string().max(500, {
+        message: "Your organization's patient priorities must be less than 500 characters long."
+    }).optional(),
     website: z.preprocess(
         (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
         z.string().url({
@@ -72,6 +75,7 @@ export default function EditPagProfileAboutCardDialog({
         resolver: zodResolver(editOrgFormSchema),
         defaultValues: {
             description: organization.description || "",
+            patientPriorities: organization.description || "",
             website: organization.website || "",
             therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
                 label: ther,
@@ -93,6 +97,7 @@ export default function EditPagProfileAboutCardDialog({
     useEffect(() => {
         editOrgForm.reset({
             description: organization.description || "",
+            patientPriorities: organization.description || "",
             website: organization.website || "",
             therapeuticsInDevelopment: organization.therapeuticsInDevelopment?.map((ther) => ({
                 label: ther,
@@ -173,8 +178,8 @@ export default function EditPagProfileAboutCardDialog({
         });
     }
 
-    const handleClose = () => {
-        if (Object.keys(editOrgForm.formState.dirtyFields).length > 0) {
+    const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
+        if (showUnsavedChanges && Object.keys(editOrgForm.formState.dirtyFields).length > 0) {
             // form is dirty, give user the option to save/discard unsaved changes
             setUnsavedChangesIsOpen(true)
         } else {
@@ -184,7 +189,7 @@ export default function EditPagProfileAboutCardDialog({
     }
 
     useEffect(() => {
-        if (isClosing) handleClose() // external close, handle closing with option for saving unsaved changes
+        if (isClosing) handleClose({showUnsavedChanges: true}) // external close, handle closing with option for saving unsaved changes
     }, [isClosing])
 
     useEffect(() => {
@@ -279,6 +284,25 @@ export default function EditPagProfileAboutCardDialog({
                                         </FormItem>
                                     )}
                                 />
+
+                                <FormField
+                                    control={editOrgForm.control}
+                                    name="patientPriorities"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Patient priorities</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    {...field}
+                                                    placeholder="Tell us about your organization's patient priorities"
+                                                    data-testid="about-patient-priorities-input"
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+
                                 <FormField
                                     control={editOrgForm.control}
                                     name="website"
@@ -408,14 +432,13 @@ export default function EditPagProfileAboutCardDialog({
                             </ScrollArea>
 
                             <DialogFooter className="pt-4">
-                            <DialogClose asChild>
-                                <Button 
-                                    variant={"secondary"}
-                                    onClick={() => {handleClose()}}
-                                >
-                                    Cancel
-                                </Button>
-                            </DialogClose>
+                            <Button 
+                                type="button"
+                                variant={"secondary"}
+                                onClick={() => {handleClose({showUnsavedChanges: false})}}
+                            >
+                                Cancel
+                            </Button>
 
                             <Button
                                 variant={"cta"}

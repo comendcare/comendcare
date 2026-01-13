@@ -2,31 +2,18 @@ import Image from "next/image"
 import { ProfilePhoto } from "@comend/components/profile-photo"
 import {getSession} from "@comend/lib/auth";
 import {MemberWithUser} from "@comend/lib/types";
+import { NoResultsTemplate } from "@comend/components/no-results";
 
 export default async function PAGSettingsMembersTab({members}: {members: MemberWithUser[]}) {
     const session = await getSession()
 
     if (!session?.user?.organizationId) {
         return (
-            <div className="w-full h-full flex flex-col items-center justify-center py-20">
-                <Image
-                    alt="missing organization"
-                    src="https://illustrations.popsy.co/gray/success.svg"
-                    width={300}
-                    height={300}
-                    className="dark:hidden"
-                />
-                <Image
-                    alt="missing organization"
-                    src="https://illustrations.popsy.co/white/success.svg"
-                    width={300}
-                    height={300}
-                    className="hidden dark:block"
-                />
-                <p className="font-title text-xl text-stone-600 dark:text-stone-400">
-                    {`You're not part of an organization yet.`}
-                </p>
-            </div>
+            <NoResultsTemplate 
+                imgAlt="missing organization"
+                src="https://illustrations.popsy.co/white/success.svg"
+                title={`You're not part of an organization yet.`}
+            />
         )
     }
 
@@ -100,25 +87,11 @@ export default async function PAGSettingsMembersTab({members}: {members: MemberW
                     </div>
                 </div>
             ) : (
-                <div className="h-full flex flex-col items-center justify-center py-8">
-                    <Image
-                        alt="no members"
-                        src="https://illustrations.popsy.co/gray/success.svg"
-                        width={300}
-                        height={300}
-                        className="dark:hidden"
-                    />
-                    <Image
-                        alt="no members"
-                        src="https://illustrations.popsy.co/white/success.svg"
-                        width={300}
-                        height={300}
-                        className="hidden dark:block"
-                    />
-                    <p className="font-title text-xl text-stone-600 dark:text-stone-400">
-                        No members yet.
-                    </p>
-                </div>
+                <NoResultsTemplate 
+                    imgAlt="no members"
+                    src="https://illustrations.popsy.co/gray/success.svg"
+                    title={`No members yet.`}
+                />
             )}
         </div>
     )

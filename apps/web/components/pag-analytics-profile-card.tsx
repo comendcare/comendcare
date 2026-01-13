@@ -12,7 +12,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <UserCircle className="h-5 w-5" />
-                    Organization profile
+                    <h1 className="text-2xl font-normal">Organization profile</h1>
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">

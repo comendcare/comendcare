@@ -52,6 +52,7 @@ export default async function ProfilePage(props: IndexPageProps) {
             published: true,
             name: true,
             description: true,
+            patientPriorities: true,
             contactEmail: true,
             logo: true,
             image: true,
@@ -272,7 +273,7 @@ export default async function ProfilePage(props: IndexPageProps) {
         const unpackedConditions = conditions?.success ? conditions.data : []
         const tagsResult = await getTagsForEntity(
             TaggableType.CONDITION,
-            unpackedConditions[0]?.id
+            unpackedConditions?.[0]?.id
         );
 
         conditionTags = tagsResult.success

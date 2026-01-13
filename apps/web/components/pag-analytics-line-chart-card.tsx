@@ -5,7 +5,7 @@ import {ResponsiveContainer, Line, LineChart, XAxis, YAxis, Tooltip, CartesianGr
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {Button} from "@comend/components/ui/button";
 import {useRouter} from "next/navigation";
-import {ExternalLink} from "lucide-react"
+import {ExternalLink, UserCircle} from "lucide-react"
 import Link from "next/link";
 import {OrganizationForAnalytics} from "@comend/lib/types";
 
@@ -85,7 +85,8 @@ export default function PAGAnalyticsLineChartCard({organization}: { organization
         <Card className="col-span-4">
             <CardHeader>
                 <CardTitle className="flex flex-row items-center justify-start gap-x-2">
-                    Profile views
+                    <UserCircle className="h-5 w-5" />
+                    <h1 className="text-2xl font-normal">Profile views</h1>
 
                     <Button
                         asChild

@@ -281,7 +281,7 @@ export function DialogImageSelector({
                             onClick={() => handleClick()}
                         >
                             <Image/>
-                            Select New Photo
+                            Select new photo
                         </Button>
                     </div>
                 </>
@@ -576,7 +576,7 @@ export function ImageSelector({
                             onClick={() => handleClick()}
                         >
                             <Image/>
-                            Select New Photo
+                            Select new photo
                         </Button>
                     </div>
                 </>

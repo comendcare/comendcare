@@ -2,6 +2,7 @@ import Image from "next/image"
 import { ProfilePhoto } from "@comend/components/profile-photo"
 import {Invitation, Prisma} from "@prisma/client";
 import {getSession} from "@comend/lib/auth";
+import { NoResultsTemplate } from "@comend/components/no-results";
 
 export default async function PAGSettingsInvitationsTab({organization}: {organization: Prisma.OrganizationGetPayload<{
         include: { invitations: true };
@@ -12,25 +13,11 @@ export default async function PAGSettingsInvitationsTab({organization}: {organiz
 
     if (!session?.user?.organizationId) {
         return (
-            <div className="w-full h-full flex flex-col items-center justify-center py-8">
-                <Image
-                    alt="missing organization"
-                    src="https://illustrations.popsy.co/gray/success.svg"
-                    width={300}
-                    height={300}
-                    className="dark:hidden"
-                />
-                <Image
-                    alt="missing organization"
-                    src="https://illustrations.popsy.co/white/success.svg"
-                    width={300}
-                    height={300}
-                    className="hidden dark:block"
-                />
-                <p className="font-title text-xl text-stone-600 dark:text-stone-400">
-                    {`You're not part of an organization yet.`}
-                </p>
-            </div>
+            <NoResultsTemplate 
+                imgAlt="missing organization"
+                src="https://illustrations.popsy.co/white/success.svg"
+                title={`You're not part of an organization yet.`}
+            />
         )
     }
 
@@ -43,23 +30,11 @@ export default async function PAGSettingsInvitationsTab({organization}: {organiz
                         <p className="text-sm text-gray-700">All open invitations sent by your organization.</p>
                     </div>
                 </div>
-                <Image
-                    alt="No open invitations"
+                <NoResultsTemplate 
+                    imgAlt="No open invitations"
                     src="https://illustrations.popsy.co/gray/paper-plane.svg"
-                    width={300}
-                    height={300}
-                    className="dark:hidden"
+                    title={`Your organization doesn't have any open invitations.`}
                 />
-                <Image
-                    alt="No open invitations"
-                    src="https://illustrations.popsy.co/white/paper-plane.svg"
-                    width={300}
-                    height={300}
-                    className="hidden dark:block"
-                />
-                <p className="font-title text-xl text-stone-600 dark:text-stone-400">
-                    {`Your organization doesn't have any open invitations.`}
-                </p>
             </div>
         )
     }

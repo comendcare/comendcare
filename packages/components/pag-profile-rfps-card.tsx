@@ -62,9 +62,10 @@ export const PAGProfileRFPsHoverableCard = ({rfps, isPrivate}: { rfps: any[], is
                         {current} of {count}
                     </div>
                 </CardHeader>
-                <CardContent className="w-full max-w-full px-16">
+                <CardContent>
                     {rfps.length > 0
                         ? (
+                            <div className="w-full max-w-full px-16">
                             <Carousel opts={{loop: true}} setApi={setApi} className="w-full">
                                 <CarouselContent>
                                     {rfps.map((rfp: any, index: number) => (
@@ -101,6 +102,7 @@ export const PAGProfileRFPsHoverableCard = ({rfps, isPrivate}: { rfps: any[], is
                                 <CarouselPrevious/>
                                 <CarouselNext/>
                             </Carousel>
+                            </div>
                         )
                         : (<NoRFPs isPrivate={isPrivate}/>)
                     }
