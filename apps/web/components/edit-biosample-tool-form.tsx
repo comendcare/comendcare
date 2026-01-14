@@ -626,7 +626,9 @@ export function EditBiosampleToolForm({
                                                                 biosampleId: toolData.id
                                                             }
                                                         )
-                                                        setCreateRequests(prev => [...prev, newRequest])
+                                                        const updatedCreateRequests = [...createRequests, newRequest]
+                                                        setCreateRequests(updatedCreateRequests)
+                                                        form.setValue("createRequests", updatedCreateRequests, {shouldDirty: true})
                                                     }}
                                                 />
                                             )}

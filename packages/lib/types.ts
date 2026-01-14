@@ -2377,6 +2377,7 @@ export const editBiosampleForm = z.object({
     variant: z.string().optional(),
     // institutions: z.array(optionSchema).optional(),
     storageFacility: z.array(optionSchema).optional(),
+    createRequests: z.array(z.custom<any>()).optional(),
     anatomicalSite: z.string().optional(),
     preservationMethod: z.string().optional(),
     preservation: z.string().optional(),
@@ -2483,6 +2484,7 @@ export const editDiseaseModelForm = z.object({
     genes: z.array(optionSchema).optional(),
     // institutions: z.array(optionSchema).optional(),
     storageFacility: z.array(optionSchema).optional(),
+    createRequests: z.array(z.custom<any>()).optional(),
 })
 
 export const editDataToolForm = z.object({
@@ -2511,6 +2513,7 @@ export const editDataToolForm = z.object({
     cohortSize: z.string().optional(),
     // institutions: z.array(optionSchema).optional(),
     storageFacility: z.array(optionSchema).optional(),
+    createRequests: z.array(z.custom<any>()).optional(),
 })
 
 const nilOrEmptyToUndef = <T extends z.ZodTypeAny>(inner: T) =>
