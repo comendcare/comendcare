@@ -178,7 +178,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
     }
 
     const {data: biosamples, pageCount: biosamplesPageCount} = await getBiosamples(
-        organization.id,
+        organization?.id,
         {
             id: true,
             createdAt: true,
@@ -228,7 +228,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
     )
 
     const {data: diseaseModels, pageCount: diseaseModelsPageCount} = await getDiseaseModels(
-        organization.id,
+        organization?.id,
         {
             id: true,
             createdAt: true,
@@ -262,7 +262,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
     )
 
     const {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount} = await getClinicalDatasets(
-        organization.id,
+        organization?.id,
         {
             id: true,
             createdAt: true,
@@ -311,7 +311,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
     if (conditions) {
         const tagsResult = await getTagsForEntity(
             TaggableType.CONDITION,
-            conditions[0].id
+            conditions?.[0]?.id
         );
 
         conditionTags = tagsResult.success
@@ -384,7 +384,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                                 //     mixpanelTrack(`Organization Profile Shared`, {
                                 //         "Platform": socialOption,
                                 //         ...(organization ? {
-                                //             "Organization ID": organization.id,
+                                //             "Organization ID": organization?.id,
                                 //             "Organization Name": organization.name
                                 //         } : undefined)
                                 //     })
