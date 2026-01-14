@@ -1733,7 +1733,7 @@ export const OpenToFormField = ({form}: { form: any }) => {
             control={form.control}
             name="openTo"
             render={({field}) => (
-                <FormItem>
+                <FormItem id="openTo">
                     <FormLabel>{`Open to (required)`}</FormLabel>
                     <FormDescription>{`Specify which parties you wish to source proposals from.`}</FormDescription>
                     <FormControl>
@@ -1834,7 +1834,7 @@ export const ContactsFormField = ({form, title}: { form: any, title?: string }) 
             control={form.control}
             name="contacts"
             render={({field}) => (
-                <FormItem>
+                <FormItem id="contacts">
                     <div className="flex flex-row justify-between gap-2 items-center">
                         <div className="flex flex-col">
                             <FormLabel>{title || `Contacts`}</FormLabel>
