@@ -1901,7 +1901,7 @@ export const EditTitle = ({form, className}: { form: any, className?: string }) 
                     <FormControl>
                         <AutosizeTextarea
                             className="overflow-hidden font-semibold text-xl"
-                            id="title"
+                            // id="title"
                             placeholder={`Enter a title`}
                             defaultValue={field.value}
                             onChange={field.onChange}
