@@ -80,7 +80,7 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                         {tab === 'projects' ? (
                             <>
                                 <DialogTitle className="text-2xl">
-                                    Project templates
+                                    Project library
                                 </DialogTitle>
                                 <DialogDescription>
                                     Select the individual project templates you would like to add to your research plan.
