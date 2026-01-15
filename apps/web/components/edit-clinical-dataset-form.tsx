@@ -147,6 +147,7 @@ export function EditClincalDatasetForm({
     const [isSaving, setIsSaving] = useState(false)
     const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(toolData.createFacilityRequests || [])
     const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
 
     const form = useForm<z.infer<typeof editDataToolForm>>({
         mode: "onSubmit",
@@ -249,6 +250,19 @@ export function EditClincalDatasetForm({
         return companiesData.concat(institutionsData)
     }
 
+    // scroll errors into view when form errors are updated
+    useEffect(() => {
+        if (Object.keys(form.formState.errors).length > 0) {
+            // Get first field with error
+            const firstErrorField = Object.keys(form.formState.errors)[0];
+            const fieldEl = document.querySelector(`[id="${firstErrorField}"]`);
+            if (fieldEl && scrollRef.current) {
+                // scroll the container, not the window
+                fieldEl.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        }
+    }, [form.formState.errors]);
+
     // Initialization - Allow update once form is initialized
     useEffect(() => {
         const init = async () => {
@@ -327,7 +341,7 @@ export function EditClincalDatasetForm({
                 onSubmit={form.handleSubmit((values) => handleFormSubmit(values, createRequests))}
                 className="flex max-h-[80vh] flex-col overflow-hidden"
             >
-                <ScrollArea type={"always"}>
+                <ScrollArea type={"always"} ref={scrollRef}>
                 <ScrollBar />
                 <div className="flex flex-col gap-4 pr-4">
                     <FormItem className="flex gap-2 items-center">
@@ -353,7 +367,7 @@ export function EditClincalDatasetForm({
                         control={form.control}
                         name="title"
                         render={({field}) => (
-                            <FormItem className="w-full flex gap-4 items-center">
+                            <FormItem className="w-full flex gap-4 items-center" id="title">
                                 <FormLabel className="w-[100px]">{`Title`}</FormLabel>
                                 <FormControl>
                                     <div className="w-full">
@@ -373,7 +387,7 @@ export function EditClincalDatasetForm({
                         control={form.control}
                         name="types"
                         render={({field}) => (
-                            <FormItem className="w-full flex gap-4 items-center">
+                            <FormItem className="w-full flex gap-4 items-center" id="types">
                                 <FormLabel className="w-[100px]">{`Type`}</FormLabel>
                                 <FormControl>
                                     <MultipleSelector
@@ -493,7 +507,9 @@ export function EditClincalDatasetForm({
                                                                 clinicalDatasetId: toolData.id
                                                             }
                                                         )
-                                                        setCreateRequests(prev => [...prev, newRequest])
+                                                        const updatedCreateRequests = [...createRequests, newRequest]
+                                                        setCreateRequests(updatedCreateRequests)
+                                                        form.setValue("createRequests", updatedCreateRequests, {shouldDirty: true})
                                                     }}
                                                 />
                                             )}

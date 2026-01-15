@@ -49,7 +49,7 @@ import { Separator } from "@comend/components/ui/separator"
 import { Checkbox } from "@comend/components/ui/checkbox"
 import LoadingDots from "@comend/components/icons/loading-dots"
 import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
-import { stubFalse } from "lodash"
+import { first, stubFalse } from "lodash"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -90,23 +90,23 @@ const HEADER_IMAGE_OPTIONS = [
 ]
 
 const editRFPForm = z.object({
-  headerImage: z.string().optional(),
-  title: z.string().optional(),
-  description: z.string().optional(),
-  eligibility: z.string().optional(),
-  instructions: z.string().optional(),
-  evaluationProcess: z.string().optional(),
-  attachments: z.array(z.custom<AttachmentType>()).optional(),
-  isPrivate: z.boolean(),
-  contacts: z.array(z.custom<any>()).optional(),
-  openTo: z.array(z.string()).optional(),
-  startDate: z.date().optional(),
-  endDate: z.date().optional(),
-  milestones: z.array(z.custom<Milestone>()).optional(),
-  budget: z.number().optional(),
-  notes: z.string().optional(),
-  isRolling: z.boolean(),
-  fundingIsFlexible: z.boolean(),
+    headerImage: z.string().optional(),
+    title: z.string().optional(),
+    isPrivate: z.boolean(),
+    isRolling: z.boolean(),
+    startDate: z.date().optional(), 
+    endDate: z.date().optional(),
+    openTo: z.array(z.string()).optional(),
+    budget: z.number().optional(),
+    fundingIsFlexible: z.boolean(),
+    contacts: z.array(z.custom<any>()).optional(),
+    description: z.string().optional(),
+    eligibility: z.string().optional(),
+    instructions: z.string().optional(),
+    evaluationProcess: z.string().optional(),
+    milestones: z.array(z.custom<Milestone>()).optional(),
+    attachments: z.array(z.custom<AttachmentType>()).optional(),
+    notes: z.string().optional(),
 })
 
 function validateOnSubmit(
@@ -118,16 +118,6 @@ function validateOnSubmit(
     // Field-level required checks
     if (!values.title?.trim()) {
         setError("title", { message: "Please provide a title" });
-        hasError = true;
-    }
-
-    if (!values.description?.trim()) {
-        setError("description", { message: "Scope is required" });
-        hasError = true;
-    }
-
-    if (!values.openTo || values.openTo.length === 0) {
-        setError("openTo", { message: "At least one applicable party is required." });
         hasError = true;
     }
 
@@ -147,6 +137,11 @@ function validateOnSubmit(
         hasError = true;
     }
 
+    if (!values.openTo || values.openTo.length === 0) {
+        setError("openTo", { message: "At least one applicable party is required." });
+        hasError = true;
+    }
+
     if (!values.fundingIsFlexible && !values.budget) {
         setError("budget", { message: "A funding value is required." });
         hasError = true;
@@ -157,6 +152,11 @@ function validateOnSubmit(
         hasError = true;
     } else if (values.contacts.some(c => !c.email)) {
         setError("contacts", { message: "All contacts require an email address." });
+        hasError = true;
+    }
+
+    if (!values.description?.trim()) {
+        setError("description", { message: "Scope is required" });
         hasError = true;
     }
 
@@ -194,6 +194,7 @@ export function EditRFPForm({
     } = useRFPStore(useShallow(rfpSelector))
     const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
+    const scrollRef = useRef<HTMLDivElement>(null);
 
     const form = useForm<z.infer<typeof editRFPForm>>({
         mode: "onSubmit",
@@ -346,6 +347,19 @@ export function EditRFPForm({
     //     return () => subscription.unsubscribe()
     // }, [form])
 
+    // scroll errors into view when form errors are updated
+    useEffect(() => {
+        if (Object.keys(form.formState.errors).length > 0) {
+            // Get first field with error
+            const firstErrorField = Object.keys(form.formState.errors)[0];
+            const fieldEl = document.querySelector(`[id="${firstErrorField}"]`);
+            if (fieldEl && scrollRef.current) {
+                // scroll the container, not the window
+                fieldEl.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        }
+    }, [form.formState.errors]);
+
     const handleDeleteRFP = async () => {
         if (!session?.user?.organizationId) {
             toast.error(
@@ -459,7 +473,7 @@ export function EditRFPForm({
 
     return (
         <Form {...form}>
-            <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
+            <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"} ref={scrollRef}>
                 <ScrollBar />
                 <form 
                     onSubmit={form.handleSubmit(handleFormSubmit)}
@@ -469,11 +483,10 @@ export function EditRFPForm({
                         control={form.control}
                         name="title"
                         render={({field}) => (
-                            <FormItem>
+                            <FormItem id="title">
                                 <FormLabel>{`Title (required)`}</FormLabel>
                                 <FormControl>
                                     <Input
-                                        id="title"
                                         placeholder={`Enter a title`}
                                         {...field}
                                     />
@@ -566,7 +579,7 @@ export function EditRFPForm({
                         control={form.control}
                         name="description"
                         render={({field}) => (
-                            <FormItem>
+                            <FormItem id="description">
                                 <FormLabel >{`Scope (required)`}</FormLabel>
                                 <FormControl>
                                     <Textarea
@@ -793,7 +806,7 @@ const ProposalTimelineInput = ({form}: {form: any}) => {
                     control={form.control}
                     name="startDate"
                     render={({field}) => (
-                        <FormItem className="w-full">
+                        <FormItem className="w-full" id="startDate">
                             <FormLabel>{`Request opens (required)`}</FormLabel>
                             <div>
                                 <Popover >
@@ -828,7 +841,7 @@ const ProposalTimelineInput = ({form}: {form: any}) => {
                     control={form.control}
                     name="endDate"
                     render={({field}) => (
-                        <FormItem className="w-full">
+                        <FormItem className="w-full" id="endDate">
                             <FormLabel>{`Deadline for proposals (required)`}</FormLabel>
                             <Popover >
                                 <PopoverTrigger asChild>
