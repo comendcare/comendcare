@@ -291,23 +291,40 @@ export function EditMilestoneForm({
         }
     })
 
+    const watchedNodeType = useWatch({control: form.control, name: "nodeType"})
+    const watchedTitle = useWatch({control: form.control, name: "title"})
+    const watchedDescription = useWatch({control: form.control, name: "description"})
+    const watchedTypes = useWatch({control: form.control, name: "types"})
+    const watchedOtherTypeDetails = useWatch({control: form.control, name: "otherTypeDetails"})
+    const watchedStartDate = useWatch({control: form.control, name: "startDate"})
+    const watchedEndDate = useWatch({control: form.control, name: "endDate"})
+    const watchedBudget = useWatch({control: form.control, name: "budget"})
+    const watchedAttachments = useWatch({control: form.control, name: "attachments"})
+    const watchedStatus = useWatch({control: form.control, name: "status"})
+    const watchedIsPrivate = useWatch({control: form.control, name: "isPrivate"})
+    const watchedContacts = useWatch({control: form.control, name: "contacts"})
+    const watchedOpenTo = useWatch({control: form.control, name: "openTo"})
+    const watchedTools = useWatch({control: form.control, name: "tools"})
+    const watchedRfps = useWatch({control: form.control, name: "rfps"})
+    const watchedNotes = useWatch({control: form.control, name: "notes"})
+
     const formData = {
-        nodeType: form.watch("nodeType"),
-        title: form.watch("title"),
-        description: form.watch("description"),
-        types: form.watch("types"),
-        otherTypeDetails: form.watch("otherTypeDetails"),
-        startDate: form.watch("startDate"),
-        endDate: form.watch("endDate"),
-        budget: form.watch("budget"),
-        attachments: form.watch("attachments"),
-        status: form.watch("status"),
-        isPrivate: form.watch("isPrivate"),
-        contacts: form.watch("contacts"),
-        openTo: form.watch("openTo"),
-        tools: form.watch("tools"),
-        rfps: form.watch("rfps"),
-        notes: form.watch("notes")
+        nodeType: watchedNodeType,
+        title: watchedTitle,
+        description: watchedDescription,
+        types: watchedTypes,
+        otherTypeDetails: watchedOtherTypeDetails,
+        startDate: watchedStartDate,
+        endDate: watchedEndDate,
+        budget: watchedBudget,
+        attachments: watchedAttachments,
+        status: watchedStatus,
+        isPrivate: watchedIsPrivate,
+        contacts: watchedContacts,
+        openTo: watchedOpenTo,
+        tools: watchedTools,
+        rfps: watchedRfps,
+        notes: watchedNotes
     }
 
     // Debounced save (stable)
