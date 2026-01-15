@@ -857,7 +857,10 @@ export async function getMilestoneTypes(
     }>,
 ) {
     try {
-        const types = await prisma.milestoneType.findMany({select})
+        const types = await prisma.milestoneType.findMany({
+            select,
+            orderBy: [{label: 'asc'}]
+        })
         return {success: true, data: types}
     } catch (error: any) {
         console.error("Database error finding milestone types:", error)

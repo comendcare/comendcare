@@ -1253,232 +1253,408 @@ export const REQUEST_STATUS_OPTIONS: any[] = [
 ]
 
 export const MILESTONE_TYPE_OPTIONS: any[] = [
+    // Molecular disease characterization
     {
         id: 'BASICSCIENCE',
         value: 'BASICSCIENCE',
         label: 'Basic science',
         services: ['Literature Searches/Reviews', 'Pathway Mapping'],
-        categories: ['discovery'],
-        description: 'Understand the fundamental biological processes that contribute to a disease'
+        categories: ['molecular disease characterization'],
+        description: 'Foundational research aimed at understanding the fundamental biological mechanisms and pathways underlying a specific disease.'
     },
     {
         id: 'FUNCTIONALSTUDY',
         value: 'FUNCTIONALSTUDY',
         label: 'Functional study',
         services: ['DNA Mutagenesis', 'Mutation Data Profiling', 'SNP Characterization'],
-        categories: ['discovery'],
-        description: "Determine the effect of a mutation on a gene or protein’s function. This is important for identifying the disease mechanism of action."
-    }, {
+        categories: ['molecular disease characterization'],
+        description: "Experiments designed to determine the specific biological role of a gene or protein and how its dysfunction leads to disease."
+    }, 
+    {
+        id: 'BIOMARKER',
+        value: 'BIOMARKER',
+        label: 'Biomarker discovery',
+        services: ['Biomarker Analytical Validation', 'Biomarker Clinical Utility', 'Biomarker Clinical Validation', 'Biomarker Discovery', 'Biomarker Services', 'Biomarker Services Consulting', 'Clinical Biomarker Analysis', 'Diagnostic Biomarkers Discovery', 'Digital Biomarkers', 'Discovery Biomarker Analytics', 'Metabolomics Biomarker Discovery', 'Pharmacodynamic Biomarkers Discovery', 'Predictive Biomarkers Discovery', 'Prognostic Biomarkers Discovery', 'Translational Biomarker Discovery'],
+        categories: ['molecular disease characterization'],
+        description: 'The identification of measurable biological indicators, such as proteins or tissue morphology that can objectively evaluate disease presence or progression.'
+    }, 
+    {
+        id: 'GENOMICS',
+        value: 'GENOMICS',
+        label: 'Genomics',
+        services: [],
+        categories: ['molecular disease characterization'],
+        description: '',
+    }, 
+    {
+        id: 'TRANSCRIPTOMICS',
+        value: 'TRANSCRIPTOMICS',
+        label: 'Transcriptomics',
+        services: [],
+        categories: ['molecular disease characterization'],
+        description: '',
+    }, 
+    {
+        id: 'PROTEOMICS',
+        value: 'PROTEOMICS',
+        label: 'Proteomics',
+        services: [],
+        categories: ['molecular disease characterization'],
+        description: '',
+    }, 
+    {
+        id: 'METABOLOMICS',
+        value: 'METABOLOMICS',
+        label: 'Metabolomics',
+        services: [],
+        categories: ['molecular disease characterization'],
+        description: '',
+    }, 
+    {
+        id: 'EPIGENOMICS',
+        value: 'EPIGENOMICS',
+        label: 'Epigenomics',
+        services: [],
+        categories: ['molecular disease characterization'],
+        description: '',
+    }, 
+
+
+    // Clinical studies
+    {
         id: 'NATURALHISTORYSTUDY',
         value: 'NATURALHISTORYSTUDY',
         label: 'Natural history study',
         services: ['Health Economics and Outcomes Research (HEOR)', 'Non-Interventional Studies', 'Observational Research', 'Patient-Reported Outcome Studies', 'RWE/HEOR Data Analysis', 'RWE/HEOR/Market Access Data Analytics', 'Real World Evidence (RWE) Studies', 'Real-World Data', 'Real-World Evidence', 'eCOA - Electronic Clinical Outcomes Assessments', 'ePRO - Electronic Patient-reported Outcome'],
-        categories: ['clinical study'],
-        description: 'Observe how a disease naturally progresses over time under standard of care conditions. Outcomes are usually measured by clinical researchers through formal clinical visits.'
-    }, {
+        categories: ['clinical studies'],
+        description: 'An observational study that tracks the course of a disease over time in the absence of a specific experimental treatment.'
+    }, 
+    {
         id: 'PATIENTREGISTRY',
         value: 'PATIENTREGISTRY',
         label: 'Patient registry',
         services: ['Clinical Data Registry', 'Patient Recruitment', 'Patient-Reported Outcome Studies', 'Registries - Disease', 'Registries - Patient', 'Registries - Product'],
-        categories: ['clinical study'],
-        description: 'Build a systematic database of patient information to track disease progression.'
-    }, {
-        id: 'BIOMARKER',
-        value: 'BIOMARKER',
-        label: 'Biomarker',
-        services: ['Biomarker Analytical Validation', 'Biomarker Clinical Utility', 'Biomarker Clinical Validation', 'Biomarker Discovery', 'Biomarker Services', 'Biomarker Services Consulting', 'Clinical Biomarker Analysis', 'Diagnostic Biomarkers Discovery', 'Digital Biomarkers', 'Discovery Biomarker Analytics', 'Metabolomics Biomarker Discovery', 'Pharmacodynamic Biomarkers Discovery', 'Predictive Biomarkers Discovery', 'Prognostic Biomarkers Discovery', 'Translational Biomarker Discovery'],
-        categories: ['discovery'],
-        description: 'Identify measurable biological indicators that indicate treatment response in patients.'
-    }, {
+        categories: ['clinical studies'],
+        description: 'A centralized database that collects uniform information about individuals diagnosed with a specific disease to support research and clinical care.'
+    }, 
+    {
+        id: 'DISEASECONCEPTMODEL',
+        value: 'DISEASECONCEPTMODEL',
+        label: 'Disease concept model',
+        services: [],
+        categories: ['clinical studies'],
+        description: 'A structured framework that defines the symptoms and impacts of a disease that are most meaningful to patients, used to guide drug development.'
+    }, 
+    {
+        id: 'GENOTYPEPHENOTYPEANALYSIS',
+        value: 'GENOTYPEPHENOTYPEANALYSIS',
+        label: 'Genotype-phenotype analysis',
+        services: [],
+        categories: ['clinical studies'],
+        description: 'Correlating specific genetic mutations (genotype) with the observable physical traits and symptoms (phenotype) of patients.'
+    }, 
+    {
         id: 'OUTCOMEMEASURE',
         value: 'OUTCOMEMEASURE',
-        label: 'Outcome measure',
+        label: 'Endpoint selection',
         services: ['Biomarker Analytical Validation', 'Biomarker Clinical Validation', 'Biomarker Discovery', 'Biomarker Services', 'Biomarker Services Consulting', 'Clinical Biomarker Analysis', 'Predictive Biomarkers Discovery', 'Prognostic Biomarkers Discovery', 'Translational Biomarker Discovery'],
-        categories: ['clinical study'],
-        description: 'Define clear criteria to judge whether a treatment is working in clinical studies.'
-    }, {
-        id: 'BIOBANK',
-        value: 'BIOBANK',
-        label: 'Biobank',
-        services: ['Biobanking'],
+        categories: ['clinical studies'],
+        description: 'The process of choosing specific, measurable outcomes that will determine if a treatment is effective in a clinical trial.'
+    }, 
+    {
+        id: 'OTHERCLINICALSTUDY',
+        value: 'OTHERCLINICALSTUDY',
+        label: 'Other clinical study',
+        services: [],
+        categories: ['clinical studies'],
+        description: 'Any other observational or non-interventional research involving human participants.'
+    }, 
+
+
+
+    // Disease models
+    {
+        id: 'BIOSAMPLECOLLECTION',
+        value: 'BIOSAMPLECOLLECTION',
+        label: 'Biosample collection',
+        services: [],
         categories: ['disease models'],
-        description: 'Collect and store patient biological samples with associated clinical data securely.'
-    }, {
+        description: 'The systematic gathering of biological materials like blood, tissue, or saliva from patients for research purposes.'
+    }, 
+    // {
+    //     id: 'BIOBANK',
+    //     value: 'BIOBANK',
+    //     label: 'Biobank',
+    //     services: ['Biobanking'],
+    //     categories: ['disease models'],
+    //     description: 'Collect and store patient biological samples with associated clinical data securely.'
+    // }, 
+    {
         id: 'PATIENTDERIVEDCELLLINE',
         value: 'PATIENTDERIVEDCELLLINE',
         label: 'Patient-derived cell line',
         services: ['Cell Culture', 'Cell Line Authentication', 'Cell Line Characterization', 'Cell Line Construction', 'Human Immortalized Cell Culture', 'Human Primary Cells'],
         categories: ['disease models'],
-        description: 'Grow cells taken directly from patients to study disease characteristics.'
-    }, {
+        description: 'Cells taken from a patient and immortalized in the lab to create an infinite supply of disease-specific biological material.'
+    }, 
+    {
         id: 'ENGINEEREDCELLLINE',
         value: 'ENGINEEREDCELLLINE',
         label: 'Engineered cell line',
         services: ['Cell Culture', 'Cell Line Authentication', 'Cell Line Characterization', 'Cell Line Construction', 'Gene-Edited iPSCs Disease Models', 'Human Immortalized Cell Culture', "Human iPSC's", 'Isogenic Knockout iPSC Lines'],
         categories: ['disease models'],
-        description: 'Create modified cells that express or silence specific genes for research insights or models patient mutations.'
-    }, {
+        description: 'Healthy cells that have been genetically modified in a laboratory to mimic specific disease mutations or behaviours, e.g. induced pluripotent stem cells (iPSCs).'
+    }, 
+    {
         id: 'MOUSEMODEL',
         value: 'MOUSEMODEL',
         label: 'Mouse model',
         services: ['Knockin Mice', 'Knockout Mice', 'Sprague Dawley Rat'],
         categories: ['disease models'],
-        description: 'Model genetic impacts on disease in order to understand the disease biology and the impacts of treatment on disease. '
-    }, {
+        description: 'A strain of mice genetically modified or treated to exhibit symptoms similar to the human disease, used for testing potential therapies.'
+    }, 
+    {
         id: 'OTHERDISEASEMODEL',
         value: 'OTHERDISEASEMODEL',
         label: 'Other disease model',
         services: ['3D Cell Culture', 'Animal Model Development', 'Human 3D cultures', 'Human Organoids', 'In Vitro Disease Models', 'Model Development', 'Non-Human Primate Models', 'Zebrafish Animal Model'],
         categories: ['disease models'],
-        description: 'E.g. yeast, c.elegans, drosophilia, macaque, pig, dog, zebrafish, organoids, or in-silico models'
-    }, {
-        id: 'TARGETVALIDATION',
-        value: 'TARGETVALIDATION',
-        label: 'Target validation',
-        services: ['Target Validation', 'Target Validation Consulting'],
-        categories: ['discovery'],
-        description: ''
-    }, {
+        description: 'Alternative biological systems, such as organoids, fruit flies, or large animals, used to study disease pathology and test treatments.'
+    }, 
+
+
+
+    // Discovery
+    {
         id: 'ASSAYDEVELOPMENT',
         value: 'ASSAYDEVELOPMENT',
         label: 'Assay development',
         services: ['Assay Development', 'Assay Development Consulting', 'ELISA', 'In Vitro Assay Development', 'Metabolomics Biomarker Discovery'],
-        categories: ['preclinical'],
-        description: ''
-    }, {
+        categories: ['discovery'],
+        description: 'The creation and optimization of experimental tests used to measure biological activity or the effect of a drug on a target.'
+    }, 
+    {
         id: 'DRUGSCREEN',
         value: 'DRUGSCREEN',
         label: 'Drug screen',
         services: ['Discovery Compound Screening Analytics', 'High Throughput Screening', 'Natural Product Libraries', 'Natural Product Screening'],
         categories: ['discovery'],
-        description: 'Test many compounds rapidly in a disease model to find those with promising effects against the target.'
-    }, {
-        id: 'EFFICASYSTUDY',
-        value: 'EFFICASYSTUDY',
-        label: 'Efficacy study',
-        services: ['In Vitro Efficacy Test', 'Mouse Efficacy Monotherapy', 'Rat Efficacy Monotherapy'],
-        categories: ['preclinical'],
-        description: ''
-    }, {
-        id: 'DOSEFINDINGSTUDY',
-        value: 'DOSEFINDINGSTUDY',
-        label: 'Dose finding study',
-        services: ['Dose Range Finding Study - Dog /Canine', 'Dose Range Finding Study - Mouse', 'Dose Range Finding Study - Other Species', 'Dose Range Finding Study - Rat', 'In Vitro Dose Determination Tests', 'In Vitro Toxicology Testing'],
-        categories: ['preclinical'],
-        description: 'Test a range of doses of the treatment to determine levels at which it has a biological effect and is safe.'
-    }, {
-        id: 'TOXICOLOGYSTUDY',
-        value: 'TOXICOLOGYSTUDY',
-        label: 'Toxicology study',
-        services: ['General Toxicology', 'In Vitro Toxicology Testing', 'Mammalian Toxicology', 'Toxicology Consulting'],
-        categories: ['preclinical'],
-        description: 'Assess potential harmful effects of a treatment in model systems before human trials.'
-    }, {
-        id: 'BIODISTRIBUTIONSTUDY',
-        value: 'BIODISTRIBUTIONSTUDY',
-        label: 'Biodistribution study',
-        services: ['Drug Distribution Studies'],
-        categories: ['preclinical'],
-        description: ''
-    }, {
+        description: 'The high-throughput testing of large libraries of chemical compounds to identify those that have a desired effect on the disease target.'
+    }, 
+    {
+        id: 'DRUGREPURPOSING',
+        value: 'DRUGREPURPOSING',
+        label: 'Drug repurposing',
+        services: [],
+        categories: ['discovery'],
+        description: 'Investigating whether existing drugs already approved for other conditions can be effective in treating a different disease.'
+    }, 
+    // {
+    //     id: 'TARGETVALIDATION',
+    //     value: 'TARGETVALIDATION',
+    //     label: 'Target validation',
+    //     services: ['Target Validation', 'Target Validation Consulting'],
+    //     categories: ['molecular disease characterization'],
+    //     description: ''
+    // }, 
+
+
+    // Design and manufacturing
+    {
         id: 'GENETHERAPYPRODUCTION',
         value: 'GENETHERAPYPRODUCTION',
-        label: 'Gene therapy production',
+        label: 'Construct design',
         services: ['Adeno Associated Virus (AAV) Production', 'GLP Large Molecule Bioanalysis', 'Gene Synthesis', 'Gene/Oligo Synthesis', 'Oligo Synthesis', 'Plasmid DNA Preparation and Extraction', 'RNA oligo synthesis'],
-        categories: ['design & manufacturing'],
-        description: ''
-    }, {
+        categories: ['design and manufacturing'],
+        description: 'The genetic engineering process of designing the specific DNA sequence (transgene and promoter) that will be delivered to treat the disease.'
+    }, 
+    {
+        id: 'PLASMIDPRODUCTION',
+        value: 'PLASMIDPRODUCTION',
+        label: 'Plasmid production',
+        services: [],
+        categories: ['design and manufacturing'],
+        description: 'The manufacturing of circular DNA molecules used as the template to produce viral vectors for gene therapy.'
+    }, 
+    {
+        id: 'VECTORPRODUCTION',
+        value: 'VECTORPRODUCTION',
+        label: 'Vector production',
+        services: [],
+        categories: ['design and manufacturing'],
+        description: 'The process of manufacturing the viral delivery vehicles (such as AAV or lentivirus) that carry a therapeutic gene into cells.'
+    }, 
+    {
+        id: 'OLIGONUCELOTIDESYNTHESIS',
+        value: 'OLIGONUCELOTIDESYNTHESIS',
+        label: 'Oligonucelotide synthesis',
+        services: [],
+        categories: ['design and manufacturing'],
+        description: 'The chemical synthesis of short strands of nucleic acids (DNA or RNA) designed to modulate gene expression.'
+    }, 
+    {
         id: 'GPMANUFACTURING',
         value: 'GPMANUFACTURING',
         label: 'GMP manufacturing',
         services: ['Chemistry Manufacturing and Controls (CMC)', 'Chemistry Manufacturing and Controls (CMC) Consulting', 'GMP Synthesis', 'Large Scale Purification'],
-        categories: ['design & manufacturing'],
-        description: '(Good Manufacturing Practices)\n\nProduce clinical-grade materials under strict quality controls for human use.'
-    }, {
+        categories: ['design and manufacturing'],
+        description: 'Production of the therapy under "Good Manufacturing Practice" regulations to ensure it is safe, pure, and consistent for human use.'
+    }, 
+
+
+    // Pre-clinical
+    {
+        id: 'EFFICASYSTUDY',
+        value: 'EFFICASYSTUDY',
+        label: 'Proof of concept (efficacy)',
+        services: ['In Vitro Efficacy Test', 'Mouse Efficacy Monotherapy', 'Rat Efficacy Monotherapy'],
+        categories: ['pre-clinical'],
+        description: ''
+    }, 
+    {
+        id: 'TOXICOLOGYSTUDY',
+        value: 'TOXICOLOGYSTUDY',
+        label: 'Toxicology',
+        services: ['General Toxicology', 'In Vitro Toxicology Testing', 'Mammalian Toxicology', 'Toxicology Consulting'],
+        categories: ['pre-clinical'],
+        description: ''
+    },
+    {
+        id: 'DOSEFINDINGSTUDY',
+        value: 'DOSEFINDINGSTUDY',
+        label: 'Dose finding',
+        services: ['Dose Range Finding Study - Dog /Canine', 'Dose Range Finding Study - Mouse', 'Dose Range Finding Study - Other Species', 'Dose Range Finding Study - Rat', 'In Vitro Dose Determination Tests', 'In Vitro Toxicology Testing'],
+        categories: ['pre-clinical'],
+        description: ''
+    },  
+    {
+        id: 'BIODISTRIBUTIONSTUDY',
+        value: 'BIODISTRIBUTIONSTUDY',
+        label: 'Biodistribution',
+        services: ['Drug Distribution Studies'],
+        categories: ['pre-clinical'],
+        description: ''
+    }, 
+
+
+
+    // Regulatory
+    {
+        id: 'ICD-10 CODE',
+        value: 'ICD-10 CODE',
+        label: 'ICD-10 code',
+        services: [],
+        categories: ['regulatory'],
+        description: ''
+    }, 
+    {
         id: 'INTERACTMEETING',
         value: 'INTERACTMEETING',
         label: 'INTERACT meeting',
         services: [],
         categories: ['regulatory'],
         description: ''
-    }, {
+    }, 
+    {
         id: 'PREINDMEETING',
         value: 'PREINDMEETING',
         label: 'Pre-IND meeting',
         services: ['IND Enabling Package', 'IND Writing', 'IND Writing Consulting', 'Investigational Medicinal Product Dossier (IMPD) and Investigational New Drug (IND) Dossier', 'Regulatory Starting Materials'],
         categories: ['regulatory'],
-        description: 'Discuss the preclinical data, manufacturing, plans for clinical testing and get feedback on the proposed clinical trial design, preclinical data, and regulatory requirements.'
-    }, {
+        description: ''
+    }, 
+    {
         id: 'INDSUBMISSION',
         value: 'INDSUBMISSION',
         label: 'IND submission',
         services: ['IND Enabling Package', 'IND Writing', 'IND Writing Consulting', 'Investigational Medicinal Product Dossier (IMPD) and Investigational New Drug (IND) Dossier', 'Regulatory Starting Materials'],
         categories: ['regulatory'],
-        description: 'Submit an Investigational New Drug (IND) application to begin human clinical trials.'
-    }, {
-        id: 'SITESELECTION',
-        value: 'SITESELECTION',
-        label: 'Site selection',
-        services: ['Site Selection', 'Study/Site Feasibility Study'],
-        categories: ['clinical study'],
         description: ''
-    }, {
-        id: 'PATIENTRECRUITMENT',
-        value: 'PATIENTRECRUITMENT',
-        label: 'Patient recruitment',
-        services: ['Clinical Trial Recruitment', 'Patient Recruitment'],
-        categories: ['clinical study'],
+    }, 
+    {
+        id: 'ORPHANDRUGDESIGNATION',
+        value: 'ORPHANDRUGDESIGNATION',
+        label: 'Orphan drug designation',
+        services: [],
+        categories: ['regulatory'],
         description: ''
-    }, {
-        id: 'TRIALDESIGN',
-        value: 'TRIALDESIGN',
-        label: 'Trial design',
-        services: ['Clinical Trial Consulting', 'Clinical Trial Design', 'Clinical Trial Feasibility'],
-        categories: ['clinical study'],
-        description: ''
-    }, {
-        id: 'PHASE1',
-        value: 'PHASE1',
-        label: 'Phase 1',
-        services: ['Phase 1-3 Studies'],
-        categories: ['clinical study'],
-        description: 'Assess the safety of the drug, determine a safe dose, identify side effects, and study the pharmacological characteristics of the drug in humans'
-    }, {
-        id: 'PHASE1/2',
-        value: 'PHASE1/2',
-        label: 'Phase 1/2',
-        services: ['Phase 1-3 Studies'],
-        categories: ['clinical study'],
-        description: 'A combination of the first two phases of clinical testing, designed to evaluate both the safety and efficacy of a drug in a single trial.'
-    }, {
-        id: 'PHASE2',
-        value: 'PHASE2',
-        label: 'Phase 2',
-        services: ['Phase 1-3 Studies'],
-        categories: ['clinical study'],
-        description: 'Assess whether the drug works as intended and to monitor its side effects in a larger, disease-affected population'
-    }, {
-        id: 'PHASE3',
-        value: 'PHASE3',
-        label: 'Phase 3',
-        services: ['Phase 1-3 Studies'],
-        categories: ['clinical study'],
-        description: "Confirm the drug's efficacy, monitor side effects in a larger population, and compare it to current standard treatments."
-    }, {
+    }, 
+    {
         id: 'FDAAPPROVAL',
         value: 'FDAAPPROVAL',
         label: 'FDA approval',
         services: ['Regulatory Starting Materials'],
         categories: ['regulatory'],
         description: ''
-    }, {
+    }, 
+
+
+    // Clincal trials
+    {
+        id: 'TRIALDESIGN',
+        value: 'TRIALDESIGN',
+        label: 'Trial design',
+        services: ['Clinical Trial Consulting', 'Clinical Trial Design', 'Clinical Trial Feasibility'],
+        categories: ['clinical trials'],
+        description: ''
+    }, 
+    {
+        id: 'SITESELECTION',
+        value: 'SITESELECTION',
+        label: 'Site selection',
+        services: ['Site Selection', 'Study/Site Feasibility Study'],
+        categories: ['clinical trials'],
+        description: ''
+    }, 
+    {
+        id: 'PATIENTRECRUITMENT',
+        value: 'PATIENTRECRUITMENT',
+        label: 'Patient recruitment',
+        services: ['Clinical Trial Recruitment', 'Patient Recruitment'],
+        categories: ['clinical trials'],
+        description: ''
+    }, 
+    {
+        id: 'PHASE1',
+        value: 'PHASE1',
+        label: 'Phase 1',
+        services: ['Phase 1-3 Studies'],
+        categories: ['clinical trials'],
+        description: ''
+    }, 
+    {
+        id: 'PHASE1/2',
+        value: 'PHASE1/2',
+        label: 'Phase 1/2',
+        services: ['Phase 1-3 Studies'],
+        categories: ['clinical trials'],
+        description: ''
+    }, 
+    {
+        id: 'PHASE2',
+        value: 'PHASE2',
+        label: 'Phase 2',
+        services: ['Phase 1-3 Studies'],
+        categories: ['clinical trials'],
+        description: ''
+    }, 
+    {
+        id: 'PHASE3',
+        value: 'PHASE3',
+        label: 'Phase 3',
+        services: ['Phase 1-3 Studies'],
+        categories: ['clinical trials'],
+        description: ""
+    }, 
+    {
         id: 'PHASE4',
         value: 'PHASE4',
         label: 'Phase 4',
         services: ['Biomarker Services', 'Clinical Data Registry', 'Patient-Reported Outcome Studies', 'Post-Marketing (Phase 4) Studies', 'RWE/HEOR Data Analysis', 'RWE/HEOR/Market Access Data Analytics', 'Real World Evidence (RWE) Studies', 'Real-World Evidence'],
-        categories: ['clinical study'],
-        description: 'Occurs after FDA approval to monitor long-term effects and rare side effects that may not have appeared in earlier phases.'
-    }, {
+        categories: ['clinical trials'],
+        description: ""
+    }, 
+    {
         id: 'OTHER',
         value: 'OTHER',
         label: 'Other',
@@ -1803,39 +1979,51 @@ export const ASSOCIATED_SYSTEMS: Option[] = [
 export const ASSOCIATED_CATEGORIES: { id: string; label: string; value: string; description: string }[] = [
     {
         id: '1',
-        label: 'Discovery',
-        value: 'discovery',
+        label: 'Molecular disease characterization',
+        value: 'molecular disease characterization',
         description: 'Focuses on early-stage research, hypothesis generation, and initial identification of potential treatments.',
     },
     {
         id: '2',
-        label: 'Preclinical',
-        value: 'preclinical',
-        description: 'Covers laboratory and animal studies to assess the safety and efficacy of new treatments before clinical trials.',
-    },
-    {
-        id: '3',
-        label: 'Clinical study',
-        value: 'clinical study',
+        label: 'Clinical studies',
+        value: 'clinical studies',
         description: 'Involves human trials to evaluate the safety, efficacy, and outcomes of new medical interventions.',
     },
     {
-        id: '4',
+        id: '3',
         label: 'Disease models',
         value: 'disease models',
         description: 'Utilizes experimental models to study disease mechanisms and test potential treatments.',
     },
     {
+        id: '4',
+        label: 'Discovery',
+        value: 'discovery',
+        description: 'Covers laboratory and animal studies to assess the safety and efficacy of new treatments before clinical trials.',
+    },
+    {
         id: '5',
-        label: 'Design & manufacturing',
-        value: 'design & manufacturing',
+        label: 'Design and manufacturing',
+        value: 'design and manufacturing',
         description: 'Focuses on the engineering, production, and optimization of medical products and therapeutics.',
     },
     {
         id: '6',
+        label: 'Pre-clinical',
+        value: 'pre-clinical',
+        description: '',
+    },
+    {
+        id: '7',
         label: 'Regulatory',
         value: 'regulatory',
         description: 'Covers compliance, approval processes, and regulatory frameworks governing medical treatments and interventions.',
+    },
+    {
+        id: '8',
+        label: 'Clinical trials',
+        value: 'clinical trials',
+        description: '',
     },
 ];
 
@@ -2115,42 +2303,42 @@ export type ApiResponse<T> =
     | { success: false; error: string; code?: string };
 
 export type SERVICE_CATEGORY_MAP = {
-    'Literature Searches/Reviews': 'discovery',
-    'Pathway Mapping': 'discovery',
-    'DNA Mutagenesis': 'discovery',
-    'Mutation Data Profiling': 'discovery',
-    'SNP Characterization': 'discovery',
-    'Health Economics and Outcomes Research (HEOR)': 'clinical study',
-    'Non-Interventional Studies': 'clinical study',
-    'Observational Research': 'clinical study',
-    'Patient-Reported Outcome Studies': 'clinical study',
-    'RWE/HEOR Data Analysis': 'clinical study',
-    'RWE/HEOR/Market Access Data Analytics': 'clinical study',
-    'Real World Evidence (RWE) Studies': 'clinical study',
-    'Real-World Data': 'clinical study',
-    'Real-World Evidence': 'clinical study',
-    'eCOA - Electronic Clinical Outcomes Assessments': 'clinical study',
-    'ePRO - Electronic Patient-reported Outcome': 'clinical study',
-    'Clinical Data Registry': 'clinical study',
-    'Patient Recruitment': 'clinical study',
-    'Registries - Disease': 'clinical study',
-    'Registries - Patient': 'clinical study',
-    'Registries - Product': 'clinical study',
-    'Biomarker Analytical Validation': [ 'discovery', 'clinical study' ],
-    'Biomarker Clinical Utility': 'discovery',
-    'Biomarker Clinical Validation': [ 'discovery', 'clinical study' ],
-    'Biomarker Discovery': [ 'discovery', 'clinical study' ],
-    'Biomarker Services': [ 'discovery', 'clinical study' ],
-    'Biomarker Services Consulting': [ 'discovery', 'clinical study' ],
-    'Clinical Biomarker Analysis': [ 'discovery', 'clinical study' ],
-    'Diagnostic Biomarkers Discovery': 'discovery',
-    'Digital Biomarkers': 'discovery',
-    'Discovery Biomarker Analytics': 'discovery',
-    'Metabolomics Biomarker Discovery': [ 'discovery', 'preclinical' ],
-    'Pharmacodynamic Biomarkers Discovery': 'discovery',
-    'Predictive Biomarkers Discovery': [ 'discovery', 'clinical study' ],
-    'Prognostic Biomarkers Discovery': [ 'discovery', 'clinical study' ],
-    'Translational Biomarker Discovery': [ 'discovery', 'clinical study' ],
+    'Literature Searches/Reviews': 'molecular disease characterization',
+    'Pathway Mapping': 'molecular disease characterization',
+    'DNA Mutagenesis': 'molecular disease characterization',
+    'Mutation Data Profiling': 'molecular disease characterization',
+    'SNP Characterization': 'molecular disease characterization',
+    'Health Economics and Outcomes Research (HEOR)': 'clinical studies',
+    'Non-Interventional Studies': 'clinical studies',
+    'Observational Research': 'clinical studies',
+    'Patient-Reported Outcome Studies': 'clinical studies',
+    'RWE/HEOR Data Analysis': 'clinical studies',
+    'RWE/HEOR/Market Access Data Analytics': 'clinical studies',
+    'Real World Evidence (RWE) Studies': 'clinical studies',
+    'Real-World Data': 'clinical studies',
+    'Real-World Evidence': 'clinical studies',
+    'eCOA - Electronic Clinical Outcomes Assessments': 'clinical studies',
+    'ePRO - Electronic Patient-reported Outcome': 'clinical studies',
+    'Clinical Data Registry': 'clinical studies',
+    'Patient Recruitment': 'clinical studies',
+    'Registries - Disease': 'clinical studies',
+    'Registries - Patient': 'clinical studies',
+    'Registries - Product': 'clinical studies',
+    'Biomarker Analytical Validation': [ 'molecular disease characterization', 'clinical studies' ],
+    'Biomarker Clinical Utility': 'molecular disease characterization',
+    'Biomarker Clinical Validation': [ 'molecular disease characterization', 'clinical studies' ],
+    'Biomarker Discovery': [ 'molecular disease characterization', 'clinical studies' ],
+    'Biomarker Services': [ 'molecular disease characterization', 'clinical studies' ],
+    'Biomarker Services Consulting': [ 'molecular disease characterization', 'clinical studies' ],
+    'Clinical Biomarker Analysis': [ 'molecular disease characterization', 'clinical studies' ],
+    'Diagnostic Biomarkers Discovery': 'molecular disease characterization',
+    'Digital Biomarkers': 'molecular disease characterization',
+    'Discovery Biomarker Analytics': 'molecular disease characterization',
+    'Metabolomics Biomarker Discovery': [ 'molecular disease characterization', 'discovery' ],
+    'Pharmacodynamic Biomarkers Discovery': 'molecular disease characterization',
+    'Predictive Biomarkers Discovery': [ 'molecular disease characterization', 'clinical studies' ],
+    'Prognostic Biomarkers Discovery': [ 'molecular disease characterization', 'clinical studies' ],
+    'Translational Biomarker Discovery': [ 'molecular disease characterization', 'clinical studies' ],
     'Biobanking': 'disease models',
     'Cell Culture': 'disease models',
     'Cell Line Authentication': 'disease models',
@@ -2172,53 +2360,53 @@ export type SERVICE_CATEGORY_MAP = {
     'Model Development': 'disease models',
     'Non-Human Primate Models': 'disease models',
     'Zebrafish Animal Model': 'disease models',
-    'Target Validation': 'discovery',
-    'Target Validation Consulting': 'discovery',
-    'Assay Development': 'preclinical',
-    'Assay Development Consulting': 'preclinical',
-    'ELISA': 'preclinical',
-    'In Vitro Assay Development': 'preclinical',
-    'Discovery Compound Screening Analytics': 'discovery',
-    'High Throughput Screening': 'discovery',
-    'Natural Product Libraries': 'discovery',
-    'Natural Product Screening': 'discovery',
-    'In Vitro Efficacy Test': 'preclinical',
-    'Mouse Efficacy Monotherapy': 'preclinical',
-    'Rat Efficacy Monotherapy': 'preclinical',
-    'Dose Range Finding Study - Dog /Canine': 'preclinical',
-    'Dose Range Finding Study - Mouse': 'preclinical',
-    'Dose Range Finding Study - Other Species': 'preclinical',
-    'Dose Range Finding Study - Rat': 'preclinical',
-    'In Vitro Dose Determination Tests': 'preclinical',
-    'In Vitro Toxicology Testing': 'preclinical',
-    'General Toxicology': 'preclinical',
-    'Mammalian Toxicology': 'preclinical',
-    'Toxicology Consulting': 'preclinical',
-    'Drug Distribution Studies': 'preclinical',
-    'Adeno Associated Virus (AAV) Production': 'design & manufacturing',
-    'GLP Large Molecule Bioanalysis': 'design & manufacturing',
-    'Gene Synthesis': 'design & manufacturing',
-    'Gene/Oligo Synthesis': 'design & manufacturing',
-    'Oligo Synthesis': 'design & manufacturing',
-    'Plasmid DNA Preparation and Extraction': 'design & manufacturing',
-    'RNA oligo synthesis': 'design & manufacturing',
-    'Chemistry Manufacturing and Controls (CMC)': 'design & manufacturing',
-    'Chemistry Manufacturing and Controls (CMC) Consulting': 'design & manufacturing',
-    'GMP Synthesis': 'design & manufacturing',
-    'Large Scale Purification': 'design & manufacturing',
+    'Target Validation': 'molecular disease characterization',
+    'Target Validation Consulting': 'molecular disease characterization',
+    'Assay Development': 'discovery',
+    'Assay Development Consulting': 'discovery',
+    'ELISA': 'discovery',
+    'In Vitro Assay Development': 'discovery',
+    'Discovery Compound Screening Analytics': 'molecular disease characterization',
+    'High Throughput Screening': 'molecular disease characterization',
+    'Natural Product Libraries': 'molecular disease characterization',
+    'Natural Product Screening': 'molecular disease characterization',
+    'In Vitro Efficacy Test': 'discovery',
+    'Mouse Efficacy Monotherapy': 'discovery',
+    'Rat Efficacy Monotherapy': 'discovery',
+    'Dose Range Finding Study - Dog /Canine': 'discovery',
+    'Dose Range Finding Study - Mouse': 'discovery',
+    'Dose Range Finding Study - Other Species': 'discovery',
+    'Dose Range Finding Study - Rat': 'discovery',
+    'In Vitro Dose Determination Tests': 'discovery',
+    'In Vitro Toxicology Testing': 'discovery',
+    'General Toxicology': 'discovery',
+    'Mammalian Toxicology': 'discovery',
+    'Toxicology Consulting': 'discovery',
+    'Drug Distribution Studies': 'discovery',
+    'Adeno Associated Virus (AAV) Production': 'design and manufacturing',
+    'GLP Large Molecule Bioanalysis': 'design and manufacturing',
+    'Gene Synthesis': 'design and manufacturing',
+    'Gene/Oligo Synthesis': 'design and manufacturing',
+    'Oligo Synthesis': 'design and manufacturing',
+    'Plasmid DNA Preparation and Extraction': 'design and manufacturing',
+    'RNA oligo synthesis': 'design and manufacturing',
+    'Chemistry Manufacturing and Controls (CMC)': 'design and manufacturing',
+    'Chemistry Manufacturing and Controls (CMC) Consulting': 'design and manufacturing',
+    'GMP Synthesis': 'design and manufacturing',
+    'Large Scale Purification': 'design and manufacturing',
     'IND Enabling Package': 'regulatory',
     'IND Writing': 'regulatory',
     'IND Writing Consulting': 'regulatory',
     'Investigational Medicinal Product Dossier (IMPD) and Investigational New Drug (IND) Dossier': 'regulatory',
     'Regulatory Starting Materials': 'regulatory',
-    'Site Selection': 'clinical study',
-    'Study/Site Feasibility Study': 'clinical study',
-    'Clinical Trial Recruitment': 'clinical study',
-    'Clinical Trial Consulting': 'clinical study',
-    'Clinical Trial Design': 'clinical study',
-    'Clinical Trial Feasibility': 'clinical study',
-    'Phase 1-3 Studies': 'clinical study',
-    'Post-Marketing (Phase 4) Studies': 'clinical study'
+    'Site Selection': 'clinical studies',
+    'Study/Site Feasibility Study': 'clinical studies',
+    'Clinical Trial Recruitment': 'clinical studies',
+    'Clinical Trial Consulting': 'clinical studies',
+    'Clinical Trial Design': 'clinical studies',
+    'Clinical Trial Feasibility': 'clinical studies',
+    'Phase 1-3 Studies': 'clinical studies',
+    'Post-Marketing (Phase 4) Studies': 'clinical studies'
 }
 
 export interface Task {
