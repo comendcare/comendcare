@@ -5,6 +5,8 @@ interface ResearchPlanLayoutProps {
     params: { id: string }
 }
 
+export const revalidate = 30; // Revalidate every 30 seconds
+
 export default async function ResearchPlanLayout({children, params}: ResearchPlanLayoutProps) {
     await ensureOrgContextForRoadmap(params.id);
 
