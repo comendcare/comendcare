@@ -3,11 +3,16 @@ import {
     getInvitations,
     getPublicOrganizationData,
     getAllNonMemberOrganizations,
+    getOrganizationFromOrganizationId,
 } from "@comend/lib/fetchers";
 import {Separator} from "@comend/components/ui/separator";
 import NewOrganizationForm from "~web/components/new-organization-form";
 
-export default async function CreateNewOrganizationPage() {
+export default async function CreateNewOrganizationPage({
+    searchParams,
+}: {
+    searchParams: { [key: string]: string | string[] | undefined }
+}) {
 
     // Invitations (to decide where to redirect after user update)
     const invRes = await getInvitations({
@@ -46,6 +51,25 @@ export default async function CreateNewOrganizationPage() {
             description: org.description || "",
         }));
     }
+
+    let organization = undefined
+    const orgId: string | undefined = typeof searchParams.id === 'string' ? searchParams.id : undefined
+    if (orgId) {
+        organization = await getOrganizationFromOrganizationId(orgId, {
+            id: true,
+            description: true,
+            name: true,
+            yearFounded: true,
+            contactEmail: true,
+            subdomain: true,
+            incorporationStatus: true,
+            website: true,
+            therapeuticsInDevelopment: true,
+            therapeuticsOfInterest: true,
+            metadata: true,
+        })
+    }
+
 
     return (
         <div className="flex flex-col space-y-8 w-full max-w-5xl mx-auto py-8 px-6">

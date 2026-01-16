@@ -41,7 +41,7 @@ import {handleImageUpload} from "@comend/lib/upload";
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {Textarea} from "@comend/components/ui/textarea";
 import {FormImageSelector} from "@comend/components/form-image-selector";
-import {Invitation} from "@prisma/client";
+import {Invitation, Organization} from "@prisma/client";
 import { badgeVariants } from "@comend/components/ui/badge";
 
 /**************************************
@@ -123,7 +123,10 @@ const refinedSchema = unifiedSchema.superRefine((vals, ctx) => {
 /**************************************
  * Component
  **************************************/
-export default function NewOrganizationForm({invitations, organizations}: {
+export default function NewOrganizationForm({
+    invitations, 
+    organizations
+}: {
     invitations: Invitation[],
     organizations: Option[]
 }) {
@@ -147,7 +150,6 @@ export default function NewOrganizationForm({invitations, organizations}: {
     });
 
     const [debouncedSubdomain] = useDebounce(form.watch("subdomain"), 500);
-
 
     /**************************************
      * Subdomain availability check
