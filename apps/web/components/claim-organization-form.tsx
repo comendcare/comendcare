@@ -23,7 +23,7 @@ import {Separator} from "@comend/components/ui/separator";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import MoneyInput from "@comend/components/money-input";
 import type {FileWithPreview} from "@comend/components/image-selector";
-import {years, toKebabCase} from "@comend/lib/utils";
+import {years, toKebabCase, getPublicFile} from "@comend/lib/utils";
 import {Option, optionSchema, MODALITIES, MOLECULAR_MECHANISMS} from "@comend/lib/types";
 import {useDebounce} from "use-debounce";
 import {toast} from "sonner";
@@ -128,7 +128,7 @@ export default function ClaimOrganizationForm({
     invitations, 
     // organizations
 }: {
-    organization: Organization,
+    organization: any,
     invitations: Invitation[],
     // organizations: Option[]
 }) {
@@ -145,11 +145,14 @@ export default function ClaimOrganizationForm({
     // Collections
     const hasInvitations = invitations.length > 0;
 
+    const condition = organization.conditions?.[0]?.condition
+
     // Debounced subdomain check
     const form = useForm<z.infer<typeof unifiedSchema>>({
         mode: "onChange",
         resolver: zodResolver(refinedSchema),
         defaultValues: {
+            // organization information (about)
             name: organization.name || undefined,
             description: organization.description || undefined,
             subdomain: organization.subdomain || undefined,
@@ -159,6 +162,33 @@ export default function ClaimOrganizationForm({
             therapeuticsInDevelopment: MODALITIES.filter(option => organization.therapeuticsInDevelopment.includes(option.label)),
             therapeuticsOfInterest: MODALITIES.filter(option => organization.therapeuticsOfInterest.includes(option.label)),
             orgImage: organization.image || undefined,
+
+            // condition information
+            disorder: condition.name ? [{label: condition.name, value: condition.name}] : [],
+            associatedConditions: (condition.associatedConditions ?? []).map((name: string) => ({
+                label: name,
+                value: name,
+            })),
+            summary: condition.summary ?? "",
+            categories: (condition.diseaseCategories ?? []).map((cat: string) => ({label: cat, value: cat})),
+            causal: (condition.causalGenes ?? []).map((gene: string) => ({label: gene, value: gene})),
+            genes: (condition.associatedGenes ?? []).map((gene: string) => ({label: gene, value: gene})),
+            systems: (condition.associatedSystems ?? []).map((system: string) => ({
+                label: system,
+                value: system,
+            })),
+            symptoms: (condition.associatedSignsAndSymptoms ?? []).map((s: string) => ({
+                label: s,
+                value: s,
+            })),
+            engaged: condition.numberOfPatientsEngaged?.toString() ?? "",
+            national: condition.nationalEstimatedPopulation?.toString() ?? "",
+            global: condition.globalEstimatedPopulation?.toString() ?? "",
+
+            // organization information (finances)
+            raised: organization.moneyRaised || undefined,
+            budget: organization.researchBudget || undefined,
+            deployed: organization.moneyDeployed || undefined,
         }
     });
 
@@ -174,7 +204,7 @@ export default function ClaimOrganizationForm({
             const sd = debouncedSubdomain;
             if (!sd) return;
             try {
-                const ok = await checkSubdomainAvailability(sd);
+                const ok = await checkSubdomainAvailability(sd, organization.id);
                 if (!ok) {
                     form.setError("subdomain", {
                         type: "manual",

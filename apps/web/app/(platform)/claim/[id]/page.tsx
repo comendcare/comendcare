@@ -57,6 +57,11 @@ export default async function CreateNewOrganizationPage({
             therapeuticsInDevelopment: true,
             therapeuticsOfInterest: true,
             metadata: true,
+            image: true,
+            conditions: true,
+            moneyRaised: true,
+            moneyDeployed: true,
+            researchBudget: true,
         })
     }
 
