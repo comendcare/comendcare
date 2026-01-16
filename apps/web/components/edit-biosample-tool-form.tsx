@@ -18,12 +18,7 @@ import {Button} from "@comend/components/ui/button"
 import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
-    DialogClose,
-    DialogContent,
     DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
 } from "@comend/components/ui/dialog"
 import { BIOSAMPLE_TYPE_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, QUANTITY_OPTIONS } from "@comend/lib/types"
 import type {CreateFacilityRequest, Prisma} from "@prisma/client"
@@ -36,7 +31,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/t
 import ProjectMultipleSelector from "./project-multiple-selector"
 import MultipleSelector, { MultipleSelectorRef } from "@comend/components/ui/multiple-selector"
 import { editBiosampleForm, Option } from "@comend/lib/types"
-import { useRouter } from "next/navigation"
 import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@comend/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@comend/components/ui/select"
@@ -50,7 +44,6 @@ import LoadingDots from "@comend/components/icons/loading-dots"
 import { Badge } from "@comend/components/ui/badge"
 import { SubmitCreateRequest } from "./create-facility-request-button"
 import { badgeVariants } from "@comend/components/ui/badge"
-import { DialogDescription } from "@radix-ui/react-dialog"
 import { Session } from "next-auth"
 import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
 
@@ -150,7 +143,6 @@ export function EditBiosampleToolForm({
 }) {
     const initializing = useRef(true)
     const {data: session} = useSession()
-    const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
@@ -263,9 +255,6 @@ export function EditBiosampleToolForm({
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editBiosampleForm>, createFacilityRequests: CreateFacilityRequest[]) => {
-        const isValid = form.trigger()
-        if (!isValid) return // stops submission
-        
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(
@@ -385,9 +374,6 @@ export function EditBiosampleToolForm({
                     rfps: true,
                     metadata: true
                 })
-                if (response.success && response.data) {
-                    setOrgIsPublished(response.data.published)
-                }
             }
 
             // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away
