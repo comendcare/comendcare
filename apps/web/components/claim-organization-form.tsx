@@ -149,7 +149,20 @@ export default function ClaimOrganizationForm({
     const form = useForm<z.infer<typeof unifiedSchema>>({
         mode: "onChange",
         resolver: zodResolver(refinedSchema),
+        defaultValues: {
+            name: organization.name || undefined,
+            description: organization.description || undefined,
+            subdomain: organization.subdomain || undefined,
+            website: organization.website || undefined,
+            contactEmail: organization.contactEmail || undefined,
+            founded: organization.yearFounded || undefined,
+            therapeuticsInDevelopment: MODALITIES.filter(option => organization.therapeuticsInDevelopment.includes(option.label)),
+            therapeuticsOfInterest: MODALITIES.filter(option => organization.therapeuticsOfInterest.includes(option.label)),
+            orgImage: organization.image || undefined,
+        }
     });
+
+    console.log(`organization`, organization)
 
     const [debouncedSubdomain] = useDebounce(form.watch("subdomain"), 500);
 
@@ -214,13 +227,18 @@ export default function ClaimOrganizationForm({
             };
             Object.entries(extra).forEach(([k, v]) => v && formData.append(k, v as string));
 
-            const createRes: any = await createOrganization(formData);
+            // const createRes: any = await createOrganization(formData);
+            // if (createRes?.error) {
+            //     toast.error(createRes.error);
+            //     return;
+            // }
+            const createRes: any = await updateOrganization(organization.id, formData);
             if (createRes?.error) {
                 toast.error(createRes.error);
                 return;
             }
             toast.success("Successfully created organization!");
-            mixpanelTrack("Created Organization", {
+            mixpanelTrack("Claimed Organization", {
                 name: values.name,
                 looking: values.therapeuticsOfInterest?.map((x) => x.label).join(",")
             });
@@ -280,14 +298,14 @@ export default function ClaimOrganizationForm({
                     }
                 });
 
-                const condRes = await createCondition(cfd);
-                if (condRes?.success && condRes?.data?.id) {
-                    await connectOrganizationToCondition(orgId, condRes.data.id);
-                    toast.success("Condition saved!");
-                } else if (condRes?.error) {
-                    console.error(condRes.error);
-                    toast.error(condRes.error);
-                }
+                // const condRes = await createCondition(cfd);
+                // if (condRes?.success && condRes?.data?.id) {
+                //     await connectOrganizationToCondition(orgId, condRes.data.id);
+                //     toast.success("Condition saved!");
+                // } else if (condRes?.error) {
+                //     console.error(condRes.error);
+                //     toast.error(condRes.error);
+                // }
             }
 
             // 6) Finances (optional; only if at least one is provided + orgId)

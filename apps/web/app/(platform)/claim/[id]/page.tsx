@@ -73,7 +73,7 @@ export default async function CreateNewOrganizationPage({
             </div>
             <Separator/>
             <ClaimOrganizationForm
-                organization={organization}
+                organization={organization?.data}
                 invitations={invitations}
             />
         </div>
