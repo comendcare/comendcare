@@ -33,6 +33,7 @@ import {
     updateOrganization,
     connectOrganizationToCondition,
     createCondition,
+    updateCondition,
 } from "@comend/lib/actions";
 import {
     checkSubdomainAvailability,
@@ -235,8 +236,8 @@ export default function ClaimOrganizationForm({
             if (values.subdomain) formData.append("subdomain", values.subdomain);
             if (values.website) formData.append("website", values.website);
             if (values.contactEmail) formData.append("contactEmail", values.contactEmail);
-            if (values.title) formData.append("title", values.title);
-            if (values.founded) formData.append("founded", values.founded);
+            // if (values.title) formData.append("title", values.title);
+            if (values.founded) formData.append("yearFounded", values.founded);
             // if (values.incorporationStatus) formData.append("incorporationStatus", values.incorporationStatus);
 
             // Upload org image only if changed
@@ -257,14 +258,9 @@ export default function ClaimOrganizationForm({
             };
             Object.entries(extra).forEach(([k, v]) => v && formData.append(k, v as string));
 
-            // const createRes: any = await createOrganization(formData);
-            // if (createRes?.error) {
-            //     toast.error(createRes.error);
-            //     return;
-            // }
-            const createRes: any = await updateOrganization(organization.id, formData);
-            if (createRes?.error) {
-                toast.error(createRes.error);
+            const updatedOrganization: any = await updateOrganization(organization.id, formData);
+            if (!updatedOrganization) {
+                toast.error("Error updating organization");
                 return;
             }
             toast.success("Successfully created organization!");
@@ -274,7 +270,7 @@ export default function ClaimOrganizationForm({
             });
 
             // 4) Organization: join or create (and possibly update existing)
-            let orgId = createRes.organization.id
+            let orgId = updatedOrganization?.id
 
             // 5) Condition (optional; only if disorder selected and we have an org)
             const numOrNull = (s?: string | null) =>
@@ -286,9 +282,9 @@ export default function ClaimOrganizationForm({
                 // Build the same mapped structure as the editor
                 const mappedData: Record<string, any> = {
                     name: values.disorder?.[0]?.label || "",
-                    // normalize to slugs like the editor
+                    // Normalize to slugs even for creatable values
                     associatedConditions: (values.associatedConditions ?? []).map(o =>
-                        toKebabCase(String(o.value || o.label || "").trim())
+                        String(o.label || o.value || "").trim()
                     ),
                     summary: values.summary ?? "",
                     diseaseCategories: (values.categories ?? []).map(i => i.label),
@@ -297,45 +293,47 @@ export default function ClaimOrganizationForm({
                     numberOfPatientsEngaged: numOrNull(values.engaged),
                     nationalEstimatedPopulation: numOrNull(values.national),
                     globalEstimatedPopulation: numOrNull(values.global),
-                    // keep mechanisms consistent with editor: it uses `categories` for UI and leaves `mechanisms` unused
                     relevantDiseaseMechanisms: values.mechanisms ?? [],
                     causalGenes: (values.causal ?? []).map(i => i.label),
                     associatedGenes: (values.genes ?? []).map(i => i.label),
                     associatedSystems: (values.systems ?? []).map(i => i.label),
-                    // wire up optional fields you already have in the schema
                     associatedSignsAndSymptoms: (values.symptoms ?? []).map(i => i.label),
                     existingDatabasesAndStudies: (values.studies ?? []).map(i => i.label),
                     toolsUnderDevelopment: (values.tools ?? []).map(i => i.label),
-                    metadata: {
-                        otherCategories: values.otherCategories ?? null,
-                        otherSystems: values.otherSystems ?? null,
-                    },
-                };
-
-                const appendCsv = (fd: FormData, key: string, arr: string[]) => {
-                    if (arr && arr.length) fd.append(key, arr.join(",")); // e.g. "ABCF1,BRCA1"
+                    // metadata: {
+                    //     otherCategories: values.otherCategories ?? null,
+                    //     otherMechanisms: values.otherMechanisms ?? null,
+                    //     otherSystems: values.otherSystems ?? null,
+                    // },
+                    // biomarkers: (values.biomarkers ?? [])
+                    //     .map((b) => ({
+                    //         name: (b.name ?? "").trim(),
+                    //         type: normalizeType(b.type),
+                    //     }))
+                    //     .filter((b) => b.name && b.type),
                 };
 
                 Object.entries(mappedData).forEach(([key, value]) => {
                     if (key === "metadata") {
                         cfd.append(key, JSON.stringify(value ?? {}));
                     } else if (Array.isArray(value)) {
-                        appendCsv(cfd, key, value);
-                    } else if (value === null || value === undefined || value === "") {
-                        // skip null/empty so server falls back to []
+                        cfd.append(key, JSON.stringify(value));
+                    } else if (value === null) {
+                        cfd.append(key, "null"); // tell the server to clear
                     } else {
                         cfd.append(key, String(value));
                     }
                 });
 
                 // const condRes = await createCondition(cfd);
-                // if (condRes?.success && condRes?.data?.id) {
-                //     await connectOrganizationToCondition(orgId, condRes.data.id);
-                //     toast.success("Condition saved!");
-                // } else if (condRes?.error) {
-                //     console.error(condRes.error);
-                //     toast.error(condRes.error);
-                // }
+                const condRes = await updateCondition(organization.id, cfd)
+                if (condRes?.success && condRes?.data?.id) {
+                    // await connectOrganizationToCondition(orgId, condRes.data.id);
+                    toast.success("Condition saved!");
+                } else if (condRes?.error) {
+                    console.error(condRes.error);
+                    toast.error(condRes.error);
+                }
             }
 
             // 6) Finances (optional; only if at least one is provided + orgId)
