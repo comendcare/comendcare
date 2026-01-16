@@ -471,7 +471,7 @@ export function ImageSelector({
         <>
             {isCropping ? (
                 // user is currently cropping the image, show cropping UI
-                <div className="p-0 gap-0 overflow-hidden w-full">
+                <div className="p-0 gap-0 overflow-hidden w-full max-w-[600px] max-h-[800px]">
                     <div className="p-6 size-full max-h-full w-full">
                         <ReactCrop
                             crop={crop}
