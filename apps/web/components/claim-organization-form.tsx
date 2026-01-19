@@ -34,6 +34,7 @@ import {
     connectOrganizationToCondition,
     createCondition,
     updateCondition,
+    updateMemberWithOwnerPermission,
 } from "@comend/lib/actions";
 import {
     checkSubdomainAvailability,
@@ -126,13 +127,12 @@ const refinedSchema = unifiedSchema.superRefine((vals, ctx) => {
  **************************************/
 export default function ClaimOrganizationForm({
     organization,
-    // invitations, 
-    // organizations
+    membership,
 }: {
     organization: any,
-    // invitations: Invitation[],
-    // organizations: Option[]
+    membership: any
 }) {
+    const {data: session} = useSession();
     const router = useRouter();
     const {update} = useSession();
 
@@ -142,9 +142,6 @@ export default function ClaimOrganizationForm({
 
     // Files
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
-
-    // Collections
-    // const hasInvitations = invitations.length > 0;
 
     const condition = organization.conditions?.[0]?.condition
 
@@ -193,8 +190,6 @@ export default function ClaimOrganizationForm({
         }
     });
 
-    console.log(`organization`, organization)
-
     const [debouncedSubdomain] = useDebounce(form.watch("subdomain"), 500);
 
     /**************************************
@@ -226,6 +221,7 @@ export default function ClaimOrganizationForm({
      **************************************/
     async function onSubmit(values: z.infer<typeof unifiedSchema>) {
         setLoading(true);
+        const userId = session?.user?.id
 
         try {
 
@@ -238,7 +234,6 @@ export default function ClaimOrganizationForm({
             if (values.contactEmail) formData.append("contactEmail", values.contactEmail);
             // if (values.title) formData.append("title", values.title);
             if (values.founded) formData.append("yearFounded", values.founded);
-            // if (values.incorporationStatus) formData.append("incorporationStatus", values.incorporationStatus);
 
             // Upload org image only if changed
             if (selectedFile && values.orgImage && values.orgImage !== (form.formState.defaultValues as any)?.orgImage) {
@@ -263,7 +258,7 @@ export default function ClaimOrganizationForm({
                 toast.error("Error updating organization");
                 return;
             }
-            toast.success("Successfully created organization!");
+            toast.success("Successfully claimed organization!");
             mixpanelTrack("Claimed Organization", {
                 name: values.name,
                 looking: values.therapeuticsOfInterest?.map((x) => x.label).join(",")
@@ -271,6 +266,16 @@ export default function ClaimOrganizationForm({
 
             // 4) Organization: join or create (and possibly update existing)
             let orgId = updatedOrganization?.id
+
+            if (orgId && membership) {
+                const updatedMembership = await updateMemberWithOwnerPermission(
+                    orgId,
+                    membership.id,
+                    {
+                        title: values.title
+                    }
+                )
+            }
 
             // 5) Condition (optional; only if disorder selected and we have an org)
             const numOrNull = (s?: string | null) =>
@@ -300,17 +305,6 @@ export default function ClaimOrganizationForm({
                     associatedSignsAndSymptoms: (values.symptoms ?? []).map(i => i.label),
                     existingDatabasesAndStudies: (values.studies ?? []).map(i => i.label),
                     toolsUnderDevelopment: (values.tools ?? []).map(i => i.label),
-                    // metadata: {
-                    //     otherCategories: values.otherCategories ?? null,
-                    //     otherMechanisms: values.otherMechanisms ?? null,
-                    //     otherSystems: values.otherSystems ?? null,
-                    // },
-                    // biomarkers: (values.biomarkers ?? [])
-                    //     .map((b) => ({
-                    //         name: (b.name ?? "").trim(),
-                    //         type: normalizeType(b.type),
-                    //     }))
-                    //     .filter((b) => b.name && b.type),
                 };
 
                 Object.entries(mappedData).forEach(([key, value]) => {
@@ -354,8 +348,6 @@ export default function ClaimOrganizationForm({
 
             // 7) Final route
             await update({})
-            // if (hasInvitations) router.push("/app/profile");
-            // else router.push("/app/dashboard");
             router.push("/app/dashboard");
             toast.success("Onboarding complete ✨");
         } catch (error) {

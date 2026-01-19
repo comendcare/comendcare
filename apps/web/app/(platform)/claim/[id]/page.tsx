@@ -19,7 +19,7 @@ export default async function CreateNewOrganizationPage({
 }) {
     const session = await getServerSession(authOptions);
     const userId = session?.user?.id;
-    
+
     const [memberships] = await Promise.all([
         prisma.member.findMany({
             where: { userId },
@@ -76,7 +76,7 @@ export default async function CreateNewOrganizationPage({
             <Separator/>
             <ClaimOrganizationForm
                 organization={organization?.data}
-                // invitations={invitations}
+                membership={memberships.filter(member => (member.userId === session?.user?.id) && (member.organizationId === orgId))?.[0] || undefined}
             />
         </div>
     );

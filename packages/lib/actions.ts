@@ -1837,7 +1837,7 @@ export const updateMemberWithOwnerPermission = withOrganizationAuth(
 
             // Prevent demoting the last owner to member
             if (
-                targetMember.role === "owner" || targetMember.role === "support" &&
+                (targetMember.role === "owner" || targetMember.role === "support") &&
                 data.role === "member"
             ) {
                 const ownerCount = await prisma.member.count({
