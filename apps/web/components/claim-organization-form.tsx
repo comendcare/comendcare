@@ -126,11 +126,11 @@ const refinedSchema = unifiedSchema.superRefine((vals, ctx) => {
  **************************************/
 export default function ClaimOrganizationForm({
     organization,
-    invitations, 
+    // invitations, 
     // organizations
 }: {
     organization: any,
-    invitations: Invitation[],
+    // invitations: Invitation[],
     // organizations: Option[]
 }) {
     const router = useRouter();
@@ -144,7 +144,7 @@ export default function ClaimOrganizationForm({
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
 
     // Collections
-    const hasInvitations = invitations.length > 0;
+    // const hasInvitations = invitations.length > 0;
 
     const condition = organization.conditions?.[0]?.condition
 
@@ -354,8 +354,9 @@ export default function ClaimOrganizationForm({
 
             // 7) Final route
             await update({})
-            if (hasInvitations) router.push("/app/profile");
-            else router.push("/app/dashboard");
+            // if (hasInvitations) router.push("/app/profile");
+            // else router.push("/app/dashboard");
+            router.push("/app/dashboard");
             toast.success("Onboarding complete ✨");
         } catch (error) {
             console.error(error);

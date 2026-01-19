@@ -7,44 +7,40 @@ import {
 } from "@comend/lib/fetchers";
 import {Separator} from "@comend/components/ui/separator";
 import ClaimOrganizationForm from "~web/components/claim-organization-form";
+import prisma from "@comend/lib/prisma";
+import { authOptions } from "@comend/lib/auth";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
 export default async function CreateNewOrganizationPage({
     params
 }: {
     params: { id: string }
 }) {
-    /* TODO - add authentication check to see if this user has been invited to claim this organization */
-    // if this user is not a member of this org, then redirect
-
-    // Invitations (to decide where to redirect after user update)
-    const invRes = await getInvitations({
-        id: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-        accepted: true,
-        organizationId: true,
-    });
-
-    let invitations = []
-    if (invRes.success && invRes.data) {
-        invitations = await Promise.all(
-            invRes.data.map(async (i: any) => {
-                const orgRes = await getPublicOrganizationData(i.organizationId, {
-                    id: true,
-                    name: true,
-                    description: true,
-                    image: true,
-                    subdomain: true,
-                });
-                return {...i, organization: orgRes.success ? orgRes.data : null};
-            })
-        );
-    }
+    const session = await getServerSession(authOptions);
+    const userId = session?.user?.id;
+    
+    const [memberships] = await Promise.all([
+        prisma.member.findMany({
+            where: { userId },
+            include: {
+                organization: true,
+                user: true,
+                invitedBy: true,
+            },
+            orderBy: { createdAt: "asc" },
+        }),
+    ]);
 
     let organization = undefined
     const orgId: string | undefined = typeof params.id === 'string' ? params.id : undefined
+
+    // if the user is not a member of the org, redirect back to dashboard, user is not allowed to claim this org
+    if (orgId && !memberships.map(membership => membership.organizationId).includes(orgId)) {
+        redirect("/app/dashboard"); 
+    }
+
+
     if (orgId) {
         organization = await getOrganizationFromOrganizationId(orgId, {
             id: true,
@@ -80,7 +76,7 @@ export default async function CreateNewOrganizationPage({
             <Separator/>
             <ClaimOrganizationForm
                 organization={organization?.data}
-                invitations={invitations}
+                // invitations={invitations}
             />
         </div>
     );
