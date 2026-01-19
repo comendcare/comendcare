@@ -2616,6 +2616,24 @@ export const diagnosisSchema = z.object({
     severity: z.string().optional(),
 })
 
+export const editResearchPlanForm = z.object({
+    title: z
+        .string({ required_error: "Please provide a title" })
+        .min(1, "Title is required")
+        .max(200, "Title must be less than 200 characters"),
+    modalities: z.array(optionSchema).max(1, "You can only select one type").optional(),
+    partners: z.array(z.custom<any>()).optional(),
+    description: z
+        .string()
+        .max(1500, "Description must be less than 1500 characters")
+        .optional(),
+    stages: z.array(optionSchema).max(1, "You can only select one stage").optional(),
+    statuses: z.array(optionSchema).max(1, "You can only select one status").optional(),
+    links: z.array(z.custom<any>()).optional(),
+    otherModalities: z.string().optional(),
+    metadata: z.string().optional()
+})
+
 export const editBiosampleForm = z.object({
     id: z.string().optional(),
     description: z

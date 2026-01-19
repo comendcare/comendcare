@@ -48,6 +48,7 @@ import {
     editDataToolForm,
     editDiseaseModelForm,
     editOrgFormSchema,
+    editResearchPlanForm,
     MemberRequestWithUserAndOrganization,
     Milestone,
     Option,
@@ -1001,6 +1002,9 @@ export const updateRoadmap = withOrganizationAuth(
                     description: data.description,
                     content: data.content,
                     modalities: data.modalities,
+                    stages: data.stages,
+                    statuses: data.statuses,
+                    
                     ...(data.metadata ? {metadata: data.metadata} : undefined)
                 }
             })
@@ -4112,6 +4116,7 @@ export const createRoadmap = withOrganizationAuth(
     async (
         organization: Organization,
         roadmapTemplate?: (typeof templateResearchPlans)[0] & { metadata: JsonObject },
+        // roadmapTemplate?: z.infer<typeof editResearchPlanForm>,
         actor?: Actor
     ) => {
         const session = await getSession()

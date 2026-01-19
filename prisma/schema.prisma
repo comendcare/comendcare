@@ -232,27 +232,27 @@ model VerificationToken {
 }
 
 model Roadmap {
-  id             String        @id @default(cuid())
+  id             String               @id @default(cuid())
   title          String?
   description    String?
   content        String?
-  slug           String        @default(cuid())
+  slug           String               @default(cuid())
   image          String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  published      Boolean       @default(true)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  published      Boolean              @default(true)
   organizationId String?
   userId         String?
   edges          Edge[]
   milestones     Milestone[]
   nodes          Node[]
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  organization   Organization?        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
   modalities     String[]
-  partners ExternalContact[]
-  stage String
-  status String
-  links ExternalAttachment[]
+  partners       ExternalContact[]
+  stages         String[]
+  statuses       String[]
+  links          ExternalAttachment[]
   metadata       Json?
 
   @@unique([slug, organizationId])
@@ -684,6 +684,8 @@ model ExternalAttachment {
   metadata       Json?
   diseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
   diseaseModelId String?
+  Roadmap        Roadmap?      @relation(fields: [roadmapId], references: [id])
+  roadmapId      String?
 }
 
 model ExternalContact {
@@ -706,6 +708,8 @@ model ExternalContact {
   metadata       Json?
   diseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
   diseaseModelId String?
+  Roadmap        Roadmap?      @relation(fields: [roadmapId], references: [id])
+  roadmapId      String?
 }
 
 model Edge {
