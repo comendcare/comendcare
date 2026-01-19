@@ -14,6 +14,7 @@ export default async function CreateNewOrganizationPage({
     params: { id: string }
 }) {
     /* TODO - add authentication check to see if this user has been invited to claim this organization */
+    // if this user is not a member of this org, then redirect
 
     // Invitations (to decide where to redirect after user update)
     const invRes = await getInvitations({

@@ -165,26 +165,26 @@ export default function ClaimOrganizationForm({
             orgImage: organization.image || undefined,
 
             // condition information
-            disorder: condition.name ? [{label: condition.name, value: condition.name}] : [],
-            associatedConditions: (condition.associatedConditions ?? []).map((name: string) => ({
+            disorder: condition?.name ? [{label: condition.name, value: condition.name}] : [],
+            associatedConditions: (condition?.associatedConditions ?? []).map((name: string) => ({
                 label: name,
                 value: name,
             })),
-            summary: condition.summary ?? "",
-            categories: (condition.diseaseCategories ?? []).map((cat: string) => ({label: cat, value: cat})),
-            causal: (condition.causalGenes ?? []).map((gene: string) => ({label: gene, value: gene})),
-            genes: (condition.associatedGenes ?? []).map((gene: string) => ({label: gene, value: gene})),
-            systems: (condition.associatedSystems ?? []).map((system: string) => ({
+            summary: condition?.summary ?? "",
+            categories: (condition?.diseaseCategories ?? []).map((cat: string) => ({label: cat, value: cat})),
+            causal: (condition?.causalGenes ?? []).map((gene: string) => ({label: gene, value: gene})),
+            genes: (condition?.associatedGenes ?? []).map((gene: string) => ({label: gene, value: gene})),
+            systems: (condition?.associatedSystems ?? []).map((system: string) => ({
                 label: system,
                 value: system,
             })),
-            symptoms: (condition.associatedSignsAndSymptoms ?? []).map((s: string) => ({
+            symptoms: (condition?.associatedSignsAndSymptoms ?? []).map((s: string) => ({
                 label: s,
                 value: s,
             })),
-            engaged: condition.numberOfPatientsEngaged?.toString() ?? "",
-            national: condition.nationalEstimatedPopulation?.toString() ?? "",
-            global: condition.globalEstimatedPopulation?.toString() ?? "",
+            engaged: condition?.numberOfPatientsEngaged?.toString() ?? "",
+            national: condition?.nationalEstimatedPopulation?.toString() ?? "",
+            global: condition?.globalEstimatedPopulation?.toString() ?? "",
 
             // organization information (finances)
             raised: organization.moneyRaised || undefined,
