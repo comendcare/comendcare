@@ -29,7 +29,9 @@ import { useShallow } from "zustand/react/shallow"
 import {
     MODALITIES,
     optionSchema,
+    RESEARCH_PLAN_STATUS,
     RESEARCH_PLAN_TYPES,
+    RESEARCH_STAGE,
 } from "@comend/lib/types"
 import {
     AlertDialog,
@@ -43,17 +45,24 @@ import {
     AlertDialogTrigger,
 } from "@comend/components/ui/alert-dialog"
 import { revalidate } from "@comend/lib/revalidate"
+import { Plus, Trash, User } from "lucide-react"
+import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area"
+import { DialogFooter } from "@comend/components/ui/dialog"
 
 const editResearchPlanForm = z.object({
     title: z
         .string({ required_error: "Please provide a title" })
         .min(1, "Title is required")
         .max(200, "Title must be less than 200 characters"),
+    modalities: z.array(optionSchema).max(1, "You can only select one type").optional(),
+    partners: z.array(z.custom<any>()).optional(),
     description: z
         .string()
-        .max(1000, "Description must be less than 1000 characters")
+        .max(1500, "Description must be less than 1500 characters")
         .optional(),
-    modalities: z.array(optionSchema).max(1, "You can only select one type").optional(),
+    stage: z.array(optionSchema).max(1, "You can only select one stage").optional(),
+    status: z.array(optionSchema).max(1, "You can only select one status").optional(),
+    link: z.string().optional(),
     otherModalities: z.string().optional(),
 })
 
@@ -160,29 +169,22 @@ export function EditResearchPlanForm({
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+            <form 
+                onSubmit={form.handleSubmit(handleFormSubmit)} 
+                className="flex max-h-[80vh] flex-col overflow-hidden"
+            >
+                <ScrollArea type={"always"}>
+                <ScrollBar />
+                <div className="flex flex-col gap-4 pr-4">
                 <FormField
                     control={form.control}
                     name="title"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Title</FormLabel>
+                            <FormDescription>Name/type of drug for target</FormDescription>
                             <FormControl>
                                 <Input id="title" placeholder="Enter a title..." {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Description</FormLabel>
-                            <FormControl>
-                                <Textarea id="description" placeholder={`Enter a description...`} {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -194,7 +196,7 @@ export function EditResearchPlanForm({
                     name="modalities"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Scientific strategy</FormLabel>
+                            <FormLabel>Therapeutic strategy</FormLabel>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
@@ -237,7 +239,198 @@ export function EditResearchPlanForm({
                     />
                 )}
 
-                <div className="flex gap-2 justify-end">
+                <FormField
+                    control={form.control}
+                    name="partners"
+                    render={({field}) => (
+                        <FormItem id="contacts">
+                            <div className="flex gap-2 w-full justify-between items-center">
+                                <div>
+                                    <FormLabel>Partners</FormLabel>
+                                    <FormDescription>{`Add any external contacts that are not on the Comend platform.`}</FormDescription>
+                                </div>
+                                <Button
+                                    variant="secondary"
+                                    size={"icon"}
+                                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                        e.preventDefault()
+                                        form.setValue(
+                                            "partners", 
+                                            [
+                                                ...(field.value || []),
+                                                {name: "", email: "", role: null}
+                                            ],
+                                            {shouldDirty: true}
+                                        )
+                                    }}
+                                >
+                                    <Plus/>
+                                </Button>
+                            </div>
+
+                            {field?.value && field.value.length > 0 && (
+                                <ol className="flex flex-col gap-4">
+                                    {field.value.map((partner: any, index: number) => (
+                                        <li key={index} className="grid grid-cols-[20px_auto_34px] lg:grid-cols-[20px_auto_auto_34px] gap-2 items-center">
+                                            <User className="row-start-1 col-start-1 h-4 w-4"/>
+                                            <div className="h-fit w-full grow row-start-1 col-start-2">
+                                            <Input
+                                                placeholder={`Name`}
+                                                value={partner.name}
+                                                onChange={(e: React.FormEvent<HTMLInputElement>) => {
+                                                    const newValue = {
+                                                        ...partner,
+                                                        name: e.currentTarget.value
+                                                    }
+                                                    form.setValue(
+                                                        "partners",
+                                                        field?.value?.map((currentValue: any, i: number) => i === index ? newValue : currentValue),
+                                                        {shouldDirty: true}
+                                                    )
+                                                }}
+                                            />
+                                            </div>
+                                            <div className="h-fit w-full grow row-start-2 col-start-2 lg:row-start-1 lg:col-start-3">
+                                            <Input
+                                                placeholder={`Email (required)`}
+                                                value={partner.email}
+                                                onChange={(e: React.FormEvent<HTMLInputElement>) => {
+                                                    const newValue = {
+                                                        ...field.value,
+                                                        email: e.currentTarget.value
+                                                    }
+                                                    form.setValue(
+                                                        "partners",
+                                                        field?.value?.map((currentValue: any, i: number) => i === index ? newValue : currentValue),
+                                                        {shouldDirty: true}
+                                                    )
+                                                }}
+                                            />
+                                            </div>
+                                            <div className="h-fit w-full grow row-start-3 col-start-2 lg:row-start-2 lg:col-start-2 lg:col-span-2">
+                                            <Input
+                                                placeholder={`Affiliation`}
+                                                value={partner.affiliation || undefined}
+                                                onChange={(e: React.FormEvent<HTMLInputElement>) => {
+                                                    const newValue = {
+                                                        ...partner,
+                                                        affiliation: e.currentTarget.value
+                                                    }
+                                                    form.setValue(
+                                                        "partners",
+                                                        field?.value?.map((currentValue: any, i: number) => i === index ? newValue : currentValue),
+                                                        {shouldDirty: true}
+                                                    )
+                                                }}
+                                            />
+                                            </div>
+                                            <Button 
+                                                className="row-start-1 col-start-3 lg:col-start-4 h-full w-[34px]" 
+                                                variant="ghost" 
+                                                onClick={() => {
+                                                    form.setValue(
+                                                        "partners",
+                                                        field?.value?.filter((t: any, i: number) => i !== index),
+                                                        {shouldDirty: true}
+                                                    )
+                                                }}
+                                            >
+                                                <Trash />
+                                            </Button>
+                                        </li>
+                                    ))}
+                                </ol>
+                            )}
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                                <Textarea id="description" placeholder={`Enter a description...`} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="stage"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Stage</FormLabel>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={RESEARCH_STAGE}
+                                    placeholder="Select a stage..."
+                                    hidePlaceholderWhenSelected={true}
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                    maxSelected={1}
+                                    showHoverCard={false}
+                                    groupBy="type"
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Status</FormLabel>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={RESEARCH_PLAN_STATUS}
+                                    placeholder="Select a status..."
+                                    hidePlaceholderWhenSelected={true}
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                    maxSelected={1}
+                                    showHoverCard={false}
+                                    groupBy="type"
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="link"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Link</FormLabel>
+                            <FormDescription>Link to any page with more information</FormDescription>
+                            <FormControl>
+                                <Input id="link" placeholder="Enter a URL..." {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                </div>
+                </ScrollArea>
+
+                <DialogFooter className="pt-4">
                     {researchPlanData?.id ? (
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -310,7 +503,7 @@ export function EditResearchPlanForm({
                     <Button disabled={!form.formState.isValid} type="submit" variant={"cta"} className="w-fit">
                         {researchPlanData?.id ? `Save` : `Create research plan`}
                     </Button>
-                </div>
+                </DialogFooter>
             </form>
         </Form>
     )

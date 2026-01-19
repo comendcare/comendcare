@@ -249,6 +249,10 @@ model Roadmap {
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   modalities     String[]
+  partners ExternalContact[]
+  stage String
+  status String
+  links ExternalAttachment[]
   metadata       Json?
 
   @@unique([slug, organizationId])

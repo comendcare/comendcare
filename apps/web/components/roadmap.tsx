@@ -890,7 +890,7 @@ const RoadmapHeader = ({
             </span>
 
             <Dialog open={editResearchPlanIsOpen} onOpenChange={setEditResearchPlanIsOpen}>
-                <DialogContent className="max-h-[80vh] overflow-y-auto">
+                <DialogContent>
                     <DialogHeader>
                         <DialogTitle>
                             Edit Research Plan Details

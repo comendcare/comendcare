@@ -1625,7 +1625,7 @@ export const MILESTONE_TYPE_OPTIONS: any[] = [
     {
         id: 'PHASE1/2',
         value: 'PHASE1/2',
-        label: 'Phase 1/2',
+        label: 'Phase I/II',
         services: ['Phase 1-3 Studies'],
         categories: ['clinical trials'],
         description: ''
@@ -1633,7 +1633,7 @@ export const MILESTONE_TYPE_OPTIONS: any[] = [
     {
         id: 'PHASE2',
         value: 'PHASE2',
-        label: 'Phase 2',
+        label: 'Phase II',
         services: ['Phase 1-3 Studies'],
         categories: ['clinical trials'],
         description: ''
@@ -1641,7 +1641,7 @@ export const MILESTONE_TYPE_OPTIONS: any[] = [
     {
         id: 'PHASE3',
         value: 'PHASE3',
-        label: 'Phase 3',
+        label: 'Phase III',
         services: ['Phase 1-3 Studies'],
         categories: ['clinical trials'],
         description: ""
@@ -1649,7 +1649,7 @@ export const MILESTONE_TYPE_OPTIONS: any[] = [
     {
         id: 'PHASE4',
         value: 'PHASE4',
-        label: 'Phase 4',
+        label: 'Phase IV',
         services: ['Biomarker Services', 'Clinical Data Registry', 'Patient-Reported Outcome Studies', 'Post-Marketing (Phase 4) Studies', 'RWE/HEOR Data Analysis', 'RWE/HEOR/Market Access Data Analytics', 'Real World Evidence (RWE) Studies', 'Real-World Evidence'],
         categories: ['clinical trials'],
         description: ""
@@ -1776,6 +1776,77 @@ export const milestoneCategories = {
         types: ['INTERACTMEETING', 'PREINDMEETING', 'INDSUBMISSION', 'FDAAPPROVAL']
     },
 }
+
+export const RESEARCH_STAGE: Option[] = [
+    {
+        id: 'DISCOVERY',
+        label: 'Discovery',
+        value: 'DISCOVERY',
+    },
+    {
+        id: 'PRECLINICAL',
+        label: 'Pre-clinical',
+        value: 'PRECLINICAL',
+    },
+    {
+        id: 'INDAPPROVED',
+        label: 'IND-approved',
+        value: 'INDAPPROVED',
+    },
+    {
+        id: 'EXPANDEDACCESS',
+        label: 'Expanded access',
+        value: 'EXPANDEDACCESS',
+    },
+    {
+        id: 'PHASE1/2',
+        label: 'Phase I/II',
+        value: 'PHASE1/2',
+    },
+    {
+        id: 'PHASE1',
+        label: 'Phase I',
+        value: 'PHASE1',
+    },
+    {
+        id: 'PHASE2',
+        label: 'Phase II',
+        value: 'PHASE2',
+    },
+    {
+        id: 'PHASE3',
+        label: 'Phase III',
+        value: 'PHASE3',
+    },
+    {
+        id: 'FDAAPPROVED',
+        label: 'FDA approved',
+        value: 'FDAAPPROVED',
+    },
+]
+
+export const RESEARCH_PLAN_STATUS: Option[] = [
+    {
+        id: 'ONGOING',
+        label: 'Ongoing',
+        value: 'ONGOING',
+    },
+    {
+        id: 'PAUSED',
+        label: 'Paused or shelved',
+        value: 'PAUSED',
+    },
+    {
+        id: 'FAILED',
+        label: 'Failed',
+        value: 'FAILED',
+    },
+    {
+        id: 'SEEKINGPARTNERS',
+        label: 'Seeking partners (sponsors, fundraising, licensing, etc.)',
+        value: 'SEEKINGPARTNERS',
+    },
+]
 
 export const MODALITIES: Option[] = [
     {
