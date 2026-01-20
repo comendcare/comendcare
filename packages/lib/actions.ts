@@ -991,6 +991,7 @@ export const updateRoadmap = withOrganizationAuth(
                     id: data.id
                 },
                 data: {
+                    private: data.private,
                     title: data.title,
                     description: data.description,
                     content: data.content,
@@ -4124,6 +4125,7 @@ export const createRoadmap = withOrganizationAuth(
 
             const roadmap = await prisma.roadmap.create({
                 data: {
+                    private: roadmapTemplate?.private,
                     title: roadmapTemplate?.title,
                     description: roadmapTemplate?.description,
                     organization: {connect: {id: organization.id}},

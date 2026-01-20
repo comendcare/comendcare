@@ -49,6 +49,7 @@ export default async function RoadmapPage({
         }),
         getRoadmap(orgId, params.id, {
             id: true,
+            private: true,
             title: true,
             description: true,
             content: true,

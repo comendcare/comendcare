@@ -8,7 +8,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { FormProvider, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import {
     Form,
     FormControl,
@@ -22,14 +22,12 @@ import { Input } from "@comend/components/ui/input"
 import { Textarea } from "@comend/components/ui/textarea"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { createRoadmap, deleteRoadmap } from "@comend/lib/actions"
-import type {Prisma, Roadmap} from "@prisma/client"
+import type {Prisma} from "@prisma/client"
 import { JsonObject } from "@prisma/client/runtime/library"
 import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import {
     editResearchPlanForm,
-    MODALITIES,
-    optionSchema,
     RESEARCH_PLAN_STATUS,
     RESEARCH_PLAN_TYPES,
     RESEARCH_STAGE,
@@ -46,14 +44,10 @@ import {
     AlertDialogTrigger,
 } from "@comend/components/ui/alert-dialog"
 import { revalidate } from "@comend/lib/revalidate"
-import { Globe, Plus, Trash, User, Lock } from "lucide-react"
+import { Plus, Trash, User } from "lucide-react"
 import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area"
 import { DialogFooter } from "@comend/components/ui/dialog"
 import { PrivatePublicFormField } from "./edit-milestone-form"
-import { RadioGroup, RadioGroupItem } from "@comend/components/ui/radio-group"
-import { cn } from "@comend/lib/utils"
-import { Tooltip, TooltipTrigger } from "@comend/components/ui/tooltip"
-import { AnyARecord } from "dns"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -62,10 +56,10 @@ const selector = (state: RoadmapState) => ({
 })
 
 export function EditResearchPlanForm({
-                                         researchPlanData,
-                                         closeDialog,
-                                         setIsSubmitting,
-                                     }: {
+    researchPlanData,
+    closeDialog,
+    setIsSubmitting,
+}: {
     researchPlanData?: any
     closeDialog?: () => void
     setIsSubmitting?: (submitting: boolean) => void
@@ -112,6 +106,7 @@ export function EditResearchPlanForm({
             // Create new
             const roadmap = await createRoadmap(session.user.organizationId, {
                 title: values.title,
+                private: values.isPrivate,
                 description: values.description || "",
                 modalities: values?.modalities?.map((m) => m.value) || [],
                 partners: values?.partners,
