@@ -1,10 +1,7 @@
 "use client"
 
-import { TypesenseBiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/typesense-biosamples-table"
 import { useBiosamplesTableColumns } from "@comend/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns"
-import { TypesenseClinicalDatasetsTable } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/typesense-clinical-datasets-table"
 import { useClinicalDatasetsTableColumns } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
-import { TypesenseDiseaseModelsTable } from "@comend/components/biorepo/advanced-data-table/disease-models-table/typesense-disease-models-table"
 import { useDiseaseModelsTableColumns } from "@comend/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
 import { Button } from "@comend/components/ui/button"
 import { Card, CardContent, CardTitle } from "@comend/components/ui/card"
@@ -25,7 +22,31 @@ import { RFPCard } from "@comend/components/rfp-card"
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
 import { Dialog, DialogContent, DialogTrigger } from "@comend/components/ui/dialog"
 import { mixpanelTrack } from "@comend/lib/mixpanel"
-import { RFPDetails } from "@comend/components/pag-profile-rfps-card"
+import dynamic from "next/dynamic"
+
+const TypesenseBiosamplesTable = dynamic(
+    () => import("@comend/components/biorepo/advanced-data-table/biosamples-table/typesense-biosamples-table")
+        .then(m => m.TypesenseBiosamplesTable),
+    { loading: () => <Skeleton className="h-[286px] w-full" /> }
+)
+
+const TypesenseDiseaseModelsTable = dynamic(
+    () => import("@comend/components/biorepo/advanced-data-table/disease-models-table/typesense-disease-models-table")
+        .then(m => m.TypesenseDiseaseModelsTable),
+    { loading: () => <Skeleton className="h-[286px] w-full" /> }
+)
+
+const TypesenseClinicalDatasetsTable = dynamic(
+    () => import("@comend/components/biorepo/advanced-data-table/clinical-datasets-table/typesense-clinical-datasets-table")
+        .then(m => m.TypesenseClinicalDatasetsTable),
+    { loading: () => <Skeleton className="h-[286px] w-full" /> }
+)
+
+const RFPDetails = dynamic(
+    () => import("@comend/components/pag-profile-rfps-card").then(m => m.RFPDetails),
+    { loading: () => <Skeleton className="h-[400px] w-full" /> }
+)
+
 
 const croSelector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -389,7 +410,7 @@ export default function MarketplacePage() {
                                     {[...(rfpStore.featured || []), ...(rfpStore.searchResults || [])]
                                         .slice(0, width < 1280 ? 2 : 3)
                                         .map((rfp, index) => (
-                                            <Dialog>
+                                            <Dialog key={index}>
                                                 <DialogTrigger
                                                     className="w-full max-w-full h-full"
                                                     onClick={() => {
