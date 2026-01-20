@@ -10,6 +10,7 @@ import { DialogContent } from "@comend/components/ui/dialog";
 import { LoaderCircle } from "lucide-react";
 import { cn } from "@udecode/cn";
 import { ResearchPlanSearchState, useResearchPlanSearchStore } from "@/state/search/researchPlanSearchStore";
+import { ResearchPlanCard } from "@comend/components/research-plan-card";
 
 const selector = (state: ResearchPlanSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -29,11 +30,7 @@ export function ResearchPlanSearchResults() {
 
     if (!searchResults) {
         return (
-            <div className="h-full w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
-                <Skeleton className="h-[286px] w-full"/>
-                <Skeleton className="h-[286px] w-full"/>
-                <Skeleton className="h-[286px] w-full"/>
-                <Skeleton className="h-[286px] w-full"/>
+            <div className="h-full w-full flex flex-col gap-4">
                 <Skeleton className="h-[286px] w-full"/>
                 <Skeleton className="h-[286px] w-full"/>
                 <Skeleton className="h-[286px] w-full"/>
@@ -48,14 +45,13 @@ export function ResearchPlanSearchResults() {
                 {(!searchResults || searchResults.length === 0) ? (
                     <NoResultsView />
                 ): (
-                    <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
+                    <div className="w-full flex flex-col gap-4 ">
                         {searchResults.map((researchPlan: any) => (
                             <Dialog>
                                 <DialogTrigger
                                     className="w-full max-w-full h-full"
                                 >
-                                    {/* <RFPCard rfp={researchPlan} showOrganization={true}/> */}
-                                    <p>{researchPlan.title}</p>
+                                    <ResearchPlanCard researchPlan={researchPlan} showOrganization={true}/>
                                 </DialogTrigger>
                                 <DialogContent className="overflow-hidden" data-testid="dialog">
                                     {/* <RFPDetails rfp={researchPlan}/> */}

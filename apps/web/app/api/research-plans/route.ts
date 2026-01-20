@@ -10,6 +10,10 @@ export async function POST(req: Request) {
             where: {
                 id: { in: ids },
             },
+            include: {
+                organization: true,
+                milestones: true
+            }
         });
 
         return NextResponse.json(results, { status: 200 });
