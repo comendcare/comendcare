@@ -224,7 +224,8 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback, isPrivate}: {
                             disabled={true}
                         >
                             {roadmapsForModality.map(roadmap => (
-                                <RoadmapRow 
+                                <RoadmapRow
+                                    key={roadmap.id}
                                     isPrivate={isPrivate}
                                     roadmap={roadmap}
                                     rowClickCallback={rowClickCallback}
@@ -241,7 +242,8 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback, isPrivate}: {
                         disabled={true}
                     >
                         {otherRoadmaps.map(roadmap => (
-                            <RoadmapRow 
+                            <RoadmapRow
+                                key={roadmap.id}
                                 isPrivate={isPrivate}
                                 roadmap={roadmap}
                                 rowClickCallback={rowClickCallback}
