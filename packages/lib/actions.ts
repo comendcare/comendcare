@@ -502,6 +502,7 @@ export const createOrganization = withAuth(
             await revalidateTag(
                 `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
             )
+            revalidatePath("/admin/organizations")
 
             await runInProduction(() =>
                 sendNewOrganizationEmail(
