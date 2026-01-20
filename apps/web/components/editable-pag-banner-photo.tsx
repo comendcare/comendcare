@@ -29,6 +29,7 @@ import { ScrollArea, Scrollbar } from "@radix-ui/react-scroll-area";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import { UnsavedChangesDialog } from "./unsaved-changes-dialog";
 import { getPublicFile } from "@comend/lib/utils";
+import { Skeleton } from "@comend/components/ui/skeleton";
 
 const editOrgProfileImageSchema = z.object({
     image: z.string().nullable().optional(),
@@ -36,19 +37,17 @@ const editOrgProfileImageSchema = z.object({
 });
 
 export function EditablePAGBannerPhoto({
-                                   img,
-                               }: {
+    img,
+}: {
     img: string | null | undefined;
 }) {
     const {data: session} = useSession();
+    const [isInitialized, setIsInitialized] = useState(false)
     const [isSaving, setIsSaving] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
     const [open, setOpen] = useState(false);
     const [selectedFileHeader, setSelectedFileHeader] = useState<FileWithPreview | null>(null);
-    const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<
-        z.infer<typeof editOrgProfileImageSchema> | undefined
-    >(undefined);
     const [isCropping, setIsCropping] = useState(false)
     const [croppedImageUrl, setCroppedImageUrl] = React.useState<string>("")
     const [cropFile, setCropFile] = React.useState<FileWithPreview | null>(selectedFileHeader)
@@ -56,7 +55,6 @@ export function EditablePAGBannerPhoto({
     const editOrgForm = useForm<z.infer<typeof editOrgProfileImageSchema>>({
         mode: "onChange",
         resolver: zodResolver(editOrgProfileImageSchema),
-        defaultValues: defaultOrganizationValues,
     });
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgProfileImageSchema>) {
@@ -70,7 +68,7 @@ export function EditablePAGBannerPhoto({
 
             const formData = new FormData();
 
-            if (newSelectedFile && newSelectedFile.preview && newSelectedFile.preview !== defaultOrganizationValues?.headerImage) {
+            if (newSelectedFile && newSelectedFile.preview && newSelectedFile.preview !== img) {
                 try {
                     const imgUrl = await handleImageUpload(newSelectedFile as File, newSelectedFile.preview);
                     if (imgUrl) {
@@ -88,7 +86,7 @@ export function EditablePAGBannerPhoto({
                 formData.set("headerImage", "")
             }
 
-            if ((!newSelectedFile || newSelectedFile.preview !== defaultOrganizationValues?.headerImage) && img) {
+            if ((!newSelectedFile || newSelectedFile.preview !== img) && img) {
                 // if the image is being changed or deleted, delete the old image in our google cloud storage bucket
                 await handleImageDelete(img)
             }
@@ -107,11 +105,13 @@ export function EditablePAGBannerPhoto({
 
     const closeDialog = () => {
         setOpen(false)
+        setIsInitialized(false)
         setIsClosing(false)
         setIsCropping(false)
         setUnsavedChangesIsOpen(false)
 
-        editOrgForm.reset(defaultOrganizationValues)
+        // clear out any previous items
+        setSelectedFileHeader(null)
     }
 
     const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
@@ -157,25 +157,28 @@ export function EditablePAGBannerPhoto({
         }
     }
 
-    useEffect(() => {
-        const init = async () => {
-            if (img) {
-                try {
-                    const userPhoto: File = await getPublicFile(img)
-                    if (userPhoto) {
-                        const fileWithPreview = Object.assign(userPhoto, {
-                            preview: URL.createObjectURL(userPhoto),
-                        })
-                        setSelectedFileHeader(fileWithPreview)
-                    }
-                } catch (e) {
-                    console.error(e)
+    const init = async () => {
+        if (img) {
+            try {
+                const userPhoto: File = await getPublicFile(img)
+                if (userPhoto) {
+                    const fileWithPreview = Object.assign(userPhoto, {
+                        preview: URL.createObjectURL(userPhoto),
+                    })
+                    setSelectedFileHeader(fileWithPreview)
                 }
+            } catch (e) {
+                console.error(e)
             }
         }
 
-        init()
-    }, [])
+        setIsInitialized(true)
+    }
+
+    // initialize image on dialog opening
+    useEffect(() => {
+        if (open) init()
+    }, [open])
 
     return (
         <div className="relative w-full">
@@ -208,87 +211,111 @@ export function EditablePAGBannerPhoto({
                         </DialogDescription>
                     </DialogHeader>
 
-                    <Form {...editOrgForm}>
-                        <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
-                            <Scrollbar />
-                            <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-8">
-                                <FormField
-                                    control={editOrgForm.control}
-                                    name={'headerImage'}
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormControl>
-                                                <div className="flex flex-col items-start space-y-4">
-                                                    <DialogImageSelector
-                                                        aspect={16 / 4}
-                                                        selectedFile={selectedFileHeader}
-                                                        setSelectedFile={(file: FileWithPreview | null) => {
-                                                            if (!file) {
-                                                                setSelectedFileHeader(null);
-                                                                field.onChange(null);
-                                                            } else {
-                                                                setSelectedFileHeader(file);
-                                                                field.onChange(file.preview);
-                                                            }
-                                                        }}
-                                                        className="rounded h-[100px] w-[400px] mx-auto"
-                                                        parentIsCropping={isCropping}
-                                                        setParentIsCropping={setIsCropping}
-                                                        fileInputTestId={`cover-file-input`}
-                                                        cropToolbarTestId="crop-toolbar"
-                                                        cropButtonTestId="crop-btn"
-                                                        onCrop={onCrop}
-                                                        croppedImageUrl={croppedImageUrl}
-                                                        setCroppedImageUrl={setCroppedImageUrl}
-                                                        cropFile={cropFile}
-                                                        setCropFile={setCropFile}
-                                                    />
+                    {isInitialized ? (
+                        <Form {...editOrgForm}>
+                            <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 pb-12"} type={"always"}>
+                                <Scrollbar />
+                                <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-8">
+                                    <FormField
+                                        control={editOrgForm.control}
+                                        name={'headerImage'}
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <div className="flex flex-col items-start space-y-4">
+                                                        <DialogImageSelector
+                                                            aspect={16 / 4}
+                                                            selectedFile={selectedFileHeader}
+                                                            setSelectedFile={(file: FileWithPreview | null) => {
+                                                                if (!file) {
+                                                                    setSelectedFileHeader(null);
+                                                                    field.onChange(null);
+                                                                } else {
+                                                                    setSelectedFileHeader(file);
+                                                                    field.onChange(file.preview);
+                                                                }
+                                                            }}
+                                                            className="rounded h-[100px] w-[400px] mx-auto"
+                                                            parentIsCropping={isCropping}
+                                                            setParentIsCropping={setIsCropping}
+                                                            fileInputTestId={`cover-file-input`}
+                                                            cropToolbarTestId="crop-toolbar"
+                                                            cropButtonTestId="crop-btn"
+                                                            onCrop={onCrop}
+                                                            croppedImageUrl={croppedImageUrl}
+                                                            setCroppedImageUrl={setCroppedImageUrl}
+                                                            cropFile={cropFile}
+                                                            setCropFile={setCropFile}
+                                                        />
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    
+                                    <div className="absolute right-4 bottom-0 flex gap-2">
+                                    <Button 
+                                        type="button"
+                                        variant={"secondary"}
+                                        onClick={() => {handleClose({showUnsavedChanges: false})}}
+                                    >
+                                        Cancel
+                                    </Button>
+
+                                    <Button
+                                        variant={"cta"}
+                                        type="submit"
+                                        data-testid="dialog-save-btn"
+                                        disabled={isSaving}
+                                    >
+                                        {isSaving 
+                                            ? (
+                                                <div className="w-[81px] flex justify-center items-center">
+                                                    <LoadingDots/>
                                                 </div>
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-                                
-                                <div className="absolute right-4 bottom-0 flex gap-2">
-                                <Button 
-                                    type="button"
-                                    variant={"secondary"}
-                                    onClick={() => {handleClose({showUnsavedChanges: false})}}
-                                >
-                                    Cancel
-                                </Button>
+                                            ) 
+                                            : ("Save changes")
+                                        }
+                                    </Button>
+                                    </div>
+                                </form>
+                            </ScrollArea>
 
-                                <Button
-                                    variant={"cta"}
-                                    type="submit"
-                                    data-testid="dialog-save-btn"
-                                    disabled={isSaving}
-                                >
-                                    {isSaving 
-                                        ? (
-                                            <div className="w-[81px] flex justify-center items-center">
-                                                <LoadingDots/>
-                                            </div>
-                                        ) 
-                                        : ("Save changes")
-                                    }
-                                </Button>
-                                </div>
-                            </form>
-                        </ScrollArea>
+                            <UnsavedChangesDialog 
+                                isSaving={isSaving}
+                                isClosing={isClosing}
+                                setIsClosing={setIsClosing}
+                                isOpen={unsavedChangesIsOpen}
+                                setIsOpen={setUnsavedChangesIsOpen}
+                                closeDialog={closeDialog}
+                                form={editOrgForm}
+                                formSubmit={onProfileFormSubmit}
+                            />
+                        </Form>
+                    ) : (
+                        <div className="space-y-4">
+                        <div className="space-y-4 flex flex-col justify-center items-center">
+                            {/* Image preview */}
+                            <div className="relative w-fit overflow-hidden rounded-lg border">
+                            <Skeleton className="h-[100px] w-[400px]" />
+                            </div>
 
-                        <UnsavedChangesDialog 
-                            isSaving={isSaving}
-                            isClosing={isClosing}
-                            setIsClosing={setIsClosing}
-                            isOpen={unsavedChangesIsOpen}
-                            setIsOpen={setUnsavedChangesIsOpen}
-                            closeDialog={closeDialog}
-                            form={editOrgForm}
-                            formSubmit={onProfileFormSubmit}
-                        />
-                    </Form>
+                            {/* Action buttons row */}
+                            <div className="flex flex-wrap gap-2">
+                            <Skeleton className="h-9 w-[88px] rounded-md" />
+                            <Skeleton className="h-9 w-[72px] rounded-md" />
+                            <Skeleton className="h-9 w-[132px] rounded-md" />
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="flex justify-end gap-2">
+                            <Skeleton className="h-9 w-[84px] rounded-md" />
+                            <Skeleton className="h-9 w-[120px] rounded-md" />
+                        </div>
+                        </div>
+                    )}
                 </DialogContent>
             </Dialog>
         </div>

@@ -359,7 +359,7 @@ export function useClinicalDatasetsTableColumns(
             "genes", 
             "gene.symbol", 
             "cohortSize", 
-            "contacts", 
+            "institution.name",
             "links"
         ],
     };

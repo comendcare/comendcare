@@ -2,7 +2,7 @@
 
 import {zodResolver} from "@hookform/resolvers/zod"
 import React, {useEffect, useRef, useState} from "react"
-import {useForm, UseFormReturn} from "react-hook-form"
+import {useForm} from "react-hook-form"
 import {z} from "zod"
 import {
     Form,
@@ -11,7 +11,6 @@ import {
     FormLabel,
     FormItem,
     FormMessage,
-    FormDescription,
 } from "@comend/components/ui/form"
 import {Input} from "@comend/components/ui/input"
 import {Textarea} from "@comend/components/ui/textarea"
@@ -19,16 +18,11 @@ import {Button} from "@comend/components/ui/button"
 import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
     DialogFooter,
-    DialogHeader,
-    DialogTitle,
 } from "@comend/components/ui/dialog"
 import { DISEASE_MODEL_TYPE_OPTIONS, editDiseaseModelForm } from "@comend/lib/types"
 import type {CreateFacilityRequest, Prisma} from "@prisma/client"
-import { getDonorData, getOrganizationFromOrganizationId } from "@comend/lib/fetchers"
+import { getOrganizationFromOrganizationId } from "@comend/lib/fetchers"
 import { useSession } from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
@@ -139,7 +133,6 @@ export function EditDiseaseModelToolForm({
     const initializing = useRef(true)
     const router = useRouter()
     const {data: session} = useSession()
-    const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(toolData.createFacilityRequests || [])
@@ -194,9 +187,6 @@ export function EditDiseaseModelToolForm({
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editDiseaseModelForm>, createFacilityRequests: CreateFacilityRequest[]) => {
-        const isValid = form.trigger()
-        if (!isValid) return // stops submission
-        
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(
@@ -305,9 +295,6 @@ export function EditDiseaseModelToolForm({
                     rfps: true,
                     metadata: true
                 })
-                if (response.success && response.data) {
-                    setOrgIsPublished(response.data.published)
-                }
             }
 
             // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away

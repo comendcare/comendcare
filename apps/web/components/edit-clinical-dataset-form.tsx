@@ -11,7 +11,6 @@ import {
     FormLabel,
     FormItem,
     FormMessage,
-    FormDescription,
 } from "@comend/components/ui/form"
 import {Input} from "@comend/components/ui/input"
 import {Textarea} from "@comend/components/ui/textarea"
@@ -19,12 +18,7 @@ import {Button} from "@comend/components/ui/button"
 import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
     DialogFooter,
-    DialogHeader,
-    DialogTitle,
 } from "@comend/components/ui/dialog"
 import {TOOL_TYPE_OPTIONS} from "@comend/lib/types"
 import {CreateFacilityRequest, Prisma} from "@prisma/client"
@@ -198,9 +192,6 @@ export function EditClincalDatasetForm({
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editDataToolForm>, createFacilityRequests: CreateFacilityRequest[]) => {
-        const isValid = form.trigger()
-        if (!isValid) return // stops submission
-        
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(

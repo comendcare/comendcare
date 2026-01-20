@@ -2648,6 +2648,14 @@ export const editBiosampleForm = z.object({
     drinksPerDay: z.string().optional(),
     alcoholDuration: z.string().optional(),
     medications: z.array(z.string()).optional(),
+}).superRefine((data, ctx) => {
+    if (data.contacts?.length && data.contacts.some(c => !c.email)) {
+        ctx.addIssue({
+            path: ["contacts"],
+            message: "All contacts require an email address.",
+            code: z.ZodIssueCode.custom,
+        });
+    }
 })
 
 export const editDiseaseModelForm = z.object({
@@ -2673,6 +2681,14 @@ export const editDiseaseModelForm = z.object({
     // institutions: z.array(optionSchema).optional(),
     storageFacility: z.array(optionSchema).optional(),
     createRequests: z.array(z.custom<any>()).optional(),
+}).superRefine((data, ctx) => {
+    if (data.contacts?.length && data.contacts.some(c => !c.email)) {
+        ctx.addIssue({
+            path: ["contacts"],
+            message: "All contacts require an email address.",
+            code: z.ZodIssueCode.custom,
+        });
+    }
 })
 
 export const editDataToolForm = z.object({
@@ -2702,6 +2718,14 @@ export const editDataToolForm = z.object({
     // institutions: z.array(optionSchema).optional(),
     storageFacility: z.array(optionSchema).optional(),
     createRequests: z.array(z.custom<any>()).optional(),
+}).superRefine((data, ctx) => {
+    if (data.contacts?.length && data.contacts.some(c => !c.email)) {
+        ctx.addIssue({
+            path: ["contacts"],
+            message: "All contacts require an email address.",
+            code: z.ZodIssueCode.custom,
+        });
+    }
 })
 
 const nilOrEmptyToUndef = <T extends z.ZodTypeAny>(inner: T) =>
