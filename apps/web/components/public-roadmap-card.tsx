@@ -17,6 +17,7 @@ import {useState} from "react";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import { PropertyBadge } from "@comend/components/property-badge";
 import { NoResultsTemplate } from "@comend/components/no-results";
+import Link from "next/link";
 
 export const RoadmapsCard = ({
                                  roadmaps,
@@ -272,48 +273,53 @@ export const RoadmapRow = ({roadmap, rowClickCallback, isPrivate}: {roadmap: any
     const numPublishedProjects = roadmap.milestones.filter((milestone: any) => !milestone.private).length
 
     return (
-        <TableRow 
-            key={roadmap?.id} 
-            className="cursor-pointer px-0"
+        <Link
+            href={`/app/research-plan/${roadmap.id}`}
             onClick={() => rowClickCallback(roadmap)}
+            prefetch={true}
         >
-            <TableCell className="pl-0">
-                <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
-            </TableCell>
-            <TableCell>
-                <div className="flex flex-col gap-2 justify-center text-nowrap">
-                    {isPrivate && numPrivateProjects > 0 && (
-                        <PropertyBadge 
-                            className="text-nowrap border-red-200 text-red-900 font-semibold" 
-                            icon={Lock}
-                        >
-                            {numPrivateProjects === 1 ? `${numPrivateProjects} private project` : `${numPrivateProjects} private projects`}
-                        </PropertyBadge>
-                    )}
-                    {isPrivate && numPublishedProjects > 0 && (
-                        <PropertyBadge 
-                            className="text-nowrap border-green-200 text-green-900 font-semibold" 
-                            icon={Globe}
-                        >
-                            {numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}
-                        </PropertyBadge>
-                    )}
-                    {!isPrivate && numProjects > 0 && (
-                        <PropertyBadge 
-                            className="text-nowrap border-purple-200 text-purple-900 font-semibold" 
-                            icon={FileText}
-                        >
-                            {numProjects === 1 ? `${numProjects} project` : `${numProjects} projects`}
-                        </PropertyBadge>
-                    )}
-                </div>
-            </TableCell>
-            <TableCell className="pr-0">
-                <div className="flex gap-2 justify-end items-center text-nowrap">
-                    <StageOfActivityBadge showTooltip={false} milestones={roadmap.milestones}/>
-                </div>
-            </TableCell>
-        </TableRow>
+            <TableRow
+                key={roadmap?.id}
+                className="cursor-pointer px-0"
+            >
+                <TableCell className="pl-0">
+                    <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
+                </TableCell>
+                <TableCell>
+                    <div className="flex flex-col gap-2 justify-center text-nowrap">
+                        {isPrivate && numPrivateProjects > 0 && (
+                            <PropertyBadge
+                                className="text-nowrap border-red-200 text-red-900 font-semibold"
+                                icon={Lock}
+                            >
+                                {numPrivateProjects === 1 ? `${numPrivateProjects} private project` : `${numPrivateProjects} private projects`}
+                            </PropertyBadge>
+                        )}
+                        {isPrivate && numPublishedProjects > 0 && (
+                            <PropertyBadge
+                                className="text-nowrap border-green-200 text-green-900 font-semibold"
+                                icon={Globe}
+                            >
+                                {numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}
+                            </PropertyBadge>
+                        )}
+                        {!isPrivate && numProjects > 0 && (
+                            <PropertyBadge
+                                className="text-nowrap border-purple-200 text-purple-900 font-semibold"
+                                icon={FileText}
+                            >
+                                {numProjects === 1 ? `${numProjects} project` : `${numProjects} projects`}
+                            </PropertyBadge>
+                        )}
+                    </div>
+                </TableCell>
+                <TableCell className="pr-0">
+                    <div className="flex gap-2 justify-end items-center text-nowrap">
+                        <StageOfActivityBadge showTooltip={false} milestones={roadmap.milestones}/>
+                    </div>
+                </TableCell>
+            </TableRow>
+        </Link>
     )
 }
 
