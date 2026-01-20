@@ -103,7 +103,7 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
                             <div>
                                 <Label>Therapeutic strategy</Label>
                                 <MultipleSelector
-                                    value={filters.statuses ?? []}
+                                    value={filters.modalities ?? []}
                                     onChange={(vals) => setFilterKey("modalities", vals)}
                                     defaultOptions={RESEARCH_PLAN_TYPES}
                                     placeholder="Select strategy..."
