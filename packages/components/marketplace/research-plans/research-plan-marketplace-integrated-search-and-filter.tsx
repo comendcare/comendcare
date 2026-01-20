@@ -11,7 +11,7 @@ import {debounce, filter} from "lodash";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import { ResearchPlanSearchState, useResearchPlanSearchStore } from "@/state/search/researchPlanSearchStore"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
-import { RFP_OPEN_TO_TYPE_OPTIONS, Option, RFP_STATUS_TYPE_OPTIONS } from "@comend/lib/types"
+import { RFP_OPEN_TO_TYPE_OPTIONS, Option, RFP_STATUS_TYPE_OPTIONS, RESEARCH_PLAN_STATUS, RESEARCH_STAGE } from "@comend/lib/types"
 import { Badge, badgeVariants } from "@comend/components/ui/badge"
 import { handleAsyncConditionSearch, handleAsyncGeneSearch } from "@comend/lib/utils"
 
@@ -32,15 +32,15 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
     const [query, setQuery] = useState(searchTerm)
 
     const clearAll = () => {
-        setFilters({ ...filters, conditions: [], genes: [], openTo: [], status: [], organizations: [] });
+        setFilters({ ...filters, stages: [], statuses: [] });
     }
 
     // helper to update a single filter key from MultipleSelector
     const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) =>
         setFilters({...filters, [key]: value})
 
-    // const removeFilterItem = (key: keyof typeof filters, value: string) =>
-    //     setFilters({...filters, [key]: (filters[key] || []).filter((i: any) => i.value !== value)})
+    const removeFilterItem = (key: keyof typeof filters, value: string) =>
+        setFilters({...filters, [key]: (filters[key] || []).filter((i: any) => i.value !== value)})
 
     // keep searchTerm input in sync if the store changes elsewhere
     useEffect(() => setQuery(searchTerm), [searchTerm])
@@ -57,12 +57,9 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
         []
     )
 
-    // const activeCount =
-    //     (filters.conditions?.length || 0) +
-    //     (filters.genes?.length || 0) + 
-    //     (filters.openTo?.length || 0) +
-    //     (filters.status?.length || 0)
-    const activeCount = 0
+    const activeCount =
+        (filters.stages?.length || 0) +
+        (filters.statuses?.length || 0)
 
     return (
         <div className="w-full mx-auto flex flex-col gap-y-2">
@@ -101,53 +98,14 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
                         }}
                     >
                         <DialogTitle>Research Plan Filters</DialogTitle>
-                            {/* Conditions */}
-                            {/* <div>
-                                <Label>Condition</Label>
+                            {/* Stages */}
+                            <div>
+                                <Label>Stages</Label>
                                 <MultipleSelector
-                                    value={filters.conditions ?? []}
-                                    onChange={(vals) => setFilterKey("conditions", vals)}
-                                    onSearch={handleAsyncConditionSearch}
-                                    placeholder="Select conditions..."
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{className: "bg-transparent"}}
-                                    loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading conditions...</p>}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                    }
-                                    triggerSearchOnFocus={true}
-                                    showHoverCard={false}
-                                />
-                            </div> */}
-
-                            {/* Genes */}
-                            {/* <div>
-                                <Label>Gene</Label>
-                                <MultipleSelector
-                                    value={filters.genes ?? []}
-                                    badgeClassName={badgeVariants({variant: "teal"})}
-                                    onChange={(vals) => setFilterKey("genes", vals)}
-                                    onSearch={handleAsyncGeneSearch}
-                                    placeholder="Select genes..."
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{className: "bg-transparent"}}
-                                    loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading genes...</p>}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                    }
-                                    triggerSearchOnFocus={true}
-                                    showHoverCard={false}
-                                />
-                            </div> */}
-
-                            {/* Open to */}
-                            {/* <div>
-                                <Label>Open to</Label>
-                                <MultipleSelector
-                                    value={filters.openTo ?? []}
-                                    onChange={(vals) => setFilterKey("openTo", vals)}
-                                    defaultOptions={RFP_OPEN_TO_TYPE_OPTIONS}
-                                    placeholder="Select option..."
+                                    value={filters.stages ?? []}
+                                    onChange={(vals) => setFilterKey("stages", vals)}
+                                    defaultOptions={RESEARCH_STAGE}
+                                    placeholder="Select stage..."
                                     hidePlaceholderWhenSelected
                                     commandProps={{className: "bg-transparent"}}
                                     emptyIndicator={
@@ -155,15 +113,15 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
                                     }
                                     showHoverCard={false}
                                 />
-                            </div> */}
+                            </div>
 
-                            {/* Status */}
-                            {/* <div>
+                            {/* Statuses */}
+                            <div>
                                 <Label>Status</Label>
                                 <MultipleSelector
-                                    value={filters.status ?? []}
-                                    onChange={(vals) => setFilterKey("status", vals)}
-                                    defaultOptions={RFP_STATUS_TYPE_OPTIONS}
+                                    value={filters.statuses ?? []}
+                                    onChange={(vals) => setFilterKey("statuses", vals)}
+                                    defaultOptions={RESEARCH_PLAN_STATUS}
                                     placeholder="Select status..."
                                     hidePlaceholderWhenSelected
                                     commandProps={{className: "bg-transparent"}}
@@ -172,7 +130,7 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
                                     }
                                     showHoverCard={false}
                                 />
-                            </div> */}
+                            </div>
                     </DialogContent>
                 </Dialog>
             </div>
@@ -181,55 +139,29 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
             <div className="flex flex-row gap-2 items-center">
                 {activeCount > 0 && (
                     <div className="flex flex-wrap gap-2 items-center">
-                        {/* conditions */}
-                        {/* {(filters.conditions || []).map((item) => (
-                            <Badge key={`conditions-${item.value}`} variant="secondary" className="text-xs">
-                                {item.value}
-                                <button
-                                    onClick={() => removeFilterItem("conditions", item.value)}
-                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
-                                >
-                                    <X className="h-3 w-3" />
-                                </button>
-                            </Badge>
-                        ))} */}
-
-                        {/* genes */}
-                        {/* {(filters.genes || []).map((item) => (
-                            <Badge key={`genes-${item.value}`} variant="teal" className="text-xs">
-                                {item.value}
-                                <button
-                                    onClick={() => removeFilterItem("genes", item.value)}
-                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
-                                >
-                                    <X className="h-3 w-3" />
-                                </button>
-                            </Badge>
-                        ))} */}
-
-                        {/* {(filters.openTo || []).map((item) => (
-                            <Badge key={`openTo-${item.value}`} variant="secondary" className="text-xs">
+                        {(filters.stages || []).map((item) => (
+                            <Badge key={`stages-${item.value}`} variant="secondary" className="text-xs">
                                 {item.label}
                                 <button
-                                    onClick={() => removeFilterItem("openTo", item.value)}
+                                    onClick={() => removeFilterItem("stages", item.value)}
                                     className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
                                 >
                                     <X className="h-3 w-3" />
                                 </button>
                             </Badge>
-                        ))} */}
+                        ))}
 
-                        {/* {(filters.status || []).map((item) => (
-                            <Badge key={`status-${item.value}`} variant="secondary" className="text-xs">
+                        {(filters.statuses || []).map((item) => (
+                            <Badge key={`statuses-${item.value}`} variant="secondary" className="text-xs">
                                 {item.label}
                                 <button
-                                    onClick={() => removeFilterItem("status", item.value)}
+                                    onClick={() => removeFilterItem("statuses", item.value)}
                                     className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
                                 >
                                     <X className="h-3 w-3" />
                                 </button>
                             </Badge>
-                        ))} */}
+                        ))}
 
                         <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs">
                             Clear all

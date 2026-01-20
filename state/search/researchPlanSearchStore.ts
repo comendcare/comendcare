@@ -25,11 +25,16 @@ export type FiltersType = {
     //     value: string,
     //     disable?: boolean,
     // }[],
-    // status: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
+    stages: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    statuses: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
     // organizations: {
     //     label: string,
     //     value: string,
@@ -43,6 +48,8 @@ export const defaultFilters = {
     // openTo: [],
     // status: [],
     // organizations: []
+    stages: [],
+    statuses: []
 }
 
 function generateFiltersString(filters: FiltersType): string {
@@ -50,45 +57,21 @@ function generateFiltersString(filters: FiltersType): string {
 
     const escapeValue = (value: string) => `\`${value}\``;
 
-    // conditions
-    // if (filters?.conditions && filters.conditions.length > 0) {
-    //     const conditionFilter = filters.conditions
-    //         .map(condition => `condition.name:=[${escapeValue(condition.value)}]`)
-    //         .join(" || ");
-    //     filtersList.push(`(${conditionFilter})`);
-    // }
+    // stages
+    if (filters?.stages && filters.stages.length > 0) {
+        const stageFilter = filters.stages
+            .map(stage => `stages:=[${escapeValue(stage.value)}]`)
+            .join(" || ");
+            filtersList.push(`(${stageFilter})`);
+    }
 
-    // genes
-    // if (filters?.genes && filters.genes.length > 0) {
-    //     const geneFilter = filters.genes
-    //         .map(gene => `condition.causalGenes:=${escapeValue(gene.value)} || condition.associatedGenes:=${escapeValue(gene.value)}`)
-    //         .join(" || ");
-    //     filtersList.push(`(${geneFilter})`);
-    // }
-
-    // open to 
-    // if (filters?.openTo && filters.openTo.length > 0) {
-    //     const openToFilter = filters.openTo
-    //         .map(openTo => `openTo:=[${escapeValue(openTo.value)}]`)
-    //         .join(" || ");
-    //     filtersList.push(`(${openToFilter})`);
-    // }
-
-    // status
-    // if (filters?.status && filters.status.length > 0) {
-    //     const statusFilter = filters.status
-    //         .map(status => `status:=[${escapeValue(status.value)}]`)
-    //         .join(" || ");
-    //     filtersList.push(`(${statusFilter})`);
-    // }
-
-    // Organizations
-    // if (filters?.organizations && filters.organizations.length > 0) {
-    //     const organizationFilter = filters.organizations
-    //         .map(organization => `organization.id:=[${escapeValue(organization.value)}]`)
-    //         .join(" || ");
-    //     filtersList.push(`(${organizationFilter})`);
-    // }
+    // statuses
+    if (filters?.statuses && filters.statuses.length > 0) {
+        const statusFilter = filters.statuses
+            .map(status => `statuses:=[${escapeValue(status.value)}]`)
+            .join(" || ");
+            filtersList.push(`(${statusFilter})`);
+    }
 
     // Combine all filters with `&&`
     const typesenseFilters = filtersList.length > 0 ? filtersList.join(" && ") : "";
@@ -126,7 +109,7 @@ const getUpdatedSearchResults = async (
         const filtersString = generateFiltersString(state.filters)
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "title,description",
+            query_by: "title,description,partners,links",
             per_page: 12,
             page: Math.min(state.lastFetchedPage, state.totalPages), // don't fetch any pages out of range
             ...(filtersString ? { filter_by: filtersString } : undefined),
