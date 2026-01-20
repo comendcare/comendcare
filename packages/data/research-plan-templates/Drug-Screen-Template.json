@@ -10,6 +10,10 @@
     "published": true,
     "organizationId": "cm869ngpm0000of3vh8f98q2l",
     "userId": null,
+    "partners": null,
+    "links": null,
+    "stages": [],
+    "statuses": [],
     "modalities": ["DRUG_REPURPOSING_SCREENING"],
     "milestones": [
         {
@@ -115,14 +119,7 @@
             "roadmapId": "cm9ud3w9v0000zzb8a7osd7r5",
             "organizationId": "cm869ngpm0000of3vh8f98q2l",
             "nodeId": "NNyJeT7oUGLZU9OjN9tqJ",
-            "types": [
-                {
-                    "id": "9c426dea-d598-4408-9614-18dbd65f6339",
-                    "milestoneTypeId": "TARGETVALIDATION",
-                    "milestoneId": "ZcEJe2BD8TrRJhCNWq6Cj",
-                    "createdAt": "2025-05-14T19:20:49.457Z"
-                }
-            ]
+            "types": []
         },
         {
             "id": "RuH8wD0c33Abm15vhG_R1",

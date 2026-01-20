@@ -257,14 +257,6 @@ export function EditResearchPlanForm({
                                     size={"icon"}
                                     onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                         e.preventDefault()
-                                        // form.setValue(
-                                        //     "partners", 
-                                        //     [
-                                        //         ...(field.value || []),
-                                        //         {name: "", email: "", role: null}
-                                        //     ],
-                                        //     {shouldDirty: true}
-                                        // )
                                         form.setValue(
                                             "partners", 
                                             [

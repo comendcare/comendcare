@@ -10,6 +10,10 @@
     "published": true,
     "organizationId": "cmah3gmve000e10fa66iiodi5",
     "userId": null,
+    "partners": null,
+    "links": null,
+    "stages": [],
+    "statuses": [],
     "modalities": [
         "ANTISENSE_OLIGONUCLEOTIDE"
     ],

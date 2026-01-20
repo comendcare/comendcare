@@ -985,8 +985,6 @@ export const updateRoadmap = withOrganizationAuth(
             roadmap?.partners.map(c => c.id)
         )
 
-        console.log(`update data`, data)
-
         try {
             const response = await prisma.roadmap.update({
                 where: {
@@ -1011,7 +1009,6 @@ export const updateRoadmap = withOrganizationAuth(
                             .filter((a: any) => linksDiff.toAdd.includes(a.id))
                             .map((a: any) => ({ link: a.link, name: a.name ?? undefined })),
                     },
-
                     partners: {
                         deleteMany: partnersDiff.toRemove.length ? { id: { in: partnersDiff.toRemove } } : undefined,
                         update: (data.partners || [])
@@ -4116,7 +4113,6 @@ export const createRoadmap = withOrganizationAuth(
     async (
         organization: Organization,
         roadmapTemplate?: (typeof templateResearchPlans)[0] & { metadata: JsonObject },
-        // roadmapTemplate?: z.infer<typeof editResearchPlanForm>,
         actor?: Actor
     ) => {
         const session = await getSession()
@@ -4132,6 +4128,16 @@ export const createRoadmap = withOrganizationAuth(
                     description: roadmapTemplate?.description,
                     organization: {connect: {id: organization.id}},
                     modalities: roadmapTemplate?.modalities,
+                    links: {
+                        create: (roadmapTemplate?.links || [])
+                            .map((a: any) => ({ link: a.link, name: a.name ?? undefined })),
+                    },
+                    partners: {
+                        create: (roadmapTemplate?.partners || [])
+                            .map((c: any) => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
+                    },
+                    stages: roadmapTemplate?.stages || [],
+                    statuses: roadmapTemplate?.statuses || [],
                     ...(roadmapTemplate?.metadata ? {metadata: roadmapTemplate.metadata} : undefined),
                     // published defaults to true per your model; omit to use default
                 },
