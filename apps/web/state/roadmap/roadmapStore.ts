@@ -111,8 +111,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                     return
                 }
 
-                console.log(`update data`, data)
-
                 const roadmap = await updateRoadmap(orgId, {
                     id,
                     private: data.isPrivate,
