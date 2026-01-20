@@ -135,15 +135,24 @@ export const syncToTypesense = async (env: {
                 private: false // only sync public research plans
             },
             select: {
-                // createdAt: true,
                 id: true,
                 title: true,
                 description: true,
-                // eligibility: true,
-                // evaluationProcess: true,
-                // openTo: true,
-                // startDate: true,
-                // endDate: true
+                partners: {
+                    select: {
+                        name: true,
+                        email: true,
+                        affiliation: true
+                    }
+                },
+                stages: true,
+                statuses: true,
+                links: {
+                    select: {
+                        name: true,
+                        link: true,
+                    }
+                },
             }
         })
 
