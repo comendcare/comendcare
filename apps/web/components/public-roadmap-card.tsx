@@ -9,7 +9,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/ta
 import {Button} from "@comend/components/ui/button";
 import {ChevronsUpDown, FileText, Globe, Lock, Pencil} from "lucide-react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@comend/components/ui/table";
-import {Milestone, Option, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
+import {Milestone, Option, RESEARCH_PLAN_STATUS, RESEARCH_PLAN_TYPES, RESEARCH_STAGE} from "@comend/lib/types";
 import {Badge} from "@comend/components/ui/badge";
 import type {Organization} from "@prisma/client";
 import {NoProjects} from "./no-projects";
@@ -134,10 +134,23 @@ export const RoadmapCard = ({
                     <CardDescription>
                         {roadmap.description}
                     </CardDescription>
-                    <div className="flex gap-2">
+                    {/* <div className="flex gap-2">
                         {RESEARCH_PLAN_TYPES.filter(typeOption => (roadmap.modalities || []).includes(typeOption.value)).map((type: Option, index) =>
                             <ResearchPlanTypeBadge key={index} label={type.label}/>)}
                         <StageOfActivityBadge showTooltip={false} milestones={roadmap.milestones}/>
+                    </div> */}
+                    <div className="flex gap-2 flex-wrap">
+                        {RESEARCH_PLAN_TYPES.filter(modality => roadmap.modalities.includes(modality.value)).map(m => (
+                            <Badge variant={"secondary"} className="text-sm">{m.label}</Badge>
+                        ))}
+    
+                        {RESEARCH_STAGE.filter(stage => roadmap.stages.includes(stage.value)).map(s => (
+                            <Badge variant={"secondary"} className="text-sm">{s.label}</Badge>
+                        ))}
+    
+                        {RESEARCH_PLAN_STATUS.filter(status => roadmap.statuses.includes(status.value)).map(s => (
+                            <Badge variant={"secondary"} className="text-sm">{s.label}</Badge>
+                        ))}
                     </div>
 
                     <TabsList className="w-min rounded-t-md rounded-b-none z-10 -py-2">
