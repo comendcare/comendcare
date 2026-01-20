@@ -675,17 +675,17 @@ model ExternalAttachment {
   link String
 
   toolId         String?
-  tool           Tool?         @relation(fields: [toolId], references: [id])
+  tool           Tool?         @relation(fields: [toolId], references: [id], onDelete: Cascade)
   biosampleId    String?
-  biosample      Biosample?    @relation(fields: [biosampleId], references: [id])
+  biosample      Biosample?    @relation(fields: [biosampleId], references: [id], onDelete: Cascade)
   rfpId          String?
-  rfp            RFP?          @relation(fields: [rfpId], references: [id])
+  rfp            RFP?          @relation(fields: [rfpId], references: [id], onDelete: Cascade)
   milestoneId    String?
-  milestone      Milestone?    @relation(fields: [milestoneId], references: [id])
+  milestone      Milestone?    @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
   metadata       Json?
-  diseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
+  diseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id], onDelete: Cascade)
   diseaseModelId String?
-  Roadmap        Roadmap?      @relation(fields: [roadmapId], references: [id])
+  Roadmap        Roadmap?      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
   roadmapId      String?
 }
 
@@ -699,17 +699,17 @@ model ExternalContact {
   affiliation String?
 
   toolId         String?
-  tool           Tool?         @relation(fields: [toolId], references: [id])
+  tool           Tool?         @relation(fields: [toolId], references: [id], onDelete: Cascade)
   biosampleId    String?
-  biosample      Biosample?    @relation(fields: [biosampleId], references: [id])
+  biosample      Biosample?    @relation(fields: [biosampleId], references: [id], onDelete: Cascade)
   rfpId          String?
-  rfp            RFP?          @relation(fields: [rfpId], references: [id])
+  rfp            RFP?          @relation(fields: [rfpId], references: [id], onDelete: Cascade)
   milestoneId    String?
-  milestone      Milestone?    @relation(fields: [milestoneId], references: [id])
+  milestone      Milestone?    @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
   metadata       Json?
-  diseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
+  diseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id], onDelete: Cascade)
   diseaseModelId String?
-  Roadmap        Roadmap?      @relation(fields: [roadmapId], references: [id])
+  Roadmap        Roadmap?      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
   roadmapId      String?
 }
 

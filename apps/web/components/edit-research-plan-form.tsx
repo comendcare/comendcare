@@ -586,7 +586,6 @@ export function EditResearchPlanForm({
                     )}
 
                     <Button 
-                        disabled={!form.formState.isValid} 
                         type="submit" 
                         variant={"cta"} 
                         className="w-fit"
