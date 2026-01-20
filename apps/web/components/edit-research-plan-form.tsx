@@ -53,6 +53,7 @@ import { PrivatePublicFormField } from "./edit-milestone-form"
 import { RadioGroup, RadioGroupItem } from "@comend/components/ui/radio-group"
 import { cn } from "@comend/lib/utils"
 import { Tooltip, TooltipTrigger } from "@comend/components/ui/tooltip"
+import { AnyARecord } from "dns"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -65,7 +66,7 @@ export function EditResearchPlanForm({
                                          closeDialog,
                                          setIsSubmitting,
                                      }: {
-    researchPlanData?: Partial<Roadmap>
+    researchPlanData?: any
     closeDialog?: () => void
     setIsSubmitting?: (submitting: boolean) => void
 }) {
@@ -81,6 +82,10 @@ export function EditResearchPlanForm({
             isPrivate: researchPlanData?.private !== undefined && researchPlanData?.private !== null ? researchPlanData?.private : true,
             title: researchPlanData?.title || undefined,
             description: researchPlanData?.description || undefined,
+            partners: researchPlanData?.partners || undefined,
+            stages: RESEARCH_STAGE.filter((stage) => (researchPlanData?.stages ||[]).includes(stage.value)),
+            statuses: RESEARCH_PLAN_STATUS.filter((status) => (researchPlanData?.statuses ||[]).includes(status.value)),
+            links: researchPlanData?.links || undefined,
             modalities: RESEARCH_PLAN_TYPES.filter((modality) =>
                 (researchPlanData?.modalities || []).includes(modality.value)
             ),
@@ -252,10 +257,18 @@ export function EditResearchPlanForm({
                                     size={"icon"}
                                     onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                         e.preventDefault()
+                                        // form.setValue(
+                                        //     "partners", 
+                                        //     [
+                                        //         ...(field.value || []),
+                                        //         {name: "", email: "", role: null}
+                                        //     ],
+                                        //     {shouldDirty: true}
+                                        // )
                                         form.setValue(
                                             "partners", 
                                             [
-                                                ...(field.value || []),
+                                                ...(field?.value || []),
                                                 {name: "", email: "", role: null}
                                             ],
                                             {shouldDirty: true}
@@ -294,7 +307,7 @@ export function EditResearchPlanForm({
                                                 value={partner.email}
                                                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                                                     const newValue = {
-                                                        ...field.value,
+                                                        ...partner,
                                                         email: e.currentTarget.value
                                                     }
                                                     form.setValue(

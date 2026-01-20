@@ -61,6 +61,10 @@ export default async function RoadmapPage({
             organization: true,
             user: true,
             modalities: true,
+            partners: true,
+            stages: true,
+            statuses: true,
+            links: true,
             metadata: true,
         }),
         getRoadmapMilestones(orgId, params.id, {

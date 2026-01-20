@@ -933,7 +933,7 @@ export const deleteOrganization = withOrganizationAuth(
 );
 
 export const updateRoadmap = withOrganizationAuth(
-    async (organizationId: string, data: Partial<Roadmap>) => {
+    async (organizationId: string, data: any) => {
         const session = await getSession()
         if (!session?.user.id) {
             return {
@@ -975,7 +975,11 @@ export const updateRoadmap = withOrganizationAuth(
         };
 
         // Only consider fields you allow to be updated here
-        const updatableKeys = ["title", "description", "content", "modalities", "metadata"] as const;
+        const updatableKeys = ["title", "description", "content", "modalities", "metadata", "partners", "stages", "statuses", "links"] as const;
+                    // partners: researchPlanData?.partners || undefined,
+                    // stages: RESEARCH_STAGE.filter((stage) => (researchPlanData?.stages ||[]).includes(stage.value)),
+                    // statuses: RESEARCH_PLAN_STATUS.filter((status) => (researchPlanData?.statuses ||[]).includes(status.value)),
+                    // links: researchPlanData?.links || undefined,
 
         // Compute change set (based on incoming "data" vs current "roadmap")
         const changedFields: string[] = [];
@@ -992,6 +996,9 @@ export const updateRoadmap = withOrganizationAuth(
             }
         }
 
+        console.log(`update keys`, updatableKeys)
+        console.log(`update data`, data)
+
         try {
             const response = await prisma.roadmap.update({
                 where: {
@@ -1004,6 +1011,36 @@ export const updateRoadmap = withOrganizationAuth(
                     modalities: data.modalities,
                     stages: data.stages,
                     statuses: data.statuses,
+                    // partners: data.partners,
+                    // links: data.links,
+                    ...(data?.partners ? (
+                        {
+                            partners: {
+                                deleteMany: {},
+                                createMany: {
+                                    data: (data?.partners || []).map((partner: any) => ({
+                                        name: partner.name,
+                                        email: partner.email,
+                                        ...(partner.role ? {role: partner.role} : undefined),
+                                        ...(partner.affiliation ? {affiliation: partner.affiliation} : undefined)
+                                    }))
+                                }
+                            }
+                        }
+                    ) : undefined),
+                    ...(data?.links ? (
+                        {
+                            links: {
+                                deleteMany: {}, // clear all existing attachments
+                                createMany: {
+                                    data: (data?.links || []).map((attachment: any) => ({
+                                        link: attachment.link,
+                                        ...(attachment.name ? {name: attachment.name} : undefined)
+                                    }))
+                                }
+                            }
+                        }
+                    ) : undefined),
                     
                     ...(data.metadata ? {metadata: data.metadata} : undefined)
                 }
