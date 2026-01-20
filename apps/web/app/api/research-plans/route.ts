@@ -12,7 +12,9 @@ export async function POST(req: Request) {
             },
             include: {
                 organization: true,
-                milestones: true
+                milestones: {
+                    where: { private: false }
+                }
             }
         });
 

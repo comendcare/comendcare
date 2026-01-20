@@ -11,6 +11,7 @@ import { LoaderCircle } from "lucide-react";
 import { cn } from "@udecode/cn";
 import { ResearchPlanSearchState, useResearchPlanSearchStore } from "@/state/search/researchPlanSearchStore";
 import { ResearchPlanCard } from "@comend/components/research-plan-card";
+import Link from "next/link";
 
 const selector = (state: ResearchPlanSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -47,17 +48,12 @@ export function ResearchPlanSearchResults() {
                 ): (
                     <div className="w-full flex flex-col gap-4 ">
                         {searchResults.map((researchPlan: any) => (
-                            <Dialog>
-                                <DialogTrigger
-                                    className="w-full max-w-full h-full"
-                                >
-                                    <ResearchPlanCard researchPlan={researchPlan} showOrganization={true}/>
-                                </DialogTrigger>
-                                <DialogContent className="overflow-hidden" data-testid="dialog">
-                                    {/* <RFPDetails rfp={researchPlan}/> */}
-                                    <p>{researchPlan.title}</p>
-                                </DialogContent>
-                            </Dialog>
+                            <Link 
+                                target="_blank"
+                                href={`http://${researchPlan.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlan.id}`}
+                            >
+                                <ResearchPlanCard researchPlan={researchPlan} showOrganization={true}/>
+                            </Link>
                         ))}
                     </div>
                 )}
