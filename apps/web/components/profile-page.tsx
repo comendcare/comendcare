@@ -9,7 +9,6 @@ import {RoadmapsCard} from "~web/components/public-roadmap-card";
 import {Building2, Calendar, CircleDollarSign, ExternalLink, HandCoins} from "lucide-react";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {Dialog, DialogContent, DialogTrigger} from "@comend/components/ui/dialog";
-import ShareDialog from "~web/components/share-dialog";
 import {Button, buttonVariants} from "@comend/components/ui/button";
 import {EditableProfilePhoto} from "./editable-profile-photo";
 import {EditablePAGBannerPhoto} from "./editable-pag-banner-photo";
@@ -19,6 +18,11 @@ import { SearchParams } from "@comend/components/types";
 import dynamic from "next/dynamic";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import type { Biosample, DiseaseModel, Tool } from "@prisma/client";
+
+const ShareDialog = dynamic(() => import("~web/components/share-dialog"), {
+    ssr: false,
+    loading: () => <LoadingDots color="#808080" />,
+});
 
 export type ToolCounts = {
     biosampleCount: number;
