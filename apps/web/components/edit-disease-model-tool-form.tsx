@@ -176,14 +176,22 @@ export function EditDiseaseModelToolForm({
         }
     })
 
+    const description = useWatch({control: form.control, name: "description"})
+    const types = useWatch({control: form.control, name: "types"})
+    const otherTypeDetails = useWatch({control: form.control, name: "otherTypeDetails"})
+    const attachments = useWatch({control: form.control, name: "attachments"})
+    const isPrivate = useWatch({control: form.control, name: "isPrivate"})
+    const contacts = useWatch({control: form.control, name: "contacts"})
+    const milestones = useWatch({control: form.control, name: "milestones"})
+
     const formData = {
-        description: form.watch("description"),
-        types: form.watch("types"),
-        otherTypeDetails: form.watch("otherTypeDetails"),
-        attachments: form.watch("attachments"),
-        isPrivate: form.watch("isPrivate"),
-        contacts: form.watch("contacts"),
-        milestones: form.watch("milestones"),
+        description,
+        types,
+        otherTypeDetails,
+        attachments,
+        isPrivate,
+        contacts,
+        milestones,
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editDiseaseModelForm>, createFacilityRequests: CreateFacilityRequest[]) => {
