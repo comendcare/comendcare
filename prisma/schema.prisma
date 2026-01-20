@@ -233,6 +233,7 @@ model VerificationToken {
 
 model Roadmap {
   id             String               @id @default(cuid())
+  private        Boolean              @default(true)
   title          String?
   description    String?
   content        String?

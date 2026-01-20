@@ -46,9 +46,13 @@ import {
     AlertDialogTrigger,
 } from "@comend/components/ui/alert-dialog"
 import { revalidate } from "@comend/lib/revalidate"
-import { Plus, Trash, User } from "lucide-react"
+import { Globe, Plus, Trash, User, Lock } from "lucide-react"
 import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area"
 import { DialogFooter } from "@comend/components/ui/dialog"
+import { PrivatePublicFormField } from "./edit-milestone-form"
+import { RadioGroup, RadioGroupItem } from "@comend/components/ui/radio-group"
+import { cn } from "@comend/lib/utils"
+import { Tooltip, TooltipTrigger } from "@comend/components/ui/tooltip"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -74,6 +78,7 @@ export function EditResearchPlanForm({
         mode: "onChange",
         resolver: zodResolver(editResearchPlanForm),
         defaultValues: {
+            isPrivate: researchPlanData?.private !== undefined && researchPlanData?.private !== null ? researchPlanData?.private : true,
             title: researchPlanData?.title || undefined,
             description: researchPlanData?.description || undefined,
             modalities: RESEARCH_PLAN_TYPES.filter((modality) =>
@@ -167,6 +172,21 @@ export function EditResearchPlanForm({
                         </FormItem>
                     )}
                 />
+
+                <FormItem className="flex gap-6 items-center">
+                    <div className="grow">
+                        <FormLabel>{`Visibility`}</FormLabel>
+                        <FormDescription>
+                            {`Private research plans will not be shown to people outside of your organization.`}
+                        </FormDescription>
+                    </div>
+                    <div className="w-[90px]">
+                        <PrivatePublicFormField 
+                            form={form} 
+                            // formData={formData} 
+                        />
+                    </div>
+                </FormItem>
 
                 <FormField
                     control={form.control}

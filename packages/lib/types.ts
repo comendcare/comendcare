@@ -2617,6 +2617,7 @@ export const diagnosisSchema = z.object({
 })
 
 export const editResearchPlanForm = z.object({
+    isPrivate: z.boolean(),
     title: z
         .string({ required_error: "Please provide a title" })
         .min(1, "Title is required")

@@ -1468,7 +1468,7 @@ export const PrivatePublicFormField = ({
                                            mixpanelTrackCallback
                                        }: {
     form: any,
-    formData: any,
+    formData?: any,
     mixpanelTrackCallback?: (isPrivate: boolean) => void
 }) => {
     return (
