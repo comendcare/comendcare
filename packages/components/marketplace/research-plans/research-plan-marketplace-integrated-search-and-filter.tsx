@@ -11,7 +11,7 @@ import {debounce, filter} from "lodash";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import { ResearchPlanSearchState, useResearchPlanSearchStore } from "@/state/search/researchPlanSearchStore"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
-import { RFP_OPEN_TO_TYPE_OPTIONS, Option, RFP_STATUS_TYPE_OPTIONS, RESEARCH_PLAN_STATUS, RESEARCH_STAGE } from "@comend/lib/types"
+import { RFP_OPEN_TO_TYPE_OPTIONS, Option, RFP_STATUS_TYPE_OPTIONS, RESEARCH_PLAN_STATUS, RESEARCH_STAGE, RESEARCH_PLAN_TYPES } from "@comend/lib/types"
 import { Badge, badgeVariants } from "@comend/components/ui/badge"
 import { handleAsyncConditionSearch, handleAsyncGeneSearch } from "@comend/lib/utils"
 
@@ -32,7 +32,7 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
     const [query, setQuery] = useState(searchTerm)
 
     const clearAll = () => {
-        setFilters({ ...filters, stages: [], statuses: [] });
+        setFilters({ ...filters, stages: [], statuses: [], modalities: [] });
     }
 
     // helper to update a single filter key from MultipleSelector
@@ -59,7 +59,8 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
 
     const activeCount =
         (filters.stages?.length || 0) +
-        (filters.statuses?.length || 0)
+        (filters.statuses?.length || 0) + 
+        (filters.modalities?.length || 0)
 
     return (
         <div className="w-full mx-auto flex flex-col gap-y-2">
@@ -69,7 +70,7 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
                     <Label className="text-base font-semibold text-gray-900">Search</Label>
                     <Input
                         type="text"
-                        placeholder="Title, scope, condition, gene..."
+                        placeholder="Title, description, partners..."
                         value={query}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             const search: string = e.target.value
@@ -98,6 +99,23 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
                         }}
                     >
                         <DialogTitle>Research Plan Filters</DialogTitle>
+                            {/* Modalities/Therapeutic Strategies */}
+                            <div>
+                                <Label>Therapeutic strategy</Label>
+                                <MultipleSelector
+                                    value={filters.statuses ?? []}
+                                    onChange={(vals) => setFilterKey("modalities", vals)}
+                                    defaultOptions={RESEARCH_PLAN_TYPES}
+                                    placeholder="Select strategy..."
+                                    hidePlaceholderWhenSelected
+                                    commandProps={{className: "bg-transparent"}}
+                                    emptyIndicator={
+                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
+                                    }
+                                    showHoverCard={false}
+                                />
+                            </div>
+
                             {/* Stages */}
                             <div>
                                 <Label>Stages</Label>
@@ -139,6 +157,18 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
             <div className="flex flex-row gap-2 items-center">
                 {activeCount > 0 && (
                     <div className="flex flex-wrap gap-2 items-center">
+                        {(filters.modalities || []).map((item) => (
+                            <Badge key={`modalities-${item.value}`} variant="secondary" className="text-xs">
+                                {item.label}
+                                <button
+                                    onClick={() => removeFilterItem("modalities", item.value)}
+                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+
                         {(filters.stages || []).map((item) => (
                             <Badge key={`stages-${item.value}`} variant="secondary" className="text-xs">
                                 {item.label}

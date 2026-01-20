@@ -35,6 +35,11 @@ export type FiltersType = {
         value: string,
         disable?: boolean,
     }[],
+    modalities: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
     // organizations: {
     //     label: string,
     //     value: string,
@@ -49,7 +54,8 @@ export const defaultFilters = {
     // status: [],
     // organizations: []
     stages: [],
-    statuses: []
+    statuses: [],
+    modalities: []
 }
 
 function generateFiltersString(filters: FiltersType): string {
@@ -71,6 +77,14 @@ function generateFiltersString(filters: FiltersType): string {
             .map(status => `statuses:=[${escapeValue(status.value)}]`)
             .join(" || ");
             filtersList.push(`(${statusFilter})`);
+    }
+
+    // modalities/therapeutic strategies
+    if (filters?.modalities && filters.modalities.length > 0) {
+        const modalitiesFilter = filters.modalities
+            .map(status => `modalities:=[${escapeValue(status.value)}]`)
+            .join(" || ");
+            filtersList.push(`(${modalitiesFilter})`);
     }
 
     // Combine all filters with `&&`

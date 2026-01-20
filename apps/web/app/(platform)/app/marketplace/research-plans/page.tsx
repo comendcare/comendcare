@@ -18,11 +18,9 @@ export default function ResearchPlanPage() {
     useEffect(() => {
         if (!initialized) {
             const parsedResearchPlanFilters = {
-            //     conditions: [],
-            //     genes: [],
-            //     openTo: [],
-            //     status: [],
-            //     organizations: []
+                stages: [],
+                statuses: [],
+                modalities: []
             }
             initializeResearchPlanSearch(parsedResearchPlanFilters)
             console.log(`RFP search initialized...`)
