@@ -148,6 +148,11 @@ export default function NewOrganizationForm({invitations, organizations}: {
 
     const [debouncedSubdomain] = useDebounce(form.watch("subdomain"), 500);
 
+    // Prefetch for faster navigation after form submission
+    useEffect(() => {
+        const href = hasInvitations ? "/app/profile" : "/app/dashboard"
+        router.prefetch(href)
+    }, [hasInvitations, router])
 
     /**************************************
      * Subdomain availability check

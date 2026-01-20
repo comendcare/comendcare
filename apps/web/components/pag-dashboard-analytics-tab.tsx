@@ -50,7 +50,10 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                                 size="icon"
                                 className="p-0 h-auto w-auto"
                             >
-                                <Link href="/app/research-plan" aria-label="Research plans">
+                                <Link
+                                    href="/app/research-plan"
+                                    aria-label="Research plans"
+                                >
                                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                                 </Link>
                             </Button>

@@ -109,9 +109,7 @@ export default function MarketplacePage() {
                 mechanisms: [] as any[],
                 modalities: [] as any[],
             }
-            await initializeOrganizationSearch(parsedPAGFilters)
             setPagsInitialized(true)
-            console.log(`Organization search initialized...`)
 
             const parsedBiosampleFilters = {
                 types: [] as any[],
@@ -119,9 +117,7 @@ export default function MarketplacePage() {
                 conditions: [] as any[],
                 organizations: [] as any[],
             }
-            await initializeBiosampleSearch(parsedBiosampleFilters)
             setBiosamplesInitialized(true)
-            console.log(`Biosample search initialized...`)
 
             const parsedDiseaseModelFilters = {
                 types: [] as any[],
@@ -129,9 +125,7 @@ export default function MarketplacePage() {
                 conditions: [] as any[],
                 organizations: [] as any[],
             }
-            await initializeDiseaseModelSearch(parsedDiseaseModelFilters)
             setDiseaseModelsInitialized(true)
-            console.log(`Disease Model search initialized...`)
 
             const parsedClinicalDatasetFilters = {
                 types: [] as any[],
@@ -139,9 +133,7 @@ export default function MarketplacePage() {
                 conditions: [] as any[],
                 organizations: [] as any[]
             }
-            await initializeClinicalDatasetSearch(parsedClinicalDatasetFilters)
             setClinicalDatasetsInitialized(true)
-            console.log(`Clinical Dataset search initialized...`)
 
             const parsedRFPFilters = {
                 conditions: [],
@@ -150,9 +142,7 @@ export default function MarketplacePage() {
                 status: [],
                 organizations: []
             }
-            initializeRFPSearch(parsedRFPFilters)
             setRfpsInitialized(true)
-            console.log(`RFP search initialized...`)
 
             const parsedCROFilters = {
                 categories: [] as any[],
@@ -161,9 +151,16 @@ export default function MarketplacePage() {
                 certifications: [] as any[],
                 tags: [] as any[],
             }
-            await initializeCROSearch(parsedCROFilters)
             setCROsInitialized(true)
-            console.log(`CRO search initialized...`)
+
+            await Promise.all([
+                initializeOrganizationSearch(parsedPAGFilters),
+                initializeBiosampleSearch(parsedBiosampleFilters),
+                initializeDiseaseModelSearch(parsedDiseaseModelFilters),
+                initializeClinicalDatasetSearch(parsedClinicalDatasetFilters),
+                initializeCROSearch(parsedCROFilters),
+            ]);
+            initializeRFPSearch(parsedRFPFilters);
         }
 
         init()
