@@ -961,42 +961,30 @@ export const updateRoadmap = withOrganizationAuth(
                     orderBy: [{createdAt: "desc"}]
                 },
                 edges: true,
-                organization: true
+                organization: true,
+                links: true,
+                partners: true,
             }
         })
 
         if (!roadmap) return {error: "Roadmap not found"}
 
-        // Utility to compare (handles objects/arrays by JSON stringifying)
-        const isEqual = (a: unknown, b: unknown) => {
-            const ja = typeof a === "object" ? JSON.stringify(a) : a;
-            const jb = typeof b === "object" ? JSON.stringify(b) : b;
-            return ja === jb;
-        };
+        const diffIds = (incoming: string[], existingIds: string[]) => ({
+            toAdd: (incoming || []).filter(id => !existingIds.includes(id)),
+            toUpdate: (incoming || []).filter(id => existingIds.includes(id)),
+            toRemove: (existingIds || []).filter(id => !incoming.includes(id)),
+        })
 
-        // Only consider fields you allow to be updated here
-        const updatableKeys = ["title", "description", "content", "modalities", "metadata", "partners", "stages", "statuses", "links"] as const;
-                    // partners: researchPlanData?.partners || undefined,
-                    // stages: RESEARCH_STAGE.filter((stage) => (researchPlanData?.stages ||[]).includes(stage.value)),
-                    // statuses: RESEARCH_PLAN_STATUS.filter((status) => (researchPlanData?.statuses ||[]).includes(status.value)),
-                    // links: researchPlanData?.links || undefined,
+        const linksDiff = diffIds(
+            (data.links || []).map((a: any) => a.id),
+            roadmap?.links.map(a => a.id)
+        )
 
-        // Compute change set (based on incoming "data" vs current "roadmap")
-        const changedFields: string[] = [];
-        const changes: Record<string, { before: unknown; after: unknown }> = {};
+        const partnersDiff = diffIds(
+            (data.partners || []).map((c: any) => c.id),
+            roadmap?.partners.map(c => c.id)
+        )
 
-        for (const key of updatableKeys) {
-            if (typeof data[key] !== "undefined") {
-                const beforeVal = (roadmap as any)[key];
-                const afterVal = (data as any)[key];
-                if (!isEqual(beforeVal, afterVal)) {
-                    changedFields.push(key);
-                    changes[key] = {before: beforeVal, after: afterVal};
-                }
-            }
-        }
-
-        console.log(`update keys`, updatableKeys)
         console.log(`update data`, data)
 
         try {
@@ -1011,36 +999,31 @@ export const updateRoadmap = withOrganizationAuth(
                     modalities: data.modalities,
                     stages: data.stages,
                     statuses: data.statuses,
-                    // partners: data.partners,
-                    // links: data.links,
-                    ...(data?.partners ? (
-                        {
-                            partners: {
-                                deleteMany: {},
-                                createMany: {
-                                    data: (data?.partners || []).map((partner: any) => ({
-                                        name: partner.name,
-                                        email: partner.email,
-                                        ...(partner.role ? {role: partner.role} : undefined),
-                                        ...(partner.affiliation ? {affiliation: partner.affiliation} : undefined)
-                                    }))
-                                }
-                            }
-                        }
-                    ) : undefined),
-                    ...(data?.links ? (
-                        {
-                            links: {
-                                deleteMany: {}, // clear all existing attachments
-                                createMany: {
-                                    data: (data?.links || []).map((attachment: any) => ({
-                                        link: attachment.link,
-                                        ...(attachment.name ? {name: attachment.name} : undefined)
-                                    }))
-                                }
-                            }
-                        }
-                    ) : undefined),
+                    links: {
+                        deleteMany: linksDiff.toRemove.length ? { id: { in: linksDiff.toRemove } } : undefined,
+                        update: (data.links || [])
+                            .filter((a: any) => linksDiff.toUpdate.includes(a.id))
+                            .map((a: any) => ({
+                                where: {id: a.id},
+                                data: { link: a.link, name: a.name ?? undefined }
+                            })),
+                        create: (data.links || [])
+                            .filter((a: any) => linksDiff.toAdd.includes(a.id))
+                            .map((a: any) => ({ link: a.link, name: a.name ?? undefined })),
+                    },
+
+                    partners: {
+                        deleteMany: partnersDiff.toRemove.length ? { id: { in: partnersDiff.toRemove } } : undefined,
+                        update: (data.partners || [])
+                            .filter((c: any) => partnersDiff.toUpdate.includes(c.id))
+                            .map((c: any) => ({
+                                where: {id: c.id},
+                                data: { name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined }
+                            })),
+                        create: (data.partners || [])
+                            .filter((c: any) => partnersDiff.toAdd.includes(c.id))
+                            .map((c: any) => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
+                    },
                     
                     ...(data.metadata ? {metadata: data.metadata} : undefined)
                 }
@@ -1055,32 +1038,12 @@ export const updateRoadmap = withOrganizationAuth(
 
             // if the organization has a custom domain, we need to revalidate those tags too
             roadmap.organization?.customDomain &&
-            (await revalidateTag(
-                `${roadmap.organization?.customDomain}-roadmaps`
-            ),
+                (await revalidateTag(
+                    `${roadmap.organization?.customDomain}-roadmaps`
+                ),
                 await revalidateTag(
                     `${roadmap.organization?.customDomain}-${roadmap.slug}`
                 ))
-
-            // await writeRawEvent({
-            //     provider: "app",
-            //     eventType: "org_research_plan_updated",
-            //     externalId: roadmap.id, // back-reference for idempotency
-            //     occurredAt: new Date(),
-            //     payload: {
-            //         orgId: roadmap.organization?.id ?? organizationId,
-            //         orgName: roadmap.organization?.name ?? undefined,
-            //         roadmapId: roadmap.id,
-            //         title: response.title ?? roadmap.title,
-            //         published: response.published, // boolean
-            //         // actor
-            //         userId: session.user.id,
-            //         userName: session.user.name,
-            //         // change details
-            //         changedFields: changedFields.length ? changedFields : undefined,
-            //         changes: Object.keys(changes).length ? changes : undefined,
-            //     },
-            // });
 
             return response
         } catch (error: any) {
