@@ -113,7 +113,6 @@ export const useRoadmapStore = create<RoadmapState>()(
 
                 const roadmap = await updateRoadmap(orgId, {
                     id,
-                    private: data.isPrivate,
                     title: data.title,
                     description: data.description || null,
                     modalities: data.modalities?.map(modality => modality.value) || [],
