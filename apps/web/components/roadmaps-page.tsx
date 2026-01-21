@@ -93,9 +93,8 @@ export default function RoadmapsPage({ orgId, organization, roadmaps }: Props) {
                 <RoadmapsTable 
                     isPrivate={true}
                     roadmaps={roadmaps} 
-                    rowClickCallback={(roadmap) => {
+                    rowClickCallback={() => {
                         setIsLoading(true)
-                        router.push(`/app/research-plan/${roadmap.id}`)
                     }}
                 />
             </div>

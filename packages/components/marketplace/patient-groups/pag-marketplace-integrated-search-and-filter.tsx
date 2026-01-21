@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {unstable_batchedUpdates} from "react-dom";
 import { Funnel, X } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { debounce } from "lodash";
@@ -129,17 +130,19 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
     //     // eslint-disable-next-line react-hooks/exhaustive-deps
     // }, []);
 
-    const handleInputChangeCallback = useCallback(
-        (text: string) => {
+    const handleInputChangeCallback = useCallback((text: string) => {
+        unstable_batchedUpdates(() => {
             setSearchTerm(text);
-            
-            // Handle setting universal search in other marketplaces
             setBiosampleSearchTerm(text);
             setDiseaseModelSearchTerm(text);
             setClinicalDatasetSearchTerm(text);
-        },
-        [setSearchTerm]
-    );
+        });
+    }, [
+        setSearchTerm,
+        setBiosampleSearchTerm,
+        setDiseaseModelSearchTerm,
+        setClinicalDatasetSearchTerm,
+    ])
 
     const debounceHandleInputChange = useMemo(
         () => debounce(handleInputChangeCallback, 500),

@@ -1,4 +1,3 @@
-"use client"
 import {PagProfileAboutCard} from "~web/components/pag-profile-about-card";
 import {formatMoney, isOnboarded, setOnboarded, standardizeYear} from "@comend/lib/utils";
 import {Card} from "@comend/components/ui/card";
@@ -10,7 +9,6 @@ import {RoadmapsCard} from "~web/components/public-roadmap-card";
 import {Building2, Calendar, CircleDollarSign, ExternalLink, HandCoins} from "lucide-react";
 import {ScrollArea} from "@comend/components/ui/scroll-area";
 import {Dialog, DialogContent, DialogTrigger} from "@comend/components/ui/dialog";
-import ShareDialog from "~web/components/share-dialog";
 import {Button, buttonVariants} from "@comend/components/ui/button";
 import {EditableProfilePhoto} from "./editable-profile-photo";
 import {EditablePAGBannerPhoto} from "./editable-pag-banner-photo";
@@ -20,9 +18,11 @@ import { SearchParams } from "@comend/components/types";
 import dynamic from "next/dynamic";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import type { Biosample, DiseaseModel, Tool } from "@prisma/client";
-import { useEffect } from "react";
-import { toast } from "sonner";
-import { useOnborda } from "./onborda/OnbordaContext";
+
+const ShareDialog = dynamic(() => import("~web/components/share-dialog"), {
+    ssr: false,
+    loading: () => <LoadingDots color="#808080" />,
+});
 
 export type ToolCounts = {
     biosampleCount: number;
@@ -83,44 +83,6 @@ export default function PAGProfilePage({
     searchParams,
     conditionTags
 }: PAGProfilePageProps) {
-    const { startOnborda } = useOnborda()
-    
-    // useEffect(() => {
-    //     const startOnbordaAndRemoveToast = () => {
-    //         startOnborda('organization-profile-tour')
-    //         setOnboarded('organization-profile-tour')
-    //         toast.dismiss()
-    //     }
-
-    //     // Only start tour if user is new and is on the /app/research-plan page
-    //     if (!isOnboarded('organization-profile-tour')) {
-    //         toast("Welcome to Comend!", {
-    //             id: "onborda",
-    //             duration: 300000,
-    //             position: "bottom-left",
-    //             description: `Would you like to take a quick tour?`,
-    //             action: (
-    //                 <div className="flex flex-col space-y-2 ml-4">
-    //                     <Button
-    //                         onClick={() => startOnbordaAndRemoveToast()}
-    //                         variant="secondary"
-    //                     >
-    //                         {`Yes please!`}
-    //                     </Button>
-    //                     <Button
-    //                         onClick={() => {
-    //                             toast.dismiss()
-    //                             setOnboarded('organization-profile-tour')
-    //                         }}
-    //                         variant="ghost"
-    //                     >
-    //                         {`No thanks!`}
-    //                     </Button>
-    //                 </div>
-    //             )
-    //         })
-    //     }
-    // }, [startOnborda])
 
     return (
         <div className="grid grid-cols-5 px-4 w-full max-w-7xl my-4 mx-auto gap-4">
