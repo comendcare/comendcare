@@ -154,7 +154,6 @@ export default function MarketplacePage() {
                 conditions: [] as any[],
                 organizations: [] as any[]
             }
-            setClinicalDatasetsInitialized(true)
 
             const parsedRFPFilters = {
                 conditions: [],
