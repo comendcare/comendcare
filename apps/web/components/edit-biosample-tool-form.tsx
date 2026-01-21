@@ -241,17 +241,7 @@ export function EditBiosampleToolForm({
         }
     })
 
-    const description = useWatch({ control: form.control, name: "description" })
     const types = useWatch({ control: form.control, name: "types" })
-    const otherTypeDetails = useWatch({ control: form.control, name: "otherTypeDetails" })
-    const attachments = useWatch({ control: form.control, name: "attachments" })
-    const isPrivate = useWatch({ control: form.control, name: "isPrivate" })
-    const contacts = useWatch({ control: form.control, name: "contacts" })
-    const milestones = useWatch({ control: form.control, name: "milestones" })
-    const diagnoses = useWatch({ control: form.control, name: "diagnoses" })
-    const donorId = useWatch({ control: form.control, name: "donorId" })
-    const donor = useWatch({ control: form.control, name: "donor" })
-
     const formData = {
         description,
         types,
