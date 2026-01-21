@@ -130,7 +130,6 @@ export default function MarketplacePage() {
                 mechanisms: [] as any[],
                 modalities: [] as any[],
             }
-            setPagsInitialized(true)
 
             const parsedBiosampleFilters = {
                 types: [] as any[],
