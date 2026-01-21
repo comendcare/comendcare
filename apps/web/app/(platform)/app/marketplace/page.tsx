@@ -146,7 +146,6 @@ export default function MarketplacePage() {
                 conditions: [] as any[],
                 organizations: [] as any[],
             }
-            setDiseaseModelsInitialized(true)
 
             const parsedClinicalDatasetFilters = {
                 types: [] as any[],
