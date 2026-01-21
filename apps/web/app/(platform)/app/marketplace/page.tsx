@@ -163,7 +163,6 @@ export default function MarketplacePage() {
                 status: [],
                 organizations: []
             }
-            setRfpsInitialized(true)
 
             const parsedCROFilters = {
                 categories: [] as any[],
