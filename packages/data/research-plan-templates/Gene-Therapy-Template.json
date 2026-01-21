@@ -13,8 +13,8 @@
     "userId": null,
     "partners": null,
     "links": null,
-    "stages": [],
-    "statuses": [],
+    "stages": ["DISCOVERY"],
+    "statuses": ["PLANNING"],
     "modalities": ["GENE_THERAPY_AAV"],
     "milestones": [
         {

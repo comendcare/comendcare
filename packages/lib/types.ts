@@ -1827,6 +1827,11 @@ export const RESEARCH_STAGE: Option[] = [
 
 export const RESEARCH_PLAN_STATUS: Option[] = [
     {
+        id: 'PLANNING',
+        label: 'Planning',
+        value: 'PLANNING',
+    },
+    {
         id: 'ONGOING',
         label: 'Ongoing',
         value: 'ONGOING',
@@ -2617,19 +2622,24 @@ export const diagnosisSchema = z.object({
 })
 
 export const editResearchPlanForm = z.object({
-    isPrivate: z.boolean(),
     title: z
         .string({ required_error: "Please provide a title" })
         .min(1, "Title is required")
         .max(60, "Title must be less than 60 characters"),
-    modalities: z.array(optionSchema).max(1, "You can only select one type").optional(),
+    modalities: z.array(optionSchema)
+        .min(1, "Please select a therapeutic strategy")    
+        .max(1, "You can only select one type"),
     partners: z.array(z.custom<any>()).optional(),
     description: z
         .string()
         .max(1500, "Description must be less than 1500 characters")
         .optional(),
-    stages: z.array(optionSchema).max(1, "You can only select one stage").optional(),
-    statuses: z.array(optionSchema).max(1, "You can only select one status").optional(),
+    stages: z.array(optionSchema)
+        .min(1, "Please select a stage")
+        .max(1, "You can only select one stage"),
+    statuses: z.array(optionSchema)
+        .min(1, "Please select a status")  
+        .max(1, "You can only select one status"),
     links: z.array(z.custom<any>()).optional(),
     otherModalities: z.string().optional(),
     metadata: z.string().optional()

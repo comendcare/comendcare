@@ -73,7 +73,6 @@ export function EditResearchPlanForm({
         mode: "onChange",
         resolver: zodResolver(editResearchPlanForm),
         defaultValues: {
-            isPrivate: researchPlanData?.private !== undefined && researchPlanData?.private !== null ? researchPlanData?.private : true,
             title: researchPlanData?.title || undefined,
             description: researchPlanData?.description || undefined,
             partners: researchPlanData?.partners || undefined,
@@ -106,7 +105,6 @@ export function EditResearchPlanForm({
             // Create new
             const roadmap = await createRoadmap(session.user.organizationId, {
                 title: values.title,
-                private: values.isPrivate,
                 description: values.description || "",
                 modalities: values?.modalities?.map((m) => m.value) || [],
                 partners: values?.partners,
