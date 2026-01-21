@@ -180,15 +180,7 @@ export function EditClincalDatasetForm({
         }
     })
 
-    const title = useWatch({ control: form.control, name: "title" })
-    const description = useWatch({ control: form.control, name: "description" })
     const types = useWatch({ control: form.control, name: "types" })
-    const otherTypeDetails = useWatch({ control: form.control, name: "otherTypeDetails" })
-    const attachments = useWatch({ control: form.control, name: "attachments" })
-    const isPrivate = useWatch({ control: form.control, name: "isPrivate" })
-    const contacts = useWatch({ control: form.control, name: "contacts" })
-    const milestones = useWatch({ control: form.control, name: "milestones" })
-
     const formData = {
         title,
         description,
