@@ -15,8 +15,8 @@ import type {Organization} from "@prisma/client";
 import {NoProjects} from "./no-projects";
 import {useState} from "react";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
-import { PropertyBadge } from "@comend/components/property-badge";
-import { NoResultsTemplate } from "@comend/components/no-results";
+import {PropertyBadge} from "@comend/components/property-badge";
+import {NoResultsTemplate} from "@comend/components/no-results";
 import Link from "next/link";
 
 export const RoadmapsCard = ({
@@ -33,7 +33,8 @@ export const RoadmapsCard = ({
         <Card className="organization-profile-tour-step4 w-full" data-testid="roadmaps-card">
             <CardHeader className="w-full pt-6 pb-2 space-y-4">
                 <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                    <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="roadmaps-heading">
+                    <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight"
+                               data-testid="roadmaps-heading">
                         Research plans
                     </CardTitle>
                     {pathname === "/app/profile" &&
@@ -60,18 +61,18 @@ export const RoadmapsCard = ({
                     />
                     : (pathname === "/app/profile"
                             ? (
-                                <NoResultsTemplate 
+                                <NoResultsTemplate
                                     imgAlt="No research plans"
                                     src="https://illustrations.popsy.co/gray/studying.svg"
                                     title="Your organization does not have any public research plans yet."
                                 />
                             )
                             : (
-                                <NoResultsTemplate 
+                                <NoResultsTemplate
                                     imgAlt="No research plans"
                                     src="https://illustrations.popsy.co/gray/studying.svg"
                                     title="No research plans yet"
-                                    description={organization.name ? `${organization.name} doesn't have any public research plans yet.`: `This organization doesn't have any public research plans yet.`}
+                                    description={organization.name ? `${organization.name} doesn't have any public research plans yet.` : `This organization doesn't have any public research plans yet.`}
                                 />
                             )
                     )
@@ -105,7 +106,7 @@ export const RoadmapCard = ({
     const params = useSearchParams()
     if (!roadmap) {
         return (
-            <NoResultsTemplate 
+            <NoResultsTemplate
                 imgAlt="No research plans"
                 src="https://illustrations.popsy.co/gray/studying.svg"
                 title="No research plans yet"
@@ -142,10 +143,12 @@ export const RoadmapCard = ({
                     </div>
 
                     <TabsList className="w-min rounded-t-md rounded-b-none z-10 -py-2">
-                        <TabsTrigger value="flow" className="data-[state=active]:shadow-none rounded-b-none -mb-2 py-2.5">
+                        <TabsTrigger value="flow"
+                                     className="data-[state=active]:shadow-none rounded-b-none -mb-2 py-2.5">
                             Flow view
                         </TabsTrigger>
-                        <TabsTrigger value="list" className="data-[state=active]:shadow-none rounded-b-none -mb-2 py-2.5">
+                        <TabsTrigger value="list"
+                                     className="data-[state=active]:shadow-none rounded-b-none -mb-2 py-2.5">
                             List view
                         </TabsTrigger>
                     </TabsList>
@@ -254,7 +257,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback, isPrivate}: {
                 )}
                 {roadmaps.length <= 0 && (
                     <div className="w-full flex justify-center p-4">
-                        <NoResultsTemplate 
+                        <NoResultsTemplate
                             imgAlt="No research plans"
                             src="https://illustrations.popsy.co/gray/studying.svg"
                             title="No research plans yet!"
@@ -267,20 +270,24 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback, isPrivate}: {
     )
 }
 
-export const RoadmapRow = ({roadmap, rowClickCallback, isPrivate}: {roadmap: any, rowClickCallback: (roadmap: any) => void, isPrivate: boolean}) => {
+export const RoadmapRow = ({roadmap, rowClickCallback, isPrivate}: {
+    roadmap: any,
+    rowClickCallback: (roadmap: any) => void,
+    isPrivate: boolean
+}) => {
     const numProjects = roadmap.milestones.length
     const numPrivateProjects = roadmap.milestones.filter((milestone: any) => milestone.private).length
     const numPublishedProjects = roadmap.milestones.filter((milestone: any) => !milestone.private).length
 
     return (
-        <Link
-            href={`/app/research-plan/${roadmap.id}`}
-            onClick={() => rowClickCallback(roadmap)}
-            prefetch={true}
+        <TableRow
+            key={roadmap?.id}
+            className="cursor-pointer px-0"
         >
-            <TableRow
-                key={roadmap?.id}
-                className="cursor-pointer px-0"
+            <Link
+                href={`/app/research-plan/${roadmap.id}`}
+                onClick={() => rowClickCallback(roadmap)}
+                prefetch={true}
             >
                 <TableCell className="pl-0">
                     <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
@@ -318,8 +325,8 @@ export const RoadmapRow = ({roadmap, rowClickCallback, isPrivate}: {roadmap: any
                         <StageOfActivityBadge showTooltip={false} milestones={roadmap.milestones}/>
                     </div>
                 </TableCell>
-            </TableRow>
-        </Link>
+            </Link>
+        </TableRow>
     )
 }
 
@@ -355,7 +362,10 @@ export const CollapsibleTableGroup = ({label, colSpan, disabled = false, childre
     )
 }
 
-export const StageOfActivityBadge = ({milestones, showTooltip = true}: { milestones: Milestone[], showTooltip?: boolean }) => {
+export const StageOfActivityBadge = ({milestones, showTooltip = true}: {
+    milestones: Milestone[],
+    showTooltip?: boolean
+}) => {
     const stage = getStage(milestones)
 
     return (showTooltip ? (
@@ -371,7 +381,7 @@ export const StageOfActivityBadge = ({milestones, showTooltip = true}: { milesto
             </Tooltip>
         </TooltipProvider>
     ) : (
-        <Badge variant={stage.variant as any} className="text-sm">{stage.label}</Badge> 
+        <Badge variant={stage.variant as any} className="text-sm">{stage.label}</Badge>
     ))
 }
 
