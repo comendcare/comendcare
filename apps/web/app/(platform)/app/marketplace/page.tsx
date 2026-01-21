@@ -138,7 +138,6 @@ export default function MarketplacePage() {
                 conditions: [] as any[],
                 organizations: [] as any[],
             }
-            setBiosamplesInitialized(true)
 
             const parsedDiseaseModelFilters = {
                 types: [] as any[],
