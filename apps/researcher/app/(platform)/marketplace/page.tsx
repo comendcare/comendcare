@@ -456,6 +456,7 @@ export default function MarketplacePage() {
                                 <>
                                     {researcherStore.searchResults?.slice(0, 3).map((researcher, index) => (
                                         <Link
+                                            key={index}
                                             href={
                                                 process.env.NEXT_PUBLIC_VERCEL_ENV
                                                     ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/researcher/${researcher.user.id}`
