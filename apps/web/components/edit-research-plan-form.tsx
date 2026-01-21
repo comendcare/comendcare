@@ -44,7 +44,7 @@ import {
     AlertDialogTrigger,
 } from "@comend/components/ui/alert-dialog"
 import { revalidate } from "@comend/lib/revalidate"
-import { Plus, Trash, User } from "lucide-react"
+import { Building2, Plus, Trash, User } from "lucide-react"
 import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area"
 import { DialogFooter } from "@comend/components/ui/dialog"
 import { PrivatePublicFormField } from "./edit-milestone-form"
@@ -173,21 +173,6 @@ export function EditResearchPlanForm({
                     )}
                 />
 
-                <FormItem className="flex gap-6 items-center">
-                    <div className="grow">
-                        <FormLabel>{`Visibility`}</FormLabel>
-                        <FormDescription>
-                            {`Private research plans will not be shown to people outside of your organization.`}
-                        </FormDescription>
-                    </div>
-                    <div className="w-[90px]">
-                        <PrivatePublicFormField 
-                            form={form} 
-                            // formData={formData} 
-                        />
-                    </div>
-                </FormItem>
-
                 <FormField
                     control={form.control}
                     name="modalities"
@@ -244,7 +229,7 @@ export function EditResearchPlanForm({
                             <div className="flex gap-2 w-full justify-between items-center">
                                 <div>
                                     <FormLabel>Partners</FormLabel>
-                                    <FormDescription>{`Add any external contacts that are not on the Comend platform.`}</FormDescription>
+                                    <FormDescription>{`Name of the lab or company you're partnering with.`}</FormDescription>
                                 </div>
                                 <Button
                                     type="button"
@@ -267,47 +252,12 @@ export function EditResearchPlanForm({
                             </div>
 
                             {field?.value && field.value.length > 0 && (
-                                <ol className="flex flex-col gap-4">
+                                <ol className="flex flex-col gap-2">
                                     {field.value.map((partner: any, index: number) => (
-                                        <li key={index} className="grid grid-cols-[20px_auto_34px] lg:grid-cols-[20px_auto_auto_34px] gap-2 items-center">
-                                            <User className="row-start-1 col-start-1 h-4 w-4"/>
-                                            <div className="h-fit w-full grow row-start-1 col-start-2">
+                                        <li key={index} className="flex gap-2 items-center">
+                                            <div className="h-fit w-full grow">
                                             <Input
-                                                placeholder={`Name`}
-                                                value={partner.name}
-                                                onChange={(e: React.FormEvent<HTMLInputElement>) => {
-                                                    const newValue = {
-                                                        ...partner,
-                                                        name: e.currentTarget.value
-                                                    }
-                                                    form.setValue(
-                                                        "partners",
-                                                        field?.value?.map((currentValue: any, i: number) => i === index ? newValue : currentValue),
-                                                        {shouldDirty: true}
-                                                    )
-                                                }}
-                                            />
-                                            </div>
-                                            <div className="h-fit w-full grow row-start-2 col-start-2 lg:row-start-1 lg:col-start-3">
-                                            <Input
-                                                placeholder={`Email (required)`}
-                                                value={partner.email}
-                                                onChange={(e: React.FormEvent<HTMLInputElement>) => {
-                                                    const newValue = {
-                                                        ...partner,
-                                                        email: e.currentTarget.value
-                                                    }
-                                                    form.setValue(
-                                                        "partners",
-                                                        field?.value?.map((currentValue: any, i: number) => i === index ? newValue : currentValue),
-                                                        {shouldDirty: true}
-                                                    )
-                                                }}
-                                            />
-                                            </div>
-                                            <div className="h-fit w-full grow row-start-3 col-start-2 lg:row-start-2 lg:col-start-2 lg:col-span-2">
-                                            <Input
-                                                placeholder={`Affiliation`}
+                                                placeholder={`Partner name`}
                                                 value={partner.affiliation || undefined}
                                                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                                                     const newValue = {
@@ -324,7 +274,7 @@ export function EditResearchPlanForm({
                                             </div>
                                             <Button 
                                                 type="button"
-                                                className="row-start-1 col-start-3 lg:col-start-4 h-full w-[34px]" 
+                                                className="h-full w-[34px]" 
                                                 variant="ghost" 
                                                 onClick={() => {
                                                     form.setValue(
