@@ -20,7 +20,6 @@ const Roadmap = dynamic(() => import("~web/components/roadmap").then(mod => ({ d
     ssr: true
 })
 
-export const revalidate = 30; // Revalidate every 30 seconds
 
 export default async function RoadmapPage({
                                               params,
