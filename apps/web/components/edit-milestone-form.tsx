@@ -291,23 +291,13 @@ export function EditMilestoneForm({
         }
     })
 
-    const watchedNodeType = useWatch({control: form.control, name: "nodeType"})
     const watchedTitle = useWatch({control: form.control, name: "title"})
-    const watchedDescription = useWatch({control: form.control, name: "description"})
     const watchedTypes = useWatch({control: form.control, name: "types"})
-    const watchedOtherTypeDetails = useWatch({control: form.control, name: "otherTypeDetails"})
     const watchedStartDate = useWatch({control: form.control, name: "startDate"})
     const watchedEndDate = useWatch({control: form.control, name: "endDate"})
-    const watchedBudget = useWatch({control: form.control, name: "budget"})
     const watchedAttachments = useWatch({control: form.control, name: "attachments"})
-    const watchedStatus = useWatch({control: form.control, name: "status"})
     const watchedIsPrivate = useWatch({control: form.control, name: "isPrivate"})
-    const watchedContacts = useWatch({control: form.control, name: "contacts"})
-    const watchedOpenTo = useWatch({control: form.control, name: "openTo"})
-    const watchedTools = useWatch({control: form.control, name: "tools"})
-    const watchedRfps = useWatch({control: form.control, name: "rfps"})
-    const watchedNotes = useWatch({control: form.control, name: "notes"})
-
+    const watchedContacts = useWatch({control: form.control, name: "contacts"}
     const formData = {
         nodeType: watchedNodeType,
         title: watchedTitle,
