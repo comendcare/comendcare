@@ -42,6 +42,123 @@ export default async function ProfilePage(props: IndexPageProps) {
     const validFilters = getValidFilters(search.filters);
     const globalFilter = search.q ?? "";
 
+    // Kick off everything that can run in parallel ASAP
+    const biosamplesPromise = getBiosamples(
+        session?.user.organizationId,
+        {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+            description: true,
+            contacts: true,
+            attachments: true,
+            private: true,
+            types: true,
+            genotype: true,
+            variant: true,
+            availability: true,
+            quantity: true,
+            quantityUnit: true,
+            currentCountry: true,
+            countryOfCollection: true,
+            preservationMethod: true,
+            anatomicalSite: true,
+            methodOfTransport: true,
+            collectionDate: true,
+            ageAtCollection: true,
+            price: true,
+            priceUnit: true,
+            notes: true,
+
+            milestones: {include: {milestone: true}},
+            donorId: true,
+            donor: {
+                include: {
+                    diagnoses: {
+                        include: {type: true}
+                    }
+                }
+            },
+            institutionId: true,
+            institution: true,
+            company: true,
+            geneId: true,
+            gene: true,
+            genes: true,
+            organizationId: true,
+            organization: true,
+            materialAndDataAccessRequests: true
+        },
+        {...search, q: globalFilter, filters: validFilters},
+        true // public only
+    )
+
+    const diseaseModelsPromise = getDiseaseModels(
+        session?.user.organizationId,
+        {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+
+            description: true,
+            contacts: true,
+            attachments: true,
+            private: true,
+            // pinned: true,
+            // metadata: true,
+            types: true,
+            genotype: true,
+            strain: true,
+            notes: true,
+
+            institutionId: true,
+            institution: true,
+            company: true,
+            geneId: true,
+            gene: true,
+            genes: true,
+            conditionId: true,
+            condition: true,
+            organizationId: true,
+            organization: {include: {conditions: {include: {condition: true}}}},
+            milestones: {include: {milestone: true}},
+        },
+        {...search, q: globalFilter, filters: validFilters},
+        true // public only
+    )
+
+    const clinicalDatasetsPromise = getClinicalDatasets(
+        session?.user.organizationId,
+        {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+
+            title: true,
+            cohortSize: true,
+            description: true,
+            contacts: true,
+            attachments: true,
+            private: true,
+            // pinned: true,
+            // metadata: true,
+            types: true,
+            notes: true,
+
+            institutionId: true,
+            institution: true,
+            company: true,
+            geneId: true,
+            gene: true,
+            genes: true,
+            organizationId: true,
+            organization: {include: {conditions: {include: {condition: true}}}},
+            milestones: {include: {milestone: true}},
+        },
+        {...search, q: globalFilter, filters: validFilters},
+        true // public only
+    )
+
     // Phase 1: kick off everything that only needs orgId, in parallel
     const organizationPromise = prisma.organization.findUnique({
         where: { id: orgId },
@@ -104,8 +221,8 @@ export default async function ProfilePage(props: IndexPageProps) {
 
     // 3) Public data keyed by subdomain (server)
     const subdomain = organization.subdomain ?? null;
-    const [roadmaps, toolCountsRaw, rfps] = subdomain
-        ? await Promise.all([
+    const publicPromise = subdomain
+        ? Promise.all([
             getPublicRoadmapsForOrganization(subdomain, {
                 id: true,
                 title: true,
@@ -136,123 +253,39 @@ export default async function ProfilePage(props: IndexPageProps) {
                 organization: true
             }),
         ])
-        : [[], {}, []];
+        : Promise.resolve([[], {}, []] as const);
 
-    const {data: biosamples, pageCount: biosamplesPageCount} = await getBiosamples(
-        session?.user.organizationId,
-        {
-            id: true,
-            createdAt: true,
-            updatedAt: true,
-            description: true,
-            contacts: true,
-            attachments: true,
-            private: true,
-            types: true,
-            genotype: true,
-            variant: true,
-            availability: true,
-            quantity: true,
-            quantityUnit: true,
-            currentCountry: true,
-            countryOfCollection: true,
-            preservationMethod: true,
-            anatomicalSite: true,
-            methodOfTransport: true,
-            collectionDate: true,
-            ageAtCollection: true,
-            price: true,
-            priceUnit: true,
-            notes: true,
+    let conditionTags: string[] = []
+    const tagsPromise = (async () => {
+        if (conditions) {
+            const unpackedConditions = conditions?.success ? conditions.data : []
+            const tagsResult = await getTagsForEntity(
+                TaggableType.CONDITION,
+                unpackedConditions?.[0]?.id
+            );
 
-            milestones: {include: {milestone: true}},
-            donorId: true,
-            donor: {
-                include: {
-                    diagnoses: {
-                        include: {type: true}
-                    }
-                }
-            },
-            institutionId: true,
-            institution: true,
-            company: true,
-            geneId: true,
-            gene: true,
-            genes: true,
-            organizationId: true,
-            organization: true,
-            materialAndDataAccessRequests: true
-        },
-        {...search, q: globalFilter, filters: validFilters},
-        true // public only
-    )
+            return tagsResult.success
+                ? tagsResult.data?.map(t => t.value) ?? []
+                : [];
+        }
+        return [];
+    })();
 
-    const {data: diseaseModels, pageCount: diseaseModelsPageCount} = await getDiseaseModels(
-        session?.user.organizationId,
-        {
-            id: true,
-            createdAt: true,
-            updatedAt: true,
+    const [
+        [roadmaps, toolCountsRaw, rfps],
+        {data: biosamples, pageCount: biosamplesPageCount},
+        {data: diseaseModels, pageCount: diseaseModelsPageCount},
+        {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount},
+        resolvedConditionTags
+    ] = await Promise.all([
+        publicPromise,
+        biosamplesPromise,
+        diseaseModelsPromise,
+        clinicalDatasetsPromise,
+        tagsPromise
+    ]);
 
-            description: true,
-            contacts: true,
-            attachments: true,
-            private: true,
-            // pinned: true,
-            // metadata: true,
-            types: true,
-            genotype: true,
-            strain: true,
-            notes: true,
-
-            institutionId: true,
-            institution: true,
-            company: true,
-            geneId: true,
-            gene: true,
-            genes: true,
-            conditionId: true,
-            condition: true,
-            organizationId: true,
-            organization: {include: {conditions: {include: {condition: true}}}},
-            milestones: {include: {milestone: true}},
-        },
-        {...search, q: globalFilter, filters: validFilters},
-        true // public only
-    )
-
-    const {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount} = await getClinicalDatasets(
-        session?.user.organizationId,
-        {
-            id: true,
-            createdAt: true,
-            updatedAt: true,
-
-            title: true,
-            cohortSize: true,
-            description: true,
-            contacts: true,
-            attachments: true,
-            private: true,
-            // pinned: true,
-            // metadata: true,
-            types: true,
-            notes: true,
-
-            institutionId: true,
-            institution: true,
-            company: true,
-            geneId: true,
-            gene: true,
-            genes: true,
-            organizationId: true,
-            organization: {include: {conditions: {include: {condition: true}}}},
-            milestones: {include: {milestone: true}},
-        },
-        {...search, q: globalFilter, filters: validFilters},
-        true // public only
-    )
+    conditionTags = resolvedConditionTags;
 
     const isOwner = ["owner", "support"].includes(session?.user?.membership?.role);
 
@@ -267,19 +300,6 @@ export default async function ProfilePage(props: IndexPageProps) {
         diseaseModelCount: Number((toolCountsRaw as any)?.diseaseModelCount ?? 0),
         clinicalDatasetCount: Number((toolCountsRaw as any)?.clinicalDatasetCount ?? 0),
     };
-
-    let conditionTags: string[] = []
-    if (conditions) {
-        const unpackedConditions = conditions?.success ? conditions.data : []
-        const tagsResult = await getTagsForEntity(
-            TaggableType.CONDITION,
-            unpackedConditions?.[0]?.id
-        );
-
-        conditionTags = tagsResult.success
-            ? tagsResult.data?.map(t => t.value) ?? []
-            : [];
-    }
 
     return (
         <PAGProfilePage

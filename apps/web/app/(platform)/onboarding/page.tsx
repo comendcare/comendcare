@@ -111,6 +111,11 @@ export default function OnboardingPage() {
         },
     });
 
+    useEffect(() => {
+        if (isInitializing) return;
+        router.prefetch(hasInvitations ? "/app/profile" : "/app/dashboard");
+    }, [isInitializing, hasInvitations, router]);
+
     /**************************************
      * Initialization: fetch user, orgs, invitations
      **************************************/

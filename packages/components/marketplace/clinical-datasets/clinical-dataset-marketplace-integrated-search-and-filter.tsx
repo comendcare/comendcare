@@ -18,6 +18,7 @@ import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/bi
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
 import { handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils"
+import {unstable_batchedUpdates} from "react-dom";
 
 export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, setSearchTerm, filters, setFilters, totalResults} = useClinicalDatasetSearchStore(
@@ -85,15 +86,20 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
 
     const handleInputChangeCallback = useCallback(
         (search: string) => {
-            setSearchTerm(search)
-
-            // Handle setting universal search in other marketplaces
-            setOrganizationSearchTerm(search);
-            setBiosampleSearchTerm(search);
-            setDiseaseModelSearchTerm(search);
+            unstable_batchedUpdates(() => {
+                setSearchTerm(search);
+                setOrganizationSearchTerm(search);
+                setBiosampleSearchTerm(search);
+                setDiseaseModelSearchTerm(search);
+            });
         },
-        [setSearchTerm]
-    )
+        [
+            setSearchTerm,
+            setOrganizationSearchTerm,
+            setBiosampleSearchTerm,
+            setDiseaseModelSearchTerm,
+        ]
+    );
 
     const debounceHandleInputChange = useMemo(
         () => debounce(handleInputChangeCallback, 500),
