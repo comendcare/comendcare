@@ -3,8 +3,6 @@ import NoOrganization from "~web/components/no-organization";
 import RoadmapsPage from "~web/components/roadmaps-page";
 import prisma from "@comend/lib/prisma";
 
-export const revalidate = 60; // Revalidate every 60 seconds
-
 export default async function RoadmapPage() {
     const session = await getSession();
     const orgId = session?.user.organizationId;
