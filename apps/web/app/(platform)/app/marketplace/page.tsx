@@ -180,8 +180,8 @@ export default function MarketplacePage() {
                 initializeDiseaseModelSearch(parsedDiseaseModelFilters),
                 initializeClinicalDatasetSearch(parsedClinicalDatasetFilters),
                 initializeCROSearch(parsedCROFilters),
+                initializeRFPSearch(parsedRFPFilters);
             ]);
-            initializeRFPSearch(parsedRFPFilters);
         }
 
         init()
