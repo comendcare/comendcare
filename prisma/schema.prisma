@@ -691,10 +691,10 @@ model ExternalAttachment {
 
 model ExternalContact {
   id          String  @id @unique @default(uuid())
-  name        String /// @encrypted
+  name        String? /// @encrypted
   nameHash    String? /// @encryption:hash(name)
   role        String?
-  email       String /// @encrypted
+  email       String? /// @encrypted
   emailHash   String? /// @encryption:hash(email)
   affiliation String?
 

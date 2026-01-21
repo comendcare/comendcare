@@ -2621,7 +2621,7 @@ export const editResearchPlanForm = z.object({
     title: z
         .string({ required_error: "Please provide a title" })
         .min(1, "Title is required")
-        .max(200, "Title must be less than 200 characters"),
+        .max(60, "Title must be less than 60 characters"),
     modalities: z.array(optionSchema).max(1, "You can only select one type").optional(),
     partners: z.array(z.custom<any>()).optional(),
     description: z

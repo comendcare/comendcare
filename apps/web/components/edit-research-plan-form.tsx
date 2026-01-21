@@ -241,7 +241,7 @@ export function EditResearchPlanForm({
                                             "partners", 
                                             [
                                                 ...(field?.value || []),
-                                                {name: "", email: "", role: null}
+                                                {affiliation: ""}
                                             ],
                                             {shouldDirty: true}
                                         )
