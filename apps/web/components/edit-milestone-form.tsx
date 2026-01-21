@@ -297,24 +297,15 @@ export function EditMilestoneForm({
     const watchedEndDate = useWatch({control: form.control, name: "endDate"})
     const watchedAttachments = useWatch({control: form.control, name: "attachments"})
     const watchedIsPrivate = useWatch({control: form.control, name: "isPrivate"})
-    const watchedContacts = useWatch({control: form.control, name: "contacts"}
+    const watchedContacts = useWatch({control: form.control, name: "contacts"})
     const formData = {
-        nodeType: watchedNodeType,
         title: watchedTitle,
-        description: watchedDescription,
         types: watchedTypes,
-        otherTypeDetails: watchedOtherTypeDetails,
         startDate: watchedStartDate,
         endDate: watchedEndDate,
-        budget: watchedBudget,
         attachments: watchedAttachments,
-        status: watchedStatus,
         isPrivate: watchedIsPrivate,
         contacts: watchedContacts,
-        openTo: watchedOpenTo,
-        tools: watchedTools,
-        rfps: watchedRfps,
-        notes: watchedNotes
     }
 
     // Debounced save (stable)

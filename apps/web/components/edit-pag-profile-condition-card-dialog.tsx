@@ -74,7 +74,6 @@ export default function EditPAGProfileConditionCardDialog({
         name: "prevalenceDenominator",
     });
 
-
     useEffect(() => {
         if (!condition || !conditionTags) return;
 

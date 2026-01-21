@@ -243,16 +243,7 @@ export function EditBiosampleToolForm({
 
     const types = useWatch({ control: form.control, name: "types" })
     const formData = {
-        description,
         types,
-        otherTypeDetails,
-        attachments,
-        isPrivate,
-        contacts,
-        milestones,
-        diagnoses,
-        donorId,
-        donor,
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editBiosampleForm>, createFacilityRequests: CreateFacilityRequest[]) => {

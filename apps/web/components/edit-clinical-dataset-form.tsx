@@ -182,14 +182,7 @@ export function EditClincalDatasetForm({
 
     const types = useWatch({ control: form.control, name: "types" })
     const formData = {
-        title,
-        description,
         types,
-        otherTypeDetails,
-        attachments,
-        isPrivate,
-        contacts,
-        milestones,
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editDataToolForm>, createFacilityRequests: CreateFacilityRequest[]) => {

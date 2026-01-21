@@ -282,14 +282,14 @@ export const RoadmapRow = ({roadmap, rowClickCallback, isPrivate}: {
     return (
         <TableRow
             key={roadmap?.id}
-            className="cursor-pointer px-0"
+            className="cursor-pointer px-4"
         >
             <Link
                 href={`/app/research-plan/${roadmap.id}`}
                 onClick={() => rowClickCallback(roadmap)}
                 prefetch={true}
             >
-                <TableCell className="pl-0">
+                <TableCell className="w-full">
                     <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
                 </TableCell>
                 <TableCell>
@@ -320,7 +320,7 @@ export const RoadmapRow = ({roadmap, rowClickCallback, isPrivate}: {
                         )}
                     </div>
                 </TableCell>
-                <TableCell className="pr-0">
+                <TableCell className="w-full pr-0">
                     <div className="flex gap-2 justify-end items-center text-nowrap">
                         <StageOfActivityBadge showTooltip={false} milestones={roadmap.milestones}/>
                     </div>
