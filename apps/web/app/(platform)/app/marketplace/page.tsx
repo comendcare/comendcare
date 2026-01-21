@@ -172,7 +172,6 @@ export default function MarketplacePage() {
                 certifications: [] as any[],
                 tags: [] as any[],
             }
-            setCROsInitialized(true)
 
             await Promise.all([
                 initializeOrganizationSearch(parsedPAGFilters),
