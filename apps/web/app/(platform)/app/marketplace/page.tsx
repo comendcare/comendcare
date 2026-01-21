@@ -183,7 +183,12 @@ export default function MarketplacePage() {
                 initializeRFPSearch(parsedRFPFilters);
             ]);
         }
-
+            setPagsInitialized(true)
+            setBiosamplesInitialized(true)
+            setDiseaseModelsInitialized(true)
+            setClinicalDatasetsInitialized(true)
+            setRfpsInitialized(true)
+            setCROsInitialized(true)
         init()
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
