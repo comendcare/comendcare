@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import {useRouter} from "next/navigation";
-import {PulsatingButton} from "@comend/components/ui/pulsating-button";
+import Link from "next/link";
+import { PulsatingButton } from "@comend/components/ui/pulsating-button";
 
 export default function CreateOrJoinOrganizationButton() {
-    const router = useRouter();
-
     return (
-        <PulsatingButton
-            className="bg-black"
-            pulseColor={"#9ca3af"}
-            onClick={() => router.push("/create/new-organization")}
+        <Link
+            href="/create/new-organization"
+            prefetch={true}
+            className="inline-block"
         >
-            Create an organization
-        </PulsatingButton>
-    )
+            <PulsatingButton className="bg-black" pulseColor={"#9ca3af"}>
+                Create an organization
+            </PulsatingButton>
+        </Link>
+    );
 }
