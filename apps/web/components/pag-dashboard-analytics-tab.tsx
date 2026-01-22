@@ -1,13 +1,31 @@
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
-import PAGAnalyticsLineChartCard from "~web/components/pag-analytics-line-chart-card";
+import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {Workflow, ExternalLink, Microscope, Megaphone} from "lucide-react";
 import {getSession} from "@comend/lib/auth";
-import {DashboardProjectsStatusCard} from "~web/components/dashboard-projects-status-card";
-import PAGAnalyticsToolsCard from "~web/components/pag-analytics-tools-card";
-import PAGAnalyticsProfileCard from "~web/components/pag-analytics-profile-card";
 import {Button} from "@comend/components/ui/button";
 import Link from "next/link";
-import {OrganizationForAnalytics} from "@comend/lib/types";
+import type {OrganizationForAnalytics} from "@comend/lib/types";
+import dynamic from "next/dynamic";
+
+const DashboardProjectsStatusCard = dynamic(
+    () => import("~web/components/dashboard-projects-status-card").then(m => m.DashboardProjectsStatusCard),
+    { loading: () => <Card className="min-h-[200px]" /> }
+);
+
+const PAGAnalyticsToolsCard = dynamic(
+    () => import("~web/components/pag-analytics-tools-card").then(m => m.default),
+    { loading: () => <Card className="min-h-[200px]" /> }
+);
+
+const PAGAnalyticsLineChartCard = dynamic(
+    () => import("~web/components/pag-analytics-line-chart-card").then(m => m.default),
+    { loading: () => <Card className="min-h-[300px] col-span-4" /> }
+);
+
+const PAGAnalyticsProfileCard = dynamic(
+    () => import("~web/components/pag-analytics-profile-card").then(m => m.default),
+    { loading: () => <Card className="min-h-[300px] col-span-3" /> }
+);
+
 
 export default async function PAGDashboardAnalyticsTab({organization}: {organization: OrganizationForAnalytics}) {
     const session = await getSession()
@@ -50,7 +68,10 @@ export default async function PAGDashboardAnalyticsTab({organization}: {organiza
                                 size="icon"
                                 className="p-0 h-auto w-auto"
                             >
-                                <Link href="/app/research-plan" aria-label="Research plans">
+                                <Link
+                                    href="/app/research-plan"
+                                    aria-label="Research plans"
+                                >
                                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                                 </Link>
                             </Button>

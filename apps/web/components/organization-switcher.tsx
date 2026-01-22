@@ -12,6 +12,7 @@ import {Check, ChevronsUpDown, Plus} from "lucide-react";
 import {useSession} from "next-auth/react";
 import {Skeleton} from "@comend/components/ui/skeleton";
 import {MembershipWithOrganization} from "@comend/lib/types";
+import Link from "next/link";
 
 export function OrganizationSwitcher({memberships}: { memberships: MembershipWithOrganization[] }) {
     const {data: session, update} = useSession();
@@ -86,15 +87,16 @@ export function OrganizationSwitcher({memberships}: { memberships: MembershipWit
                             </div>
 
                             <DropdownMenuSeparator/>
-                            <DropdownMenuItem
-                                onClick={() => router.push("/create/new-organization")}
-                                className="gap-2 p-2"
-                            >
-                                <div
-                                    className="flex size-6 items-center justify-center rounded-md border bg-background">
-                                    <Plus className="size-4"/>
-                                </div>
-                                <div className="font-medium text-muted-foreground">Create an organization</div>
+
+                            <DropdownMenuItem asChild className="gap-2 p-2">
+                                <Link href="/create/new-organization">
+                                    <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+                                        <Plus className="size-4" />
+                                    </div>
+                                    <div className="font-medium text-muted-foreground">
+                                        Create an organization
+                                    </div>
+                                </Link>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

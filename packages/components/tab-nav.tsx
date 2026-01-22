@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import {usePathname} from "next/navigation"
-import {cn} from "./../../packages/lib/utils"
+import {cn} from "@comend/lib/utils"
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "./ui/tooltip";
 import { LucideIcon } from "lucide-react";
 
@@ -45,6 +45,7 @@ export function TabNav({
                                     : "text-muted-foreground",
                                 link.comingSoon ? "pointer-events-none opacity-60" : "" // Disable click and add opacity
                             )}
+                            prefetch={true}
                         >
                             {link.icon && <link.icon className="mr-2 h-6 w-6"/>}
                             {link.name}

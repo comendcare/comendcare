@@ -16,7 +16,7 @@ const NavUser = dynamic(
     {
         ssr: false,
         loading: () => (
-            <div className="h-8 w-8 rounded-lg bg-gray-200 animate-pulse" aria-label="Loading user menu" />
+            <div className="h-8 w-8 rounded-lg bg-gray-200 animate-pulse" aria-label="Loading user menu"/>
         ),
     }
 );
@@ -27,31 +27,31 @@ export default async function AppLayoutServer({children}: { children: React.Reac
 
     const [memberships, invitations, claimOrgInvitations, user, memberRequests] = await Promise.all([
         prisma.member.findMany({
-            where: { userId },
+            where: {userId},
             include: {
                 organization: true,
                 user: true,
                 invitedBy: true,
             },
-            orderBy: { createdAt: "asc" },
+            orderBy: {createdAt: "asc"},
         }),
         prisma.invitation.findMany({
-            where: { email: session!.user!.email!, accepted: false },
-            select: { id: true, role: true, organizationId: true, organization: true },
-            orderBy: { createdAt: "asc" },
+            where: {email: session!.user!.email!, accepted: false},
+            select: {id: true, role: true, organizationId: true, organization: true},
+            orderBy: {createdAt: "asc"},
         }),
         prisma.claimOrganizationInvitation.findMany({
-            where: { email: session!.user!.email!, accepted: false },
-            select: { 
-                id: true, 
-                role: true, 
-                organizationId: true, 
+            where: {email: session!.user!.email!, accepted: false},
+            select: {
+                id: true,
+                role: true,
+                organizationId: true,
                 organization: true,
             },
-            orderBy: { createdAt: "asc" },
+            orderBy: {createdAt: "asc"},
         }),
         prisma.user.findUnique({
-            where: { id: userId },
+            where: {id: userId},
             select: {
                 id: true,
                 email: true,
@@ -69,9 +69,9 @@ export default async function AppLayoutServer({children}: { children: React.Reac
             },
         }),
         prisma.memberRequest.findMany({
-            where: { userId, approved: true },
-            include: { user: true, organization: true },
-            orderBy: { createdAt: "desc" },
+            where: {userId, approved: true},
+            include: {user: true, organization: true},
+            orderBy: {createdAt: "desc"},
         }),
     ]);
 
@@ -81,44 +81,51 @@ export default async function AppLayoutServer({children}: { children: React.Reac
     if (memberships.length === 0) {
         return (
             <InvitationGate invitations={invitations}>
-            <ClaimInvitationGate claimInvitations={claimOrgInvitations}>
-                <div className="min-h-screen h-full flex flex-col items-center">
-                    <header
-                        className="px-4 bg-white sticky top-0 flex justify-end h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full z-50 overflow-hidden"
-                    >
-                        <NavUser
-                            user={user}
-                            memberRequests={memberRequests}
-                        />
-                    </header>
-                    <main className="flex flex-col items-start justify-center h-[calc(100vh-3.5rem)] mx-auto max-w-md text-left space-y-4">
-                        <h1 className="text-xl font-semibold">Welcome to Comend!</h1>
+                <ClaimInvitationGate claimInvitations={claimOrgInvitations}>
+                    <div className="min-h-screen h-full flex flex-col items-center">
+                        <header
+                            className="px-4 bg-white sticky top-0 flex justify-end h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full z-50 overflow-hidden"
+                        >
+                            <NavUser
+                                user={user}
+                                memberRequests={memberRequests}
+                            />
+                        </header>
+                        <main
+                            className="flex flex-col items-start justify-center h-[calc(100vh-3.5rem)] mx-auto max-w-md text-left space-y-4">
+                            <h1 className="text-xl font-semibold">Welcome to Comend!</h1>
 
-                        <p>
-                            {`You're not a member of any organizations yet. Please contact your organization's owner to request an invitation. Otherwise, create a new organization.`}
-                        </p>
+                            <p>
+                                {`You're not a member of any organizations yet. Please contact your organization's owner to request an invitation. Otherwise, create a new organization.`}
+                            </p>
 
-                        <Link href="/create/new-organization" className="inline-block">
-                            <Button variant="cta">Create an organization</Button>
-                        </Link>
-                    </main>
-                </div>
-            </ClaimInvitationGate>
+                            <Link
+                                href="/create/new-organization"
+                                className="inline-block"
+                                prefetch={true}
+                            >
+                                <Button variant="cta">
+                                    Create an organization
+                                </Button>
+                            </Link>
+                        </main>
+                    </div>
+                </ClaimInvitationGate>
             </InvitationGate>
         )
     }
 
     return (
         <InvitationGate invitations={invitations}>
-        <ClaimInvitationGate claimInvitations={claimOrgInvitations}>
-            <AppClientShell
-                user={user}
-                memberships={memberships}
-                memberRequests={memberRequests}
-            >
-                {children}
-            </AppClientShell>
-        </ClaimInvitationGate>
+            <ClaimInvitationGate claimInvitations={claimOrgInvitations}>
+                <AppClientShell
+                    user={user}
+                    memberships={memberships}
+                    memberRequests={memberRequests}
+                >
+                    {children}
+                </AppClientShell>
+            </ClaimInvitationGate>
         </InvitationGate>
     );
 }

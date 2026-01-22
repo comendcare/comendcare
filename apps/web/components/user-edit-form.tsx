@@ -16,7 +16,6 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react";
 import {toast} from "sonner";
-import {useRouter} from "next/navigation";
 import {editUser} from "@comend/lib/actions";
 import {Checkbox} from "@comend/components/ui/checkbox";
 import {AddressType} from "@comend/lib/types";
@@ -48,7 +47,6 @@ const userFormSchema = z.object({
 });
 
 export default function UserEditForm() {
-    const router = useRouter();
     const {data: session} = useSession();
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
     const [isCropping, setIsCropping] = useState(false)
@@ -258,8 +256,6 @@ export default function UserEditForm() {
             }
 
             toast.success("Successfully updated user profile!");
-            // router.refresh();
-            // router.push("/onboarding/organization");
         } catch (error) {
             console.error('Error:', error)
             toast.error("An error occurred while updating your profile.");

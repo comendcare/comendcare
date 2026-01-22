@@ -1,10 +1,15 @@
 "use client"
-import { EditResearchPlanForm } from "~web/components/edit-research-plan-form"
+import dynamic from "next/dynamic"
 import { Separator } from "@comend/components/ui/separator"
 import Spinner from "@comend/components/ui/spinner"
 import { useState } from "react"
 import Image from "next/image"
 import logo from "@/public/Full logo.png"
+
+const EditResearchPlanForm = dynamic(() => import("~web/components/edit-research-plan-form").then(mod => ({ default: mod.EditResearchPlanForm })), {
+    loading: () => <Spinner className="scale-150" />,
+    ssr: false
+})
 
 export default function CreateResearchPlanPage() {
     const [isLoading, setIsLoading] = useState(false)

@@ -24,7 +24,6 @@ import {
   WandSparklesIcon,
 } from 'lucide-react';
 
-import { EmojiDropdownMenu } from './emoji-dropdown-menu';
 import { RedoToolbarButton, UndoToolbarButton } from './history-toolbar-button';
 import { IndentListToolbarButton } from './indent-list-toolbar-button';
 import { IndentTodoToolbarButton } from './indent-todo-toolbar-button';
@@ -123,7 +122,6 @@ export function FixedToolbarButtons() {
           {/* <ToolbarGroup> */}
             <LinkToolbarButton />
             <TableDropdownMenu />
-            <EmojiDropdownMenu />
           {/* </ToolbarGroup> */}
 
           {/* <ToolbarGroup>
