@@ -8,7 +8,6 @@ import Link from "next/link";
 import type { OrganizationForAnalytics } from "@comend/lib/types";
 import dynamic from "next/dynamic";
 
-// --- Suspense fallbacks (copied from your loading skeleton shapes) ---
 function DashboardProjectsStatusCardSkeleton() {
     return (
         <Card className="col-span-3">
