@@ -15,15 +15,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@comend/components/ui/select";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { inviteUser } from "@comend/lib/actions";
-import { getIp } from "@comend/lib/utils";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import { Input } from "@comend/components/ui/input";
-import { Button } from "@comend/components/ui/button";
+import {useForm} from "react-hook-form";
+import {z} from "zod";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {inviteUser} from "@comend/lib/actions";
+import {getIp} from "@comend/lib/utils";
+import {useSession} from "next-auth/react";
+import {useEffect, useState} from "react";
+import {Input} from "@comend/components/ui/input";
+import {Button} from "@comend/components/ui/button";
 import {
     Dialog,
     DialogContent,
@@ -32,27 +32,27 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@comend/components/ui/dialog";
-import { toast } from "sonner";
-import { getOrganizationFromOrganizationId } from "@comend/lib/fetchers";
-import { UserPlus } from "lucide-react";
-import { mixpanelTrack } from "@comend/lib/mixpanel";
+import {toast} from "sonner";
+import {getOrganizationFromOrganizationId} from "@comend/lib/fetchers";
+import {UserPlus} from "lucide-react";
+import {mixpanelTrack} from "@comend/lib/mixpanel";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import type {Organization} from "@prisma/client";
 
 const invitationFormSchema = z.object({
-    email: z.string().email({ message: "Please enter a valid email address." }),
-    role: z.enum(["member", "owner"], { message: "Role must be either Member or Owner." }),
+    email: z.string().email({message: "Please enter a valid email address."}),
+    role: z.enum(["member", "owner"], {message: "Role must be either Member or Owner."}),
 });
 
-export default function InviteUserToOrgDialog({organization}: {organization: Organization}) {
-    const { data: session, status } = useSession();
+export default function InviteUserToOrgDialog({organization}: { organization: Organization }) {
+    const {data: session, status} = useSession();
     const [loading, setLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(invitationFormSchema),
-        defaultValues: { role: "member" },
+        defaultValues: {role: "member"},
     });
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
@@ -87,13 +87,13 @@ export default function InviteUserToOrgDialog({organization}: {organization: Org
         }
     }
 
-    const disabled = !["owner", "support"].includes(session?.user?.membership?.role) || status !== "authenticated";
+    const disabled = status !== "authenticated";
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
                 <Button className="gap-x-2" disabled={disabled} variant={'cta'}>
-                    <UserPlus />
+                    <UserPlus/>
                     Invite user
                 </Button>
             </DialogTrigger>
@@ -111,14 +111,15 @@ export default function InviteUserToOrgDialog({organization}: {organization: Org
                         <FormField
                             control={form.control}
                             name="email"
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
-                                    <FormDescription>The invitation to your organization will be sent here.</FormDescription>
+                                    <FormDescription>The invitation to your organization will be sent
+                                        here.</FormDescription>
                                     <FormControl>
                                         <Input type="email" placeholder="example@gmail.com" {...field} />
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />
@@ -126,29 +127,51 @@ export default function InviteUserToOrgDialog({organization}: {organization: Org
                         <FormField
                             control={form.control}
                             name="role"
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Role</FormLabel>
                                     <FormDescription>Choose the role for the invited user.</FormDescription>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select a role" />
+                                                {field.value ? (
+                                                    <span>{field.value === "owner" ? "Owner" : "Member"}</span>
+                                                ) : (
+                                                    <span className="text-muted-foreground">Select a role</span>
+                                                )}
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            <SelectItem value="member">Member</SelectItem>
-                                            <SelectItem value="owner">Owner</SelectItem>
+                                            <SelectItem
+                                                value="member"
+                                            >
+                                                <p>
+                                                    Member
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Can view, edit, and manage member.
+                                                </p>
+                                            </SelectItem>
+                                            <SelectItem
+                                                value="owner"
+                                            >
+                                                <p>
+                                                    Owner
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Complete control over profiles, members and account settings.
+                                                </p>
+                                            </SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <FormMessage />
+                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />
 
                         <div className="w-full flex justify-end">
                             <Button type="submit" disabled={loading || !organization} variant={'cta'}>
-                                {loading ? <LoadingDots /> : "Submit"}
+                                {loading ? <LoadingDots/> : "Submit"}
                             </Button>
                         </div>
                     </form>
