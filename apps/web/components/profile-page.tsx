@@ -71,7 +71,6 @@ const EditPAGProfileHeaderDialog = dynamic(
 export default function PAGProfilePage({
     organization,
     conditions,
-    // roadmaps,
     researchPlans,
     researchPlansPageCount,
     toolCounts,
@@ -269,10 +268,8 @@ export default function PAGProfilePage({
                                         rfps={rfps}
                                     />
                                     <RoadmapsCard 
-                                        // roadmaps={roadmaps} 
                                         researchPlans={researchPlans}
                                         researchPlansPageCount={researchPlansPageCount}
-                                        searchParams={searchParams}
                                         organization={organization}
                                     />
                                     {/* tools card handles it's own data state via zustand - necessary for pagination to work properly */}

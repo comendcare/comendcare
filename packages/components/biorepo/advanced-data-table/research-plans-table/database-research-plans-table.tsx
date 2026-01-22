@@ -28,7 +28,7 @@ export function DatabaseResearchPlansTable({
     columns: ColumnDef<any>[],
     onSelectionChange?: (selectedRows: Tool[]) => void,
     onRowClickCallback?: (e: any, row: Row<any> | undefined) => void,
-    searchParams: SearchParams,
+    searchParams?: SearchParams,
     showFilters?: boolean,
     showPagination?: boolean,
     interactive?: boolean,
@@ -65,11 +65,6 @@ export function DatabaseResearchPlansTable({
                 className="w-full"
                 table={table}
                 showPagination={showPagination}
-                noResults={
-                    (data.length === 0 && Object.keys(searchParams).length === 0) 
-                    ? (<>{!!noResultsOverride && noResultsOverride}</>)
-                    : undefined
-                }
                 onRowClickCallback={onRowClickCallback}
             >
                 <></>

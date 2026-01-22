@@ -10,8 +10,6 @@ import React from "react";
 import { Mail, Share } from "lucide-react"
 import { RoadmapsCard } from "~web/components/public-roadmap-card"
 import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header"
-import { researchPlanSearchParamsCache } from "@comend/lib/validations"
-import { getValidFilters } from "@comend/lib/data-table"
 
 export async function generateMetadata({
     params
@@ -100,11 +98,6 @@ export default async function OrganizationRoadmapPage({
     params: { domain: string }
 }) {
     const domain = decodeURIComponent(params.domain)
-    const searchParams = params
-    const search = researchPlanSearchParamsCache.parse(searchParams);
-    const validFilters = getValidFilters(search.filters);
-    const globalFilter = search.q ?? "";
-
     const organization = await getOrganizationData(domain, {
         id: true,
         name: true,
@@ -123,7 +116,7 @@ export default async function OrganizationRoadmapPage({
     if (!organization) notFound()
 
     const {data: researchPlans, pageCount: researchPlansPageCount} = await getResearchPlans(
-        organization?.id,
+        organization.id,
         {
             id: true,
             title: true,
@@ -137,7 +130,7 @@ export default async function OrganizationRoadmapPage({
             partners: true,
             links: true,
         },
-        {...search, q: globalFilter, filters: validFilters},
+        undefined,
         true,
     )
     
@@ -159,7 +152,6 @@ export default async function OrganizationRoadmapPage({
                             <RoadmapsCard
                                 researchPlans={researchPlans}
                                 researchPlansPageCount={researchPlansPageCount}
-                                searchParams={searchParams}
                                 organization={organization}
                             />
                         </div>

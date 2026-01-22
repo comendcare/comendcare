@@ -5,7 +5,6 @@ import {
     getOrganizationData,
     getConditionsDataFromOrgId,
     getPublicRFPsForOrganization,
-    getPublicRoadmapsForOrganization,
     getPublicToolCountsForOrganization,
     getBiosamples,
     getDiseaseModels,
@@ -24,13 +23,10 @@ import React from "react";
 import UnpublishedOrganizationPage from "~web/components/unpublished-organization-page";
 import {Mail, Share} from "lucide-react";
 import { PAGProfileToolsCard } from "~web/components/pag-profile-tools-card";
-import { SearchParams } from "@comend/components/types";
 import { biosampleSearchParamsCache } from "@comend/lib/validations";
 import { getValidFilters } from "@comend/lib/data-table";
 import { RFPSort } from "@comend/lib/utils";
 import {TaggableType} from "@prisma/client";
-import { authOptions } from "@comend/lib/auth";
-import { getServerSession } from "next-auth";
 
 interface IndexPageProps {
     params: {domain: string},
@@ -99,6 +95,16 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
     })
 
     if (!organization) notFound()
+
+    if (!organization.verified) {
+        // Render unverified organization state
+        return <UnverifiedOrganizationPage organization={organization}/>
+    }
+
+    if (!organization.published) {
+        // Render unpublished organization state
+        return <UnpublishedOrganizationPage organization={organization}/>
+    }
 
     const [
         toolCounts, 
@@ -282,20 +288,6 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
         console.error(conditionResponse.error)
     }
 
-    if (!organization.verified) {
-        // Render unverified organization state
-        return (
-            <UnverifiedOrganizationPage organization={organization}/>
-        );
-    }
-
-    if (!organization.published) {
-        // Render unpublished organization state
-        return (
-            <UnpublishedOrganizationPage organization={organization}/>
-        );
-    }
-
     let conditionTags: string[] = []
     if (conditions) {
         const tagsResult = await getTagsForEntity(
@@ -339,7 +331,6 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                             <RoadmapsCard 
                                 researchPlans={researchPlans}
                                 researchPlansPageCount={researchPlansPageCount}
-                                searchParams={searchParams}
                                 organization={organization}
                             />
                             {/* tools card handles it's own data state via zustand - necessary for pagination to work properly */}
