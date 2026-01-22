@@ -174,12 +174,9 @@ export const RoadmapCard = ({
 
     return (
         <Tabs
-            // defaultValue={urlView === 'flow' || params.get('view') === 'flow' ? 'flow' : 'list'} // list default
-            // defaultValue={urlView === 'list' || params.get('view') === 'list' ? 'list' : 'flow'} // flow default
             value={urlView === 'list' || params.get('view') === 'list' ? 'list' : 'flow'}
             className="w-full"
-            onValueChange={setUrlView ? setUrlView : () => {
-            }}
+            onValueChange={setUrlView ? setUrlView : () => {}}
         >
             <Card className="organization-profile-tour-step4 flex flex-col gap-0">
                 <CardHeader className="w-full pt-6 pb-0 space-y-4">
@@ -207,6 +204,25 @@ export const RoadmapCard = ({
                             <Badge variant={"secondary"} className="text-sm">{s.label}</Badge>
                         ))}
                     </div>
+
+                    <PropertyBadge>
+                        <b>{roadmap.partners.length <= 1 ? 'Partner:' : 'Partners:'}</b>
+                        {roadmap.partners
+                            .map((partner: any) => partner.affiliation)
+                            .join(", ")}
+                    </PropertyBadge>
+
+                    <PropertyBadge>
+                        <b>{roadmap.links.length <= 1 ? 'Link:' : 'Links:'}</b>
+                        {roadmap.links
+                            .map((externalLink: any, index: number) => (
+                                <span className="flex flex-nowrap gap-0">
+                                    <a href={externalLink.link} target="_blank">{externalLink.name || externalLink.link}</a>
+                                    {roadmap.links.length > 1 && index < roadmap.links.length - 1 && ', '}
+                                </span>
+                            ))
+                        }
+                    </PropertyBadge>
 
                     <TabsList className="w-min rounded-t-md rounded-b-none z-10 -py-2">
                         <TabsTrigger value="flow" className="data-[state=active]:shadow-none rounded-b-none -mb-2 py-2.5">
