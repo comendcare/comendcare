@@ -5103,11 +5103,23 @@ export const syncDBRFPs = withOrganizationAuth(
 export const updateMilestonesVisibility = withOrganizationAuth(
     async (_: Organization, {milestones, isPrivate}: {milestones: Milestone[], isPrivate: boolean}) => {
         try {
+            const roadmapId = milestones[0].roadmapId
             const updatedMilestones = await prisma.milestone.updateMany({
-                where: {id: {in: milestones.map(m => m.id)}},
-                data: {
-                    private: isPrivate
-                }
+                where: { id: { in: milestones.map(m => m.id) } },
+                data: { private: isPrivate },
+            })
+
+            const allMilestones = await prisma.milestone.findMany({
+                where: { roadmapId },
+            })
+            let roadmapPublishStatus = false
+            allMilestones.forEach(milestone => {
+                roadmapPublishStatus = roadmapPublishStatus || !milestone.private
+            })
+
+            const updatedResearchPlan = await prisma.roadmap.update({
+                where: {id: roadmapId},
+                data: {private: !roadmapPublishStatus}
             })
 
             return {success: true, data: updatedMilestones};
@@ -5346,6 +5358,19 @@ export const updateMilestones = withOrganizationAuth(
                     },
                 });
             }
+
+            const allMilestones = await prisma.milestone.findMany({
+                where: {roadmapId: updatedMilestones[0].roadmapId}
+            })
+            let roadmapPublishStatus = false
+            allMilestones.forEach(milestone => {
+                roadmapPublishStatus = roadmapPublishStatus || !milestone.private
+            })
+
+            const updatedResearchPlan = await prisma.roadmap.update({
+                where: {id: updatedMilestones[0].roadmapId},
+                data: {private: !roadmapPublishStatus}
+            })
 
             return {success: true, data: updatedMilestones};
         } catch (error: any) {

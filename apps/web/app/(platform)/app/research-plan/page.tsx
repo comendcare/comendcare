@@ -36,6 +36,7 @@ export default async function RoadmapPage(props: IndexPageProps) {
         session?.user.organizationId,
         {
             id: true,
+            private: true,
             title: true,
             description: true,
             published: true,
