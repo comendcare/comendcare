@@ -10,7 +10,8 @@ import {
     getDiseaseModels,
     getPublicRFPsForOrganization,
     getPublicRoadmapsForOrganization,
-    getPublicToolCountsForOrganization, getTagsForEntity
+    getPublicToolCountsForOrganization, getTagsForEntity,
+    getResearchPlans
 } from "@comend/lib/fetchers";
 import { biosampleSearchParamsCache } from "@comend/lib/validations"
 import { getValidFilters } from "@comend/lib/data-table";
@@ -254,6 +255,37 @@ export default async function ProfilePage(props: IndexPageProps) {
         true // public only
     )
 
+    const {data: researchPlans, pageCount: researchPlansPageCount} = await getResearchPlans(
+        session?.user.organizationId,
+        {
+            id: true,
+            title: true,
+            description: true,
+            published: true,
+            organizationId: true,
+            // milestones: {
+            //     // where: {private: false},
+            //     include: {
+            //         types: {include: {milestoneType: true}},
+            //         biosamples: true,
+            //         diseaseModels: true,
+            //         tools: true,
+            //         rfps: true,
+            //     },
+            //     orderBy: [{createdAt: "desc"}]
+            // },
+            organization: true,
+            modalities: true,
+            stages: true,
+            statuses: true,
+            partners: true,
+            links: true,
+        },
+        {...search, q: globalFilter, filters: validFilters},
+        true,
+        // columns
+    )
+
     const isOwner = ["owner", "support"].includes(session?.user?.membership?.role);
 
     const safeOrg = {
@@ -285,7 +317,9 @@ export default async function ProfilePage(props: IndexPageProps) {
         <PAGProfilePage
             organization={safeOrg}
             conditions={conditions?.success ? conditions.data : []}
-            roadmaps={roadmaps}
+            // roadmaps={roadmaps}
+            researchPlans={researchPlans}
+            researchPlansPageCount={researchPlansPageCount}
             toolCounts={toolCounts}
             biosamples={biosamples}
             biosamplesPageCount={biosamplesPageCount}

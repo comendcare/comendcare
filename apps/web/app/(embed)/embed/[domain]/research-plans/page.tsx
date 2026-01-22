@@ -1,11 +1,21 @@
 import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header";
 import { RoadmapsCard } from "~web/components/public-roadmap-card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@comend/components/ui/breadcrumb";
-import { getOrganizationData, getPublicRoadmapsForOrganization } from "@comend/lib/fetchers";
+import { getOrganizationData, getPublicRoadmapsForOrganization, getResearchPlans } from "@comend/lib/fetchers";
 import { notFound } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@comend/lib/auth";
+import { researchPlanSearchParamsCache } from "@comend/lib/validations";
+import { getValidFilters } from "@comend/lib/data-table";
 
 export default async function EmbeddedResearchPlansPage({params}: {params: {domain: string}}) {
-    const [organization, roadmaps] = await Promise.all([
+    const searchParams = params
+    const session = await getServerSession(authOptions);
+    const search = researchPlanSearchParamsCache.parse(searchParams);
+    const validFilters = getValidFilters(search.filters);
+    const globalFilter = search.q ?? "";
+
+    const [organization, roadmaps, {data: researchPlans, pageCount: researchPlansPageCount}] = await Promise.all([
         getOrganizationData(params.domain, {
             id: true,
             public: true,
@@ -58,15 +68,45 @@ export default async function EmbeddedResearchPlansPage({params}: {params: {doma
             metadata: true
         }),
         getPublicRoadmapsForOrganization(params.domain, {
+            id: true,
+            title: true,
+            description: true,
+            slug: true,
+            edges: true,
+            milestones: true,
+            nodes: true,
+            modalities: true
+        }),
+        getResearchPlans(
+            session?.user.organizationId,
+            {
                 id: true,
                 title: true,
                 description: true,
-                slug: true,
-                edges: true,
-                milestones: true,
-                nodes: true,
-                modalities: true
-            }),
+                published: true,
+                organizationId: true,
+                // milestones: {
+                //     // where: {private: false},
+                //     include: {
+                //         types: {include: {milestoneType: true}},
+                //         biosamples: true,
+                //         diseaseModels: true,
+                //         tools: true,
+                //         rfps: true,
+                //     },
+                //     orderBy: [{createdAt: "desc"}]
+                // },
+                organization: true,
+                modalities: true,
+                stages: true,
+                statuses: true,
+                partners: true,
+                links: true,
+            },
+            {...search, q: globalFilter, filters: validFilters},
+            true,
+            // columns
+        )
     ])
 
     if (!organization) {
@@ -93,7 +133,13 @@ export default async function EmbeddedResearchPlansPage({params}: {params: {doma
                 </BreadcrumbList>
             </Breadcrumb>
             <PAGRoadmapHeader organization={organization} editable={false} embedded={true}/>
-            <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
+            <RoadmapsCard 
+                // roadmaps={roadmaps} 
+                researchPlans={researchPlans}
+                researchPlansPageCount={researchPlansPageCount}
+                searchParams={searchParams}
+                organization={organization}
+            />
         </div>
     )
 }

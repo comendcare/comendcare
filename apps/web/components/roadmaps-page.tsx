@@ -66,7 +66,7 @@ export default function RoadmapsPage({ orgId, organization, data, pageCount, sea
             <div className="p-6 w-full onborda-existing-research-plans-section">
                 <div className="w-full flex justify-between items-center gap-4">
                     <h2 className="col-span-full font-semibold text-2xl">My research plans</h2>
-                    <div className="flex gap-4 ">
+                    <div className="flex gap-4">
                         {data.length > 0 
                             ? (
                                 <CreateResearchPlanDialog 
@@ -112,7 +112,7 @@ export default function RoadmapsPage({ orgId, organization, data, pageCount, sea
                         router.push(`/app/research-plan/${roadmap.id}`)
                     }}
                 /> */}
-                <Shell className="gap-2">
+                <Shell className="gap-2 w-full max-w-full">
                     <FeatureFlagsProvider showFilters={false}>
                         <Suspense
                             fallback={

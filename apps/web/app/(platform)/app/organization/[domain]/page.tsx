@@ -8,7 +8,8 @@ import {
     getPublicToolCountsForOrganization,
     getBiosamples,
     getDiseaseModels,
-    getClinicalDatasets, getTagsForEntity
+    getClinicalDatasets, getTagsForEntity,
+    getResearchPlans
 } from "@comend/lib/fetchers"
 import PAGPublicProfileHeader from "~web/components/pag-public-profile-header";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
@@ -29,6 +30,8 @@ import { biosampleSearchParamsCache } from "@comend/lib/validations";
 import { getValidFilters } from "@comend/lib/data-table";
 import { RFPSort } from "@comend/lib/utils";
 import {TaggableType} from "@prisma/client";
+import { authOptions } from "@comend/lib/auth";
+import { getServerSession } from "next-auth";
 
 interface IndexPageProps {
     params: {domain: string},
@@ -62,6 +65,7 @@ export async function generateStaticParams() {
 
 export default async function OrganizationHomePage(props: IndexPageProps) {
     const searchParams = await props.searchParams
+    const session = await getServerSession(authOptions);
     const search = biosampleSearchParamsCache.parse(searchParams);
     const validFilters = getValidFilters(search.filters);
     const globalFilter = search.q ?? "";
@@ -148,7 +152,37 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
             milestones: true,
             organizationId: true,
             organization: true,
-        })
+        }),
+        getResearchPlans(
+            session?.user.organizationId,
+            {
+                id: true,
+                title: true,
+                description: true,
+                published: true,
+                organizationId: true,
+                // milestones: {
+                //     // where: {private: false},
+                //     include: {
+                //         types: {include: {milestoneType: true}},
+                //         biosamples: true,
+                //         diseaseModels: true,
+                //         tools: true,
+                //         rfps: true,
+                //     },
+                //     orderBy: [{createdAt: "desc"}]
+                // },
+                organization: true,
+                modalities: true,
+                stages: true,
+                statuses: true,
+                partners: true,
+                links: true,
+            },
+            {...search, q: globalFilter, filters: validFilters},
+            false,
+            // columns
+        )
     ])
 
     if (!organization) {
@@ -294,6 +328,37 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
         true // public only
     )
 
+    const {data: researchPlans, pageCount: researchPlansPageCount} = await getResearchPlans(
+        session?.user.organizationId,
+        {
+            id: true,
+            title: true,
+            description: true,
+            published: true,
+            organizationId: true,
+            // milestones: {
+            //     // where: {private: false},
+            //     include: {
+            //         types: {include: {milestoneType: true}},
+            //         biosamples: true,
+            //         diseaseModels: true,
+            //         tools: true,
+            //         rfps: true,
+            //     },
+            //     orderBy: [{createdAt: "desc"}]
+            // },
+            organization: true,
+            modalities: true,
+            stages: true,
+            statuses: true,
+            partners: true,
+            links: true,
+        },
+        {...search, q: globalFilter, filters: validFilters},
+        true,
+        // columns
+    )
+
     if (!organization.verified) {
         // Render unverified organization state
         return (
@@ -370,7 +435,13 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                                     clinicalDatasetsPageCount={clinicalDatasetsPageCount}
                                 />
                             }
-                            <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
+                            <RoadmapsCard 
+                                // roadmaps={roadmaps} 
+                                researchPlans={researchPlans}
+                                researchPlansPageCount={researchPlansPageCount}
+                                searchParams={searchParams}
+                                organization={organization}
+                            />
                         </div>
                     </div>
 

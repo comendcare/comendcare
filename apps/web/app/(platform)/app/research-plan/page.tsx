@@ -30,45 +30,7 @@ export default async function RoadmapPage(props: IndexPageProps) {
         },
     })
 
-    // const roadmaps = await prisma.roadmap.findMany({
-    //     where: {organizationId: orgId},
-    //     orderBy: {createdAt: "desc"},
-    //     select: {
-    //         id: true,
-    //         title: true,
-    //         description: true,
-    //         content: true,
-    //         slug: true,
-    //         image: true,
-    //         createdAt: true,
-    //         updatedAt: true,
-    //         published: true,
-    //         organizationId: true,
-    //         userId: true,
-    //         edges: true,
-    //         milestones: {
-    //             // where: {private: false},
-    //             include: {
-    //                 types: {include: {milestoneType: true}},
-    //                 biosamples: true,
-    //                 diseaseModels: true,
-    //                 tools: true,
-    //                 rfps: true,
-    //             },
-    //             orderBy: [{createdAt: "desc"}]
-    //         },
-    //         nodes: true,
-    //         organization: true,
-    //         user: true,
-    //         modalities: true,
-    //         metadata: true,
-    //     },
-    // })
-
     // const columns = useResearchPlansTableColumns({session: session as any})
-    // const {data, pageCount} = await getRoadmaps()
-
-    const columns = useResearchPlansTableColumns({session: session as any})
 
     const {data, pageCount} = await getResearchPlans(
         session?.user.organizationId,
@@ -76,45 +38,31 @@ export default async function RoadmapPage(props: IndexPageProps) {
             id: true,
             title: true,
             description: true,
-            // content: true,
-            // slug: true,
-            // image: true,
-            // createdAt: true,
-            // updatedAt: true,
             published: true,
             organizationId: true,
-            // userId: true,
-            // edges: true,
-            milestones: {
-                // where: {private: false},
-                include: {
-                    types: {include: {milestoneType: true}},
-                    biosamples: true,
-                    diseaseModels: true,
-                    tools: true,
-                    rfps: true,
-                },
-                orderBy: [{createdAt: "desc"}]
-            },
-            // nodes: true,
+            // milestones: {
+            //     // where: {private: false},
+            //     include: {
+            //         types: {include: {milestoneType: true}},
+            //         biosamples: true,
+            //         diseaseModels: true,
+            //         tools: true,
+            //         rfps: true,
+            //     },
+            //     orderBy: [{createdAt: "desc"}]
+            // },
             organization: true,
-            // user: true,
             modalities: true,
             stages: true,
             statuses: true,
             partners: true,
             links: true,
-            // metadata: true,
         },
         {...search, q: globalFilter, filters: validFilters},
         false,
-        columns
+        // columns
     )
 
-    // // not part of an org
-    // if (!orgId) return <NoOrganization />
-    // return <PrivateBiosampleToolsPage data={[...data]} pageCount={pageCount} searchParams={searchParams} />
-    
     if (!orgId) return <NoOrganization/>
     if (!organization) return <NoOrganization />
 
@@ -122,12 +70,9 @@ export default async function RoadmapPage(props: IndexPageProps) {
         <RoadmapsPage
             orgId={orgId}
             organization={organization}
-            // roadmaps={roadmaps}
             data={[...data]} 
             pageCount={pageCount} 
             searchParams={searchParams}
-            // columns={columns}
-
         />
     )
 }

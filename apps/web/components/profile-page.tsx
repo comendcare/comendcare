@@ -19,7 +19,7 @@ import Link from "next/link";
 import { SearchParams } from "@comend/components/types";
 import dynamic from "next/dynamic";
 import LoadingDots from "@comend/components/icons/loading-dots";
-import type { Biosample, DiseaseModel, Tool } from "@prisma/client";
+import type { Biosample, DiseaseModel, Roadmap, Tool } from "@prisma/client";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useOnborda } from "./onborda/OnbordaContext";
@@ -33,7 +33,9 @@ export type ToolCounts = {
 type PAGProfilePageProps = {
     organization: any;
     conditions: any[];
-    roadmaps: any[];
+    // roadmaps: any[];
+    researchPlans: Roadmap[];
+    researchPlansPageCount: number;
     toolCounts: ToolCounts;
     biosamples: Biosample[];
     biosamplesPageCount: number;
@@ -69,7 +71,9 @@ const EditPAGProfileHeaderDialog = dynamic(
 export default function PAGProfilePage({
     organization,
     conditions,
-    roadmaps,
+    // roadmaps,
+    researchPlans,
+    researchPlansPageCount,
     toolCounts,
     biosamples,
     biosamplesPageCount,
@@ -264,7 +268,13 @@ export default function PAGProfilePage({
                                         isPrivate={true}
                                         rfps={rfps}
                                     />
-                                    <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
+                                    <RoadmapsCard 
+                                        // roadmaps={roadmaps} 
+                                        researchPlans={researchPlans}
+                                        researchPlansPageCount={researchPlansPageCount}
+                                        searchParams={searchParams}
+                                        organization={organization}
+                                    />
                                     {/* tools card handles it's own data state via zustand - necessary for pagination to work properly */}
                                     <PAGProfileToolsCard 
                                         organization={organization}

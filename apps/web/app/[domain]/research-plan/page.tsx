@@ -1,7 +1,7 @@
 "use server"
 import {notFound} from "next/navigation"
 import prisma from "@comend/lib/prisma"
-import {getOrganizationData, getPublicRoadmapsForOrganization} from "@comend/lib/fetchers"
+import {getOrganizationData, getResearchPlans} from "@comend/lib/fetchers"
 import Image from "next/image"
 import PAGPublicRoadmapBreadcrumb from "~web/components/pag-public-roadmap-breadcrumb";
 import {FloatingDock} from "~web/components/floating-dock";
@@ -10,65 +10,28 @@ import React from "react";
 import { Mail, Share } from "lucide-react"
 import { RoadmapsCard } from "~web/components/public-roadmap-card"
 import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header"
+import { researchPlanSearchParamsCache } from "@comend/lib/validations"
+import { getValidFilters } from "@comend/lib/data-table"
 
 export async function generateMetadata({
-                                           params
-                                       }: {
+    params
+}: {
     params: { domain: string; slug: string }
 }) {
     const domain = decodeURIComponent(params.domain)
-    const slug = decodeURIComponent(params.slug)
-
     const organizationData = await getOrganizationData(domain, {
         id: true,
-        public: true,
-        verified: true,
-        published: true,
         name: true,
         description: true,
         contactEmail: true,
         logo: true,
         image: true,
-        headerImage: true,
-        biopharmaConsentSettings: true,
         subdomain: true,
         customDomain: true,
-        statedGoal: true,
         yearFounded: true,
-        incorporationStatus: true,
-        therapeuticsOfInterest: true,
-        therapeuticsInDevelopment: true,
-        website: true,
         moneyRaised: true,
         moneyDeployed: true,
         researchBudget: true,
-        // address1                  String?
-        // address2                  String?
-        // formattedAddress          String?
-        // city                      String?
-        // region                    String?
-        // postalCode                String?
-        // country                   String?
-        // lat                       String?
-        // lng                       String?
-        createdAt: true,
-        updatedAt: true,
-        user: true,
-        userId: true,
-        roadmaps: true,
-        members: true,
-        clients: true,
-        invitations: true,
-        membershipRequests: true,
-        conditions: true,
-        kanban: true,
-        milestones: true,
-        platformNotifications: true,
-        reviews: true,
-        savedCompanies: true,
-        tools: true,
-        rfps: true,
-        metadata: true
     })
 
     // Fallback to avoid passing null to title or description
@@ -114,12 +77,6 @@ export async function generateStaticParams() {
                 }
             }
         }
-        // feel free to remove this filter if you want to generate paths for all roadmaps
-        // where: {
-        //     organization: {
-        //         subdomain: "demo",
-        //     },
-        // },
     })
 
     const allPaths = allRoadmaps
@@ -137,133 +94,56 @@ export async function generateStaticParams() {
     return allPaths
 }
 
-// const posts: Post[] = [
-//     {
-//         id: '1',
-//         user: {
-//             name: 'John Doe',
-//             username: '@johndoe',
-//             avatar: '/placeholder.svg?height=40&width=40'
-//         },
-//         content: 'Just finished a great hike! The view was breathtaking. 🏞️ #NatureLover',
-//         image: '/placeholder.png',
-//         likes: 120,
-//         comments: 18,
-//         shares: 5,
-//         timestamp: '2 hours ago'
-//     },
-//     {
-//         id: '2',
-//         user: {
-//             name: 'Jane Smith',
-//             username: '@janesmith',
-//             avatar: '/placeholder.svg?height=40&width=40'
-//         },
-//         content: 'Excited to announce my new project! Stay tuned for more details. 🚀 #NewBeginnings',
-//         image: '/placeholder.png',
-//         likes: 89,
-//         comments: 32,
-//         shares: 12,
-//         timestamp: '5 hours ago'
-//     },
-//     {
-//         id: '3',
-//         user: {
-//             name: 'Bob Jackson',
-//             username: '@bobby',
-//             avatar: '/placeholder.svg?height=40&width=40'
-//         },
-//         content: 'Hello!. 🚀 #NewBeginnings',
-//         image: '/placeholder.png',
-//         likes: 29,
-//         comments: 32,
-//         shares: 1,
-//         timestamp: '5 hours ago'
-//     }
-// ]
-
 export default async function OrganizationRoadmapPage({
-                                                          params
-                                                      }: {
+    params
+}: {
     params: { domain: string }
 }) {
     const domain = decodeURIComponent(params.domain)
+    const searchParams = params
+    const search = researchPlanSearchParamsCache.parse(searchParams);
+    const validFilters = getValidFilters(search.filters);
+    const globalFilter = search.q ?? "";
 
-    // const data = await getRoadmapData(domain, slug)
-    const [organization, roadmaps] = await Promise.all([
-        getOrganizationData(domain, {
-            id: true,
-            public: true,
-            verified: true,
-            published: true,
-            name: true,
-            description: true,
-            contactEmail: true,
-            logo: true,
-            image: true,
-            headerImage: true,
-            biopharmaConsentSettings: true,
-            subdomain: true,
-            customDomain: true,
-            statedGoal: true,
-            yearFounded: true,
-            incorporationStatus: true,
-            therapeuticsOfInterest: true,
-            therapeuticsInDevelopment: true,
-            website: true,
-            moneyRaised: true,
-            moneyDeployed: true,
-            researchBudget: true,
-            // address1                  String?
-            // address2                  String?
-            // formattedAddress          String?
-            // city                      String?
-            // region                    String?
-            // postalCode                String?
-            // country                   String?
-            // lat                       String?
-            // lng                       String?
-            createdAt: true,
-            updatedAt: true,
-            user: true,
-            userId: true,
-            roadmaps: true,
-            members: true,
-            clients: true,
-            invitations: true,
-            membershipRequests: true,
-            conditions: true,
-            kanban: true,
-            milestones: true,
-            platformNotifications: true,
-            reviews: true,
-            savedCompanies: true,
-            tools: true,
-            rfps: true,
-            metadata: true
-        }),
-        getPublicRoadmapsForOrganization(domain, {
+    const organization = await getOrganizationData(domain, {
+        id: true,
+        name: true,
+        description: true,
+        contactEmail: true,
+        logo: true,
+        image: true,
+        subdomain: true,
+        customDomain: true,
+        yearFounded: true,
+        moneyRaised: true,
+        moneyDeployed: true,
+        researchBudget: true,
+    })
+
+    if (!organization) notFound()
+
+    const {data: researchPlans, pageCount: researchPlansPageCount} = await getResearchPlans(
+        organization?.id,
+        {
             id: true,
             title: true,
             description: true,
-            slug: true,
-            edges: true,
-            milestones: true,
-            nodes: true,
-            modalities: true
-        }),
-    ])
-
-    console.log(`GOT HERE`)
-    console.log(`organization info`, organization)
-
-    if (!organization) {
-        notFound()
-    }
+            published: true,
+            organizationId: true,
+            organization: true,
+            modalities: true,
+            stages: true,
+            statuses: true,
+            partners: true,
+            links: true,
+        },
+        {...search, q: globalFilter, filters: validFilters},
+        true,
+    )
     
     return (
         <>
-            {roadmaps.length > 0 ? (
+            {researchPlans.length > 0 ? (
                     <>
                         <div
                             className="flex flex-col items-start justify-center my-24 gap-8 max-w-7xl m-auto w-full text-left p-2"
@@ -277,7 +157,9 @@ export default async function OrganizationRoadmapPage({
                                 editable={false}
                             />
                             <RoadmapsCard
-                                roadmaps={roadmaps}
+                                researchPlans={researchPlans}
+                                researchPlansPageCount={researchPlansPageCount}
+                                searchParams={searchParams}
                                 organization={organization}
                             />
                         </div>
@@ -291,15 +173,6 @@ export default async function OrganizationRoadmapPage({
                                         <ShareDialog
                                             url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`}
                                             organization={organization}
-                                            // trackShareEvent={(socialOption: string) => {
-                                            //     mixpanelTrack(`Research Plans Table Shared`, {
-                                            //         "Platform": socialOption,
-                                            //         ...(organization ? {
-                                            //             "Organization ID": organization.id,
-                                            //             "Organization Name": organization.name
-                                            //         } : undefined)
-                                            //     })
-                                            // }}
                                             trackShareEvent={{
                                                 title: `Research Plans Table Shared`
                                             }}
@@ -311,7 +184,6 @@ export default async function OrganizationRoadmapPage({
                                         {
                                             title: "Contact patient group",
                                             icon: <Mail/>,
-                                            // dialog: <ContactPAGDialog organization={organization} />,
                                             href: `mailto:${organization.contactEmail}`
                                         },
                                     ]

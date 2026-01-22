@@ -62,6 +62,7 @@ export function DatabaseResearchPlansTable({
     return (
         <>
             <DataTable
+                className="w-full"
                 table={table}
                 showPagination={showPagination}
                 noResults={
