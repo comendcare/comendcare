@@ -34,12 +34,12 @@ export async function initializeRFPSearch(filters: RFPMarketplaceFiltersType) {
     }
 }
 
-export async function initializeResearchPlanSearch(filters: ResearchPlanMarketplaceFiltersType) {
+export async function initializeResearchPlanSearch(filters: ResearchPlanMarketplaceFiltersType, sortBy?: string | string[] | undefined) {
     if (typeof window !== "undefined") {
         const initResearchPlanSearchState = useResearchPlanSearchStore.getState().initState;
 
         // Call Zustand's initState directly
-        await initResearchPlanSearchState(filters)
+        await initResearchPlanSearchState(filters, sortBy)
     }
 }
 

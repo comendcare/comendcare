@@ -4,10 +4,11 @@ import * as React from "react";
 import {DataTable} from "../data-table/data-table";
 import {useDataTable} from "@comend/lib/hooks/use-data-table";
 import {ColumnDef, Row} from "@tanstack/react-table";
-import type {Roadmap, Tool} from "@prisma/client";
+import type {Organization, Roadmap, Tool} from "@prisma/client";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 import {DataTableToolbar} from "../data-table/data-table-toolbar";
 import { useResearchPlanSearchStore } from "@/state/search/researchPlanSearchStore";
+import { useRouter } from "next/navigation";
 
 export function TypesenseResearchPlansTable({
     data, 
@@ -24,6 +25,7 @@ export function TypesenseResearchPlansTable({
     searchParams: SearchParams,
     showPagination?: boolean,
 }) {
+    const router = useRouter()
     const {table, shallow, debounceMs, throttleMs} = useDataTable({
         data,
         columns,
@@ -50,6 +52,11 @@ export function TypesenseResearchPlansTable({
                 table={table}
                 showPagination={showPagination}
                 useStore={useResearchPlanSearchStore}
+                onRowClickCallback={
+                    (e: any, row: Row<any> | undefined) => {
+                        router.push(row?.original.organization.subdomain ? `http://${row?.original.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${row?.original.id}` : '#')
+                    }
+                }
             >
                 {/* 
                     Required for in header sorting functionality, but hidden so we don't clog up the table

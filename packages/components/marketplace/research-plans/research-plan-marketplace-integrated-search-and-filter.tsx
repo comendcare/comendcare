@@ -31,6 +31,9 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
 
     const [query, setQuery] = useState(searchTerm)
 
+    // Keep local input in sync with store (e.g., external changes)
+    useEffect(() => setQuery(searchTerm), [searchTerm]);
+
     const clearAll = () => {
         setFilters({ ...filters, stages: [], statuses: [], modalities: [] });
     }

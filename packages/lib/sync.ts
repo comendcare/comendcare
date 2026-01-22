@@ -1052,6 +1052,8 @@ export const syncToTypesense = async (env: {
             },
             select: {
                 id: true,
+                createdAt: true,
+                updatedAt: true,
                 title: true,
                 description: true,
                 partners: {
@@ -1076,6 +1078,8 @@ export const syncToTypesense = async (env: {
         if (researchPlans.length > 0) {
             const uploadResearchPlans = researchPlans.map(researchPlan => ({
                 ...researchPlan,
+                createdAt: researchPlan.createdAt.getTime(), // special case for created at to enable sorting
+                updatedAt: researchPlan.createdAt.getTime(), // special case for created at to enable sorting
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'research-plans', uploadResearchPlans);
         } else {

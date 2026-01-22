@@ -27,10 +27,10 @@ import { useSession } from "next-auth/react";
 import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/public-research-plans-table-columns";
 
 export const RoadmapsCard = ({
-researchPlans,
-researchPlansPageCount,
-searchParams,
-organization,
+    researchPlans,
+    researchPlansPageCount,
+    searchParams,
+    organization,
 }: {
     researchPlans: Roadmap[],
     researchPlansPageCount: number,

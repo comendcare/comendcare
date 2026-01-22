@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { ASSOCIATED_CATEGORIES, Milestone } from '@comend/lib/types'
-import { getExclusiveToFirstGroup, sleep } from '@comend/lib/utils';
+import { getExclusiveToFirstGroup, sleep, typesenseSortByFromColumnId } from '@comend/lib/utils';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { SearchResponse } from 'typesense/lib/Typesense/Documents';
 
@@ -95,7 +95,7 @@ function generateFiltersString(filters: FiltersType): string {
 }
 
 const sortByFilters: { [key: string]: string } = {
-    // "default": "title:asc",
+    // "default": "createdAt:desc",
 }
 
 async function withRetry<T>(
@@ -120,14 +120,29 @@ const getUpdatedSearchResults = async (
         state: any,
         isNewSearch: boolean = true
     ) => {
+        let sortByList = []
         const filtersString = generateFiltersString(state.filters)
+
+        if (state.sortBy) {
+            const parsedSort = JSON.parse(state.sortBy)
+
+            if (parsedSort && Array.isArray(parsedSort)) {
+                parsedSort.map((sort: any) => {
+                    sortByList.push(`${typesenseSortByFromColumnId(sort.id, sort.desc)}`)
+                })
+            }
+        }
+
+        sortByList.push(`createdAt:desc`)
+        const sortBy = sortByList.join(`,`)
+
         const searchParameters = {
             q: state.searchTerm,
             query_by: "title,description,partners,links",
-            per_page: 12,
-            page: Math.min(state.lastFetchedPage, state.totalPages), // don't fetch any pages out of range
+            per_page: state.resultsPerPage,
+            page: state.page,
             ...(filtersString ? { filter_by: filtersString } : undefined),
-            // sort_by: sortByFilters[state.sortBy],
+            sort_by: sortBy,
         };
 
         const results: SearchResponse<Object> = await typesense
@@ -138,6 +153,9 @@ const getUpdatedSearchResults = async (
         const typeSenseHits = results.hits || [];
         // @ts-ignore
         const ids = typeSenseHits.map(hit => hit.document.id);
+
+        const totalResults = results.found || 0;
+        const totalPages = Math.ceil(totalResults / state.resultsPerPage);
 
         if (ids.length === 0) {
             return {
@@ -163,9 +181,9 @@ const getUpdatedSearchResults = async (
         const enrichedResults = ids.map((id: string) => prismaResults.find((company: any) => company.id === id) || null).filter(Boolean);
 
         return {
-            results: isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults],
+            results: enrichedResults,
             total: results.found || 0,
-            totalPages: Math.ceil(results.out_of/12)
+            totalPages: totalPages || 0
         };
     }
 
@@ -174,16 +192,17 @@ const getUpdatedSearchResults = async (
 
 export interface ResearchPlanSearchState {
     initialized: boolean,
-    initState: (filters: FiltersType) => Promise<void>,
-    featured: any[],
+    setInit: (initState: boolean) => void,
+    initState: (filters: FiltersType, sortBy?: string | string[] | undefined) => Promise<void>,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
-    sortBy: string,
-    setSortBy: (sortBy: string | undefined) => void,
+    sortBy: string | string[] | undefined,
+    setSortBy: (sortBy: string | string[] | undefined) => void,
+    resultsPerPage: number,
+    setResultsPerPage: (numResults: number) => void,
+    page: number,
+    setPage: (page: number) => void,
     totalPages: number,
-    setTotalPages: (page: number) => void,
-    lastFetchedPage: number,
-    setLastFetchedPage: (page: number) => void,
     view: ViewType,
     setView: (view: ViewType) => void,
     allResults: any[],
@@ -191,7 +210,7 @@ export interface ResearchPlanSearchState {
     searchResults: any[] | undefined
     setSearchResults: (results: any[]) => void
     filters: FiltersType,
-    setFilters: (updatedFilters: FiltersType) => void,
+    setFilters: (updatedFilters: FiltersType) => Promise<void>,
     totalResults: undefined | number,
     setTotalResults: (total: number) => void,
 }
@@ -199,78 +218,85 @@ export interface ResearchPlanSearchState {
 export const useResearchPlanSearchStore = create<ResearchPlanSearchState>()(
     temporal((set, get) => ({
             initialized: false,
-            initState: async (filters: FiltersType) => {
-                const { results, total, totalPages } = await getUpdatedSearchResults({
-                    ...get(),
-                    sortBy: "default",
-                    lastFetchedPage: 1,
-                }, true)
-
+            setInit: (initState: boolean) => {
+                set({initialized: initState})
+            },
+            initState: async (filters: FiltersType, sortBy?: string | string[] | undefined) => {
                 set({ 
-                    initialized: true, 
-                    sortBy: "default", 
-                    searchResults: results, 
-                    lastFetchedPage: 1, 
+                    filters,
+                    searchTerm: "",
+                    sortBy,
+                    page: 1,
+                })
+
+                const { results, total, totalPages } = await getUpdatedSearchResults(get(), true)
+
+                set({
+                    searchResults: results,
+                    totalPages,
                     totalResults: total,
-                    totalPages: totalPages
+                    initialized: true,
                 })
             },
-            featured: [],
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
                 const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     searchTerm: newSearch,
-                    lastFetchedPage: 1,
                 }, true)
 
                 if (newSearch.length > 0) {
                     // only track searches if the user has entered text in the searchbar
                     const filters = get().filters
-                    // mixpanelTrack("Search Service Providers", {
-                    //     "Search Term": newSearch,
-                    //     "Results": total,
-                    //     "Filters": {
-                    //         "Milestone Types": filters.milestoneTypes.map(filter => filter.label),
-                    //         "Business Types": filters.types.map(filter => filter.label),
-                    //         "Certifications": filters.certifications.map(filter => filter.label),
-                    //         "Tags": filters.tags.map(filter => filter.label),
-                    //         "Categories": filters.categories.map(filter => filter.label)
-                    //     }
-                    // })
+                    mixpanelTrack("Search research plans", {
+                        "Search Term": newSearch,
+                        "Results": total,
+                        "Filters": {
+                            // "Types": filters.modalities?.map(filter => filter.label),
+                            // "Business Types": filters.types.map(filter => filter.label),
+                            // "Certifications": filters.certifications.map(filter => filter.label),
+                            // "Tags": filters.tags.map(filter => filter.label),
+                            // "Categories": filters.categories.map(filter => filter.label)
+                        }
+                    })
                 }
 
                 set({
                     searchTerm: newSearch,
                     searchResults: results,
-                    lastFetchedPage: 1,
+                    totalPages,
+                    page: 1,
                     totalResults: total,
-                    totalPages: totalPages
                 })
             },
-            sortBy: "default",
-            setSortBy: async (sortBy: string | undefined) => {
+            sortBy: undefined,
+            setSortBy: async (sortBy: string | string[] | undefined) => {
+                // if new sort by value == previous sort by value, don't update
+                if (JSON.stringify(get().sortBy) === JSON.stringify(sortBy)) return
+
                 const { results, total, totalPages } = await getUpdatedSearchResults({
                     ...get(),
                     sortBy,
-                    lastFetchedPage: 1,
                 }, true)
-                set({ sortBy, searchResults: results, lastFetchedPage: 1, totalResults: total, totalPages })
+                set({ sortBy, searchResults: results, totalPages, page: 1, totalResults: total })
             },
-            totalPages: 1,
-            setTotalPages: (page: number) => {
-                set({totalPages: page})
-            },
-            lastFetchedPage: 1, // page numbers in TypeSense start at 1
-            setLastFetchedPage: async (page: number) => {
-                // don't search if we've already gotten to the last page
-                if (page > get().totalPages) return
-
+            resultsPerPage: 10,
+            setResultsPerPage: async (numResults: number) => {
                 const {results: updateSearchResults, totalPages} = await getUpdatedSearchResults({
                     ...get(),
-                    lastFetchedPage: page
+                    resultsPerPage: numResults,
+                    page: 1
                 }, false)
-                set({ lastFetchedPage: Math.min(page, totalPages), searchResults: updateSearchResults, totalPages })
+                set({ resultsPerPage: numResults, page: 1, totalPages, searchResults: updateSearchResults })
+            },
+            totalPages: 1,
+            page: 1, // page numbers in TypeSense start at 1
+            setPage: async (page: number) => {
+                const {results: updateSearchResults, totalPages} = await getUpdatedSearchResults({
+                    ...get(),
+                    page,
+                }, false)
+                set({ page, totalPages, searchResults: updateSearchResults })
             },
             view: 'grid',
             setView: (view: ViewType) => set({ view }),
@@ -290,56 +316,12 @@ export const useResearchPlanSearchStore = create<ResearchPlanSearchState>()(
                     lastFetchedPage: 1,
                 }, true)
 
-                const recentlySelected = {
-                    categories: getExclusiveToFirstGroup(newFilters, get().filters, 'categories'),
-                    milestoneTypes: getExclusiveToFirstGroup(newFilters, get().filters, 'milestoneTypes'),
-                    types: getExclusiveToFirstGroup(newFilters, get().filters, 'types'),
-                    certifications: getExclusiveToFirstGroup(newFilters, get().filters, 'certifications'),
-                    tags: getExclusiveToFirstGroup(newFilters, get().filters, 'tags')
-                }
-
-                const recentlyRemoved = {
-                    categories: getExclusiveToFirstGroup(get().filters, newFilters, 'categories'),
-                    milestoneTypes: getExclusiveToFirstGroup(get().filters, newFilters, 'milestoneTypes'),
-                    types: getExclusiveToFirstGroup(get().filters, newFilters, 'types'),
-                    certifications: getExclusiveToFirstGroup(get().filters, newFilters, 'certifications'),
-                    tags: getExclusiveToFirstGroup(get().filters, newFilters, 'tags')
-                }
-
-                if (Object.values(recentlySelected).flatMap(value => value).length > 0 || Object.values(recentlyRemoved).flatMap(value => value).length > 0) {
-                    // if something has been added or removed, track as a mixpanel event
-                    // mixpanelTrack("Marketplace Service Provider Filters Selected", {
-                    //     "Results": total,
-                    //     "Filters": {
-                    //         "Milestone Types": newFilters.milestoneTypes.map(filter => filter.label),
-                    //         "Business Types": newFilters.types.map(filter => filter.label),
-                    //         "Certifications": newFilters.certifications.map(filter => filter.label),
-                    //         "Tags": newFilters.tags.map(filter => filter.label),
-                    //         "Categories": newFilters.categories.map(filter => filter.label)
-                    //     },
-                    //     "Added": {
-                    //         "Milestone Types": recentlySelected.milestoneTypes.map(filter => filter.label),
-                    //         "Business Types": recentlySelected.types.map(filter => filter.label),
-                    //         "Certifications": recentlySelected.certifications.map(filter => filter.label),
-                    //         "Categories": recentlySelected.categories.map(filter => filter.label),
-                    //         "Tags": recentlySelected.tags.map(filter => filter.label)
-                    //     },
-                    //     "Removed": {
-                    //         "Milestone Types": recentlyRemoved.milestoneTypes.map(filter => filter.label),
-                    //         "Business Types": recentlyRemoved.types.map(filter => filter.label),
-                    //         "Certifications": recentlyRemoved.certifications.map(filter => filter.label),
-                    //         "Categories": recentlyRemoved.categories.map(filter => filter.label),
-                    //         "Tags": recentlyRemoved.tags.map(filter => filter.label)
-                    //     },
-                    // })
-                }
-
                 set({
                     filters: newFilters,
-                    lastFetchedPage: 1,
+                    page: 1,
                     searchResults: results,
                     totalResults: total,
-                    totalPages: totalPages
+                    totalPages,
                 })
             },
             totalResults: undefined,
