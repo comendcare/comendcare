@@ -20,6 +20,7 @@ import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-tabl
 import { DatabaseResearchPlansTable } from "@comend/components/biorepo/advanced-data-table/research-plans-table/database-research-plans-table"
 import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/private-research-plans-table-columns";
 import { useSession } from "next-auth/react";
+import { Row } from "@tanstack/react-table";
 
 
 type Props = {
@@ -137,7 +138,7 @@ export default function RoadmapsPage({ orgId, organization, data, pageCount, sea
                                 columns={columns}
                                 searchParams={searchParams}
                                 // onSelectionChange={setRowSelection}
-                                // onRowClickCallback={(e: any, row: Row<any> | undefined) => setEditingTool(row?.original)}
+                                onRowClickCallback={(e: any, row: Row<any> | undefined) => row?.original.id && router.push(`/app/research-plan/${row.original.id}`)}
                                 showPagination={true}
                                 // noResultsOverride={(
                                 //     <NoResultsTemplate 
@@ -146,34 +147,6 @@ export default function RoadmapsPage({ orgId, organization, data, pageCount, sea
                                 //         title="You do not have any patient biosamples"
                                 //         description="A tool is a project outcome that can be used for future research. Ex/ clinical datasets, disease models, papers."
                                 //     />
-                                // )}
-                                // interactiveDialog={(
-                                //     <>
-                                //     <Dialog 
-                                //         open={!!editingTool}
-                                //         onOpenChange={(open) => {
-                                //             if (!open) setIsClosing(true)
-                                //         }}
-                                //     >
-                                //         <DialogPortal>
-                                //             <div onClick={(e) => e.stopPropagation()}>
-                                //                 {editingTool && (
-                                //                     <EditAssetDialog
-                                //                         key={editingTool?.id}
-                                //                         data={editingTool} 
-                                //                         type={'biosample'}
-                                //                         isClosing={isClosing}
-                                //                         setIsClosing={setIsClosing}
-                                //                         closeDialog={() => {
-                                //                             setEditingTool(undefined)
-                                //                             setIsClosing(false)
-                                //                         }}
-                                //                     />
-                                //                 )}
-                                //             </div>
-                                //         </DialogPortal>
-                                //     </Dialog>
-                                //     </>
                                 // )}
                             />
                         </Suspense>

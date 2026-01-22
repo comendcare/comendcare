@@ -14,7 +14,9 @@ import {
     DONOR_RACE_OPTIONS,
     DONOR_SEX_OPTIONS,
     QUANTITY_OPTIONS,
+    RESEARCH_PLAN_STATUS,
     RESEARCH_PLAN_TYPES,
+    RESEARCH_STAGE,
 } from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { Badge } from "./../../../ui/badge";
@@ -89,37 +91,6 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     }
                 </div>
             ),
-            enableHiding: true,
-            enableColumnFilter: true,
-            meta: {
-                label: "Visibility",
-                variant: "select",
-                options: [
-                    {
-                        label: "Private",
-                        value: "true",
-                    }, {
-                        label: "Published",
-                        value: "false",
-                    }
-                ],
-                icon: CircleDashed,
-                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
-                    const filters = [
-                        {
-                            ...filter,
-                            ...({value: filter.value === "true" ? true : false}),
-                        } as any
-                    ]
-                    const results = filterColumns({
-                        filters,
-                        // join operator doesn't matter in this case because there will only be one entry in the list
-                        joinOperator: 'or'
-                    })
-
-                    return results
-                },
-            },
         },
         {
             id: "title",
@@ -137,8 +108,6 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     <p>{row.original.title || 'Untitled research plan'}</p>
                 </div>
             ),
-            enableHiding: true,
-            meta: { label: "Title" }
         },
         {
             id: "modalities",
@@ -152,7 +121,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
             ),
             cell: ({row}) => (
                 <>
-                    {(row.original.types || []).map((type: string, index: number) => {
+                    {(row.original.modalities || []).map((type: string, index: number) => {
                         const typeOption = RESEARCH_PLAN_TYPES.find(t => t.value === type)
                         return (
                             <Badge>{typeOption?.label}</Badge>
@@ -160,14 +129,95 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     })}
                 </>
             ),
-            enableHiding: true,
-            enableColumnFilter: true,
-            meta: {
-                label: "Type",
-                variant: "multiSelect",
-                options: RESEARCH_PLAN_TYPES,
-                icon: CircleDashed,
-            },
+        },
+        {
+            id: "stages",
+            accessorKey: "stages",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Stage"
+                />
+            ),
+            cell: ({row}) => (
+                <>
+                    {(row.original.stages || []).map((type: string, index: number) => {
+                        const typeOption = RESEARCH_STAGE.find(t => t.value === type)
+                        return (
+                            <Badge>{typeOption?.label}</Badge>
+                        )
+                    })}
+                </>
+            ),
+        },
+        {
+            id: "statuses",
+            accessorKey: "statuses",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Status"
+                />
+            ),
+            cell: ({row}) => (
+                <>
+                    {(row.original.statuses || []).map((type: string, index: number) => {
+                        const typeOption = RESEARCH_PLAN_STATUS.find(t => t.value === type)
+                        return (
+                            <Badge>{typeOption?.label}</Badge>
+                        )
+                    })}
+                </>
+            ),
+        },
+        {
+            id: "partners",
+            accessorKey: "partners",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Partners"
+                />
+            ),
+            cell: ({row}) => (
+                <ul className="flex flex-col gap-2">
+                    {row.original.partners?.map((partner: any, index: number) => (
+                        <li key={index}>
+                            {partner.affiliation}
+                        </li>
+                    ))}
+                </ul>
+            ),
+        },
+        {
+            id: "links",
+            accessorKey: "links",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Links"
+                />
+            ),
+            cell: ({row}) => (
+                <ul className="flex flex-col gap-2">
+                    {row.original.links?.map((attachment: any, index: number) => (
+                        <li key={index}>
+                            <Link 
+                                className="line-clamp-2 underline" 
+                                href={attachment.link || "/"}
+                                target="_blank"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                            {attachment.name || attachment.link}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            ),
         },
         {
             id: "description",
@@ -176,7 +226,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Notes"
+                    title="Description"
                 />
             ),
             cell: ({row}) => (
@@ -184,8 +234,6 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     {row.original.description}
                 </div>
             ),
-            meta: { label: "Notes" },
-            enableHiding: true,
         },
         // {
         //     id: "actions",
