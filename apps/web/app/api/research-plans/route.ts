@@ -14,7 +14,9 @@ export async function POST(req: Request) {
                 organization: true,
                 milestones: {
                     where: { private: false }
-                }
+                },
+                links: true,
+                partners: true,
             }
         });
 

@@ -10,21 +10,6 @@ import { SearchResponse } from 'typesense/lib/Typesense/Documents';
 export type ViewType = 'grid' | 'list'
 
 export type FiltersType = {
-    // conditions: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
-    // genes: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
-    // openTo: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[],
     stages: {
         label: string,
         value: string,
@@ -40,19 +25,9 @@ export type FiltersType = {
         value: string,
         disable?: boolean,
     }[],
-    // organizations: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    // }[]
 }
 
 export const defaultFilters = {
-    // conditions: [],
-    // genes: [],
-    // openTo: [],
-    // status: [],
-    // organizations: []
     stages: [],
     statuses: [],
     modalities: []
@@ -66,7 +41,7 @@ function generateFiltersString(filters: FiltersType): string {
     // stages
     if (filters?.stages && filters.stages.length > 0) {
         const stageFilter = filters.stages
-            .map(stage => `stages:=[${escapeValue(stage.value)}]`)
+            .map(stage => `stages:=[${escapeValue(stage.label)}]`)
             .join(" || ");
             filtersList.push(`(${stageFilter})`);
     }
@@ -74,7 +49,7 @@ function generateFiltersString(filters: FiltersType): string {
     // statuses
     if (filters?.statuses && filters.statuses.length > 0) {
         const statusFilter = filters.statuses
-            .map(status => `statuses:=[${escapeValue(status.value)}]`)
+            .map(status => `statuses:=[${escapeValue(status.label)}]`)
             .join(" || ");
             filtersList.push(`(${statusFilter})`);
     }
@@ -82,7 +57,7 @@ function generateFiltersString(filters: FiltersType): string {
     // modalities/therapeutic strategies
     if (filters?.modalities && filters.modalities.length > 0) {
         const modalitiesFilter = filters.modalities
-            .map(status => `modalities:=[${escapeValue(status.value)}]`)
+            .map(status => `modalities:=[${escapeValue(status.label)}]`)
             .join(" || ");
             filtersList.push(`(${modalitiesFilter})`);
     }
@@ -138,7 +113,7 @@ const getUpdatedSearchResults = async (
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "title,description,partners,links",
+            query_by: "organization.name,title,description,modalities,links.name,links.link,partners.affiliation,stages,statuses",
             per_page: state.resultsPerPage,
             page: state.page,
             ...(filtersString ? { filter_by: filtersString } : undefined),

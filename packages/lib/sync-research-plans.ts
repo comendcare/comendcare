@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic'; // Prevent caching
+import { MODALITIES, RESEARCH_PLAN_STATUS, RESEARCH_STAGE } from "./../lib/types";
 import prisma from "./prisma"
 
 const sendTypeSenseRequest = async (
@@ -190,7 +191,16 @@ export const syncToTypesense = async (env: {
                 ...researchPlan,
                 createdAt: researchPlan.createdAt.getTime(), // special case for created at to enable sorting
                 updatedAt: researchPlan.createdAt.getTime(), // special case for created at to enable sorting
-                milestones: researchPlan.milestones.filter(milestone => !milestone.private).length // public project count
+                milestones: researchPlan.milestones.filter(milestone => !milestone.private).length, // public project count
+                modalities: MODALITIES
+                    .filter((option: any) => researchPlan.modalities.includes(option.value))
+                    .map((option: any) => option.label),
+                stages: RESEARCH_STAGE
+                    .filter((option: any) => researchPlan.stages.includes(option.value))
+                    .map((option: any) => option.label),
+                statuses: RESEARCH_PLAN_STATUS
+                    .filter((option: any) => researchPlan.statuses.includes(option.value))
+                    .map((option: any) => option.label),
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'research-plans', uploadResearchPlans);
         } else {
