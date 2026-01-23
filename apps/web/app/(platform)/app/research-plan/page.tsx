@@ -19,42 +19,39 @@ export default async function RoadmapPage(props: IndexPageProps) {
     const validFilters = getValidFilters(search.filters);
     const globalFilter = search.q ?? "";
 
-    const organization = await prisma.organization.findUnique({
-        where: {id: orgId},
-        select: {
-            id: true,
-            name: true,
-            subdomain: true,
-            customDomain: true,
-        },
-    })
+    const [organization, {data, pageCount}] = await Promise.all([
+        prisma.organization.findUnique({
+            where: {id: orgId},
+            select: {
+                id: true,
+                name: true,
+                subdomain: true,
+                customDomain: true,
+            },
+        }),
+        getResearchPlans(
+            session?.user.organizationId,
+            {
+                id: true,
+                private: true,
+                title: true,
+                description: true,
+                published: true,
+                organizationId: true,
+                milestones: true,
+                organization: true,
+                modalities: true,
+                stages: true,
+                statuses: true,
+                partners: true,
+                links: true,
+            },
+            {...search, q: globalFilter, filters: validFilters},
+            false,
+        )
+    ])
 
-    // const columns = useResearchPlansTableColumns({session: session as any})
-
-    const {data, pageCount} = await getResearchPlans(
-        session?.user.organizationId,
-        {
-            id: true,
-            private: true,
-            title: true,
-            description: true,
-            published: true,
-            organizationId: true,
-            milestones: true,
-            organization: true,
-            modalities: true,
-            stages: true,
-            statuses: true,
-            partners: true,
-            links: true,
-        },
-        {...search, q: globalFilter, filters: validFilters},
-        false,
-        // columns
-    )
-
-    if (!orgId) return <NoOrganization/>
-    if (!organization) return <NoOrganization />
+    if (!orgId || !organization) return <NoOrganization/>
 
     return (
         <RoadmapsPage
