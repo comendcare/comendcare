@@ -41,7 +41,7 @@ export type RoadmapState = {
         roadmapId: string
     ) => void,
     details: Roadmap | undefined,
-    setDetails: (data: z.infer<typeof editResearchPlanForm>) => Promise<void>
+    setDetails: (id: string, orgId: string, data: z.infer<typeof editResearchPlanForm>) => Promise<void>
     onboardingActive: boolean,
     setOnboardingActive: (active: boolean) => void,
     roadmapId: string | null
@@ -91,8 +91,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 })
             },
             details: undefined,
-            setDetails: async (data: z.infer<typeof editResearchPlanForm>) => {
-                const id = get().roadmapId
+            setDetails: async (id: string, orgId: string, data: z.infer<typeof editResearchPlanForm>) => {
                 if (!id) {
                     console.error(`Error: no active research plan!`)
                     return
@@ -105,12 +104,11 @@ export const useRoadmapStore = create<RoadmapState>()(
 
                 // fetch the updated org id OR (if it hasn't been updated) fetch the org id from the current roadmap
                 // used for authorization - check if the user has access to edit this roadmap
-                const orgId = get().details?.organizationId
-                if (!orgId) {
-                    console.error(`Error: this research plan is not associated with an organization!`)
-                    return
-                }
-
+                // const orgId = get().details?.organizationId
+                // if (!orgId) {
+                //     console.error(`Error: this research plan is not associated with an organization!`)
+                //     return
+                // }
                 const roadmap = await updateRoadmap(orgId, {
                     id,
                     title: data.title,

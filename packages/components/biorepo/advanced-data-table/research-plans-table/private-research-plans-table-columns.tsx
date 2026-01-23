@@ -27,6 +27,7 @@ import { filterColumns } from "@comend/lib/filter-columns";
 import { generateId } from "@comend/lib/id";
 import { ExtendedColumnFilter } from "@comend/lib/types/data-table";
 import { Session } from "next-auth";
+import { ResearchPlanActionsMenu } from "comend-pag-platform/components/research-plans-actions-menu";
 
 export function useResearchPlansTableColumns({session}: {session: Session | null}): ColumnDef<any>[] {
     const columns: ColumnDef<any>[] = [
@@ -235,11 +236,15 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                 </div>
             ),
         },
-        // {
-        //     id: "actions",
-        //     cell: ({row}) => <AssetActionsMenu tool={row.original} type={'research-plan'}/>,
-        //     enableHiding: false,
-        // },
+        {
+            id: "actions",
+            size: 1,        // smallest possible width
+            minSize: 1,
+            maxSize: 1,
+            enableResizing: false,
+            cell: ({row}) => <ResearchPlanActionsMenu researchPlan={row.original}/>,
+            enableHiding: false,
+        },
     ]
 
     return columns

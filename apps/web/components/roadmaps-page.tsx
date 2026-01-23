@@ -49,7 +49,7 @@ export default function RoadmapsPage({ orgId, organization, data, pageCount, sea
             edges: [],
             milestones: [],
             selectedView: null,
-            selectedNodeIds: []
+            selectedNodeIds: [],
         })
     }, [])
 

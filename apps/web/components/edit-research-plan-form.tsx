@@ -99,7 +99,7 @@ export function EditResearchPlanForm({
 
         if (researchPlanData?.id) {
             // Update existing
-            await setDetails(values)
+            await setDetails(researchPlanData?.id, researchPlanData?.organizationId, values)
             if (closeDialog) closeDialog()
         } else {
             // Create new
