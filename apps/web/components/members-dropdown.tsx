@@ -38,8 +38,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
     const {data: session, update} = useSession()
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isLastOwner, setIsLastOwner] = useState(false)
-    const role = session?.user?.membership?.role;
-    const isManager = ["owner", "support"].includes(role as string);
+    const isManager = true; // allow anyone to manage members
 
     const form = useForm<z.infer<typeof formSchema>>({
         mode: "onChange",
@@ -151,8 +150,8 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
         router.push("/app/profile");
     };
 
-    const canEditMembership = session?.user?.id === member?.user?.id || isManager;
-    const canRevokeMembership = isManager && session?.user?.id !== member?.user?.id;
+    const canEditMembership = isManager;
+    const canRevokeMembership = session?.user?.id !== member?.user?.id;
     const canLeaveOrganization = session?.user?.id === member?.user?.id;
 
     const showDropdownTrigger = canEditMembership || canLeaveOrganization || canRevokeMembership;
@@ -182,7 +181,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     {
-                        (session?.user?.id === member?.user?.id || isManager) && (
+                        isManager && (
                             <DialogTrigger asChild>
                                 <DropdownMenuItem>
                                     <Pencil/>
@@ -274,7 +273,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                                                             Member
                                                         </p>
                                                         <p className="text-sm text-muted-foreground">
-                                                            Can view and edit.
+                                                            Can view, edit, and manage member.
                                                         </p>
                                                     </SelectItem>
                                                     <SelectItem value="owner">
@@ -282,7 +281,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                                                             Owner
                                                         </p>
                                                         <p className="text-sm text-muted-foreground">
-                                                            Can view, edit, and manage organization members.
+                                                            Complete control over profiles, members and account settings.
                                                         </p>
                                                     </SelectItem>
                                                 </SelectContent>

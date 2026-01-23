@@ -101,6 +101,11 @@ export default async function RootLayout({
                 <CustomerIOSnippet />
                 </>
             )}
+            {/* 
+                disable grammarly due to lag
+                https://www.notion.so/comend/Grammarly-Chrome-extension-causing-lags-opening-typing-in-forms-2e8801a6fddc80a6ace6fb8cf214235b?source=copy_link 
+            */}
+            <meta name="grammarly" content="false" /> 
         </head>
         <body>
         <Suspense fallback={<Loading/>}>
