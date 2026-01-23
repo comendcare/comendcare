@@ -94,6 +94,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     }
                 </div>
             ),
+            enableSorting: false,
         },
         {
             id: "title",
@@ -111,6 +112,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     <p>{row.original.title || 'Untitled research plan'}</p>
                 </div>
             ),
+            enableSorting: false,
         },
         {
             id: "modalities",
@@ -132,6 +134,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     })}
                 </>
             ),
+            enableSorting: false,
         },
         {
             id: "stages",
@@ -153,6 +156,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     })}
                 </>
             ),
+            enableSorting: false,
         },
         {
             id: "statuses",
@@ -174,6 +178,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     })}
                 </>
             ),
+            enableSorting: false,
         },
         {
             id: "partners",
@@ -194,6 +199,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     ))}
                 </ul>
             ),
+            enableSorting: false,
         },
         {
             id: "links",
@@ -221,6 +227,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     ))}
                 </ul>
             ),
+            enableSorting: false,
         },
         {
             id: "milestones",
@@ -257,6 +264,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     </div>
                 )
             },
+            enableSorting: false,
         },
         {
             id: "description",
@@ -273,6 +281,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     {row.original.description}
                 </div>
             ),
+            enableSorting: false,
         },
         {
             id: "actions",
@@ -282,6 +291,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
             enableResizing: false,
             cell: ({row}) => <ResearchPlanActionsMenu researchPlan={row.original}/>,
             enableHiding: false,
+            enableSorting: false,
         },
     ]
 
