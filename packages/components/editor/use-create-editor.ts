@@ -16,7 +16,6 @@ import {
   usePlateEditor,
 } from '@udecode/plate-common/react';
 import { DatePlugin } from '@udecode/plate-date/react';
-import { EmojiInputPlugin } from '@udecode/plate-emoji/react';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 import { TocPlugin } from '@udecode/plate-heading/react';
 import { HighlightPlugin } from '@udecode/plate-highlight/react';
@@ -51,7 +50,6 @@ import { ColumnElement } from './../plate-ui/column-element';
 import { ColumnGroupElement } from './../plate-ui/column-group-element';
 import { CommentLeaf } from './../plate-ui/comment-leaf';
 import { DateElement } from './../plate-ui/date-element';
-import { EmojiInputElement } from './../plate-ui/emoji-input-element';
 import { HeadingElement } from './../plate-ui/heading-element';
 import { HighlightLeaf } from './../plate-ui/highlight-leaf';
 import { HrElement } from './../plate-ui/hr-element';
@@ -106,7 +104,6 @@ export const useCreateEditor = ({ value }: { value?: Value | undefined | null })
           [ColumnPlugin.key]: ColumnGroupElement,
           [CommentsPlugin.key]: CommentLeaf,
           [DatePlugin.key]: DateElement,
-          [EmojiInputPlugin.key]: EmojiInputElement,
           [FilePlugin.key]: MediaFileElement,
           [HEADING_KEYS.h1]: withProps(HeadingElement, { variant: 'h1' }),
           [HEADING_KEYS.h2]: withProps(HeadingElement, { variant: 'h2' }),

@@ -20,7 +20,7 @@ import {
     FormMessage
 } from "@comend/components/ui/form";
 import {z} from "zod";
-import {useForm} from "react-hook-form";
+import {useForm, useWatch} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Input} from "@comend/components/ui/input";
 import {Textarea} from "@comend/components/ui/textarea";
@@ -116,10 +116,18 @@ export default function EditPagProfileAboutCardDialog({
         });
     }, [organization, editOrgForm]);
 
-    const formData = editOrgForm.watch()
+    const therapeuticsInDevelopment = useWatch({
+        control: editOrgForm.control,
+        name: "therapeuticsInDevelopment",
+    });
+
+    const therapeuticsOfInterest = useWatch({
+        control: editOrgForm.control,
+        name: "therapeuticsOfInterest",
+    });
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
-        const isValid = editOrgForm.trigger()
+        const isValid = await editOrgForm.trigger()
         if (!isValid) return // stops submission
 
         setIsSaving(true)
@@ -266,7 +274,7 @@ export default function EditPagProfileAboutCardDialog({
                     >
 
                         <ScrollArea className={"max-h-[80vh] -mr-2 pr-3"} type={"always"}>
-                            <ScrollBar />   
+                            <ScrollBar/>
                             <div className="flex flex-col gap-4 pr-4 space-y-8">
                                 <FormField
                                     control={editOrgForm.control}
@@ -355,7 +363,7 @@ export default function EditPagProfileAboutCardDialog({
                                     )}
                                 />
 
-                                {formData.therapeuticsInDevelopment?.some((item) => item.value === "Other" || item.value === "OTHER") && (
+                                {therapeuticsInDevelopment?.some((item) => item.value === "Other" || item.value === "OTHER") && (
                                     <FormField
                                         control={editOrgForm.control}
                                         name="otherTherapeuticsInDevelopment"
@@ -407,7 +415,7 @@ export default function EditPagProfileAboutCardDialog({
                                     )}
                                 />
 
-                                {editOrgForm.watch("therapeuticsOfInterest")?.some((item) => item.value === "Other" || item.value === "OTHER") && (
+                                {therapeuticsOfInterest?.some((item) => item.value === "Other" || item.value === "OTHER") && (
                                     <FormField
                                         control={editOrgForm.control}
                                         name="otherTherapeuticsOfInterest"

@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {
     AlertDialog,
     AlertDialogContent,
@@ -30,13 +30,17 @@ export default function InvitationBlocker({
     const [open] = useState(true); // permanently open until handled
     const [working, setWorking] = useState(false);
 
+    useEffect(() => {
+        router.prefetch("/app/profile");
+    }, [router]);
+
     const onAccept = async (invId: string) => {
         try {
             setWorking(true);
             const res = await acceptInvitation(invId);
             if (res?.success) {
                 toast.success("Invitation accepted.");
-                update({});
+                await update({});
                 router.push("/app/profile");
             } else {
                 toast.error(res?.error ?? "Failed to accept invitation.");

@@ -48,11 +48,18 @@ const userFormSchema = z.object({
 export default function UserOnboardingForm() {
     const router = useRouter();
     const {data: session} = useSession();
-    const [loading, setLoading] = useState(false);
-    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
-    const [invitations, setInvitations] = useState<any[]>([]);
-    const hasInvitations = invitations.length > 0;
+    const [loading, setLoading] = useState(false)
+    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null)
+    const [invitations, setInvitations] = useState<any[]>([])
+    const hasInvitations = invitations.length > 0
     const [isInitializing, setIsInitializing] = useState(true)
+
+    // Prefetch profile or organization page based on whether the user has any invitations
+    useEffect(() => {
+        if (isInitializing) return
+        const nextHref = hasInvitations ? "/app/profile" : "/onboarding/organization"
+        router.prefetch(nextHref)
+    }, [hasInvitations, isInitializing, router])
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -255,12 +262,11 @@ export default function UserOnboardingForm() {
                 values.image = imgUrl || undefined
             }
 
-            for (const [key, value] of Object.entries(values)) {
-                const res: any = await editUser(session?.user?.id as string, {[key]: value});
-                if (res?.error) {
-                    toast.error(res.error);
-                    return;
-                }
+            const res: any = await editUser(session?.user?.id as string, values);
+
+            if (res?.error) {
+                toast.error(res.error);
+                return;
             }
 
             toast.success("Successfully updated user profile!");

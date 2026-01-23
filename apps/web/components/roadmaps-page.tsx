@@ -107,9 +107,8 @@ export default function RoadmapsPage({ orgId, organization, data, pageCount, sea
                 {/* <RoadmapsTable 
                     isPrivate={true}
                     roadmaps={roadmaps} 
-                    rowClickCallback={(roadmap) => {
+                    rowClickCallback={() => {
                         setIsLoading(true)
-                        router.push(`/app/research-plan/${roadmap.id}`)
                     }}
                 /> */}
                 <Shell className="gap-2 w-full max-w-full">

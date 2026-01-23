@@ -29,26 +29,40 @@ export default async function RoadmapPage(props: IndexPageProps) {
                 customDomain: true,
             },
         }),
-        getResearchPlans(
-            session?.user.organizationId,
-            {
+        prisma.roadmap.findMany({
+            where: {organizationId: orgId},
+            orderBy: {createdAt: "desc"},
+            select: {
                 id: true,
-                private: true,
                 title: true,
                 description: true,
+                content: true,
+                slug: true,
+                image: true,
+                createdAt: true,
+                updatedAt: true,
                 published: true,
                 organizationId: true,
-                milestones: true,
+                userId: true,
+                edges: true,
+                milestones: {
+                    // where: {private: false},
+                    include: {
+                        types: {include: {milestoneType: true}},
+                        biosamples: true,
+                        diseaseModels: true,
+                        tools: true,
+                        rfps: true,
+                    },
+                    orderBy: [{createdAt: "desc"}]
+                },
+                nodes: true,
                 organization: true,
+                user: true,
                 modalities: true,
-                stages: true,
-                statuses: true,
-                partners: true,
-                links: true,
+                metadata: true,
             },
-            {...search, q: globalFilter, filters: validFilters},
-            false,
-        )
+        })
     ])
 
     if (!orgId || !organization) return <NoOrganization/>
