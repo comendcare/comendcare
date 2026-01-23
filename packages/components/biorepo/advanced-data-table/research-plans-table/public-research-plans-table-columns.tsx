@@ -95,7 +95,7 @@ export function useResearchPlansTableColumns(
                     })}
                 </>
             ),
-            enableSorting,
+            enableSorting: false,
             enableHiding,
         },
         {
@@ -118,7 +118,7 @@ export function useResearchPlansTableColumns(
                     })}
                 </>
             ),
-            enableSorting,
+            enableSorting: false,
             enableHiding,
         },
         {
@@ -141,7 +141,7 @@ export function useResearchPlansTableColumns(
                     })}
                 </>
             ),
-            enableSorting,
+            enableSorting: false,
             enableHiding,
         },
         {
@@ -221,7 +221,7 @@ export function useResearchPlansTableColumns(
                     </div>
                 )
             },
-            enableSorting: false,
+            enableSorting,
             enableHiding,
         },
         {

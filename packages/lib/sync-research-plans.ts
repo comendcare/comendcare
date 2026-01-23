@@ -124,6 +124,26 @@ export const syncToTypesense = async (env: {
                     name: ".*",
                     type: "auto",
                 },
+                {
+                    name: "organization.name",
+                    type: "string",
+                    sort: true,
+                },
+                {
+                    name: "title",
+                    type: "string",
+                    sort: true,
+                },
+                {
+                    name: "milestones",
+                    type: "int64",
+                    sort: true,
+                },
+                {
+                    name: "description",
+                    type: "string",
+                    sort: true,
+                }
             ]
         }
         
@@ -156,7 +176,10 @@ export const syncToTypesense = async (env: {
                     }
                 },
                 modalities: true,
-                // organization: true
+                organization: {
+                    select: {name: true}
+                },
+                milestones: {where: {private: false}},
             }
         })
 
@@ -167,6 +190,7 @@ export const syncToTypesense = async (env: {
                 ...researchPlan,
                 createdAt: researchPlan.createdAt.getTime(), // special case for created at to enable sorting
                 updatedAt: researchPlan.createdAt.getTime(), // special case for created at to enable sorting
+                milestones: researchPlan.milestones.filter(milestone => !milestone.private).length // public project count
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'research-plans', uploadResearchPlans);
         } else {
