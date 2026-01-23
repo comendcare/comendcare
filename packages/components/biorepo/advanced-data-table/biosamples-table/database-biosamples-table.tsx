@@ -66,8 +66,8 @@ export function DatabaseBiosamplesTable({
                 showPagination={showPagination}
                 noResults={
                     (data.length === 0 && Object.keys(searchParams).length === 0) 
-                    ? (<>{!!noResultsOverride && noResultsOverride}</>)
-                    : undefined
+                        ? (<>{!!noResultsOverride && noResultsOverride}</>)
+                        : undefined
                 }
                 onRowClickCallback={onRowClickCallback}
             >

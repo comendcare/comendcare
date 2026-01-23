@@ -66,6 +66,12 @@ export function DatabaseResearchPlansTable({
                 table={table}
                 showPagination={showPagination}
                 onRowClickCallback={onRowClickCallback}
+                noResults={
+                    // (data.length === 0 && Object.keys(searchParams).length === 0) 
+                    (data.length === 0) 
+                        ? (<>{!!noResultsOverride && noResultsOverride}</>)
+                        : undefined
+                }
             >
                 <></>
             </DataTable>

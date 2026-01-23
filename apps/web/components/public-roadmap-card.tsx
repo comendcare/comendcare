@@ -109,6 +109,14 @@ export const RoadmapsCard = ({
                                             }
                                         }
                                         showPagination={false}
+                                        noResultsOverride={(
+                                            <NoResultsTemplate
+                                                imgAlt="No research plans"
+                                                src="https://illustrations.popsy.co/gray/studying.svg"
+                                                title="No research plans yet!"
+                                                description="This organization does not have any public research plans yet."
+                                            />
+                                        )}
                                     />
                                 </Suspense>
                             </FeatureFlagsProvider>
