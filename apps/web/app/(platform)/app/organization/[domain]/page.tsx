@@ -277,6 +277,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                 statuses: true,
                 partners: true,
                 links: true,
+                milestones: {where: {private: false}}
             },
             undefined,
             true, // public only

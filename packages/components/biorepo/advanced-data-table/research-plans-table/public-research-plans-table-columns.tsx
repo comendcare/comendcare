@@ -1,16 +1,17 @@
 import type {ColumnDef} from "@tanstack/react-table";
 import * as React from "react";
 import {DataTableColumnHeader} from "./../data-table/data-table-column-header";
-import {DIAGNOSIS_SEVERITY_OPTIONS, QUANTITY_OPTIONS, RESEARCH_PLAN_STATUS, RESEARCH_PLAN_TYPES, RESEARCH_STAGE} from "./../../../../../packages/lib/types";
+import {DIAGNOSIS_SEVERITY_OPTIONS, Milestone, QUANTITY_OPTIONS, RESEARCH_PLAN_STATUS, RESEARCH_PLAN_TYPES, RESEARCH_STAGE} from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
 import { Badge } from "./../../../ui/badge";
-import { CircleDashed } from "lucide-react";
+import { CircleDashed, Globe } from "lucide-react";
 import { handleAsyncCompanyAndInstitutionSearch, handleAsyncConditionSearch, handleAsyncDiagnosesSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils";
 import { ExtendedColumnFilter, ExtendedColumnSort } from "@comend/lib/types/data-table";
 import { filterColumns } from "@comend/lib/filter-columns";
 import { generateId } from "@comend/lib/id";
+import { PropertyBadge } from "./../../../../../packages/components/property-badge";
 
 type Preset = "default" | "profile";
 
@@ -162,7 +163,7 @@ export function useResearchPlansTableColumns(
                     ))}
                 </ul>
             ),
-            enableSorting,
+            enableSorting: false,
             enableHiding,
         },
         {
@@ -191,7 +192,36 @@ export function useResearchPlansTableColumns(
                     ))}
                 </ul>
             ),
-            enableSorting,
+            enableSorting: false,
+            enableHiding,
+        },
+        {
+            id: "milestones",
+            accessorKey: "milestones",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Number of projects"
+                />
+            ),
+            cell: ({row}) => {
+                const numPublishedProjects = row.original.milestones.filter((milestone: Milestone) => !milestone.private).length
+
+                return (
+                    <div className="flex flex-col gap-2 justify-center text-nowrap">
+                        {numPublishedProjects > 0 && (
+                            <PropertyBadge 
+                                className="text-nowrap border-green-200 text-green-900 font-semibold" 
+                                icon={Globe}
+                            >
+                                {numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}
+                            </PropertyBadge>
+                        )}
+                    </div>
+                )
+            },
+            enableSorting: false,
             enableHiding,
         },
         {
@@ -223,6 +253,7 @@ export function useResearchPlansTableColumns(
             "statuses", 
             "partners", 
             "links", 
+            "milestones",
             "description"
         ],
     };

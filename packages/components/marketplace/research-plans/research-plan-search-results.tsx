@@ -21,7 +21,7 @@ export function ResearchPlanSearchResults({
 }) {
     const { searchResults } = useResearchPlanSearchStore(useShallow(selector))
     const columns = useResearchPlansTableColumns(
-        false,
+        true,
         false,
         false,
         'default'

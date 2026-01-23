@@ -129,6 +129,7 @@ export default async function OrganizationRoadmapPage({
             statuses: true,
             partners: true,
             links: true,
+            milestones: {where: {private: false}}
         },
         undefined,
         true,

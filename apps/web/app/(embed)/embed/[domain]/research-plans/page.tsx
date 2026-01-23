@@ -41,6 +41,7 @@ export default async function EmbeddedResearchPlansPage({params}: {params: {doma
             statuses: true,
             partners: true,
             links: true,
+            milestones: {where: {private: false}}
         },
         undefined,
         true, // public only

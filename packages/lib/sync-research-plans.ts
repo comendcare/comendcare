@@ -156,6 +156,7 @@ export const syncToTypesense = async (env: {
                     }
                 },
                 modalities: true,
+                // organization: true
             }
         })
 

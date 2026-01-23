@@ -28,6 +28,8 @@ import { generateId } from "@comend/lib/id";
 import { ExtendedColumnFilter } from "@comend/lib/types/data-table";
 import { Session } from "next-auth";
 import { ResearchPlanActionsMenu } from "comend-pag-platform/components/research-plans-actions-menu";
+import { PropertyBadge } from "./../../../../../packages/components/property-badge";
+import { Milestone } from "@prisma/client";
 
 export function useResearchPlansTableColumns({session}: {session: Session | null}): ColumnDef<any>[] {
     const columns: ColumnDef<any>[] = [
@@ -219,6 +221,42 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     ))}
                 </ul>
             ),
+        },
+        {
+            id: "milestones",
+            accessorKey: "milestones",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Number of projects"
+                />
+            ),
+            cell: ({row}) => {
+                const numPrivateProjects = row.original.milestones.filter((milestone: Milestone) => milestone.private).length
+                const numPublishedProjects = row.original.milestones.filter((milestone: Milestone) => !milestone.private).length
+
+                return (
+                    <div className="flex flex-col gap-2 justify-center text-nowrap">
+                        {numPrivateProjects > 0 && (
+                            <PropertyBadge 
+                                className="text-nowrap border-red-200 text-red-900 font-semibold" 
+                                icon={Lock}
+                            >
+                                {numPrivateProjects === 1 ? `${numPrivateProjects} private project` : `${numPrivateProjects} private projects`}
+                            </PropertyBadge>
+                        )}
+                        {numPublishedProjects > 0 && (
+                            <PropertyBadge 
+                                className="text-nowrap border-green-200 text-green-900 font-semibold" 
+                                icon={Globe}
+                            >
+                                {numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}
+                            </PropertyBadge>
+                        )}
+                    </div>
+                )
+            },
         },
         {
             id: "description",

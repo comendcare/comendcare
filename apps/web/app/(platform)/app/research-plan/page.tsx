@@ -2,8 +2,7 @@ import {getSession} from "@comend/lib/auth"
 import NoOrganization from "~web/components/no-organization";
 import RoadmapsPage from "~web/components/roadmaps-page";
 import prisma from "@comend/lib/prisma";
-import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/private-research-plans-table-columns"
-import { getResearchPlans, getRoadmap, getRoadmaps } from "@comend/lib/fetchers";
+import { getResearchPlans } from "@comend/lib/fetchers";
 import { SearchParams } from "@comend/components/types";
 import { researchPlanSearchParamsCache } from "@comend/lib/validations";
 import { getValidFilters } from "@comend/lib/data-table";
@@ -41,17 +40,7 @@ export default async function RoadmapPage(props: IndexPageProps) {
             description: true,
             published: true,
             organizationId: true,
-            // milestones: {
-            //     // where: {private: false},
-            //     include: {
-            //         types: {include: {milestoneType: true}},
-            //         biosamples: true,
-            //         diseaseModels: true,
-            //         tools: true,
-            //         rfps: true,
-            //     },
-            //     orderBy: [{createdAt: "desc"}]
-            // },
+            milestones: true,
             organization: true,
             modalities: true,
             stages: true,
