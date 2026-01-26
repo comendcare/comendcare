@@ -1,6 +1,6 @@
 "use client"
 import { Suspense, useEffect, useState } from "react";
-
+import dynamic from "next/dynamic"
 import type { Organization, Roadmap } from "@prisma/client";
 import { ResearchPlanTemplatesCard } from "./roadmap-templates";
 import Loading from "./../../../loading";
@@ -13,7 +13,6 @@ import { Dialog, DialogContent } from "@comend/components/ui/dialog";
 import ShareDialog from "./share-dialog";
 import { PulsatingButton } from "@comend/components/ui/pulsating-button";
 import { cn } from "@comend/lib/utils";
-import CreateResearchPlanDialog from "./create-research-plan-dialog";
 import { Shell } from "@comend/components/biorepo/advanced-data-table/lib/shell";
 import { FeatureFlagsProvider } from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
@@ -23,6 +22,16 @@ import { useSession } from "next-auth/react";
 import { Row } from "@tanstack/react-table";
 import { NoResultsTemplate } from "@comend/components/no-results";
 
+const CreateResearchPlanDialog = dynamic(
+    () => import("./create-research-plan-dialog"),
+    {
+        ssr: false,
+        loading: () => <Button variant="cta" disabled>
+            <Plus/>
+            Create an empty research plan
+        </Button>, // keep trigger UI unchanged
+    }
+)
 
 type Props = {
     orgId: string;
@@ -53,6 +62,17 @@ export default function RoadmapsPage({ orgId, organization, data, pageCount, sea
             selectedNodeIds: [],
         })
     }, [])
+
+    useEffect(() => {
+        if (!Array.isArray(data)) return
+
+        data
+            .map((r) => r?.id)
+            .filter((id): id is string => typeof id === "string" && id.length > 0)
+            .forEach((id) => {
+                router.prefetch(`/app/research-plan/${id}`)
+            })
+    }, [data, router])
 
     const handleShare = async () => {
         // override default delete behaviour with our custom dialog
