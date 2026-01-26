@@ -9,6 +9,7 @@ export async function cioSyncOrg(org: {
     subdomain: string | null;
     name?: string | null;
     description?: string | null;
+    attributes?: Record<string, any>;
 }) {
     if (!PAG_OBJECT_TYPE_ID) return { ok: false, error: "Missing CIO_PAG_OBJECT_TYPE_ID" };
     const objectId = (org.subdomain ?? "").trim();
@@ -21,6 +22,7 @@ export async function cioSyncOrg(org: {
             subdomain: objectId,
             name: org.name ?? null,
             description: org.description ?? null,
+            ...(org.attributes ?? {})
         },
     });
 }
