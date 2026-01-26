@@ -724,7 +724,7 @@ const RoadmapHeader = ({
     return (
         <>
         <div ref={parentRef} className="flex justify-between items-center">
-            <span className="flex flex-row items-center">
+            <span className="flex flex-row items-center justify-center">
                 <div className="w-full">
                     <h1 className="text-2xl font-semibold text-wrap line-clamp-2 pr-1">{researchPlanDetails.title || "Untitled Research Plan"}</h1>
                     {researchPlanDetails.description && (<p className="text-wrap line-clamp-2 text-muted-foreground text-sm">{researchPlanDetails.description}</p>)}
@@ -738,8 +738,8 @@ const RoadmapHeader = ({
                     <Pencil />
                 </Button>
                 <div className="p-[6px] h-[40px]">
-                    {RESEARCH_STAGE.filter(stage => researchPlanDetails.stages?.includes(stage.value)).map(stage => (
-                        <Badge variant={'secondary'} className="text-sm">{stage.label}</Badge>
+                    {RESEARCH_STAGE.filter(stage => researchPlanDetails.stages?.includes(stage.value || stage.label)).map(stage => (
+                        <Badge variant={'secondary'} className="text-sm text-nowrap">{stage.label}</Badge>
                     ))}
                 </div>
                 {milestones.filter(milestone => !milestone.private).length <= 0 
