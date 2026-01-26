@@ -990,6 +990,10 @@ export const updateRoadmap = withOrganizationAuth(
                 where: {
                     id: data.id
                 },
+                include: {
+                    partners: true,
+                    links: true,
+                },
                 data: {
                     private: data.private,
                     title: data.title,
