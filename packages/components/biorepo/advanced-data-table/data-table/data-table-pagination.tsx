@@ -144,13 +144,13 @@ export function TypesenseDataTablePagination<TData>({
         <div className="flex items-center space-x-2">
           <p className="whitespace-nowrap font-medium text-sm">Rows per page</p>
           <Select
-            value={resultsPerPage.toString()}
+            value={resultsPerPage?.toString()}
             onValueChange={(value) => {
               setResultsPerPage(Number(value))
             }}
           >
             <SelectTrigger className="h-8 w-[4.5rem] [&[data-size]]:h-8">
-              <SelectValue placeholder={resultsPerPage.toString()} />
+              <SelectValue placeholder={resultsPerPage?.toString()} />
             </SelectTrigger>
             <SelectContent side="top">
               {pageSizeOptions.map((pageSize) => (

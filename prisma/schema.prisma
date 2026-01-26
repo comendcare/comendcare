@@ -232,23 +232,28 @@ model VerificationToken {
 }
 
 model Roadmap {
-  id             String        @id @default(cuid())
+  id             String               @id @default(cuid())
+  private        Boolean              @default(true)
   title          String?
   description    String?
   content        String?
-  slug           String        @default(cuid())
+  slug           String               @default(cuid())
   image          String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  published      Boolean       @default(true)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  published      Boolean              @default(true)
   organizationId String?
   userId         String?
   edges          Edge[]
   milestones     Milestone[]
   nodes          Node[]
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  organization   Organization?        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
   modalities     String[]
+  partners       ExternalContact[]
+  stages         String[]
+  statuses       String[]
+  links          ExternalAttachment[]
   metadata       Json?
 
   @@unique([slug, organizationId])
@@ -670,38 +675,42 @@ model ExternalAttachment {
   link String
 
   toolId         String?
-  tool           Tool?         @relation(fields: [toolId], references: [id])
+  tool           Tool?         @relation(fields: [toolId], references: [id], onDelete: Cascade)
   biosampleId    String?
-  biosample      Biosample?    @relation(fields: [biosampleId], references: [id])
+  biosample      Biosample?    @relation(fields: [biosampleId], references: [id], onDelete: Cascade)
   rfpId          String?
-  rfp            RFP?          @relation(fields: [rfpId], references: [id])
+  rfp            RFP?          @relation(fields: [rfpId], references: [id], onDelete: Cascade)
   milestoneId    String?
-  milestone      Milestone?    @relation(fields: [milestoneId], references: [id])
+  milestone      Milestone?    @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
   metadata       Json?
-  diseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
+  diseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id], onDelete: Cascade)
   diseaseModelId String?
+  Roadmap        Roadmap?      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  roadmapId      String?
 }
 
 model ExternalContact {
   id          String  @id @unique @default(uuid())
-  name        String /// @encrypted
+  name        String? /// @encrypted
   nameHash    String? /// @encryption:hash(name)
   role        String?
-  email       String /// @encrypted
+  email       String? /// @encrypted
   emailHash   String? /// @encryption:hash(email)
   affiliation String?
 
   toolId         String?
-  tool           Tool?         @relation(fields: [toolId], references: [id])
+  tool           Tool?         @relation(fields: [toolId], references: [id], onDelete: Cascade)
   biosampleId    String?
-  biosample      Biosample?    @relation(fields: [biosampleId], references: [id])
+  biosample      Biosample?    @relation(fields: [biosampleId], references: [id], onDelete: Cascade)
   rfpId          String?
-  rfp            RFP?          @relation(fields: [rfpId], references: [id])
+  rfp            RFP?          @relation(fields: [rfpId], references: [id], onDelete: Cascade)
   milestoneId    String?
-  milestone      Milestone?    @relation(fields: [milestoneId], references: [id])
+  milestone      Milestone?    @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
   metadata       Json?
-  diseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id])
+  diseaseModel   DiseaseModel? @relation(fields: [diseaseModelId], references: [id], onDelete: Cascade)
   diseaseModelId String?
+  Roadmap        Roadmap?      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  roadmapId      String?
 }
 
 model Edge {

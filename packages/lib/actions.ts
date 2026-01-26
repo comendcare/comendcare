@@ -48,6 +48,7 @@ import {
     editDataToolForm,
     editDiseaseModelForm,
     editOrgFormSchema,
+    editResearchPlanForm,
     MemberRequestWithUserAndOrganization,
     Milestone,
     Option,
@@ -932,7 +933,7 @@ export const deleteOrganization = withOrganizationAuth(
 );
 
 export const updateRoadmap = withOrganizationAuth(
-    async (organizationId: string, data: Partial<Roadmap>) => {
+    async (organizationId: string, data: any) => {
         const session = await getSession()
         if (!session?.user.id) {
             return {
@@ -960,47 +961,72 @@ export const updateRoadmap = withOrganizationAuth(
                     orderBy: [{createdAt: "desc"}]
                 },
                 edges: true,
-                organization: true
+                organization: true,
+                links: true,
+                partners: true,
             }
         })
 
         if (!roadmap) return {error: "Roadmap not found"}
 
-        // Utility to compare (handles objects/arrays by JSON stringifying)
-        const isEqual = (a: unknown, b: unknown) => {
-            const ja = typeof a === "object" ? JSON.stringify(a) : a;
-            const jb = typeof b === "object" ? JSON.stringify(b) : b;
-            return ja === jb;
-        };
+        const diffIds = (incoming: string[], existingIds: string[]) => ({
+            toAdd: (incoming || []).filter(id => !existingIds.includes(id)),
+            toUpdate: (incoming || []).filter(id => existingIds.includes(id)),
+            toRemove: (existingIds || []).filter(id => !incoming.includes(id)),
+        })
 
-        // Only consider fields you allow to be updated here
-        const updatableKeys = ["title", "description", "content", "modalities", "metadata"] as const;
+        const linksDiff = diffIds(
+            (data.links || []).map((a: any) => a.id),
+            roadmap?.links.map(a => a.id)
+        )
 
-        // Compute change set (based on incoming "data" vs current "roadmap")
-        const changedFields: string[] = [];
-        const changes: Record<string, { before: unknown; after: unknown }> = {};
-
-        for (const key of updatableKeys) {
-            if (typeof data[key] !== "undefined") {
-                const beforeVal = (roadmap as any)[key];
-                const afterVal = (data as any)[key];
-                if (!isEqual(beforeVal, afterVal)) {
-                    changedFields.push(key);
-                    changes[key] = {before: beforeVal, after: afterVal};
-                }
-            }
-        }
+        const partnersDiff = diffIds(
+            (data.partners || []).map((c: any) => c.id),
+            roadmap?.partners.map(c => c.id)
+        )
 
         try {
             const response = await prisma.roadmap.update({
                 where: {
                     id: data.id
                 },
+                include: {
+                    partners: true,
+                    links: true,
+                },
                 data: {
+                    private: data.private,
                     title: data.title,
                     description: data.description,
                     content: data.content,
                     modalities: data.modalities,
+                    stages: data.stages,
+                    statuses: data.statuses,
+                    links: {
+                        deleteMany: linksDiff.toRemove.length ? { id: { in: linksDiff.toRemove } } : undefined,
+                        update: (data.links || [])
+                            .filter((a: any) => linksDiff.toUpdate.includes(a.id))
+                            .map((a: any) => ({
+                                where: {id: a.id},
+                                data: { link: a.link, name: a.name ?? undefined }
+                            })),
+                        create: (data.links || [])
+                            .filter((a: any) => linksDiff.toAdd.includes(a.id))
+                            .map((a: any) => ({ link: a.link, name: a.name ?? undefined })),
+                    },
+                    partners: {
+                        deleteMany: partnersDiff.toRemove.length ? { id: { in: partnersDiff.toRemove } } : undefined,
+                        update: (data.partners || [])
+                            .filter((c: any) => partnersDiff.toUpdate.includes(c.id))
+                            .map((c: any) => ({
+                                where: {id: c.id},
+                                data: { name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined }
+                            })),
+                        create: (data.partners || [])
+                            .filter((c: any) => partnersDiff.toAdd.includes(c.id))
+                            .map((c: any) => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
+                    },
+                    
                     ...(data.metadata ? {metadata: data.metadata} : undefined)
                 }
             })
@@ -1014,32 +1040,12 @@ export const updateRoadmap = withOrganizationAuth(
 
             // if the organization has a custom domain, we need to revalidate those tags too
             roadmap.organization?.customDomain &&
-            (await revalidateTag(
-                `${roadmap.organization?.customDomain}-roadmaps`
-            ),
+                (await revalidateTag(
+                    `${roadmap.organization?.customDomain}-roadmaps`
+                ),
                 await revalidateTag(
                     `${roadmap.organization?.customDomain}-${roadmap.slug}`
                 ))
-
-            // await writeRawEvent({
-            //     provider: "app",
-            //     eventType: "org_research_plan_updated",
-            //     externalId: roadmap.id, // back-reference for idempotency
-            //     occurredAt: new Date(),
-            //     payload: {
-            //         orgId: roadmap.organization?.id ?? organizationId,
-            //         orgName: roadmap.organization?.name ?? undefined,
-            //         roadmapId: roadmap.id,
-            //         title: response.title ?? roadmap.title,
-            //         published: response.published, // boolean
-            //         // actor
-            //         userId: session.user.id,
-            //         userName: session.user.name,
-            //         // change details
-            //         changedFields: changedFields.length ? changedFields : undefined,
-            //         changes: Object.keys(changes).length ? changes : undefined,
-            //     },
-            // });
 
             return response
         } catch (error: any) {
@@ -4123,10 +4129,21 @@ export const createRoadmap = withOrganizationAuth(
 
             const roadmap = await prisma.roadmap.create({
                 data: {
+                    private: roadmapTemplate?.private,
                     title: roadmapTemplate?.title,
                     description: roadmapTemplate?.description,
                     organization: {connect: {id: organization.id}},
                     modalities: roadmapTemplate?.modalities,
+                    links: {
+                        create: (roadmapTemplate?.links || [])
+                            .map((a: any) => ({ link: a.link, name: a.name ?? undefined })),
+                    },
+                    partners: {
+                        create: (roadmapTemplate?.partners || [])
+                            .map((c: any) => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
+                    },
+                    stages: roadmapTemplate?.stages || [],
+                    statuses: roadmapTemplate?.statuses || [],
                     ...(roadmapTemplate?.metadata ? {metadata: roadmapTemplate.metadata} : undefined),
                     // published defaults to true per your model; omit to use default
                 },
@@ -5090,11 +5107,23 @@ export const syncDBRFPs = withOrganizationAuth(
 export const updateMilestonesVisibility = withOrganizationAuth(
     async (_: Organization, {milestones, isPrivate}: {milestones: Milestone[], isPrivate: boolean}) => {
         try {
+            const roadmapId = milestones[0].roadmapId
             const updatedMilestones = await prisma.milestone.updateMany({
-                where: {id: {in: milestones.map(m => m.id)}},
-                data: {
-                    private: isPrivate
-                }
+                where: { id: { in: milestones.map(m => m.id) } },
+                data: { private: isPrivate },
+            })
+
+            const allMilestones = await prisma.milestone.findMany({
+                where: { roadmapId },
+            })
+            let roadmapPublishStatus = false
+            allMilestones.forEach(milestone => {
+                roadmapPublishStatus = roadmapPublishStatus || !milestone.private
+            })
+
+            const updatedResearchPlan = await prisma.roadmap.update({
+                where: {id: roadmapId},
+                data: {private: !roadmapPublishStatus}
             })
 
             return {success: true, data: updatedMilestones};
@@ -5333,6 +5362,19 @@ export const updateMilestones = withOrganizationAuth(
                     },
                 });
             }
+
+            const allMilestones = await prisma.milestone.findMany({
+                where: {roadmapId: updatedMilestones[0].roadmapId}
+            })
+            let roadmapPublishStatus = false
+            allMilestones.forEach(milestone => {
+                roadmapPublishStatus = roadmapPublishStatus || !milestone.private
+            })
+
+            const updatedResearchPlan = await prisma.roadmap.update({
+                where: {id: updatedMilestones[0].roadmapId},
+                data: {private: !roadmapPublishStatus}
+            })
 
             return {success: true, data: updatedMilestones};
         } catch (error: any) {
