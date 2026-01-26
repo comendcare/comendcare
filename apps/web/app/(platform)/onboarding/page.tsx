@@ -43,7 +43,7 @@ import {
 } from "@comend/lib/fetchers";
 import {handleImageUpload} from "@comend/lib/upload";
 import {FormImageSelector} from "@comend/components/form-image-selector";
-import {TID} from "./../../../../../utils/test-utils/test-ids";
+import {TID} from "../../../../../utils/test-utils/test-ids";
 
 const safeMixpanel = {
     identify: (...args: any[]) => {

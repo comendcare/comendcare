@@ -49,14 +49,14 @@ export default function Loading() {
                     <Card className="col-span-3">
                         <CardHeader>
                             <Skeleton className="h-5 w-32"/>
-                        </CardHeader>
-                        <CardContent className="pl-2 space-y-4">
-                            <Skeleton className="h-64 w-full"/>
                             <div className="grid grid-cols-3 gap-3">
                                 <Skeleton className="h-4 w-full"/>
                                 <Skeleton className="h-4 w-full"/>
                                 <Skeleton className="h-4 w-full"/>
                             </div>
+                        </CardHeader>
+                        <CardContent className="pl-2 space-y-4">
+                            <Skeleton className="h-56 w-full"/>
                         </CardContent>
                     </Card>
 

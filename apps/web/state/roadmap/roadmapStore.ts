@@ -13,7 +13,6 @@ import {
     createNodesAndEdgesFromTemplate,
     deleteNode,
     moveNodes,
-    updateDBFlow,
     updateEdges,
     updateMilestones,
     updateMilestonesVisibility,
@@ -21,10 +20,10 @@ import {
 } from "@comend/lib/actions"
 import {toast} from "sonner"
 import {nanoid} from "nanoid"
-import {Milestone, Roadmap} from "@comend/lib/types"
+import {editResearchPlanForm, Milestone, Roadmap} from "@comend/lib/types"
 import {getMilestoneTypes} from "@comend/lib/fetchers"
 import {mixpanelTrack} from "@comend/lib/mixpanel";
-import { sleep } from "@comend/lib/utils"
+import z from "zod"
 
 export type RoadmapState = {
     initialized: boolean,
@@ -39,7 +38,7 @@ export type RoadmapState = {
         roadmapId: string
     ) => void,
     details: Roadmap | undefined,
-    setDetails: (details: Partial<Roadmap>) => Promise<void>
+    setDetails: (id: string, orgId: string, data: z.infer<typeof editResearchPlanForm>) => Promise<void>
     onboardingActive: boolean,
     setOnboardingActive: (active: boolean) => void,
     roadmapId: string | null
@@ -89,32 +88,34 @@ export const useRoadmapStore = create<RoadmapState>()(
                 })
             },
             details: undefined,
-            setDetails: async (details: Partial<Roadmap> | undefined) => {
-                const id = get().roadmapId
+            setDetails: async (id: string, orgId: string, data: z.infer<typeof editResearchPlanForm>) => {
                 if (!id) {
                     console.error(`Error: no active research plan!`)
                     return
                 }
 
-                if (!details) {
+                if (!data) {
                     console.error(`Error: research plan details are not intialized.`)
                     return
                 }
 
                 // fetch the updated org id OR (if it hasn't been updated) fetch the org id from the current roadmap
                 // used for authorization - check if the user has access to edit this roadmap
-                const orgId = details?.organizationId || get().details?.organizationId
-                if (!orgId) {
-                    console.error(`Error: this research plan is not associated with an organization!`)
-                    return
-                }
-
+                // const orgId = get().details?.organizationId
+                // if (!orgId) {
+                //     console.error(`Error: this research plan is not associated with an organization!`)
+                //     return
+                // }
                 const roadmap = await updateRoadmap(orgId, {
                     id,
-                    title: details.title,
-                    description: details.description || null,
-                    modalities: details.modalities || [],
-                    metadata: details.metadata || null
+                    title: data.title,
+                    description: data.description || null,
+                    modalities: data.modalities?.map(modality => modality.value) || [],
+                    metadata: data.metadata || null,
+                    partners: data?.partners || undefined,
+                    stages: data?.stages?.map(stage => stage.value) || [],
+                    statuses: data?.statuses?.map(status => status.value) || [],
+                    links: data?.links || undefined,
                 })
                 
                 console.log(`roadmap data`, roadmap)
@@ -122,7 +123,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 if (roadmap) set({ details: roadmap as Roadmap })
 
                 // optimistic local
-                set({details: {...(get().details || {}), ...details} as any});
+                // set({details: {...(get().details || {}), ...data} as any});
                 // durable op
                 // const {enqueue} = useWriteQueue.getState();
                 // enqueue({

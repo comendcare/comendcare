@@ -13,12 +13,28 @@ import {BIOSAMPLE_TYPE_OPTIONS} from "@comend/lib/types"
 import {debounce} from "lodash";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
-import type { Option } from "@comend/lib/types"
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
 import { handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils"
 import {unstable_batchedUpdates} from "react-dom";
+import dynamic from "next/dynamic"
+
+const BiosampleFiltersDialog = dynamic(
+    () =>
+        import("./biosample-filters-dialog").then(
+            (m) => m.BiosampleFiltersDialog
+        ),
+    {
+        ssr: false,
+        loading: () => (
+            <Button disabled className="m-4 rounded-full" variant={'cta'}>
+                <Funnel/>
+                Filters
+            </Button>
+        ),
+    }
+)
 
 export function BiosampleMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, setSearchTerm, filters, setFilters, totalResults} = useBiosampleSearchStore(
@@ -65,7 +81,6 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
             setSearchTerm: state.setSearchTerm
         }))
     )
-    const dialogRef = useRef<HTMLDivElement>(null)
 
     const [query, setQuery] = useState(searchTerm)
 
@@ -212,99 +227,7 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                 <Separator orientation="vertical" className="h-8" />
 
                 {/* Mobile and additional filters */}
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button className="m-4 rounded-full" variant={'cta'}>
-                            <Funnel />
-                            Filters
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent
-                        ref={dialogRef}
-                        onOpenAutoFocus={(e) => {
-                            e.preventDefault() // prevent focusing the first input
-                            dialogRef.current?.focus() // focus the dialog content instead
-                        }}
-                    >
-                        <DialogTitle>Biosample filters</DialogTitle>
-                        {/* Conditions */}
-                        <div>
-                            <Label>Condition</Label>
-                            <MultipleSelector
-                                value={filters.conditions ?? []}
-                                onChange={(vals) => setFilterKey("conditions", vals)}
-                                onSearch={handleAsyncConditionSearch}
-                                placeholder="Select conditions..."
-                                hidePlaceholderWhenSelected
-                                commandProps={{className: "bg-transparent"}}
-                                loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading conditions...</p>}
-                                emptyIndicator={
-                                    <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                }
-                                triggerSearchOnFocus={true}
-                                showHoverCard={false}
-                            />
-                        </div>
-
-                        {/* Genes */}
-                        <div>
-                            <Label>Gene</Label>
-                            <MultipleSelector
-                                value={filters.genes ?? []}
-                                badgeClassName={badgeVariants({variant: "teal"})}
-                                onChange={(vals) => setFilterKey("genes", vals)}
-                                onSearch={handleAsyncGeneSearch}
-                                placeholder="Select genes..."
-                                hidePlaceholderWhenSelected
-                                commandProps={{className: "bg-transparent"}}
-                                loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading genes...</p>}
-                                emptyIndicator={
-                                    <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                }
-                                triggerSearchOnFocus={true}
-                                showHoverCard={false}
-                            />
-                        </div>
-                        
-                        {/* Biosample Types */}
-                        <div>
-                            <Label>Biosample types</Label>
-                            <MultipleSelector
-                                value={filters.types ?? []}
-                                badgeClassName={badgeVariants({variant: "lightBlue"})}
-                                onChange={(vals) => setFilterKey("types", vals)}
-                                defaultOptions={BIOSAMPLE_TYPE_OPTIONS}
-                                placeholder="Select types..."
-                                hidePlaceholderWhenSelected
-                                commandProps={{className: "bg-transparent"}}
-                                emptyIndicator={
-                                    <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                }
-                                triggerSearchOnFocus={true}
-                                showHoverCard={false}
-                            />
-                        </div>
-
-                        {/* Patient Group */}
-                        <div>
-                            <Label>Organization</Label>
-                            <MultipleSelector
-                                value={filters.organizations ?? []}
-                                onChange={(vals) => setFilterKey("organizations", vals)}
-                                onSearch={handleAsyncOrganizationSearch}
-                                placeholder="Select organizations..."
-                                hidePlaceholderWhenSelected
-                                commandProps={{className: "bg-transparent"}}
-                                loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading organizations...</p>}
-                                emptyIndicator={
-                                    <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                }
-                                triggerSearchOnFocus={true}
-                                showHoverCard={false}
-                            />
-                        </div>
-                    </DialogContent>
-                </Dialog>
+                <BiosampleFiltersDialog/>
             </div>
 
             {/* Active filter badges */}
