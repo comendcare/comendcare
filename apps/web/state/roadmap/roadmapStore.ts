@@ -123,7 +123,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 if (roadmap) set({ details: roadmap as Roadmap })
 
                 // optimistic local
-                set({details: {...(get().details || {}), ...data} as any});
+                // set({details: {...(get().details || {}), ...data} as any});
                 // durable op
                 // const {enqueue} = useWriteQueue.getState();
                 // enqueue({
