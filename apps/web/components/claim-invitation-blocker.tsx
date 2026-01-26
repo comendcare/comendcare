@@ -53,7 +53,8 @@ export default function ClaimInvitationBlocker({
 
                 // if this is the first user to claim, forward them to the claim forms (onboarding edit)
                 // otherwise the default add membership & delete invitation suffices
-                if (firstToClaim) router.push(`/onboarding/organization?id=${res?.data?.organizationId}`)
+                // if (firstToClaim) router.push(`/onboarding/organization?id=${res?.data?.organizationId}`)
+                if (firstToClaim) router.push(`/claim/${res?.data?.organizationId}`)
             } else {
                 toast.error(res?.error ?? "Failed to accept invitation.");
             }

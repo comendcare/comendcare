@@ -74,7 +74,7 @@ export const createClaimInvitation = withAdminAuth(
 
         try {
             if (!session) {
-                throw new Error("You must be signed in to perform this action")
+                return {success: false, error: "You must be signed in to perform this action"}
             }
 
             const lowerCaseEmail = email.toLowerCase()
@@ -97,7 +97,7 @@ export const createClaimInvitation = withAdminAuth(
             }
 
             // Check if an invitation has already been sent to this email for the same organization
-            const existingInvitation = await prisma.invitation.findFirst({
+            const existingInvitation = await prisma.claimOrganizationInvitation.findFirst({
                 where: {
                     email: lowerCaseEmail,
                     organizationId: organization.id
@@ -105,7 +105,7 @@ export const createClaimInvitation = withAdminAuth(
             });
 
             if (existingInvitation) {
-                return {success: false, error: "An invitation has already been sent to this email."}
+                return {success: false, error: "A claim invitation has already been sent to this email."}
             }
 
             // 1. Create claim invitiation ----------------------------------------------------------------------
@@ -169,11 +169,12 @@ export const createClaimInvitation = withAdminAuth(
 
             if (!claimInvitation) {
                 console.error("Error inviting user to claim.")
-                return {success: false, error: "Database error. please try again later."}
+                return {success: false, error: "Error inviting user to claim."}
             }
 
             revalidatePath("/app/team")
             revalidatePath("/app/profile")
+            revalidatePath(`/admin/organization/${organization.id}/members`)
 
             return {success: true, data: claimInvitation}
 

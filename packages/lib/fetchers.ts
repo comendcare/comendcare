@@ -952,10 +952,18 @@ export async function getPublicMilestoneDetails(
 
 export async function checkSubdomainAvailability(
     nickname: string,
+    orgId?: string,
 ): Promise<Boolean | { error: string }> {
     try {
         const existingOrg = await prisma.organization.findUnique({
-            where: {subdomain: nickname},
+            where: {
+                subdomain: nickname,
+                ...(orgId && {
+                    NOT: {
+                        id: orgId,
+                    },
+                }),
+            },
         });
 
         return !existingOrg

@@ -78,7 +78,7 @@ export default function EditPAGProfileConditionCardDialog({
         if (!condition || !conditionTags) return;
 
         const defaultValues: z.infer<typeof researchFormSchema> = {
-            disorder: condition.name ? [{label: condition.name, value: condition.name}] : [],
+            disorder: condition?.name ? [{label: condition.name, value: condition.name}] : [],
             associatedConditions: (condition.associatedConditions ?? []).map((name) => ({
                 label: name,
                 value: name,

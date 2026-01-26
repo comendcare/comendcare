@@ -503,6 +503,7 @@ export const createOrganization = withAuth(
             await revalidateTag(
                 `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
             )
+            revalidatePath("/admin/organizations")
 
             await runInProduction(() =>
                 sendNewOrganizationEmail(
@@ -1843,7 +1844,7 @@ export const updateMemberWithOwnerPermission = withOrganizationAuth(
 
             // Prevent demoting the last owner to member
             if (
-                targetMember.role === "owner" || targetMember.role === "support" &&
+                (targetMember.role === "owner" || targetMember.role === "support") &&
                 data.role === "member"
             ) {
                 const ownerCount = await prisma.member.count({
