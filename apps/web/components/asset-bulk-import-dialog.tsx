@@ -72,10 +72,72 @@ export async function formatClinicalDatasetData(clinicalDataset: any): Promise<{
         return [option.databaseKey, val]
     })))
 
+    const contactsLength = Math.max((data.contactNames || []).length, (data.contactEmails || []).length)
+    const contacts = []
+    for (let i = 0; i < contactsLength; i++) {
+        if (data.contactNames[i] && data.contactEmails[i]) {
+            contacts.push({
+                name: data.contactNames[i] || "", 
+                email: data.contactEmails[i] || "", 
+                role: null
+            })
+        } else if (data.contactNames[i]) {
+            contacts.push({
+                name: data.contactNames[i] || "", 
+                email: "", 
+                role: null
+            })
+        } else if (data.contactEmails[i]) {
+            contacts.push({
+                name: "", 
+                email: data.contactEmails[i] || "", 
+                role: null
+            })
+        }
+    }
+
+    data.contacts = contacts
+
+    const linksLength = Math.max((data.linkNames || []).length, (data.linkURLs || []).length)
+    const links = []
+    for (let i = 0; i < linksLength; i++) {
+        if (data.linkNames [i] && data.linkURLs[i]) {
+            links.push({
+                name: data.linkNames [i],
+                link: data.linkURLs[i]
+            })
+        } else if (data.linkNames [i]) {
+            links.push({
+                name: data.linkNames [i],
+                link: ""
+            })
+        } else if (data.linkURLs[i]) {
+            links.push({
+                name: "",
+                link: data.linkURLs[i]
+            })
+        }
+    }
+
+    data.attachments = links
+
     return {data: data as z.infer<typeof editDataToolForm>, errors}
 }
 
 const clinicalDatasetImportSchema: ImportSchemaEntry[] = [
+    {
+        spreadsheetKey: 'Visibility', 
+        databaseKey: 'isPrivate',
+        required: false, 
+        defaultValue: true, 
+        isValid: (entry) => typeof entry === 'string',
+        fetchDatabaseValue: async (entry) => {
+            if (entry?.trim() == 'Published') return false
+            if (entry?.trim() == 'Private') return true
+
+            return true
+        }
+    },
     {
         spreadsheetKey: 'Title',
         databaseKey: 'title',
@@ -84,7 +146,91 @@ const clinicalDatasetImportSchema: ImportSchemaEntry[] = [
         isValid: (entry) => typeof entry === 'string',
     },
     {
-        spreadsheetKey: 'Description',
+        spreadsheetKey: 'Type',
+        databaseKey: 'types',
+        required: true,
+        defaultValue: [],
+        isValid: (entry) => !!TOOL_TYPE_OPTIONS.find(option => option.label === entry?.trim()),
+        fetchDatabaseValue: async (entry) => {
+            const foundOption = TOOL_TYPE_OPTIONS.find(option => option.label === entry?.trim())
+            if (foundOption) return [foundOption]
+            return []
+        }
+    },
+    {
+        spreadsheetKey: 'Gene',
+        databaseKey: 'genes',
+        required: false,
+        defaultValue: undefined,
+        isValid: (entry) => typeof entry === 'string',
+        fetchDatabaseValue: async (entry) => {
+            if (!entry) return []
+
+            const res = await fetch(`/api/genes?search=${encodeURIComponent(entry?.trim() || "")}`);
+            const foundGenes = await res.json();
+
+            if (foundGenes && foundGenes.length > 0) {
+                return [{
+                    label: entry?.trim(), 
+                    value: entry?.trim()
+                }]
+            }
+
+            return []
+        }
+    },
+    {
+        spreadsheetKey: 'Storage Facility',
+        databaseKey: 'storageFacility',
+        required: false,
+        defaultValue: undefined,
+        isValid: (entry) => typeof entry === 'string',
+        fetchDatabaseValue: async (entry) => {
+            if (!entry) return []
+
+            const companiesResponse = await fetch(`/api/companies?search=${encodeURIComponent(entry?.trim() || '')}`)
+            const foundCompanies = await companiesResponse.json()
+
+            const institutionsResponse = await fetch(`/api/institutions?search=${encodeURIComponent(entry?.trim() || '')}`)
+            const foundInstitutions = await institutionsResponse.json()
+
+            return foundCompanies.concat(foundInstitutions)
+        },
+    },
+    {
+        spreadsheetKey: 'Point of Contact Name',
+        databaseKey: 'contactNames', // hack to get contacts working, on the milestone this is 'contacts'
+        required: false,
+        defaultValue: undefined,
+        isValid: (entry) => typeof entry === 'string',
+        fetchDatabaseValue: async (entry) => entry.split(","),
+    },
+    {
+        spreadsheetKey: 'Point of Contact Email',
+        databaseKey: 'contactEmails', // hack to get contacts working, on the milestone this is 'contacts'
+        required: false,
+        defaultValue: undefined,
+        isValid: (entry) => typeof entry === 'string',
+        fetchDatabaseValue: async (entry) => entry.split(","),
+    },
+    {
+        spreadsheetKey: 'Link Name',
+        databaseKey: 'linkNames', // hack to get links working, on the milestone this is 'attachments'
+        required: false,
+        defaultValue: undefined,
+        isValid: (entry) => typeof entry === 'string',
+        fetchDatabaseValue: async (entry) => entry.split(","),
+    },
+    {
+        spreadsheetKey: 'Link URL',
+        databaseKey: 'linkURLs', // hack to get links working, on the milestone this is 'attachments'
+        required: false,
+        defaultValue: undefined,
+        isValid: (entry) => typeof entry === 'string',
+        fetchDatabaseValue: async (entry) => entry.split(","),
+    },
+    {
+        spreadsheetKey: 'Notes',
         databaseKey: 'description',
         required: false,
         defaultValue: undefined,
