@@ -19,7 +19,6 @@ import {cn} from "@comend/lib/utils";
 import {ASSOCIATED_CATEGORIES} from "@comend/lib/types";
 import {createRoadmap} from "@comend/lib/actions";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@comend/components/ui/tooltip";
-import CreateResearchPlanDialog from "./../components/create-research-plan-dialog"
 import {useSession} from "next-auth/react";
 
 const selector = (state: RoadmapState) => ({

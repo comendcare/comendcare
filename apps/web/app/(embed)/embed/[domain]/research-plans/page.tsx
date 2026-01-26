@@ -1,78 +1,52 @@
 import { PAGRoadmapHeader } from "~web/components/pag-roadmap-header";
 import { RoadmapsCard } from "~web/components/public-roadmap-card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@comend/components/ui/breadcrumb";
-import { getOrganizationData, getPublicRoadmapsForOrganization } from "@comend/lib/fetchers";
+import { getOrganizationData, getResearchPlans } from "@comend/lib/fetchers";
 import { notFound } from "next/navigation";
 
 export default async function EmbeddedResearchPlansPage({params}: {params: {domain: string}}) {
-    const [organization, roadmaps] = await Promise.all([
-        getOrganizationData(params.domain, {
-            id: true,
-            public: true,
-            verified: true,
-            published: true,
-            name: true,
-            description: true,
-            contactEmail: true,
-            logo: true,
-            image: true,
-            headerImage: true,
-            biopharmaConsentSettings: true,
-            subdomain: true,
-            customDomain: true,
-            statedGoal: true,
-            yearFounded: true,
-            incorporationStatus: true,
-            therapeuticsOfInterest: true,
-            therapeuticsInDevelopment: true,
-            website: true,
-            moneyRaised: true,
-            moneyDeployed: true,
-            researchBudget: true,
-            // address1                  String?
-            // address2                  String?
-            // formattedAddress          String?
-            // city                      String?
-            // region                    String?
-            // postalCode                String?
-            // country                   String?
-            // lat                       String?
-            // lng                       String?
-            createdAt: true,
-            updatedAt: true,
-            user: true,
-            userId: true,
-            roadmaps: true,
-            members: true,
-            clients: true,
-            invitations: true,
-            membershipRequests: true,
-            conditions: true,
-            kanban: true,
-            milestones: true,
-            platformNotifications: true,
-            reviews: true,
-            savedCompanies: true,
-            tools: true,
-            rfps: true,
-            metadata: true
-        }),
-        getPublicRoadmapsForOrganization(params.domain, {
-                id: true,
-                title: true,
-                description: true,
-                slug: true,
-                edges: true,
-                milestones: true,
-                nodes: true,
-                modalities: true
-            }),
-    ])
+    const organization = await getOrganizationData(params.domain, {
+        id: true,
+        public: true,
+        verified: true,
+        published: true,
+        name: true,
+        description: true,
+        contactEmail: true,
+        logo: true,
+        image: true,
+        headerImage: true,
+        subdomain: true,
+        customDomain: true,
+        yearFounded: true,
+        website: true,
+        moneyRaised: true,
+        moneyDeployed: true,
+        researchBudget: true,
+    })
 
-    if (!organization) {
-        notFound()
-    }
-    
+    if (!organization) notFound()
+
+    const {data: researchPlans, pageCount: researchPlansPageCount} = await getResearchPlans(
+        organization.id,
+        {
+            id: true,
+            title: true,
+            description: true,
+            published: true,
+            organizationId: true,
+            organization: true,
+            modalities: true,
+            stages: true,
+            statuses: true,
+            partners: true,
+            links: true,
+            milestones: {where: {private: false}}
+        },
+        undefined,
+        true, // public only
+    )
+
     return (
         <div
             className="flex flex-col items-start justify-center my-24 gap-8 max-w-7xl m-auto w-full text-left p-2"
@@ -93,7 +67,11 @@ export default async function EmbeddedResearchPlansPage({params}: {params: {doma
                 </BreadcrumbList>
             </Breadcrumb>
             <PAGRoadmapHeader organization={organization} editable={false} embedded={true}/>
-            <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
+            <RoadmapsCard 
+                researchPlans={researchPlans}
+                researchPlansPageCount={researchPlansPageCount}
+                organization={organization}
+            />
         </div>
     )
 }

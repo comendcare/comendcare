@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import { useState } from "react"
 import Image from "next/image"
 import logo from "@/public/Full logo.png"
@@ -8,7 +8,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { FormProvider, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import {
     Form,
     FormControl,
@@ -22,14 +22,15 @@ import { Input } from "@comend/components/ui/input"
 import { Textarea } from "@comend/components/ui/textarea"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 import { createRoadmap, deleteRoadmap } from "@comend/lib/actions"
-import type {Roadmap} from "@prisma/client"
+import type {Prisma} from "@prisma/client"
 import { JsonObject } from "@prisma/client/runtime/library"
 import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import {
-    MODALITIES,
-    optionSchema,
+    editResearchPlanForm,
+    RESEARCH_PLAN_STATUS,
     RESEARCH_PLAN_TYPES,
+    RESEARCH_STAGE,
 } from "@comend/lib/types"
 import {
     AlertDialog,
@@ -43,19 +44,12 @@ import {
     AlertDialogTrigger,
 } from "@comend/components/ui/alert-dialog"
 import { revalidate } from "@comend/lib/revalidate"
-
-const editResearchPlanForm = z.object({
-    title: z
-        .string({ required_error: "Please provide a title" })
-        .min(1, "Title is required")
-        .max(200, "Title must be less than 200 characters"),
-    description: z
-        .string()
-        .max(1000, "Description must be less than 1000 characters")
-        .optional(),
-    modalities: z.array(optionSchema).max(1, "You can only select one type").optional(),
-    otherModalities: z.string().optional(),
-})
+import { Building2, Plus, Trash, User } from "lucide-react"
+import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area"
+import { DialogFooter } from "@comend/components/ui/dialog"
+import { PrivatePublicFormField } from "./edit-milestone-form"
+import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
+import LoadingDots from "@comend/components/icons/loading-dots"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -64,18 +58,23 @@ const selector = (state: RoadmapState) => ({
 })
 
 export function EditResearchPlanForm({
-                                         researchPlanData,
-                                         closeDialog,
-                                         setIsSubmitting,
-                                     }: {
-    researchPlanData?: Partial<Roadmap>
-    closeDialog?: () => void
-    setIsSubmitting?: (submitting: boolean) => void
+    researchPlanData,
+    closeDialog,
+    isClosing,
+    setIsClosing,
+}: {
+    researchPlanData?: any
+    closeDialog: (formValues?: any) => void, // if form values are provided, unsaved changes popup is shown
+    isClosing: boolean,
+    setIsClosing: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const router = useRouter()
     const { data: session } = useSession()
-    const { roadmapId, details, setDetails } = useRoadmapStore(useShallow(selector))
+    const { setDetails } = useRoadmapStore(useShallow(selector))
     const [isLoading, setIsLoading] = useState(false)
+    const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [isSaving, setIsSaving] = useState(false)
 
     const form = useForm<z.infer<typeof editResearchPlanForm>>({
         mode: "onChange",
@@ -83,6 +82,10 @@ export function EditResearchPlanForm({
         defaultValues: {
             title: researchPlanData?.title || undefined,
             description: researchPlanData?.description || undefined,
+            partners: researchPlanData?.partners || undefined,
+            stages: RESEARCH_STAGE.filter((stage) => (researchPlanData?.stages ||[]).includes(stage.value)),
+            statuses: RESEARCH_PLAN_STATUS.filter((status) => (researchPlanData?.statuses ||[]).includes(status.value)),
+            links: researchPlanData?.links || undefined,
             modalities: RESEARCH_PLAN_TYPES.filter((modality) =>
                 (researchPlanData?.modalities || []).includes(modality.value)
             ),
@@ -93,9 +96,21 @@ export function EditResearchPlanForm({
         },
     })
 
+    // scroll errors into view when form errors are updated
+    useEffect(() => {
+        if (Object.keys(form.formState.errors).length > 0) {
+            // Get first field with error
+            const firstErrorField = Object.keys(form.formState.errors)[0];
+            const fieldEl = document.querySelector(`[id="${firstErrorField}"]`);
+            if (fieldEl && scrollRef.current) {
+                // scroll the container, not the window
+                fieldEl.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        }
+    }, [form.formState.errors]);
+
     const handleFormSubmit = async (values: z.infer<typeof editResearchPlanForm>) => {
-        setIsLoading(true)
-        if (setIsSubmitting) setIsSubmitting(true)
+        if (setIsSaving) setIsSaving(true)
         if (!session?.user?.organizationId) {
             console.error(`No session data: no organization ID`)
             return
@@ -103,25 +118,18 @@ export function EditResearchPlanForm({
 
         if (researchPlanData?.id) {
             // Update existing
-            await setDetails({
-                title: values.title,
-                description: values.description || null,
-                modalities: (values.modalities || []).map((m) => m.value),
-                metadata: {
-                    ...(researchPlanData?.metadata
-                        ? JSON.parse(JSON.stringify(researchPlanData.metadata))
-                        : undefined),
-                    otherModalities: values.otherModalities,
-                } as JsonObject,
-            })
-
-            if (closeDialog) closeDialog()
+            await setDetails(researchPlanData?.id, researchPlanData?.organizationId, values)
+            closeDialog()
         } else {
             // Create new
             const roadmap = await createRoadmap(session.user.organizationId, {
                 title: values.title,
                 description: values.description || "",
                 modalities: values?.modalities?.map((m) => m.value) || [],
+                partners: values?.partners,
+                stages: values?.stages?.map((m) => m.value) || [],
+                statuses: values?.statuses?.map((m) => m.value) || [],
+                links: values?.links,
                 milestones: [],
                 id: "",
                 content: null,
@@ -143,10 +151,31 @@ export function EditResearchPlanForm({
             }, {userId: session?.user.id, userName: session?.user.name})
 
             if (roadmap && roadmap.id) {
+                if (closeDialog) closeDialog()
                 router.push(`/app/research-plan/${roadmap.id}`)
             }
         }
     }
+
+    const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
+        if (showUnsavedChanges && Object.keys(form.formState.dirtyFields)?.length > 0) {
+            // form is dirty, give user the option to save/discard unsaved changes
+            setUnsavedChangesIsOpen(true)
+        } else {
+            // form is not dirty, close regularly
+            closeDialog()
+        }
+    }
+
+    useEffect(() => {
+        if (isClosing) handleClose({showUnsavedChanges: true}) // external close, handle closing with option for saving unsaved changes
+    }, [isClosing])
+
+    useEffect(() => {
+        // if the user has closed the unsaved changes dialog, end the isClosing state of all other dialogs
+        // all dialogs should be either fully closed or fully open
+        if (!unsavedChangesIsOpen) setIsClosing(false)
+    }, [unsavedChangesIsOpen])
 
     if (isLoading)
         return (
@@ -160,29 +189,22 @@ export function EditResearchPlanForm({
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+            <form 
+                onSubmit={form.handleSubmit(handleFormSubmit)} 
+                className="flex max-h-[80vh] flex-col overflow-hidden"
+            >
+                <ScrollArea type={"always"} ref={scrollRef}>
+                <ScrollBar />
+                <div className="flex flex-col gap-4 pr-4">
                 <FormField
                     control={form.control}
                     name="title"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Title</FormLabel>
+                            <FormDescription>Name/type of drug for target</FormDescription>
                             <FormControl>
                                 <Input id="title" placeholder="Enter a title..." {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Description</FormLabel>
-                            <FormControl>
-                                <Textarea id="description" placeholder={`Enter a description...`} {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -194,7 +216,7 @@ export function EditResearchPlanForm({
                     name="modalities"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Scientific strategy</FormLabel>
+                            <FormLabel>Therapeutic strategy</FormLabel>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
@@ -237,7 +259,245 @@ export function EditResearchPlanForm({
                     />
                 )}
 
-                <div className="flex gap-2 justify-end">
+                <FormField
+                    control={form.control}
+                    name="partners"
+                    render={({field}) => (
+                        <FormItem id="contacts">
+                            <div className="flex gap-2 w-full justify-between items-center">
+                                <div>
+                                    <FormLabel>Partners</FormLabel>
+                                    <FormDescription>{`Name of the lab or company you're partnering with.`}</FormDescription>
+                                </div>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    size={"icon"}
+                                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                        e.preventDefault()
+                                        form.setValue(
+                                            "partners", 
+                                            [
+                                                ...(field?.value || []),
+                                                {affiliation: ""}
+                                            ],
+                                            {shouldDirty: true}
+                                        )
+                                    }}
+                                >
+                                    <Plus/>
+                                </Button>
+                            </div>
+
+                            {field?.value && field.value.length > 0 && (
+                                <ol className="flex flex-col gap-2">
+                                    {field.value.map((partner: any, index: number) => (
+                                        <li key={index} className="flex gap-2 items-center">
+                                            <div className="h-fit w-full grow">
+                                            <Input
+                                                placeholder={`Partner name`}
+                                                value={partner.affiliation || undefined}
+                                                onChange={(e: React.FormEvent<HTMLInputElement>) => {
+                                                    const newValue = {
+                                                        ...partner,
+                                                        affiliation: e.currentTarget.value
+                                                    }
+                                                    form.setValue(
+                                                        "partners",
+                                                        field?.value?.map((currentValue: any, i: number) => i === index ? newValue : currentValue),
+                                                        {shouldDirty: true}
+                                                    )
+                                                }}
+                                            />
+                                            </div>
+                                            <Button 
+                                                type="button"
+                                                className="h-full w-[34px]" 
+                                                variant="ghost" 
+                                                onClick={() => {
+                                                    form.setValue(
+                                                        "partners",
+                                                        field?.value?.filter((t: any, i: number) => i !== index),
+                                                        {shouldDirty: true}
+                                                    )
+                                                }}
+                                            >
+                                                <Trash />
+                                            </Button>
+                                        </li>
+                                    ))}
+                                </ol>
+                            )}
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                                <Textarea id="description" placeholder={`Enter a description...`} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="stages"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Stage</FormLabel>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={RESEARCH_STAGE}
+                                    placeholder="Select a stage..."
+                                    hidePlaceholderWhenSelected={true}
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                    maxSelected={1}
+                                    showHoverCard={false}
+                                    groupBy="type"
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="statuses"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Status</FormLabel>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={RESEARCH_PLAN_STATUS}
+                                    placeholder="Select a status..."
+                                    hidePlaceholderWhenSelected={true}
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                    maxSelected={1}
+                                    showHoverCard={false}
+                                    groupBy="type"
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="links"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-col grow">
+                            <FormControl>
+                                <>
+                                    <div className="flex flex-row justify-between gap-2 items-center">
+                                        <div>
+                                            <FormLabel>{`Links`}</FormLabel>
+                                            <FormDescription>{`Add any links that are not on the Comend platform.`}</FormDescription>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            size={"icon"}
+                                            variant="secondary"
+                                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                                e.preventDefault()
+                                                form.setValue(
+                                                    "links", 
+                                                    [
+                                                        ...(field?.value || []),
+                                                        {name: "", link: ""}
+                                                    ],
+                                                    {shouldDirty: true}
+                                                )
+                                            }}
+                                        >
+                                            <Plus/>
+                                        </Button>
+                                    </div>
+
+                                    {field.value && field.value.length > 0 && (
+                                        <ol className="flex flex-col gap-2">
+                                            {field.value.map((paper: Prisma.ExternalAttachmentGetPayload<{}>, index: number) => (
+                                                <li key={index} className="flex flex-row gap-2 items-center">
+                                                    <div className="w-full grow">
+                                                    <Input
+                                                        placeholder={`Name`}
+                                                        value={paper.name || ""}
+                                                        onChange={(e: React.FormEvent<HTMLInputElement>) => {
+                                                            const newValue = {
+                                                                ...paper,
+                                                                name: e.currentTarget.value
+                                                            }
+                                                            form.setValue(
+                                                                "links",
+                                                                field?.value?.map((currentValue: any, i: number) => i === index ? newValue : currentValue),
+                                                                {shouldDirty: true}
+                                                            )
+                                                        }}
+                                                    />
+                                                    </div>
+                                                    <div className="w-full grow">
+                                                    <Input
+                                                        placeholder={`Url`}
+                                                        value={paper.link}
+                                                        onChange={(e: React.FormEvent<HTMLInputElement>) => {
+                                                            const newValue = {
+                                                                ...paper,
+                                                                link: e.currentTarget.value
+                                                            }
+                                                            form.setValue(
+                                                                "links",
+                                                                field?.value?.map((currentValue: any, i: number) => i === index ? newValue : currentValue),
+                                                                {shouldDirty: true}
+                                                            )
+                                                        }}
+                                                    />
+                                                    </div>
+                                                    <Button 
+                                                        className="h-full w-[34px]" 
+                                                        variant="ghost" 
+                                                        type="button"
+                                                        onClick={() => {
+                                                            form.setValue(
+                                                                "links",
+                                                                field?.value?.filter((t: any, i: number) => i !== index),
+                                                                {shouldDirty: true}
+                                                            )
+                                                        }}
+                                                    >
+                                                        <Trash />
+                                                    </Button>
+                                                </li>
+                                            ))}
+                                        </ol>
+                                    )}
+                                </>
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+                </div>
+                </ScrollArea>
+
+                <DialogFooter className="pt-4">
                     {researchPlanData?.id ? (
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -296,6 +556,7 @@ export function EditResearchPlanForm({
                         </AlertDialog>
                     ) : (
                         <Button
+                            type="button"
                             variant={"secondary"}
                             className="w-fit"
                             onClick={(e) => {
@@ -308,10 +569,34 @@ export function EditResearchPlanForm({
                         </Button>
                     )}
 
-                    <Button disabled={!form.formState.isValid} type="submit" variant={"cta"} className="w-fit">
-                        {researchPlanData?.id ? `Save` : `Create research plan`}
-                    </Button>
-                </div>
+                    <div className="bg-white rounded-md p-0">
+                        <Button
+                            variant={"cta"}
+                            type="submit"
+                            disabled={isSaving}
+                        >
+                            {isSaving 
+                                ? (
+                                    <div className="w-[81px] flex justify-center items-center">
+                                        <LoadingDots/>
+                                    </div>
+                                ) 
+                                : (researchPlanData?.id ? `Save` : `Create research plan`)
+                            }
+                        </Button>
+                    </div>
+                </DialogFooter>
+
+                <UnsavedChangesDialog 
+                    isSaving={isSaving}
+                    isClosing={isClosing}
+                    setIsClosing={setIsClosing}
+                    isOpen={unsavedChangesIsOpen}
+                    setIsOpen={setUnsavedChangesIsOpen}
+                    closeDialog={closeDialog}
+                    form={form}
+                    formSubmit={handleFormSubmit}
+                />
             </form>
         </Form>
     )

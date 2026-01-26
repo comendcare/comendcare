@@ -73,7 +73,6 @@ export default function InviteToClaimOrgDialog({organization}: {organization: Or
                 });
 
                 toast.success(`Invitation to claim ${organization.name} created successfully for ${invitation.email}.`);
-                window.location.reload();
             } else {
                 console.error(response.error);
                 toast.error(response.error);

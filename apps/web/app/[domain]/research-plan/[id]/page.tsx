@@ -206,7 +206,11 @@ export default async function OrganizationRoadmapPage({
                         roadmapId: true,
                     }
                 },
-                modalities: true
+                modalities: true,
+                stages: true,
+                statuses: true,
+                partners: true,
+                links: true
             }),
     ])
 

@@ -5,11 +5,11 @@ import {
     getOrganizationData,
     getConditionsDataFromOrgId,
     getPublicRFPsForOrganization,
-    getPublicRoadmapsForOrganization,
     getPublicToolCountsForOrganization,
     getBiosamples,
     getDiseaseModels,
-    getClinicalDatasets, getTagsForEntity
+    getClinicalDatasets, getTagsForEntity,
+    getResearchPlans
 } from "@comend/lib/fetchers"
 import PAGPublicProfileHeader from "~web/components/pag-public-profile-header";
 import {RoadmapsCard} from "~web/components/public-roadmap-card";
@@ -23,7 +23,6 @@ import React from "react";
 import UnpublishedOrganizationPage from "~web/components/unpublished-organization-page";
 import {Mail, Share} from "lucide-react";
 import { PAGProfileToolsCard } from "~web/components/pag-profile-tools-card";
-import { SearchParams } from "@comend/components/types";
 import { biosampleSearchParamsCache } from "@comend/lib/validations";
 import { getValidFilters } from "@comend/lib/data-table";
 import { RFPSort } from "@comend/lib/utils";
@@ -31,7 +30,7 @@ import {TaggableType} from "@prisma/client";
 
 interface IndexPageProps {
     params: {domain: string},
-    searchParams: Promise<SearchParams>
+    searchParams: Record<string, string | string[] | undefined>;
 }
 
 export async function generateStaticParams() {
@@ -66,69 +65,56 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
     const validFilters = getValidFilters(search.filters);
     const globalFilter = search.q ?? "";
 
-    const [organization, roadmaps, toolCounts, rfps] = await Promise.all([
-        getOrganizationData(domain, {
-            id: true,
-            public: true,
-            verified: true,
-            published: true,
-            name: true,
-            description: true,
-            patientPriorities: true,
-            contactEmail: true,
-            logo: true,
-            image: true,
-            headerImage: true,
-            biopharmaConsentSettings: true,
-            subdomain: true,
-            customDomain: true,
-            statedGoal: true,
-            yearFounded: true,
-            incorporationStatus: true,
-            therapeuticsOfInterest: true,
-            therapeuticsInDevelopment: true,
-            website: true,
-            moneyRaised: true,
-            moneyDeployed: true,
-            researchBudget: true,
-            // address1                  String?
-            // address2                  String?
-            // formattedAddress          String?
-            // city                      String?
-            // region                    String?
-            // postalCode                String?
-            // country                   String?
-            // lat                       String?
-            // lng                       String?
-            createdAt: true,
-            updatedAt: true,
-            user: true,
-            userId: true,
-            roadmaps: true,
-            members: true,
-            clients: true,
-            invitations: true,
-            membershipRequests: true,
-            conditions: true,
-            kanban: true,
-            milestones: true,
-            platformNotifications: true,
-            reviews: true,
-            savedCompanies: true,
-            tools: true,
-            rfps: true,
-            metadata: true
-        }),
-        getPublicRoadmapsForOrganization(domain, {
-            id: true,
-            title: true,
-            description: true,
-            slug: true,
-            edges: true,
-            milestones: true,
-            nodes: true,
-            modalities: true
-        }),
+    const organization = await getOrganizationData(domain, {
+        id: true,
+        public: true,
+        verified: true,
+        published: true,
+        name: true,
+        description: true,
+        patientPriorities: true,
+        contactEmail: true,
+        logo: true,
+        image: true,
+        headerImage: true,
+        biopharmaConsentSettings: true,
+        subdomain: true,
+        customDomain: true,
+        statedGoal: true,
+        yearFounded: true,
+        incorporationStatus: true,
+        therapeuticsOfInterest: true,
+        therapeuticsInDevelopment: true,
+        website: true,
+        moneyRaised: true,
+        moneyDeployed: true,
+        researchBudget: true,
+        createdAt: true,
+        updatedAt: true,
+        members: true,
+    })
+
+    if (!organization) notFound()
+
+    if (!organization.verified) {
+        // Render unverified organization state
+        return <UnverifiedOrganizationPage organization={organization}/>
+    }
+
+    if (!organization.published) {
+        // Render unpublished organization state
+        return <UnpublishedOrganizationPage organization={organization}/>
+    }
+
+    const [
+        toolCounts, 
+        rfps, 
+        conditionResponse,
+        {data: biosamples, pageCount: biosamplesPageCount},
+        {data: diseaseModels, pageCount: diseaseModelsPageCount},
+        {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount},
+        {data: researchPlans, pageCount: researchPlansPageCount}
+    ] = await Promise.all([
         getPublicToolCountsForOrganization(domain),
         getPublicRFPsForOrganization(domain, {
             id: true,
@@ -147,16 +133,8 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
             milestones: true,
             organizationId: true,
             organization: true
-        })
-    ])
-
-    if (!organization) {
-        notFound()
-    }
-
-    let conditions = null
-    if (organization) {
-        const response = await getConditionsDataFromOrgId(organization?.id, {
+        }),
+        getConditionsDataFromOrgId(organization.id, {
             id: true,
             name: true,
             summary: true,
@@ -169,142 +147,146 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
             causalGenes: true,
             associatedGenes: true,
             biomarkers: true,
-        })
-        if (response.success) {
-            conditions = response.data
-        } else {
-            console.error(response.error)
-        }
-    }
+        }),
+        getBiosamples(
+            organization?.id,
+            {
+                id: true,
+                createdAt: true,
+                updatedAt: true,
+                description: true,
+                contacts: true,
+                attachments: true,
+                private: true,
+                types: true,
+                genotype: true,
+                variant: true,
+                availability: true,
+                quantity: true,
+                quantityUnit: true,
+                currentCountry: true,
+                countryOfCollection: true,
+                preservationMethod: true,
+                anatomicalSite: true,
+                methodOfTransport: true,
+                collectionDate: true,
+                ageAtCollection: true,
+                price: true,
+                priceUnit: true,
+                notes: true,
 
-    const {data: biosamples, pageCount: biosamplesPageCount} = await getBiosamples(
-        organization?.id,
-        {
-            id: true,
-            createdAt: true,
-            updatedAt: true,
-            description: true,
-            contacts: true,
-            attachments: true,
-            private: true,
-            types: true,
-            genotype: true,
-            variant: true,
-            availability: true,
-            quantity: true,
-            quantityUnit: true,
-            currentCountry: true,
-            countryOfCollection: true,
-            preservationMethod: true,
-            anatomicalSite: true,
-            methodOfTransport: true,
-            collectionDate: true,
-            ageAtCollection: true,
-            price: true,
-            priceUnit: true,
-            notes: true,
-
-            milestones: {include: {milestone: true}},
-            donorId: true,
-            donor: {
-                include: {
-                    diagnoses: {
-                        include: {type: true}
+                milestones: {include: {milestone: true}},
+                donorId: true,
+                donor: {
+                    include: {
+                        diagnoses: {
+                            include: {type: true}
+                        }
                     }
-                }
+                },
+                institutionId: true,
+                institution: true,
+                company: true,
+                geneId: true,
+                gene: true,
+                genes: true,
+                organizationId: true,
+                organization: true,
+                materialAndDataAccessRequests: true
             },
-            institutionId: true,
-            institution: true,
-            company: true,
-            geneId: true,
-            gene: true,
-            genes: true,
-            organizationId: true,
-            organization: true,
-            materialAndDataAccessRequests: true
-        },
-        {...search, q: globalFilter, filters: validFilters},
-        true // public only
-    )
+            {...search, q: globalFilter, filters: validFilters},
+            true // public only
+        ),
+        getDiseaseModels(
+            organization?.id,
+            {
+                id: true,
+                createdAt: true,
+                updatedAt: true,
 
-    const {data: diseaseModels, pageCount: diseaseModelsPageCount} = await getDiseaseModels(
-        organization?.id,
-        {
-            id: true,
-            createdAt: true,
-            updatedAt: true,
+                description: true,
+                contacts: true,
+                attachments: true,
+                private: true,
+                // pinned: true,
+                // metadata: true,
+                types: true,
+                genotype: true,
+                strain: true,
+                notes: true,
 
-            description: true,
-            contacts: true,
-            attachments: true,
-            private: true,
-            // pinned: true,
-            // metadata: true,
-            types: true,
-            genotype: true,
-            strain: true,
-            notes: true,
+                institutionId: true,
+                institution: true,
+                company: true,
+                geneId: true,
+                gene: true,
+                genes: true,
+                conditionId: true,
+                condition: true,
+                organizationId: true,
+                organization: {include: {conditions: {include: {condition: true}}}},
+                milestones: {include: {milestone: true}},
+            },
+            {...search, q: globalFilter, filters: validFilters},
+            true // public only
+        ),
+        getClinicalDatasets(
+            organization?.id,
+            {
+                id: true,
+                createdAt: true,
+                updatedAt: true,
 
-            institutionId: true,
-            institution: true,
-            company: true,
-            geneId: true,
-            gene: true,
-            genes: true,
-            conditionId: true,
-            condition: true,
-            organizationId: true,
-            organization: {include: {conditions: {include: {condition: true}}}},
-            milestones: {include: {milestone: true}},
-        },
-        {...search, q: globalFilter, filters: validFilters},
-        true // public only
-    )
+                title: true,
+                cohortSize: true,
+                description: true,
+                contacts: true,
+                attachments: true,
+                private: true,
+                // pinned: true,
+                // metadata: true,
+                types: true,
+                notes: true,
 
-    const {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount} = await getClinicalDatasets(
-        organization?.id,
-        {
-            id: true,
-            createdAt: true,
-            updatedAt: true,
+                institutionId: true,
+                institution: true,
+                company: true,
+                geneId: true,
+                gene: true,
+                genes: true,
+                organizationId: true,
+                organization: {include: {conditions: {include: {condition: true}}}},
+                milestones: {include: {milestone: true}},
+            },
+            {...search, q: globalFilter, filters: validFilters},
+            true // public only
+        ),
+        getResearchPlans(
+            organization.id,
+            {
+                id: true,
+                title: true,
+                description: true,
+                published: true,
+                organizationId: true,
+                organization: true,
+                modalities: true,
+                stages: true,
+                statuses: true,
+                partners: true,
+                links: true,
+                milestones: {where: {private: false}}
+            },
+            undefined,
+            true,
+        )
+    ])
 
-            title: true,
-            cohortSize: true,
-            description: true,
-            contacts: true,
-            attachments: true,
-            private: true,
-            // pinned: true,
-            // metadata: true,
-            types: true,
-            notes: true,
-
-            institutionId: true,
-            institution: true,
-            company: true,
-            geneId: true,
-            gene: true,
-            genes: true,
-            organizationId: true,
-            organization: {include: {conditions: {include: {condition: true}}}},
-            milestones: {include: {milestone: true}},
-        },
-        {...search, q: globalFilter, filters: validFilters},
-        true // public only
-    )
-
-    if (!organization.verified) {
-        // Render unverified organization state
-        return (
-            <UnverifiedOrganizationPage organization={organization}/>
-        );
-    }
-
-    if (!organization.published) {
-        // Render unpublished organization state
-        return (
-            <UnpublishedOrganizationPage organization={organization}/>
-        );
+    let conditions = null
+    if (conditionResponse.success) {
+        conditions = conditionResponse.data
+    } else {
+        console.error(conditionResponse.error)
     }
 
     let conditionTags: string[] = []
@@ -347,7 +329,11 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                                     rfps={RFPSort(rfps)}
                                 />
                             )}
-                            <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
+                            <RoadmapsCard 
+                                researchPlans={researchPlans}
+                                researchPlansPageCount={researchPlansPageCount}
+                                organization={organization}
+                            />
                             {/* tools card handles it's own data state via zustand - necessary for pagination to work properly */}
                             {(
                                 toolCounts.biosampleCount > 0 || 
@@ -380,15 +366,6 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                             <ShareDialog
                                 url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
                                 organization={organization}
-                                // trackShareEvent={(socialOption: string) => {
-                                //     mixpanelTrack(`Organization Profile Shared`, {
-                                //         "Platform": socialOption,
-                                //         ...(organization ? {
-                                //             "Organization ID": organization?.id,
-                                //             "Organization Name": organization.name
-                                //         } : undefined)
-                                //     })
-                                // }}
                                 trackShareEvent={{
                                     title: `Organization Profile Shared`
                                 }}
@@ -400,7 +377,6 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                             {
                                 title: "Contact patient group",
                                 icon: <Mail/>,
-                                // dialog: <ContactPAGDialog organization={organization}/>,
                                 href: `mailto:${organization.contactEmail}`
                             },
                         ]
