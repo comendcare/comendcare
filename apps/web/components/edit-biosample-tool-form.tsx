@@ -2,7 +2,7 @@
 
 import {zodResolver} from "@hookform/resolvers/zod"
 import React, {useEffect, useRef, useState} from "react"
-import {useForm} from "react-hook-form"
+import {useForm, useWatch} from "react-hook-form"
 import {z} from "zod"
 import {
     Form,
@@ -241,17 +241,9 @@ export function EditBiosampleToolForm({
         }
     })
 
+    const types = useWatch({ control: form.control, name: "types" })
     const formData = {
-        description: form.watch("description"),
-        types: form.watch("types"),
-        otherTypeDetails: form.watch("otherTypeDetails"),
-        attachments: form.watch("attachments"),
-        isPrivate: form.watch("isPrivate"),
-        contacts: form.watch("contacts"),
-        milestones: form.watch("milestones"),
-        diagnoses: form.watch("diagnoses"),
-        donorId: form.watch("donorId"),
-        donor: form.watch("donor"),
+        types,
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editBiosampleForm>, createFacilityRequests: CreateFacilityRequest[]) => {

@@ -399,7 +399,7 @@ export default function MarketplacePage() {
                                     {[...(rfpStore.featured || []), ...(rfpStore.searchResults || [])]
                                         .slice(0, width < 1280 ? 2 : 3)
                                         .map((rfp, index) => (
-                                            <Dialog>
+                                            <Dialog key={rfp.id}>
                                                 <DialogTrigger
                                                     className="w-full max-w-full h-full"
                                                     onClick={() => {
@@ -456,6 +456,7 @@ export default function MarketplacePage() {
                                 <>
                                     {researcherStore.searchResults?.slice(0, 3).map((researcher, index) => (
                                         <Link
+                                            key={index}
                                             href={
                                                 process.env.NEXT_PUBLIC_VERCEL_ENV
                                                     ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/researcher/${researcher.user.id}`

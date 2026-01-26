@@ -10,12 +10,13 @@ import {
     getDiseaseModels,
     getPublicRFPsForOrganization,
     getPublicRoadmapsForOrganization,
-    getPublicToolCountsForOrganization, getTagsForEntity
+    getPublicToolCountsForOrganization, getTagsForEntity,
+    getResearchPlans
 } from "@comend/lib/fetchers";
 import { biosampleSearchParamsCache } from "@comend/lib/validations"
 import { getValidFilters } from "@comend/lib/data-table";
 import { RFPSort } from "@comend/lib/utils";
-import {TaggableType} from "@prisma/client";
+import {Biosample, TaggableType} from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -104,18 +105,15 @@ export default async function ProfilePage(props: IndexPageProps) {
 
     // 3) Public data keyed by subdomain (server)
     const subdomain = organization.subdomain ?? null;
-    const [roadmaps, toolCountsRaw, rfps] = subdomain
+    const [
+        toolCountsRaw, 
+        rfps,
+        {data: biosamples, pageCount: biosamplesPageCount},
+        {data: diseaseModels, pageCount: diseaseModelsPageCount},
+        {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount},
+        {data: researchPlans, pageCount: researchPlansPageCount}
+    ] = subdomain
         ? await Promise.all([
-            getPublicRoadmapsForOrganization(subdomain, {
-                id: true,
-                title: true,
-                description: true,
-                slug: true,
-                edges: true,
-                milestones: true,
-                nodes: true,
-                modalities: true,
-            }),
             getPublicToolCountsForOrganization(subdomain),
             getPublicRFPsForOrganization(subdomain, {
                 id: true,
@@ -135,124 +133,147 @@ export default async function ProfilePage(props: IndexPageProps) {
                 organizationId: true,
                 organization: true
             }),
+            getBiosamples(
+                organization.id,
+                {
+                    id: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    description: true,
+                    contacts: true,
+                    attachments: true,
+                    private: true,
+                    types: true,
+                    genotype: true,
+                    variant: true,
+                    availability: true,
+                    quantity: true,
+                    quantityUnit: true,
+                    currentCountry: true,
+                    countryOfCollection: true,
+                    preservationMethod: true,
+                    anatomicalSite: true,
+                    methodOfTransport: true,
+                    collectionDate: true,
+                    ageAtCollection: true,
+                    price: true,
+                    priceUnit: true,
+                    notes: true,
+
+                    milestones: {include: {milestone: true}},
+                    donorId: true,
+                    donor: {
+                        include: {
+                            diagnoses: {
+                                include: {type: true}
+                            }
+                        }
+                    },
+                    institutionId: true,
+                    institution: true,
+                    company: true,
+                    geneId: true,
+                    gene: true,
+                    genes: true,
+                    organizationId: true,
+                    organization: true,
+                    materialAndDataAccessRequests: true
+                },
+                {...search, q: globalFilter, filters: validFilters},
+                true // public only
+            ),
+            getDiseaseModels(
+                organization.id,
+                {
+                    id: true,
+                    createdAt: true,
+                    updatedAt: true,
+
+                    description: true,
+                    contacts: true,
+                    attachments: true,
+                    private: true,
+                    // pinned: true,
+                    // metadata: true,
+                    types: true,
+                    genotype: true,
+                    strain: true,
+                    notes: true,
+
+                    institutionId: true,
+                    institution: true,
+                    company: true,
+                    geneId: true,
+                    gene: true,
+                    genes: true,
+                    conditionId: true,
+                    condition: true,
+                    organizationId: true,
+                    organization: {include: {conditions: {include: {condition: true}}}},
+                    milestones: {include: {milestone: true}},
+                },
+                {...search, q: globalFilter, filters: validFilters},
+                true // public only
+            ),
+            getClinicalDatasets(
+                organization.id,
+                {
+                    id: true,
+                    createdAt: true,
+                    updatedAt: true,
+
+                    title: true,
+                    cohortSize: true,
+                    description: true,
+                    contacts: true,
+                    attachments: true,
+                    private: true,
+                    // pinned: true,
+                    // metadata: true,
+                    types: true,
+                    notes: true,
+
+                    institutionId: true,
+                    institution: true,
+                    company: true,
+                    geneId: true,
+                    gene: true,
+                    genes: true,
+                    organizationId: true,
+                    organization: {include: {conditions: {include: {condition: true}}}},
+                    milestones: {include: {milestone: true}},
+                },
+                {...search, q: globalFilter, filters: validFilters},
+                true // public only
+            ),
+            getResearchPlans(
+                organization.id,
+                {
+                    id: true,
+                    title: true,
+                    description: true,
+                    published: true,
+                    organizationId: true,
+                    organization: true,
+                    modalities: true,
+                    stages: true,
+                    statuses: true,
+                    partners: true,
+                    links: true,
+                    milestones: {where: {private: false}}
+                },
+                undefined,
+                true,
+            )
         ])
-        : [[], {}, []];
-
-    const {data: biosamples, pageCount: biosamplesPageCount} = await getBiosamples(
-        session?.user.organizationId,
-        {
-            id: true,
-            createdAt: true,
-            updatedAt: true,
-            description: true,
-            contacts: true,
-            attachments: true,
-            private: true,
-            types: true,
-            genotype: true,
-            variant: true,
-            availability: true,
-            quantity: true,
-            quantityUnit: true,
-            currentCountry: true,
-            countryOfCollection: true,
-            preservationMethod: true,
-            anatomicalSite: true,
-            methodOfTransport: true,
-            collectionDate: true,
-            ageAtCollection: true,
-            price: true,
-            priceUnit: true,
-            notes: true,
-
-            milestones: {include: {milestone: true}},
-            donorId: true,
-            donor: {
-                include: {
-                    diagnoses: {
-                        include: {type: true}
-                    }
-                }
-            },
-            institutionId: true,
-            institution: true,
-            company: true,
-            geneId: true,
-            gene: true,
-            genes: true,
-            organizationId: true,
-            organization: true,
-            materialAndDataAccessRequests: true
-        },
-        {...search, q: globalFilter, filters: validFilters},
-        true // public only
-    )
-
-    const {data: diseaseModels, pageCount: diseaseModelsPageCount} = await getDiseaseModels(
-        session?.user.organizationId,
-        {
-            id: true,
-            createdAt: true,
-            updatedAt: true,
-
-            description: true,
-            contacts: true,
-            attachments: true,
-            private: true,
-            // pinned: true,
-            // metadata: true,
-            types: true,
-            genotype: true,
-            strain: true,
-            notes: true,
-
-            institutionId: true,
-            institution: true,
-            company: true,
-            geneId: true,
-            gene: true,
-            genes: true,
-            conditionId: true,
-            condition: true,
-            organizationId: true,
-            organization: {include: {conditions: {include: {condition: true}}}},
-            milestones: {include: {milestone: true}},
-        },
-        {...search, q: globalFilter, filters: validFilters},
-        true // public only
-    )
-
-    const {data: clinicalDatasets, pageCount: clinicalDatasetsPageCount} = await getClinicalDatasets(
-        session?.user.organizationId,
-        {
-            id: true,
-            createdAt: true,
-            updatedAt: true,
-
-            title: true,
-            cohortSize: true,
-            description: true,
-            contacts: true,
-            attachments: true,
-            private: true,
-            // pinned: true,
-            // metadata: true,
-            types: true,
-            notes: true,
-
-            institutionId: true,
-            institution: true,
-            company: true,
-            geneId: true,
-            gene: true,
-            genes: true,
-            organizationId: true,
-            organization: {include: {conditions: {include: {condition: true}}}},
-            milestones: {include: {milestone: true}},
-        },
-        {...search, q: globalFilter, filters: validFilters},
-        true // public only
-    )
+        : [
+            {}, 
+            [], 
+            {data: [], pageCount: 0}, 
+            {data: [], pageCount: 0}, 
+            {data: [], pageCount: 0}, 
+            {data: [], pageCount: 0}
+        ];
 
     const isOwner = ["owner", "support"].includes(session?.user?.membership?.role);
 
@@ -285,7 +306,8 @@ export default async function ProfilePage(props: IndexPageProps) {
         <PAGProfilePage
             organization={safeOrg}
             conditions={conditions?.success ? conditions.data : []}
-            roadmaps={roadmaps}
+            researchPlans={researchPlans}
+            researchPlansPageCount={researchPlansPageCount}
             toolCounts={toolCounts}
             biosamples={biosamples}
             biosamplesPageCount={biosamplesPageCount}

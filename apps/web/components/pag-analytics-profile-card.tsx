@@ -10,9 +10,9 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
     return (
         <Card className="col-span-3 flex flex-col">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <UserCircle className="h-5 w-5" />
-                    <h1 className="text-2xl font-normal">Organization profile</h1>
+                <CardTitle className="flex items-center gap-2 font-normal">
+                    <UserCircle className="h-5 w-5"/>
+                    Organization profile
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -21,7 +21,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                     {/* Members */}
                     <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                         <div className="flex items-center gap-2">
-                            <Users className="h-4 w-4 text-muted-foreground" />
+                            <Users className="h-4 w-4 text-muted-foreground"/>
                             <span className="text-sm font-medium">
                                 Members
                             </span>
@@ -33,7 +33,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                                     className: "p-0 h-auto w-auto",
                                 })}
                             >
-                                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                                <ExternalLink className="h-4 w-4 text-muted-foreground"/>
                             </Link>
                         </div>
                         <div className="text-lg font-semibold">
@@ -56,7 +56,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                                     className: "p-0 h-auto w-auto",
                                 })}
                             >
-                                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                                <ExternalLink className="h-4 w-4 text-muted-foreground"/>
                             </Link>
                         </div>
                         <div className="text-lg font-semibold">
@@ -69,7 +69,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                     {/* Research budget */}
                     <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                         <div className="flex items-center gap-2">
-                            <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+                            <CircleDollarSign className="h-4 w-4 text-muted-foreground"/>
                             <span className="text-sm font-medium">
                                 Research budget
                             </span>
@@ -81,7 +81,7 @@ export default function PAGAnalyticsProfileCard({organization}: { organization: 
                                     className: "p-0 h-auto w-auto",
                                 })}
                             >
-                                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                                <ExternalLink className="h-4 w-4 text-muted-foreground"/>
                             </Link>
                         </div>
                         <div className="text-lg font-semibold">

@@ -55,6 +55,7 @@ export function ResearcherSearchResults({
                     <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                         {searchResults.map((researcher) => (
                             <Link
+                                key={researcher.id}
                                 // href={
                                 //     process.env.NEXT_PUBLIC_VERCEL_ENV
                                 //         ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/researcher/${researcher.id}`

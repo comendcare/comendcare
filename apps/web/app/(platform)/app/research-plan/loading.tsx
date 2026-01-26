@@ -1,10 +1,7 @@
-"use client";
-
 import * as React from "react";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@comend/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@comend/components/ui/table";
-import { useLoadingTimeout } from "~web/hooks/useLoadingTimeout";
 
 function TemplatesSectionSkeleton() {
     return (
@@ -100,9 +97,6 @@ function RoadmapsTableSkeleton() {
 }
 
 export default function Loading() {
-    // Optional: avoids flashing skeletons on ultra-fast loads
-    useLoadingTimeout(5000);
-
     return (
         <main className="flex flex-col items-center h-full w-full mx-auto p-4 gap-4">
             {/* Research plan templates */}

@@ -13,11 +13,11 @@ import {BIOSAMPLE_TYPE_OPTIONS} from "@comend/lib/types"
 import {debounce} from "lodash";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
-import type { Option } from "@comend/lib/types"
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
 import { handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils"
+import {unstable_batchedUpdates} from "react-dom";
 
 export function BiosampleMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, setSearchTerm, filters, setFilters, totalResults} = useBiosampleSearchStore(
@@ -85,15 +85,20 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
 
     const handleInputChangeCallback = useCallback(
         (search: string) => {
-            setSearchTerm(search)
-
-            // Handle setting universal search in other marketplaces
-            setOrganizationSearchTerm(search);
-            setDiseaseModelSearchTerm(search);
-            setClinicalDatasetSearchTerm(search);
+            unstable_batchedUpdates(() => {
+                setSearchTerm(search);
+                setOrganizationSearchTerm(search);
+                setDiseaseModelSearchTerm(search);
+                setClinicalDatasetSearchTerm(search);
+            });
         },
-        [setSearchTerm]
-    )
+        [
+            setSearchTerm,
+            setOrganizationSearchTerm,
+            setDiseaseModelSearchTerm,
+            setClinicalDatasetSearchTerm,
+        ]
+    );
 
     const debounceHandleInputChange = useMemo(
         () => debounce(handleInputChangeCallback, 500),

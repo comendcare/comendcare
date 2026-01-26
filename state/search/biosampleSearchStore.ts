@@ -109,8 +109,6 @@ const getUpdatedSearchResults = async (
         sortByList.push(`createdAt:desc`)
         const sortBy = sortByList.join(`,`)
 
-        console.log(`SORT BY`, sortBy)
-
         const searchParameters = {
             q: state.searchTerm,
             query_by: "description,gene.symbol,type.label,organization.conditions.condition.name,organization",
@@ -125,10 +123,6 @@ const getUpdatedSearchResults = async (
             .documents()
             .search(searchParameters);
 
-        console.log(`TYPESENSE RESULTS`, results)
-
-        // return isNewSearch ? results.hits : state.searchResults
-
         const typeSenseHits = results.hits || [];
         // @ts-ignore
         const ids = typeSenseHits.map(hit => hit.document.id);
@@ -137,7 +131,6 @@ const getUpdatedSearchResults = async (
         const totalPages = Math.ceil(totalResults / state.resultsPerPage);
 
         if (ids.length === 0) {
-            // return isNewSearch ? [] : state.searchResults;
             return {
                 results: isNewSearch ? [] : state.searchResults,
                 total: results.found || 0,

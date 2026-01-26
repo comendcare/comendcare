@@ -2,7 +2,7 @@
 
 import {zodResolver} from "@hookform/resolvers/zod"
 import React, {useCallback, useEffect, experimental_useEffectEvent, useMemo, useRef, useState} from "react"
-import {useForm, UseFormReturn} from "react-hook-form"
+import {useForm, UseFormReturn, useWatch} from "react-hook-form"
 import {z} from "zod"
 import {
     Form,
@@ -291,23 +291,21 @@ export function EditMilestoneForm({
         }
     })
 
+    const watchedTitle = useWatch({control: form.control, name: "title"})
+    const watchedTypes = useWatch({control: form.control, name: "types"})
+    const watchedStartDate = useWatch({control: form.control, name: "startDate"})
+    const watchedEndDate = useWatch({control: form.control, name: "endDate"})
+    const watchedAttachments = useWatch({control: form.control, name: "attachments"})
+    const watchedIsPrivate = useWatch({control: form.control, name: "isPrivate"})
+    const watchedContacts = useWatch({control: form.control, name: "contacts"})
     const formData = {
-        nodeType: form.watch("nodeType"),
-        title: form.watch("title"),
-        description: form.watch("description"),
-        types: form.watch("types"),
-        otherTypeDetails: form.watch("otherTypeDetails"),
-        startDate: form.watch("startDate"),
-        endDate: form.watch("endDate"),
-        budget: form.watch("budget"),
-        attachments: form.watch("attachments"),
-        status: form.watch("status"),
-        isPrivate: form.watch("isPrivate"),
-        contacts: form.watch("contacts"),
-        openTo: form.watch("openTo"),
-        tools: form.watch("tools"),
-        rfps: form.watch("rfps"),
-        notes: form.watch("notes")
+        title: watchedTitle,
+        types: watchedTypes,
+        startDate: watchedStartDate,
+        endDate: watchedEndDate,
+        attachments: watchedAttachments,
+        isPrivate: watchedIsPrivate,
+        contacts: watchedContacts,
     }
 
     // Debounced save (stable)
@@ -1468,7 +1466,7 @@ export const PrivatePublicFormField = ({
                                            mixpanelTrackCallback
                                        }: {
     form: any,
-    formData: any,
+    formData?: any,
     mixpanelTrackCallback?: (isPrivate: boolean) => void
 }) => {
     return (

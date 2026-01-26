@@ -2,7 +2,7 @@
 import React from "react";
 import {notFound} from "next/navigation"
 import prisma from "@comend/lib/prisma"
-import {getOrganizationData, getPublicRoadmapsForOrganization} from "@comend/lib/fetchers"
+import {getOrganizationData, getResearchPlans} from "@comend/lib/fetchers"
 import Image from "next/image"
 import {FloatingDock} from "~web/components/floating-dock";
 import ShareDialog from "~web/components/share-dialog";
@@ -140,96 +140,82 @@ export async function generateStaticParams() {
 
 
 export default async function OrganizationRoadmapPage({
-                                                          params
-                                                      }: {
+    params
+}: {
     params: { domain: string; slug: string }
 }) {
     const domain = decodeURIComponent(params.domain)
+    const organization = await getOrganizationData(domain, {
+        id: true,
+        public: true,
+        verified: true,
+        published: true,
+        name: true,
+        description: true,
+        contactEmail: true,
+        logo: true,
+        image: true,
+        headerImage: true,
+        biopharmaConsentSettings: true,
+        subdomain: true,
+        customDomain: true,
+        statedGoal: true,
+        yearFounded: true,
+        incorporationStatus: true,
+        therapeuticsOfInterest: true,
+        therapeuticsInDevelopment: true,
+        website: true,
+        moneyRaised: true,
+        moneyDeployed: true,
+        researchBudget: true,
+        createdAt: true,
+        updatedAt: true,
+        members: true,
+        conditions: true,
+        metadata: true
+    })
 
-    // const data = await getRoadmapData(domain, slug)
-    const [organization, roadmaps] = await Promise.all([
-        getOrganizationData(domain, {
+    if (!organization) notFound()
+
+    const {data: researchPlans, pageCount: researchPlansPageCount} = await getResearchPlans(
+        organization.id,
+        {
             id: true,
-            public: true,
-            verified: true,
-            published: true,
-            name: true,
+            title: true,
             description: true,
-            contactEmail: true,
-            logo: true,
-            image: true,
-            headerImage: true,
-            biopharmaConsentSettings: true,
-            subdomain: true,
-            customDomain: true,
-            statedGoal: true,
-            yearFounded: true,
-            incorporationStatus: true,
-            therapeuticsOfInterest: true,
-            therapeuticsInDevelopment: true,
-            website: true,
-            moneyRaised: true,
-            moneyDeployed: true,
-            researchBudget: true,
-            // address1                  String?
-            // address2                  String?
-            // formattedAddress          String?
-            // city                      String?
-            // region                    String?
-            // postalCode                String?
-            // country                   String?
-            // lat                       String?
-            // lng                       String?
-            createdAt: true,
-            updatedAt: true,
-            user: true,
-            userId: true,
-            roadmaps: true,
-            members: true,
-            clients: true,
-            invitations: true,
-            membershipRequests: true,
-            conditions: true,
-            kanban: true,
-            milestones: true,
-            platformNotifications: true,
-            reviews: true,
-            savedCompanies: true,
-            tools: true,
-            rfps: true,
-            metadata: true
-        }),
-        getPublicRoadmapsForOrganization(domain, {
-                id: true,
-                title: true,
-                description: true,
-                slug: true,
-                edges: true,
-                milestones: true,
-                nodes: true,
-                modalities: true
-            }),
-    ])
-
-    if (!organization) {
-        notFound()
-    }
+            published: true,
+            organizationId: true,
+            organization: true,
+            modalities: true,
+            stages: true,
+            statuses: true,
+            partners: true,
+            links: true,
+            milestones: {where: {private: false}}
+        },
+        undefined,
+        true, // public only
+    )
 
     return (
         <>
-            {roadmaps.length > 0 ? (
+            {researchPlans.length > 0 ? (
                     <>
                         <div
                             className="flex flex-col items-start justify-center gap-4 max-w-7xl mx-auto w-full text-left p-4"
                         >
                             <MarketplaceBreadcrumb
                                 organization={organization}
-                                roadmap={roadmaps[0]}
+                                roadmap={researchPlans[0]}
                                 marketplaceDomain={"/app/marketplace/milestones"}
                             />
 
                             <PAGRoadmapHeader organization={organization} editable={false} />
-                            <RoadmapsCard roadmaps={roadmaps} organization={organization}/>
+                            <RoadmapsCard 
+                                researchPlans={researchPlans}
+                                researchPlansPageCount={researchPlansPageCount}
+                                organization={organization}
+                            />
                         </div>
 
                         <FloatingDock
@@ -239,7 +225,7 @@ export default async function OrganizationRoadmapPage({
                                     icon: <Share />,
                                     dialog: (
                                         <ShareDialog
-                                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}
+                                            url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlans[0].id}`}
                                             organization={organization}
                                             // trackShareEvent={(socialOption: string) => {
                                             //     mixpanelTrack(`Research Plans Table Shared`, {

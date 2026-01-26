@@ -38,14 +38,17 @@ export default function CreateResearchPlanDialog({
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog 
+            open={open} 
+            onOpenChange={setOpen}
+        >
             <DialogTrigger asChild>
                 {trigger ?? (
                     <Button variant="cta">Create research plan</Button>
                 )}
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-xl max-h-[80vh] overflow-y-auto">
+            <DialogContent>
                 {isLoading ? (
                     <div className="h-full w-full p-10 gap-4">
                         <div className="h-full flex flex-col space-y-8 items-center justify-center">
@@ -57,7 +60,7 @@ export default function CreateResearchPlanDialog({
                         </div>
                     </div>
                 ) : (
-                    <div className="flex flex-col space-y-4">
+                    <>
                         <DialogHeader>
                             <DialogTitle className="text-xl">Create a research plan</DialogTitle>
                             <DialogDescription>
@@ -72,7 +75,7 @@ export default function CreateResearchPlanDialog({
                             closeDialog={() => setOpen(false)}
                             setIsSubmitting={setLoadingBoth}
                         />
-                    </div>
+                    </>
                 )}
             </DialogContent>
         </Dialog>
