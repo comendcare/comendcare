@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import { useState } from "react"
 import Image from "next/image"
 import logo from "@/public/Full logo.png"
@@ -48,6 +48,7 @@ import { Building2, Plus, Trash, User } from "lucide-react"
 import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area"
 import { DialogFooter } from "@comend/components/ui/dialog"
 import { PrivatePublicFormField } from "./edit-milestone-form"
+import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -58,16 +59,21 @@ const selector = (state: RoadmapState) => ({
 export function EditResearchPlanForm({
     researchPlanData,
     closeDialog,
-    setIsSubmitting,
+    isClosing,
+    setIsClosing,
 }: {
     researchPlanData?: any
-    closeDialog?: () => void
-    setIsSubmitting?: (submitting: boolean) => void
+    closeDialog: (formValues?: any) => void, // if form values are provided, unsaved changes popup is shown
+    isClosing: boolean,
+    setIsClosing: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const router = useRouter()
     const { data: session } = useSession()
-    const { roadmapId, details, setDetails } = useRoadmapStore(useShallow(selector))
+    const { setDetails } = useRoadmapStore(useShallow(selector))
     const [isLoading, setIsLoading] = useState(false)
+    const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [isSaving, setIsSaving] = useState(false)
 
     const form = useForm<z.infer<typeof editResearchPlanForm>>({
         mode: "onChange",
@@ -89,9 +95,21 @@ export function EditResearchPlanForm({
         },
     })
 
+    // scroll errors into view when form errors are updated
+    useEffect(() => {
+        if (Object.keys(form.formState.errors).length > 0) {
+            // Get first field with error
+            const firstErrorField = Object.keys(form.formState.errors)[0];
+            const fieldEl = document.querySelector(`[id="${firstErrorField}"]`);
+            if (fieldEl && scrollRef.current) {
+                // scroll the container, not the window
+                fieldEl.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        }
+    }, [form.formState.errors]);
+
     const handleFormSubmit = async (values: z.infer<typeof editResearchPlanForm>) => {
-        setIsLoading(true)
-        if (setIsSubmitting) setIsSubmitting(true)
+        if (setIsSaving) setIsSaving(true)
         if (!session?.user?.organizationId) {
             console.error(`No session data: no organization ID`)
             return
@@ -100,7 +118,7 @@ export function EditResearchPlanForm({
         if (researchPlanData?.id) {
             // Update existing
             await setDetails(researchPlanData?.id, researchPlanData?.organizationId, values)
-            if (closeDialog) closeDialog()
+            closeDialog()
         } else {
             // Create new
             const roadmap = await createRoadmap(session.user.organizationId, {
@@ -132,10 +150,31 @@ export function EditResearchPlanForm({
             }, {userId: session?.user.id, userName: session?.user.name})
 
             if (roadmap && roadmap.id) {
+                if (closeDialog) closeDialog()
                 router.push(`/app/research-plan/${roadmap.id}`)
             }
         }
     }
+
+    const handleClose = ({showUnsavedChanges}: {showUnsavedChanges?: boolean}) => {
+        if (showUnsavedChanges && Object.keys(form.formState.dirtyFields)?.length > 0) {
+            // form is dirty, give user the option to save/discard unsaved changes
+            setUnsavedChangesIsOpen(true)
+        } else {
+            // form is not dirty, close regularly
+            closeDialog()
+        }
+    }
+
+    useEffect(() => {
+        if (isClosing) handleClose({showUnsavedChanges: true}) // external close, handle closing with option for saving unsaved changes
+    }, [isClosing])
+
+    useEffect(() => {
+        // if the user has closed the unsaved changes dialog, end the isClosing state of all other dialogs
+        // all dialogs should be either fully closed or fully open
+        if (!unsavedChangesIsOpen) setIsClosing(false)
+    }, [unsavedChangesIsOpen])
 
     if (isLoading)
         return (
@@ -153,7 +192,7 @@ export function EditResearchPlanForm({
                 onSubmit={form.handleSubmit(handleFormSubmit)} 
                 className="flex max-h-[80vh] flex-col overflow-hidden"
             >
-                <ScrollArea type={"always"}>
+                <ScrollArea type={"always"} ref={scrollRef}>
                 <ScrollBar />
                 <div className="flex flex-col gap-4 pr-4">
                 <FormField
@@ -537,6 +576,17 @@ export function EditResearchPlanForm({
                         {researchPlanData?.id ? `Save` : `Create research plan`}
                     </Button>
                 </DialogFooter>
+
+                <UnsavedChangesDialog 
+                    isSaving={isSaving}
+                    isClosing={isClosing}
+                    setIsClosing={setIsClosing}
+                    isOpen={unsavedChangesIsOpen}
+                    setIsOpen={setUnsavedChangesIsOpen}
+                    closeDialog={closeDialog}
+                    form={form}
+                    formSubmit={handleFormSubmit}
+                />
             </form>
         </Form>
     )

@@ -27,10 +27,16 @@ const EditResearchPlanForm = dynamic(
 export const ResearchPlanActionsMenu = ({researchPlan}: {researchPlan: Roadmap}) => {
     const [isOpen, setIsOpen] = useState(false)
     const [editIsOpen, setEditIsOpen] = useState(false)
+    const [isClosing, setIsClosing] = useState(false)
     const popoverRef = useRef<HTMLInputElement>(null)
 
     const handleEdit = () => {
         setEditIsOpen(true)
+    }
+
+    const closeDialog = () => {
+        setEditIsOpen(false)
+        setIsClosing(false)
     }
 
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
@@ -98,7 +104,14 @@ export const ResearchPlanActionsMenu = ({researchPlan}: {researchPlan: Roadmap})
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <Dialog open={editIsOpen} onOpenChange={setEditIsOpen}>
+            <Dialog 
+                open={editIsOpen} 
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setIsClosing(true)
+                    }
+                }}
+            >
                 <DialogPortal>
                     <div onClick={(e) => e.stopPropagation()}>
                         <DialogContent>
@@ -111,9 +124,11 @@ export const ResearchPlanActionsMenu = ({researchPlan}: {researchPlan: Roadmap})
                                 </DialogDescription>
                             </DialogHeader>
 
-                            <EditResearchPlanForm
-                                researchPlanData={researchPlan}
-                                closeDialog={() => setEditIsOpen(false)}
+                            <EditResearchPlanForm 
+                                researchPlanData={researchPlan} 
+                                closeDialog={closeDialog}
+                                isClosing={isClosing} 
+                                setIsClosing={setIsClosing}
                             />
                         </DialogContent>
                     </div>
