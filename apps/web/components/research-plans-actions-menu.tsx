@@ -1,6 +1,6 @@
 "use client"
 
-import {Copy, Ellipsis, Pencil, Trash} from "lucide-react"
+import {Ellipsis, Pencil} from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -9,31 +9,28 @@ import {
 } from "@comend/components/ui/dropdown-menu"
 import { Button } from "@comend/components/ui/button"
 import { useEffect, useRef, useState } from "react"
-import { Asset, Roadmap } from "@comend/lib/types"
-import { useSession } from "next-auth/react"
+import { Roadmap } from "@comend/lib/types"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogPortal, DialogTitle } from "@comend/components/ui/dialog"
-import { DeleteClinicalDatasetDialog } from "comend-pag-platform/components/delete-clinical-dataset-dialog"
-import { EditAssetDialog } from "./edit-tool-dialog"
-import { usePathname } from "next/navigation"
-import { DeleteBiosampleDialog } from "./delete-biosample-dialog"
-import { DeleteDiseaseModelDialog } from "./delete-disease-model-dialog"
-import { EditResearchPlanForm } from "./edit-research-plan-form"
+import dynamic from "next/dynamic"
+
+const EditResearchPlanForm = dynamic(
+    () => import("./edit-research-plan-form").then(m => m.EditResearchPlanForm),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="text-sm text-muted-foreground">Loading editor…</div>
+        ),
+    }
+)
+
 
 export const ResearchPlanActionsMenu = ({researchPlan}: {researchPlan: Roadmap}) => {
-    const {data: session} = useSession()
-    const pathname = usePathname()
     const [isOpen, setIsOpen] = useState(false)
-    const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [editIsOpen, setEditIsOpen] = useState(false)
-    const [isClosing, setIsClosing] = useState(false)
     const popoverRef = useRef<HTMLInputElement>(null)
 
     const handleEdit = () => {
         setEditIsOpen(true)
-    }
-
-    const handleDelete = () => {
-        setDeleteIsOpen(true)
     }
 
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
@@ -113,19 +110,15 @@ export const ResearchPlanActionsMenu = ({researchPlan}: {researchPlan: Roadmap})
                                     {`Edit details like the name and description of your Research Plan. Click save when you're done.`}
                                 </DialogDescription>
                             </DialogHeader>
-                            <EditResearchPlanForm researchPlanData={researchPlan} closeDialog={() => setEditIsOpen(false)}/>
+
+                            <EditResearchPlanForm
+                                researchPlanData={researchPlan}
+                                closeDialog={() => setEditIsOpen(false)}
+                            />
                         </DialogContent>
                     </div>
                 </DialogPortal>
             </Dialog>
-
-            {/* <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
-                <DialogPortal>
-                    <div onClick={(e) => e.stopPropagation()}>
-                        {(() => {})()}
-                    </div>
-                </DialogPortal>
-            </Dialog> */}
         </>
     )
 }
