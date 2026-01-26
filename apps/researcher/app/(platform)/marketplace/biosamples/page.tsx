@@ -1,7 +1,7 @@
 import React from "react"
 import Image from "next/image"
 import {getSession} from "@comend/lib/auth"
-import {SearchParams} from "@comend//components/types"
+import {SearchParams} from "@comend/components/types"
 import {getValidFilters} from "@comend/lib/data-table"
 import { getBiosamples } from "@comend/lib/fetchers"
 import { biosampleSearchParamsCache } from "@comend/lib/validations"
