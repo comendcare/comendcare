@@ -496,6 +496,7 @@ export function EditResearchPlanForm({
                                                     variant={"destructive"}
                                                     onClick={async () => {
                                                         if (researchPlanData?.id) {
+                                                            router.prefetch("/app/research-plan")
                                                             setIsLoading(true)
                                                             await deleteRoadmap(session?.user.organizationId, researchPlanData)
                                                             revalidate('/app/research-plan')
