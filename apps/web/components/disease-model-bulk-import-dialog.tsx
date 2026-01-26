@@ -6,7 +6,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { CircleX, Import, LoaderCircle } from "lucide-react";
 import { FileUploadForm } from "~web/components/file-upload-form";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createDiseaseModel } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
