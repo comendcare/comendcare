@@ -30,17 +30,23 @@ export default function CreateResearchPlanDialog({
     setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const [open, setOpen] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
+    const [isClosing, setIsClosing] = useState(false)
 
-    const setLoadingBoth = (val: boolean) => {
-        setIsLoading(val)
-        if (setIsLoadingExternal) setIsLoadingExternal(val)
+    const closeDialog = () => {
+        setOpen(false)
+        setIsClosing(false)
     }
 
     return (
         <Dialog 
             open={open} 
-            onOpenChange={setOpen}
+            onOpenChange={(open) => {
+                if (!open) {
+                    setIsClosing(true)
+                } else {
+                    setOpen(true)
+                }
+            }}
         >
             <DialogTrigger asChild>
                 {trigger ?? (
@@ -49,34 +55,22 @@ export default function CreateResearchPlanDialog({
             </DialogTrigger>
 
             <DialogContent>
-                {isLoading ? (
-                    <div className="h-full w-full p-10 gap-4">
-                        <div className="h-full flex flex-col space-y-8 items-center justify-center">
-                            <Spinner className="scale-150" />
-                            <div className="w-1/6 min-w-40">
-                                <Image priority src={logo} alt="Comend logo" />
-                            </div>
-                            <p>Creating your research plan</p>
-                        </div>
-                    </div>
-                ) : (
-                    <>
-                        <DialogHeader>
-                            <DialogTitle className="text-xl">Create a research plan</DialogTitle>
-                            <DialogDescription>
-                                To help create your research plan, please answer a few questions.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <Separator />
+                <>
+                    <DialogHeader>
+                        <DialogTitle className="text-xl">Create a research plan</DialogTitle>
+                        <DialogDescription>
+                            To help create your research plan, please answer a few questions.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <Separator />
 
-
-                        <EditResearchPlanForm
-                            researchPlanData={researchPlanData}
-                            closeDialog={() => setOpen(false)}
-                            setIsSubmitting={setLoadingBoth}
-                        />
-                    </>
-                )}
+                    <EditResearchPlanForm 
+                        researchPlanData={researchPlanData} 
+                        closeDialog={closeDialog}
+                        isClosing={isClosing} 
+                        setIsClosing={setIsClosing}
+                    />
+                </>
             </DialogContent>
         </Dialog>
     )

@@ -49,6 +49,7 @@ import { ScrollArea, ScrollBar } from "@comend/components/ui/scroll-area"
 import { DialogFooter } from "@comend/components/ui/dialog"
 import { PrivatePublicFormField } from "./edit-milestone-form"
 import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
+import LoadingDots from "@comend/components/icons/loading-dots"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -568,13 +569,22 @@ export function EditResearchPlanForm({
                         </Button>
                     )}
 
-                    <Button 
-                        type="submit" 
-                        variant={"cta"} 
-                        className="w-fit"
-                    >
-                        {researchPlanData?.id ? `Save` : `Create research plan`}
-                    </Button>
+                    <div className="bg-white rounded-md p-0">
+                        <Button
+                            variant={"cta"}
+                            type="submit"
+                            disabled={isSaving}
+                        >
+                            {isSaving 
+                                ? (
+                                    <div className="w-[81px] flex justify-center items-center">
+                                        <LoadingDots/>
+                                    </div>
+                                ) 
+                                : (researchPlanData?.id ? `Save` : `Create research plan`)
+                            }
+                        </Button>
+                    </div>
                 </DialogFooter>
 
                 <UnsavedChangesDialog 
