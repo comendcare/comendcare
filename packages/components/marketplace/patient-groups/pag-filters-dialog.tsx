@@ -10,7 +10,7 @@ import { Separator } from "@comend/components/ui/separator";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import MultipleSelector from "@comend/components/ui/multiple-selector";
 
-import { mechanisms, ASSOCIATED_SYSTEMS, MODALITIES } from "@comend/lib/types";
+import {mechanisms, ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@comend/lib/types";
 import { handleAsyncConditionSearch, handleAsyncGeneSearch } from "@comend/lib/utils";
 
 import { useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
