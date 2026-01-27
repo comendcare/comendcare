@@ -23,7 +23,7 @@ import type { OrganizationSearchState } from "@/state/search/organizationSearchS
 import { useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
 
 // Options
-import {mechanisms} from "@comend/lib/types";
+import {mechanisms, MOLECULAR_MECHANISMS} from "@comend/lib/types";
 import { ASSOCIATED_SYSTEMS, MODALITIES } from "@comend/lib/types";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore";
@@ -46,12 +46,6 @@ const PAGFiltersDialog = dynamic(
         ),
     }
 );
-
-// Helpers to normalize options
-const MECHANISM_OPTIONS = mechanisms.map((m: any) => ({
-    label: m.label ?? m.name ?? String(m.id),
-    value: String(m.id),
-}));
 
 // Sort menu (mirrors store-supported sort keys)
 const SORT_ITEMS: { value: string; label: string }[] = [
@@ -310,7 +304,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                         {/* mechanisms */}
                         {(filters.mechanisms || []).map((item) => (
                             <Badge key={`mechanisms-${item.value}`} variant="secondary" className="text-xs">
-                                {MECHANISM_OPTIONS.find((o) => o.value === item.value)?.label ||
+                                {MOLECULAR_MECHANISMS.find((o) => o.value === item.value)?.label ||
                                     item.value}
                                 <button
                                     onClick={() => removeFilterItem("mechanisms", item.value)}

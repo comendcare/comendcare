@@ -73,7 +73,7 @@ function generateFiltersString(filters: FiltersType) {
 
     if (filters?.mechanisms && filters.mechanisms.length > 0) {
         const mechanismFilters = filters.mechanisms
-            .map(system => `conditions.condition.relevantDiseaseMechanisms:="${escapeValue(system.value)}"`)
+            .map(system => `conditions.condition.diseaseCategories:="${escapeValue(system.value)}"`)
             .join(" || ");
 
         filtersList.push(`(${mechanismFilters})`);

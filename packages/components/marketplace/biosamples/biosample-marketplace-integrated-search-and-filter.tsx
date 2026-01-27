@@ -234,8 +234,6 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                         {/* conditions */}
                         {(filters.conditions || []).map((item) => (
                             <Badge key={`conditions-${item.value}`} variant="secondary" className="text-xs">
-                                {/* {MECHANISM_OPTIONS.find((o) => o.value === item.value)?.label ||
-                                    item.value} */}
                                 {item.value}
                                 <button
                                     onClick={() => removeFilterItem("conditions", item.value)}
