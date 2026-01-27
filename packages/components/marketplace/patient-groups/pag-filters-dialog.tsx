@@ -18,11 +18,6 @@ import { useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
 import { useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore";
 import { useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
 
-const MECHANISM_OPTIONS = mechanisms.map((m: any) => ({
-    label: m.label ?? m.name ?? String(m.id),
-    value: String(m.id),
-}));
-
 export function PAGFiltersDialog() {
     const { filters, setFilters } = useOrganizationSearchStore();
     const { filters: biosampleFilters, setFilters: setBiosampleFilters } = useBiosampleSearchStore();
