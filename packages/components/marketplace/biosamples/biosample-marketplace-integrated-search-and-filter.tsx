@@ -8,15 +8,12 @@ import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"
 import {Badge, badgeVariants} from "@comend/components/ui/badge"
 import {Separator} from "@comend/components/ui/separator"
-import MultipleSelector from "@comend/components/ui/multiple-selector"
 import {BIOSAMPLE_TYPE_OPTIONS} from "@comend/lib/types"
 import {debounce} from "lodash";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore"
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore"
-import { handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils"
 import {unstable_batchedUpdates} from "react-dom";
 import dynamic from "next/dynamic"
 
@@ -237,8 +234,6 @@ export function BiosampleMarketplaceIntegratedSearchAndFilter() {
                         {/* conditions */}
                         {(filters.conditions || []).map((item) => (
                             <Badge key={`conditions-${item.value}`} variant="secondary" className="text-xs">
-                                {/* {MECHANISM_OPTIONS.find((o) => o.value === item.value)?.label ||
-                                    item.value} */}
                                 {item.value}
                                 <button
                                     onClick={() => removeFilterItem("conditions", item.value)}
