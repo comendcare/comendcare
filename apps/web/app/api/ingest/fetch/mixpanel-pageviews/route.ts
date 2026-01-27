@@ -2,7 +2,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@comend/lib/prisma";
 import crypto from "node:crypto";
-import {cioTrackServer} from "../../../../../../../packages/lib/customerio/customer-io";
+import {cioTrackServer} from "@comend/lib/customerio/customer-io";
+import {cioSyncOrg} from "@comend/lib/customerio/cio-sync-org";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -118,6 +119,16 @@ async function runCheck() {
             };
 
             const dedupeKey = stableDedupeKey(org.id, milestone);
+
+            await cioSyncOrg({
+                subdomain: org.subdomain,
+                name: org.name,
+                attributes: {
+                    profile_view_count: totalViews,
+                    profile_view_count_updated_at: Math.floor(occurredAt.getTime() / 1000),
+                    latest_views_milestone: milestone ?? null,
+                },
+            });
 
             // FIRST-WRITER-ONLY: create + catch unique => prevents duplicate fanout
             try {

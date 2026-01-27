@@ -10,10 +10,29 @@ import {Separator} from "@comend/components/ui/separator"
 import {debounce} from "lodash";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
 import { ResearcherSearchState, useResearcherSearchStore } from "@/state/search/researcherSearchStore"
-import MultipleSelector from "@comend/components/ui/multiple-selector"
-import { MILESTONE_TYPE_OPTIONS, MODALITIES } from "@comend/lib/types"
 import { Badge, badgeVariants } from "@comend/components/ui/badge"
 import { handleAsyncConditionSearch, handleAsyncGeneSearch } from "@comend/lib/utils"
+import dynamic from "next/dynamic"
+
+const ResearcherFiltersDialog = dynamic(
+    () => import("./researcher-filters-dialog").then((m) => m.ResearcherFiltersDialog),
+    {
+        ssr: false,
+        loading: () => (
+            <>
+                <Separator orientation="vertical" className="h-8" />
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button disabled className="m-4 rounded-full" variant={"cta"}>
+                            <Funnel />
+                            Filters
+                        </Button>
+                    </DialogTrigger>
+                </Dialog>
+            </>
+        ),
+    }
+)
 
 export function ResearcherMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, sortBy, setSortBy, setSearchTerm, filters, setFilters, totalResults} = useResearcherSearchStore(
@@ -85,96 +104,7 @@ export function ResearcherMarketplaceIntegratedSearchAndFilter() {
                 <Separator orientation="vertical" className="h-8" />
 
                 {/* Mobile and additional filters */}
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button className="m-4 rounded-full" variant={'cta'}>
-                            <Funnel />
-                            Filters
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent
-                        ref={dialogRef}
-                        onOpenAutoFocus={(e) => {
-                            e.preventDefault() // prevent focusing the first input
-                            dialogRef.current?.focus() // focus the dialog content instead
-                        }}
-                    >
-                        <DialogTitle>Researcher Filters</DialogTitle>
-                            {/* Research Interests */}
-                            <div>
-                                <Label>Research interests</Label>
-                                <MultipleSelector
-                                    value={filters.researchInterests ?? []}
-                                    onChange={(vals) => setFilterKey("researchInterests", vals)}
-                                    options={MILESTONE_TYPE_OPTIONS}
-                                    placeholder="Select option..."
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{className: "bg-transparent"}}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                    }
-                                    triggerSearchOnFocus={true}
-                                    showHoverCard={false}
-                                />
-                            </div>
-
-                            {/* Therapeutis of interest */}
-                            <div>
-                                <Label>Therapeutics of interest</Label>
-                                <MultipleSelector
-                                    value={filters.therapeuticsOfInterest ?? []}
-                                    onChange={(vals) => setFilterKey("therapeuticsOfInterest", vals)}
-                                    defaultOptions={MODALITIES}
-                                    placeholder="Select option..."
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{className: "bg-transparent"}}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                    }
-                                    showHoverCard={false}
-                                />
-                            </div>
-
-                            {/* Conditions of Interest */}
-                            <div>
-                                <Label>Conditions of interest</Label>
-                                <MultipleSelector
-                                    value={filters.conditionsOfInterest ?? []}
-                                    onChange={(vals) => setFilterKey("conditionsOfInterest", vals)}
-                                    onSearch={handleAsyncConditionSearch}
-                                    placeholder="Select conditions..."
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{className: "bg-transparent"}}
-                                    loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading conditions...</p>}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                    }
-                                    triggerSearchOnFocus={true}
-                                    showHoverCard={false}
-                                />
-                            </div>
-
-                            {/* Genes */}
-                            <div>
-                                <Label>Gene of interest</Label>
-                                <MultipleSelector
-                                    value={filters.genes ?? []}
-                                    badgeClassName={badgeVariants({variant: "teal"})}
-                                    onChange={(vals) => setFilterKey("genes", vals)}
-                                    onSearch={handleAsyncGeneSearch}
-                                    placeholder="Select genes..."
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{className: "bg-transparent"}}
-                                    loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading genes...</p>}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                    }
-                                    triggerSearchOnFocus={true}
-                                    showHoverCard={false}
-                                />
-                            </div>
-                    </DialogContent>
-                </Dialog>
+                <ResearcherFiltersDialog/>
             </div>
 
             {/* Active filter badges */}

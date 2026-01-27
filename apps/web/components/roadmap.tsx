@@ -692,9 +692,13 @@ const RoadmapHeader = ({
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1024)
     const [editResearchPlanIsOpen, setEditResearchPlanIsOpen] = useState(false)
+    const [isClosing, setIsClosing] = useState(false)
     const [shareIsOpen, setShareIsOpen] = useState(false)
 
-    console.log(`research plan header data`, researchPlanDetails)
+    const closeDialog = () => {
+        setEditResearchPlanIsOpen(false)
+        setIsClosing(false)
+    }
 
     useEffect(() => {
         const el = parentRef.current;
@@ -897,7 +901,14 @@ const RoadmapHeader = ({
                 </Tooltip>
             </span>
 
-            <Dialog open={editResearchPlanIsOpen} onOpenChange={setEditResearchPlanIsOpen}>
+            <Dialog 
+                open={editResearchPlanIsOpen} 
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setIsClosing(true)
+                    }
+                }}
+            >
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>
@@ -907,7 +918,12 @@ const RoadmapHeader = ({
                             {`Edit details like the name and description of your Research Plan. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditResearchPlanForm researchPlanData={researchPlanDetails} closeDialog={() => setEditResearchPlanIsOpen(false)}/>
+                    <EditResearchPlanForm 
+                        researchPlanData={researchPlanDetails} 
+                        closeDialog={closeDialog}
+                        isClosing={isClosing} 
+                        setIsClosing={setIsClosing}
+                    />
                 </DialogContent>
             </Dialog>
 
