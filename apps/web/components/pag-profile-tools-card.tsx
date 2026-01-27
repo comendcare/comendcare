@@ -16,6 +16,9 @@ import { ToolCounts } from "./profile-page";
 import { useRouter } from "next/navigation";
 import Image from "next/image"
 import {NoResultsTemplate} from "@comend/components/no-results"
+import { Row } from "@tanstack/react-table";
+import { Dialog, DialogContent } from "@comend/components/ui/dialog";
+import {BiosampleDetails} from "@comend/components/biosample-details"
 
 const getInitState = (
     counts: {
@@ -57,6 +60,7 @@ export const PAGProfileToolsCard = ({
 }) => {
     const [isInitialized, setIsInitialized] = useState<boolean>(false)    
     const [section, setSection] = useState<string | undefined>(undefined)
+    const [biosample, setBiosample] = useState<Biosample | undefined>(undefined)
     const biosampleColumns = useBiosamplesTableColumns(
         true, // enable sorting
         true, // enable hiding
@@ -182,6 +186,7 @@ export const PAGProfileToolsCard = ({
                                             columns={biosampleColumns}
                                             searchParams={{}}
                                             showPagination={toolCounts.biosampleCount > 10}
+                                            onRowClickCallback={(e: any, row: Row<any> | undefined) => setBiosample(row?.original as Biosample)}
                                         />
                                     </FeatureFlagsProvider>
                                 </div>
@@ -225,6 +230,19 @@ export const PAGProfileToolsCard = ({
                     />
                 )}
             </CardContent>
+
+            <Dialog 
+                open={!!biosample} 
+                onOpenChange={
+                    (open) => {
+                        if (!open) setBiosample(undefined)
+                    }
+                }
+            >
+                <DialogContent>
+                    <BiosampleDetails biosample={biosample} />
+                </DialogContent>
+            </Dialog>
         </Card>
     );
 }
