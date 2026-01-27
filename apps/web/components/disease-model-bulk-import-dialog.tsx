@@ -303,6 +303,8 @@ export function DiseaseModelBulkImportDialog({
                     if (formattedErrors.length > 0) errors.push(formattedErrors)
                 }
 
+                console.log(`total errors`, errors)
+
                 setTotalErrors(errors)
             } catch (e) {
                 toast('Error!', {
@@ -392,7 +394,7 @@ export function DiseaseModelBulkImportDialog({
                                 {totalErrors.map((error, index) => (
                                     <Badge variant={"red"} key={index} className="w-full">
                                         <CircleX className="h-4 w-4 min-h-4 min-w-4"/>
-                                        {error?.[0]?.id}
+                                        {`${error?.[0]?.id} - ${error?.[0]?.message}`}
                                     </Badge>
                                 ))}
                             </ul>

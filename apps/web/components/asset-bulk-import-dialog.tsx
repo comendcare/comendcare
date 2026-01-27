@@ -139,7 +139,7 @@ const clinicalDatasetImportSchema: ImportSchemaEntry[] = [
     {
         spreadsheetKey: 'Title',
         databaseKey: 'title',
-        required: false,
+        required: true,
         defaultValue: undefined,
         isValid: (entry) => typeof entry === 'string',
     },
@@ -385,7 +385,7 @@ export function AssetBulkImportDialog({
                                 {totalErrors.map((error, index) => (
                                     <Badge variant={"red"} key={index} className="w-full">
                                         <CircleX className="h-4 w-4 min-h-4 min-w-4"/>
-                                        {error?.[0]?.id}
+                                        {`${error?.[0]?.id} - ${error?.[0]?.message}`}
                                     </Badge>
                                 ))}
                             </ul>
