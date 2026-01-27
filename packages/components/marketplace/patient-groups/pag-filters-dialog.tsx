@@ -121,7 +121,7 @@ export function PAGFiltersDialog() {
                         <MultipleSelector
                             value={filters.mechanisms ?? []}
                             onChange={(vals) => setFilterKey("mechanisms", vals)}
-                            defaultOptions={MECHANISM_OPTIONS}
+                            defaultOptions={MOLECULAR_MECHANISMS}
                             placeholder="Any"
                             hidePlaceholderWhenSelected
                             commandProps={{ className: "bg-transparent" }}
