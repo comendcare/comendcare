@@ -1617,7 +1617,7 @@ export const MILESTONE_TYPE_OPTIONS: any[] = [
     {
         id: 'PHASE1',
         value: 'PHASE1',
-        label: 'Phase 1',
+        label: 'Phase I',
         services: ['Phase 1-3 Studies'],
         categories: ['clinical trials'],
         description: ''
