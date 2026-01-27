@@ -2627,7 +2627,7 @@ export const editResearchPlanForm = z.object({
         .min(1, "Title is required")
         .max(60, "Title must be less than 60 characters"),
     modalities: z.array(optionSchema)
-        .min(1, "Please select a therapeutic strategy")    
+        .min(1, "Please select a research strategy")    
         .max(1, "You can only select one type"),
     partners: z.array(z.custom<any>()).optional(),
     description: z

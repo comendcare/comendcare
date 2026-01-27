@@ -301,7 +301,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback, isPrivate}: {
         <Table>
             <TableHeader className="px-0">
                 <TableRow className="pointer-events-none px-0">
-                    <TableHead className="w-full px-0">Therapeutic strategy</TableHead>
+                    <TableHead className="w-full px-0">Research strategy</TableHead>
                     <TableHead></TableHead>
                     <TableHead className="self-end text-right w-fit text-nowrap px-0">Stage</TableHead>
                 </TableRow>
