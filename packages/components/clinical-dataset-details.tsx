@@ -9,7 +9,7 @@ import { Badge } from "@comend/components/ui/badge";
 import { Button } from "@comend/components/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@comend/components/ui/dialog";
 import { Separator } from "@comend/components/ui/separator";
-import { CaretAccordion } from "ui/carret-accordion";
+import { CaretAccordion } from "@comend/components/ui/carret-accordion";
 
 export const ClinicalDatasetDetails = ({clinicalDataset}: { clinicalDataset: any }) => {
     return (
