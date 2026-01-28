@@ -7,14 +7,13 @@ export function PAGBannerPhoto({
 }) {
     return (
         img ? (
-            <img 
-                className={"min-h-32 lg:min-h-48 object-cover bg-secondary"} 
-                src={img} alt="" 
-                data-testid="banner-img"
-                onError={(e) => {
-                    e.currentTarget.src = ""
-                }}
-            />
+            <div className={"min-h-32 object-cover lg:min-h-48 bg-secondary"} >
+                <img 
+                    className="object-cover w-full"
+                    src={img} alt="" 
+                    data-testid="banner-img"
+                />
+            </div>
         ) : (
             <div 
                 className={"h-32 w-full object-cover lg:h-48 bg-secondary"} 
