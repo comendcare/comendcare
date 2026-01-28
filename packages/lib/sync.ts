@@ -15,13 +15,13 @@ const sendTypeSenseRequest = async (
     };
     const body = data ? JSON.stringify(data) : undefined;
 
-    console.log(`Sending TypeSense request: ${method} ${url}`);
-    if (data) console.log('Request payload:', JSON.stringify(data, null, 2));
+    // console.log(`Sending TypeSense request: ${method} ${url}`);
+    // if (data) console.log('Request payload:', JSON.stringify(data, null, 2));
 
     try {
         const response = await fetch(url, { method, headers, body });
         const responseData = await response.json();
-        console.log(`Response from TypeSense (${method} ${url}):`, responseData);
+        // console.log(`Response from TypeSense (${method} ${url}):`, responseData);
         return responseData;
     } catch (error) {
         console.error(`Error in TypeSense request (${method} ${url}):`, error);
@@ -65,7 +65,7 @@ const bulkImportDocuments = async (
     const documentsString = documents.map((doc) => JSON.stringify(doc)).join('\n');
 
     console.log(`Importing ${documents.length} documents to collection: ${collectionName}`);
-    console.log('Documents being imported:', documents);
+    // console.log('Documents being imported:', documents);
 
     try {
         const response = await fetch(importUrl, {
@@ -77,7 +77,7 @@ const bulkImportDocuments = async (
             body: documentsString,
         });
         const result = await response.text();
-        console.log(`Bulk import result for ${collectionName}:`, result);
+        // console.log(`Bulk import result for ${collectionName}:`, result);
 
         const lines = result.trim().split('\n');
         const failed = lines.filter((line) => {
@@ -710,7 +710,7 @@ export const syncToTypesense = async (env: {
 
             // map orgs to include all required data
             const uploadOrgs = await Promise.all(organizations.map(async (org, index) => {
-                console.log(`Org ${index + 1}:`, org)
+                // console.log(`Org ${index + 1}:`, org)
                 const organization = await prisma.organization.findUnique({
                     where: { id: org.id },
                     include: { 
@@ -768,7 +768,7 @@ export const syncToTypesense = async (env: {
             console.log('Validating milestone data...');
 
             const uploadMilestones = await Promise.all(milestones.map(async (ms, index) => {
-                console.log(`Milestone ${index + 1}:`, ms)
+                // console.log(`Milestone ${index + 1}:`, ms)
                 const milestone = await prisma.milestone.findUnique({
                     where: { id: ms.id },
                     include: { node: true }
@@ -1131,7 +1131,7 @@ export const syncToTypesense = async (env: {
 
             // map orgs to include all required data
             const uploadResearchers = await Promise.all(researchers.map(async (researcher, index) => {
-                console.log(`Researcher ${index + 1}:`, researcher)
+                // console.log(`Researcher ${index + 1}:`, researcher)
                 const fetchedResearcher = await prisma.researcher.findUnique({
                     where: { id: researcher.id },
                     include: {
