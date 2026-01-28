@@ -192,7 +192,7 @@ export default function MarketplacePage() {
 
     return (
         <div className="flex flex-col w-full h-full mx-auto gap-8">
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-8 pb-8">
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Patient groups</h2>
