@@ -10,6 +10,7 @@ import { Button } from "@comend/components/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@comend/components/ui/dialog";
 import { Separator } from "@comend/components/ui/separator";
 import { CaretAccordion } from "@comend/components/ui/carret-accordion";
+import { QUANTITY_OPTIONS } from "@comend/lib/types";
 
 export const BiosampleDetails = ({biosample}: { biosample: any }) => {
 
@@ -19,89 +20,30 @@ export const BiosampleDetails = ({biosample}: { biosample: any }) => {
             <DialogHeader>
                 <DialogTitle className="text-2xl font-semibold">{biosample?.id}</DialogTitle>
             </DialogHeader>
-            <div className="flex flex-col gap-4 pt-4 ">
-                {/* <RFPStatusBadge status={status} /> */}
-                
-                <div className="flex gap-4">
-                {/* <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words grow-2">
-                    {Array.isArray(biosample.openTo) && biosample.openTo.length > 0 && (
-                        <li>
-                            <PropertyBadge>
-                                <b>Open to:</b>
-                                {biosample.openTo
-                                    .map((option: string) => {
-                                        switch (option) {
-                                            case "CRO":
-                                                return "Service providers";
-                                            case "ACADEMIC":
-                                                return "Academics";
-                                            default:
-                                                return option;
-                                        }
-                                    })
-                                    .join(", ")}
-                            </PropertyBadge>
-                        </li>
-                    )}
-
-                    {biosample.budget && (
-                        <li>
-                            <PropertyBadge>
-                                <p><b>Budget: </b> ${formatMoney(rfp.budget)}</p>
-                            </PropertyBadge>
-                        </li>
-                    )}
-
-                    {biosample.startDate && (
-                        <li>
-                            <PropertyBadge>
-                                <b>Opens: </b>{formatDateUTC(rfp.startDate)}
-                            </PropertyBadge>
-                        </li>
-                    )}
-
-                    {biosample.endDate && (
-                        <li>
-                            <PropertyBadge>
-                                <b>Due: </b>{formatDateUTC(rfp.endDate)}
-                            </PropertyBadge>
-                        </li>
-                    )}
-                </ul> */}
-                    {/* {(biosample?.contacts && biosample?.contacts?.length > 0) && (
-                        <div className="grow-1">
-                        <Button 
-                            variant="cta"
-                            className="ml-auto font-normal"
-                            asChild
-                        >
-                            <Link href={`mailto:${biosample?.contacts[0].email}`}>
-                                <Mail className="h-4 w-4 min-h-4 min-w-4"/>
-                                Contact
-                            </Link>
-                        </Button>
-                        </div>
-                    )} */}
-                </div>
-
-                {(biosample?.milestones && biosample?.milestones.length > 0) && (
-                    <div className="border-l-2 border-purple-200 pl-2 space-y-2">
-                        <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
-                            <Workflow className="h-4 w-4 min-w-4 text-purple-900" />
-                            <span className="text-purple-900 text-nowrap">Projects</span>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {biosample.milestones.map((project: any) => (
-                                <Badge className="font-normal" variant={"purple"}>
-                                    <FileText className="h-4 w-4 min-h-4 min-w-4"/>
-                                    {project.milestone.title}
-                                </Badge>
-                            ))}
-                        </div>
-                    </div>
+            <div className="flex flex-col gap-4 pt-4">
+                {/* <div className="flex gap-2 items-center min-w-[110px] text-nowrap">
+                    <img className="size-8 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${biosample.donorId}`} alt="User Avatar" />
+                    <p>{biosample.donorId}</p>
+                </div> */}
+                {biosample?.quantity && biosample?.quantityUnit && (
+                    <Badge variant="green" className="w-fit">{`${biosample.quantity} ${QUANTITY_OPTIONS.find(option => option.value === biosample.quantityUnit)?.label}`}</Badge>
                 )}
 
-                <DialogDescription className="text-sm text-muted-foreground">{biosample?.description}</DialogDescription>
+                {/* <PropertyBadge>
+                    <b>Open to:</b>
+                    {rfp.openTo
+                        .map((option: string) => {
+                            switch (option) {
+                                case "CRO":
+                                    return "Service providers";
+                                case "ACADEMIC":
+                                    return "Academics";
+                                default:
+                                    return option;
+                            }
+                        })
+                        .join(", ")}
+                </PropertyBadge> */}
 
                 <Separator />
 
@@ -120,14 +62,14 @@ export const BiosampleDetails = ({biosample}: { biosample: any }) => {
 
                 <Separator />
 
-                {/* {biosample.eligibility && (
+                {biosample?.description && (
                     <CaretAccordion 
                         title={'Notes'}
                         content={
-                            <p className="text-sm">{biosample.eligibility}</p>
+                            <p className="text-sm">{biosample.description}</p>
                         }
                     />
-                )} */}
+                )}
 
                 {/* {rfp.instructions && (
                     <CaretAccordion 
