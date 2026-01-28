@@ -1851,6 +1851,11 @@ export const RESEARCH_PLAN_STATUS: Option[] = [
         label: 'Seeking partners (sponsors, fundraising, licensing, etc.)',
         value: 'SEEKINGPARTNERS',
     },
+    {
+        id: 'COMPLETED',
+        label: 'Completed',
+        value: 'COMPLETED',
+    },
 ]
 
 export const MODALITIES: Option[] = [
