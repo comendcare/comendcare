@@ -82,7 +82,7 @@ export function useResearchPlansTableColumns(
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Therapeutic strategy"
+                    title="Research strategy"
                 />
             ),
             cell: ({row}) => (

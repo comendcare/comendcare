@@ -1309,8 +1309,7 @@ export const inviteUser = withOrganizationAuth(
             console.error("Error inviting user:", error)
             return {success: false, error: "Database error. please try again later."}
         }
-    },
-    ['owner', 'support'] // this function is only available to owners of this organization
+    }
 )
 
 export const approveMemberRequestAndCreateMember = withOrganizationAuth(

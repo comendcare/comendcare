@@ -36,7 +36,7 @@ export function ResearchPlanFiltersDialog() {
                 <DialogTitle>Research Plan Filters</DialogTitle>
                 {/* Modalities/Therapeutic Strategies */}
                 <div>
-                    <Label>Therapeutic strategy</Label>
+                    <Label>Research strategy</Label>
                     <MultipleSelector
                         value={filters.modalities ?? []}
                         onChange={(vals) => setFilterKey("modalities", vals)}
