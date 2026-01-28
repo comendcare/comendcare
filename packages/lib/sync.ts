@@ -15,13 +15,13 @@ const sendTypeSenseRequest = async (
     };
     const body = data ? JSON.stringify(data) : undefined;
 
-    // console.log(`Sending TypeSense request: ${method} ${url}`);
-    // if (data) console.log('Request payload:', JSON.stringify(data, null, 2));
+    console.log(`Sending TypeSense request: ${method} ${url}`);
+    if (data) console.log('Request payload:', JSON.stringify(data, null, 2));
 
     try {
         const response = await fetch(url, { method, headers, body });
         const responseData = await response.json();
-        // console.log(`Response from TypeSense (${method} ${url}):`, responseData);
+        console.log(`Response from TypeSense (${method} ${url}):`, responseData);
         return responseData;
     } catch (error) {
         console.error(`Error in TypeSense request (${method} ${url}):`, error);
@@ -65,7 +65,7 @@ const bulkImportDocuments = async (
     const documentsString = documents.map((doc) => JSON.stringify(doc)).join('\n');
 
     console.log(`Importing ${documents.length} documents to collection: ${collectionName}`);
-    // console.log('Documents being imported:', documents);
+    console.log('Documents being imported:', documents);
 
     try {
         const response = await fetch(importUrl, {
@@ -77,7 +77,7 @@ const bulkImportDocuments = async (
             body: documentsString,
         });
         const result = await response.text();
-        // console.log(`Bulk import result for ${collectionName}:`, result);
+        console.log(`Bulk import result for ${collectionName}:`, result);
 
         const lines = result.trim().split('\n');
         const failed = lines.filter((line) => {
@@ -695,7 +695,7 @@ export const syncToTypesense = async (env: {
         };
 
         /* UPDATE ORGANIZATION ---------------------------------------------------------------------------------------- */
-        // console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
+        console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizationSchema);
         const organizations = await prisma.organization.findMany({
             where: {
@@ -703,14 +703,14 @@ export const syncToTypesense = async (env: {
                 published: true
             }
         });
-        // console.log('Raw organizations data:', organizations);
+        console.log('Raw organizations data:', organizations);
 
         if (organizations.length > 0) {
             console.log('Validating organization data...');
 
             // map orgs to include all required data
             const uploadOrgs = await Promise.all(organizations.map(async (org, index) => {
-                // console.log(`Org ${index + 1}:`, org)
+                console.log(`Org ${index + 1}:`, org)
                 const organization = await prisma.organization.findUnique({
                     where: { id: org.id },
                     include: { 
@@ -753,7 +753,7 @@ export const syncToTypesense = async (env: {
         }
 
         /* UPDATE MILESTONES ---------------------------------------------------------------------------------------- */
-        // console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
+        console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
         const milestones = await prisma.milestone.findMany({
             where: {
@@ -763,12 +763,12 @@ export const syncToTypesense = async (env: {
                 }
             }
         });
-        // console.log('Raw milestones data:', milestones);
+        console.log('Raw milestones data:', milestones);
         if (milestones.length > 0) {
             console.log('Validating milestone data...');
 
             const uploadMilestones = await Promise.all(milestones.map(async (ms, index) => {
-                // console.log(`Milestone ${index + 1}:`, ms)
+                console.log(`Milestone ${index + 1}:`, ms)
                 const milestone = await prisma.milestone.findUnique({
                     where: { id: ms.id },
                     include: { node: true }
@@ -794,7 +794,7 @@ export const syncToTypesense = async (env: {
         }
 
         /* UPDATE CROS/COMPANIES ---------------------------------------------------------------------------------- */
-        // console.log('CRO Schema:', JSON.stringify(companySchema, null, 2));
+        console.log('CRO Schema:', JSON.stringify(companySchema, null, 2));
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companySchema);
         const companies = await prisma.company.findMany({
             select: {
@@ -813,7 +813,7 @@ export const syncToTypesense = async (env: {
                 milestoneTypes: true,
             }
         });
-        // console.log('Raw companies data:', companies);
+        console.log('Raw companies data:', companies);
         if (companies.length > 0) {
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companies);
         } else {
@@ -821,7 +821,7 @@ export const syncToTypesense = async (env: {
         }
 
         /* UPDATE BIOSAMPLES ---------------------------------------------------------------------------------------- */
-        // console.log('Biosample Schema:', JSON.stringify(biosampleSchema, null, 2));
+        console.log('Biosample Schema:', JSON.stringify(biosampleSchema, null, 2));
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', biosampleSchema);
         const biosamples = await prisma.biosample.findMany({
             where: {
@@ -861,7 +861,7 @@ export const syncToTypesense = async (env: {
                 createFacilityRequests: true,
             }
         })
-        // console.log('Raw biosamples data:', biosamples)
+        console.log('Raw biosamples data:', biosamples)
         if (biosamples.length > 0) {
             const uploadBiosamples = biosamples.map(biosample => ({
                 ...biosample,
@@ -883,7 +883,7 @@ export const syncToTypesense = async (env: {
 
 
         /* UPDATE DISEASE MODELS ---------------------------------------------------------------------------------------- */
-        // console.log('Disease Model:', JSON.stringify(diseaseModelSchema, null, 2));
+        console.log('Disease Model:', JSON.stringify(diseaseModelSchema, null, 2));
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', diseaseModelSchema);
         const diseaseModels = await prisma.diseaseModel.findMany({
             where: {
@@ -922,7 +922,7 @@ export const syncToTypesense = async (env: {
                 createFacilityRequests: true,
             }
         })
-        // console.log('Raw disease models data:', diseaseModels)
+        console.log('Raw disease models data:', diseaseModels)
         if (diseaseModels.length > 0) {
             const uploadDiseaseModels = diseaseModels.map(diseaseModel => ({
                 ...diseaseModel,
@@ -944,7 +944,7 @@ export const syncToTypesense = async (env: {
         }
 
         /* UPDATE CLINICAL DATASETS ---------------------------------------------------------------------------------- */
-        // console.log('Clinical Dataset:', JSON.stringify(clinicalDatasetSchema, null, 2));
+        console.log('Clinical Dataset:', JSON.stringify(clinicalDatasetSchema, null, 2));
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', clinicalDatasetSchema);
         const clinicalDatasets = await prisma.tool.findMany({
             where: {
@@ -981,7 +981,7 @@ export const syncToTypesense = async (env: {
                 createFacilityRequests: true,
             }
         })
-        // console.log('Raw clinical datasets data:', clinicalDatasets)
+        console.log('Raw clinical datasets data:', clinicalDatasets)
         if (clinicalDatasets.length > 0) {
             const uploadClinicalDatasets = clinicalDatasets.map(dataset => ({
                 // id: dataset.id,
@@ -1012,7 +1012,7 @@ export const syncToTypesense = async (env: {
         }
 
         /* UPDATE RFPS ---------------------------------------------------------------------------------- */
-        // console.log(`RFPs`, JSON.stringify(rfpSchema, null, 2))
+        console.log(`RFPs`, JSON.stringify(rfpSchema, null, 2))
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'rfps', rfpSchema);
         const rfps = await prisma.rFP.findMany({
             where: {
@@ -1049,7 +1049,7 @@ export const syncToTypesense = async (env: {
                 endDate: true
             }
         })
-        // console.log('Raw rfp data:', rfps)
+        console.log('Raw rfp data:', rfps)
         if (rfps.length > 0) {
             const uploadRFPs = rfps.map(rfp => ({
                 ...rfp,
@@ -1121,17 +1121,17 @@ export const syncToTypesense = async (env: {
         }
 
         /* UPDATE RESEARCHERS --------------------------------------------------------------------------- */
-        // console.log('Researcher Schema:', JSON.stringify(researcherSchema, null, 2));
+        console.log('Researcher Schema:', JSON.stringify(researcherSchema, null, 2));
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'researchers', researcherSchema);
         const researchers = await prisma.researcher.findMany({});
-        // console.log('Raw researchers data:', researchers);
+        console.log('Raw researchers data:', researchers);
 
         if (researchers.length > 0) {
             console.log('Validating researcher data...');
 
             // map orgs to include all required data
             const uploadResearchers = await Promise.all(researchers.map(async (researcher, index) => {
-                // console.log(`Researcher ${index + 1}:`, researcher)
+                console.log(`Researcher ${index + 1}:`, researcher)
                 const fetchedResearcher = await prisma.researcher.findUnique({
                     where: { id: researcher.id },
                     include: {
