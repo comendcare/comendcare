@@ -72,7 +72,7 @@ export default function MoneyInput(props: TextInputProps & {className?: string})
                 };
 
                 return (
-                    <FormItem>
+                    <FormItem id={name}>
                         {props.label && <FormLabel>{props.label}</FormLabel>}
                         {props.description && <FormDescription className="flex items-center">{props.description}</FormDescription>}
                         <FormControl>

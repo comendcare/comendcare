@@ -1,6 +1,6 @@
 "use client"
-import { useEffect, useState } from "react";
-
+import { Suspense, useEffect, useState } from "react";
+import dynamic from "next/dynamic"
 import type { Organization, Roadmap } from "@prisma/client";
 import { ResearchPlanTemplatesCard } from "./roadmap-templates";
 import Loading from "./../../../loading";
@@ -13,18 +13,42 @@ import { Dialog, DialogContent } from "@comend/components/ui/dialog";
 import ShareDialog from "./share-dialog";
 import { PulsatingButton } from "@comend/components/ui/pulsating-button";
 import { cn } from "@comend/lib/utils";
-import CreateResearchPlanDialog from "./create-research-plan-dialog";
+import { Shell } from "@comend/components/biorepo/advanced-data-table/lib/shell";
+import { FeatureFlagsProvider } from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
+import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
+import { DatabaseResearchPlansTable } from "@comend/components/biorepo/advanced-data-table/research-plans-table/database-research-plans-table"
+import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/private-research-plans-table-columns";
+import { useSession } from "next-auth/react";
+import { Row } from "@tanstack/react-table";
+import { NoResultsTemplate } from "@comend/components/no-results";
+
+const CreateResearchPlanDialog = dynamic(
+    () => import("./create-research-plan-dialog"),
+    {
+        ssr: false,
+        loading: () => <Button variant="cta" disabled>
+            <Plus/>
+            Create an empty research plan
+        </Button>, // keep trigger UI unchanged
+    }
+)
 
 type Props = {
     orgId: string;
     organization: Pick<Organization, "id" | "name" | "subdomain" | "customDomain">;
-    roadmaps: any[];
+    // roadmaps: any[];
+    data: any;
+    pageCount: any;
+    // columns: any;
+    searchParams: any;
 };
 
-export default function RoadmapsPage({ orgId, organization, roadmaps }: Props) {
+export default function RoadmapsPage({ orgId, organization, data, pageCount, searchParams }: Props) {
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
     const [shareIsOpen, setShareIsOpen] = useState(false)
+    const {data: session} = useSession()
+    const columns = useResearchPlansTableColumns({session})
 
     useEffect(() => {
         // un-initialize any active research plans
@@ -35,9 +59,20 @@ export default function RoadmapsPage({ orgId, organization, roadmaps }: Props) {
             edges: [],
             milestones: [],
             selectedView: null,
-            selectedNodeIds: []
+            selectedNodeIds: [],
         })
     }, [])
+
+    useEffect(() => {
+        if (!Array.isArray(data)) return
+
+        data
+            .map((r) => r?.id)
+            .filter((id): id is string => typeof id === "string" && id.length > 0)
+            .forEach((id) => {
+                router.prefetch(`/app/research-plan/${id}`)
+            })
+    }, [data, router])
 
     const handleShare = async () => {
         // override default delete behaviour with our custom dialog
@@ -52,8 +87,8 @@ export default function RoadmapsPage({ orgId, organization, roadmaps }: Props) {
             <div className="p-6 w-full onborda-existing-research-plans-section">
                 <div className="w-full flex justify-between items-center gap-4">
                     <h2 className="col-span-full font-semibold text-2xl">My research plans</h2>
-                    <div className="flex gap-4 ">
-                        {roadmaps.length > 0 
+                    <div className="flex gap-4">
+                        {data.length > 0 
                             ? (
                                 <CreateResearchPlanDialog 
                                     trigger={
@@ -90,14 +125,52 @@ export default function RoadmapsPage({ orgId, organization, roadmaps }: Props) {
                         </Button>
                     </div>
                 </div>
-                <RoadmapsTable 
+                {/* <RoadmapsTable 
                     isPrivate={true}
                     roadmaps={roadmaps} 
-                    rowClickCallback={(roadmap) => {
+                    rowClickCallback={() => {
                         setIsLoading(true)
-                        router.push(`/app/research-plan/${roadmap.id}`)
                     }}
-                />
+                /> */}
+                <Shell className="gap-2 w-full max-w-full">
+                    <FeatureFlagsProvider showFilters={false}>
+                        <Suspense
+                            fallback={
+                                <DataTableSkeleton
+                                    columnCount={7}
+                                    filterCount={2}
+                                    cellWidths={[
+                                        "10rem",
+                                        "30rem",
+                                        "10rem",
+                                        "10rem",
+                                        "6rem",
+                                        "6rem",
+                                        "6rem",
+                                    ]}
+                                    shrinkZero
+                                />
+                            }
+                        >
+                            <DatabaseResearchPlansTable 
+                                data={data} 
+                                pageCount={pageCount} 
+                                columns={columns}
+                                searchParams={searchParams}
+                                onRowClickCallback={(e: any, row: Row<any> | undefined) => row?.original.id && router.push(`/app/research-plan/${row.original.id}`)}
+                                showPagination={true}
+                                noResultsOverride={(
+                                    <NoResultsTemplate
+                                        imgAlt="No research plans"
+                                        src="https://illustrations.popsy.co/gray/studying.svg"
+                                        title="No research plans yet!"
+                                        description="Your organization does not have any research plans yet."
+                                    />
+                                )}
+                            />
+                        </Suspense>
+                    </FeatureFlagsProvider>
+                </Shell>
             </div>
             
             <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>

@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'; // Prevent caching
 import { checkDateRangeUTC, getSortRank, handleGetAvailability, stringToSortableInt } from "./utils";
 import prisma from "./prisma"
-import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, MILESTONE_TYPE_OPTIONS, MODALITIES, RFP, TOOL_TYPE_OPTIONS } from "./types";
+import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, MILESTONE_TYPE_OPTIONS, MODALITIES, RESEARCH_PLAN_STATUS, RESEARCH_STAGE, RFP, TOOL_TYPE_OPTIONS } from "./types";
 
 const sendTypeSenseRequest = async (
     url: string,
@@ -647,6 +647,36 @@ export const syncToTypesense = async (env: {
                 // }
             ]
         }
+        const researchPlanSchema = {
+            name: 'research-plans',
+            enable_nested_fields: true,
+            fields: [
+                {
+                    name: ".*",
+                    type: "auto",
+                },
+                {
+                    name: "organization.name",
+                    type: "string",
+                    sort: true,
+                },
+                {
+                    name: "title",
+                    type: "string",
+                    sort: true,
+                },
+                {
+                    name: "milestones",
+                    type: "int64",
+                    sort: true,
+                },
+                {
+                    name: "description",
+                    type: "string",
+                    sort: true,
+                }
+            ]
+        }
         const researcherSchema = {
             name: 'researchers',
             enable_nested_fields: true,
@@ -1031,6 +1061,63 @@ export const syncToTypesense = async (env: {
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'rfps', uploadRFPs);
         } else {
             console.log('No rfps to import.');
+        }
+
+        /* UPDATE RESEARCH PLANS ---------------------------------------------------------------------------------- */
+        console.log(`Research Plans`, JSON.stringify(researchPlanSchema, null, 2))
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'research-plans', researchPlanSchema);
+        const researchPlans = await prisma.roadmap.findMany({
+            where: {
+                private: false // only sync public research plans
+            },
+            select: {
+                id: true,
+                createdAt: true,
+                updatedAt: true,
+                title: true,
+                description: true,
+                partners: {
+                    select: {
+                        name: true,
+                        email: true,
+                        affiliation: true
+                    }
+                },
+                stages: true,
+                statuses: true,
+                links: {
+                    select: {
+                        name: true,
+                        link: true,
+                    }
+                },
+                modalities: true,
+                organization: {
+                    select: {name: true}
+                },
+                milestones: {where: {private: false}},
+            }
+        })
+        console.log('Raw research plan data:', researchPlans)
+        if (researchPlans.length > 0) {
+            const uploadResearchPlans = researchPlans.map(researchPlan => ({
+                ...researchPlan,
+                createdAt: researchPlan.createdAt.getTime(), // special case for created at to enable sorting
+                updatedAt: researchPlan.createdAt.getTime(), // special case for created at to enable sorting
+                milestones: researchPlan.milestones.filter(milestone => !milestone.private).length, // public project count
+                modalities: MODALITIES
+                    .filter((option: any) => researchPlan.modalities.includes(option.value))
+                    .map((option: any) => option.label),
+                stages: RESEARCH_STAGE
+                    .filter((option: any) => researchPlan.stages.includes(option.value))
+                    .map((option: any) => option.label),
+                statuses: RESEARCH_PLAN_STATUS
+                    .filter((option: any) => researchPlan.statuses.includes(option.value))
+                    .map((option: any) => option.label),
+            }))
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'research-plans', uploadResearchPlans);
+        } else {
+            console.log('No research plans to import.');
         }
 
         /* UPDATE RESEARCHERS --------------------------------------------------------------------------- */

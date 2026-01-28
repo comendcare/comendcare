@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {unstable_batchedUpdates} from "react-dom";
 import { Funnel, X } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { debounce } from "lodash";
@@ -18,26 +19,33 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@comend/components/ui/select";
-import MultipleSelector from "@comend/components/ui/multiple-selector";
-
 import type { OrganizationSearchState } from "@/state/search/organizationSearchStore";
 import { useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
 
 // Options
-import {mechanisms} from "@comend/lib/types";
+import {mechanisms, MOLECULAR_MECHANISMS} from "@comend/lib/types";
 import { ASSOCIATED_SYSTEMS, MODALITIES } from "@comend/lib/types";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
-import type { Option } from "@comend/lib/types";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore";
 import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/state/search/clinicalDatasetSearchStore";
 import { handleAsyncConditionSearch, handleAsyncGeneSearch } from "@comend/lib/utils";
+import dynamic from "next/dynamic";
 
-// Helpers to normalize options
-const MECHANISM_OPTIONS = mechanisms.map((m: any) => ({
-    label: m.label ?? m.name ?? String(m.id),
-    value: String(m.id),
-}));
+const PAGFiltersDialog = dynamic(
+    () => import("./pag-filters-dialog").then((m) => m.PAGFiltersDialog),
+    {
+        ssr: false,
+        loading: () => (
+            <>
+                <Separator orientation="vertical" className="h-8" />
+                <Button disabled className="m-4 rounded-full" variant={"cta"}>
+                    <Funnel />
+                    Filters
+                </Button>
+            </>
+        ),
+    }
+);
 
 // Sort menu (mirrors store-supported sort keys)
 const SORT_ITEMS: { value: string; label: string }[] = [
@@ -129,17 +137,19 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
     //     // eslint-disable-next-line react-hooks/exhaustive-deps
     // }, []);
 
-    const handleInputChangeCallback = useCallback(
-        (text: string) => {
+    const handleInputChangeCallback = useCallback((text: string) => {
+        unstable_batchedUpdates(() => {
             setSearchTerm(text);
-            
-            // Handle setting universal search in other marketplaces
             setBiosampleSearchTerm(text);
             setDiseaseModelSearchTerm(text);
             setClinicalDatasetSearchTerm(text);
-        },
-        [setSearchTerm]
-    );
+        });
+    }, [
+        setSearchTerm,
+        setBiosampleSearchTerm,
+        setDiseaseModelSearchTerm,
+        setClinicalDatasetSearchTerm,
+    ])
 
     const debounceHandleInputChange = useMemo(
         () => debounce(handleInputChangeCallback, 500),
@@ -258,122 +268,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                 <Separator orientation="vertical" className="h-8" />
 
                 {/* Mobile and additional filters */}
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button className="m-4 rounded-full" variant={'cta'}>
-                            <Funnel />
-                            Filters
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent
-                        ref={dialogRef}
-                        onOpenAutoFocus={(e) => {
-                            e.preventDefault() // prevent focusing the first input
-                            dialogRef.current?.focus() // focus the dialog content instead
-                        }}
-                    >
-                        <DialogTitle>Patient group filters</DialogTitle>
-                            {/* Conditions */}
-                            <div>
-                                <Label>Condition</Label>
-                                <MultipleSelector
-                                    value={filters.conditions ?? []}
-                                    onChange={(vals) => setFilterKey("conditions", vals)}
-                                    onSearch={handleAsyncConditionSearch}
-                                    placeholder="Any condition"
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{className: "bg-transparent"}}
-                                    loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading conditions...</p>}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                    }
-                                    triggerSearchOnFocus={true}
-                                    showHoverCard={false}
-                                />
-                            </div>
-
-                            {/* Genes */}
-                            <div>
-                                <Label>Gene</Label>
-                                <MultipleSelector
-                                    value={filters.genes ?? []}
-                                    badgeClassName={badgeVariants({variant: "teal"})}
-                                    onChange={(vals) => setFilterKey("genes", vals)}
-                                    onSearch={handleAsyncGeneSearch}
-                                    placeholder="Any gene"
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{className: "bg-transparent"}}
-                                    loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading genes...</p>}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                    }
-                                    triggerSearchOnFocus={true}
-                                    showHoverCard={false}
-                                />
-                            </div>
-
-                            {/* Mechanisms of action */}
-                            <div>
-                                <Label>
-                                    Mechanisms of action
-                                </Label>
-                                <MultipleSelector
-                                    value={filters.mechanisms ?? []}
-                                    onChange={(vals) => setFilterKey("mechanisms", vals)}
-                                    defaultOptions={MECHANISM_OPTIONS}
-                                    placeholder="Any"
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{ className: "bg-transparent" }}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">
-                                            no results found.
-                                        </p>
-                                    }
-                                    showHoverCard={false}
-                                />
-                            </div>
-
-                            {/* Associated systems */}
-                            <div>
-                                <Label>
-                                    Associated systems
-                                </Label>
-                                <MultipleSelector
-                                    value={filters.systems ?? []}
-                                    onChange={(vals) => setFilterKey("systems", vals)}
-                                    defaultOptions={SYSTEM_OPTIONS}
-                                    placeholder="Any"
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{ className: "bg-transparent" }}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">
-                                            no results found.
-                                        </p>
-                                    }
-                                />
-                            </div>
-
-                            {/* Modalities */}
-                            <div>
-                                <Label>
-                                    Modalities of interest
-                                </Label>
-                                <MultipleSelector
-                                    value={filters.modalities ?? []}
-                                    onChange={(vals) => setFilterKey("modalities", vals)}
-                                    defaultOptions={MODALITY_OPTIONS}
-                                    placeholder="Any"
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{ className: "bg-transparent" }}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">
-                                            no results found.
-                                        </p>
-                                    }
-                                />
-                            </div>
-                    </DialogContent>
-                </Dialog>
+                <PAGFiltersDialog/>
             </div>
 
             {/* Active filter badges */}
@@ -409,7 +304,7 @@ export default function PAGMarketplaceIntegratedSearchAndFilter() {
                         {/* mechanisms */}
                         {(filters.mechanisms || []).map((item) => (
                             <Badge key={`mechanisms-${item.value}`} variant="secondary" className="text-xs">
-                                {MECHANISM_OPTIONS.find((o) => o.value === item.value)?.label ||
+                                {MOLECULAR_MECHANISMS.find((o) => o.value === item.value)?.label ||
                                     item.value}
                                 <button
                                     onClick={() => removeFilterItem("mechanisms", item.value)}

@@ -7,13 +7,28 @@ import {Button} from "@comend/components/ui/button"
 import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"
 import {Separator} from "@comend/components/ui/separator"
-import {debounce, filter} from "lodash";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/components/ui/dialog";
+import {debounce} from "lodash";
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
-import MultipleSelector from "@comend/components/ui/multiple-selector"
-import { RFP_OPEN_TO_TYPE_OPTIONS, Option, RFP_STATUS_TYPE_OPTIONS } from "@comend/lib/types"
 import { Badge, badgeVariants } from "@comend/components/ui/badge"
 import { handleAsyncConditionSearch, handleAsyncGeneSearch } from "@comend/lib/utils"
+import dynamic from "next/dynamic"
+
+const RFPFiltersDialog = dynamic(
+    () => import("./rfp-filters-dialog").then((m) => m.RFPFiltersDialog),
+    {
+        ssr: false,
+        loading: () => (
+            <>
+                <Separator orientation="vertical" className="h-8" />
+                <Button disabled className="m-4 rounded-full" variant={"cta"}>
+                    <Funnel />
+                    Filters
+                </Button>
+            </>
+        ),
+    }
+)
+
 
 export function RFPMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, sortBy, setSortBy, setSearchTerm, filters, setFilters, totalResults} = useRFPSearchStore(
@@ -85,95 +100,7 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
                 <Separator orientation="vertical" className="h-8" />
 
                 {/* Mobile and additional filters */}
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button className="m-4 rounded-full" variant={'cta'}>
-                            <Funnel />
-                            Filters
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent
-                        ref={dialogRef}
-                        onOpenAutoFocus={(e) => {
-                            e.preventDefault() // prevent focusing the first input
-                            dialogRef.current?.focus() // focus the dialog content instead
-                        }}
-                    >
-                        <DialogTitle>RFP Filters</DialogTitle>
-                            {/* Conditions */}
-                            <div>
-                                <Label>Condition</Label>
-                                <MultipleSelector
-                                    value={filters.conditions ?? []}
-                                    onChange={(vals) => setFilterKey("conditions", vals)}
-                                    onSearch={handleAsyncConditionSearch}
-                                    placeholder="Select conditions..."
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{className: "bg-transparent"}}
-                                    loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading conditions...</p>}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                    }
-                                    triggerSearchOnFocus={true}
-                                    showHoverCard={false}
-                                />
-                            </div>
-
-                            {/* Genes */}
-                            <div>
-                                <Label>Gene</Label>
-                                <MultipleSelector
-                                    value={filters.genes ?? []}
-                                    badgeClassName={badgeVariants({variant: "teal"})}
-                                    onChange={(vals) => setFilterKey("genes", vals)}
-                                    onSearch={handleAsyncGeneSearch}
-                                    placeholder="Select genes..."
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{className: "bg-transparent"}}
-                                    loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading genes...</p>}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                    }
-                                    triggerSearchOnFocus={true}
-                                    showHoverCard={false}
-                                />
-                            </div>
-
-                            {/* Open to */}
-                            <div>
-                                <Label>Open to</Label>
-                                <MultipleSelector
-                                    value={filters.openTo ?? []}
-                                    onChange={(vals) => setFilterKey("openTo", vals)}
-                                    defaultOptions={RFP_OPEN_TO_TYPE_OPTIONS}
-                                    placeholder="Select option..."
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{className: "bg-transparent"}}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                    }
-                                    showHoverCard={false}
-                                />
-                            </div>
-
-                            {/* Status */}
-                            <div>
-                                <Label>Status</Label>
-                                <MultipleSelector
-                                    value={filters.status ?? []}
-                                    onChange={(vals) => setFilterKey("status", vals)}
-                                    defaultOptions={RFP_STATUS_TYPE_OPTIONS}
-                                    placeholder="Select status..."
-                                    hidePlaceholderWhenSelected
-                                    commandProps={{className: "bg-transparent"}}
-                                    emptyIndicator={
-                                        <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                    }
-                                    showHoverCard={false}
-                                />
-                            </div>
-                    </DialogContent>
-                </Dialog>
+                <RFPFiltersDialog/>
             </div>
 
             {/* Active filter badges */}
@@ -183,8 +110,6 @@ export function RFPMarketplaceIntegratedSearchAndFilter() {
                         {/* conditions */}
                         {(filters.conditions || []).map((item) => (
                             <Badge key={`conditions-${item.value}`} variant="secondary" className="text-xs">
-                                {/* {MECHANISM_OPTIONS.find((o) => o.value === item.value)?.label ||
-                                    item.value} */}
                                 {item.value}
                                 <button
                                     onClick={() => removeFilterItem("conditions", item.value)}

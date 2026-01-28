@@ -1,5 +1,6 @@
 {
     "id": "cm9ud3w9v0000zzb8a7osd7r5",
+    "private": true,
     "title": "Gene therapy research plan",
     "description": "This research plan is designed to develop and evaluate therapeutic strategies that utilize AAV technologies to deliver a gene to target cells in the body, with the hope of treating and potentially curing inherited or acquired diseases at the molecular level.",
     "content": null,
@@ -10,6 +11,10 @@
     "published": true,
     "organizationId": "cm869ngpm0000of3vh8f98q2l",
     "userId": null,
+    "partners": null,
+    "links": null,
+    "stages": ["DISCOVERY"],
+    "statuses": ["PLANNING"],
     "modalities": ["GENE_THERAPY_AAV"],
     "milestones": [
         {
@@ -128,7 +133,7 @@
             "id": "1PrLYqL0LqeznEjBlBztc",
             "createdAt": "2025-04-23T20:09:29.134Z",
             "updatedAt": "2025-05-14T19:20:49.455Z",
-            "title": "Phase 1/2",
+            "title": "Phase I/II",
             "description": "A combination of the first two phases of clinical testing, designed to evaluate both the safety and efficacy of a drug in a single trial.",
             "notes": null,
             "status": "PLANNED",
@@ -156,7 +161,7 @@
             "id": "z3PPSgFUh0PEddtUSHgTo",
             "createdAt": "2025-04-23T20:09:29.134Z",
             "updatedAt": "2025-05-14T19:20:49.456Z",
-            "title": "Phase 3",
+            "title": "Phase III",
             "description": "Confirm the drug's efficacy, monitor side effects in a larger population, and compare it to current standard treatments.",
             "notes": null,
             "status": "PLANNED",

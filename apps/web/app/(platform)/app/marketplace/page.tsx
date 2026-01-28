@@ -1,10 +1,7 @@
 "use client"
 
-import { TypesenseBiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/typesense-biosamples-table"
 import { useBiosamplesTableColumns } from "@comend/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns"
-import { TypesenseClinicalDatasetsTable } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/typesense-clinical-datasets-table"
 import { useClinicalDatasetsTableColumns } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns"
-import { TypesenseDiseaseModelsTable } from "@comend/components/biorepo/advanced-data-table/disease-models-table/typesense-disease-models-table"
 import { useDiseaseModelsTableColumns } from "@comend/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns"
 import { Button } from "@comend/components/ui/button"
 import { Card, CardContent, CardTitle } from "@comend/components/ui/card"
@@ -25,7 +22,31 @@ import { RFPCard } from "@comend/components/rfp-card"
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
 import { Dialog, DialogContent, DialogTrigger } from "@comend/components/ui/dialog"
 import { mixpanelTrack } from "@comend/lib/mixpanel"
-import { RFPDetails } from "@comend/components/pag-profile-rfps-card"
+import dynamic from "next/dynamic"
+
+const TypesenseBiosamplesTable = dynamic(
+    () => import("@comend/components/biorepo/advanced-data-table/biosamples-table/typesense-biosamples-table")
+        .then(m => m.TypesenseBiosamplesTable),
+    { loading: () => <Skeleton className="h-[286px] w-full" /> }
+)
+
+const TypesenseDiseaseModelsTable = dynamic(
+    () => import("@comend/components/biorepo/advanced-data-table/disease-models-table/typesense-disease-models-table")
+        .then(m => m.TypesenseDiseaseModelsTable),
+    { loading: () => <Skeleton className="h-[286px] w-full" /> }
+)
+
+const TypesenseClinicalDatasetsTable = dynamic(
+    () => import("@comend/components/biorepo/advanced-data-table/clinical-datasets-table/typesense-clinical-datasets-table")
+        .then(m => m.TypesenseClinicalDatasetsTable),
+    { loading: () => <Skeleton className="h-[286px] w-full" /> }
+)
+
+const RFPDetails = dynamic(
+    () => import("@comend/components/pag-profile-rfps-card").then(m => m.RFPDetails),
+    { loading: () => <Skeleton className="h-[400px] w-full" /> }
+)
+
 
 const croSelector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -109,9 +130,6 @@ export default function MarketplacePage() {
                 mechanisms: [] as any[],
                 modalities: [] as any[],
             }
-            await initializeOrganizationSearch(parsedPAGFilters)
-            setPagsInitialized(true)
-            console.log(`Organization search initialized...`)
 
             const parsedBiosampleFilters = {
                 types: [] as any[],
@@ -119,9 +137,6 @@ export default function MarketplacePage() {
                 conditions: [] as any[],
                 organizations: [] as any[],
             }
-            await initializeBiosampleSearch(parsedBiosampleFilters)
-            setBiosamplesInitialized(true)
-            console.log(`Biosample search initialized...`)
 
             const parsedDiseaseModelFilters = {
                 types: [] as any[],
@@ -129,9 +144,6 @@ export default function MarketplacePage() {
                 conditions: [] as any[],
                 organizations: [] as any[],
             }
-            await initializeDiseaseModelSearch(parsedDiseaseModelFilters)
-            setDiseaseModelsInitialized(true)
-            console.log(`Disease Model search initialized...`)
 
             const parsedClinicalDatasetFilters = {
                 types: [] as any[],
@@ -139,9 +151,6 @@ export default function MarketplacePage() {
                 conditions: [] as any[],
                 organizations: [] as any[]
             }
-            await initializeClinicalDatasetSearch(parsedClinicalDatasetFilters)
-            setClinicalDatasetsInitialized(true)
-            console.log(`Clinical Dataset search initialized...`)
 
             const parsedRFPFilters = {
                 conditions: [],
@@ -150,9 +159,6 @@ export default function MarketplacePage() {
                 status: [],
                 organizations: []
             }
-            initializeRFPSearch(parsedRFPFilters)
-            setRfpsInitialized(true)
-            console.log(`RFP search initialized...`)
 
             const parsedCROFilters = {
                 categories: [] as any[],
@@ -161,9 +167,22 @@ export default function MarketplacePage() {
                 certifications: [] as any[],
                 tags: [] as any[],
             }
-            await initializeCROSearch(parsedCROFilters)
+
+            await Promise.all([
+                initializeOrganizationSearch(parsedPAGFilters),
+                initializeBiosampleSearch(parsedBiosampleFilters),
+                initializeDiseaseModelSearch(parsedDiseaseModelFilters),
+                initializeClinicalDatasetSearch(parsedClinicalDatasetFilters),
+                initializeCROSearch(parsedCROFilters),
+                initializeRFPSearch(parsedRFPFilters),
+            ]);
+
+            setPagsInitialized(true)
+            setBiosamplesInitialized(true)
+            setDiseaseModelsInitialized(true)
+            setClinicalDatasetsInitialized(true)
+            setRfpsInitialized(true)
             setCROsInitialized(true)
-            console.log(`CRO search initialized...`)
         }
 
         init()
@@ -173,7 +192,7 @@ export default function MarketplacePage() {
 
     return (
         <div className="flex flex-col w-full h-full mx-auto gap-8">
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-8 pb-8">
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Patient groups</h2>
@@ -213,7 +232,7 @@ export default function MarketplacePage() {
                         }
                     </ol>
                 </div>
-        
+
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Patient biosamples</h2>
@@ -231,11 +250,11 @@ export default function MarketplacePage() {
                             ? (
                                 <>
                                     <div className="max-w-7xl w-full overflow-auto">
-                                        <TypesenseBiosamplesTable 
-                                            showPagination={false} 
-                                            data={biosampleStore.searchResults?.slice(0, 3)} 
-                                            pageCount={1} 
-                                            columns={biosampleColumns} 
+                                        <TypesenseBiosamplesTable
+                                            showPagination={false}
+                                            data={biosampleStore.searchResults?.slice(0, 3)}
+                                            pageCount={1}
+                                            columns={biosampleColumns}
                                             searchParams={{}}
                                         />
                                     </div>
@@ -293,7 +312,7 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                (diseaseModelsInitialized && diseaseModelsInitialized) 
+                                (diseaseModelsInitialized && diseaseModelsInitialized)
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
@@ -392,7 +411,7 @@ export default function MarketplacePage() {
                                     {[...(rfpStore.featured || []), ...(rfpStore.searchResults || [])]
                                         .slice(0, width < 1280 ? 2 : 3)
                                         .map((rfp, index) => (
-                                            <Dialog>
+                                            <Dialog key={index}>
                                                 <DialogTrigger
                                                     className="w-full max-w-full h-full"
                                                     onClick={() => {
@@ -430,7 +449,7 @@ export default function MarketplacePage() {
                         }
                     </ol>
                 </div>
-                
+
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Service providers</h2>

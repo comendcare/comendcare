@@ -8,6 +8,7 @@ import {
     GLOBAL_FEED_TYPES,
     Option,
     RequestFiltersType,
+    RESEARCH_PLAN_TYPES,
     TOOL_TYPE_OPTIONS
 } from "./types";
 import {logError} from "./utils";
@@ -19,7 +20,7 @@ import type {
     MaterialAndDataAccessRequest,
     Organization,
     Prisma,
-    Researcher, TaggableType,
+    Researcher, Roadmap, TaggableType,
     Tool,
     User
 } from "@prisma/client";
@@ -38,7 +39,7 @@ import {getPubMedSearchResultData, getPubMedSearchResultIds} from "./pubmed";
 import {filterColumns} from "./filter-columns";
 import {nanoid} from "nanoid";
 import {mergeResearcherData, mergeResearcherDataAdvanced} from "./../../apps/researcher/lib/utils";
-import {GetBiosamplesSchema, GetClinicalDatasetsSchema, GetDiseaseModelSchema} from "./validations";
+import {GetBiosamplesSchema, GetClinicalDatasetsSchema, GetDiseaseModelSchema, GetResearchPlansSchema} from "./validations";
 import {notFound, redirect} from "next/navigation";
 import {switchOrganization} from "./actions";
 import {ColumnDef} from "@tanstack/react-table";
@@ -857,7 +858,10 @@ export async function getMilestoneTypes(
     }>,
 ) {
     try {
-        const types = await prisma.milestoneType.findMany({select})
+        const types = await prisma.milestoneType.findMany({
+            select,
+            orderBy: [{label: 'asc'}]
+        })
         return {success: true, data: types}
     } catch (error: any) {
         console.error("Database error finding milestone types:", error)
@@ -948,10 +952,18 @@ export async function getPublicMilestoneDetails(
 
 export async function checkSubdomainAvailability(
     nickname: string,
+    orgId?: string,
 ): Promise<Boolean | { error: string }> {
     try {
         const existingOrg = await prisma.organization.findUnique({
-            where: {subdomain: nickname},
+            where: {
+                subdomain: nickname,
+                ...(orgId && {
+                    NOT: {
+                        id: orgId,
+                    },
+                }),
+            },
         });
 
         return !existingOrg
@@ -2955,6 +2967,181 @@ function prismaOrderByFromColumnId(sort: ExtendedColumnSort<any>, schemaColumns?
     return parts.reduceRight((acc, key) => {
         return {[key]: Object.keys(acc).length ? acc : (sort.desc ? "desc" : "asc")}
     }, {})
+}
+
+export const getResearchPlans = async (
+    organizationId: string | null | undefined,
+    select: Prisma.RoadmapSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+    input?: GetResearchPlansSchema,
+    publicOnly: boolean = false,
+    columns?: ColumnDef<any>[],
+): Promise<{ data: Roadmap[], pageCount: number }> => {
+    if (publicOnly) { // allow any requester to fetch public data
+        if (organizationId) {
+            // if org ID is provided only fetch tools for organization
+            const organization = await prisma.organization.findUnique({
+                where: {id: organizationId}
+            })
+
+            return await fetchResearchPlans(
+                organization,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        } else {
+            // if org ID is not provided fetch all public tools
+            return await fetchResearchPlans(
+                undefined,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        }
+    }
+
+    // only allow members of the organization to fetch private data
+    return (await withOrganizationAuth(
+        async (
+            organization: Organization,
+            select: Prisma.RoadmapSelect<InternalArgs & {
+                result: {};
+                model: {};
+                query: {};
+                client: {};
+            }>,
+            input?: GetResearchPlansSchema,
+            publicOnly: boolean = false
+        ) => {
+            return await fetchResearchPlans(
+                organization,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        }
+    ))(organizationId, select, input, publicOnly)
+}
+
+const fetchResearchPlans = async (
+    organization: Organization | null | undefined,
+    select: Prisma.RoadmapSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+    columns?: ColumnDef<any>[] | undefined,
+    input?: GetResearchPlansSchema,
+    publicOnly: boolean = false
+) => {
+    try {
+        if (!input) {
+            const [data, total] = await prisma.$transaction([
+                prisma.roadmap.findMany({
+                    where: {
+                        ...(organization ? {organizationId: organization.id} : undefined),
+                        ...(publicOnly ? {private: false} : undefined)
+                    },
+                    select,
+                    orderBy: {createdAt: "asc"},
+                }),
+                prisma.roadmap.count({
+                    where: {
+                        ...(organization ? {organizationId: organization.id} : undefined),
+                        ...(publicOnly ? {private: false} : undefined)
+                    }
+                }),
+            ]);
+
+            return {data, pageCount: 1};
+        }
+
+        const offset = (input.page - 1) * input.perPage;
+        const advancedTable =
+            input.filterFlag === "advancedFilters"
+
+        let where: any = {};
+
+        if (advancedTable) {
+            where = filterColumns({
+                filters: input.filters,
+                joinOperator: input.joinOperator,
+                schemaColumns: columns
+            })
+        } else {
+            const filters: any[] = []
+            if (input.title) {
+                filters.push({
+                    id: 'title',
+                    value: input.title,
+                    variant: 'text',
+                    operator: 'iLike',
+                    filterId: nanoid()
+                })
+            }
+
+            where = filterColumns({
+                filters,
+                joinOperator: "and"
+            }) || {}
+
+            console.log(`where filter`, where)
+        }
+
+        // add global filter
+        if (input.q) {
+            // custom filtering for types - if any of the type labels include the query, include biosamples
+            // with these types
+            const queriedTypes = RESEARCH_PLAN_TYPES.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+
+            where.OR = [
+                {id: {contains: input.q, mode: "insensitive"}},
+            ];
+
+            if (queriedTypes) {
+                where.OR = where.OR.concat([{types: {hasSome: queriedTypes.map(t => t.value)}}])
+            }
+        }
+
+        const orderBy = input.sort.length
+            ? input.sort.map(s => prismaOrderByFromColumnId(s, columns))
+            : [{createdAt: {sort: "asc"}}];
+
+        const [data, total] = await prisma.$transaction([
+            prisma.roadmap.findMany({
+                skip: offset,
+                take: input.perPage,
+                where: {
+                    ...where,
+                    ...(organization ? {organizationId: organization.id} : undefined),
+                    ...(publicOnly ? {private: false} : undefined)
+                },
+                select,
+                orderBy,
+            }),
+            prisma.roadmap.count({
+                where: {
+                    ...where,
+                    ...(organization ? {organizationId: organization.id} : undefined),
+                    ...(publicOnly ? {private: false} : undefined)
+                }
+            }),
+        ]);
+
+        const pageCount = Math.ceil(total / input.perPage);
+        return {data, pageCount};
+    } catch {
+        return {data: [], pageCount: 0};
+    }
 }
 
 export const getBiosamples = async (

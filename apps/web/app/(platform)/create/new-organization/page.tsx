@@ -3,14 +3,19 @@ import {
     getInvitations,
     getPublicOrganizationData,
     getAllNonMemberOrganizations,
+    getOrganizationFromOrganizationId,
 } from "@comend/lib/fetchers";
 import {Separator} from "@comend/components/ui/separator";
 import NewOrganizationForm from "~web/components/new-organization-form";
 
-export default async function CreateNewOrganizationPage() {
+export default async function CreateNewOrganizationPage({
+    searchParams,
+}: {
+    searchParams: { [key: string]: string | string[] | undefined }
+}) {
 
-    // Invitations (to decide where to redirect after user update)
-    const invRes = await getInvitations({
+    // Kick off both in parallel (independent)
+    const invResPromise = getInvitations({
         id: true,
         email: true,
         role: true,
@@ -20,25 +25,38 @@ export default async function CreateNewOrganizationPage() {
         organizationId: true,
     });
 
+    const orgsResPromise = getAllNonMemberOrganizations({id: true, name: true, description: true});
+
+    const [invRes, orgsRes] = await Promise.all([invResPromise, orgsResPromise]);
+
     let invitations = []
     if (invRes.success && invRes.data) {
-        invitations = await Promise.all(
-            invRes.data.map(async (i: any) => {
-                const orgRes = await getPublicOrganizationData(i.organizationId, {
+        // Deduplicate org fetches by organizationId
+        const orgIds = Array.from(new Set(invRes.data.map((i: any) => i.organizationId).filter(Boolean)));
+
+        const orgEntries = await Promise.all(
+            orgIds.map(async (orgId: string) => {
+                const orgRes = await getPublicOrganizationData(orgId, {
                     id: true,
                     name: true,
                     description: true,
                     image: true,
                     subdomain: true,
                 });
-                return {...i, organization: orgRes.success ? orgRes.data : null};
+                return [orgId, orgRes.success ? orgRes.data : null] as const;
             })
         );
+
+        const orgById = new Map(orgEntries);
+
+        invitations = invRes.data.map((i: any) => ({
+            ...i,
+            organization: orgById.get(i.organizationId) ?? null
+        }));
     }
 
     // Organizations (for joining)
     let organizations: Option[] = [];
-    const orgsRes = await getAllNonMemberOrganizations({id: true, name: true, description: true});
     if (orgsRes.success && orgsRes.data) {
         organizations = orgsRes.data.map((org: any, idx: number) => ({
             value: org.id || String(idx),
@@ -46,6 +64,25 @@ export default async function CreateNewOrganizationPage() {
             description: org.description || "",
         }));
     }
+
+    let organization = undefined
+    const orgId: string | undefined = typeof searchParams.id === 'string' ? searchParams.id : undefined
+    if (orgId) {
+        organization = await getOrganizationFromOrganizationId(orgId, {
+            id: true,
+            description: true,
+            name: true,
+            yearFounded: true,
+            contactEmail: true,
+            subdomain: true,
+            incorporationStatus: true,
+            website: true,
+            therapeuticsInDevelopment: true,
+            therapeuticsOfInterest: true,
+            metadata: true,
+        })
+    }
+
 
     return (
         <div className="flex flex-col space-y-8 w-full max-w-5xl mx-auto py-8 px-6">

@@ -53,12 +53,12 @@ export function AdminUsersAnalyticsCards() {
                             {growthPositive ? (
                                 <>
                                     <TrendingUpIcon className="size-3" />
-                                    +{data.growthRate.toFixed(1)}%
+                                    +{data.growthRate?.toFixed(1)}%
                                 </>
                             ) : (
                                 <>
                                     <TrendingDownIcon className="size-3" />
-                                    {data.growthRate.toFixed(1)}%
+                                    {data.growthRate?.toFixed(1)}%
                                 </>
                             )}
                         </Badge>

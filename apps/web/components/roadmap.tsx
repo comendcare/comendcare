@@ -31,7 +31,7 @@ import { CircleCheckBig, Globe, Info, LayoutTemplate, Lock, Pencil, Plus, Redo2,
 import Image from "next/image"
 import { NewMilestoneDialogForm, TabType } from "./new-milestone-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@comend/components/ui/select"
-import { Milestone } from "@comend/lib/types"
+import { Milestone, RESEARCH_PLAN_STATUS, RESEARCH_STAGE } from "@comend/lib/types"
 import Loading from "./../../../loading";
 import { Biosample, DiseaseModel, MilestoneType, Organization, RFP, Roadmap as RoadmapType, Tool } from "@prisma/client"
 import { useSession } from "next-auth/react"
@@ -47,6 +47,7 @@ import {
 } from "@comend/components/ui/context-menu"
 import {initializeRoadmapState} from "@comend/lib/initialize-client-state";
 import { ProjectBulkImportDialog } from "./project-bulk-import-dialog"
+import { Badge } from "@comend/components/ui/badge"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -691,7 +692,13 @@ const RoadmapHeader = ({
     const [parentWidth, setParentWidth] = useState(0)
     const [isCollapsed, setIsCollapsed] = useState(parentWidth <= 1024)
     const [editResearchPlanIsOpen, setEditResearchPlanIsOpen] = useState(false)
+    const [isClosing, setIsClosing] = useState(false)
     const [shareIsOpen, setShareIsOpen] = useState(false)
+
+    const closeDialog = () => {
+        setEditResearchPlanIsOpen(false)
+        setIsClosing(false)
+    }
 
     useEffect(() => {
         const el = parentRef.current;
@@ -721,8 +728,11 @@ const RoadmapHeader = ({
     return (
         <>
         <div ref={parentRef} className="flex justify-between items-center">
-            <span className="flex flex-row items-center">
-                <h1 className="h-full text-2xl font-semibold text-wrap line-clamp-2 pr-1">{researchPlanDetails.title || "Untitled Research Plan"}</h1>
+            <span className="flex flex-row items-center justify-center">
+                <div className="w-full">
+                    <h1 className="text-2xl font-semibold text-wrap line-clamp-2 pr-1">{researchPlanDetails.title || "Untitled Research Plan"}</h1>
+                    {researchPlanDetails.description && (<p className="text-wrap line-clamp-2 text-muted-foreground text-sm">{researchPlanDetails.description}</p>)}
+                </div>
                 <Button
                     onClick={() => setEditResearchPlanIsOpen(true)} 
                     variant="ghost"
@@ -732,7 +742,14 @@ const RoadmapHeader = ({
                     <Pencil />
                 </Button>
                 <div className="p-[6px] h-[40px]">
-                    <StageOfActivityBadge showTooltip={false} milestones={milestones} />
+                    {RESEARCH_STAGE.filter(stage => researchPlanDetails.stages?.includes(stage.value || stage.label)).map(stage => (
+                        <Badge variant={'secondary'} className="text-sm text-nowrap">{stage.label}</Badge>
+                    ))}
+                </div>
+                <div className="p-[6px] h-[40px]">
+                    {RESEARCH_PLAN_STATUS.filter(status => researchPlanDetails.statuses?.includes(status.value || status.label)).map(status => (
+                        <Badge variant={'secondary'} className="text-sm text-nowrap">{status.label}</Badge>
+                    ))}
                 </div>
                 {milestones.filter(milestone => !milestone.private).length <= 0 
                     ? (
@@ -889,8 +906,15 @@ const RoadmapHeader = ({
                 </Tooltip>
             </span>
 
-            <Dialog open={editResearchPlanIsOpen} onOpenChange={setEditResearchPlanIsOpen}>
-                <DialogContent className="max-h-[80vh] overflow-y-auto">
+            <Dialog 
+                open={editResearchPlanIsOpen} 
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setIsClosing(true)
+                    }
+                }}
+            >
+                <DialogContent>
                     <DialogHeader>
                         <DialogTitle>
                             Edit Research Plan Details
@@ -899,7 +923,12 @@ const RoadmapHeader = ({
                             {`Edit details like the name and description of your Research Plan. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
-                    <EditResearchPlanForm researchPlanData={researchPlanDetails} closeDialog={() => setEditResearchPlanIsOpen(false)}/>
+                    <EditResearchPlanForm 
+                        researchPlanData={researchPlanDetails} 
+                        closeDialog={closeDialog}
+                        isClosing={isClosing} 
+                        setIsClosing={setIsClosing}
+                    />
                 </DialogContent>
             </Dialog>
 

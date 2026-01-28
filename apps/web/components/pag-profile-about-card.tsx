@@ -1,5 +1,3 @@
-"use client"
-
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {nameToInitials} from "@comend/lib/utils";
 import {Member, Organization, User} from "@prisma/client";
@@ -12,6 +10,7 @@ import LoadingDots from "@comend/components/icons/loading-dots";
 import React from "react";
 import {Badge} from "@comend/components/ui/badge";
 import {SeeMoreDescription} from "@comend/components/see-more-description";
+import {TrackingLink} from "~web/components/tracking-link";
 
 const EditPagProfileAboutCardDialog = dynamic(
     () => import("~web/components/edit-pag-profile-about-card-dialog"),
@@ -78,10 +77,11 @@ export const PagProfileAboutCard = ({
                         <div className="max-w-full overflow-hidden" data-testid="about-website-section">
                             {(isPrivate || (!isPrivate && organization?.website)) &&
                                 (organization?.website ? (
-                                    <Link
-                                        onClick={() =>
-                                            mixpanelTrack("Organization Website Visited", {Website: organization.website!})
-                                        }
+                                    <TrackingLink
+                                        track={{
+                                            event: "Organization Website Visited",
+                                            props: { Website: "https://example.com" },
+                                        }}
                                         href={
                                             organization.website!.startsWith("http")
                                                 ? organization.website!
@@ -93,7 +93,7 @@ export const PagProfileAboutCard = ({
                                         className="text-blue-600 underline"
                                     >
                                         {organization.website}
-                                    </Link>
+                                    </TrackingLink>
                                 ) : (
                                     <p className="text-gray-400" data-testid="website-empty">
                                         No website.

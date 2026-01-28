@@ -59,12 +59,12 @@ export function AdminOrganizationsAnalyticsCards() {
                             {growthPositive ? (
                                 <>
                                     <TrendingUpIcon className="size-3" />
-                                    +{data.growthRate.toFixed(1)}%
+                                    +{data.growthRate?.toFixed(1)}%
                                 </>
                             ) : (
                                 <>
                                     <TrendingDownIcon className="size-3" />
-                                    {data.growthRate.toFixed(1)}%
+                                    {data.growthRate?.toFixed(1)}%
                                 </>
                             )}
                         </Badge>
@@ -81,7 +81,7 @@ export function AdminOrganizationsAnalyticsCards() {
                 <CardHeader className="relative">
                     <CardDescription>Active Accounts</CardDescription>
                     <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-                        {data.activeOrganizations.toLocaleString()} </CardTitle>
+                        {data.activeOrganizations?.toLocaleString()} </CardTitle>
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1 text-sm">
                     <div className="text-muted-foreground">

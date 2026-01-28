@@ -9,30 +9,50 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/ta
 import {Button} from "@comend/components/ui/button";
 import {ChevronsUpDown, FileText, Globe, Lock, Pencil} from "lucide-react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@comend/components/ui/table";
-import {Milestone, Option, RESEARCH_PLAN_TYPES} from "@comend/lib/types";
+import {Milestone, Option, RESEARCH_PLAN_STATUS, RESEARCH_PLAN_TYPES, RESEARCH_STAGE} from "@comend/lib/types";
 import {Badge} from "@comend/components/ui/badge";
-import type {Organization} from "@prisma/client";
+import type {Organization, Roadmap} from "@prisma/client";
 import {NoProjects} from "./no-projects";
-import {useState} from "react";
+import {Suspense, useState} from "react";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import { PropertyBadge } from "@comend/components/property-badge";
 import { NoResultsTemplate } from "@comend/components/no-results";
+import { Shell } from "@comend/components/biorepo/advanced-data-table/lib/shell";
+import { FeatureFlagsProvider } from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
+import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
+import { DatabaseResearchPlansTable } from "@comend/components/biorepo/advanced-data-table/research-plans-table/database-research-plans-table";
+import { Row } from "@tanstack/react-table";
+import { SearchParams } from "@comend/components/types";
+import { useSession } from "next-auth/react";
+import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/public-research-plans-table-columns";
+import Link from "next/link";
 
 export const RoadmapsCard = ({
-                                 roadmaps,
-                                 organization,
-                             }: {
-    roadmaps: any[],
+    researchPlans,
+    researchPlansPageCount,
+    searchParams,
+    organization,
+}: {
+    researchPlans: Roadmap[],
+    researchPlansPageCount: number,
+    searchParams?: SearchParams,
     organization: Partial<Organization>,
 }) => {
     const router = useRouter()
     const pathname = usePathname()
+    const columns = useResearchPlansTableColumns(
+        false,
+        false,
+        false,
+        'profile'
+    )
 
     return (
         <Card className="organization-profile-tour-step4 w-full" data-testid="roadmaps-card">
             <CardHeader className="w-full pt-6 pb-2 space-y-4">
                 <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                    <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight" data-testid="roadmaps-heading">
+                    <CardTitle className="scroll-m-20 text-2xl font-semibold tracking-tight"
+                               data-testid="roadmaps-heading">
                         Research plans
                     </CardTitle>
                     {pathname === "/app/profile" &&
@@ -49,28 +69,73 @@ export const RoadmapsCard = ({
             </CardHeader>
 
             <CardContent className="px-8">
-                {(roadmaps && roadmaps.length > 0)
-                    ? <RoadmapsTable
-                        isPrivate={false}
-                        roadmaps={roadmaps}
-                        rowClickCallback={(roadmap) =>
-                            router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap?.id}` : '#')
-                        }
-                    />
+                {(researchPlans && researchPlans.length > 0)
+                    ? (
+                        // <RoadmapsTable
+                        //     isPrivate={false}
+                        //     roadmaps={roadmaps}
+                        //     rowClickCallback={(roadmap) =>
+                        //         router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap?.id}` : '#')
+                        //     }
+                        // />
+                        <Shell className="gap-2">
+                            <FeatureFlagsProvider showFilters={false}>
+                                <Suspense
+                                    fallback={
+                                        <DataTableSkeleton
+                                            columnCount={7}
+                                            filterCount={2}
+                                            cellWidths={[
+                                                "10rem",
+                                                "30rem",
+                                                "10rem",
+                                                "10rem",
+                                                "6rem",
+                                                "6rem",
+                                                "6rem",
+                                            ]}
+                                            shrinkZero
+                                        />
+                                    }
+                                >
+                                    <DatabaseResearchPlansTable 
+                                        data={researchPlans} 
+                                        pageCount={researchPlansPageCount} 
+                                        columns={columns}
+                                        searchParams={searchParams}
+                                        onRowClickCallback={
+                                            (e: any, row: Row<any> | undefined) => {
+                                                router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${row?.original.id}` : '#')
+                                            }
+                                        }
+                                        showPagination={false}
+                                        noResultsOverride={(
+                                            <NoResultsTemplate
+                                                imgAlt="No research plans"
+                                                src="https://illustrations.popsy.co/gray/studying.svg"
+                                                title="No research plans yet!"
+                                                description="This organization does not have any public research plans yet."
+                                            />
+                                        )}
+                                    />
+                                </Suspense>
+                            </FeatureFlagsProvider>
+                        </Shell>
+                    )
                     : (pathname === "/app/profile"
                             ? (
-                                <NoResultsTemplate 
+                                <NoResultsTemplate
                                     imgAlt="No research plans"
                                     src="https://illustrations.popsy.co/gray/studying.svg"
                                     title="Your organization does not have any public research plans yet."
                                 />
                             )
                             : (
-                                <NoResultsTemplate 
+                                <NoResultsTemplate
                                     imgAlt="No research plans"
                                     src="https://illustrations.popsy.co/gray/studying.svg"
                                     title="No research plans yet"
-                                    description={organization.name ? `${organization.name} doesn't have any public research plans yet.`: `This organization doesn't have any public research plans yet.`}
+                                    description={organization.name ? `${organization.name} doesn't have any public research plans yet.` : `This organization doesn't have any public research plans yet.`}
                                 />
                             )
                     )
@@ -104,7 +169,7 @@ export const RoadmapCard = ({
     const params = useSearchParams()
     if (!roadmap) {
         return (
-            <NoResultsTemplate 
+            <NoResultsTemplate
                 imgAlt="No research plans"
                 src="https://illustrations.popsy.co/gray/studying.svg"
                 title="No research plans yet"
@@ -119,12 +184,9 @@ export const RoadmapCard = ({
 
     return (
         <Tabs
-            // defaultValue={urlView === 'flow' || params.get('view') === 'flow' ? 'flow' : 'list'} // list default
-            // defaultValue={urlView === 'list' || params.get('view') === 'list' ? 'list' : 'flow'} // flow default
             value={urlView === 'list' || params.get('view') === 'list' ? 'list' : 'flow'}
             className="w-full"
-            onValueChange={setUrlView ? setUrlView : () => {
-            }}
+            onValueChange={setUrlView ? setUrlView : () => {}}
         >
             <Card className="organization-profile-tour-step4 flex flex-col gap-0">
                 <CardHeader className="w-full pt-6 pb-0 space-y-4">
@@ -134,17 +196,51 @@ export const RoadmapCard = ({
                     <CardDescription>
                         {roadmap.description}
                     </CardDescription>
-                    <div className="flex gap-2">
+                    {/* <div className="flex gap-2">
                         {RESEARCH_PLAN_TYPES.filter(typeOption => (roadmap.modalities || []).includes(typeOption.value)).map((type: Option, index) =>
                             <ResearchPlanTypeBadge key={index} label={type.label}/>)}
                         <StageOfActivityBadge showTooltip={false} milestones={roadmap.milestones}/>
+                    </div> */}
+                    <div className="flex gap-2 flex-wrap">
+                        {RESEARCH_PLAN_TYPES.filter(modality => roadmap.modalities.includes(modality.value)).map(m => (
+                            <Badge variant={"secondary"} className="text-sm">{m.label}</Badge>
+                        ))}
+    
+                        {RESEARCH_STAGE.filter(stage => roadmap.stages.includes(stage.value)).map(s => (
+                            <Badge variant={"secondary"} className="text-sm">{s.label}</Badge>
+                        ))}
+    
+                        {RESEARCH_PLAN_STATUS.filter(status => roadmap.statuses.includes(status.value)).map(s => (
+                            <Badge variant={"secondary"} className="text-sm">{s.label}</Badge>
+                        ))}
                     </div>
 
+                    <PropertyBadge>
+                        <b>{roadmap.partners.length <= 1 ? 'Partner:' : 'Partners:'}</b>
+                        {roadmap.partners
+                            .map((partner: any) => partner.affiliation)
+                            .join(", ")}
+                    </PropertyBadge>
+
+                    <PropertyBadge>
+                        <b>{roadmap.links.length <= 1 ? 'Link:' : 'Links:'}</b>
+                        {roadmap.links
+                            .map((externalLink: any, index: number) => (
+                                <span className="flex flex-nowrap gap-0">
+                                    <a href={externalLink.link} target="_blank">{externalLink.name || externalLink.link}</a>
+                                    {roadmap.links.length > 1 && index < roadmap.links.length - 1 && ', '}
+                                </span>
+                            ))
+                        }
+                    </PropertyBadge>
+
                     <TabsList className="w-min rounded-t-md rounded-b-none z-10 -py-2">
-                        <TabsTrigger value="flow" className="data-[state=active]:shadow-none rounded-b-none -mb-2 py-2.5">
+                        <TabsTrigger value="flow"
+                                     className="data-[state=active]:shadow-none rounded-b-none -mb-2 py-2.5">
                             Flow view
                         </TabsTrigger>
-                        <TabsTrigger value="list" className="data-[state=active]:shadow-none rounded-b-none -mb-2 py-2.5">
+                        <TabsTrigger value="list"
+                                     className="data-[state=active]:shadow-none rounded-b-none -mb-2 py-2.5">
                             List view
                         </TabsTrigger>
                     </TabsList>
@@ -205,7 +301,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback, isPrivate}: {
         <Table>
             <TableHeader className="px-0">
                 <TableRow className="pointer-events-none px-0">
-                    <TableHead className="w-full px-0">Therapeutic strategy</TableHead>
+                    <TableHead className="w-full px-0">Research strategy</TableHead>
                     <TableHead></TableHead>
                     <TableHead className="self-end text-right w-fit text-nowrap px-0">Stage</TableHead>
                 </TableRow>
@@ -224,7 +320,8 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback, isPrivate}: {
                             disabled={true}
                         >
                             {roadmapsForModality.map(roadmap => (
-                                <RoadmapRow 
+                                <RoadmapRow
+                                    key={roadmap.id}
                                     isPrivate={isPrivate}
                                     roadmap={roadmap}
                                     rowClickCallback={rowClickCallback}
@@ -241,7 +338,8 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback, isPrivate}: {
                         disabled={true}
                     >
                         {otherRoadmaps.map(roadmap => (
-                            <RoadmapRow 
+                            <RoadmapRow
+                                key={roadmap.id}
                                 isPrivate={isPrivate}
                                 roadmap={roadmap}
                                 rowClickCallback={rowClickCallback}
@@ -251,7 +349,7 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback, isPrivate}: {
                 )}
                 {roadmaps.length <= 0 && (
                     <div className="w-full flex justify-center p-4">
-                        <NoResultsTemplate 
+                        <NoResultsTemplate
                             imgAlt="No research plans"
                             src="https://illustrations.popsy.co/gray/studying.svg"
                             title="No research plans yet!"
@@ -264,53 +362,62 @@ export const RoadmapsTable = ({roadmaps, rowClickCallback, isPrivate}: {
     )
 }
 
-export const RoadmapRow = ({roadmap, rowClickCallback, isPrivate}: {roadmap: any, rowClickCallback: (roadmap: any) => void, isPrivate: boolean}) => {
+export const RoadmapRow = ({roadmap, rowClickCallback, isPrivate}: {
+    roadmap: any,
+    rowClickCallback: (roadmap: any) => void,
+    isPrivate: boolean
+}) => {
     const numProjects = roadmap.milestones.length
     const numPrivateProjects = roadmap.milestones.filter((milestone: any) => milestone.private).length
     const numPublishedProjects = roadmap.milestones.filter((milestone: any) => !milestone.private).length
 
     return (
-        <TableRow 
-            key={roadmap?.id} 
-            className="cursor-pointer px-0"
-            onClick={() => rowClickCallback(roadmap)}
+        <TableRow
+            key={roadmap?.id}
+            className="cursor-pointer px-4"
         >
-            <TableCell className="pl-0">
-                <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
-            </TableCell>
-            <TableCell>
-                <div className="flex flex-col gap-2 justify-center text-nowrap">
-                    {isPrivate && numPrivateProjects > 0 && (
-                        <PropertyBadge 
-                            className="text-nowrap border-red-200 text-red-900 font-semibold" 
-                            icon={Lock}
-                        >
-                            {numPrivateProjects === 1 ? `${numPrivateProjects} private project` : `${numPrivateProjects} private projects`}
-                        </PropertyBadge>
-                    )}
-                    {isPrivate && numPublishedProjects > 0 && (
-                        <PropertyBadge 
-                            className="text-nowrap border-green-200 text-green-900 font-semibold" 
-                            icon={Globe}
-                        >
-                            {numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}
-                        </PropertyBadge>
-                    )}
-                    {!isPrivate && numProjects > 0 && (
-                        <PropertyBadge 
-                            className="text-nowrap border-purple-200 text-purple-900 font-semibold" 
-                            icon={FileText}
-                        >
-                            {numProjects === 1 ? `${numProjects} project` : `${numProjects} projects`}
-                        </PropertyBadge>
-                    )}
-                </div>
-            </TableCell>
-            <TableCell className="pr-0">
-                <div className="flex gap-2 justify-end items-center text-nowrap">
-                    <StageOfActivityBadge showTooltip={false} milestones={roadmap.milestones}/>
-                </div>
-            </TableCell>
+            <Link
+                href={`/app/research-plan/${roadmap.id}`}
+                onClick={() => rowClickCallback(roadmap)}
+                prefetch={true}
+            >
+                <TableCell className="w-full">
+                    <p className="font-semibold">{roadmap.title || 'Untitled Research Plan'}</p>
+                </TableCell>
+                <TableCell>
+                    <div className="flex flex-col gap-2 justify-center text-nowrap">
+                        {isPrivate && numPrivateProjects > 0 && (
+                            <PropertyBadge
+                                className="text-nowrap border-red-200 text-red-900 font-semibold"
+                                icon={Lock}
+                            >
+                                {numPrivateProjects === 1 ? `${numPrivateProjects} private project` : `${numPrivateProjects} private projects`}
+                            </PropertyBadge>
+                        )}
+                        {isPrivate && numPublishedProjects > 0 && (
+                            <PropertyBadge
+                                className="text-nowrap border-green-200 text-green-900 font-semibold"
+                                icon={Globe}
+                            >
+                                {numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}
+                            </PropertyBadge>
+                        )}
+                        {!isPrivate && numProjects > 0 && (
+                            <PropertyBadge
+                                className="text-nowrap border-purple-200 text-purple-900 font-semibold"
+                                icon={FileText}
+                            >
+                                {numProjects === 1 ? `${numProjects} project` : `${numProjects} projects`}
+                            </PropertyBadge>
+                        )}
+                    </div>
+                </TableCell>
+                <TableCell className="w-full pr-0">
+                    <div className="flex gap-2 justify-end items-center text-nowrap">
+                        <StageOfActivityBadge showTooltip={false} milestones={roadmap.milestones}/>
+                    </div>
+                </TableCell>
+            </Link>
         </TableRow>
     )
 }
@@ -347,7 +454,10 @@ export const CollapsibleTableGroup = ({label, colSpan, disabled = false, childre
     )
 }
 
-export const StageOfActivityBadge = ({milestones, showTooltip = true}: { milestones: Milestone[], showTooltip?: boolean }) => {
+export const StageOfActivityBadge = ({milestones, showTooltip = true}: {
+    milestones: Milestone[],
+    showTooltip?: boolean
+}) => {
     const stage = getStage(milestones)
 
     return (showTooltip ? (
@@ -363,7 +473,7 @@ export const StageOfActivityBadge = ({milestones, showTooltip = true}: { milesto
             </Tooltip>
         </TooltipProvider>
     ) : (
-        <Badge variant={stage.variant as any} className="text-sm">{stage.label}</Badge> 
+        <Badge variant={stage.variant as any} className="text-sm">{stage.label}</Badge>
     ))
 }
 

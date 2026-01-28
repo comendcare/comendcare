@@ -2,7 +2,7 @@
 
 import {zodResolver} from "@hookform/resolvers/zod"
 import React, {useEffect, useRef, useState} from "react"
-import {useForm, UseFormReturn} from "react-hook-form"
+import {useForm, useWatch} from "react-hook-form"
 import {z} from "zod"
 import {
     Form,
@@ -11,7 +11,6 @@ import {
     FormLabel,
     FormItem,
     FormMessage,
-    FormDescription,
 } from "@comend/components/ui/form"
 import {Input} from "@comend/components/ui/input"
 import {Textarea} from "@comend/components/ui/textarea"
@@ -19,16 +18,11 @@ import {Button} from "@comend/components/ui/button"
 import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
     DialogFooter,
-    DialogHeader,
-    DialogTitle,
 } from "@comend/components/ui/dialog"
 import { DISEASE_MODEL_TYPE_OPTIONS, editDiseaseModelForm } from "@comend/lib/types"
 import type {CreateFacilityRequest, Prisma} from "@prisma/client"
-import { getDonorData, getOrganizationFromOrganizationId } from "@comend/lib/fetchers"
+import { getOrganizationFromOrganizationId } from "@comend/lib/fetchers"
 import { useSession } from "next-auth/react"
 import { AttachmentsFormField, ContactsFormField, PrivatePublicFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
@@ -139,12 +133,12 @@ export function EditDiseaseModelToolForm({
     const initializing = useRef(true)
     const router = useRouter()
     const {data: session} = useSession()
-    const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(toolData.createFacilityRequests || [])
     const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
     const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
+    const scrollRef = useRef<HTMLDivElement>(null);
     
     const form = useForm<z.infer<typeof editDiseaseModelForm>>({
         mode: "onSubmit",
@@ -182,20 +176,12 @@ export function EditDiseaseModelToolForm({
         }
     })
 
+    const types = useWatch({control: form.control, name: "types"})    
     const formData = {
-        description: form.watch("description"),
-        types: form.watch("types"),
-        otherTypeDetails: form.watch("otherTypeDetails"),
-        attachments: form.watch("attachments"),
-        isPrivate: form.watch("isPrivate"),
-        contacts: form.watch("contacts"),
-        milestones: form.watch("milestones"),
+        types,
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editDiseaseModelForm>, createFacilityRequests: CreateFacilityRequest[]) => {
-        const isValid = form.trigger()
-        if (!isValid) return // stops submission
-        
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(
@@ -245,6 +231,19 @@ export function EditDiseaseModelToolForm({
         return companiesData.concat(institutionsData)
     }
 
+    // scroll errors into view when form errors are updated
+    useEffect(() => {
+        if (Object.keys(form.formState.errors).length > 0) {
+            // Get first field with error
+            const firstErrorField = Object.keys(form.formState.errors)[0];
+            const fieldEl = document.querySelector(`[id="${firstErrorField}"]`);
+            if (fieldEl && scrollRef.current) {
+                // scroll the container, not the window
+                fieldEl.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        }
+    }, [form.formState.errors]);
+
     // Initialization - Allow update once form is initialized
     useEffect(() => {
         const init = async () => {
@@ -291,9 +290,6 @@ export function EditDiseaseModelToolForm({
                     rfps: true,
                     metadata: true
                 })
-                if (response.success && response.data) {
-                    setOrgIsPublished(response.data.published)
-                }
             }
 
             // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away
@@ -314,7 +310,7 @@ export function EditDiseaseModelToolForm({
                 onSubmit={form.handleSubmit((values) => handleFormSubmit(values, createRequests))}
                 className="flex max-h-[80vh] flex-col overflow-hidden"
             >
-                <ScrollArea type={"always"}>
+                <ScrollArea type={"always"} ref={scrollRef}>
                 <ScrollBar />
                 <div className="flex flex-col gap-4 pr-4">
                     <FormItem className="flex gap-2 items-center">
@@ -340,7 +336,7 @@ export function EditDiseaseModelToolForm({
                         control={form.control}
                         name="types"
                         render={({field}) => (
-                            <FormItem className="w-full flex gap-4 items-center">
+                            <FormItem className="w-full flex gap-4 items-center" id="types">
                                 <FormLabel className="w-[100px]">{`Disease model type`}</FormLabel>
                                 <FormControl>
                                     <MultipleSelector
@@ -481,7 +477,9 @@ export function EditDiseaseModelToolForm({
                                                                 diseaseModelId: toolData.id
                                                             }
                                                         )
-                                                        setCreateRequests(prev => [...prev, newRequest])
+                                                        const updatedCreateRequests = [...createRequests, newRequest]
+                                                        setCreateRequests(updatedCreateRequests)
+                                                        form.setValue("createRequests", updatedCreateRequests, {shouldDirty: true})
                                                     }}
                                                 />
                                             )}

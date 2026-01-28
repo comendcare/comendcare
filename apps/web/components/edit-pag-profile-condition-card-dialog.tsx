@@ -42,6 +42,8 @@ import {ConditionForCard} from "~web/components/pag-profile-conditions-card";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area";
 import {UnsavedChangesDialog} from "./unsaved-changes-dialog";
+import { useWatch } from "react-hook-form";
+
 
 export default function EditPAGProfileConditionCardDialog({
                                                               condition,
@@ -65,11 +67,18 @@ export default function EditPAGProfileConditionCardDialog({
         resolver: zodResolver(researchFormSchema),
     })
 
+    const categories = useWatch({ control: editResearchForm.control, name: "categories" });
+    const systems = useWatch({ control: editResearchForm.control, name: "systems" });
+    const prevalenceDenominator = useWatch({
+        control: editResearchForm.control,
+        name: "prevalenceDenominator",
+    });
+
     useEffect(() => {
         if (!condition || !conditionTags) return;
 
         const defaultValues: z.infer<typeof researchFormSchema> = {
-            disorder: condition.name ? [{label: condition.name, value: condition.name}] : [],
+            disorder: condition?.name ? [{label: condition.name, value: condition.name}] : [],
             associatedConditions: (condition.associatedConditions ?? []).map((name) => ({
                 label: name,
                 value: name,
@@ -114,7 +123,7 @@ export default function EditPAGProfileConditionCardDialog({
     };
 
     async function onResearchFormSubmit(values: z.infer<typeof researchFormSchema>) {
-        const isValid = editResearchForm.trigger()
+        const isValid = await editResearchForm.trigger()
         if (!isValid) return // stops submission
 
         setIsSaving(true)
@@ -533,7 +542,7 @@ export default function EditPAGProfileConditionCardDialog({
                                         )}
                                     />
 
-                                    {editResearchForm.watch("categories")?.some((item) => item.value === "OTHER" || item.value === "Other") && (
+                                    {categories?.some((item) => item.value === "OTHER" || item.value === "Other") && (
                                         <FormField
                                             control={editResearchForm.control}
                                             name="otherCategories"
@@ -583,7 +592,7 @@ export default function EditPAGProfileConditionCardDialog({
                                         )}
                                     />
 
-                                    {editResearchForm.watch("systems")?.some((item) => item.value === "OTHER" || item.value === "Other") && (
+                                    {systems?.some((item) => item.value === "OTHER" || item.value === "Other") && (
                                         <FormField
                                             control={editResearchForm.control}
                                             name="otherSystems"
@@ -636,7 +645,7 @@ export default function EditPAGProfileConditionCardDialog({
                                                 <FormLabel>
                                                     {`Estimated total prevalence`} –{" "}
                                                     {formatNumberWithCommas(numeratorField.value)}
-                                                    {editResearchForm.watch("prevalenceDenominator") && (
+                                                    {prevalenceDenominator && (
                                                         <> in {formatNumberWithCommas(editResearchForm.watch("prevalenceDenominator"))}</>
                                                     )}
                                                 </FormLabel>

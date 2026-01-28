@@ -17,11 +17,19 @@ export default function PAGSettingsClaimOrganizationInvitationsTab({organization
 
     if (invitees.length === 0) {
         return (
-            <NoResultsTemplate 
-                imgAlt="No open claim invitations"
-                src="https://illustrations.popsy.co/white/paper-plane.svg"
-                title={`Your organization doesn't have any open invitations.`}
-            />
+            <div className="h-full w-full flex flex-col mx-auto justify-center items-center">
+                <div className="p-4 w-full sm:flex sm:items-center">
+                    <div className="space-y-2 sm:flex-auto">
+                        <h2 className="text-xl font-semibold leading-6 text-gray-900">Claim Invitations</h2>
+                        <p className="text-sm text-gray-700">All open claim organization invitations sent.</p>
+                    </div>
+                </div>
+                <NoResultsTemplate 
+                    imgAlt="No open claim invitations"
+                    src="https://illustrations.popsy.co/white/paper-plane.svg"
+                    title={`Your organization doesn't have any open claim invitations.`}
+                />
+            </div>
         )
     }
 

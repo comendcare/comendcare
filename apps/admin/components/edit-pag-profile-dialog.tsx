@@ -456,7 +456,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
 
                     if (conditions && conditions.length > 0) {
                         const fetchedValues = conditions.map((condition: any) => ({
-                            disorder: condition.name ? [{ label: condition.name, value: condition.name }] : [],
+                            disorder: condition?.name ? [{ label: condition.name, value: condition.name }] : [],
                             summary: condition.summary || "",
                             categories: condition.diseaseCategories?.map((cat: any) => ({
                                 label: cat,

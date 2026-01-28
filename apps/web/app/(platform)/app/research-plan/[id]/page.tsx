@@ -1,18 +1,25 @@
 import { getSession } from "@comend/lib/auth"
-import { Roadmap } from "~web/components/roadmap"
+import dynamic from "next/dynamic"
 import NoOrganization from "~web/components/no-organization"
 import {
-    getBiosamples, 
-    getClinicalDatasets, 
-    getDiseaseModels, 
-    getMilestoneTypes, 
-    getOrganizationFromOrganizationId, 
-    getRFPs, 
-    getRoadmap, 
-    getRoadmapEdges, 
-    getRoadmapMilestones, 
+    getBiosamples,
+    getClinicalDatasets,
+    getDiseaseModels,
+    getMilestoneTypes,
+    getOrganizationFromOrganizationId,
+    getRFPs,
+    getRoadmap,
+    getRoadmapEdges,
+    getRoadmapMilestones,
     getRoadmapNodes
 } from "@comend/lib/fetchers"
+import FlowViewSkeleton from "../loading"
+
+const Roadmap = dynamic(() => import("~web/components/roadmap").then(mod => ({ default: mod.Roadmap })), {
+    loading: () => <FlowViewSkeleton />,
+    ssr: true
+})
+
 
 export default async function RoadmapPage({
                                               params,
@@ -25,6 +32,7 @@ export default async function RoadmapPage({
     const orgId = session?.user.organizationId
     if (!orgId) return <NoOrganization />
 
+    // Group fetches: core roadmap data first, then options in parallel
     const [
         milestoneTypesSettle,
         organizationSettle,
@@ -49,6 +57,7 @@ export default async function RoadmapPage({
         }),
         getRoadmap(orgId, params.id, {
             id: true,
+            private: true,
             title: true,
             description: true,
             content: true,
@@ -61,6 +70,10 @@ export default async function RoadmapPage({
             organization: true,
             user: true,
             modalities: true,
+            partners: true,
+            stages: true,
+            statuses: true,
+            links: true,
             metadata: true,
         }),
         getRoadmapMilestones(orgId, params.id, {

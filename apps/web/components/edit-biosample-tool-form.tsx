@@ -2,7 +2,7 @@
 
 import {zodResolver} from "@hookform/resolvers/zod"
 import React, {useEffect, useRef, useState} from "react"
-import {useForm} from "react-hook-form"
+import {useForm, useWatch} from "react-hook-form"
 import {z} from "zod"
 import {
     Form,
@@ -18,12 +18,7 @@ import {Button} from "@comend/components/ui/button"
 import {ScrollArea, ScrollBar} from "@comend/components/ui/scroll-area"
 import {
     Dialog,
-    DialogClose,
-    DialogContent,
     DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
 } from "@comend/components/ui/dialog"
 import { BIOSAMPLE_TYPE_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DONOR_RACE_OPTIONS, DONOR_SEX_OPTIONS, QUANTITY_OPTIONS } from "@comend/lib/types"
 import type {CreateFacilityRequest, Prisma} from "@prisma/client"
@@ -36,7 +31,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/t
 import ProjectMultipleSelector from "./project-multiple-selector"
 import MultipleSelector, { MultipleSelectorRef } from "@comend/components/ui/multiple-selector"
 import { editBiosampleForm, Option } from "@comend/lib/types"
-import { useRouter } from "next/navigation"
 import { revalidate } from "@comend/lib/revalidate"
 import { Separator } from "@comend/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@comend/components/ui/select"
@@ -50,7 +44,6 @@ import LoadingDots from "@comend/components/icons/loading-dots"
 import { Badge } from "@comend/components/ui/badge"
 import { SubmitCreateRequest } from "./create-facility-request-button"
 import { badgeVariants } from "@comend/components/ui/badge"
-import { DialogDescription } from "@radix-ui/react-dialog"
 import { Session } from "next-auth"
 import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
 
@@ -150,12 +143,12 @@ export function EditBiosampleToolForm({
 }) {
     const initializing = useRef(true)
     const {data: session} = useSession()
-    const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [unsavedChangesIsOpen, setUnsavedChangesIsOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [createRequests, setCreateRequests] = useState<CreateFacilityRequest[]>(toolData.createFacilityRequests || [])
     const storageFacilityRef = React.useRef<MultipleSelectorRef>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
 
     const handleGeneAsyncSearch = async (query: string) => {
         const res = await fetch(`/api/genes?search=${encodeURIComponent(query || "")}`);
@@ -248,23 +241,12 @@ export function EditBiosampleToolForm({
         }
     })
 
+    const types = useWatch({ control: form.control, name: "types" })
     const formData = {
-        description: form.watch("description"),
-        types: form.watch("types"),
-        otherTypeDetails: form.watch("otherTypeDetails"),
-        attachments: form.watch("attachments"),
-        isPrivate: form.watch("isPrivate"),
-        contacts: form.watch("contacts"),
-        milestones: form.watch("milestones"),
-        diagnoses: form.watch("diagnoses"),
-        donorId: form.watch("donorId"),
-        donor: form.watch("donor"),
+        types,
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editBiosampleForm>, createFacilityRequests: CreateFacilityRequest[]) => {
-        const isValid = form.trigger()
-        if (!isValid) return // stops submission
-        
         setIsSaving(true)
         if (!session?.user?.organizationId) {
             toast.error(
@@ -325,6 +307,19 @@ export function EditBiosampleToolForm({
         form.setValue("internalDonorId", donorData?.internalId?.toString() ?? "", {shouldDirty: true, shouldValidate: true})
     }
 
+    // scroll errors into view when form errors are updated
+    useEffect(() => {
+        if (Object.keys(form.formState.errors).length > 0) {
+            // Get first field with error
+            const firstErrorField = Object.keys(form.formState.errors)[0];
+            const fieldEl = document.querySelector(`[id="${firstErrorField}"]`);
+            if (fieldEl && scrollRef.current) {
+                // scroll the container, not the window
+                fieldEl.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        }
+    }, [form.formState.errors]);
+
     // Initialization - Allow update once form is initialized
     useEffect(() => {
         const init = async () => {
@@ -371,9 +366,6 @@ export function EditBiosampleToolForm({
                     rfps: true,
                     metadata: true
                 })
-                if (response.success && response.data) {
-                    setOrgIsPublished(response.data.published)
-                }
             }
 
             // trigger a form validation if we're editing an tool, if the imported data is not valid, let the user know right away
@@ -394,7 +386,7 @@ export function EditBiosampleToolForm({
                 onSubmit={form.handleSubmit((values) => handleFormSubmit(values, createRequests))}
                 className="flex max-h-[80vh] flex-col overflow-hidden"
             >
-                <ScrollArea type={"always"}>
+                <ScrollArea type={"always"} ref={scrollRef}>
                 <ScrollBar />
                 <div className="flex flex-col gap-4 pr-4">
                     <FormItem className="flex gap-2 items-center">
@@ -416,7 +408,7 @@ export function EditBiosampleToolForm({
                         control={form.control}
                         name="types"
                         render={({field}) => (
-                            <FormItem className="w-full flex gap-4 items-center">
+                            <FormItem className="w-full flex gap-4 items-center" id="types">
                                 <FormLabel className="w-[100px]">{`Biosample type`}</FormLabel>
                                 <FormControl>
                                     <MultipleSelector
@@ -626,7 +618,9 @@ export function EditBiosampleToolForm({
                                                                 biosampleId: toolData.id
                                                             }
                                                         )
-                                                        setCreateRequests(prev => [...prev, newRequest])
+                                                        const updatedCreateRequests = [...createRequests, newRequest]
+                                                        setCreateRequests(updatedCreateRequests)
+                                                        form.setValue("createRequests", updatedCreateRequests, {shouldDirty: true})
                                                     }}
                                                 />
                                             )}

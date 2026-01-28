@@ -41,8 +41,10 @@ import {handleImageUpload} from "@comend/lib/upload";
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {Textarea} from "@comend/components/ui/textarea";
 import {FormImageSelector} from "@comend/components/form-image-selector";
-import {Invitation} from "@prisma/client";
+import {Invitation, Organization} from "@prisma/client";
 import { badgeVariants } from "@comend/components/ui/badge";
+import { useWatch } from "react-hook-form";
+
 
 /**************************************
  * Zod schema (ALL FIELDS IN ONE)
@@ -123,7 +125,10 @@ const refinedSchema = unifiedSchema.superRefine((vals, ctx) => {
 /**************************************
  * Component
  **************************************/
-export default function NewOrganizationForm({invitations, organizations}: {
+export default function NewOrganizationForm({
+    invitations, 
+    organizations
+}: {
     invitations: Invitation[],
     organizations: Option[]
 }) {
@@ -146,8 +151,18 @@ export default function NewOrganizationForm({invitations, organizations}: {
         resolver: zodResolver(refinedSchema),
     });
 
-    const [debouncedSubdomain] = useDebounce(form.watch("subdomain"), 500);
+    const subdomain = useWatch({ control: form.control, name: "subdomain" });
+    const therapeuticsInDevelopment = useWatch({ control: form.control, name: "therapeuticsInDevelopment" });
+    const therapeuticsOfInterest = useWatch({ control: form.control, name: "therapeuticsOfInterest" });
+    const categories = useWatch({ control: form.control, name: "categories" });
+    const orgImage = useWatch({ control: form.control, name: "orgImage" });
 
+    // Prefetch for faster navigation after form submission
+    useEffect(() => {
+        const href = hasInvitations ? "/app/profile" : "/app/dashboard"
+        router.prefetch(href)
+    }, [hasInvitations, router])
+    const [debouncedSubdomain] = useDebounce(subdomain, 500);
 
     /**************************************
      * Subdomain availability check
@@ -395,15 +410,9 @@ export default function NewOrganizationForm({invitations, organizations}: {
                                     <FormDescription>
                                         {`This will create your organization's unique Comend profile link (e.g., yourname.comend.io). Use a short name or abbreviation. This is not your external website.`}
                                         <br/>
-                                        {form.watch("subdomain") &&
-                                            !form.formState.errors.subdomain && (
-                                                <>
-                                                    {`Your profile URL will be: ${form
-                                                        .watch("subdomain")
-                                                        .toLowerCase()
-                                                        .replace(/\s+/g, "-")}.comend.io`}
-                                                </>
-                                            )}
+                                        {subdomain && !form.formState.errors.subdomain && (
+                                            <>Your profile URL will be: {subdomain.toLowerCase().replace(/\s+/g, "-")}.comend.io</>
+                                        )}
                                     </FormDescription>
                                     <FormControl>
                                         <Input {...field}
@@ -513,7 +522,7 @@ export default function NewOrganizationForm({invitations, organizations}: {
                             }}
                         />
 
-                        {form.watch("therapeuticsInDevelopment")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
+                        {therapeuticsInDevelopment?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
                             <FormField
                                 control={form.control}
                                 name="otherTherapeuticsInDevelopment"
@@ -563,7 +572,7 @@ export default function NewOrganizationForm({invitations, organizations}: {
                             }}
                         />
 
-                        {form.watch("therapeuticsOfInterest")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
+                        {therapeuticsOfInterest?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
                             <FormField
                                 control={form.control}
                                 name="otherTherapeuticsOfInterest"
@@ -619,7 +628,7 @@ export default function NewOrganizationForm({invitations, organizations}: {
                             title="Organization Logo"
                             description="PNG/JPG only (no SVG)."
                             aspect={1}
-                            img={form.watch("orgImage") || undefined}
+                            img={orgImage || undefined}
                             selectedFile={selectedFile}
                             setSelectedFile={setSelectedFile}
                             className=""
@@ -759,7 +768,7 @@ export default function NewOrganizationForm({invitations, organizations}: {
                             }}
                         />
 
-                        {form.watch("categories")?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
+                        {categories?.some((i) => ["OTHER", "Other"].includes(i.value)) && (
                             <FormField
                                 control={form.control}
                                 name="otherCategories"
