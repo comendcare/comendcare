@@ -178,7 +178,7 @@ export const RoadmapCard = ({
         )
     }
 
-    if (roadmap?.milestones && roadmap.milestones.length <= 0) {
+    if (!roadmap || roadmap?.private) {
         return <NoProjectsCard isPublic={isPublic}/>
     }
 
@@ -247,27 +247,33 @@ export const RoadmapCard = ({
                 </CardHeader>
 
                 <CardContent className="bg-secondary mx-6 mb-6 rounded-b-md rounded-r-md -mt-1 p-1">
-                    <TabsContent value="flow" className="w-full p-0 mt-0">
-                        <div className="h-[60vh] w-full bg-white rounded-b-md rounded-r-md">
-                            <PublicFlowView
-                                roadmap={roadmap}
-                                subdomain={subdomain}
-                                urlMilestone={urlMilestone || undefined}
-                                setUrlMilestone={setUrlMilestone || undefined}
-                                externalLinks={externalLinks}
-                            />
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="list" className="w-full p-0 mt-0">
-                        <PublicTimelineView
-                            roadmap={roadmap}
-                            subdomain={subdomain}
-                            externalLinks={externalLinks}
-                            urlMilestone={urlMilestone}
-                            organization={organization}
-                            setUrlMilestone={setUrlMilestone}
-                        />
-                    </TabsContent>
+                    {roadmap?.milestones && roadmap.milestones.length <= 0 ? (
+                        <NoProjectsCard isPublic={isPublic}/>
+                    ) : (
+                        <>
+                            <TabsContent value="flow" className="w-full p-0 mt-0">
+                                <div className="h-[60vh] w-full bg-white rounded-b-md rounded-r-md">
+                                    <PublicFlowView
+                                        roadmap={roadmap}
+                                        subdomain={subdomain}
+                                        urlMilestone={urlMilestone || undefined}
+                                        setUrlMilestone={setUrlMilestone || undefined}
+                                        externalLinks={externalLinks}
+                                    />
+                                </div>
+                            </TabsContent>
+                            <TabsContent value="list" className="w-full p-0 mt-0">
+                                <PublicTimelineView
+                                    roadmap={roadmap}
+                                    subdomain={subdomain}
+                                    externalLinks={externalLinks}
+                                    urlMilestone={urlMilestone}
+                                    organization={organization}
+                                    setUrlMilestone={setUrlMilestone}
+                                />
+                            </TabsContent>
+                    </>
+                    )}
                 </CardContent>
             </Card>
         </Tabs>

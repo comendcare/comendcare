@@ -326,11 +326,12 @@ export async function getPublicRoadmapsForOrganization(
             organization: {
                 subdomain: subdomain,
             },
-            milestones: {
-                some: {
-                    private: false, // Only include roadmaps with at least one public milestone
-                },
-            },
+            // milestones: {
+            //     some: {
+            //         private: false, // Only include roadmaps with at least one public milestone
+            //     },
+            // },
+            private: false,
         },
         select: {
             ...select,
