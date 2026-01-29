@@ -57,7 +57,7 @@ const ClaimedBadge = ({ organizationId, mini = false }: ClaimedBadgeProps) => {
             <TooltipTrigger asChild>
                 <span className="inline-flex">{content}</span>
             </TooltipTrigger>
-            <TooltipContent className="max-w-36">
+            <TooltipContent className="max-w-56">
                 Claimed organizations have at least one member from the organization signed up and on Comend.
             </TooltipContent>
         </Tooltip>
