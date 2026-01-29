@@ -31,7 +31,7 @@ import { CircleCheckBig, Globe, Info, LayoutTemplate, Lock, Pencil, Plus, Redo2,
 import Image from "next/image"
 import { NewMilestoneDialogForm, TabType } from "./new-milestone-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@comend/components/ui/select"
-import { Milestone, RESEARCH_STAGE } from "@comend/lib/types"
+import { Milestone, RESEARCH_PLAN_STATUS, RESEARCH_STAGE } from "@comend/lib/types"
 import Loading from "./../../../loading";
 import { Biosample, DiseaseModel, MilestoneType, Organization, RFP, Roadmap as RoadmapType, Tool } from "@prisma/client"
 import { useSession } from "next-auth/react"
@@ -744,6 +744,11 @@ const RoadmapHeader = ({
                 <div className="p-[6px] h-[40px]">
                     {RESEARCH_STAGE.filter(stage => researchPlanDetails.stages?.includes(stage.value || stage.label)).map(stage => (
                         <Badge variant={'secondary'} className="text-sm text-nowrap">{stage.label}</Badge>
+                    ))}
+                </div>
+                <div className="p-[6px] h-[40px]">
+                    {RESEARCH_PLAN_STATUS.filter(status => researchPlanDetails.statuses?.includes(status.value || status.label)).map(status => (
+                        <Badge variant={'secondary'} className="text-sm text-nowrap">{status.label}</Badge>
                     ))}
                 </div>
                 {milestones.filter(milestone => !milestone.private).length <= 0 

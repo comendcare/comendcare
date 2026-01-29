@@ -152,16 +152,20 @@ export default function InviteUserToOrgDialog({organization}: { organization: Or
                                                     Can view, edit, and manage member.
                                                 </p>
                                             </SelectItem>
-                                            <SelectItem
-                                                value="owner"
-                                            >
-                                                <p>
-                                                    Owner
-                                                </p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    Complete control over profiles, members and account settings.
-                                                </p>
-                                            </SelectItem>
+                                            {
+                                                session?.user.membership.role !== "member" && (
+                                                    <SelectItem
+                                                        value="owner"
+                                                    >
+                                                        <p>
+                                                            Owner
+                                                        </p>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            Complete control over profiles, members and account settings.
+                                                        </p>
+                                                    </SelectItem>
+                                                )
+                                            }
                                         </SelectContent>
                                     </Select>
                                     <FormMessage/>

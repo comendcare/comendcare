@@ -1771,7 +1771,7 @@ export function AttachmentsFormField({form}: { form: UseFormReturn<any> }) {
                             <div className="flex flex-row justify-between gap-2 items-center">
                                 <div>
                                     <FormLabel>{`Links`}</FormLabel>
-                                    <FormDescription>{`Add any links that are not on the Comend platform.`}</FormDescription>
+                                    <FormDescription>{`Add any useful links (e.g. websites, Google Drive links)`}</FormDescription>
                                 </div>
                                 <Button
                                     size={"icon"}

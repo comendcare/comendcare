@@ -216,12 +216,12 @@ export function EditResearchPlanForm({
                     name="modalities"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Therapeutic strategy</FormLabel>
+                            <FormLabel>Research strategy</FormLabel>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
                                     defaultOptions={RESEARCH_PLAN_TYPES}
-                                    placeholder="Select a type..."
+                                    placeholder="Select a strategy..."
                                     hidePlaceholderWhenSelected={true}
                                     emptyIndicator={
                                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
@@ -267,7 +267,7 @@ export function EditResearchPlanForm({
                             <div className="flex gap-2 w-full justify-between items-center">
                                 <div>
                                     <FormLabel>Partners</FormLabel>
-                                    <FormDescription>{`Name of the lab or company you're partnering with.`}</FormDescription>
+                                    <FormDescription>{`Names of the labs or companies you're partnering with.`}</FormDescription>
                                 </div>
                                 <Button
                                     type="button"
@@ -295,7 +295,7 @@ export function EditResearchPlanForm({
                                         <li key={index} className="flex gap-2 items-center">
                                             <div className="h-fit w-full grow">
                                             <Input
-                                                placeholder={`Partner name`}
+                                                placeholder={`Partner names`}
                                                 value={partner.affiliation || undefined}
                                                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                                                     const newValue = {
@@ -410,7 +410,7 @@ export function EditResearchPlanForm({
                                     <div className="flex flex-row justify-between gap-2 items-center">
                                         <div>
                                             <FormLabel>{`Links`}</FormLabel>
-                                            <FormDescription>{`Add any links that are not on the Comend platform.`}</FormDescription>
+                                            <FormDescription>{`Add any useful links (e.g. websites, Google Drive links)`}</FormDescription>
                                         </div>
                                         <Button
                                             type="button"

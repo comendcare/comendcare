@@ -121,7 +121,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                 <DataTableColumnHeader 
                     className="min-w-fit text-nowrap"
                     column={column} 
-                    title="Therapeutic strategy"
+                    title="Research strategy"
                 />
             ),
             cell: ({row}) => (

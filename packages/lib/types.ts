@@ -1617,7 +1617,7 @@ export const MILESTONE_TYPE_OPTIONS: any[] = [
     {
         id: 'PHASE1',
         value: 'PHASE1',
-        label: 'Phase 1',
+        label: 'Phase I',
         services: ['Phase 1-3 Studies'],
         categories: ['clinical trials'],
         description: ''
@@ -1850,6 +1850,11 @@ export const RESEARCH_PLAN_STATUS: Option[] = [
         id: 'SEEKINGPARTNERS',
         label: 'Seeking partners (sponsors, fundraising, licensing, etc.)',
         value: 'SEEKINGPARTNERS',
+    },
+    {
+        id: 'COMPLETED',
+        label: 'Completed',
+        value: 'COMPLETED',
     },
 ]
 
@@ -2627,7 +2632,7 @@ export const editResearchPlanForm = z.object({
         .min(1, "Title is required")
         .max(60, "Title must be less than 60 characters"),
     modalities: z.array(optionSchema)
-        .min(1, "Please select a therapeutic strategy")    
+        .min(1, "Please select a research strategy")    
         .max(1, "You can only select one type"),
     partners: z.array(z.custom<any>()).optional(),
     description: z

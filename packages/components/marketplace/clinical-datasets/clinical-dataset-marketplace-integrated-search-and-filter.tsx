@@ -19,6 +19,23 @@ import { ClinicalDatasetSearchState, useClinicalDatasetSearchStore } from "@/sta
 import { DiseaseModelSearchState, useDiseaseModelSearchStore } from "@/state/search/diseaseModelSearchStore"
 import { handleAsyncConditionSearch, handleAsyncGeneSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils"
 import {unstable_batchedUpdates} from "react-dom";
+import dynamic from "next/dynamic";
+
+const ClinicalDatasetsFiltersDialog = dynamic(
+    () =>
+        import("./clinical-datasets-filters-dialog").then(
+            (m) => m.ClinicalDatasetsFiltersDialog
+        ),
+    {
+        ssr: false,
+        loading: () => (
+            <Button disabled className="m-4 rounded-full" variant={'cta'}>
+                <Funnel/>
+                Filters
+            </Button>
+        ),
+    }
+)
 
 export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
     const {searchTerm, setSearchTerm, filters, setFilters, totalResults} = useClinicalDatasetSearchStore(
@@ -65,7 +82,6 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
             setSearchTerm: state.setSearchTerm
         }))
     )
-    const dialogRef = useRef<HTMLDivElement>(null)
 
     const [query, setQuery] = useState(searchTerm)
 
@@ -212,98 +228,7 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
                 <Separator orientation="vertical" className="h-8" />
 
                 {/* Mobile and additional filters */}
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button className="m-4 rounded-full" variant={'cta'}>
-                            <Funnel />
-                            Filters
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent
-                        ref={dialogRef}
-                        onOpenAutoFocus={(e) => {
-                            e.preventDefault() // prevent focusing the first input
-                            dialogRef.current?.focus() // focus the dialog content instead
-                        }}
-                    >
-                        <DialogTitle>Clinical dataset filters</DialogTitle>
-                        {/* Conditions */}
-                        <div>
-                            <Label>Condition</Label>
-                            <MultipleSelector
-                                value={filters.conditions ?? []}
-                                onChange={(vals) => setFilterKey("conditions", vals)}
-                                onSearch={handleAsyncConditionSearch}
-                                placeholder="Any condition"
-                                hidePlaceholderWhenSelected
-                                commandProps={{className: "bg-transparent"}}
-                                loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading conditions...</p>}
-                                emptyIndicator={
-                                    <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                }
-                                triggerSearchOnFocus={true}
-                                showHoverCard={false}
-                            />
-                        </div>
-
-                        {/* Genes */}
-                        <div>
-                            <Label>Gene</Label>
-                            <MultipleSelector
-                                value={filters.genes ?? []}
-                                badgeClassName={badgeVariants({variant: "teal"})}
-                                onChange={(vals) => setFilterKey("genes", vals)}
-                                onSearch={handleAsyncGeneSearch}
-                                placeholder="Any gene"
-                                hidePlaceholderWhenSelected
-                                commandProps={{className: "bg-transparent"}}
-                                loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading genes...</p>}
-                                emptyIndicator={
-                                    <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                }
-                                triggerSearchOnFocus={true}
-                                showHoverCard={false}
-                            />
-                        </div>
-
-                        {/* Clinical Dataset Types */}
-                        <div>
-                            <Label>Clinical dataset types</Label>
-                            <MultipleSelector
-                                value={filters.types ?? []}
-                                badgeClassName={badgeVariants({variant: "lightBlue"})}
-                                onChange={(vals) => setFilterKey("types", vals)}
-                                defaultOptions={TOOL_TYPE_OPTIONS}
-                                placeholder="Any"
-                                hidePlaceholderWhenSelected
-                                commandProps={{className: "bg-transparent"}}
-                                emptyIndicator={
-                                    <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                }
-                                showHoverCard={false}
-                            />
-                        </div>
-
-                        {/* Patient Group */}
-                        <div>
-                            <Label>Organization</Label>
-                            <MultipleSelector
-                                value={filters.organizations ?? []}
-                                onChange={(vals) => setFilterKey("organizations", vals)}
-                                onSearch={handleAsyncOrganizationSearch}
-                                placeholder="Select organizations..."
-                                hidePlaceholderWhenSelected
-                                commandProps={{className: "bg-transparent"}}
-                                loadingIndicator={<p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">Loading organizations...</p>}
-                                emptyIndicator={
-                                    <p className="text-center text-sm leading-10 text-gray-600 dark:text-gray-400">no results found.</p>
-                                }
-                                triggerSearchOnFocus={true}
-                                showHoverCard={false}
-                            />
-                        </div>
-                    </DialogContent>
-                </Dialog>
+                <ClinicalDatasetsFiltersDialog/>
             </div>
 
             {/* Active filter badges */}
@@ -313,8 +238,6 @@ export function ClinicalDatasetMarketplaceIntegratedSearchAndFilter() {
                         {/* conditions */}
                         {(filters.conditions || []).map((item) => (
                             <Badge key={`conditions-${item.value}`} variant="secondary" className="text-xs">
-                                {/* {MECHANISM_OPTIONS.find((o) => o.value === item.value)?.label ||
-                                    item.value} */}
                                 {item.value}
                                 <button
                                     onClick={() => removeFilterItem("conditions", item.value)}

@@ -1201,7 +1201,11 @@ export const inviteUser = withOrganizationAuth(
 
         try {
             if (!session) {
-                throw new Error("You must be signed in to perform this action")
+                return {success: false, error: "You must be signed in to perform this action."}
+            }
+
+            if (session.user.membership.role === "member" && role !== "member") {
+                return {success: false, error: "Members can only invite other members."}
             }
 
             if (email === session.user.email) {
@@ -1309,8 +1313,7 @@ export const inviteUser = withOrganizationAuth(
             console.error("Error inviting user:", error)
             return {success: false, error: "Database error. please try again later."}
         }
-    },
-    ['owner', 'support'] // this function is only available to owners of this organization
+    }
 )
 
 export const approveMemberRequestAndCreateMember = withOrganizationAuth(
