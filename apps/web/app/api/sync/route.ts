@@ -1087,7 +1087,7 @@ const syncToTypesense = async (env: {
             const uploadResearchPlans = researchPlans.map(researchPlan => ({
                 ...researchPlan,
                 createdAt: researchPlan.createdAt.getTime(), // special case for created at to enable sorting
-                updatedAt: researchPlan.createdAt.getTime(), // special case for created at to enable sorting
+                updatedAt: researchPlan.updatedAt.getTime(), // special case for created at to enable sorting
                 milestones: researchPlan.milestones.filter(milestone => !milestone.private).length, // public project count
                 modalities: MODALITIES
                     .filter((option: any) => researchPlan.modalities.includes(option.value))
