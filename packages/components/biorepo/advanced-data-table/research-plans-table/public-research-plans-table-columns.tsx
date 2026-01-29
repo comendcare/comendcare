@@ -1,33 +1,18 @@
 import type {ColumnDef} from "@tanstack/react-table";
 import * as React from "react";
 import {DataTableColumnHeader} from "./../data-table/data-table-column-header";
-import {
-    DIAGNOSIS_SEVERITY_OPTIONS,
-    Milestone,
-    QUANTITY_OPTIONS,
-    RESEARCH_PLAN_STATUS,
-    RESEARCH_PLAN_TYPES,
-    RESEARCH_STAGE
-} from "./../../../../../packages/lib/types";
+import {DIAGNOSIS_SEVERITY_OPTIONS, Milestone, QUANTITY_OPTIONS, RESEARCH_PLAN_STATUS, RESEARCH_PLAN_TYPES, RESEARCH_STAGE} from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
-import {ProfilePhoto} from "./../../../profile-photo";
+import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
-import {Badge} from "./../../../ui/badge";
-import {CircleDashed, Globe} from "lucide-react";
-import {
-    handleAsyncCompanyAndInstitutionSearch,
-    handleAsyncConditionSearch,
-    handleAsyncDiagnosesSearch,
-    handleAsyncGeneSearch,
-    handleAsyncInstitutionSearch,
-    handleAsyncOrganizationSearch
-} from "@comend/lib/utils";
-import {ExtendedColumnFilter, ExtendedColumnSort} from "@comend/lib/types/data-table";
-import {filterColumns} from "@comend/lib/filter-columns";
-import {generateId} from "@comend/lib/id";
-import {PropertyBadge} from "./../../../../../packages/components/property-badge";
+import { Badge } from "./../../../ui/badge";
+import { CircleDashed, Globe } from "lucide-react";
+import { handleAsyncCompanyAndInstitutionSearch, handleAsyncConditionSearch, handleAsyncDiagnosesSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils";
+import { ExtendedColumnFilter, ExtendedColumnSort } from "@comend/lib/types/data-table";
+import { filterColumns } from "@comend/lib/filter-columns";
+import { generateId } from "@comend/lib/id";
+import { PropertyBadge } from "./../../../../../packages/components/property-badge";
 import ClaimedBadge from "comend-pag-platform/components/claimed-badge";
-import { TooltipProvider } from "@comend/components/ui/tooltip"
 
 type Preset = "default" | "profile";
 
@@ -67,13 +52,10 @@ export function useResearchPlansTableColumns(
                     >
                         {row.original.organization?.name}
                     </Link>
-                    <TooltipProvider>
-
-                        <ClaimedBadge
-                            organizationId={row.original?.organization?.id}
-                            mini={true}
-                        />
-                    </TooltipProvider>
+                    <ClaimedBadge
+                        organizationId={row.original?.organization?.id}
+                        mini={true}
+                    />
                 </div>
             ),
             enableSorting,
@@ -200,7 +182,7 @@ export function useResearchPlansTableColumns(
                                 target="_blank"
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                {attachment.name || attachment.link}
+                            {attachment.name || attachment.link}
                             </Link>
                         </li>
                     ))}
