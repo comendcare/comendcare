@@ -70,7 +70,7 @@ function generateFiltersString(filters: FiltersType): string {
 }
 
 const sortByFilters: { [key: string]: string } = {
-    // "default": "createdAt:desc",
+    "default": "updatedAt:desc",
 }
 
 async function withRetry<T>(
@@ -108,7 +108,7 @@ const getUpdatedSearchResults = async (
             }
         }
 
-        sortByList.push(`createdAt:desc`)
+        sortByList.push(`updatedAt:desc`)
         const sortBy = sortByList.join(`,`)
 
         const searchParameters = {
