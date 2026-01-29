@@ -6,8 +6,8 @@ import { RESEARCH_PLAN_STATUS, RESEARCH_PLAN_TYPES, RESEARCH_STAGE } from '@come
 const DATA_PATH = './packages/data/DemoPlans.csv'
 const ADMIN_EMAILS = [
   "megan@comendcare.com",
-//   "albert@comendcare.com",
-//   "flawnson@comendcare.com",
+  "albert@comendcare.com",
+  "flawnson@comendcare.com",
 ];
 
 /** ========= Minimal CSV parser that respects quotes ========= */
