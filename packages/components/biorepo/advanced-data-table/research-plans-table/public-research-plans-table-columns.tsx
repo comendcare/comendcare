@@ -12,6 +12,7 @@ import { ExtendedColumnFilter, ExtendedColumnSort } from "@comend/lib/types/data
 import { filterColumns } from "@comend/lib/filter-columns";
 import { generateId } from "@comend/lib/id";
 import { PropertyBadge } from "./../../../../../packages/components/property-badge";
+import ClaimedBadge from "comend-pag-platform/components/claimed-badge";
 
 type Preset = "default" | "profile";
 
@@ -54,6 +55,21 @@ export function useResearchPlansTableColumns(
                 </div>
             ),
             enableSorting,
+            enableHiding,
+        },
+        {
+            id: "claimed",
+            header: ({ column }) => (
+                <DataTableColumnHeader
+                    className="min-w-fit text-nowrap"
+                    column={column}
+                    title="Claimed"
+                />
+            ),
+            cell: ({ row }) => (
+                <ClaimedBadge organizationId={row.original?.organization?.id} />
+            ),
+            enableSorting: false,
             enableHiding,
         },
         {
