@@ -52,24 +52,13 @@ export function useResearchPlansTableColumns(
                     >
                         {row.original.organization?.name}
                     </Link>
+                    <ClaimedBadge
+                        organizationId={row.original?.organization?.id}
+                        mini={true}
+                    />
                 </div>
             ),
             enableSorting,
-            enableHiding,
-        },
-        {
-            id: "claimed",
-            header: ({ column }) => (
-                <DataTableColumnHeader
-                    className="min-w-fit text-nowrap"
-                    column={column}
-                    title="Claimed"
-                />
-            ),
-            cell: ({ row }) => (
-                <ClaimedBadge organizationId={row.original?.organization?.id} />
-            ),
-            enableSorting: false,
             enableHiding,
         },
         {
