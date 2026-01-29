@@ -79,7 +79,7 @@ export function OrganizationMarketplaceCard({
                                 <ProfilePhoto img={image} name={name} className="h-9 w-9 -mt-1"/>
                                 {name}
                                 <ClaimedBadge
-                                    organizationId={organizationId}
+                                    organizationId={organization.id}
                                     mini={true}
                                 />
                             </CardTitle>
