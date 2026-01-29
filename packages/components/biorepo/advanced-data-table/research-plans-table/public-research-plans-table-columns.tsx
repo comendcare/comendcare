@@ -87,12 +87,9 @@ export function useResearchPlansTableColumns(
             ),
             cell: ({row}) => (
                 <>
-                    {(row.original.modalities || []).map((type: string, index: number) => {
-                        const typeOption = RESEARCH_PLAN_TYPES.find(t => t.value === type)
-                        return (
-                            <Badge>{typeOption?.label}</Badge>
-                        )
-                    })}
+                    {RESEARCH_PLAN_TYPES
+                        .filter(option => (row.original.modalities || []).includes(option.value))
+                        .map(option => <Badge>{option?.label}</Badge>)}
                 </>
             ),
             enableSorting: false,
@@ -110,12 +107,9 @@ export function useResearchPlansTableColumns(
             ),
             cell: ({row}) => (
                 <>
-                    {(row.original.stages || []).map((type: string, index: number) => {
-                        const typeOption = RESEARCH_STAGE.find(t => t.value === type)
-                        return (
-                            <Badge>{typeOption?.label}</Badge>
-                        )
-                    })}
+                    {RESEARCH_STAGE
+                        .filter(option => (row.original.stages || []).includes(option.value))
+                        .map(option => <Badge>{option?.label}</Badge>)}
                 </>
             ),
             enableSorting: false,
@@ -133,12 +127,9 @@ export function useResearchPlansTableColumns(
             ),
             cell: ({row}) => (
                 <>
-                    {(row.original.statuses || []).map((type: string, index: number) => {
-                        const typeOption = RESEARCH_PLAN_STATUS.find(t => t.value === type)
-                        return (
-                            <Badge>{typeOption?.label}</Badge>
-                        )
-                    })}
+                    {RESEARCH_PLAN_STATUS
+                        .filter(option => (row.original.statuses || []).includes(option.value))
+                        .map(option => <Badge>{option?.label}</Badge>)}
                 </>
             ),
             enableSorting: false,
