@@ -7,6 +7,7 @@ import {
 } from "@comend/lib/fetchers";
 import {Separator} from "@comend/components/ui/separator";
 import NewOrganizationForm from "~web/components/new-organization-form";
+import AgentCreateOrganization from "@comend/components/agent-create-organization";
 
 export default async function CreateNewOrganizationPage({
     searchParams,
@@ -94,7 +95,17 @@ export default async function CreateNewOrganizationPage({
                     One simple form. We’ll use your answers to set up your profile, organization, condition, and finances.
                 </p>
             </div>
-            <Separator/>
+
+            <AgentCreateOrganization />
+
+            <div className="relative flex items-center my-6">
+                <div className="flex-grow border-t border-border" />
+                <span className="mx-4 text-sm font-semibold text-muted-foreground uppercase">
+                    OR
+                </span>
+                <div className="flex-grow border-t border-border" />
+            </div>
+
             <NewOrganizationForm
                 invitations={invitations}
                 organizations={organizations}

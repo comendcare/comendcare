@@ -122,9 +122,6 @@ const refinedSchema = unifiedSchema.superRefine((vals, ctx) => {
     }
 });
 
-/**************************************
- * Component
- **************************************/
 export default function NewOrganizationForm({
     invitations, 
     organizations
@@ -367,7 +364,7 @@ export default function NewOrganizationForm({
                 {/* ORGANIZATION */}
                 <section className="space-y-6">
                     <h2 className="text-xl font-semibold">
-                        Organization
+                        Create Organization Manually
                     </h2>
 
                     <div className="space-y-6">
