@@ -197,7 +197,7 @@ export function EditMilestoneForm({
     onClose: () => void,
     className?: string,
 }) {
-    const {setMilestone, savingList} = useRoadmapStore(useShallow(selector))
+    const {setMilestone, savingList, selectedNodeIds} = useRoadmapStore(useShallow(selector))
     const initializing = useRef(true)
     const [isInitialized, setIsInitialized] = useState(false)
     const {data: session, status} = useSession()
@@ -235,7 +235,7 @@ export function EditMilestoneForm({
             budget: milestoneData?.budget !== null && milestoneData?.budget !== undefined ? milestoneData.budget : undefined,
             attachments: milestoneData?.attachments || undefined,
             status: milestoneData?.status || "PLANNED",
-            isPrivate: milestoneData?.private || false,
+            isPrivate: milestoneData?.private !== undefined && milestoneData?.private !== null ? milestoneData?.private : true,
             contacts: milestoneData?.contacts || undefined,
             openTo: milestoneData?.openTo || [],
             tools: [
@@ -540,13 +540,6 @@ export function EditMilestoneForm({
         // missing dependencies disabled - we only want to run this once on initialization
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
-    useEffect(() => {
-        // handle updating any properties that can be edited externally (outside this form)
-        if (milestoneData.private !== form.getValues("isPrivate")) {
-            form.setValue("isPrivate", milestoneData.private)
-        }
-    }, [milestoneData])
 
     useEffect(() => {
         // Forces re-validation whenever the startDate or endDate changes

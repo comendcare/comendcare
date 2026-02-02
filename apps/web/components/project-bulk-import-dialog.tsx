@@ -149,7 +149,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
         required: false, 
         defaultValue: true, 
         isValid: (entry) => typeof entry === 'string',
-        fetchDatabaseValue: (entry) => {
+        fetchDatabaseValue: async (entry) => {
             if (entry == 'Published') return false
             if (entry == 'Private') return true
 
@@ -176,7 +176,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
         required: false,
         defaultValue: 'PLANNED',
         isValid: (entry) => !!MILESTONE_STATUS_OPTIONS.find(option => option.label === entry),
-        fetchDatabaseValue: (entry) => {
+        fetchDatabaseValue: async (entry) => {
             const foundOption = MILESTONE_STATUS_OPTIONS.find(option => option.label === entry)
             if (foundOption) return foundOption.value
             return 'PLANNED'
@@ -188,7 +188,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
         required: false,
         defaultValue: [],
         isValid: (entry) => !!MILESTONE_TYPE_OPTIONS.find(option => option.label === entry),
-        fetchDatabaseValue: (entry) => {
+        fetchDatabaseValue: async (entry) => {
             const foundOption = MILESTONE_TYPE_OPTIONS.find(option => option.label === entry)
             if (foundOption) return [foundOption]
             return []
@@ -209,7 +209,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
                 return false
             }
         },
-        fetchDatabaseValue: (entry) => {
+        fetchDatabaseValue: async (entry) => {
             try { 
                 if (!entry) return undefined
                 return parseInt(entry)
@@ -231,7 +231,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
                 return false
             }
         },
-        fetchDatabaseValue: (entry) => {
+        fetchDatabaseValue: async (entry) => {
             if (entry) {
                 const d = new Date(entry)
                 // strip time, only store date (midnight, EST is stored as time in DB)
@@ -254,7 +254,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
                 return false
             }
         },
-        fetchDatabaseValue: (entry) => {
+        fetchDatabaseValue: async (entry) => {
             if (entry) {
                 const d = new Date(entry)
                 // strip time, only store date (midnight, EST is stored as time in DB)
@@ -270,7 +270,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
         required: false,
         defaultValue: undefined,
         isValid: (entry) => typeof entry === 'string',
-        fetchDatabaseValue: (entry) => entry.split(","),
+        fetchDatabaseValue: async (entry) => entry.split(","),
     },
     {
         spreadsheetKey: 'Contact Email',
@@ -278,7 +278,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
         required: false,
         defaultValue: undefined,
         isValid: (entry) => typeof entry === 'string',
-        fetchDatabaseValue: (entry) => entry.split(","),
+        fetchDatabaseValue: async (entry) => entry.split(","),
     },
     {
         spreadsheetKey: 'Link Name',
@@ -286,7 +286,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
         required: false,
         defaultValue: undefined,
         isValid: (entry) => typeof entry === 'string',
-        fetchDatabaseValue: (entry) => entry.split(","),
+        fetchDatabaseValue: async (entry) => entry.split(","),
     },
     {
         spreadsheetKey: 'Link URL',
@@ -294,7 +294,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
         required: false,
         defaultValue: undefined,
         isValid: (entry) => typeof entry === 'string',
-        fetchDatabaseValue: (entry) => entry.split(","),
+        fetchDatabaseValue: async (entry) => entry.split(","),
     },
     {
         spreadsheetKey: 'Internal Notes',
@@ -302,7 +302,7 @@ const projectImportSchema: ImportSchemaEntry[] = [
         required: false,
         defaultValue: undefined,
         isValid: (entry) => typeof entry === 'string',
-        fetchDatabaseValue: (entry) => ([{"children":[{"text":entry}],"type":"p"}])
+        fetchDatabaseValue: async (entry) => ([{"children":[{"text":entry}],"type":"p"}])
     },
 ]
 
