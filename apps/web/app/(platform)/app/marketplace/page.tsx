@@ -232,7 +232,7 @@ export default function MarketplacePage() {
                         }
                     </ol>
                 </div>
-        
+
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Patient biosamples</h2>
@@ -250,11 +250,11 @@ export default function MarketplacePage() {
                             ? (
                                 <>
                                     <div className="max-w-7xl w-full overflow-auto">
-                                        <TypesenseBiosamplesTable 
-                                            showPagination={false} 
-                                            data={biosampleStore.searchResults?.slice(0, 3)} 
-                                            pageCount={1} 
-                                            columns={biosampleColumns} 
+                                        <TypesenseBiosamplesTable
+                                            showPagination={false}
+                                            data={biosampleStore.searchResults?.slice(0, 3)}
+                                            pageCount={1}
+                                            columns={biosampleColumns}
                                             searchParams={{}}
                                         />
                                     </div>
@@ -312,7 +312,7 @@ export default function MarketplacePage() {
                                 </>
                             )
                             : (
-                                (diseaseModelsInitialized && diseaseModelsInitialized) 
+                                (diseaseModelsInitialized && diseaseModelsInitialized)
                                     ? (
                                         <Card className="h-[286px] w-full">
                                             <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
@@ -449,7 +449,7 @@ export default function MarketplacePage() {
                         }
                     </ol>
                 </div>
-                
+
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Service providers</h2>

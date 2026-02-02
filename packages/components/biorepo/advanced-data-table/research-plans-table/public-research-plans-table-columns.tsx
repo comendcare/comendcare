@@ -12,12 +12,13 @@ import { ExtendedColumnFilter, ExtendedColumnSort } from "@comend/lib/types/data
 import { filterColumns } from "@comend/lib/filter-columns";
 import { generateId } from "@comend/lib/id";
 import { PropertyBadge } from "./../../../../../packages/components/property-badge";
+import ClaimedBadge from "comend-pag-platform/components/claimed-badge";
 
 type Preset = "default" | "profile";
 
 export function useResearchPlansTableColumns(
-    enableSorting: boolean = true, 
-    enableHiding: boolean = true, 
+    enableSorting: boolean = true,
+    enableHiding: boolean = true,
     typesenseSearch: boolean = true,
     presetName?: Preset,
 ): ColumnDef<any>[] {
@@ -28,9 +29,9 @@ export function useResearchPlansTableColumns(
             id: "organization.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "organization.name",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Associated patient group"
                 />
             ),
@@ -51,6 +52,10 @@ export function useResearchPlansTableColumns(
                     >
                         {row.original.organization?.name}
                     </Link>
+                    <ClaimedBadge
+                        organizationId={row.original?.organization?.id}
+                        mini={true}
+                    />
                 </div>
             ),
             enableSorting,
@@ -60,8 +65,8 @@ export function useResearchPlansTableColumns(
             id: "title",
             accessorKey: "title",
             header: ({column}) => (
-                <DataTableColumnHeader 
-                    column={column} 
+                <DataTableColumnHeader
+                    column={column}
                     title="Title"
                     className="min-w-fit text-nowrap"
                     // tooltip="Unique ID assigned to this sample. This ID is public and appears in the marketplace."
@@ -79,9 +84,9 @@ export function useResearchPlansTableColumns(
             id: "modalities",
             accessorKey: "modalities",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Research strategy"
                 />
             ),
@@ -99,9 +104,9 @@ export function useResearchPlansTableColumns(
             id: "stages",
             accessorKey: "stages",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Stage"
                 />
             ),
@@ -119,9 +124,9 @@ export function useResearchPlansTableColumns(
             id: "statuses",
             accessorKey: "statuses",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Status"
                 />
             ),
@@ -139,9 +144,9 @@ export function useResearchPlansTableColumns(
             id: "partners",
             accessorKey: "partners",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Partners"
                 />
             ),
@@ -161,9 +166,9 @@ export function useResearchPlansTableColumns(
             id: "links",
             accessorKey: "links",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Links"
                 />
             ),
@@ -171,8 +176,8 @@ export function useResearchPlansTableColumns(
                 <ul className="flex flex-col gap-2">
                     {row.original.links?.map((attachment: any, index: number) => (
                         <li key={index}>
-                            <Link 
-                                className="line-clamp-2 underline" 
+                            <Link
+                                className="line-clamp-2 underline"
                                 href={attachment.link || "/"}
                                 target="_blank"
                                 onClick={(e) => e.stopPropagation()}
@@ -190,9 +195,9 @@ export function useResearchPlansTableColumns(
             id: "milestones",
             accessorKey: "milestones",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Number of projects"
                 />
             ),
@@ -202,8 +207,8 @@ export function useResearchPlansTableColumns(
                 return (
                     <div className="flex flex-col gap-2 justify-center text-nowrap">
                         {numPublishedProjects > 0 && (
-                            <PropertyBadge 
-                                className="text-nowrap border-green-200 text-green-900 font-semibold" 
+                            <PropertyBadge
+                                className="text-nowrap border-green-200 text-green-900 font-semibold"
                                 icon={Globe}
                             >
                                 {numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}
@@ -219,9 +224,9 @@ export function useResearchPlansTableColumns(
             id: "description",
             accessorKey: "description",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Description"
                 />
             ),
@@ -238,12 +243,12 @@ export function useResearchPlansTableColumns(
     const presets: Record<Preset, string[]> = {
         default: columns.map((c) => c.id as string),
         profile: [
-            "title", 
-            "modalities", 
+            "title",
+            "modalities",
             "stages",
-            "statuses", 
-            "partners", 
-            "links", 
+            "statuses",
+            "partners",
+            "links",
             "milestones",
             "description"
         ],

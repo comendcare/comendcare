@@ -951,3 +951,25 @@ export const getCompanyContactRequests = withAdminAuth(
         }
     }
 )
+
+export const getIsOrganizationClaimed = withAdminAuth(
+    async (organizationId: string): Promise<boolean> => {
+        const hasNonComendMember = await prisma.organization.findFirst({
+            where: {
+                id: organizationId,
+                members: {
+                    some: {
+                        email: {
+                            not: {
+                                contains: "@comendcare.com",
+                            },
+                        },
+                    },
+                },
+            },
+            select: { id: true },
+        })
+
+        return Boolean(hasNonComendMember)
+    }
+)

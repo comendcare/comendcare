@@ -1,6 +1,6 @@
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@comend/components/ui/card";
 import Link from "next/link";
-import {formatMoney, getStage} from "@comend/lib/utils";
+import {formatMoney, formatNumberWithCommas, getStage} from "@comend/lib/utils";
 import {Badge, BadgeProps, badgeVariants} from "@comend/components/ui/badge";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Separator} from "@comend/components/ui/separator";
@@ -9,6 +9,7 @@ import React, { useEffect, useRef, useState } from "react";
 import {PropertyBadge} from "@comend/components/property-badge";
 import { milestoneCategories, MODALITIES, Option } from "@comend/lib/types";
 import { VariantProps } from "class-variance-authority";
+import ClaimedBadge from "comend-pag-platform/components/claimed-badge";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -77,6 +78,10 @@ export function OrganizationMarketplaceCard({
                             <CardTitle className="text-xl flex flex-row gap-2 items-start h-[56px]">
                                 <ProfilePhoto img={image} name={name} className="h-9 w-9 -mt-1"/>
                                 {name}
+                                <ClaimedBadge
+                                    organizationId={organization.id}
+                                    mini={true}
+                                />
                             </CardTitle>
                         </Link>
                         {/*{!isPublic && <SaveOrganizationDialog savedOrganization={organization} type={"card"}/>}*/}
@@ -98,7 +103,7 @@ export function OrganizationMarketplaceCard({
                         {numberOfPatientsEngaged !== null && numberOfPatientsEngaged > 0 && (
                             <div className="text-sm text-gray-700 m-0 flex items-center">
                                 <Users className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
-                                {numberOfPatientsEngaged} patients
+                                {formatNumberWithCommas(numberOfPatientsEngaged)} patients
                             </div>
                         )}
                     </div>
