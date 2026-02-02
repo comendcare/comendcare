@@ -44,6 +44,7 @@ import {FormImageSelector} from "@comend/components/form-image-selector";
 import {Invitation, Organization} from "@prisma/client";
 import { badgeVariants } from "@comend/components/ui/badge";
 import { useWatch } from "react-hook-form";
+import AgentFillCreateOrganizationForm from "@comend/components/agent-fill-create-organization-form";
 
 
 /**************************************
@@ -122,9 +123,6 @@ const refinedSchema = unifiedSchema.superRefine((vals, ctx) => {
     }
 });
 
-/**************************************
- * Component
- **************************************/
 export default function NewOrganizationForm({
     invitations, 
     organizations
@@ -364,10 +362,21 @@ export default function NewOrganizationForm({
                 console.log(e);
                 toast.error("Please fix the highlighted errors.");
             })} className="space-y-10">
+
+                <AgentFillCreateOrganizationForm form={form} />
+
+                <div className="relative flex items-center my-6">
+                    <div className="flex-grow border-t border-border" />
+                    <span className="mx-4 text-sm font-semibold text-muted-foreground uppercase">
+                        OR
+                    </span>
+                    <div className="flex-grow border-t border-border" />
+                </div>
+
                 {/* ORGANIZATION */}
                 <section className="space-y-6">
                     <h2 className="text-xl font-semibold">
-                        Organization
+                        Create Organization Manually
                     </h2>
 
                     <div className="space-y-6">
