@@ -202,12 +202,12 @@ export const useRoadmapStore = create<RoadmapState>()(
                     }
                 })
 
-                set({milestones: updatedMilestones})
-
                 // update DB milestones
                 const response = await updateMilestonesVisibility(get().details?.organizationId, {milestones, isPrivate})
                 if (response?.success && response?.data) {
                     get().savingListRemove(milestones.filter(milestone => !!milestone.id).map(milestone => milestone.id))
+                    // reset selected node ids to remount edit milestone form if it's open
+                    set({milestones: updatedMilestones, selectedNodeIds: [...get().selectedNodeIds]})
                     return response.data as Milestone[]
                 } else {
                     toast.error("Could not update milestones", {position: "bottom-left"})
