@@ -96,15 +96,15 @@ export default async function CreateNewOrganizationPage({
                 </p>
             </div>
 
-            <AgentCreateOrganization />
+            {/*<AgentCreateOrganization />*/}
 
-            <div className="relative flex items-center my-6">
-                <div className="flex-grow border-t border-border" />
-                <span className="mx-4 text-sm font-semibold text-muted-foreground uppercase">
-                    OR
-                </span>
-                <div className="flex-grow border-t border-border" />
-            </div>
+            {/*<div className="relative flex items-center my-6">*/}
+            {/*    <div className="flex-grow border-t border-border" />*/}
+            {/*    <span className="mx-4 text-sm font-semibold text-muted-foreground uppercase">*/}
+            {/*        OR*/}
+            {/*    </span>*/}
+            {/*    <div className="flex-grow border-t border-border" />*/}
+            {/*</div>*/}
 
             <NewOrganizationForm
                 invitations={invitations}
