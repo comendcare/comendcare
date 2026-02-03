@@ -14,6 +14,7 @@ import { ResearchPlanActionsMenu } from "comend-pag-platform/components/research
 import { PropertyBadge } from "./../../../../../packages/components/property-badge";
 import { Milestone } from "@prisma/client";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./../../../ui/tooltip";
+import { SeeMoreDescription } from "./../../../../../packages/components/see-more-description";
 
 export function useResearchPlansTableColumns({session}: {session: Session | null}): ColumnDef<any>[] {
     const columns: ColumnDef<any>[] = [
@@ -144,6 +145,23 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
             enableSorting: false,
         },
         {
+            id: "description",
+            accessorKey: "description",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap min-w-[200px]"
+                    column={column} 
+                    title="Description"
+                />
+            ),
+            cell: ({row}) => (
+                <div>
+                    <SeeMoreDescription description={row.original.description}/>
+                </div>
+            ),
+            enableSorting: false,
+        },
+        {
             id: "links",
             accessorKey: "links",
             header: ({column}) => (
@@ -220,23 +238,6 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                     </div>
                 )
             },
-            enableSorting: false,
-        },
-        {
-            id: "description",
-            accessorKey: "description",
-            header: ({column}) => (
-                <DataTableColumnHeader 
-                    className="min-w-fit text-nowrap"
-                    column={column} 
-                    title="Description"
-                />
-            ),
-            cell: ({row}) => (
-                <div className="line-clamp-3">
-                    {row.original.description}
-                </div>
-            ),
             enableSorting: false,
         },
         {

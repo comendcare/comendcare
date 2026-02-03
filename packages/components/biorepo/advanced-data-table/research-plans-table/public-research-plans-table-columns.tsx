@@ -9,6 +9,7 @@ import { Globe } from "lucide-react";
 import { PropertyBadge } from "./../../../../../packages/components/property-badge";
 import ClaimedBadge from "comend-pag-platform/components/claimed-badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./../../../ui/tooltip";
+import { SeeMoreDescription } from "./../../../../../packages/components/see-more-description";
 
 type Preset = "default" | "profile";
 
@@ -159,6 +160,24 @@ export function useResearchPlansTableColumns(
             enableHiding,
         },
         {
+            id: "description",
+            accessorKey: "description",
+            header: ({column}) => (
+                <DataTableColumnHeader
+                    className="min-w-fit text-nowrap min-w-[200px]"
+                    column={column}
+                    title="Description"
+                />
+            ),
+            cell: ({row}) => (
+                <div>
+                    <SeeMoreDescription description={row.original.description}/>
+                </div>
+            ),
+            enableSorting,
+            enableHiding,
+        },
+        {
             id: "links",
             accessorKey: "links",
             header: ({column}) => (
@@ -220,24 +239,6 @@ export function useResearchPlansTableColumns(
                     </div>
                 )
             },
-            enableSorting,
-            enableHiding,
-        },
-        {
-            id: "description",
-            accessorKey: "description",
-            header: ({column}) => (
-                <DataTableColumnHeader
-                    className="min-w-fit text-nowrap"
-                    column={column}
-                    title="Description"
-                />
-            ),
-            cell: ({row}) => (
-                <div className="line-clamp-3">
-                    {row.original.description}
-                </div>
-            ),
             enableSorting,
             enableHiding,
         },
