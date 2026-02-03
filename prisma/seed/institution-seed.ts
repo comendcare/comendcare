@@ -1,14 +1,15 @@
 import prisma from "@comend/lib/prisma";
 import * as fs from "fs/promises";
 
-async function main() {
-    console.log("Starting institution seed script...");
+export async function seed() {
+    console.log("Institutions: Starting institution seed script...");
 
-    const raw = await fs.readFile("packages/data/v1.69-2025-08-07-ror-data.json", "utf-8");
+    const raw = await fs.readFile("./packages/data/v1.69-2025-08-07-ror-data.json", "utf-8");
     const institutions = JSON.parse(raw);
 
     let processedCount = 0;
 
+    await prisma.institution.deleteMany()
     for (const inst of institutions) {
         try {
             await prisma.institution.upsert({
@@ -43,7 +44,7 @@ async function main() {
         }
     }
 
-    console.log(`Created/updated ${processedCount} institutions.`);
+    console.log(`Institutions: Processed ${processedCount} records in total.`);
 
     // Process relationships
     let relationshipCount = 0;
@@ -86,15 +87,15 @@ async function main() {
         }
     }
 
-    console.log(`Created ${relationshipCount} relationships.`);
+    console.log(`Institutions: Created ${relationshipCount} relationships.`);
 }
 
-main()
+seed()
     .then(() => {
-        console.log("Institution seeding complete!");
+        console.log("Institutions: Seeding finished successfully!");
     })
     .catch((err) => {
-        console.error("Error during seeding:", err);
+        console.error("Institutions: Error during seeding:", err);
     })
     .finally(async () => {
         await prisma.$disconnect();

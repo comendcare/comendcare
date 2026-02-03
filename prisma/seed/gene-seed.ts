@@ -2,8 +2,8 @@ import prisma from "@comend/lib/prisma"
 import * as fs from 'fs/promises'
 import path from "path";
 
-async function main() {
-    console.log('Starting seed script...');
+export async function seed() {
+    console.log('Genes: Starting seed script...');
 
     // Load the JSON data
     const filePath = path.resolve(__dirname, "../../packages/data/non_alt_loci_set.json");
@@ -16,6 +16,7 @@ async function main() {
 
     let processedCount = 0;
 
+    await prisma.gene.deleteMany()
     for (const gene of genes) {
         try {
             // Parse date fields safely
@@ -86,15 +87,15 @@ async function main() {
         }
     }
 
-    console.log(`Seed script completed. Processed ${processedCount} records in total.`);
+    console.log(`Genes: Processed ${processedCount} records in total.`);
 }
 
-main()
+seed()
     .then(() => {
-        console.log('Seeding finished successfully!');
+        console.log('Genes: Seeding finished successfully!');
     })
     .catch((error) => {
-        console.error('Error seeding database:', error);
+        console.error('Genes: Error seeding database:', error);
     })
     .finally(async () => {
         await prisma.$disconnect();

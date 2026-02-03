@@ -2,8 +2,8 @@ import prisma from "@comend/lib/prisma"
 import * as fs from "fs/promises";
 import path from "path";
 
-async function main() {
-    console.log('Starting seed script...');
+export async function seed() {
+    console.log('CROs: Starting seed script...');
 
     // Load the JSON data
     const filePath = path.resolve(__dirname, "../../packages/data/new_dataset.json");
@@ -13,18 +13,8 @@ async function main() {
 
     let processedCount = 0;
 
+    await prisma.company.deleteMany()
     for (const company of companies) {
-        // const hasValidDescription = company.description && company.description.trim() !== "";
-        // const hasNonEmptyServices = Array.isArray(company.services) && company.services.length > 0;
-        // const hasNonEmptySites = Array.isArray(company.sites) && company.sites.length > 0;
-        // const hasNonEmptyCertifications = Array.isArray(company.certifications) && company.certifications.length > 0;
-        // const hasValidWebsite = company.website && company.website.trim() !== "";
-        //
-        // if (!(hasValidDescription && hasNonEmptyServices && hasNonEmptySites && hasNonEmptyCertifications && hasValidWebsite)) {
-        //     console.warn(`Skipping company that does not meet all validation criteria: ${company.title || 'Unknown Title'}`);
-        //     continue;
-        // }
-
         try {
             await prisma.company.create({
                 data: {
@@ -105,15 +95,15 @@ async function main() {
         }
     }
 
-    console.log(`Seed script completed. Processed ${processedCount} records in total.`);
+    console.log(`CROs: Processed ${processedCount} records in total.`);
 }
 
-main()
+seed()
     .then(() => {
-        console.log('Seeding finished successfully!');
+        console.log('CROs: Seeding finished successfully!');
     })
     .catch((error) => {
-        console.error('Error seeding database:', error);
+        console.error('CROs: Error seeding database:', error);
     })
     .finally(async () => {
         await prisma.$disconnect();
