@@ -38,8 +38,7 @@ export const BiosampleDetails = ({biosample}: { biosample: any }) => {
 
                     <PropertyBadge>
                         <b>Gene:</b>
-                        <span><Badge variant={'teal'}>{biosample?.gene.symbol || ''}</Badge></span>
-                        {/* <span>{biosample?.genes.map((gene: string) => <Badge variant={'teal'}>{gene}</Badge>)}</span> */}
+                        {biosample?.gene && (<Badge variant={'teal'}>{biosample?.gene?.symbol || ''}</Badge>)}
                     </PropertyBadge>
 
                     <PropertyBadge>
