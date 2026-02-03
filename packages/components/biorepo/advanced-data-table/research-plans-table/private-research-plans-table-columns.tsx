@@ -1,71 +1,23 @@
 import type {ColumnDef} from "@tanstack/react-table";
-import {
-    CircleDashed,
-    FileText,
-    Globe,
-    Lock,
-} from "lucide-react";
+import {Globe, Lock} from "lucide-react";
 import * as React from "react";
+import {DataTableColumnHeader} from "./../data-table/data-table-column-header";
 import {
-    DataTableColumnHeader
-} from "./../data-table/data-table-column-header";
-import {
-    DIAGNOSIS_SEVERITY_OPTIONS,
-    DONOR_RACE_OPTIONS,
-    DONOR_SEX_OPTIONS,
-    QUANTITY_OPTIONS,
     RESEARCH_PLAN_STATUS,
     RESEARCH_PLAN_TYPES,
     RESEARCH_STAGE,
 } from "./../../../../../packages/lib/types";
-import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { Badge } from "./../../../ui/badge";
-import { Checkbox } from "./../../../ui/checkbox";
-import { handleAsyncCompanyAndInstitutionSearch, handleAsyncDiagnosesSearch, handleAsyncGeneSearch, handleAsyncMilestoneSearch } from "./../../../../../packages/lib/utils";
 import Link from "next/link";
-import { filterColumns } from "@comend/lib/filter-columns";
-import { generateId } from "@comend/lib/id";
-import { ExtendedColumnFilter } from "@comend/lib/types/data-table";
 import { Session } from "next-auth";
 import { ResearchPlanActionsMenu } from "comend-pag-platform/components/research-plans-actions-menu";
 import { PropertyBadge } from "./../../../../../packages/components/property-badge";
 import { Milestone } from "@prisma/client";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./../../../ui/tooltip";
+import { SeeMoreDescription } from "./../../../../../packages/components/see-more-description";
 
 export function useResearchPlansTableColumns({session}: {session: Session | null}): ColumnDef<any>[] {
     const columns: ColumnDef<any>[] = [
-        // {
-        //     id: "select",
-        //     header: ({ table }) => (
-        //         <div className="-ml-1 pr-1">
-        //             <Checkbox
-        //                 checked={
-        //                     table.getIsAllPageRowsSelected() ||
-        //                     (table.getIsSomePageRowsSelected() && "indeterminate")
-        //                 }
-        //                 onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        //                 aria-label="Select all"
-        //                 className="translate-y-[2px]"
-        //             />
-        //         </div>
-        //     ),
-        //     cell: ({ row }) => (
-        //         <div
-        //             onClick={(e) => {
-        //                 e.stopPropagation(); // prevent row onClick from firing
-        //             }}
-        //         >
-        //             <Checkbox
-        //                 checked={row.getIsSelected()}
-        //                 onCheckedChange={(value) => row.toggleSelected(!!value)}
-        //                 aria-label="Select row"
-        //                 className="translate-y-[2px]"
-        //             />
-        //         </div>
-        //     ),
-        //     enableSorting: false,
-        //     enableHiding: false,
-        //     meta: { label: "Select" }
-        // },
         {
             id: "private",
             accessorKey: "private",
@@ -193,6 +145,23 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
             enableSorting: false,
         },
         {
+            id: "description",
+            accessorKey: "description",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap min-w-[200px]"
+                    column={column} 
+                    title="Description"
+                />
+            ),
+            cell: ({row}) => (
+                <div>
+                    <SeeMoreDescription description={row.original.description}/>
+                </div>
+            ),
+            enableSorting: false,
+        },
+        {
             id: "links",
             accessorKey: "links",
             header: ({column}) => (
@@ -237,41 +206,38 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                 return (
                     <div className="flex flex-col gap-2 justify-center text-nowrap">
                         {numPrivateProjects > 0 && (
-                            <PropertyBadge 
-                                className="text-nowrap border-red-200 text-red-900 font-semibold" 
-                                icon={Lock}
-                            >
-                                {numPrivateProjects === 1 ? `${numPrivateProjects} private project` : `${numPrivateProjects} private projects`}
-                            </PropertyBadge>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <PropertyBadge 
+                                        className="text-nowrap border-red-200 text-red-900 font-semibold" 
+                                        icon={Lock}
+                                    >
+                                        {numPrivateProjects}
+                                    </PropertyBadge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{numPrivateProjects === 1 ? `${numPrivateProjects} private project` : `${numPrivateProjects} private projects`}</p>
+                                </TooltipContent>
+                            </Tooltip>
                         )}
                         {numPublishedProjects > 0 && (
-                            <PropertyBadge 
-                                className="text-nowrap border-green-200 text-green-900 font-semibold" 
-                                icon={Globe}
-                            >
-                                {numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}
-                            </PropertyBadge>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <PropertyBadge 
+                                        className="text-nowrap border-green-200 text-green-900 font-semibold" 
+                                        icon={Globe}
+                                    >
+                                        {numPublishedProjects}
+                                    </PropertyBadge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}</p>
+                                </TooltipContent>
+                            </Tooltip>
                         )}
                     </div>
                 )
             },
-            enableSorting: false,
-        },
-        {
-            id: "description",
-            accessorKey: "description",
-            header: ({column}) => (
-                <DataTableColumnHeader 
-                    className="min-w-fit text-nowrap"
-                    column={column} 
-                    title="Description"
-                />
-            ),
-            cell: ({row}) => (
-                <div className="line-clamp-3">
-                    {row.original.description}
-                </div>
-            ),
             enableSorting: false,
         },
         {
