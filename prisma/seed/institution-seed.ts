@@ -4,18 +4,27 @@ import * as fs from "fs/promises";
 export async function seed() {
     console.log("Institutions: Starting institution seed script...");
 
-    const raw = await fs.readFile("./packages/data/v1.69-2025-08-07-ror-data.json", "utf-8");
-    const institutions = JSON.parse(raw);
+    let institutions: any[] = [
+        {
+            name: 'Example Company',
+            established: 2026,
+            website: 'https://example.com'
+        }
+    ]
+
+    try {
+        const raw = await fs.readFile("./packages/data/v1.69-2025-08-07-ror-data.json", "utf-8");
+        institutions = JSON.parse(raw);
+    } catch (e) {
+        console.error(`Failed to fech file. Using default seed institutions.`)
+    }
 
     let processedCount = 0;
 
-    await prisma.institution.deleteMany()
     for (const inst of institutions) {
         try {
-            await prisma.institution.upsert({
-                where: { rorId: inst.id },
-                update: {},
-                create: {
+            await prisma.institution.create({
+                data: {
                     rorId: inst.id,
                     name: inst.name,
                     established: inst.established || null,
@@ -40,7 +49,13 @@ export async function seed() {
 
             processedCount++;
         } catch (error: any) {
-            console.error(`Failed to process institution ${inst.name} (${inst.id}):`, error);
+            if (error.code === 'P2002') {
+                console.error(
+                    `Unique constraint violation for institution ${inst.name}. Skipping.`
+                );
+            } else {
+                console.error(`Failed to process institution ${inst.name}:`, error);
+            }
         }
     }
 
