@@ -1,7 +1,7 @@
 import { ScrollArea } from "@comend/components/ui/scroll-area";
 import { cn, formatDateUTC, formatMoney } from "@comend/lib/utils";
 import { ExternalAttachment, ExternalContact } from "@prisma/client";
-import { FileText, LinkIcon, Mail, Workflow } from "lucide-react";
+import { ExternalLink, FileText, LinkIcon, Mail, Workflow } from "lucide-react";
 import Link from "next/link";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 import { PropertyBadge } from "@comend/components/property-badge";
@@ -10,6 +10,7 @@ import { Button } from "@comend/components/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@comend/components/ui/dialog";
 import { Separator } from "@comend/components/ui/separator";
 import { CaretAccordion } from "@comend/components/ui/carret-accordion";
+import { TOOL_TYPE_OPTIONS } from "@comend/lib/types";
 
 export const ClinicalDatasetDetails = ({clinicalDataset}: { clinicalDataset: any }) => {
     return (
@@ -19,88 +20,37 @@ export const ClinicalDatasetDetails = ({clinicalDataset}: { clinicalDataset: any
                 <DialogTitle className="text-2xl font-semibold">{clinicalDataset?.title}</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-4 pt-4 ">
-                {/* <RFPStatusBadge status={status} /> */}
-                
                 <div className="flex gap-4">
-                {/* <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words grow-2">
-                    {Array.isArray(clinicalDataset.openTo) && clinicalDataset.openTo.length > 0 && (
-                        <li>
-                            <PropertyBadge>
-                                <b>Open to:</b>
-                                {clinicalDataset.openTo
-                                    .map((option: string) => {
-                                        switch (option) {
-                                            case "CRO":
-                                                return "Service providers";
-                                            case "ACADEMIC":
-                                                return "Academics";
-                                            default:
-                                                return option;
-                                        }
-                                    })
-                                    .join(", ")}
-                            </PropertyBadge>
-                        </li>
+                    {clinicalDataset?.types && TOOL_TYPE_OPTIONS.filter(option => clinicalDataset.types.includes(option.value)) && (
+                        TOOL_TYPE_OPTIONS.filter(option => clinicalDataset.types.includes(option.value)).map(type => (
+                            <Badge variant={"lightBlue"} className="w-fit">{type.label}</Badge>
+                        ))
                     )}
-
-                    {clinicalDataset.budget && (
-                        <li>
-                            <PropertyBadge>
-                                <p><b>Budget: </b> ${formatMoney(rfp.budget)}</p>
-                            </PropertyBadge>
-                        </li>
-                    )}
-
-                    {clinicalDataset.startDate && (
-                        <li>
-                            <PropertyBadge>
-                                <b>Opens: </b>{formatDateUTC(rfp.startDate)}
-                            </PropertyBadge>
-                        </li>
-                    )}
-
-                    {clinicalDataset.endDate && (
-                        <li>
-                            <PropertyBadge>
-                                <b>Due: </b>{formatDateUTC(rfp.endDate)}
-                            </PropertyBadge>
-                        </li>
-                    )}
-                </ul> */}
-                    {/* {(clinicalDataset?.contacts && clinicalDataset?.contacts?.length > 0) && (
-                        <div className="grow-1">
-                        <Button 
-                            variant="cta"
-                            className="ml-auto font-normal"
-                            asChild
-                        >
-                            <Link href={`mailto:${clinicalDataset?.contacts[0].email}`}>
-                                <Mail className="h-4 w-4 min-h-4 min-w-4"/>
-                                Contact
-                            </Link>
-                        </Button>
-                        </div>
-                    )} */}
                 </div>
 
-                {(clinicalDataset?.milestones && clinicalDataset?.milestones.length > 0) && (
-                    <div className="border-l-2 border-purple-200 pl-2 space-y-2">
-                        <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
-                            <Workflow className="h-4 w-4 min-w-4 text-purple-900" />
-                            <span className="text-purple-900 text-nowrap">Projects</span>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {clinicalDataset.milestones.map((project: any) => (
-                                <Badge className="font-normal" variant={"purple"}>
-                                    <FileText className="h-4 w-4 min-h-4 min-w-4"/>
-                                    {project.milestone.title}
-                                </Badge>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                <div className="grid gap-4 grid-cols-2">
+                    <PropertyBadge>
+                        <b>Dataset ID:</b>
+                        <p>{clinicalDataset?.id}</p>
+                    </PropertyBadge>
 
-                <DialogDescription className="text-sm text-muted-foreground">{clinicalDataset?.description}</DialogDescription>
+                    <PropertyBadge>
+                        <b>Genes:</b>
+                        <span className="flex gap-2 flex-wrap">
+                            {clinicalDataset?.genes?.map((gene: string) => <Badge variant={'teal'}>{gene}</Badge>)}
+                        </span>
+                    </PropertyBadge>
+
+                    <PropertyBadge>
+                        <b>Stored with:</b>
+                        <p>{clinicalDataset?.company?.title || clinicalDataset?.institution?.name}</p>
+                    </PropertyBadge>
+
+                    <PropertyBadge>
+                        <b>Cohort size:</b>
+                        <p>{clinicalDataset?.cohortSize}</p>
+                    </PropertyBadge>
+                </div>
 
                 <Separator />
 
@@ -119,32 +69,14 @@ export const ClinicalDatasetDetails = ({clinicalDataset}: { clinicalDataset: any
 
                 <Separator />
 
-                {/* {clinicalDataset.eligibility && (
+                {clinicalDataset?.description && (
                     <CaretAccordion 
                         title={'Notes'}
                         content={
-                            <p className="text-sm">{clinicalDataset.eligibility}</p>
-                        }
-                    />
-                )} */}
-
-                {/* {rfp.instructions && (
-                    <CaretAccordion 
-                        title={'Instructions'}
-                        content={
-                            <p className="text-sm">{rfp.instructions}</p>
+                            <p className="text-sm">{clinicalDataset.description}</p>
                         }
                     />
                 )}
-
-                {rfp.evaluationProcess && (
-                    <CaretAccordion 
-                        title={'Evaluation process'}
-                        content={
-                            <p className="text-sm">{rfp.evaluationProcess}</p>
-                        }
-                    />
-                )} */}
 
                 {((clinicalDataset?.contacts && clinicalDataset.contacts.length > 0) || (clinicalDataset?.attachments && clinicalDataset.attachments.length > 0)) && <Separator />}
 
@@ -153,7 +85,7 @@ export const ClinicalDatasetDetails = ({clinicalDataset}: { clinicalDataset: any
                         <h3 className="text-lg font-semibold">Contacts</h3>
                         {clinicalDataset?.contacts?.map((contact: ExternalContact) => (
                             <span className="flex items-center gap-2 text-wrap w-full text-sm">
-                                <Mail className="mt-1 h-4 w-4 min-h-4 min-w-4"/>
+                                <Mail className="h-4 w-4 min-h-4 min-w-4"/>
                                 <a
                                     className={cn(contact?.email && "underline")}
                                     onClick={(e) => {
@@ -174,12 +106,12 @@ export const ClinicalDatasetDetails = ({clinicalDataset}: { clinicalDataset: any
                     <div className="flex flex-col gap-2 w-full">
                         <h3 className="text-lg font-semibold">Attachments</h3>
                         {clinicalDataset?.attachments?.map((attachment: ExternalAttachment) => (
-                            <span className="flex items-start gap-2 text-wrap w-full text-sm">
-                                <LinkIcon className="mt-1 h-4 w-4 min-h-4 min-w-4"/>
+                            <span className="flex items-center gap-2 text-wrap w-full text-sm">
+                                <LinkIcon className="h-4 w-4 min-h-4 min-w-4"/>
                                 <a
                                     className={cn(
                                         attachment?.link && "underline", 
-                                        "text-wrap w-full",
+                                        "text-wrap",
                                         // allow text break in middle of word for long links
                                         !attachment.name && attachment.link && "break-all"
                                     )}
@@ -187,9 +119,11 @@ export const ClinicalDatasetDetails = ({clinicalDataset}: { clinicalDataset: any
                                         e.stopPropagation();
                                     }}
                                     href={attachment?.link}
+                                    target="_blank"
                                 >
                                     {attachment?.name || attachment?.link || "No attachments"}
                                 </a>
+                                <ExternalLink className="h-4 w-4 min-h-4 min-w-4"/>
                             </span>
                         ))}
                     </div>
