@@ -1,19 +1,16 @@
 import { ScrollArea } from "@comend/components/ui/scroll-area";
-import { cn, formatDateUTC, formatMoney } from "@comend/lib/utils";
+import { cn } from "@comend/lib/utils";
 import { ExternalAttachment, ExternalContact } from "@prisma/client";
-import { ExternalLink, FileText, LinkIcon, Mail, Workflow } from "lucide-react";
-import Link from "next/link";
+import { ExternalLink, LinkIcon, Mail } from "lucide-react";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 import { PropertyBadge } from "@comend/components/property-badge";
 import { Badge } from "@comend/components/ui/badge";
-import { Button } from "@comend/components/ui/button";
-import { DialogDescription, DialogHeader, DialogTitle } from "@comend/components/ui/dialog";
+import { DialogHeader, DialogTitle } from "@comend/components/ui/dialog";
 import { Separator } from "@comend/components/ui/separator";
 import { CaretAccordion } from "@comend/components/ui/carret-accordion";
 import { BIOSAMPLE_TYPE_OPTIONS, QUANTITY_OPTIONS } from "@comend/lib/types";
 
 export const BiosampleDetails = ({biosample}: { biosample: any }) => {
-
     return (
         <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 mt-2"} type={"always"}>
             <DialogHeader>
@@ -55,22 +52,6 @@ export const BiosampleDetails = ({biosample}: { biosample: any }) => {
                         <p>{biosample?.genotype}</p>
                     </PropertyBadge>
                 </div>
-
-                {/* <PropertyBadge>
-                    <b>Open to:</b>
-                    {rfp.openTo
-                        .map((option: string) => {
-                            switch (option) {
-                                case "CRO":
-                                    return "Service providers";
-                                case "ACADEMIC":
-                                    return "Academics";
-                                default:
-                                    return option;
-                            }
-                        })
-                        .join(", ")}
-                </PropertyBadge> */}
 
                 <Separator />
 
