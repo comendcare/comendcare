@@ -35,7 +35,11 @@ export function SeeMoreDescription({description}: { description: string }) {
             {isOverflowing && (
                 <Button
                     variant="link"
-                    onClick={() => setIsExpanded(!isExpanded)}
+                    onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setIsExpanded(!isExpanded)
+                    }}
                     className="p-0 h-fit underline"
                 >
                     {isExpanded ? "See less" : "See more"}

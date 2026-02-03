@@ -694,6 +694,7 @@ const RoadmapHeader = ({
     const [editResearchPlanIsOpen, setEditResearchPlanIsOpen] = useState(false)
     const [isClosing, setIsClosing] = useState(false)
     const [shareIsOpen, setShareIsOpen] = useState(false)
+    const [visibilityConfirmation, setVisibilityConfirmation] = useState<undefined | boolean>(undefined)
 
     const closeDialog = () => {
         setEditResearchPlanIsOpen(false)
@@ -759,7 +760,8 @@ const RoadmapHeader = ({
                                     <Button
                                         className="h-full w-full rounded-md flex justify-center items-center bg-red-100 hover:bg-red-300"
                                         onClick={() => {
-                                            setMilestonesVisibility(milestones, false)
+                                            // setMilestonesVisibility(milestones, false)
+                                            setVisibilityConfirmation(false)
                                         }}
                                     >
                                         <Lock className="text-red-600 h-4 w-4"/>
@@ -778,7 +780,8 @@ const RoadmapHeader = ({
                                     <Button
                                         className="h-full w-full rounded-md flex justify-center items-center bg-green-100 hover:bg-green-300"
                                         onClick={() => {
-                                            setMilestonesVisibility(milestones, true)
+                                            // setMilestonesVisibility(milestones, true)
+                                            setVisibilityConfirmation(true)
                                         }}
                                     >
                                         <Globe className="text-green-600 h-4 w-4"/>
@@ -977,6 +980,40 @@ const RoadmapHeader = ({
                     ) : (
                         <div className="text-sm text-muted-foreground">Loading organization...</div>
                     )}
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={visibilityConfirmation !== undefined} onOpenChange={(isOpen) => !isOpen && setVisibilityConfirmation(undefined)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            {visibilityConfirmation 
+                                ? 'Make projects private'
+                                : 'Publish projects' 
+                            }
+                        </DialogTitle>
+                        <DialogDescription>
+                            {visibilityConfirmation 
+                                ? 'By clicking confirm you will make all the projects in this research plan private. This will hide all these projects, and this research plan, from your profile and the marketplace. The contents of this research plan will only be visible to those in your organization.'
+                                : 'By clicking confirm you will publish all the projects in this research plan. This will allow users outside your organization to view these projects and their details on your profile and in the marketplace.' 
+                            }
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <DialogFooter>
+                        <DialogClose asChild><Button variant={'secondary'}>Cancel</Button></DialogClose>
+                        <Button 
+                            variant={'cta'} 
+                            onClick={() => {
+                                if (visibilityConfirmation !== undefined) {
+                                    setMilestonesVisibility(milestones, visibilityConfirmation)
+                                    setVisibilityConfirmation(undefined)
+                                }
+                            }}
+                        >
+                            Confirm
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>
