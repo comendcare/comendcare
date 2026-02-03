@@ -1,7 +1,7 @@
 import { ScrollArea } from "@comend/components/ui/scroll-area";
 import { cn, formatDateUTC, formatMoney } from "@comend/lib/utils";
 import { ExternalAttachment, ExternalContact } from "@prisma/client";
-import { FileText, LinkIcon, Mail, Workflow } from "lucide-react";
+import { ExternalLink, FileText, LinkIcon, Mail, Workflow } from "lucide-react";
 import Link from "next/link";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 import { PropertyBadge } from "@comend/components/property-badge";
@@ -10,98 +10,45 @@ import { Button } from "@comend/components/ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@comend/components/ui/dialog";
 import { Separator } from "@comend/components/ui/separator";
 import { CaretAccordion } from "@comend/components/ui/carret-accordion";
+import { DISEASE_MODEL_TYPE_OPTIONS } from "@comend/lib/types";
 
 export const DiseaseModelDetails = ({diseaseModel}: { diseaseModel: any }) => {
 
     return (
         <ScrollArea className={"max-h-[80vh] -mr-2 pr-3 mt-2"} type={"always"}>
-            {/* <Scrollbar /> */}
             <DialogHeader>
                 <DialogTitle className="text-2xl font-semibold">{diseaseModel?.id}</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-4 pt-4 ">
-                {/* <RFPStatusBadge status={status} /> */}
-                
                 <div className="flex gap-4">
-                {/* <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words grow-2">
-                    {Array.isArray(diseaseModel.openTo) && diseaseModel.openTo.length > 0 && (
-                        <li>
-                            <PropertyBadge>
-                                <b>Open to:</b>
-                                {diseaseModel.openTo
-                                    .map((option: string) => {
-                                        switch (option) {
-                                            case "CRO":
-                                                return "Service providers";
-                                            case "ACADEMIC":
-                                                return "Academics";
-                                            default:
-                                                return option;
-                                        }
-                                    })
-                                    .join(", ")}
-                            </PropertyBadge>
-                        </li>
+                    {diseaseModel?.types && DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel.types.includes(option.value)) && (
+                        DISEASE_MODEL_TYPE_OPTIONS.filter(option => diseaseModel.types.includes(option.value)).map(type => (
+                            <Badge variant={"lightBlue"} className="w-fit">{type.label}</Badge>
+                        ))
                     )}
-
-                    {diseaseModel.budget && (
-                        <li>
-                            <PropertyBadge>
-                                <p><b>Budget: </b> ${formatMoney(rfp.budget)}</p>
-                            </PropertyBadge>
-                        </li>
-                    )}
-
-                    {diseaseModel.startDate && (
-                        <li>
-                            <PropertyBadge>
-                                <b>Opens: </b>{formatDateUTC(rfp.startDate)}
-                            </PropertyBadge>
-                        </li>
-                    )}
-
-                    {diseaseModel.endDate && (
-                        <li>
-                            <PropertyBadge>
-                                <b>Due: </b>{formatDateUTC(rfp.endDate)}
-                            </PropertyBadge>
-                        </li>
-                    )}
-                </ul> */}
-                    {/* {(diseaseModel?.contacts && diseaseModel?.contacts?.length > 0) && (
-                        <div className="grow-1">
-                        <Button 
-                            variant="cta"
-                            className="ml-auto font-normal"
-                            asChild
-                        >
-                            <Link href={`mailto:${diseaseModel?.contacts[0].email}`}>
-                                <Mail className="h-4 w-4 min-h-4 min-w-4"/>
-                                Contact
-                            </Link>
-                        </Button>
-                        </div>
-                    )} */}
                 </div>
 
-                {(diseaseModel?.milestones && diseaseModel?.milestones.length > 0) && (
-                    <div className="border-l-2 border-purple-200 pl-2 space-y-2">
-                        <div className="h-full flex items-center gap-2 text-sm font-semibold text-foreground">
-                            <Workflow className="h-4 w-4 min-w-4 text-purple-900" />
-                            <span className="text-purple-900 text-nowrap">Projects</span>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {diseaseModel.milestones.map((project: any) => (
-                                <Badge className="font-normal" variant={"purple"}>
-                                    <FileText className="h-4 w-4 min-h-4 min-w-4"/>
-                                    {project.milestone.title}
-                                </Badge>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                <div className="grid gap-4 grid-cols-2">
+                    <PropertyBadge>
+                        <b>Strain:</b>
+                        <p>{diseaseModel?.strain}</p>
+                    </PropertyBadge>
 
-                <DialogDescription className="text-sm text-muted-foreground">{diseaseModel?.description}</DialogDescription>
+                    <PropertyBadge>
+                        <b>Gene:</b>
+                        {diseaseModel?.gene && (<Badge variant={'teal'}>{diseaseModel?.gene?.symbol || ''}</Badge>)}
+                    </PropertyBadge>
+
+                    <PropertyBadge>
+                        <b>Stored with:</b>
+                        <p>{diseaseModel?.company?.title || diseaseModel?.institution?.name}</p>
+                    </PropertyBadge>
+
+                    <PropertyBadge>
+                        <b>Genotype:</b>
+                        <p>{diseaseModel?.genotype}</p>
+                    </PropertyBadge>
+                </div>
 
                 <Separator />
 
@@ -120,32 +67,14 @@ export const DiseaseModelDetails = ({diseaseModel}: { diseaseModel: any }) => {
 
                 <Separator />
 
-                {/* {diseaseModel.eligibility && (
+                {diseaseModel?.description && (
                     <CaretAccordion 
                         title={'Notes'}
                         content={
-                            <p className="text-sm">{diseaseModel.eligibility}</p>
-                        }
-                    />
-                )} */}
-
-                {/* {rfp.instructions && (
-                    <CaretAccordion 
-                        title={'Instructions'}
-                        content={
-                            <p className="text-sm">{rfp.instructions}</p>
+                            <p className="text-sm">{diseaseModel.description}</p>
                         }
                     />
                 )}
-
-                {rfp.evaluationProcess && (
-                    <CaretAccordion 
-                        title={'Evaluation process'}
-                        content={
-                            <p className="text-sm">{rfp.evaluationProcess}</p>
-                        }
-                    />
-                )} */}
 
                 {((diseaseModel?.contacts && diseaseModel.contacts.length > 0) || (diseaseModel?.attachments && diseaseModel.attachments.length > 0)) && <Separator />}
 
@@ -154,7 +83,7 @@ export const DiseaseModelDetails = ({diseaseModel}: { diseaseModel: any }) => {
                         <h3 className="text-lg font-semibold">Contacts</h3>
                         {diseaseModel?.contacts?.map((contact: ExternalContact) => (
                             <span className="flex items-center gap-2 text-wrap w-full text-sm">
-                                <Mail className="mt-1 h-4 w-4 min-h-4 min-w-4"/>
+                                <Mail className="h-4 w-4 min-h-4 min-w-4"/>
                                 <a
                                     className={cn(contact?.email && "underline")}
                                     onClick={(e) => {
@@ -175,12 +104,12 @@ export const DiseaseModelDetails = ({diseaseModel}: { diseaseModel: any }) => {
                     <div className="flex flex-col gap-2 w-full">
                         <h3 className="text-lg font-semibold">Attachments</h3>
                         {diseaseModel?.attachments?.map((attachment: ExternalAttachment) => (
-                            <span className="flex items-start gap-2 text-wrap w-full text-sm">
-                                <LinkIcon className="mt-1 h-4 w-4 min-h-4 min-w-4"/>
+                            <span className="flex items-center gap-2 text-wrap w-full text-sm">
+                                <LinkIcon className="h-4 w-4 min-h-4 min-w-4"/>
                                 <a
                                     className={cn(
                                         attachment?.link && "underline", 
-                                        "text-wrap w-full",
+                                        "text-wrap",
                                         // allow text break in middle of word for long links
                                         !attachment.name && attachment.link && "break-all"
                                     )}
@@ -188,9 +117,11 @@ export const DiseaseModelDetails = ({diseaseModel}: { diseaseModel: any }) => {
                                         e.stopPropagation();
                                     }}
                                     href={attachment?.link}
+                                    target="_blank"
                                 >
                                     {attachment?.name || attachment?.link || "No attachments"}
                                 </a>
+                                <ExternalLink className="h-4 w-4 min-h-4 min-w-4"/>
                             </span>
                         ))}
                     </div>
