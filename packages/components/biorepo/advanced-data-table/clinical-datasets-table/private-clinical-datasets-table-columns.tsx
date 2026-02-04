@@ -274,7 +274,7 @@ export function getClinicalDatasetsTableColumns({session}: {session: Session | n
                 {row.original.attachments?.map((attachment: any, index: number) => (
                     <li key={index}>
                         <Link 
-                            className="line-clamp-2 underline" 
+                            className="line-clamp-1 underline text-ellipsis text-nowrap"  
                             href={attachment.link || "/"}
                             target="_blank"
                             onClick={(e) => e.stopPropagation()}

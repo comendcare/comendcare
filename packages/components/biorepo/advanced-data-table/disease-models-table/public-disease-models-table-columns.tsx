@@ -300,7 +300,7 @@ export function useDiseaseModelsTableColumns(
             accessorKey: "links",
             header: ({column}) => (
                 <DataTableColumnHeader 
-                    className="min-w-fit text-nowrap"
+                    className="line-clamp-1 underline text-ellipsis text-nowrap" 
                     column={column} 
                     title="Links"
                 />
