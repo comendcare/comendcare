@@ -303,7 +303,7 @@ export function useClinicalDatasetsTableColumns(
         accessorKey: "links",
         header: ({ column }) => (
             <DataTableColumnHeader 
-                className="line-clamp-1 underline text-ellipsis text-nowrap" 
+                className="line-clamp-1 underline text-ellipsis text-nowrap max-w-[250px]" 
                 column={column} 
                 title="Links"
             />
