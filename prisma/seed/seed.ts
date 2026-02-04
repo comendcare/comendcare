@@ -4,25 +4,26 @@ import {seed as seedMilestoneTypes} from './milestone-type-seed'
 import {seed as seedGenes} from './gene-seed'
 import {seed as seedCROs} from "./cro-seed"
 import {seed as seedInstitutions} from "./institution-seed"
-import {seed as seedUsers} from "./user-seed"
+
+import {createNodesAndEdgesFromTemplate} from './../../packages/lib/actions'
+
+import ASOResearchPlan from './../../packages/data/research-plan-templates/ASO Research Plan-cmaqujvbw00007u8av9kl1u60.json'
+import GeneTherapyResearchPlan from './../../packages/data/research-plan-templates/Gene-Therapy-Template.json'
+import DrugScreenResearchPlan from './../../packages/data/research-plan-templates/Drug-Screen-Template.json'
+
+export async function whitelistEmails(emails: (string | null)[]) {
+    if (!emails?.length) return;
+
+    // De-dupe + strip empties just in case
+    const unique = Array.from(new Set(emails.filter(email => email !== null)));
+
+    await prisma.whitelist.createMany({
+        data: unique.map((email) => ({ email })),
+        skipDuplicates: true, // <- avoids errors if already whitelisted
+    });
+}
 
 async function main() {
-    // try {
-    //     // Delete the collection if it exists
-    //     await sendTypeSenseRequest(
-    //         `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}/collections/organizations`,
-    //         'DELETE',
-    //         (
-    //             process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-    //                 ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-    //                 : process.env.TYPESENSE_ADMIN_API_KEY
-    //         )!,
-    //     );
-    //     console.log(`Deleted existing collection: "organizations"`);
-    // } catch (err) {
-    //     console.log(`Collection organizations does not exist. Skipping delete.`);
-    // }
-
     /* 
         SEED ESSENTIAL DATA - seed all data needed for dropdowns to fill properly, and types to work
         ---------------------------------------------------------------------------------------------------
@@ -42,82 +43,196 @@ async function main() {
     */
     const [
         flawnson, flawnsonTwo, albert, betty, megan, alice, bob, charlie, dave, eve, frank, grace,  heidi, ivan
-    ] = await seedUsers()
+    ] = await Promise.all([
+        prisma.user.upsert({
+            where: {email: 'flawnsontong1@gmail.com'},
+            update: {},
+            create: {
+                email: 'flawnsontong1@gmail.com',
+                name: 'Flawnson Tong',
+            },
+        }),
+        prisma.user.upsert({
+            where: {email: 'flawnson@comendcare.com'},
+            update: {},
+            create: {
+                email: 'flawnson@comendcare.com',
+                name: 'Flawnson Tong',
+            },
+        }),
+        prisma.user.upsert({
+            where: {email: 'albert@comendcare.com'},
+            update: {},
+            create: {
+                email: 'albert@comendcare.com',
+                name: 'Albert Wang',
+            },
+        }),
+        prisma.user.upsert({
+            where: {email: 'betty.trevino@comendcare.com'},
+            update: {},
+            create: {
+                email: 'betty.trevino@comendcare.com',
+                name: 'Betty Trevino',
+            },
+        }),
+        prisma.user.upsert({
+            where: {email: 'megan@comendcare.com'},
+            update: {},
+            create: {
+                email: 'megan@comendcare.com',
+                name: 'Megan McClure',
+            }
+        }),
+        prisma.user.upsert({
+            where: {email: 'alice@prisma.io'},
+            update: {},
+            create: {
+                email: 'alice@prisma.io',
+                name: 'Alice',
+            },
+        }),
+        prisma.user.upsert({
+            where: {email: 'bob@prisma.io'},
+            update: {},
+            create: {
+                email: 'bob@prisma.io',
+                name: 'Bob',
+            },
+        }),
+        prisma.user.upsert({
+            where: {email: 'charlie@prisma.io'},
+            update: {},
+            create: {
+                email: 'charlie@prisma.io',
+                name: 'Charlie',
+            },
+        }),
+        prisma.user.upsert({
+            where: {email: 'dave@prisma.io'},
+            update: {},
+            create: {
+                email: 'dave@prisma.io',
+                name: 'Dave',
+            },
+        }),
+        prisma.user.upsert({
+            where: {email: 'eve@prisma.io'},
+            update: {},
+            create: {
+                email: 'eve@prisma.io',
+                name: 'Eve',
+            },
+        }),
+        prisma.user.upsert({
+            where: {email: 'frank@prisma.io'},
+            update: {},
+            create: {
+                email: 'frank@prisma.io',
+                name: 'Frank',
+            },
+        }),
+        prisma.user.upsert({
+            where: {email: 'grace@prisma.io'},
+            update: {},
+            create: {
+                email: 'grace@prisma.io',
+                name: 'Grace',
+            },
+        }),
+        prisma.user.upsert({
+            where: {email: 'heidi@prisma.io'},
+            update: {},
+            create: {
+                email: 'heidi@prisma.io',
+                name: 'Heidi',
+            },
+        }),
+        prisma.user.upsert({
+            where: {email: 'ivan@prisma.io'},
+            update: {},
+            create: {
+                email: 'ivan@prisma.io',
+                name: 'Ivan',
+            },
+        })
+    ])
+
+    await whitelistEmails(
+        (await prisma.user.findMany({ select: { email: true } })).map(u => u.email)
+    )
 
     /* 
         SEED ORGANIZATION DATA 
-            - seed all data needed to simulate existing users on the application
-            - set up the whitelist & blacklist
+            - seed all data associated with organizations
+            - org, members (using previously created users), condition
+
+            - org minimally filled
+            - org with everything
+
+            - tools & rfps - maximally filled & minimally filled
         ---------------------------------------------------------------------------------------------------
     */
     const [
         celocyn,
         arcadion,
-        lysogeneFoundation,
-        neuroAidFoundation,
-        myoparFoundation,
-        cranioFoundation,
-        nephroFoundation
+        aurorin,
+        helixia,
+        neurexa,
+        mitovia,
+        lysorin,
+        cardiome,
+        pulmonyx,
+        xenara,
     ] = await Promise.all([
-        prisma.organization.create({
+        prisma.organization.create({ // minimally completed organization
             data: {
                 name: "Celocyn Syndrome Foundation",
                 verified: true,
-                description: "The Celocyn Syndrome Foundation supports research and advocacy for Celocyn Syndrome, a progressive and degenerative disorder affecting the brain. Since founding in 2012 we're raised millions for the development of treatments, some of which are now in clinical trials.",
                 subdomain: "celocyn",
                 customDomain: "celocyn",
-                yearFounded: "2012",
-                incorporationStatus: "YES",
-                therapeuticsOfInterest: ["Gene Therapy (AAV)", "Antisense Oligonucleotide (ASO)"],
-                website: "https://www.random.org/",
-                moneyRaised: 5000000,
-                moneyDeployed: 2000000,
-                researchBudget: 1000000,
                 user: {
                     connect: {
                         id: bob.id
                     }
                 },
                 members: {
-                    create: {
-                        role: "owner",
-                        email: "alice@prisma.io",
-                        title: "Donor engagement lead",
-                        user: {
-                            connect: {
-                                email: "alice@prisma.io",
+                    create: [
+                        {
+                            role: "owner",
+                            email: "flawnson@comendcare.com",
+                            title: "Director of Testing",
+                            user: {
+                                connect: {
+                                    email: "flawnson@comendcare.com",
+                                },
                             },
                         },
-                    },
+                        {
+                            role: "owner",
+                            email: "megan@comendcare.com",
+                            title: "Researcher",
+                            user: {
+                                connect: {
+                                    email: "megan@comendcare.com",
+                                },
+                            },
+                        },
+                        {
+                            role: "owner",
+                            email: "albert@comendcare.com",
+                            title: "Scientific Director",
+                            user: {
+                                connect: {
+                                    email: "albert@comendcare.com",
+                                },
+                            },
+                        },
+                    ],
                 },
-                conditions: {
-                    create: { // ConditionToOrganization
-                        condition: {
-                            create: {
-                                name: "Celocyn Syndrome",
-                                slug: "celocyn-syndrome",
-                                nordURL: "https://rarediseases.org/rare-diseases/celocyn-syndrome/",
-                                gardURL: "https://www.ncbi.nlm.nih.gov/gard/celocyn-syndrome/",
-                                summary: "Celocyn Syndrome is a progressive and degenerative disorder affecting the brain, characterized by severe neurological symptoms.",
-                                description: "Celocyn Syndrome is a rare and devastating neurodegenerative condition that targets the brain, leading to profound and progressive neurological impairment. Patients with Celocyn Syndrome often experience a wide array of debilitating symptoms, such as severe migraines, early-onset dementia, and difficulty with motor coordination. This disorder is classified as a neuroencephalomyelopathy, highlighting its impact on both the brain and spinal cord. Research into Celocyn Syndrome remains in its early stages, with a focus on understanding the genetic underpinnings of the condition. Two genes, GEL3 and M4SF, have been associated with the disease, offering potential avenues for therapeutic intervention. Efforts to combat this disorder include the development of animal models, such as mouse models, and cellular systems to study disease mechanisms and test potential treatments. Despite its low prevalence, with only 1 case per million people and 37 identified patients globally, Celocyn Syndrome represents a significant challenge for the rare disease community, necessitating collaboration between researchers, clinicians, and advocacy groups.",
-                                diseaseCategories: ["Neuroencephalomyelopathy"],
-                                prevalenceNumerator: 1,
-                                prevalenceDenominator: 1000000,
-                                prevalenceRatio: 1 / 1000000,
-                                numberOfPatientsEngaged: 37,
-                                relevantDiseaseMechanisms: ["HAPLOINSUFFICIENCY"],
-                                associatedSystems: ["Neurological", "Musculoskeletal"],
-                                associatedGenes: ["GEL3", "M4SF"],
-                                associatedSignsAndSymptoms: ["Severe migraines", "Early onset dementia"],
-                                existingDatabasesAndStudies: ["Celocyn Syndrome Registry"],
-                                toolsUnderDevelopment: ["Mouse model", "Cell line"],
-                            }
-                        }
-                    }
-                }
             },
         }),
-        prisma.organization.create({
+        prisma.organization.create({ // maximally completed organization
             data: {
                 name: "Arcadion Disease Foundation",
                 verified: true,
@@ -227,107 +342,270 @@ async function main() {
                 }
             },
         }),
+        // ─────────────────────────────
+        // MINIMAL ORGS
+        // ─────────────────────────────
         prisma.organization.create({
             data: {
-                name: "Lysogene Foundation",
-                verified: true,
-                description: "The Lysogene Foundation is dedicated to finding a cure for Lysogene Syndrome, a severe genetic disorder that affects cellular lysosome function.",
-                subdomain: "lysogene",
-                customDomain: "lysogene",
-                yearFounded: "2013",
-                incorporationStatus: "YES",
-                website: "https://www.lysogene.org/",
-                moneyRaised: 1500000,
-                moneyDeployed: 700000,
-                researchBudget: 500000,
-                user: {
-                    connect: {
-                        id: alice.id
-                    }
+                name: "Aurorin Foundation",
+                verified: false,
+                subdomain: "aurorin",
+                customDomain: "aurorin",
+                user: { connect: { id: alice.id } },
+                members: {
+                    create: [
+                        {
+                            role: "owner",
+                            email: alice.email || '',
+                            title: "Founder",
+                            user: { connect: { id: alice.id } },
+                        },
+                        {
+                            role: "member",
+                            email: bob.email || '',
+                            title: "Advisor",
+                            user: { connect: { id: bob.id } },
+                        },
+                    ],
                 },
             },
         }),
         prisma.organization.create({
             data: {
-                name: "NeuroAid Foundation",
+                name: "Helixia Research Trust",
                 verified: true,
-                description: "NeuroAid Foundation promotes research in rare neurodegenerative disorders to identify potential therapeutic pathways.",
-                subdomain: "neuroaid",
-                customDomain: "neuroaid",
-                yearFounded: "2010",
+                subdomain: "helixia",
+                customDomain: "helixia",
+                user: { connect: { id: charlie.id } },
+                members: {
+                    create: [
+                        {
+                            role: "owner",
+                            email: charlie.email || '',
+                            title: "Executive Director",
+                            user: { connect: { id: charlie.id } },
+                        },
+                    ],
+                },
+            },
+        }),
+        prisma.organization.create({
+            data: {
+                name: "Neurexa Initiative",
+                verified: false,
+                subdomain: "neurexa",
+                customDomain: "neurexa",
+                user: { connect: { id: dave.id } },
+                members: {
+                    create: [
+                        {
+                            role: "owner",
+                            email: dave.email || '',
+                            title: "Program Lead",
+                            user: { connect: { id: dave.id } },
+                        },
+                        {
+                            role: "member",
+                            email: eve.email || '',
+                            title: "Research Coordinator",
+                            user: { connect: { id: eve.id } },
+                        },
+                    ],
+                },
+            },
+        }),
+        prisma.organization.create({
+            data: {
+                name: "Mitovia Collective",
+                verified: true,
+                subdomain: "mitovia",
+                customDomain: "mitovia",
+                user: { connect: { id: frank.id } },
+                members: {
+                    create: [
+                        {
+                            role: "owner",
+                            email: frank.email || '',
+                            title: "Founder",
+                            user: { connect: { id: frank.id } },
+                        },
+                    ],
+                },
+            },
+        }),
+        // ─────────────────────────────
+        // RICH ORGS
+        // ─────────────────────────────
+        prisma.organization.create({
+            data: {
+                name: "Lysorin Disease Alliance",
+                verified: true,
+                description:
+                    "The Lysorin Disease Alliance accelerates research into rare lysosomal disorders through funding, collaboration, and patient engagement.",
+                subdomain: "lysorin",
+                customDomain: "lysorin",
+                yearFounded: "2012",
                 incorporationStatus: "YES",
-                website: "https://www.neuroaid.org/",
-                moneyRaised: 2500000,
-                moneyDeployed: 1000000,
+                therapeuticsOfInterest: ["Enzyme Replacement Therapy", "Small Molecules"],
+                website: "https://www.example.org/",
+                moneyRaised: 2100000,
+                moneyDeployed: 1450000,
                 researchBudget: 600000,
-                user: {
-                    connect: {
-                        id: charlie.id
-                    }
+                city: "Boston",
+                region: "MA",
+                country: "United States",
+                user: { connect: { id: betty.id } },
+                members: {
+                    create: [
+                        {
+                            role: "owner",
+                            email: betty.email || '',
+                            title: "Executive Director",
+                            user: { connect: { id: betty.id } },
+                        },
+                        {
+                            role: "member",
+                            email: grace.email || '',
+                            title: "Scientific Advisor",
+                            user: { connect: { id: grace.id } },
+                        },
+                        {
+                            role: "member",
+                            email: heidi.email || '',
+                            title: "Patient Engagement",
+                            user: { connect: { id: heidi.id } },
+                        },
+                    ],
                 },
             },
         }),
         prisma.organization.create({
             data: {
-                name: "Myopar Foundation",
+                name: "Cardiome Research Foundation",
                 verified: true,
-                description: "Myopar Foundation supports patients and families affected by Myopar Disease, an inherited muscular disorder.",
-                subdomain: "myopar",
-                customDomain: "myopar",
+                description:
+                    "Focused on rare genetic cardiomyopathies, Cardiome supports translational research and early therapeutic development.",
+                subdomain: "cardiome",
+                customDomain: "cardiome",
                 yearFounded: "2018",
                 incorporationStatus: "YES",
-                website: "https://www.myopar.org/",
-                moneyRaised: 1800000,
-                moneyDeployed: 800000,
-                researchBudget: 450000,
-                user: {
-                    connect: {
-                        id: dave.id
-                    }
+                therapeuticsOfInterest: ["Gene Therapy", "RNA Therapeutics"],
+                therapeuticsInDevelopment: ["AAV Gene Therapy"],
+                website: "https://www.example.org/",
+                moneyRaised: 4800000,
+                moneyDeployed: 2600000,
+                researchBudget: 1200000,
+                city: "Toronto",
+                region: "ON",
+                country: "Canada",
+                user: { connect: { id: megan.id } },
+                members: {
+                    create: [
+                        {
+                            role: "owner",
+                            email: megan.email || '',
+                            title: "Scientific Director",
+                            user: { connect: { id: megan.id } },
+                        },
+                        {
+                            role: "member",
+                            email: albert.email || '',
+                            title: "Clinical Strategy",
+                            user: { connect: { id: albert.id } },
+                        },
+                        {
+                            role: "member",
+                            email: ivan.email || '',
+                            title: "Community Partnerships",
+                            user: { connect: { id: ivan.id } },
+                        },
+                    ],
                 },
             },
         }),
         prisma.organization.create({
             data: {
-                name: "Cranio Foundation",
+                name: "Pulmonyx Foundation",
+                verified: false,
+                description:
+                    "Pulmonyx advances research into rare interstitial lung diseases through grants and patient registries.",
+                subdomain: "pulmonyx",
+                customDomain: "pulmonyx",
+                yearFounded: "2016",
+                incorporationStatus: "NO",
+                therapeuticsOfInterest: ["Small Molecules", "Biologics"],
+                website: "https://www.example.org/",
+                moneyRaised: 950000,
+                moneyDeployed: 400000,
+                researchBudget: 250000,
+                city: "San Diego",
+                region: "CA",
+                country: "United States",
+                user: { connect: { id: bob.id } },
+                members: {
+                    create: [
+                        {
+                            role: "owner",
+                            email: bob.email || '',
+                            title: "Founder",
+                            user: { connect: { id: bob.id } },
+                        },
+                        {
+                            role: "member",
+                            email: alice.email || '',
+                            title: "Operations",
+                            user: { connect: { id: alice.id } },
+                        },
+                    ],
+                },
+            },
+        }),
+        prisma.organization.create({
+            data: {
+                name: "Xenara Rare Disease Network",
                 verified: true,
-                description: "The Cranio Foundation supports research and advocacy for Cranio Syndrome, a craniofacial disorder with severe implications on bone structure.",
-                subdomain: "cranio",
-                customDomain: "cranio",
-                yearFounded: "2017",
+                description:
+                    "Xenara connects researchers, clinicians, and families to accelerate discovery across ultra-rare diseases.",
+                subdomain: "xenara",
+                customDomain: "xenara",
+                yearFounded: "2020",
                 incorporationStatus: "YES",
-                website: "https://www.cranio.org/",
-                moneyRaised: 2200000,
-                moneyDeployed: 1100000,
+                therapeuticsOfInterest: ["Gene Editing", "Antisense Oligonucleotides"],
+                website: "https://www.example.org/",
+                moneyRaised: 1750000,
+                moneyDeployed: 900000,
                 researchBudget: 500000,
-                user: {
-                    connect: {
-                        id: eve.id
-                    }
+                city: "New York",
+                region: "NY",
+                country: "United States",
+                user: { connect: { id: flawnson.id } },
+                members: {
+                    create: [
+                        {
+                            role: "owner",
+                            email: flawnson.email || '',
+                            title: "Executive Director",
+                            user: { connect: { id: flawnson.id } },
+                        },
+                        {
+                            role: "member",
+                            email: flawnsonTwo.email || '',
+                            title: "Platform Engineering",
+                            user: { connect: { id: flawnsonTwo.id } },
+                        },
+                        {
+                            role: "member",
+                            email: grace.email || '',
+                            title: "Research Programs",
+                            user: { connect: { id: grace.id } },
+                        },
+                    ],
                 },
             },
         }),
-        prisma.organization.create({
-            data: {
-                name: "Nephro Foundation",
-                verified: true,
-                description: "The Nephro Foundation advances research on Nephro Disease, a rare renal disorder affecting kidney function.",
-                subdomain: "nephro",
-                customDomain: "nephro",
-                yearFounded: "2014",
-                incorporationStatus: "YES",
-                website: "https://www.nephro.org/",
-                moneyRaised: 3000000,
-                moneyDeployed: 1400000,
-                researchBudget: 700000,
-                user: {
-                    connect: {
-                        id: frank.id
-                    }
-                },
-            },
-        })
     ])
+
+    const celocynRoadmap = await createRoadmap(celocyn.id, ASOResearchPlan)
 
     // // Create roadmaps for each foundation
     // const celocynRoadmap = await createRoadmap(
@@ -351,401 +629,107 @@ async function main() {
     // const arcadionRoadmap = await createRoadmap(
     //     arcadion.id, exampleASORoadmap
     // )
-
-    // await createTypeSenseCollection(
-    //     `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-    //     (
-    //         process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-    //             ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-    //             : process.env.TYPESENSE_ADMIN_API_KEY
-    //     )!,
-    //     {
-    //         name: 'organizations',
-    //         "fields": [
-    //             {
-    //                 "name": 'id',
-    //                 "type": 'string',
-    //                 "facet": false,
-    //                 "index": true,
-    //                 "optional": false, // Ensure it's marked as required, ID is required
-    //                 "sort": true,
-    //                 "store": true,
-    //             },
-    //             {
-    //                 "facet": false,
-    //                 "index": true,
-    //                 "infix": false,
-    //                 "locale": "",
-    //                 "name": "description",
-    //                 "optional": true,
-    //                 "sort": false,
-    //                 "stem": false,
-    //                 "store": true,
-    //                 "type": "string"
-    //             },
-    //             {
-    //                 "facet": false,
-    //                 "index": true,
-    //                 "infix": false,
-    //                 "locale": "",
-    //                 "name": "yearFounded",
-    //                 "optional": true,
-    //                 "sort": false,
-    //                 "stem": false,
-    //                 "store": true,
-    //                 "type": "string"
-    //             },
-    //             {
-    //                 "facet": false,
-    //                 "index": true,
-    //                 "infix": false,
-    //                 "locale": "",
-    //                 "name": "name",
-    //                 "optional": true,
-    //                 "sort": true,
-    //                 "stem": false,
-    //                 "store": true,
-    //                 "type": "string"
-    //             },
-    //             {
-    //                 "facet": false,
-    //                 "index": true,
-    //                 "infix": false,
-    //                 "locale": "",
-    //                 "name": "moneyRaised",
-    //                 "optional": true,
-    //                 "sort": true,
-    //                 "stem": false,
-    //                 "store": true,
-    //                 "type": "int64"
-    //             },
-    //             // {
-    //             //     "facet": false,
-    //             //     "index": true,
-    //             //     "infix": false,
-    //             //     "locale": "",
-    //             //     "name": "numberOfPatientsEngaged",
-    //             //     "optional": true,
-    //             //     "sort": true,
-    //             //     "stem": false,
-    //             //     "store": true,
-    //             //     "type": "int64"
-    //             // },
-    //             // {
-    //             //     "facet": false,
-    //             //     "index": true,
-    //             //     "infix": false,
-    //             //     "locale": "",
-    //             //     "name": "prevalenceDenominator",
-    //             //     "optional": false,
-    //             //     "sort": true,
-    //             //     "stem": false,
-    //             //     "store": true,
-    //             //     "type": "int64"
-    //             // },
-    //             // {
-    //             //     "facet": false,
-    //             //     "index": true,
-    //             //     "infix": false,
-    //             //     "locale": "",
-    //             //     "name": "prevalenceNumerator",
-    //             //     "optional": false,
-    //             //     "sort": true,
-    //             //     "stem": false,
-    //             //     "store": true,
-    //             //     "type": "int64"
-    //             // },
-    //             // {
-    //             //     "facet": false,
-    //             //     "index": true,
-    //             //     "infix": false,
-    //             //     "locale": "",
-    //             //     "name": "prevalenceRatio",
-    //             //     "optional": true,
-    //             //     "sort": true,
-    //             //     "stem": false,
-    //             //     "store": true,
-    //             //     "type": "float"
-    //             // },
-    //             {
-    //                 "facet": false,
-    //                 "index": true,
-    //                 "infix": false,
-    //                 "locale": "",
-    //                 "name": "moneyDeployed",
-    //                 "optional": true,
-    //                 "sort": true,
-    //                 "stem": false,
-    //                 "store": true,
-    //                 "type": "int64"
-    //             },
-    //             // {
-    //             //     "facet": false,
-    //             //     "index": true,
-    //             //     "infix": false,
-    //             //     "locale": "",
-    //             //     "name": "therapeuticsOfInterest",
-    //             //     "optional": true,
-    //             //     "sort": false,
-    //             //     "stem": false,
-    //             //     "store": true,
-    //             //     "type": "string[]"
-    //             // },
-    //             // {
-    //             //     "facet": false,
-    //             //     "index": true,
-    //             //     "infix": false,
-    //             //     "locale": "",
-    //             //     "name": "diseaseCategories",
-    //             //     "optional": true,
-    //             //     "sort": false,
-    //             //     "stem": false,
-    //             //     "store": true,
-    //             //     "type": "string[]"
-    //             // }
-    //             // add additional fields as needed
-    //         ],
-    //     }
-    // );
-    // console.log(`Created typesense organizations collection...`)
-
-    // const organizations = await prisma.organization.findMany()
-    // for (const organization of organizations) {
-    //     try {
-    //         await addTypeSenseDocument(
-    //             `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-    //             (
-    //                 process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-    //                     ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-    //                     : process.env.TYPESENSE_ADMIN_API_KEY
-    //             )!,
-    //             {
-    //                 id: organization.id,
-    //                 name: organization.name,
-    //                 description: organization.description,
-    //                 subdomain: organization.subdomain,
-    //                 customDomain: organization.customDomain,
-    //                 yearFounded: organization.yearFounded,
-    //                 incorporationStatus: organization.incorporationStatus,
-    //                 website: organization.website,
-    //                 moneyRaised: organization.moneyRaised,
-    //                 moneyDeployed: organization.moneyDeployed,
-    //                 researchBudget: organization.researchBudget,
-    //                 updatedAt: organization.updatedAt,
-    //                 createdAt: organization.createdAt,
-    //             }, 'organizations');
-    //         console.log(`Added organization ${organization.name} to TypeSense`);
-    //     } catch (error) {
-    //         console.error(`Failed to add organization ${organization.name} to TypeSense:`, error);
-    //     }
-    // }
-    // console.log("Added organizations to typesense...")
 }
 
-// const exampleASORoadmap = {
-//     title: 'ASO research plan',
-//     description: 'By developing an ASO therapy, we aim to address the underlying genetic cause of our rare disease. Our plan outlines each stage, from identifying the target gene to advancing through clinical trials, with the goal of bringing a safe and effective treatment to patients who urgently need it.',
-//     milestones: [
-//         {
-//             title: 'Natural History Study',
-//             description: 'Our observational research effort that follows individuals with a specific disease over time, collecting data on how the disease develops and progresses without intervention.',
-//             startDate: new Date(2019, 1, 1),
-//             budget: 500000,
-//             attachments: [],
-//             tasks: [],
-//             status: 'COMPLETED',
-//             types: ['NATURALHISTORYSTUDY'],
-//             nodeType: 'RFP'
-//         },
-//         {
-//             title: 'Literature Review',
-//             description: 'Examine existing research to better understand the disease, identify gaps in knowledge, and assess the latest findings on potential treatments.',
-//             startDate: new Date(2020, 5, 12),
-//             endDate: new Date(2021, 1, 3),
-//             budget: 150000,
-//             attachments: [],
-//             tasks: [],
-//             status: 'COMPLETED',
-//             types: ['LITERATUREREVIEW'],
-//             nodeType: 'RFP'
-//         },
-//         {
-//             title: 'Identify Existing Disease Models',
-//             description: 'Research and evaluate lab models.',
-//             startDate: new Date(2023, 3, 3),
-//             endDate: new Date(2025, 1, 1),
-//             budget: 300000,
-//             attachments: [],
-//             tasks: [],
-//             status: 'INPROGRESS',
-//             types: ['OTHERANIMALMODEL'],
-//             nodeType: 'PROJECT'
-//         },
-//         {
-//             title: 'Construct Mouse Models',
-//             description: '',
-//             startDate: new Date(2024, 5, 5),
-//             budget: 750000,
-//             attachments: [],
-//             tasks: [],
-//             status: 'INPROGRESS',
-//             types: ['MOUSEMODEL'],
-//             nodeType: 'RFP'
-//         },
-//         {
-//             title: 'Construct Patient-Derived Cells',
-//             description: 'Work with researchers to create cell lines that replicate disease characteristics.',
-//             startDate: new Date(2026, 1, 1),
-//             budget: 600000,
-//             attachments: [],
-//             tasks: [],
-//             status: 'INPROGRESS',
-//             types: ['PATIENTDERIVEDCELLLINE'],
-//             nodeType: 'ASSET'
-//         },
-//         {
-//             title: 'Design ASO Construct',
-//             description: 'Design an ASO (Antisense Oligonucleotide) construct that specifically targets the genetic mutations driving our disease.',
-//             startDate: new Date(2027, 1, 1),
-//             budget: 900000,
-//             attachments: [],
-//             tasks: [],
-//             status: 'COMPLETED',
-//             types: ['CONSTRUCTDESIGN'],
-//             nodeType: 'ASSET'
-//         },
-//         {
-//             title: 'Produce Plasmid',
-//             description: 'Create a DNA template essential for developing and testing therapies.',
-//             startDate: new Date(2028, 1, 1),
-//             budget: 500000,
-//             attachments: [],
-//             tasks: [],
-//             status: 'PLANNED',
-//             types: ['PLASMIDPRODUCTION'],
-//             nodeType: 'ASSET'
-//         },
-//         {
-//             title: 'Proof-Of-Concept Study',
-//             startDate: new Date(2029, 1, 1),
-//             description: 'Design and conduct initial experiments to demonstrate that a potential therapy or intervention can effectively target the disease.',
-//             budget: 1200000,
-//             attachments: [],
-//             tasks: [],
-//             status: 'PLANNED',
-//             types: ['PROOFOFCONCEPT'],
-//             nodeType: 'ASSET'
-//         },
-//         {
-//             title: 'Animal Toxicology Study',
-//             startDate: new Date(2030, 1, 1),
-//             description: 'Conduct preclinical trials to evaluate the safety and potential side effects of a therapy.',
-//             budget: 2000000,
-//             attachments: [],
-//             tasks: [],
-//             status: 'PLANNED',
-//             types: ['TOXICOLOGY'],
-//             nodeType: 'ASSET'
-//         }
-//     ]
-// };
+export const createRoadmap = async (
+    organizationId: string,
+    roadmapTemplate: any,
+) => {
+    try {
+        if (!organizationId) {
+            throw new Error("No organization id provided.");
+        }
 
-// async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
-//     const roadmap = await prisma.roadmap.create({
-//         data: {
-//             organization: {
-//                 connect: {id: organizationId}
-//             },
-//             title: roadmapTemplate.title || '',
-//             description: roadmapTemplate.description || '',
-//             published: true
-//         }
-//     })
+        const roadmap = await prisma.roadmap.create({
+            data: {
+                private: roadmapTemplate?.private,
+                title: roadmapTemplate?.title,
+                description: roadmapTemplate?.description,
+                organization: {connect: {id: organizationId}},
+                modalities: roadmapTemplate?.modalities,
+                links: {
+                    create: (roadmapTemplate?.links || [])
+                        .map((a: any) => ({ link: a.link, name: a.name ?? undefined })),
+                },
+                partners: {
+                    create: (roadmapTemplate?.partners || [])
+                        .map((c: any) => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
+                },
+                stages: roadmapTemplate?.stages || [],
+                statuses: roadmapTemplate?.statuses || [],
+                ...(roadmapTemplate?.metadata ? {metadata: roadmapTemplate.metadata} : undefined),
+                // published defaults to true per your model; omit to use default
+            },
+        });
 
-//     // if a roadmap template was provided, create the relevant nodes, milestones, and edges
-//     // if (roadmapTemplate?.milestones) {
-//     //     const milestones = roadmapTemplate.milestones
-//     //
-//     //     const nodes = await Promise.all(
-//     //         milestones.map(async (milestone: any, index: number) => {
-//     //             // create Node & associated Milestone
-//     //             const node = await prisma.node.create({
-//     //                 data: {
-//     //                     roadmapId: roadmap.id,
-//     //                     type: milestone.nodeType,
-//     //                     positionX: index * 500,
-//     //                     positionY: 0,
-//     //                     data: {
-//     //                         create: {
-//     //                             roadmapId: roadmap.id,
-//     //                             organizationId,
-//     //                             status: milestone.status || "PLANNED",
-//     //                             title: milestone.title,
-//     //                             ...(milestone.description ? {description: milestone.description} : undefined),
-//     //                             ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
-//     //                             ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
-//     //                             ...(milestone.budget ? {budget: milestone.budget} : undefined),
-//     //                             types: milestone.types || [],
-//     //                             private: milestone.private || false
-//     //                         }
-//     //                     }
-//     //                 }
-//     //             })
-//     //
-//     //             // grab milestone so we can add tasks
-//     //             // createMany doesn't support nested creates - we must add tasks after creating the Milestone object
-//     //             const newMilestone = await prisma.milestone.findUnique({
-//     //                 where: {nodeId: node.id},
-//     //                 include: {
-//     //                     node: true,
-//     //                     contacts: true,
-//     //                     attachments: true,
-//     //                     types: { include: { milestoneType: true } }
-//     //                 }
-//     //             })
-//     //
-//     //             // create tasks for relevant milestone
-//     //             if (newMilestone) {
-//     //                 await Promise.all((milestone.tasks || []).map(async (task: any, index: number) => (
-//     //                     await prisma.task.create({
-//     //                         data: {
-//     //                             milestoneId: newMilestone?.id,
-//     //                             status: task.status || "PLANNED",
-//     //                             name: task.name,
-//     //                             columnId: createdColumns[0]?.id,
-//     //                             orderPosition: index,
-//     //                             kanbanPosition: index,
-//     //                             checklist: {
-//     //                                 createMany: {
-//     //                                     data: (task.checklist || []).map((item: any, index: number) => ({
-//     //                                         name: item.name,
-//     //                                         complete: item.complete || false,
-//     //                                         orderPosition: index
-//     //                                     }))
-//     //                                 }
-//     //                             }
-//     //                         }
-//     //                     })
-//     //                 )))
-//     //             }
-//     //
-//     //             return node
-//     //         })
-//     //     )
-//     //
-//     //     for (let i = 0; i < nodes.length - 1; i++) {
-//     //         const edge = await prisma.edge.create({
-//     //             data: {
-//     //                 roadmap: {connect: {id: roadmap.id}},
-//     //                 source: nodes[i]?.id,
-//     //                 target: nodes[i + 1]?.id
-//     //             }
-//     //         })
-//     //     }
-//     // }
+        // If a template was provided, create nodes/edges/milestones first
+        // if (roadmapTemplate?.milestones) {
+        //     const sortedMilestones = roadmapTemplate?.milestones.sort((a: any, b: any) => {
+        //         const aNode = roadmapTemplate?.nodes?.find((node: any) => node.id === a.nodeId)
+        //         const bNode = roadmapTemplate?.nodes?.find((node: any) => node.id === b.nodeId)
 
-//     return roadmap
-// }
+        //         if (aNode?.positionX && bNode?.positionX) {
+        //             return aNode.positionX - bNode.positionX
+        //         } else if (aNode?.positionX) {
+        //             // node a is defiend, node b is not, put node a first
+        //             return -1
+        //         } else if (bNode?.positionX) {
+        //             // node b is defined, node b is not, put node b first
+        //             return 1
+        //         }
+
+        //         // if nether is defined, don't re-sort
+        //         return 0
+        //     })
+        //     const sortedNodes = roadmapTemplate?.nodes.sort((a: any, b: any) => {
+        //         if (a?.positionX && b?.positionX) {
+        //             return a.positionX - b.positionX
+        //         } else if (a?.positionX) {
+        //             // node a is defiend, node b is not, put node a first
+        //             return -1
+        //         } else if (b?.positionX) {
+        //             // node b is defined, node b is not, put node b first
+        //             return 1
+        //         }
+
+        //         // if nether is defined, don't re-sort
+        //         return 0
+        //     })
+
+        //     // sort milestones and nodes, just in case they're not sorted properly in the template file
+        //     await createNodesAndEdgesFromTemplate(organizationId, roadmap.id, {
+        //         ...roadmapTemplate,
+        //         milestones: sortedMilestones,
+        //         nodes: sortedNodes
+        //     });
+        // }
+
+        // Re-fetch with full graph
+        const finalRoadmap = await prisma.roadmap.findUnique({
+            where: {id: roadmap.id},
+            include: {
+                milestones: {
+                    include: {
+                        node: true,
+                        contacts: true,
+                        attachments: true,
+                        types: {include: {milestoneType: true}},
+                        tools: {include: {tool: true}},
+                        rfps: {include: {rfp: true}},
+                    },
+                },
+                nodes: true,
+                edges: true,
+                organization: true,
+            },
+        });
+
+        return finalRoadmap;
+    } catch (error: any) {
+        console.error("Error creating roadmap:", error?.message ?? error);
+        throw new Error(error?.message || "Failed to create roadmap.");
+    }
+}
 
 main()
     .then(async () => {
