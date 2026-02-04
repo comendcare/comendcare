@@ -296,7 +296,7 @@ export function useDiseaseModelsTableColumns({session}: {session: Session | null
             accessorKey: "links",
             header: ({column}) => (
                 <DataTableColumnHeader 
-                    className="line-clamp-1 underline text-ellipsis text-nowrap max-w-[250px]" 
+                    className="min-w-fit text-nowrap"
                     column={column} 
                     title="Links"
                 />
@@ -306,7 +306,7 @@ export function useDiseaseModelsTableColumns({session}: {session: Session | null
                     {row.original.attachments?.map((attachment: any, index: number) => (
                         <li key={index}>
                             <Link 
-                                className="line-clamp-2 underline" 
+                                className="line-clamp-1 underline text-ellipsis text-nowrap max-w-[250px]" 
                                 href={attachment.link || "/"}
                                 target="_blank"
                                 onClick={(e) => e.stopPropagation()}
