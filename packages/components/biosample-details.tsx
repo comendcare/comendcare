@@ -33,22 +33,22 @@ export const BiosampleDetails = ({biosample}: { biosample: any }) => {
                     <PropertyBadge>
                         <b>Donor:</b>
                         <img className="size-4 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${biosample?.donorId}`} alt="User Avatar" />
-                        <p>{biosample?.donorId}</p>
+                        <p>{biosample?.donorId || '--'}</p>
                     </PropertyBadge>
 
                     <PropertyBadge>
                         <b>Gene:</b>
-                        {biosample?.gene && (<Badge variant={'teal'}>{biosample?.gene?.symbol || ''}</Badge>)}
+                        {biosample?.gene ? (<Badge variant={'teal'}>{biosample?.gene?.symbol}</Badge>) : (<p>{'--'}</p>)}
                     </PropertyBadge>
 
                     <PropertyBadge>
                         <b>Stored with:</b>
-                        <p>{biosample?.company?.title || biosample?.institution?.name}</p>
+                        <p>{biosample?.company?.title || biosample?.institution?.name || '--'}</p>
                     </PropertyBadge>
 
                     <PropertyBadge>
                         <b>Genotype:</b>
-                        <p>{biosample?.genotype}</p>
+                        <p>{biosample?.genotypem || '--'}</p>
                     </PropertyBadge>
                 </div>
 
@@ -67,7 +67,7 @@ export const BiosampleDetails = ({biosample}: { biosample: any }) => {
                     </a>
                 )}
 
-                <Separator />
+                {biosample?.description && <Separator />}
 
                 {biosample?.description && (
                     <CaretAccordion 

@@ -31,24 +31,25 @@ export const ClinicalDatasetDetails = ({clinicalDataset}: { clinicalDataset: any
                 <div className="grid gap-4 grid-cols-2">
                     <PropertyBadge>
                         <b>Dataset ID:</b>
-                        <p>{clinicalDataset?.id}</p>
+                        <p>{clinicalDataset?.id || '--'}</p>
                     </PropertyBadge>
 
                     <PropertyBadge>
                         <b>Genes:</b>
                         <span className="flex gap-2 flex-wrap">
                             {clinicalDataset?.genes?.map((gene: string) => <Badge variant={'teal'}>{gene}</Badge>)}
+                            {(!clinicalDataset?.genes || clinicalDataset?.genes.length <= 0) && (<p>{'--'}</p>)}
                         </span>
                     </PropertyBadge>
 
                     <PropertyBadge>
                         <b>Stored with:</b>
-                        <p>{clinicalDataset?.company?.title || clinicalDataset?.institution?.name}</p>
+                        <p>{clinicalDataset?.company?.title || clinicalDataset?.institution?.name || '--'}</p>
                     </PropertyBadge>
 
                     <PropertyBadge>
                         <b>Cohort size:</b>
-                        <p>{clinicalDataset?.cohortSize}</p>
+                        <p>{clinicalDataset?.cohortSize || '--'}</p>
                     </PropertyBadge>
                 </div>
 
@@ -67,7 +68,7 @@ export const ClinicalDatasetDetails = ({clinicalDataset}: { clinicalDataset: any
                     </a>
                 )}
 
-                <Separator />
+                {clinicalDataset?.description && <Separator />}
 
                 {clinicalDataset?.description && (
                     <CaretAccordion 

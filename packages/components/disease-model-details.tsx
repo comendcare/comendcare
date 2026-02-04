@@ -31,22 +31,22 @@ export const DiseaseModelDetails = ({diseaseModel}: { diseaseModel: any }) => {
                 <div className="grid gap-4 grid-cols-2">
                     <PropertyBadge>
                         <b>Strain:</b>
-                        <p>{diseaseModel?.strain}</p>
+                        <p>{diseaseModel?.strain || '--'}</p>
                     </PropertyBadge>
 
                     <PropertyBadge>
                         <b>Gene:</b>
-                        {diseaseModel?.gene && (<Badge variant={'teal'}>{diseaseModel?.gene?.symbol || ''}</Badge>)}
+                        {diseaseModel?.gene ? (<Badge variant={'teal'}>{diseaseModel?.gene?.symbol}</Badge>) : (<p>{'--'}</p>)}
                     </PropertyBadge>
 
                     <PropertyBadge>
                         <b>Stored with:</b>
-                        <p>{diseaseModel?.company?.title || diseaseModel?.institution?.name}</p>
+                        <p>{diseaseModel?.company?.title || diseaseModel?.institution?.name || '--'}</p>
                     </PropertyBadge>
 
                     <PropertyBadge>
                         <b>Genotype:</b>
-                        <p>{diseaseModel?.genotype}</p>
+                        <p>{diseaseModel?.genotype || '--'}</p>
                     </PropertyBadge>
                 </div>
 
@@ -65,7 +65,7 @@ export const DiseaseModelDetails = ({diseaseModel}: { diseaseModel: any }) => {
                     </a>
                 )}
 
-                <Separator />
+                {diseaseModel?.description && <Separator />}
 
                 {diseaseModel?.description && (
                     <CaretAccordion 
