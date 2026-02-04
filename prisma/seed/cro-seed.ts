@@ -5,6 +5,7 @@ import path from "path";
 export async function seed() {
     console.log('CROs: Starting seed script...');
 
+    // Default CRO/Company
     let companies: any[] = [
         {
             url: 'https://example.com',

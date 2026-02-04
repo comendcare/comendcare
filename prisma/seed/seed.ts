@@ -4,12 +4,8 @@ import {seed as seedMilestoneTypes} from './milestone-type-seed'
 import {seed as seedGenes} from './gene-seed'
 import {seed as seedCROs} from "./cro-seed"
 import {seed as seedInstitutions} from "./institution-seed"
-
-import {createNodesAndEdgesFromTemplate} from './../../packages/lib/actions'
-
 import ASOResearchPlan from './../../packages/data/research-plan-templates/ASO Research Plan-cmaqujvbw00007u8av9kl1u60.json'
-import GeneTherapyResearchPlan from './../../packages/data/research-plan-templates/Gene-Therapy-Template.json'
-import DrugScreenResearchPlan from './../../packages/data/research-plan-templates/Drug-Screen-Template.json'
+import { Gene } from "@prisma/client"
 
 export async function whitelistEmails(emails: (string | null)[]) {
     if (!emails?.length) return;
@@ -605,130 +601,534 @@ async function main() {
         }),
     ])
 
-    const celocynRoadmap = await createRoadmap(celocyn.id, ASOResearchPlan)
+    // Seed Roadmaps/Research Plans
+    const [
+        arcadionRoadmap,
+        lysorinRoadmap,
+        cardiomeRoadmap,
+        pulmonyxRoadmap,
+        xenaraRoadmap
+    ] = await Promise.all([
+        createRoadmap(arcadion.id, ASOResearchPlan),
+        createRoadmap(lysorin.id, ASOResearchPlan),
+        createRoadmap(cardiome.id, ASOResearchPlan),
+        createRoadmap(pulmonyx.id, ASOResearchPlan),
+        createRoadmap(xenara.id, ASOResearchPlan),
+    ])
 
-    // // Create roadmaps for each foundation
-    // const celocynRoadmap = await createRoadmap(
-    //     celocyn.id, exampleASORoadmap
-    // )
-    // const lysogeneRoadmap = await createRoadmap(
-    //     lysogeneFoundation.id, exampleASORoadmap
-    // );
-    // const neuroAidRoadmap = await createRoadmap(
-    //     neuroAidFoundation.id, exampleASORoadmap
-    // );
-    // const myoparRoadmap = await createRoadmap(
-    //     myoparFoundation.id, exampleASORoadmap
-    // );
-    // const cranioRoadmap = await createRoadmap(
-    //     cranioFoundation.id, exampleASORoadmap
-    // );
-    // const nephroRoadmap = await createRoadmap(
-    //     nephroFoundation.id, exampleASORoadmap
-    // );
-    // const arcadionRoadmap = await createRoadmap(
-    //     arcadion.id, exampleASORoadmap
-    // )
+    // Seed Tools (biosamples, disease models, and clinical datasets)
+    const [
+        arcadionBiosamples,
+        lysorinBiosamples,
+        cardiomeBiosamples,
+        pulmonyxBiosamples,
+        xenaraBiosamples,
+        arcadionDiseaseModels,
+        lysorinDiseaseModels,
+        cardiomeDiseaseModels,
+        pulmonyxDiseaseModels,
+        xenaraDiseaseModels,
+        arcadionTools,
+        lysorinTools,
+        cardiomeTools,
+        pulmonyxTools,
+        xenaraTools,
+    ] = await Promise.all([
+        createDefaultBiosamples(arcadion.id),
+        createDefaultBiosamples(lysorin.id),
+        createDefaultBiosamples(cardiome.id),
+        createDefaultBiosamples(pulmonyx.id),
+        createDefaultBiosamples(xenara.id),
+        createDefaultDiseaseModels(arcadion.id),
+        createDefaultDiseaseModels(lysorin.id),
+        createDefaultDiseaseModels(cardiome.id),
+        createDefaultDiseaseModels(pulmonyx.id),
+        createDefaultDiseaseModels(xenara.id),
+        createDefaultTools(arcadion.id),
+        createDefaultTools(lysorin.id),
+        createDefaultTools(cardiome.id),
+        createDefaultTools(pulmonyx.id),
+        createDefaultTools(xenara.id),
+    ])
+
+    // Seed RFPs
+    const [
+        arcadionRFPs,
+        lysorinRFPs,
+        cardiomeRFPs,
+        pulmonyxRFPs,
+        xenaraRFPs,
+    ] = await Promise.all([
+        createDefaultRFPs(arcadion.id),
+        createDefaultRFPs(lysorin.id),
+        createDefaultRFPs(cardiome.id),
+        createDefaultRFPs(pulmonyx.id),
+        createDefaultRFPs(xenara.id),
+    ])
 }
 
 export const createRoadmap = async (
-    organizationId: string,
-    roadmapTemplate: any,
+  organizationId: string,
+  roadmapTemplate: any,
 ) => {
-    try {
-        if (!organizationId) {
-            throw new Error("No organization id provided.");
-        }
+  if (!organizationId) {
+    throw new Error("No organization id provided.")
+  }
 
-        const roadmap = await prisma.roadmap.create({
-            data: {
-                private: roadmapTemplate?.private,
-                title: roadmapTemplate?.title,
-                description: roadmapTemplate?.description,
-                organization: {connect: {id: organizationId}},
-                modalities: roadmapTemplate?.modalities,
-                links: {
-                    create: (roadmapTemplate?.links || [])
-                        .map((a: any) => ({ link: a.link, name: a.name ?? undefined })),
-                },
-                partners: {
-                    create: (roadmapTemplate?.partners || [])
-                        .map((c: any) => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
-                },
-                stages: roadmapTemplate?.stages || [],
-                statuses: roadmapTemplate?.statuses || [],
-                ...(roadmapTemplate?.metadata ? {metadata: roadmapTemplate.metadata} : undefined),
-                // published defaults to true per your model; omit to use default
-            },
-        });
+  return await prisma.$transaction(async (tx) => {
+    // 1️⃣ Create roadmap
+    const roadmap = await tx.roadmap.create({
+      data: {
+        private: false,
+        title: roadmapTemplate?.title,
+        description: roadmapTemplate?.description,
+        content: roadmapTemplate?.content ?? null,
+        image: roadmapTemplate?.image ?? null,
+        organization: { connect: { id: organizationId } },
+        modalities: roadmapTemplate?.modalities ?? [],
+        stages: roadmapTemplate?.stages ?? [],
+        statuses: roadmapTemplate?.statuses ?? [],
+        links: {
+          create: (roadmapTemplate?.links ?? []).map((l: any) => ({
+            name: l.name ?? undefined,
+            link: l.link,
+          })),
+        },
+        partners: {
+          create: (roadmapTemplate?.partners ?? []).map((p: any) => ({
+            name: p.name,
+            email: p.email,
+            role: p.role ?? undefined,
+            affiliation: p.affiliation ?? undefined,
+          })),
+        },
+        ...(roadmapTemplate?.metadata
+          ? { metadata: roadmapTemplate.metadata }
+          : {}),
+      },
+    })
 
-        // If a template was provided, create nodes/edges/milestones first
-        // if (roadmapTemplate?.milestones) {
-        //     const sortedMilestones = roadmapTemplate?.milestones.sort((a: any, b: any) => {
-        //         const aNode = roadmapTemplate?.nodes?.find((node: any) => node.id === a.nodeId)
-        //         const bNode = roadmapTemplate?.nodes?.find((node: any) => node.id === b.nodeId)
+    // Maps template IDs → new IDs
+    const nodeIdMap = new Map<string, string>()
+    const milestoneIdMap = new Map<string, string>()
 
-        //         if (aNode?.positionX && bNode?.positionX) {
-        //             return aNode.positionX - bNode.positionX
-        //         } else if (aNode?.positionX) {
-        //             // node a is defiend, node b is not, put node a first
-        //             return -1
-        //         } else if (bNode?.positionX) {
-        //             // node b is defined, node b is not, put node b first
-        //             return 1
-        //         }
+    // 2️⃣ Create nodes
+    if (roadmapTemplate?.nodes?.length) {
+      for (const node of roadmapTemplate.nodes) {
+        const newNode = await tx.node.create({
+          data: {
+            roadmapId: roadmap.id,
+            positionX: node.positionX,
+            positionY: node.positionY,
+            origin: node.origin ?? [0, 0],
+            metadata: node.metadata ?? undefined,
+          },
+        })
 
-        //         // if nether is defined, don't re-sort
-        //         return 0
-        //     })
-        //     const sortedNodes = roadmapTemplate?.nodes.sort((a: any, b: any) => {
-        //         if (a?.positionX && b?.positionX) {
-        //             return a.positionX - b.positionX
-        //         } else if (a?.positionX) {
-        //             // node a is defiend, node b is not, put node a first
-        //             return -1
-        //         } else if (b?.positionX) {
-        //             // node b is defined, node b is not, put node b first
-        //             return 1
-        //         }
-
-        //         // if nether is defined, don't re-sort
-        //         return 0
-        //     })
-
-        //     // sort milestones and nodes, just in case they're not sorted properly in the template file
-        //     await createNodesAndEdgesFromTemplate(organizationId, roadmap.id, {
-        //         ...roadmapTemplate,
-        //         milestones: sortedMilestones,
-        //         nodes: sortedNodes
-        //     });
-        // }
-
-        // Re-fetch with full graph
-        const finalRoadmap = await prisma.roadmap.findUnique({
-            where: {id: roadmap.id},
-            include: {
-                milestones: {
-                    include: {
-                        node: true,
-                        contacts: true,
-                        attachments: true,
-                        types: {include: {milestoneType: true}},
-                        tools: {include: {tool: true}},
-                        rfps: {include: {rfp: true}},
-                    },
-                },
-                nodes: true,
-                edges: true,
-                organization: true,
-            },
-        });
-
-        return finalRoadmap;
-    } catch (error: any) {
-        console.error("Error creating roadmap:", error?.message ?? error);
-        throw new Error(error?.message || "Failed to create roadmap.");
+        nodeIdMap.set(node.id, newNode.id)
+      }
     }
+
+    // 3️⃣ Create milestones (linked to nodes)
+    if (roadmapTemplate?.milestones?.length) {
+      const sortedMilestones = [...roadmapTemplate.milestones].sort(
+        (a: any, b: any) => (a.timelineOrder ?? 0) - (b.timelineOrder ?? 0),
+      )
+
+      for (const milestone of sortedMilestones) {
+
+        const newNodeId = milestone.nodeId
+          ? nodeIdMap.get(milestone.nodeId)
+          : undefined
+
+        const newMilestone = await tx.milestone.create({
+          data: {
+            roadmapId: roadmap.id,
+            organizationId,
+            title: milestone.title,
+            description: milestone.description ?? null,
+            notes: milestone.notes ?? null,
+            status: milestone.status ?? "PLANNED",
+            budget: milestone.budget ?? null,
+            startDate: milestone.startDate
+              ? new Date(milestone.startDate)
+              : null,
+            endDate: milestone.endDate
+              ? new Date(milestone.endDate)
+              : null,
+            private: false,
+            openTo: milestone.openTo ?? [],
+            timelineOrder: milestone.timelineOrder ?? 0,
+            nodeType: milestone.nodeType ?? "PROJECT",
+            nodeId: newNodeId,
+            metadata: milestone.metadata ?? undefined,
+
+            // milestone types
+            types: {
+              create: (milestone.types ?? []).map((t: any) => ({
+                milestoneTypeId: t.milestoneTypeId,
+              })),
+            },
+          },
+        })
+
+        milestoneIdMap.set(milestone.id, newMilestone.id)
+      }
+    }
+
+    // 4️⃣ Create edges (using new node IDs)
+    if (roadmapTemplate?.edges?.length) {
+      for (const edge of roadmapTemplate.edges) {
+        const source = nodeIdMap.get(edge.source)
+        const target = nodeIdMap.get(edge.target)
+
+        if (!source || !target) continue
+
+        await tx.edge.create({
+          data: {
+            roadmapId: roadmap.id,
+            source,
+            target,
+            type: edge.type ?? undefined,
+            data: edge.data ?? undefined,
+            metadata: edge.metadata ?? undefined,
+          },
+        })
+      }
+    }
+
+    // 5️⃣ Return fully-hydrated roadmap
+    return await tx.roadmap.findUnique({
+      where: { id: roadmap.id },
+      include: {
+        nodes: true,
+        edges: true,
+        organization: true,
+        milestones: {
+          include: {
+            node: true,
+            contacts: true,
+            attachments: true,
+            types: { include: { milestoneType: true } },
+            tools: { include: { tool: true } },
+            rfps: { include: { rfp: true } },
+          },
+        },
+      },
+    })
+  })
+}
+
+export async function createDefaultBiosamples(organizationId: string) {
+    // find first gene and company for link
+    const firstGene = await prisma.gene.findFirst({
+        orderBy: { id: "asc" },
+    })
+    const firstCRO = await prisma.company.findFirst({
+        orderBy: { title: "asc" }
+    })
+
+    const donor = await prisma.donor.create({
+        data: {
+            internalId: "DONOR001",
+            sex: "F",
+            race: "W",
+            species: "Human",
+            organizationId,
+        },
+    })
+
+  return await Promise.all([
+    // ─────────────────────────────
+    // MINIMAL BIOSAMPLE
+    // ─────────────────────────────
+    prisma.biosample.create({
+      data: {
+        organizationId,
+        private: false,
+        pinned: false,
+        types: ["IPSCS"],
+        genes: [],
+        availability: "Available upon request",
+        notes: "Basic biosample record. Limited metadata available.",
+      },
+    }),
+    // ─────────────────────────────
+    // RICH BIOSAMPLE
+    // ─────────────────────────────
+    prisma.biosample.create({
+        data: {
+            organizationId,
+            donorId: donor.id,
+            private: false,
+            pinned: true,
+            description:
+            "Patient-derived fibroblast sample collected for translational research and assay development.",
+            types: ["FIBROBLAST"],
+            genes: firstGene ? [firstGene.symbol!] : [], // use symbol if gene exists
+            geneId: firstGene ? firstGene.id : undefined, // link the first gene if exists
+            companyId: firstCRO ? firstCRO.id : undefined,
+            genotype: "Homozygous pathogenic variant",
+            bsiId: "SAMPLE",
+            variant: "c.1234A>T",
+            availability: "Available for academic research",
+            quantity: 3,
+            quantityUnit: "vials",
+            currentCountry: "United States",
+            countryOfCollection: "United States",
+            preservationMethod: "Cryopreserved",
+            anatomicalSite: "Skin biopsy",
+            methodOfTransport: "Dry ice",
+            ageAtCollection: 12,
+            collectionDate: new Date("2021-06-15"),
+            price: 500,
+            priceUnit: "USD",
+            metadata: {
+                qcStatus: "completed",
+                consentType: "broad research consent",
+            },
+            contacts: {
+            create: [
+                {
+                    name: "Biorepository Manager",
+                    role: "Sample Access",
+                    email: "biobank@foundation.org",
+                    affiliation: "Biorepository",
+                },
+            ],
+            },
+            attachments: {
+            create: [
+                {
+                    name: "Sample QC Report",
+                    link: "https://example.org/biosample-qc.pdf",
+                },
+            ],
+            },
+            notes:
+            "Sample consent allows use in academic and preclinical industry research.",
+        },
+        include: {
+            donor: true, // return donor details as well
+        },
+    })
+  ])
+}
+
+export async function createDefaultDiseaseModels(
+  organizationId: string,
+  conditionId?: string // optional but useful
+) {
+    // find first gene and company for link
+    const firstGene = await prisma.gene.findFirst({
+        orderBy: { id: "asc" },
+    })
+    const firstCRO = await prisma.company.findFirst({
+        orderBy: { title: "asc" }
+    })
+
+  return await Promise.all([
+    // ─────────────────────────────
+    // MINIMAL DISEASE MODEL
+    // ─────────────────────────────
+    prisma.diseaseModel.create({
+      data: {
+        organizationId,
+        private: false,
+        pinned: false,
+        types: ["NON_HUMAN_PRIMATES"],
+        genes: [],
+        notes: "Early-stage disease model under development.",
+      },
+    }),
+    // ─────────────────────────────
+    // RICH DISEASE MODEL
+    // ─────────────────────────────
+    prisma.diseaseModel.create({
+      data: {
+        organizationId,
+        conditionId,
+        private: false,
+        pinned: true,
+        description:
+          "Patient-derived iPSC neuronal model recapitulating key disease phenotypes.",
+        genes: firstGene ? [firstGene.symbol!] : [], // use symbol if gene exists
+        geneId: firstGene ? firstGene.id : undefined, // link the first gene if exists
+        companyId: firstCRO ? firstCRO.id : undefined,
+        types: ["MOUSE"],
+        genotype: "Compound heterozygous",
+        strain: "Human iPSC line",
+        metadata: {
+          differentiationProtocol: "Cortical neuron differentiation v2",
+          validationStatus: "functionally validated",
+        },
+        contacts: {
+          create: [
+            {
+              name: "Principal Investigator",
+              role: "Model Development",
+              email: "pi@foundation.org",
+              affiliation: "Research Lab",
+            },
+          ],
+        },
+        attachments: {
+          create: [
+            {
+              name: "Model Characterization Data",
+              link: "https://example.org/disease-model-characterization.pdf",
+            },
+          ],
+        },
+        notes:
+          "Model shows reproducible disease phenotypes suitable for drug screening.",
+      },
+    }),
+  ])
+}
+
+export async function createDefaultTools(organizationId: string) {
+    // find first gene and company for link
+    const firstGene = await prisma.gene.findFirst({
+        orderBy: { id: "asc" },
+    })
+    const firstCRO = await prisma.company.findFirst({
+        orderBy: { title: "asc" }
+    })
+
+  return await Promise.all([
+    // ─────────────────────────────
+    // MINIMAL TOOL
+    // ─────────────────────────────
+    prisma.tool.create({
+      data: {
+        title: "Patient Registry Dataset",
+        organizationId,
+        private: false,
+        pinned: false,
+        types: ["PATIENTREGISTRY"],
+        genes: [],
+        notes: "Basic registry dataset available upon request.",
+      },
+    }),
+    // ─────────────────────────────
+    // RICH TOOL
+    // ─────────────────────────────
+    prisma.tool.create({
+      data: {
+        title: "Patient-Derived Cell Line Platform",
+        description:
+          "Collection of patient-derived fibroblast and iPSC lines available for translational research.",
+        cohortSize: 12,
+        organizationId,
+        private: false,
+        pinned: true,
+        types: ["FUNCTIONALSTUDY"],
+        genes: firstGene ? [firstGene.symbol!] : [], // use symbol if gene exists
+        geneId: firstGene ? firstGene.id : undefined, // link the first gene if exists
+        companyId: firstCRO ? firstCRO.id : undefined,
+        metadata: {
+          materialType: ["fibroblast", "iPSC"],
+          qcCompleted: true,
+          storage: "LN2",
+        },
+        contacts: {
+          create: [
+            {
+              name: "Biorepository Manager",
+              role: "Sample Access",
+              email: "biobank@foundation.org",
+              affiliation: "Biorepository",
+            },
+            {
+              name: "Scientific Director",
+              role: "Scientific Oversight",
+              email: "science@foundation.org",
+              affiliation: "Research Leadership",
+            },
+          ],
+        },
+        attachments: {
+          create: [
+            {
+              name: "Cell Line Characterization",
+              link: "https://example.org/cell-line-qc.pdf",
+            },
+            {
+              name: "Material Transfer Agreement",
+              link: "https://example.org/mta.pdf",
+            },
+          ],
+        },
+        notes:
+          "Available to academic and industry partners. MTA and project proposal required.",
+      },
+    }),
+  ])
+}
+
+export async function createDefaultRFPs(organizationId: string) {
+  return await Promise.all([
+    // ─────────────────────────────
+    // MINIMAL RFP
+    // ─────────────────────────────
+    prisma.rFP.create({
+      data: {
+        organizationId,
+        title: "Seed Minimal RFP",
+        description: "Basic RFP with minimal fields",
+        private: false,
+        pinned: false,
+        openTo: [],
+      },
+    }),
+
+    // ─────────────────────────────
+    // RICH RFP
+    // ─────────────────────────────
+    prisma.rFP.create({
+      data: {
+        organizationId,
+        title: "Seed Rich RFP: Antisense Therapy Initiative",
+        description:
+          "Request for proposals to develop preclinical antisense oligonucleotide therapies targeting rare neurodegenerative disorders.",
+        eligibility: "Academic institutions, biotech startups, or consortia",
+        instructions:
+          "Submit proposals via our portal including methodology, timeline, and budget breakdown.",
+        evaluationProcess:
+          "Proposals will be evaluated based on innovation, feasibility, and alignment with organizational priorities.",
+        openTo: ["ACADEMIC", "CRO"],
+        startDate: new Date("2025-03-01"),
+        endDate: new Date("2025-06-01"),
+        budget: 500000,
+        private: false,
+        pinned: true,
+        contacts: {
+          create: [
+            {
+              name: "RFP Coordinator",
+              role: "Contact for questions",
+              email: "rfp-coordinator@foundation.org",
+              affiliation: "Org Admin",
+            },
+          ],
+        },
+        attachments: {
+          create: [
+            {
+              name: "RFP Guidelines",
+              link: "https://example.org/rfp-guidelines.pdf",
+            },
+            {
+              name: "Budget Template",
+              link: "https://example.org/rfp-budget.xlsx",
+            },
+          ],
+        },
+        notes: "Rich RFP example including contacts, attachments, and metadata.",
+      },
+    }),
+  ])
 }
 
 main()

@@ -4,9 +4,10 @@ import * as fs from "fs/promises";
 export async function seed() {
     console.log("Institutions: Starting institution seed script...");
 
+    // Default institution
     let institutions: any[] = [
         {
-            name: 'Example Company',
+            name: 'Example Institution',
             established: 2026,
             website: 'https://example.com'
         }

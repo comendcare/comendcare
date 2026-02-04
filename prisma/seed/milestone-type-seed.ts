@@ -3,18 +3,6 @@ import {MILESTONE_TYPE_OPTIONS} from "@comend/lib/types";
 
 export async function seed() {
     console.log('Milestone Types: Starting seed script...');
-    // await prisma.milestoneType.deleteMany()
-    // await prisma.milestoneType.createMany({
-    //     data: MILESTONE_TYPE_OPTIONS.map(type => ({
-    //         id: type.id,
-    //         label: type.label,
-    //         services: type.services,
-    //         categories: type.categories,
-    //         description: type.description
-    //     })),
-    //     skipDuplicates: true
-    // })
-
     const types = MILESTONE_TYPE_OPTIONS.map(type => ({
         id: type.id,
         label: type.label,
@@ -36,26 +24,6 @@ export async function seed() {
             }
         }
     }
-
-
-    // await Promise.all(MILESTONE_TYPE_OPTIONS.map(type => (
-    //     prisma.milestoneType.upsert({
-    //         where: {id: type.id},
-    //         update: {
-    //             label: type.label,
-    //             services: type.services,
-    //             categories: type.categories,
-    //             description: type.description
-    //         },
-    //         create: {
-    //             id: type.id,
-    //             label: type.label,
-    //             services: type.services,
-    //             categories: type.categories,
-    //             description: type.description
-    //         }
-    //     })
-    // )))
 }
 
 seed()
