@@ -5,18 +5,29 @@ import path from "path";
 export async function seed() {
     console.log('Genes: Starting seed script...');
 
-    // Load the JSON data
-    const filePath = path.resolve(__dirname, "../../packages/data/non_alt_loci_set.json");
-    const data = JSON.parse(await fs.readFile(filePath, 'utf-8'));
+    // default genes
+    let genes: any[] = [
+        {symbol: 'AAAA'},
+        {symbol: 'BBBB'},
+        {symbol: 'CCCC'},
+        {symbol: 'DDDD'}
+    ]
 
-    // Extract the `docs` array from the response
-    const genes = data.response.docs;
+    try {
+        // Load the JSON data
+        const filePath = path.resolve(__dirname, "../../packages/data/non_alt_loci_set.json");
+        const data = JSON.parse(await fs.readFile(filePath, 'utf-8'));
+
+        // Extract the `docs` array from the response
+        genes = data.response.docs;
+    } catch (e) {
+        console.error(`Failed to fech file. Using default seed genes.`)
+    }
 
     console.log(`Total records to process: ${genes.length}`);
 
     let processedCount = 0;
 
-    await prisma.gene.deleteMany()
     for (const gene of genes) {
         try {
             // Parse date fields safely
