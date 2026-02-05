@@ -80,7 +80,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                 const options = RESEARCH_PLAN_TYPES.filter(option => row.original.modalities?.includes(option.value))
                 return (
                     (options && options.length > 0)
-                        ? (options.map(option => <Badge variant={'blue'}>{option?.label}</Badge>))
+                        ? (options.map(option => <Badge variant={'lightBlue'}>{option?.label}</Badge>))
                         : (<p>{'--'}</p>)
                 )
             },
