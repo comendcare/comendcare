@@ -6,7 +6,7 @@ import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
 import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
 import { Badge } from "./../../../ui/badge";
-import { CircleDashed } from "lucide-react";
+import { CircleDashed, ExternalLink, User, Link as LinkIcon } from "lucide-react";
 import { handleAsyncCompanyAndInstitutionSearch, handleAsyncConditionSearch, handleAsyncDiagnosesSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils";
 import { ExtendedColumnFilter, ExtendedColumnSort } from "@comend/lib/types/data-table";
 import { filterColumns } from "@comend/lib/filter-columns";
@@ -361,7 +361,8 @@ export function useBiosamplesTableColumns(
                         ? (
                             <ul className="flex flex-col gap-2">
                                 {row.original.contacts?.map((contact: any, index: number) => (
-                                    <li key={index}>
+                                    <li key={index} className="flex items-center gap-2">
+                                        <User className="h-4 min-h-4 w-4 min-w-4"/>
                                         {contact.name || contact.email || contact.affiliation}
                                     </li>
                                 ))}
@@ -391,7 +392,8 @@ export function useBiosamplesTableColumns(
                         ? (
                             <ul className="flex flex-col gap-2">
                                 {row.original.attachments?.map((attachment: any, index: number) => (
-                                    <li key={index}>
+                                    <li key={index} className="flex items-center gap-2">
+                                        <LinkIcon className="h-4 min-h-4 w-4 min-w-4"/>
                                         <Link 
                                             className="line-clamp-2 underline" 
                                             href={attachment.link || "/"}
@@ -400,6 +402,7 @@ export function useBiosamplesTableColumns(
                                         >
                                         {attachment.name || attachment.link}
                                         </Link>
+                                        <ExternalLink className="h-4 min-h-4 w-4 min-w-4"/>
                                     </li>
                                 ))}
                             </ul>

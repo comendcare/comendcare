@@ -1,9 +1,12 @@
 import type {ColumnDef} from "@tanstack/react-table";
 import {
     CircleDashed,
+    ExternalLink,
     FileText,
     Globe,
     Lock,
+    User,
+    Link as LinkIcon
 } from "lucide-react";
 import * as React from "react";
 import {
@@ -295,7 +298,8 @@ export function useDiseaseModelsTableColumns({session}: {session: Session | null
                         ? (
                             <ul className="flex flex-col gap-2">
                                 {row.original.contacts?.map((contact: any, index: number) => (
-                                    <li key={index}>
+                                    <li key={index} className="flex items-center gap-2">
+                                        <User className="h-4 min-h-4 w-4 min-w-4"/>
                                         {contact.name || contact.email || contact.affiliation}
                                     </li>
                                 ))}
@@ -325,7 +329,8 @@ export function useDiseaseModelsTableColumns({session}: {session: Session | null
                         ? (
                             <ul className="flex flex-col gap-2">
                                 {row.original.attachments?.map((attachment: any, index: number) => (
-                                    <li key={index}>
+                                    <li key={index} className="flex items-center gap-2">
+                                        <LinkIcon className="h-4 min-h-4 w-4 min-w-4"/>
                                         <Link 
                                             className="line-clamp-2 underline" 
                                             href={attachment.link || "/"}
@@ -334,6 +339,7 @@ export function useDiseaseModelsTableColumns({session}: {session: Session | null
                                         >
                                         {attachment.name || attachment.link}
                                         </Link>
+                                        <ExternalLink className="h-4 min-h-4 w-4 min-w-4"/>
                                     </li>
                                 ))}
                             </ul>
