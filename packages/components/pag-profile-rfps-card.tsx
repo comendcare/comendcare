@@ -33,6 +33,7 @@ import { Button } from "@comend/components/ui/button";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 import { Separator } from "@comend/components/ui/separator";
+import { CaretAccordion } from "@comend/components/ui/carret-accordion";
 
 export const PAGProfileRFPsHoverableCard = ({rfps, isPrivate}: { rfps: any[], isPrivate: boolean }) => {
     const searchParams = useSearchParams()
@@ -355,34 +356,6 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                 )}
             </div>
         </ScrollArea>
-    )
-}
-
-const CaretAccordion = ({title, content, className}: {title: string, content: React.ReactNode, className?: string}) => {
-    const [isOpen, setIsOpen] = useState(false)
-
-    return (
-        <div className={cn("flex flex-col gap-2", className)} >
-            <span className="flex gap-2 items-center">
-                <Button 
-                    variant={'ghost'} 
-                    className="p-0 h-6 w-6"
-                    onClick={() => setIsOpen((prev) => !prev)}
-                >
-                    {isOpen ? (
-                        <ChevronDown />
-                    ) : (
-                        <ChevronRight />
-                    )}
-                </Button>
-                <p className="text-xl font-semibold">{title}</p>
-            </span>
-            {isOpen && (
-                <div>
-                    {content}
-                </div>
-            )}
-        </div>
     )
 }
 
