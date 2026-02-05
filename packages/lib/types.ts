@@ -27,6 +27,7 @@ import type {
 } from "@prisma/client";
 import {Prisma} from "@prisma/client";
 import {z} from "zod";
+import type {BadgeVariantType} from "@comend/components/ui/badge"
 
 export const BIOMARKER_TYPES = [
     { id: "DIAGNOSTIC", label: "Diagnostic Biomarker", value: "diagnostic" },
@@ -590,7 +591,8 @@ export const optionSchema = z.object({
     label: z.string(),
     value: z.string(),
     disable: z.boolean().optional(),
-    img: z.string().optional()
+    img: z.string().optional(),
+    variant: z.custom<BadgeVariantType>().optional()
 })
 
 export type ImportSchemaEntry = {

@@ -5,7 +5,7 @@ import {X} from 'lucide-react';
 import * as React from 'react';
 import {forwardRef, useEffect} from 'react';
 
-import {Badge} from './badge';
+import {Badge, BadgeVariantType} from './badge';
 import {Command, CommandGroup, CommandItem, CommandList} from './command';
 import {cn, sleep} from './../../../packages/lib/utils';
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "./hover-card";
@@ -24,6 +24,7 @@ export interface Option {
      *  https://lucide.dev/guide/packages/lucide-react#dynamic-icon-component
      */
     icon?: IconName;
+    variant?: BadgeVariantType;
 
     /** Group the options by providing key. */
     [key: string]: string | boolean | undefined | null;
@@ -521,10 +522,11 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                             className={cn(
                                                 'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground',
                                                 'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
-                                                badgeClassName,
+                                                badgeClassName
                                             )}
                                             data-fixed={option.fixed}
                                             data-disabled={disabled || undefined}
+                                            variant={option.variant || "secondary"}
                                         >
                                             {option.icon && (
                                                 <DynamicIcon name={option.icon} className="h-4 w-4 min-w-4 min-h-4" />

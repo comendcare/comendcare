@@ -361,6 +361,7 @@ export function EditResearchPlanForm({
                                     defaultOptions={RESEARCH_STAGE}
                                     placeholder="Select a stage..."
                                     hidePlaceholderWhenSelected={true}
+                                    // badgeClassName={badgeVariants({variant: field.value?.[0]?.variant as any || "secondary"})}
                                     emptyIndicator={
                                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                             no results found.
