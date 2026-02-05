@@ -16,7 +16,6 @@ export const contentType = "image/png"
 
 // Image generation
 export default async function Image(req: NextRequest): Promise<ImageResponse> {
-    console.log(req)
     const params = encode({
         // url: "https://www.comend.io/",
         url: "https://comend.io/",

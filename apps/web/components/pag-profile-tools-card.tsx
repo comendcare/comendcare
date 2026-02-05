@@ -16,6 +16,11 @@ import { ToolCounts } from "./profile-page";
 import { useRouter } from "next/navigation";
 import Image from "next/image"
 import {NoResultsTemplate} from "@comend/components/no-results"
+import { Row } from "@tanstack/react-table";
+import { Dialog, DialogContent } from "@comend/components/ui/dialog";
+import {BiosampleDetails} from "@comend/components/biosample-details"
+import {DiseaseModelDetails} from "@comend/components/disease-model-details"
+import {ClinicalDatasetDetails} from "@comend/components/clinical-dataset-details"
 
 const getInitState = (
     counts: {
@@ -57,6 +62,9 @@ export const PAGProfileToolsCard = ({
 }) => {
     const [isInitialized, setIsInitialized] = useState<boolean>(false)    
     const [section, setSection] = useState<string | undefined>(undefined)
+    const [biosample, setBiosample] = useState<Biosample | undefined>(undefined)
+    const [diseaseModel, setDiseaseModel] = useState<DiseaseModel | undefined>(undefined)
+    const [clinicalDataset, setClinicalDataset] = useState<Tool | undefined>(undefined)
     const biosampleColumns = useBiosamplesTableColumns(
         true, // enable sorting
         true, // enable hiding
@@ -182,6 +190,7 @@ export const PAGProfileToolsCard = ({
                                             columns={biosampleColumns}
                                             searchParams={{}}
                                             showPagination={toolCounts.biosampleCount > 10}
+                                            onRowClickCallback={(e: any, row: Row<any> | undefined) => setBiosample(row?.original as Biosample)}
                                         />
                                     </FeatureFlagsProvider>
                                 </div>
@@ -195,6 +204,7 @@ export const PAGProfileToolsCard = ({
                                             columns={diseaseModelColumns}
                                             searchParams={{}}
                                             showPagination={toolCounts.diseaseModelCount > 10}
+                                            onRowClickCallback={(e: any, row: Row<any> | undefined) => setDiseaseModel(row?.original as DiseaseModel)}
                                         />
                                     </FeatureFlagsProvider>
                                 </div>
@@ -208,6 +218,7 @@ export const PAGProfileToolsCard = ({
                                             columns={clinicalDatasetColumns}
                                             searchParams={{}}
                                             showPagination={toolCounts.clinicalDatasetCount > 10}
+                                            onRowClickCallback={(e: any, row: Row<any> | undefined) => setClinicalDataset(row?.original as Tool)}
                                         />
                                     </FeatureFlagsProvider>
                                 </div>
@@ -225,6 +236,48 @@ export const PAGProfileToolsCard = ({
                     />
                 )}
             </CardContent>
+
+            {/* Biosample details dialog */}
+            <Dialog 
+                open={!!biosample} 
+                onOpenChange={
+                    (open) => {
+                        if (!open) setBiosample(undefined)
+                    }
+                }
+            >
+                <DialogContent>
+                    <BiosampleDetails biosample={biosample} />
+                </DialogContent>
+            </Dialog>
+
+            {/* Disease model details dialog */}
+            <Dialog 
+                open={!!diseaseModel} 
+                onOpenChange={
+                    (open) => {
+                        if (!open) setDiseaseModel(undefined)
+                    }
+                }
+            >
+                <DialogContent>
+                    <DiseaseModelDetails diseaseModel={diseaseModel} />
+                </DialogContent>
+            </Dialog>
+
+            {/* Clinical dataset details dialog */}
+            <Dialog 
+                open={!!clinicalDataset} 
+                onOpenChange={
+                    (open) => {
+                        if (!open) setClinicalDataset(undefined)
+                    }
+                }
+            >
+                <DialogContent>
+                    <ClinicalDatasetDetails clinicalDataset={clinicalDataset} />
+                </DialogContent>
+            </Dialog>
         </Card>
     );
 }
