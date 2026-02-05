@@ -1,5 +1,5 @@
 import type {ColumnDef} from "@tanstack/react-table";
-import {Globe, Lock} from "lucide-react";
+import {Globe, Lock, Link as LinkIcon, ExternalLink, Building} from "lucide-react";
 import * as React from "react";
 import {DataTableColumnHeader} from "./../data-table/data-table-column-header";
 import {
@@ -80,7 +80,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                 const options = RESEARCH_PLAN_TYPES.filter(option => row.original.modalities?.includes(option.value))
                 return (
                     (options && options.length > 0)
-                        ? (options.map(option => <Badge>{option?.label}</Badge>))
+                        ? (options.map(option => <Badge variant={'blue'}>{option?.label}</Badge>))
                         : (<p>{'--'}</p>)
                 )
             },
@@ -143,7 +143,8 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                         ? (
                             <ul className="flex flex-col gap-2">
                                 {partners.map((partner: any, index: number) => (
-                                    <li key={index}>
+                                    <li key={index} className="flex items-center gap-2">
+                                        <Building className="h-4 min-h-4 w-4 min-w-4"/>
                                         {partner.affiliation}
                                     </li>
                                 ))}
@@ -191,7 +192,8 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                         ? (
                             <ul className="flex flex-col gap-2">
                                 {links?.map((attachment: any, index: number) => (
-                                    <li key={index}>
+                                    <li key={index} className="flex items-center gap-2">
+                                        <LinkIcon className="h-4 min-h-4 w-4 min-w-4"/>
                                         <Link 
                                             className="line-clamp-2 underline" 
                                             href={attachment.link || "/"}
@@ -200,6 +202,7 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                                         >
                                         {attachment.name || attachment.link}
                                         </Link>
+                                        <ExternalLink className="h-4 min-h-4 w-4 min-w-4"/>
                                     </li>
                                 ))}
                             </ul>

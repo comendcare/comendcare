@@ -1782,46 +1782,55 @@ export const RESEARCH_STAGE: Option[] = [
         id: 'DISCOVERY',
         label: 'Discovery',
         value: 'DISCOVERY',
+        variant: 'orange'
     },
     {
         id: 'PRECLINICAL',
         label: 'Pre-clinical',
         value: 'PRECLINICAL',
+        variant: 'yellow'
     },
     {
         id: 'INDAPPROVED',
         label: 'IND-approved',
         value: 'INDAPPROVED',
+        variant: 'lime'
     },
     {
         id: 'EXPANDEDACCESS',
         label: 'Expanded access',
         value: 'EXPANDEDACCESS',
+        variant: 'green'
     },
     {
         id: 'PHASE1/2',
         label: 'Phase I/II',
         value: 'PHASE1/2',
+        variant: 'emerald'
     },
     {
         id: 'PHASE1',
         label: 'Phase I',
         value: 'PHASE1',
+        variant: 'emerald'
     },
     {
         id: 'PHASE2',
         label: 'Phase II',
         value: 'PHASE2',
+        variant: 'emerald'
     },
     {
         id: 'PHASE3',
         label: 'Phase III',
         value: 'PHASE3',
+        variant: 'emerald'
     },
     {
         id: 'FDAAPPROVED',
         label: 'FDA approved',
         value: 'FDAAPPROVED',
+        variant: 'blue'
     },
 ]
 
