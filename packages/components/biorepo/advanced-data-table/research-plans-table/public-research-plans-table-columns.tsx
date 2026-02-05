@@ -87,13 +87,14 @@ export function useResearchPlansTableColumns(
                     title="Research strategy"
                 />
             ),
-            cell: ({row}) => (
-                <>
-                    {RESEARCH_PLAN_TYPES
-                        .filter(option => (row.original.modalities || []).includes(option.value))
-                        .map(option => <Badge>{option?.label}</Badge>)}
-                </>
-            ),
+            cell: ({row}) => {
+                const options = RESEARCH_PLAN_TYPES.filter(option => row.original.modalities?.includes(option.value))
+                return (
+                    (options && options.length > 0)
+                        ? (options.map(option => <Badge>{option?.label}</Badge>))
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
             enableHiding,
         },
@@ -107,13 +108,14 @@ export function useResearchPlansTableColumns(
                     title="Stage"
                 />
             ),
-            cell: ({row}) => (
-                <>
-                    {RESEARCH_STAGE
-                        .filter(option => (row.original.stages || []).includes(option.value))
-                        .map(option => <Badge>{option?.label}</Badge>)}
-                </>
-            ),
+            cell: ({row}) => {
+                const options = RESEARCH_STAGE.filter(option => row.original.stages?.includes(option.value))
+                return (
+                    (options && options.length > 0)
+                        ? (options.map(option => <Badge>{option?.label}</Badge>))
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
             enableHiding,
         },
@@ -127,13 +129,14 @@ export function useResearchPlansTableColumns(
                     title="Status"
                 />
             ),
-            cell: ({row}) => (
-                <>
-                    {RESEARCH_PLAN_STATUS
-                        .filter(option => (row.original.statuses || []).includes(option.value))
-                        .map(option => <Badge>{option?.label}</Badge>)}
-                </>
-            ),
+            cell: ({row}) => {
+                const options = RESEARCH_PLAN_STATUS.filter(option => row.original.statuses?.includes(option.value))
+                return (
+                    (options && options.length > 0)
+                        ? (options.map(option => <Badge>{option?.label}</Badge>))
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
             enableHiding,
         },
@@ -147,15 +150,22 @@ export function useResearchPlansTableColumns(
                     title="Partners"
                 />
             ),
-            cell: ({row}) => (
-                <ul className="flex flex-col gap-2">
-                    {row.original.partners?.map((partner: any, index: number) => (
-                        <li key={index}>
-                            {partner.affiliation}
-                        </li>
-                    ))}
-                </ul>
-            ),
+            cell: ({row}) => {
+                const partners = row.original.partners
+                return (
+                    (partners && partners.length > 0)
+                        ? (
+                            <ul className="flex flex-col gap-2">
+                                {partners.map((partner: any, index: number) => (
+                                    <li key={index}>
+                                        {partner.affiliation}
+                                    </li>
+                                ))}
+                            </ul>
+                        )
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
             enableHiding,
         },
@@ -169,11 +179,14 @@ export function useResearchPlansTableColumns(
                     title="Description"
                 />
             ),
-            cell: ({row}) => (
-                <div>
-                    <SeeMoreDescription description={row.original.description}/>
-                </div>
-            ),
+            cell: ({row}) => {
+                const description = row.original.description
+                return (
+                    (description && description.length > 0)
+                        ? (<div className="w-fit min-w-[500px]"><SeeMoreDescription description={row.original.description}/></div>)
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting,
             enableHiding,
         },
@@ -187,22 +200,29 @@ export function useResearchPlansTableColumns(
                     title="Links"
                 />
             ),
-            cell: ({row}) => (
-                <ul className="flex flex-col gap-2">
-                    {row.original.links?.map((attachment: any, index: number) => (
-                        <li key={index}>
-                            <Link
-                                className="line-clamp-2 underline"
-                                href={attachment.link || "/"}
-                                target="_blank"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                            {attachment.name || attachment.link}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            ),
+            cell: ({row}) => {
+                const links = row.original.links
+                return (
+                    (links && links.length > 0)
+                        ? (
+                            <ul className="flex flex-col gap-2">
+                                {links?.map((attachment: any, index: number) => (
+                                    <li key={index}>
+                                        <Link 
+                                            className="line-clamp-2 underline" 
+                                            href={attachment.link || "/"}
+                                            target="_blank"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                        {attachment.name || attachment.link}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        )
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
             enableHiding,
         },
@@ -218,25 +238,26 @@ export function useResearchPlansTableColumns(
             ),
             cell: ({row}) => {
                 const numPublishedProjects = row.original.milestones.filter((milestone: Milestone) => !milestone.private).length
-
                 return (
-                    <div className="flex flex-col gap-2 justify-center text-nowrap">
-                        {numPublishedProjects > 0 && (
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <PropertyBadge 
-                                        className="text-nowrap border-green-200 text-green-900 font-semibold" 
-                                        icon={Globe}
-                                    >
-                                        {numPublishedProjects}
-                                    </PropertyBadge>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>{numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        )}
-                    </div>
+                    (numPublishedProjects > 0)
+                        ? (
+                            <div className="flex flex-col gap-2 justify-center text-nowrap">
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <PropertyBadge 
+                                            className="text-nowrap border-green-200 text-green-900 font-semibold" 
+                                            icon={Globe}
+                                        >
+                                            {numPublishedProjects}
+                                        </PropertyBadge>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </div>
+                        )
+                        : (<p>{'--'}</p>)
                 )
             },
             enableSorting,
