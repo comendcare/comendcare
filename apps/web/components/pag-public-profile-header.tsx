@@ -39,8 +39,9 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                                     <Calendar
                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                         aria-hidden="true"/>
-                                    Founded
-                                    in {standardizeYear(organization?.yearFounded ?? "")}
+                                    <time dateTime={String(organization.yearFounded)}>
+                                        Founded in {standardizeYear(organization.yearFounded)}
+                                    </time>
                                 </div>
                             )}
                             {typeof organization?.moneyRaised === "number" && organization.moneyRaised > 0 && (
