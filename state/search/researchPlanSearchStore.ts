@@ -6,6 +6,7 @@ import { ASSOCIATED_CATEGORIES, Milestone } from '@comend/lib/types'
 import { getExclusiveToFirstGroup, sleep, typesenseSortByFromColumnId } from '@comend/lib/utils';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { SearchResponse } from 'typesense/lib/Typesense/Documents';
+import { BadgeVariantType } from '@comend/components/ui/badge';
 
 export type ViewType = 'grid' | 'list'
 
@@ -14,16 +15,19 @@ export type FiltersType = {
         label: string,
         value: string,
         disable?: boolean,
+        variant?: BadgeVariantType
     }[],
     statuses: {
         label: string,
         value: string,
         disable?: boolean,
+        variant?: BadgeVariantType
     }[],
     modalities: {
         label: string,
         value: string,
         disable?: boolean,
+        variant?: BadgeVariantType
     }[],
 }
 

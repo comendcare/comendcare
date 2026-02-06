@@ -112,7 +112,7 @@ export function useResearchPlansTableColumns(
                 const options = RESEARCH_STAGE.filter(option => row.original.stages?.includes(option.value))
                 return (
                     (options && options.length > 0)
-                        ? (options.map(option => <Badge>{option?.label}</Badge>))
+                        ? (options.map(option => <Badge variant={option?.variant || 'secondary'}>{option?.label}</Badge>))
                         : (<p>{'--'}</p>)
                 )
             },
