@@ -284,7 +284,18 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Research plans`}</h2>
-                        <BrowseAllSignInButton count={biosampleStore.totalResults}/>
+                        {/* <BrowseAllSignInButton count={biosampleStore.totalResults}/> */}
+                        <Link href={'/marketplace/research-plans'}>
+                            <Button
+                                variant="secondary"
+                                className="justify-self-end self-end"
+                            >
+                                {(researchPlanStore.totalResults && researchPlanStore.totalResults > 0 ) 
+                                    ? (`Browse all ${formatMoney(biosampleStore.totalResults)}`) 
+                                    : (`Browse all`)}
+                                <ArrowRight />
+                            </Button>
+                        </Link>
                     </div>
                     <ol className="w-full">
                         {(researchPlansInitialized && researchPlanStore.searchResults && researchPlanStore.searchResults.length > 0 )
@@ -333,7 +344,18 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Patient groups`}</h2>
-                        <BrowseAllSignInButton count={organizationStore.totalResults}/>
+                        {/* <BrowseAllSignInButton count={organizationStore.totalResults}/> */}
+                        <Link href={'/marketplace/patient-groups'}>
+                            <Button
+                                variant="secondary"
+                                className="justify-self-end self-end"
+                            >
+                                {(organizationStore.totalResults && organizationStore.totalResults > 0 )
+                                    ? (`Browse all ${formatMoney(organizationStore.totalResults)}`) 
+                                    : (`Browse all`)}
+                                <ArrowRight />
+                            </Button>
+                        </Link>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {(pagsInitialized && ([...(organizationStore.featuredOrgs || []), ...(organizationStore.searchResults || [])].length > 0))
@@ -366,7 +388,18 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Patient biosamples`}</h2>
-                        <BrowseAllSignInButton count={biosampleStore.totalResults}/>
+                        {/* <BrowseAllSignInButton count={biosampleStore.totalResults}/> */}
+                        <Link href={'/marketplace/biosamples'}>
+                            <Button
+                                variant="secondary"
+                                className="justify-self-end self-end"
+                            >
+                                {(biosampleStore.totalResults && biosampleStore.totalResults > 0 )
+                                    ? (`Browse all ${formatMoney(biosampleStore.totalResults)}`) 
+                                    : (`Browse all`)}
+                                <ArrowRight />
+                            </Button>
+                        </Link>
                     </div>
                     <ol className="w-full">
                         {(biosamplesInitialized && biosampleStore.searchResults && biosampleStore.searchResults.length > 0 )
@@ -416,7 +449,18 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Disease models`}</h2>
-                        <BrowseAllSignInButton count={diseaseModelStore.totalResults}/>
+                        {/* <BrowseAllSignInButton count={diseaseModelStore.totalResults}/> */}
+                        <Link href={'/marketplace/disease-models'}>
+                            <Button
+                                variant="secondary"
+                                className="justify-self-end self-end"
+                            >
+                                {(diseaseModelStore.totalResults && diseaseModelStore.totalResults > 0 )
+                                    ? (`Browse all ${formatMoney(diseaseModelStore.totalResults)}`) 
+                                    : (`Browse all`)}
+                                <ArrowRight />
+                            </Button>
+                        </Link>
                     </div>
                     <ol className="w-full">
                         {(diseaseModelsInitialized && diseaseModelStore.searchResults && diseaseModelStore.searchResults.length > 0 )
@@ -460,7 +504,18 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Clinical datasets`}</h2>
-                        <BrowseAllSignInButton count={clinicalDatasetStore.totalResults}/>
+                        {/* <BrowseAllSignInButton count={clinicalDatasetStore.totalResults}/> */}
+                        <Link href={'/marketplace/clinical-datasets'}>
+                            <Button
+                                variant="secondary"
+                                className="justify-self-end self-end"
+                            >
+                                {(clinicalDatasetStore.totalResults && clinicalDatasetStore.totalResults > 0 )
+                                    ? (`Browse all ${formatMoney(clinicalDatasetStore.totalResults)}`) 
+                                    : (`Browse all`)}
+                                <ArrowRight />
+                            </Button>
+                        </Link>
                     </div>
                     <ol className="w-full">
                         {(clinicalDatasetsInitialized && clinicalDatasetStore.searchResults && clinicalDatasetStore.searchResults.length > 0 )
@@ -504,7 +559,18 @@ export default function MarketplacePage() {
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Requests for proposals`}</h2>
-                        <BrowseAllSignInButton count={rfpStore.totalResults}/>
+                        {/* <BrowseAllSignInButton count={rfpStore.totalResults}/> */}
+                        <Link href={'/marketplace/rfps'}>
+                            <Button
+                                variant="secondary"
+                                className="justify-self-end self-end"
+                            >
+                                {(rfpStore.totalResults && rfpStore.totalResults > 0 )
+                                    ? (`Browse all ${formatMoney(rfpStore.totalResults)}`) 
+                                    : (`Browse all`)}
+                                <ArrowRight />
+                            </Button>
+                        </Link>
                     </div>
                     <ol className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {(rfpsInitialized && ([...(rfpStore.featured || []), ...(rfpStore.searchResults || [])].length > 0))
