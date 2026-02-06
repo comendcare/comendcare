@@ -121,7 +121,7 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
                         ))}
 
                         {(filters.stages || []).map((item) => (
-                            <Badge key={`stages-${item.value}`} variant="secondary" className="text-xs">
+                            <Badge key={`stages-${item.value}`} variant={item.variant || "secondary"} className="text-xs">
                                 {item.label}
                                 <button
                                     onClick={() => removeFilterItem("stages", item.value)}
