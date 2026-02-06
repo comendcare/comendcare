@@ -3,6 +3,7 @@ import {Globe, Lock, Link as LinkIcon, ExternalLink, Building} from "lucide-reac
 import * as React from "react";
 import {DataTableColumnHeader} from "./../data-table/data-table-column-header";
 import {
+    MILESTONE_TYPE_OPTIONS,
     RESEARCH_PLAN_STATUS,
     RESEARCH_PLAN_TYPES,
     RESEARCH_STAGE,
@@ -223,11 +224,14 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                 />
             ),
             cell: ({row}) => {
+                const featuredProjectTypes = ['BIOMARKER', 'EFFICASYSTUDY', 'NATURALHISTORYSTUDY', 'GPMANUFACTURING', 'TOXICOLOGYSTUDY', 'INDSUBMISSION']
+                const milestoneTypes = row.original.milestones?.flatMap((milestone: any) => milestone?.types)?.map((type: any) => type?.milestoneType?.id)?.filter((typeVal: string) => featuredProjectTypes.includes(typeVal))
                 const numPrivateProjects = row.original.milestones.filter((milestone: Milestone) => milestone.private).length
                 const numPublishedProjects = row.original.milestones.filter((milestone: Milestone) => !milestone.private).length
                 return (
                     (numPrivateProjects > 0 || numPublishedProjects > 0)
                         ? (
+                            <div className="flex gap-6">
                             <div className="flex flex-col gap-2 justify-center text-nowrap">
                                 {numPrivateProjects > 0 && (
                                     <Tooltip>
@@ -259,6 +263,10 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                                         </TooltipContent>
                                     </Tooltip>
                                 )}
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                {MILESTONE_TYPE_OPTIONS.filter(option => milestoneTypes.includes(option.id)).map(option => <Badge variant="lightBlue">{option.label}</Badge>)}
+                            </div>
                             </div>
                         )
                         : (<p>{'--'}</p>)
