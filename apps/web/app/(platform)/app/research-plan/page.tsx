@@ -38,13 +38,15 @@ export default async function RoadmapPage(props: IndexPageProps) {
                 description: true,
                 published: true,
                 organizationId: true,
-                milestones: true,
                 organization: true,
                 modalities: true,
                 stages: true,
                 statuses: true,
                 partners: true,
                 links: true,
+                milestones: {
+                    include: {types: {include: {milestoneType: true}}}
+                }
             },
             {...search, q: globalFilter, filters: validFilters},
             false,

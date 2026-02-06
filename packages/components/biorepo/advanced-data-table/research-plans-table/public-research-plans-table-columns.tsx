@@ -1,7 +1,7 @@
 import type {ColumnDef} from "@tanstack/react-table";
 import * as React from "react";
 import {DataTableColumnHeader} from "./../data-table/data-table-column-header";
-import {Milestone, RESEARCH_PLAN_STATUS, RESEARCH_PLAN_TYPES, RESEARCH_STAGE} from "./../../../../../packages/lib/types";
+import {Milestone, MILESTONE_TYPE_OPTIONS, RESEARCH_PLAN_STATUS, RESEARCH_PLAN_TYPES, RESEARCH_STAGE} from "./../../../../../packages/lib/types";
 import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
 import { Badge } from "./../../../ui/badge";
@@ -240,10 +240,13 @@ export function useResearchPlansTableColumns(
                 />
             ),
             cell: ({row}) => {
+                const featuredProjectTypes = ['BIOMARKER', 'EFFICASYSTUDY', 'NATURALHISTORYSTUDY', 'GPMANUFACTURING', 'TOXICOLOGYSTUDY', 'INDSUBMISSION']
+                const milestoneTypes = row.original.milestones?.flatMap((milestone: any) => milestone?.types)?.map((type: any) => type?.milestoneType?.id)?.filter((typeVal: string) => featuredProjectTypes.includes(typeVal))
                 const numPublishedProjects = row.original.milestones.filter((milestone: Milestone) => !milestone.private).length
                 return (
                     (numPublishedProjects > 0)
                         ? (
+                            <div className="flex gap-6">
                             <div className="flex flex-col gap-2 justify-center text-nowrap">
                                 <Tooltip>
                                     <TooltipTrigger>
@@ -258,6 +261,10 @@ export function useResearchPlansTableColumns(
                                         <p>{numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}</p>
                                     </TooltipContent>
                                 </Tooltip>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                {MILESTONE_TYPE_OPTIONS.filter(option => milestoneTypes.includes(option.id)).map(option => <Badge variant="lightBlue">{option.label}</Badge>)}
+                            </div>
                             </div>
                         )
                         : (<p>{'--'}</p>)
