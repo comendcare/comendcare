@@ -1,10 +1,13 @@
 import type {ColumnDef} from "@tanstack/react-table";
 import {
     CircleDashed,
+    ExternalLink,
     FileText,
     Globe,
     Info,
     Lock,
+    User,
+    Link as LinkIcon,
 } from "lucide-react";
 import * as React from "react";
 import {
@@ -34,6 +37,7 @@ import { filterColumns } from "@comend/lib/filter-columns";
 import { generateId } from "@comend/lib/id";
 import { ExtendedColumnFilter } from "@comend/lib/types/data-table";
 import { Session } from "next-auth";
+import { SeeMoreDescription } from "./../../../../../packages/components/see-more-description";
 
 export function useBiosamplesTableColumns({session}: {session: Session | null}): ColumnDef<any>[] {
     const columns: ColumnDef<any>[] = [
@@ -143,8 +147,8 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 items-center">
-                    <img className="size-8 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${row.original.donorId}`} alt="User Avatar" />
-                    <p>{row.original.donorId}</p>
+                    {row.original.donorId && <img className="size-8 rounded-full" src={`https://api.dicebear.com/8.x/shapes/svg?seed=${row.original.donorId}`} alt="User Avatar" />}
+                    <p>{row.original.donorId || '--'}</p>
                 </div>
             ),
             enableHiding: true,
@@ -160,6 +164,9 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     title="Internal donor ID" 
                     tooltip="Optional internal ID for your organization’s tracking system. Not guaranteed to be unique or visible outside your organization."
                 />
+            ),
+            cell: ({row}) => (
+                <p>{row.original.donor?.internalId || '--'}</p>
             ),
             enableHiding: true,
             enableSorting: false,
@@ -178,7 +185,7 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
             ),
             cell: ({row}) => (
                 <div className="flex gap-2 items-center">
-                    <p>{row.original.id || 'No Sample ID'}</p>
+                    <p>{row.original.id || '--'}</p>
                 </div>
             ),
             enableHiding: true,
@@ -194,16 +201,14 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     title="Type"
                 />
             ),
-            cell: ({row}) => (
-                <>
-                    {(row.original.types || []).map((type: string, index: number) => {
-                        const typeOption = BIOSAMPLE_TYPE_OPTIONS.find(t => t.value === type)
-                        return (
-                            <MilestoneTypeBadge label={typeOption?.label} key={index}/>
-                        )
-                    })}
-                </>
-            ),
+            cell: ({row}) => {
+                const options = BIOSAMPLE_TYPE_OPTIONS.filter(option => row.original.types?.includes(option.value))
+                return (
+                    (options && options.length > 0)
+                        ? (options.map((option, index) => <MilestoneTypeBadge label={option?.label} key={index}/>))
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
@@ -223,15 +228,18 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     title="Gene"
                 />
             ),
-            cell: ({row}) => (
-                <>
-                    {row.original.gene?.symbol && (
-                        <Badge variant={"teal"}>
-                            {row.original.gene.symbol}
-                        </Badge>
-                    )}
-                </>
-            ),
+            cell: ({row}) => {
+                const gene = row.original.gene?.symbol
+                return (
+                    (gene && gene.length > 0)
+                        ? (
+                            <Badge variant={"teal"}>
+                                {gene}
+                            </Badge>
+                        )
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
@@ -252,6 +260,9 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     title="Genotype"
                 />
             ),
+            cell: ({row}) => (
+                <p>{row.original.genotype || '--'}</p>
+            ),
             enableHiding: true,
             meta: { label: "Genotype" }
         },
@@ -264,6 +275,9 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     column={column} 
                     title="BSI ID"
                 />
+            ),
+            cell: ({row}) => (
+                <p>{row.original.bsiId || '--'}</p>
             ),
             enableHiding: true,
             meta: { label: "BSI ID" }
@@ -278,15 +292,18 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     title="Sex"
                 />
             ),
-            cell: ({row}) => (
-                <>
-                    {DONOR_SEX_OPTIONS.find(t => t.value === row.original.donor?.sex)?.label && (
-                        <Badge>
-                            {DONOR_SEX_OPTIONS.find(t => t.value === row.original.donor?.sex)?.label}
-                        </Badge>
-                    )}
-                </>
-            ),
+            cell: ({row}) => {
+                const sex = DONOR_SEX_OPTIONS.find(t => t.value === row.original.donor?.sex)
+                return (
+                    (sex)
+                        ? (
+                            <Badge>
+                                {sex.label}
+                            </Badge>
+                        )
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableHiding: true,
             enableColumnFilter: true,
             enableSorting: false,
@@ -308,15 +325,18 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     title="Race"
                 />
             ),
-            cell: ({row}) => (
-                <>
-                    {DONOR_RACE_OPTIONS.find(t => t.value === row.original.donor?.race)?.label && (
-                        <Badge>
-                            {DONOR_RACE_OPTIONS.find(t => t.value === row.original.donor?.race)?.label}
-                        </Badge>
-                    )}
-                </>
-            ),
+            cell: ({row}) => {
+                const race = DONOR_RACE_OPTIONS.find(t => t.value === row.original.donor?.race)
+                return (
+                    (race)
+                        ? (
+                            <Badge>
+                                {race.label}
+                            </Badge>
+                        )
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableHiding: true,
             enableColumnFilter: true,
             enableSorting: false,
@@ -338,21 +358,28 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     title="Diagnoses"
                 />
             ),
-            cell: ({row}) => (
-                <ul className="flex flex-col gap-2">
-                    {row.original.donor?.diagnoses?.map((diagnosis: any, index: number) => {
-                        const severityOption = DIAGNOSIS_SEVERITY_OPTIONS.find(option => option.value === diagnosis.severity)
-                        return (
-                            <li key={index} className="flex gap-2 items-center">
-                                <Badge>
-                                    {diagnosis?.type?.label} 
-                                </Badge>
-                                {severityOption && <Badge>{severityOption.label}</Badge>}
-                            </li>
+            cell: ({row}) => {
+                const diagnoses = row.original.donor?.diagnoses
+                return (
+                    (diagnoses && diagnoses.length > 0)
+                        ? (
+                            <ul className="flex flex-col gap-2">
+                                {diagnoses.map((diagnosis: any, index: number) => {
+                                    const severityOption = DIAGNOSIS_SEVERITY_OPTIONS.find(option => option.value === diagnosis.severity)
+                                    return (
+                                        <li key={index} className="flex gap-2 items-center">
+                                            <Badge>
+                                                {diagnosis?.type?.label} 
+                                            </Badge>
+                                            {severityOption && <Badge>{severityOption.label}</Badge>}
+                                        </li>
+                                    )
+                                })}
+                            </ul>
                         )
-                    })}
-                </ul>
-            ),
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
             enableHiding: true,
             enableColumnFilter: true,
@@ -392,20 +419,17 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     title="Total available quantity"
                 />
             ),
-            cell: ({row}) => (
-                <>
-                    {
-                        (
-                            row.original.quantity !== null && 
-                            row.original.quantity !== undefined && 
-                            row.original.quantityUnit && 
-                            row.original.quantity >= 0 
+            cell: ({row}) => {
+                const quantity = row.original.quantity
+                const quantityUnit = row.original.quantityUnit
+                return (
+                    (quantity !== null && quantity !== undefined && quantity > 0 && quantityUnit)
+                        ? (
+                            <p>{`${quantity} ${QUANTITY_OPTIONS.find(option => option.value === quantityUnit)?.label || quantityUnit}`}</p>
                         )
-                            ? `${row.original.quantity} ${QUANTITY_OPTIONS.find(option => option.value === row.original.quantityUnit)?.label || row.original.quantityUnit}`
-                            : ``
-                    }
-                </>
-            ),
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableHiding: true,
             enableColumnFilter: true,
             meta: {
@@ -445,14 +469,16 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                 />
             ),
             cell: ({row}) => {
+                const institution = row.original.institution?.name
+                const company = row.original.company?.title
                 return (
-                    <>
-                    {(row.original.institution?.name || row.original.company?.title) && (
-                        <Badge>
-                            {row.original.institution?.name || row.original.company?.title}
-                        </Badge>
-                    )}
-                    </>
+                    (institution || company)
+                        ? (
+                            <Badge>
+                                {institution || company}
+                            </Badge>
+                        )
+                        : (<p>{'--'}</p>)
                 )
             },
             enableHiding: true,
@@ -492,15 +518,23 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     title="Point of contact"
                 />
             ),
-            cell: ({row}) => (
-                <ul className="flex flex-col gap-2">
-                    {row.original.contacts?.map((contact: any, index: number) => (
-                        <li key={index}>
-                            {contact.name || contact.email || contact.affiliation}
-                        </li>
-                    ))}
-                </ul>
-            ),
+            cell: ({row}) => {
+                const contacts = row.original.contacts
+                return (
+                    (contacts && contacts.length > 0)
+                        ? (
+                            <ul className="flex flex-col gap-2">
+                                {row.original.contacts?.map((contact: any, index: number) => (
+                                    <li key={index} className="flex items-center gap-2">
+                                        <User className="h-4 min-h-4 w-4 min-w-4"/>
+                                        {contact.name || contact.email || contact.affiliation}
+                                    </li>
+                                ))}
+                            </ul>
+                        )
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
             enableHiding: true,
             meta: { label: "Point of contact" }
@@ -515,22 +549,31 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     title="Links"
                 />
             ),
-            cell: ({row}) => (
-                <ul className="flex flex-col gap-2">
-                    {row.original.attachments?.map((attachment: any, index: number) => (
-                        <li key={index}>
-                            <Link 
-                                className="line-clamp-1 underline text-ellipsis text-nowrap max-w-[250px]" 
-                                href={attachment.link || "/"}
-                                target="_blank"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                            {attachment.name || attachment.link}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            ),
+            cell: ({row}) => {
+                const attachments = row.original.attachments
+                return (
+                    (attachments && attachments.length > 0)
+                        ? (
+                            <ul className="flex flex-col gap-2">
+                                {row.original.attachments?.map((attachment: any, index: number) => (
+                                    <li key={index} className="flex items-center gap-2">
+                                        <LinkIcon className="h-4 min-h-4 w-4 min-w-4"/>
+                                        <Link 
+                                            className="line-clamp-2 underline" 
+                                            href={attachment.link || "/"}
+                                            target="_blank"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                        {attachment.name || attachment.link}
+                                        </Link>
+                                        <ExternalLink className="h-4 min-h-4 w-4 min-w-4"/>
+                                    </li>
+                                ))}
+                            </ul>
+                        )
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
             enableHiding: true,
             meta: { label: "Links" }
@@ -545,18 +588,25 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     title="Linked projects"
                 />
             ),
-            cell: ({row}) => (
-                <ul className="flex flex-col gap-2">
-                    {row.original.milestones?.map((milestone: any, index: number) => (
-                        <li key={index}>
-                            <Badge variant={"purple"}>
-                                <FileText className="h-4 w-4 min-h-4 min-w-4"/>
-                                {milestone.milestone?.title || undefined}
-                            </Badge>
-                        </li>
-                    ))}
-                </ul>
-            ),
+            cell: ({row}) => {
+                const milestones = row.original.milestones
+                return (
+                    (milestones && milestones.length > 0)
+                        ? (
+                            <ul className="flex flex-col gap-2">
+                                {milestones.map((milestone: any, index: number) => (
+                                    <li key={index}>
+                                        <Badge variant={"purple"} className="">
+                                            <FileText className="h-4 w-4 min-h-4 min-w-4"/>
+                                            {milestone.milestone?.title || undefined}
+                                        </Badge>
+                                    </li>
+                                ))}
+                            </ul>
+                        )
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
             enableHiding: true,
             enableColumnFilter: true,
@@ -595,11 +645,14 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     title="Notes"
                 />
             ),
-            cell: ({row}) => (
-                <div className="line-clamp-3">
-                    {row.original.description}
-                </div>
-            ),
+            cell: ({row}) => {
+                const description = row.original.description
+                return (
+                    (description && description.length > 0)
+                        ? (<div className="w-fit min-w-[500px]"><SeeMoreDescription description={description}/></div>)
+                        : (<p>{'--'}</p>)
+                )
+            },
             meta: { label: "Notes" },
             enableHiding: true,
         },
@@ -613,11 +666,14 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                     title="Internal notes"
                 />
             ),
-            cell: ({row}) => (
-                <div className="line-clamp-3">
-                    {row.original.notes}
-                </div>
-            ),
+            cell: ({row}) => {
+                const internalNotes = row.original.notes
+                return (
+                    (internalNotes && internalNotes.length > 0)
+                        ? (<div className="w-fit min-w-[500px]"><SeeMoreDescription description={internalNotes}/></div>)
+                        : (<p>{'--'}</p>)
+                )
+            },
             meta: { label: "Internal notes" },
             enableHiding: true,
         },
