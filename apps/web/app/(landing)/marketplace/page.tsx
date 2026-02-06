@@ -18,7 +18,7 @@ import Link from "next/link"
 import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
 import { OrganizationMarketplaceCard } from "@comend/components/marketplace/marketplace-pag-card"
-import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeRFPSearch } from "@comend/lib/initialize-client-state"
+import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeResearchPlanSearch, initializeRFPSearch } from "@comend/lib/initialize-client-state"
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
 import { RFPCard } from "@comend/components/rfp-card"
 import { mixpanelTrack } from "@comend/lib/mixpanel"
@@ -28,6 +28,9 @@ import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore
 import { CROMarketplaceCard } from "@comend/components/marketplace/marketplace-cro-card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@comend/components/ui/dropdown-menu"
 import { formatMoney } from "@comend/lib/utils"
+import { ResearchPlanSearchState, useResearchPlanSearchStore } from "@/state/search/researchPlanSearchStore"
+import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/public-research-plans-table-columns"
+import { TypesenseResearchPlansTable } from "@comend/components/biorepo/advanced-data-table/research-plans-table/typesense-research-plans-table"
 
 const croSelector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -67,6 +70,12 @@ const rfpSelector = (state: RFPSearchState) => ({
     totalResults: state.totalResults,
 })
 
+const researchPlanSelector = (state: ResearchPlanSearchState) => ({
+    setSearchTerm: state.setSearchTerm,
+    searchResults: state.searchResults,
+    totalResults: state.totalResults,
+})
+
 export default function MarketplacePage() {
     // const {data: session, status} = useSession()
     const croStore = useCROSearchStore(useShallow(croSelector))
@@ -75,6 +84,7 @@ export default function MarketplacePage() {
     const diseaseModelStore = useDiseaseModelSearchStore(useShallow(diseaseModelSelector))
     const clinicalDatasetStore = useClinicalDatasetSearchStore(useShallow(clinicalDatsetSelector))
     const rfpStore = useRFPSearchStore(useShallow(rfpSelector))
+    const researchPlanStore = useResearchPlanSearchStore(useShallow(researchPlanSelector))
 
     const biosampleColumns = useBiosamplesTableColumns(
         false, // disable sorting
@@ -88,17 +98,28 @@ export default function MarketplacePage() {
         false, // disable sorting,
         false, // disable hiding
     )
+    const researchPlanColumns = useResearchPlansTableColumns(
+        false, // disable sorting,
+        false, // disable hiding
+    )
     const [crosInitialized, setCROsInitialized] = useState(false)
     const [pagsInitialized, setPagsInitialized] = useState(false)
     const [biosamplesInitialized, setBiosamplesInitialized] = useState(false)
     const [diseaseModelsInitialized, setDiseaseModelsInitialized] = useState(false)
     const [clinicalDatasetsInitialized, setClinicalDatasetsInitialized] = useState(false)
     const [rfpsInitialized, setRfpsInitialized] = useState(false)
+    const [researchPlansInitialized, setResearchPlansInitialized] = useState(false)
     const [width, setWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 0)
 
     useEffect(() => {
         const init = async () => {
             console.log(`start init...`)
+            const parsedResearchPlanFilters = {
+                stages: [] as any[],
+                statuses: [] as any[],
+                modalities: [] as any[],
+            }
+
             const parsedPAGFilters = {
                 genes: [] as any[],
                 conditions: [] as any[],
@@ -106,9 +127,6 @@ export default function MarketplacePage() {
                 mechanisms: [] as any[],
                 modalities: [] as any[],
             }
-            await initializeOrganizationSearch(parsedPAGFilters)
-            setPagsInitialized(true)
-            console.log(`Organization search initialized...`)
 
             const parsedBiosampleFilters = {
                 types: [] as any[],
@@ -116,9 +134,6 @@ export default function MarketplacePage() {
                 conditions: [] as any[],
                 organizations: [] as any[],
             }
-            await initializeBiosampleSearch(parsedBiosampleFilters)
-            setBiosamplesInitialized(true)
-            console.log(`Biosample search initialized...`)
 
             const parsedDiseaseModelFilters = {
                 types: [] as any[],
@@ -126,9 +141,6 @@ export default function MarketplacePage() {
                 conditions: [] as any[],
                 organizations: [] as any[],
             }
-            await initializeDiseaseModelSearch(parsedDiseaseModelFilters)
-            setDiseaseModelsInitialized(true)
-            console.log(`Disease Model search initialized...`)
 
             const parsedClinicalDatasetFilters = {
                 types: [] as any[],
@@ -136,9 +148,6 @@ export default function MarketplacePage() {
                 conditions: [] as any[],
                 organizations: [] as any[]
             }
-            await initializeClinicalDatasetSearch(parsedClinicalDatasetFilters)
-            setClinicalDatasetsInitialized(true)
-            console.log(`Clinical Dataset search initialized...`)
 
             const parsedRFPFilters = {
                 conditions: [],
@@ -147,10 +156,7 @@ export default function MarketplacePage() {
                 status: [],
                 organizations: []
             }
-            initializeRFPSearch(parsedRFPFilters)
-            setRfpsInitialized(true)
-            console.log(`RFP search initialized...`)
-            
+
             const parsedCROFilters = {
                 categories: [] as any[],
                 milestoneTypes: [] as any[],
@@ -158,9 +164,24 @@ export default function MarketplacePage() {
                 certifications: [] as any[],
                 tags: [] as any[],
             }
-            await initializeCROSearch(parsedCROFilters)
+
+            await Promise.all([
+                initializeResearchPlanSearch(parsedResearchPlanFilters),
+                initializeOrganizationSearch(parsedPAGFilters),
+                initializeBiosampleSearch(parsedBiosampleFilters),
+                initializeDiseaseModelSearch(parsedDiseaseModelFilters),
+                initializeClinicalDatasetSearch(parsedClinicalDatasetFilters),
+                initializeCROSearch(parsedCROFilters),
+                initializeRFPSearch(parsedRFPFilters),
+            ]);
+
+            setResearchPlansInitialized(true)
+            setPagsInitialized(true)
+            setBiosamplesInitialized(true)
+            setDiseaseModelsInitialized(true)
+            setClinicalDatasetsInitialized(true)
+            setRfpsInitialized(true)
             setCROsInitialized(true)
-            console.log(`CRO search initialized...`)
         }
 
         init()
@@ -260,6 +281,55 @@ export default function MarketplacePage() {
     return (
         <div className="flex flex-col w-full h-full mx-auto gap-8">
             <div className="flex flex-col gap-8">
+                <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center gap-4">
+                        <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Research plans`}</h2>
+                        <BrowseAllSignInButton count={biosampleStore.totalResults}/>
+                    </div>
+                    <ol className="w-full">
+                        {(researchPlansInitialized && researchPlanStore.searchResults && researchPlanStore.searchResults.length > 0 )
+                            ? (
+                                <>
+                                    <div className="max-w-7xl w-full overflow-auto">
+                                        <TypesenseResearchPlansTable 
+                                            showPagination={false} 
+                                            data={researchPlanStore.searchResults?.slice(0, 3)} 
+                                            pageCount={1} 
+                                            columns={researchPlanColumns} 
+                                            searchParams={{}}
+                                        />
+                                    </div>
+                                </>
+                            )
+                            : (
+                                (researchPlansInitialized && researchPlansInitialized)
+                                    ? (
+                                        <Card className="h-[286px] w-full">
+                                            <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
+                                                <CardTitle>Add research plans!</CardTitle>
+                                                <Button
+                                                    className="w-fit"
+                                                    variant={'secondary'}
+                                                    asChild
+                                                >
+                                                    {/* <Link href={"/#contact"}> */}
+                                                    <Link href={"/app/research-plans"}>
+                                                        Research Plans
+                                                    </Link>
+                                                </Button>
+                                            </CardContent>
+                                        </Card>
+                                    )
+                                    : (
+                                        <>
+                                            <Skeleton className="h-[286px] w-full"/>
+                                        </>
+                                    )
+                            )
+                        }
+                    </ol>
+                </div>
+
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-md font-semibold md:font-normal md:text-2xl semibold">{`Patient groups`}</h2>

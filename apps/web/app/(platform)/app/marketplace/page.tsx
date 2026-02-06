@@ -17,12 +17,15 @@ import {useEffect, useState} from "react"
 import { useShallow } from "zustand/react/shallow"
 import { CROMarketplaceCard } from "@comend/components/marketplace/marketplace-cro-card"
 import { OrganizationMarketplaceCard } from "@comend/components/marketplace/marketplace-pag-card"
-import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeRFPSearch } from "@comend/lib/initialize-client-state"
+import { initializeBiosampleSearch, initializeClinicalDatasetSearch, initializeCROSearch, initializeDiseaseModelSearch, initializeOrganizationSearch, initializeResearchPlanSearch, initializeRFPSearch } from "@comend/lib/initialize-client-state"
 import { RFPCard } from "@comend/components/rfp-card"
 import { RFPSearchState, useRFPSearchStore } from "@/state/search/rfpSearchStore"
 import { Dialog, DialogContent, DialogTrigger } from "@comend/components/ui/dialog"
 import { mixpanelTrack } from "@comend/lib/mixpanel"
 import dynamic from "next/dynamic"
+import { ResearchPlanSearchState, useResearchPlanSearchStore } from "@/state/search/researchPlanSearchStore"
+import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/public-research-plans-table-columns"
+import { TypesenseResearchPlansTable } from "@comend/components/biorepo/advanced-data-table/research-plans-table/typesense-research-plans-table"
 
 const TypesenseBiosamplesTable = dynamic(
     () => import("@comend/components/biorepo/advanced-data-table/biosamples-table/typesense-biosamples-table")
@@ -80,6 +83,12 @@ const rfpSelector = (state: RFPSearchState) => ({
     searchResults: state.searchResults,
 })
 
+const researchPlanSelector = (state: ResearchPlanSearchState) => ({
+    setSearchTerm: state.setSearchTerm,
+    searchResults: state.searchResults,
+    totalResults: state.totalResults,
+})
+
 export default function MarketplacePage() {
     // const {data: session, status} = useSession()
     const croStore = useCROSearchStore(useShallow(croSelector))
@@ -88,6 +97,7 @@ export default function MarketplacePage() {
     const diseaseModelStore = useDiseaseModelSearchStore(useShallow(diseaseModelSelector))
     const clinicalDatasetStore = useClinicalDatasetSearchStore(useShallow(clinicalDatsetSelector))
     const rfpStore = useRFPSearchStore(useShallow(rfpSelector))
+    const researchPlanStore = useResearchPlanSearchStore(useShallow(researchPlanSelector))
 
     const biosampleColumns = useBiosamplesTableColumns(
         false, // disable sorting
@@ -101,12 +111,17 @@ export default function MarketplacePage() {
         false, // disable sorting,
         false, // disable hiding
     )
+    const researchPlanColumns = useResearchPlansTableColumns(
+        false, // disable sorting,
+        false, // disable hiding
+    )
     const [crosInitialized, setCROsInitialized] = useState(false)
     const [pagsInitialized, setPagsInitialized] = useState(false)
     const [biosamplesInitialized, setBiosamplesInitialized] = useState(false)
     const [diseaseModelsInitialized, setDiseaseModelsInitialized] = useState(false)
     const [clinicalDatasetsInitialized, setClinicalDatasetsInitialized] = useState(false)
     const [rfpsInitialized, setRfpsInitialized] = useState(false)
+    const [researchPlansInitialized, setResearchPlansInitialized] = useState(false)
     const [width, setWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 0)
 
     useEffect(() => {
@@ -123,6 +138,12 @@ export default function MarketplacePage() {
     useEffect(() => {
         const init = async () => {
             console.log(`start init...`)
+            const parsedResearchPlanFilters = {
+                stages: [] as any[],
+                statuses: [] as any[],
+                modalities: [] as any[],
+            }
+
             const parsedPAGFilters = {
                 genes: [] as any[],
                 conditions: [] as any[],
@@ -169,6 +190,7 @@ export default function MarketplacePage() {
             }
 
             await Promise.all([
+                initializeResearchPlanSearch(parsedResearchPlanFilters),
                 initializeOrganizationSearch(parsedPAGFilters),
                 initializeBiosampleSearch(parsedBiosampleFilters),
                 initializeDiseaseModelSearch(parsedDiseaseModelFilters),
@@ -177,6 +199,7 @@ export default function MarketplacePage() {
                 initializeRFPSearch(parsedRFPFilters),
             ]);
 
+            setResearchPlansInitialized(true)
             setPagsInitialized(true)
             setBiosamplesInitialized(true)
             setDiseaseModelsInitialized(true)
@@ -193,6 +216,61 @@ export default function MarketplacePage() {
     return (
         <div className="flex flex-col w-full h-full mx-auto gap-8">
             <div className="flex flex-col gap-8 pb-8">
+                <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center gap-4">
+                        <h2 className="text-2xl semibold">Research plans</h2>
+                        <Button asChild variant={"secondary"} className="justify-self-end self-end">
+                            <Link
+                                href={"/app/marketplace/research-plans"}
+                            >
+                                Browse all research plans
+                                <ArrowRight />
+                            </Link>
+                        </Button>
+                    </div>
+                    <ol className="w-full">
+                        {(researchPlansInitialized && researchPlanStore.searchResults && researchPlanStore.searchResults.length > 0 )
+                            ? (
+                                <>
+                                    <div className="max-w-7xl w-full overflow-auto">
+                                        <TypesenseResearchPlansTable
+                                            showPagination={false}
+                                            data={researchPlanStore.searchResults?.slice(0, 3)}
+                                            pageCount={1}
+                                            columns={researchPlanColumns}
+                                            searchParams={{}}
+                                        />
+                                    </div>
+                                </>
+                            )
+                            : (
+                                (researchPlansInitialized && researchPlansInitialized )
+                                    ? (
+                                        <Card className="h-[286px] w-full">
+                                            <CardContent className="h-full w-full flex flex-col justify-center items-center text-center gap-4">
+                                                <CardTitle>Add research plans!</CardTitle>
+                                                <Button
+                                                    className="w-fit"
+                                                    variant={'secondary'}
+                                                    asChild
+                                                >
+                                                    <Link href={"/app/research-plans"}>
+                                                        Patient research plans toolkit
+                                                    </Link>
+                                                </Button>
+                                            </CardContent>
+                                        </Card>
+                                    )
+                                    : (
+                                        <>
+                                            <Skeleton className="h-[286px] w-full"/>
+                                        </>
+                                    )
+                            )
+                        }
+                    </ol>
+                </div>
+
                 <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-4">
                         <h2 className="text-2xl semibold">Patient groups</h2>
