@@ -21,6 +21,35 @@ import {formatDistanceToNowStrict} from "date-fns";
 import Papa from "papaparse";
 import type {Member, RFP} from "@prisma/client";
 
+/* 
+    Determine if a field on an object has a value (i.e. is filled)
+    Used to calculate `filledFields` property for marketplace sort.
+ */
+export const isFilled = (value: unknown): number => {
+  if (value === null || value === undefined) return 0;
+
+  if (typeof value === 'string') return (value.trim().length > 0 ? 1 : 0);
+  if (Array.isArray(value)) return (value.length > 0 ? 1 : 0);
+  if (typeof value === 'number') return 1; // 0 still counts
+  if (typeof value === 'boolean') return 1;
+  if (value instanceof Date) return (!isNaN(value.getTime()) ? 1 : 0);
+
+  return 1;
+};
+
+export const getNestedValue = (obj: unknown, path: string): unknown => {
+  if (!obj || typeof obj !== 'object') return undefined;
+
+  return path
+    .split('.')
+    .reduce<unknown>((acc, key) => {
+      if (acc && typeof acc === 'object' && key in acc) {
+        return (acc as Record<string, unknown>)[key];
+      }
+      return undefined;
+    }, obj);
+};
+
 export const isClaimed = (members: Member[]) => {
     return (members.filter((member: Member) => !member.email.includes('comendcare.com'))?.length > 0)
 }

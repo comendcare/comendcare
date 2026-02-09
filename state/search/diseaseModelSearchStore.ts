@@ -106,7 +106,7 @@ const getUpdatedSearchResults = async (
             }
         }
 
-        sortByList.push(`createdAt:desc`)
+        sortByList.push(`fieldsFilled:desc,createdAt:desc`)
         const sortBy = sortByList.join(`,`)
 
         console.log(`SORT BY`, sortBy)

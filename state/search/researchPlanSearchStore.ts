@@ -74,7 +74,7 @@ function generateFiltersString(filters: FiltersType): string {
 }
 
 const sortByFilters: { [key: string]: string } = {
-    "default": "updatedAt:desc",
+    "default": "fieldsFilled:desc,updatedAt:desc",
 }
 
 async function withRetry<T>(
@@ -99,7 +99,7 @@ const getUpdatedSearchResults = async (
         state: any,
         isNewSearch: boolean = true
     ) => {
-        let sortByList = []
+        let sortByList: string[] = []
         const filtersString = generateFiltersString(state.filters)
 
         if (state.sortBy) {
@@ -112,7 +112,7 @@ const getUpdatedSearchResults = async (
             }
         }
 
-        sortByList.push(`updatedAt:desc`)
+        if (sortByList.length === 0) sortByList.push(`fieldsFilled:desc,updatedAt:desc`)
         const sortBy = sortByList.join(`,`)
 
         const searchParameters = {
