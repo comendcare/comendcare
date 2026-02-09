@@ -570,7 +570,13 @@ export const syncToTypesense = async (env: {
                     type: "string",
                     sort: true,
                     optional: true,
-                }
+                },
+                {
+                    name: "fieldsFilled",
+                    type: "int32",
+                    sort: true,
+                    optional: true
+                },
             ]
         }
         const clinicalDatasetSchema = {
@@ -954,10 +960,13 @@ export const syncToTypesense = async (env: {
                 genotype: true,
                 strain: true,
                 createFacilityRequests: true,
+                attachments: true,
+                contacts: true,
             }
         })
         console.log('Raw disease models data:', diseaseModels)
         if (diseaseModels.length > 0) {
+            const diseaseModelKeys = ['id', 'types', 'strain', 'gene', 'genotype', 'organization', 'organization.conditions', 'company', 'institution', 'contacts', 'attachments', 'description']
             const uploadDiseaseModels = diseaseModels.map(diseaseModel => ({
                 ...diseaseModel,
                 id_sort: stringToSortableInt(diseaseModel.id),
@@ -971,6 +980,10 @@ export const syncToTypesense = async (env: {
                 condition: diseaseModel.organization?.conditions && diseaseModel.organization.conditions.length > 0 && diseaseModel.organization.conditions[0].condition,
                 genotype: {genotype: diseaseModel.genotype},
                 strain: {strain: diseaseModel.strain},
+                fieldsFilled: diseaseModelKeys.reduce((acc, path) => {
+                    const value = getNestedValue(diseaseModel, path)
+                    return acc + isFilled(value)
+                }, 0)
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', uploadDiseaseModels);
         } else {
