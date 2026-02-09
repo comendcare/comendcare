@@ -14,6 +14,7 @@ import { useEffect, useState } from "react"
 import LoadingDots from "@comend/components/icons/loading-dots"
 import { addEmailCapture } from "@comend/lib/actions"
 import { toast } from "sonner"
+import mixpanel from "mixpanel-browser"
 
 interface ProjectLayoutProps {
     children: React.ReactNode
@@ -87,6 +88,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
 
                                 try {
                                     await addEmailCapture(form.getValues().email)
+                                    mixpanel.identify(form.getValues().email)
                                 } catch (error) {
                                     toast.error('Error submitting email address.')
                                     console.error(error)
