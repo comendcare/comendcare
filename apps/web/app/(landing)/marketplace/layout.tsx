@@ -84,20 +84,21 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
                             )}
                         />
                         <Button
-                            type="submit"
+                            // type="submit"
                             variant="cta"
                             onClick={async (e) => {
+                                e.preventDefault()
                                 if (!form.formState.isValid) {
                                     form.trigger()
                                     return
                                 }
-
-                                e.preventDefault()
                                 setLoading(true)
 
                                 await sleep(2000)
 
                                 // TODO: add email capture logic here...
+                                // window.functionalConsentedLocalStorage?.set("sidebar:state", openState)
+                                window.functionalConsentedLocalStorage?.set('emailCaptured', true)
 
                                 setLoading(false)
                                 setEmailCaptureOpen(false)
