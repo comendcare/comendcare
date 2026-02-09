@@ -3,7 +3,6 @@
 import {PublicMarketplaceNav} from "@comend/components/marketplace/marketplace-nav"
 import { TooltipProvider } from "@comend/components/ui/tooltip"
 import { Separator } from "@comend/components/ui/separator"
-import { Alert } from "@comend/components/ui/alert"
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@comend/components/ui/alert-dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@comend/components/ui/form"
 import { useForm } from "react-hook-form"
@@ -13,12 +12,8 @@ import { Input } from "@comend/components/ui/input"
 import { Button } from "@comend/components/ui/button"
 import { useEffect, useState } from "react"
 import LoadingDots from "@comend/components/icons/loading-dots"
-import { sleep } from "@comend/lib/utils"
-
-// export const metadata: Metadata = {
-//     title: "Comend",
-//     description: "Check out some examples app built using the components."
-// }
+import { addEmailCapture } from "@comend/lib/actions"
+import { toast } from "sonner"
 
 interface ProjectLayoutProps {
     children: React.ReactNode
@@ -48,10 +43,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     // Zustand state management
     return (
         <TooltipProvider>
-            {/* {(typeof window !== undefined && window?.functionalConsentedLocalStorage?.get('emailCapture')) ? (
-                <></>
-            ) : ( */}
-                <AlertDialog open={emailCaptureOpen}>
+            <AlertDialog open={emailCaptureOpen}>
                 <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>
@@ -84,7 +76,6 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
                             )}
                         />
                         <Button
-                            // type="submit"
                             variant="cta"
                             onClick={async (e) => {
                                 e.preventDefault()
@@ -94,10 +85,13 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
                                 }
                                 setLoading(true)
 
-                                await sleep(2000)
+                                try {
+                                    await addEmailCapture(form.getValues().email)
+                                } catch (error) {
+                                    toast.error('Error submitting email address.')
+                                    console.error(error)
+                                }
 
-                                // TODO: add email capture logic here...
-                                // window.functionalConsentedLocalStorage?.set("sidebar:state", openState)
                                 window.functionalConsentedLocalStorage?.set('emailCaptured', true)
 
                                 setLoading(false)
@@ -115,8 +109,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
                     </form>
                 </Form>
                 </AlertDialogContent>
-                </AlertDialog>
-            {/* )} */}
+            </AlertDialog>
             <div className="w-full flex justify-center">
                 <div className="max-w-7xl mt-16 lg:mt-28 h-full w-full flex flex-col items-center p-4 gap-4 md:gap-6">
                     <div className="flex w-full flex-col gap-4">
