@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic'; // Prevent caching
-import { checkDateRangeUTC, getSortRank, handleGetAvailability, stringToSortableInt } from "./utils";
+import { checkDateRangeUTC, getSortRank, handleGetAvailability, isFilled, stringToSortableInt } from "./utils";
 import prisma from "./prisma"
 import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, MILESTONE_TYPE_OPTIONS, MODALITIES, RESEARCH_PLAN_STATUS, RESEARCH_STAGE, RFP, TOOL_TYPE_OPTIONS } from "./types";
 
@@ -242,6 +242,18 @@ export const syncToTypesense = async (env: {
                     stem: false,
                     store: true,
                     type: "string[]"
+                },
+                {
+                    name: "fieldsFilled",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "int32"
                 },
             ],
         };
@@ -707,7 +719,6 @@ export const syncToTypesense = async (env: {
 
         if (organizations.length > 0) {
             console.log('Validating organization data...');
-
             // map orgs to include all required data
             const uploadOrgs = await Promise.all(organizations.map(async (org, index) => {
                 console.log(`Org ${index + 1}:`, org)
@@ -715,10 +726,10 @@ export const syncToTypesense = async (env: {
                     where: { id: org.id },
                     include: { 
                         conditions: {include: {condition: true}},
-                        roadmaps: true,
-                        milestones: true,
-                        tools: true,
-                        rfps: true
+                        roadmaps: {where: {private: false}},
+                        milestones: {where: {private: false}},
+                        tools: {where: {private: false}},
+                        rfps: {where: {private: false}},
                     }
                 })
 
@@ -737,11 +748,20 @@ export const syncToTypesense = async (env: {
                     organization.rfps.map(rfp => rfp.updatedAt.valueOf())
                 ))
 
-                return {
+                const finalOrg = {
                     ...organization,
                     updatedAt: orgUpdatedAt,
                     createdAt: organization.createdAt.valueOf(),
                     firstConditionPatientsEngaged,
+                    numPatientsEngaged: organization.conditions?.[0]?.condition?.numberOfPatientsEngaged
+                }
+
+                // const orgKeys = Object.keys(finalOrg)
+                const orgKeys = ['title', 'moneyDeployed', 'numPatientsEngaged', 'milestones', 'roadmaps', 'tools', 'rfps', 'conditions']
+                const fieldsFilled = orgKeys.reduce((acc: number, curr: string) => (acc + isFilled(finalOrg[curr as keyof typeof org])), 0)
+                return {
+                    ...finalOrg,
+                    fieldsFilled
                 }
             }))
 
