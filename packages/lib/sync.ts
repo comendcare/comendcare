@@ -704,7 +704,13 @@ export const syncToTypesense = async (env: {
                     name: "description",
                     type: "string",
                     sort: true,
-                }
+                },
+                {
+                    name: "fieldsFilled",
+                    type: "int32",
+                    sort: true,
+                    optional: true
+                },
             ]
         }
         const researcherSchema = {
@@ -1151,6 +1157,7 @@ export const syncToTypesense = async (env: {
         })
         console.log('Raw research plan data:', researchPlans)
         if (researchPlans.length > 0) {
+            const researchPlanKeys = ['organization', 'title', 'modalities', 'stages', 'statuses', 'partners', 'description', 'links', 'milestones']
             const uploadResearchPlans = researchPlans.map(researchPlan => ({
                 ...researchPlan,
                 createdAt: researchPlan.createdAt.getTime(), // special case for created at to enable sorting
@@ -1165,6 +1172,10 @@ export const syncToTypesense = async (env: {
                 statuses: RESEARCH_PLAN_STATUS
                     .filter((option: any) => researchPlan.statuses.includes(option.value))
                     .map((option: any) => option.label),
+                fieldsFilled: researchPlanKeys.reduce((acc, path) => {
+                    const value = getNestedValue(researchPlan, path)
+                    return acc + isFilled(value)
+                }, 0)
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'research-plans', uploadResearchPlans);
         } else {
