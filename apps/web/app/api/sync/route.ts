@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import prisma from "@comend/lib/prisma"
 import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, MILESTONE_TYPE_OPTIONS, MODALITIES, RESEARCH_PLAN_STATUS, RESEARCH_STAGE, RFP, TOOL_TYPE_OPTIONS } from '@comend/lib/types';
-import { checkDateRangeUTC, getSortRank, handleGetAvailability, isFilled, stringToSortableInt } from '@comend/lib/utils';
+import { checkDateRangeUTC, getNestedValue, getSortRank, handleGetAvailability, isFilled, stringToSortableInt } from '@comend/lib/utils';
 
 const sendTypeSenseRequest = async (
     url: string,
@@ -491,6 +491,12 @@ const syncToTypesense = async (env: {
                     sort: true,
                     optional: true,
                 },
+                {
+                    name: "fieldsFilled",
+                    type: "int32",
+                    sort: true,
+                    optional: true
+                },
             ]
         }
         const diseaseModelSchema = {
@@ -852,7 +858,7 @@ const syncToTypesense = async (env: {
                 },
                 id: true,
                 // only include public donor ID (no other donor information should be uploaded to typesense)
-                donor: {select: {id: true}},
+                donor: {select: {id: true, diagnoses: true}},
                 types: true,
                 gene: true,
                 genes: true,
@@ -863,10 +869,13 @@ const syncToTypesense = async (env: {
                 description: true,
                 genotype: true,
                 createFacilityRequests: true,
+                attachments: true,
+                contacts: true,
             }
         })
         console.log('Raw biosamples data:', biosamples)
         if (biosamples.length > 0) {
+            const biosampleKeys = ['id', 'donor', 'donor.diagnoses', 'types', 'gene', 'genotype', 'organization', 'quantity', 'company', 'institution', 'contacts', 'attachments']
             const uploadBiosamples = biosamples.map(biosample => ({
                 ...biosample,
                 id_sort: stringToSortableInt(biosample.id),
@@ -879,12 +888,16 @@ const syncToTypesense = async (env: {
                 // special case for conditions to enable sorting include only one condition
                 condition: biosample.organization?.conditions && biosample.organization.conditions.length > 0 && biosample.organization.conditions[0].condition,
                 genotype: {genotype: biosample.genotype},
+                fieldsFilled: biosampleKeys.reduce((acc, path) => {
+                    const value = getNestedValue(biosample, path)
+                    return acc + isFilled(value)
+                }, 0)
             }))
+            
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
         } else {
             console.log('No biosamples to import.');
         }
-
 
         /* UPDATE DISEASE MODELS ---------------------------------------------------------------------------------------- */
         console.log('Disease Model:', JSON.stringify(diseaseModelSchema, null, 2));

@@ -37,6 +37,19 @@ export const isFilled = (value: unknown): number => {
   return 1;
 };
 
+export const getNestedValue = (obj: unknown, path: string): unknown => {
+  if (!obj || typeof obj !== 'object') return undefined;
+
+  return path
+    .split('.')
+    .reduce<unknown>((acc, key) => {
+      if (acc && typeof acc === 'object' && key in acc) {
+        return (acc as Record<string, unknown>)[key];
+      }
+      return undefined;
+    }, obj);
+};
+
 export const isClaimed = (members: Member[]) => {
     return (members.filter((member: Member) => !member.email.includes('comendcare.com'))?.length > 0)
 }

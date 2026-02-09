@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic'; // Prevent caching
-import { checkDateRangeUTC, getSortRank, handleGetAvailability, isFilled, stringToSortableInt } from "./utils";
+import { checkDateRangeUTC, getNestedValue, getSortRank, handleGetAvailability, isFilled, stringToSortableInt } from "./utils";
 import prisma from "./prisma"
 import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, MILESTONE_TYPE_OPTIONS, MODALITIES, RESEARCH_PLAN_STATUS, RESEARCH_STAGE, RFP, TOOL_TYPE_OPTIONS } from "./types";
 
@@ -507,6 +507,12 @@ export const syncToTypesense = async (env: {
                     sort: true,
                     optional: true,
                 },
+                {
+                    name: "fieldsFilled",
+                    type: "int32",
+                    sort: true,
+                    optional: true
+                },
             ]
         }
         const diseaseModelSchema = {
@@ -868,7 +874,7 @@ export const syncToTypesense = async (env: {
                 },
                 id: true,
                 // only include public donor ID (no other donor information should be uploaded to typesense)
-                donor: {select: {id: true}},
+                donor: {select: {id: true, diagnoses: true}},
                 types: true,
                 gene: true,
                 genes: true,
@@ -879,10 +885,13 @@ export const syncToTypesense = async (env: {
                 description: true,
                 genotype: true,
                 createFacilityRequests: true,
+                attachments: true,
+                contacts: true,
             }
         })
         console.log('Raw biosamples data:', biosamples)
         if (biosamples.length > 0) {
+            const biosampleKeys = ['id', 'donor', 'donor.diagnoses', 'types', 'gene', 'genotype', 'organization', 'quantity', 'company', 'institution', 'contacts', 'attachments']
             const uploadBiosamples = biosamples.map(biosample => ({
                 ...biosample,
                 id_sort: stringToSortableInt(biosample.id),
@@ -895,7 +904,12 @@ export const syncToTypesense = async (env: {
                 // special case for conditions to enable sorting include only one condition
                 condition: biosample.organization?.conditions && biosample.organization.conditions.length > 0 && biosample.organization.conditions[0].condition,
                 genotype: {genotype: biosample.genotype},
+                fieldsFilled: biosampleKeys.reduce((acc, path) => {
+                    const value = getNestedValue(biosample, path)
+                    return acc + isFilled(value)
+                }, 0)
             }))
+            
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
         } else {
             console.log('No biosamples to import.');
