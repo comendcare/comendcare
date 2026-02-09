@@ -634,7 +634,13 @@ export const syncToTypesense = async (env: {
                     type: "int64",
                     sort: true,
                     optional: true,
-                }
+                },
+                {
+                    name: "fieldsFilled",
+                    type: "int32",
+                    sort: true,
+                    optional: true
+                },
             ]
         }
         const rfpSchema = {
@@ -1026,20 +1032,14 @@ export const syncToTypesense = async (env: {
                 types: true,
                 cohortSize: true,
                 createFacilityRequests: true,
+                attachments: true,
+                contacts: true,
             }
         })
         console.log('Raw clinical datasets data:', clinicalDatasets)
         if (clinicalDatasets.length > 0) {
+            const clinicalDatasetKeys = ['id', 'title', 'types', 'cohortSize', 'organization.conditions', 'organization', 'genes', 'company', 'institution', 'contacts', 'attachments', 'description']
             const uploadClinicalDatasets = clinicalDatasets.map(dataset => ({
-                // id: dataset.id,
-                // title: dataset.title,
-                // description: dataset.description,
-                // // types: dataset.types,
-                // types: TOOL_TYPE_OPTIONS.filter(option => dataset.types.includes(option.value)),
-                // gene: dataset.gene?.symbol,
-                // conditions: dataset.organization?.conditions?.map(condition => condition.condition?.name) || [],
-                // organization: dataset.organization
-
                 ...dataset,
                 id_sort: stringToSortableInt(dataset.id),
                 createdAt: dataset.createdAt.getTime(), // special case for created at to enable sorting
@@ -1051,7 +1051,11 @@ export const syncToTypesense = async (env: {
                 // special case for types to enable searching by label & sorting include all info, and only include one type
                 type: TOOL_TYPE_OPTIONS.filter(option => dataset.types.includes(option.value))[0],
                 // special case for conditions to enable sorting include only one condition
-                condition: dataset.organization?.conditions && dataset.organization.conditions.length > 0 && dataset.organization.conditions[0].condition
+                condition: dataset.organization?.conditions && dataset.organization.conditions.length > 0 && dataset.organization.conditions[0].condition,
+                fieldsFilled: clinicalDatasetKeys.reduce((acc, path) => {
+                    const value = getNestedValue(dataset, path)
+                    return acc + isFilled(value)
+                }, 0)
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', uploadClinicalDatasets);
         } else {
