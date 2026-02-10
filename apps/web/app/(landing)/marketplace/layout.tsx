@@ -94,20 +94,16 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
                                 }
 
                                 try {
-                                    const anonId = mixpanel?.get_distinct_id();
+                                    const anonId = mixpanel?.get_distinct_id()
                                     // Identify the user on this device
-                                    mixpanel?.identify(anonId);
-
-                                    console.log(`SET EMAIL ADDRESS`, form.getValues().email)
-                                    mixpanel?.people.set({
-                                        $email: form.getValues().email,
-                                    });
+                                    mixpanel?.identify(anonId)
+                                    mixpanel?.people.set({$email: form.getValues().email})
 
                                     mixpanel?.track("Email Captured", {
                                         email: form.getValues().email,
                                         source: "public_marketplace_gate",
                                         email_domain: form.getValues().email.split("@")[1],
-                                    });
+                                    })
                                 } catch (error) {
                                     console.error(`Error identifying mixpanel user. Mixpanel may not be initialized.`)
                                 }
