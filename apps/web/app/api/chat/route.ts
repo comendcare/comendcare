@@ -55,15 +55,15 @@ const OUTPUT_FORMAT_RULES = `
 Response format (must follow):
 
 If Comend's data has relevant items:
-1) Start with 2-6 sentences describing what the platform shows (grounded in Comend data).
-2) Then list the relevant platform items. For each item, include:
+1) Start with 2-6 sentences describing what Comend shows.
+2) Then list the relevant Comend items. For each item, include:
    - Item: <title> (<collection>/<id>)
      Where to view: <url>
      What it says: <1-3 sentences grounded in Comend data>
 
 If Comend data has no relevant items:
 Respond ONLY with:
-"I don’t know from platform data."
+"I don’t know from Comend data."
 Then add ONE line:
 "Try searching on Comend for: <3-5 better queries>"
 Do NOT provide general knowledge.
