@@ -8,8 +8,12 @@ type Message = { role: "user" | "assistant"; content: string };
 
 type ChatBody = {
     messages: Message[];
-    personaSystem: string; // from your UI persona.system
-    orgId?: string | null; // future: pass org scope
+    personaSystem?: string;
+    orgId?: string | null;
+
+    // OPTIONAL: allow client to request more items when listing
+    page?: number;
+    perPage?: number;
 };
 
 export type CollectionName =
@@ -26,13 +30,11 @@ export type CollectionName =
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 // ===== URL BUILDING =====
-// IMPORTANT: make this a HOST (no protocol). ex: "localhost:3000" or "comend.com"
 const PUBLIC_HOST =
     (process.env.NEXT_PUBLIC_APP_HOST ||
         process.env.NEXT_PUBLIC_APP_URL?.replace(/^https?:\/\//, "").replace(/\/$/, "") ||
         "localhost:3000") as string;
 
-// IMPORTANT: "http" in dev, "https" in prod
 const PUBLIC_PROTOCOL =
     (process.env.NEXT_PUBLIC_APP_PROTOCOL ||
         (PUBLIC_HOST.includes("localhost") ? "http" : "https")) as string;
@@ -45,31 +47,6 @@ function absoluteUrl(path: string, orgSubdomain?: string) {
     return `${PUBLIC_PROTOCOL}://${hostForOrg(orgSubdomain)}${p}`;
 }
 
-const LINK_RULES = `
-Linking rules (must follow):
-- If you reference any item from Comend, you MUST include its "Where to view:" link.
-- Never invent urls. Use ONLY the urls that appear in Comend's data.
-`;
-
-const OUTPUT_FORMAT_RULES = `
-Response format (must follow):
-
-If Comend's data has relevant items:
-1) Start with 2-6 sentences describing what Comend shows.
-2) Then list the relevant Comend items. For each item, include:
-   - Item: <title> (<collection>/<id>)
-     Where to view: <url>
-     About: <1-3 sentences grounded in Comend data>
-
-If Comend data has no relevant items:
-Respond ONLY with:
-"I don’t know from Comend data."
-Then add ONE line:
-"Try searching on Comend for: <3-5 better queries>"
-Do NOT provide general knowledge.
-`;
-
-// lib/urls/publicUrls.ts (kept same name)
 export function publicItemUrl(collection: CollectionName, doc: any) {
     const id = String(doc?.id ?? "");
     const slug = String(doc?.slug ?? "");
@@ -80,14 +57,9 @@ export function publicItemUrl(collection: CollectionName, doc: any) {
         doc?.organizationSubdomain ||
         undefined;
 
-    // If your entire app is subdomain-scoped, keep orgSubdomain in all these.
-    // If some routes are root-domain scoped, drop orgSubdomain for those.
     switch (collection) {
         case "organizations":
-            // If org homepage is just the subdomain root:
             return absoluteUrl("/", orgSubdomain);
-        // If your org page is /org/:slug:
-        // return absoluteUrl(`/org/${slug || id}`, orgSubdomain);
 
         case "research-plans":
             return absoluteUrl(`/research-plan/${id}`, orgSubdomain);
@@ -111,7 +83,6 @@ export function publicItemUrl(collection: CollectionName, doc: any) {
             return absoluteUrl(`/marketplace/clinical-datasets/${id}`, orgSubdomain);
 
         case "milestones":
-            // only if you actually have a public milestone page
             return absoluteUrl(`/milestone/${id}`, orgSubdomain);
 
         default:
@@ -139,19 +110,140 @@ function bestSnippet(hit: MultiSearchHit): string | undefined {
     return firstFromSnippets;
 }
 
-async function typesenseSearch(opts: { q: string; orgId?: string | null }) {
+function getTypesenseConfig() {
     const TYPESENSE_NODE = process.env.NEXT_PUBLIC_TYPESENSE_NODE;
-    const key = process.env.NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY;
+    const searchKey = process.env.NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY;
 
     if (!TYPESENSE_NODE) throw new Error("Missing env NEXT_PUBLIC_TYPESENSE_NODE");
-    if (!key) throw new Error("Missing env NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY");
+    if (!searchKey) throw new Error("Missing env NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY");
 
     const TYPESENSE_URL = `https://${TYPESENSE_NODE}`.replace(/\/$/, "");
+    return { TYPESENSE_URL, searchKey };
+}
+
+/**
+ * Very lightweight intent detection. Keep it simple and deterministic.
+ * You can expand this over time.
+ */
+type Intent =
+    | { kind: "count_orgs" }
+    | { kind: "list_orgs"; page: number; perPage: number }
+    | { kind: "normal_search"; q: string };
+
+function detectIntent(userText: string, body: ChatBody): Intent {
+    const q = (userText ?? "").trim();
+    const lower = q.toLowerCase();
+
+    // count organizations
+    if (/\bhow many\b/.test(lower) && (/\borgs?\b/.test(lower) || /\borganizations?\b/.test(lower))) {
+        return { kind: "count_orgs" };
+    }
+
+    // list all organizations / show orgs
+    if (
+        (/\b(list|show|all)\b/.test(lower) && (/\borgs?\b/.test(lower) || /\borganizations?\b/.test(lower))) ||
+        lower === "organizations" ||
+        lower === "orgs"
+    ) {
+        const page = Number.isFinite(body.page) && (body.page as number) > 0 ? (body.page as number) : 1;
+        const perPageRaw = Number.isFinite(body.perPage) && (body.perPage as number) > 0 ? (body.perPage as number) : 25;
+        const perPage = Math.max(1, Math.min(perPageRaw, 100)); // safety cap
+        return { kind: "list_orgs", page, perPage };
+    }
+
+    return { kind: "normal_search", q };
+}
+
+async function getOrganizationsCountNoAdmin() {
+    const { TYPESENSE_URL, searchKey } = getTypesenseConfig();
+
+    const url = new URL(`${TYPESENSE_URL}/collections/organizations/documents/search`);
+    url.searchParams.set("q", "*");
+    url.searchParams.set("query_by", "name,description");
+    url.searchParams.set("per_page", "1");
+
+    const res = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+            "X-TYPESENSE-API-KEY": searchKey,
+        },
+        cache: "no-store",
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Typesense org count search failed: ${res.status} ${text}`);
+    }
+
+    const json = await res.json();
+    return Number(json?.found ?? 0);
+}
+
+/**
+ * List orgs with q="*" (paged). This is for “show me all orgs”.
+ */
+async function listOrganizations(opts: { page: number; perPage: number }) {
+    const { TYPESENSE_URL, searchKey } = getTypesenseConfig();
+
+    const url = new URL(`${TYPESENSE_URL}/collections/organizations/documents/search`);
+    url.searchParams.set("q", "*");
+    url.searchParams.set("query_by", "name,description");
+    url.searchParams.set("page", String(opts.page));
+    url.searchParams.set("per_page", String(opts.perPage));
+
+    const res = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+            "X-TYPESENSE-API-KEY": searchKey,
+        },
+        cache: "no-store",
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Typesense organizations list failed: ${res.status} ${text}`);
+    }
+
+    const json = await res.json();
+    const hits = (json?.hits ?? []) as Array<{ document: any; text_match?: number; highlights?: any }>;
+
+    const items = hits
+        .map((h) => {
+            const doc = h.document ?? {};
+            const id = String(doc.id ?? "");
+            if (!id) return null;
+
+            const title = String(doc.name ?? "(untitled)");
+            const snippet = bestSnippet({ highlights: h.highlights } as any);
+            const about = String(snippet || doc.description || "").slice(0, 800);
+
+            const orgSubdomain = doc.subdomain || undefined;
+            const url = publicItemUrl("organizations", { ...doc, __orgSubdomain: orgSubdomain });
+
+            return { collection: "organizations" as const, id, title, about, url };
+        })
+        .filter(Boolean) as Array<{ collection: "organizations"; id: string; title: string; about: string; url: string }>;
+
+    return {
+        found: Number(json?.found ?? items.length),
+        page: opts.page,
+        perPage: opts.perPage,
+        items,
+    };
+}
+
+/**
+ * Your existing multi_search, but:
+ * - allow more per collection
+ * - return more than 20 (cap higher)
+ * - include collectionName reliably
+ */
+async function typesenseMultiSearch(opts: { q: string }) {
+    const { TYPESENSE_URL, searchKey } = getTypesenseConfig();
 
     const q = (opts.q ?? "").trim();
     if (!q) return [];
 
-    // KEEP YOUR ORIGINAL query_by (known-good schema), just add fuzz/prefix params.
     const searches = [
         { collection: "organizations", q, query_by: "name,description" },
         { collection: "milestones", q, query_by: "title,description,type,status,nodeType" },
@@ -183,19 +275,14 @@ async function typesenseSearch(opts: { q: string; orgId?: string | null }) {
             collection: s.collection,
             q: s.q,
             query_by: s.query_by,
-            per_page: 6,
 
-            // ===== make non-exact matching work =====
+            per_page: 10,
+
             prefix: true,
             exhaustive_search: true,
             num_typos: 2,
             typo_tokens_threshold: 1,
-
-            // ===== helpful ranking knobs =====
-            // prioritize_exact_match is supported in Typesense search; it’s safe to send.
             prioritize_exact_match: true,
-
-            // highlights help the model say “What it says”
             highlight_full_fields: s.query_by,
         })),
     };
@@ -204,14 +291,13 @@ async function typesenseSearch(opts: { q: string; orgId?: string | null }) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "X-TYPESENSE-API-KEY": key,
+            "X-TYPESENSE-API-KEY": searchKey,
         },
         body: JSON.stringify(body),
         cache: "no-store",
     });
 
     if (!res.ok) {
-        // DO NOT silently return [] — that makes debugging impossible.
         const text = await res.text();
         throw new Error(`Typesense multi_search failed: ${res.status} ${text}`);
     }
@@ -222,13 +308,12 @@ async function typesenseSearch(opts: { q: string; orgId?: string | null }) {
         collection: CollectionName;
         id: string;
         title?: string;
-        text: string;
+        about: string;
         url: string;
         score: number;
     }> = [];
 
     for (const r of json.results ?? []) {
-        // FIX: in multi_search, collection name is here:
         const collectionName =
             (r.request_params?.collection_name as CollectionName) ||
             (r.search?.collection as CollectionName) ||
@@ -241,40 +326,19 @@ async function typesenseSearch(opts: { q: string; orgId?: string | null }) {
             const id = String(doc.id ?? "");
             if (!id) continue;
 
-            const title =
-                doc.name ||
-                doc.title?.title ||
-                doc.title ||
-                doc.user?.name ||
-                doc.organization?.name ||
-                undefined;
+            const title = doc.name || doc.title?.title || doc.title || doc.user?.name || doc.organization?.name || undefined;
 
-            // prefer snippet/highlights rather than dumping JSON
             const snippet = bestSnippet(h);
-            const text =
-                snippet ||
-                doc.description ||
-                doc.title?.title ||
-                doc.title ||
-                doc.name ||
-                JSON.stringify(doc);
+            const about = String(snippet || doc.description || doc.title?.title || doc.title || doc.name || "").slice(0, 800);
 
-            // subdomain extraction (must exist in indexed doc; no guessing)
-            const orgSubdomain =
-                doc.subdomain ||
-                doc.organization?.subdomain ||
-                undefined;
-
-            const url = publicItemUrl(collectionName, {
-                ...doc,
-                __orgSubdomain: orgSubdomain,
-            });
+            const orgSubdomain = doc.subdomain || doc.organization?.subdomain || undefined;
+            const url = publicItemUrl(collectionName, { ...doc, __orgSubdomain: orgSubdomain });
 
             out.push({
                 collection: collectionName,
                 id,
                 title,
-                text: String(text).slice(0, 800),
+                about,
                 url,
                 score: Number(h.text_match ?? 0),
             });
@@ -282,25 +346,35 @@ async function typesenseSearch(opts: { q: string; orgId?: string | null }) {
     }
 
     out.sort((a, b) => b.score - a.score);
-    return out.slice(0, 20);
+    return out.slice(0, 60);
 }
 
-function buildContextBlock(
-    results: Array<{ collection: string; id: string; title?: string; text: string; url: string }>
-) {
-    if (!results.length) return "Comend data: (no results)";
+const LINK_RULES = `
+Linking rules (must follow):
+- If you reference any item from Comend, you MUST include its "Where to view:" link.
+- Never invent urls. Use ONLY urls present in the provided Comend context.
+`;
 
-    return [
-        "Comend data (the ONLY factual source):",
-        "",
-        ...results.map((r, i) =>
-            [
-                `[#${i + 1}] Item: ${r.title ?? "(untitled)"} (${r.collection}/${r.id})`,
-                `Where to view: ${r.url}`,
-                `Summary: ${r.text}`,
-            ].join("\n")
-        ),
-    ].join("\n\n");
+const OUTPUT_FORMAT_RULES = `
+Response format (must follow):
+
+If Comend's data has relevant items:
+1) Start with 2-6 sentences describing what Comend shows.
+2) Then list the relevant Comend items. For each item, include:
+   - Item: <title> (<collection>/<id>)
+     Where to view: <url>
+     About: <1-3 sentences grounded in Comend data>
+
+If Comend data has no relevant items:
+Respond ONLY with:
+"I don’t know from Comend data."
+Then add ONE line:
+"Try searching on Comend for: <3-5 better queries>"
+Do NOT provide general knowledge.
+`;
+
+function buildContextBlockJson(payload: unknown) {
+    return `Comend data (the ONLY factual source):\n${JSON.stringify(payload, null, 2)}`;
 }
 
 export async function POST(req: Request) {
@@ -309,9 +383,22 @@ export async function POST(req: Request) {
     const personaSystem = body.personaSystem ?? "You are a helpful assistant.";
 
     const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
+    const intent = detectIntent(lastUser, body);
 
-    const tsResults = await typesenseSearch({ q: lastUser, orgId: body.orgId ?? null });
-    const context = buildContextBlock(tsResults);
+    let contextPayload: any = null;
+
+    if (intent.kind === "count_orgs") {
+        const count = await getOrganizationsCountNoAdmin();
+        contextPayload = { kind: "count_orgs", count };
+    } else if (intent.kind === "list_orgs") {
+        const list = await listOrganizations({ page: intent.page, perPage: intent.perPage });
+        contextPayload = { kind: "list_orgs", ...list };
+    } else {
+        const results = await typesenseMultiSearch({ q: intent.q });
+        contextPayload = { kind: "search", q: intent.q, results };
+    }
+
+    const context = buildContextBlockJson(contextPayload);
 
     const input = [
         { role: "system" as const, content: personaSystem },
@@ -322,9 +409,12 @@ export async function POST(req: Request) {
     ];
 
     const response = await openai.responses.create({
-        model: "gpt-5",
+        model: "gpt-5-nano",
         input,
     });
 
-    return NextResponse.json({ text: response.output_text });
+    return NextResponse.json({
+        text: response.output_text,
+        debug: process.env.NODE_ENV === "development" ? { intent, contextPayload } : undefined,
+    });
 }

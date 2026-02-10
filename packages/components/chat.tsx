@@ -193,6 +193,7 @@ export function Chat({
                     onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
                     disabled={isLoading}
                     className="w-[calc(100vw-336px)] h-full"
+                    maxLength={maxTokens * 2}
                 />
                 <Button onClick={handleSend} disabled={isLoading || !input.trim()}>
                     {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
