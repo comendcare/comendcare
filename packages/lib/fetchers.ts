@@ -18,6 +18,7 @@ import type {
     Condition,
     DiseaseModel,
     MaterialAndDataAccessRequest,
+    Milestone,
     Organization,
     Prisma,
     Researcher, Roadmap, TaggableType,
@@ -2970,6 +2971,68 @@ function prismaOrderByFromColumnId(sort: ExtendedColumnSort<any>, schemaColumns?
     }, {})
 }
 
+export const getProjects = async (
+    organizationId: string | null | undefined,
+    select: Prisma.MilestoneSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+    input?: GetResearchPlansSchema,
+    publicOnly: boolean = false,
+    columns?: ColumnDef<any>[],
+): Promise<{ data: Milestone[], pageCount: number }> => {
+    if (publicOnly) { // allow any requester to fetch public data
+        if (organizationId) {
+            // if org ID is provided only fetch tools for organization
+            const organization = await prisma.organization.findUnique({
+                where: {id: organizationId}
+            })
+
+            return await fetchProjects(
+                organization,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        } else {
+            // if org ID is not provided fetch all public tools
+            return await fetchProjects(
+                undefined,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        }
+    }
+
+    // only allow members of the organization to fetch private data
+    return (await withOrganizationAuth(
+        async (
+            organization: Organization,
+            select: Prisma.RoadmapSelect<InternalArgs & {
+                result: {};
+                model: {};
+                query: {};
+                client: {};
+            }>,
+            input?: GetResearchPlansSchema,
+            publicOnly: boolean = false
+        ) => {
+            return await fetchResearchPlans(
+                organization,
+                select,
+                columns,
+                input,
+                publicOnly
+            )
+        }
+    ))(organizationId, select, input, publicOnly)
+}
+
 export const getResearchPlans = async (
     organizationId: string | null | undefined,
     select: Prisma.RoadmapSelect<InternalArgs & {
@@ -3030,6 +3093,119 @@ export const getResearchPlans = async (
             )
         }
     ))(organizationId, select, input, publicOnly)
+}
+
+const fetchProjects = async (
+    organization: Organization | null | undefined,
+    select: Prisma.MilestoneSelect<InternalArgs & {
+        result: {};
+        model: {};
+        query: {};
+        client: {};
+    }>,
+    columns?: ColumnDef<any>[] | undefined,
+    input?: GetResearchPlansSchema,
+    publicOnly: boolean = false
+) => {
+    try {
+        if (!input) {
+            const [data, total] = await prisma.$transaction([
+                prisma.milestone.findMany({
+                    where: {
+                        ...(organization ? {organizationId: organization.id} : undefined),
+                        ...(publicOnly ? {private: false} : undefined)
+                    },
+                    select,
+                    orderBy: {createdAt: "asc"},
+                }),
+                prisma.roadmap.count({
+                    where: {
+                        ...(organization ? {organizationId: organization.id} : undefined),
+                        ...(publicOnly ? {private: false} : undefined)
+                    }
+                }),
+            ]);
+
+            return {data, pageCount: 1};
+        }
+
+        const offset = (input.page - 1) * input.perPage;
+        const advancedTable =
+            input.filterFlag === "advancedFilters"
+
+        let where: any = {};
+
+        if (advancedTable) {
+            where = filterColumns({
+                filters: input.filters,
+                joinOperator: input.joinOperator,
+                schemaColumns: columns
+            })
+        } else {
+            const filters: any[] = []
+            if (input.title) {
+                filters.push({
+                    id: 'title',
+                    value: input.title,
+                    variant: 'text',
+                    operator: 'iLike',
+                    filterId: nanoid()
+                })
+            }
+
+            where = filterColumns({
+                filters,
+                joinOperator: "and"
+            }) || {}
+
+            console.log(`where filter`, where)
+        }
+
+        // add global filter
+        if (input.q) {
+            // custom filtering for types - if any of the type labels include the query, include biosamples
+            // with these types
+            const queriedTypes = RESEARCH_PLAN_TYPES.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+
+            where.OR = [
+                {id: {contains: input.q, mode: "insensitive"}},
+            ];
+
+            if (queriedTypes) {
+                where.OR = where.OR.concat([{types: {hasSome: queriedTypes.map(t => t.value)}}])
+            }
+        }
+
+        const orderBy = input.sort.length
+            ? input.sort.map(s => prismaOrderByFromColumnId(s, columns))
+            : [{createdAt: {sort: "asc"}}];
+
+        const [data, total] = await prisma.$transaction([
+            prisma.milestone.findMany({
+                skip: offset,
+                take: input.perPage,
+                where: {
+                    ...where,
+                    ...(organization ? {organizationId: organization.id} : undefined),
+                    ...(publicOnly ? {private: false} : undefined)
+                },
+                select,
+                orderBy,
+            }),
+            prisma.milestone.count({
+                where: {
+                    ...where,
+                    ...(organization ? {organizationId: organization.id} : undefined),
+                    ...(publicOnly ? {private: false} : undefined)
+                }
+            }),
+        ]);
+
+        const pageCount = Math.ceil(total / input.perPage);
+        return {data, pageCount};
+    } catch {
+        return {data: [], pageCount: 0};
+    }
 }
 
 const fetchResearchPlans = async (

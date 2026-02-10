@@ -37,13 +37,15 @@ type Props = {
     orgId: string;
     organization: Pick<Organization, "id" | "name" | "subdomain" | "customDomain">;
     // roadmaps: any[];
-    data: any;
-    pageCount: any;
+    researchPlansData: any;
+    researchPlansPageCount: any;
+    projectsData: any;
+    projectsPageCount: any;
     // columns: any;
     searchParams: any;
 };
 
-export default function RoadmapsPage({ orgId, organization, data, pageCount, searchParams }: Props) {
+export default function RoadmapsPage({ orgId, organization, researchPlansData, researchPlansPageCount, projectsData, projectsPageCount, searchParams }: Props) {
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
     const [shareIsOpen, setShareIsOpen] = useState(false)
@@ -64,15 +66,15 @@ export default function RoadmapsPage({ orgId, organization, data, pageCount, sea
     }, [])
 
     useEffect(() => {
-        if (!Array.isArray(data)) return
+        if (!Array.isArray(researchPlansData)) return
 
-        data
+        researchPlansData
             .map((r) => r?.id)
             .filter((id): id is string => typeof id === "string" && id.length > 0)
             .forEach((id) => {
                 router.prefetch(`/app/research-plan/${id}`)
             })
-    }, [data, router])
+    }, [researchPlansData, router])
 
     const handleShare = async () => {
         // override default delete behaviour with our custom dialog
@@ -88,7 +90,7 @@ export default function RoadmapsPage({ orgId, organization, data, pageCount, sea
                 <div className="w-full flex justify-between items-center gap-4">
                     <h2 className="col-span-full font-semibold text-2xl">My research plans</h2>
                     <div className="flex gap-4">
-                        {data.length > 0 
+                        {researchPlansData.length > 0 
                             ? (
                                 <CreateResearchPlanDialog 
                                     trigger={
@@ -153,8 +155,8 @@ export default function RoadmapsPage({ orgId, organization, data, pageCount, sea
                             }
                         >
                             <DatabaseResearchPlansTable 
-                                data={data} 
-                                pageCount={pageCount} 
+                                data={researchPlansData} 
+                                pageCount={researchPlansPageCount} 
                                 columns={columns}
                                 searchParams={searchParams}
                                 onRowClickCallback={(e: any, row: Row<any> | undefined) => row?.original.id && router.push(`/app/research-plan/${row.original.id}`)}

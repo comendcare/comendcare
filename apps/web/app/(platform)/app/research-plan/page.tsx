@@ -2,7 +2,7 @@ import {getSession} from "@comend/lib/auth"
 import NoOrganization from "~web/components/no-organization";
 import RoadmapsPage from "~web/components/roadmaps-page";
 import prisma from "@comend/lib/prisma";
-import { getResearchPlans } from "@comend/lib/fetchers";
+import { getProjects, getResearchPlans } from "@comend/lib/fetchers";
 import { SearchParams } from "@comend/components/types";
 import { researchPlanSearchParamsCache } from "@comend/lib/validations";
 import { getValidFilters } from "@comend/lib/data-table";
@@ -19,7 +19,7 @@ export default async function RoadmapPage(props: IndexPageProps) {
     const validFilters = getValidFilters(search.filters);
     const globalFilter = search.q ?? "";
 
-    const [organization, {data, pageCount}] = await Promise.all([
+    const [organization, researchPlansDataResponse, projectsDataResponse] = await Promise.all([
         prisma.organization.findUnique({
             where: {id: orgId},
             select: {
@@ -50,6 +50,19 @@ export default async function RoadmapPage(props: IndexPageProps) {
             },
             {...search, q: globalFilter, filters: validFilters},
             false,
+        ),
+        getProjects(
+            session?.user.organizationId,
+            {
+                id: true,
+                private: true,
+                title: true,
+                description: true,
+                organizationId: true,
+                organization: true,
+            },
+            {...search, q: globalFilter, filters: validFilters},
+            false,
         )
     ])
 
@@ -59,8 +72,10 @@ export default async function RoadmapPage(props: IndexPageProps) {
         <RoadmapsPage
             orgId={orgId}
             organization={organization}
-            data={[...data]} 
-            pageCount={pageCount} 
+            researchPlansData={[...researchPlansDataResponse.data]} 
+            researchPlansPageCount={researchPlansDataResponse.pageCount} 
+            projectsData={[...projectsDataResponse.data]} 
+            projectsPageCount={projectsDataResponse.pageCount} 
             searchParams={searchParams}
         />
     )
