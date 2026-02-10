@@ -59,7 +59,7 @@ If Comend's data has relevant items:
 2) Then list the relevant Comend items. For each item, include:
    - Item: <title> (<collection>/<id>)
      Where to view: <url>
-     What it says: <1-3 sentences grounded in Comend data>
+     About: <1-3 sentences grounded in Comend data>
 
 If Comend data has no relevant items:
 Respond ONLY with:
