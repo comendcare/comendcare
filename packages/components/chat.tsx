@@ -1,10 +1,12 @@
 "use client"
 
-import {useEffect, useMemo, useRef, useState} from "react"
+import {useEffect, useRef, useState} from "react"
+import {useSession} from "next-auth/react"
+import Image from "next/image"
 import {Button} from "./ui/button"
 import {Input} from "./ui/input"
 import {ScrollArea} from "./ui/scroll-area"
-import {Loader2, Send, User} from "lucide-react"
+import {Loader2, Send} from "lucide-react"
 
 interface Message {
     role: "user" | "assistant"
@@ -15,7 +17,6 @@ export interface ChatPersonasDemoProps {
     temperature?: number
     maxTokens?: number
     initialMessages?: Message[]
-    // optional: lets you scope storage per org/user/etc
     storageKey?: string
 }
 
@@ -32,31 +33,75 @@ function safeParseMessages(raw: string | null): Message[] {
     }
 }
 
+function initials(name?: string | null) {
+    const n = (name ?? "").trim()
+    if (!n) return "U"
+    const parts = n.split(/\s+/).filter(Boolean)
+    const a = parts[0]?.[0] ?? "U"
+    const b = parts.length > 1 ? parts[parts.length - 1]?.[0] : ""
+    return (a + b).toUpperCase()
+}
+
+function Avatar({
+                    src,
+                    name,
+                    size = 20,
+                }: {
+    src?: string | null
+    name?: string | null
+    size?: number
+}) {
+    const [errored, setErrored] = useState(false)
+    const px = size
+
+    if (src && !errored) {
+        return (
+            <Image
+                src={src}
+                alt={name ? `${name} avatar` : "User avatar"}
+                width={px}
+                height={px}
+                className="rounded-full shrink-0"
+                onError={() => setErrored(true)}
+            />
+        )
+    }
+
+    return (
+        <div
+            className="rounded-full shrink-0 bg-muted text-muted-foreground flex items-center justify-center font-medium"
+            style={{width: px, height: px, fontSize: Math.max(10, Math.floor(px * 0.5))}}
+            aria-label={name ? `${name} avatar` : "User avatar"}
+        >
+            {initials(name)}
+        </div>
+    )
+}
+
 export function Chat({
                          temperature = 0.8,
                          maxTokens = 200,
                          initialMessages = [],
                          storageKey = "comend:chat:session",
                      }: ChatPersonasDemoProps = {}) {
+    const {data: session} = useSession()
+    const userImage = (session?.user as any)?.image as string | undefined
+    const userName = (session?.user as any)?.name as string | undefined
+
     const [messages, setMessages] = useState<Message[]>(initialMessages)
     const [input, setInput] = useState("")
     const [isLoading, setIsLoading] = useState(false)
-
-    // IMPORTANT: shadcn ScrollArea scrolls via an inner viewport div.
     const viewportRef = useRef<HTMLDivElement | null>(null)
 
-    // Hydrate from sessionStorage on first mount (client only)
     useEffect(() => {
         const saved = safeParseMessages(sessionStorage.getItem(storageKey))
         if (saved.length) setMessages(saved)
     }, [storageKey])
 
-    // Persist on every change
     useEffect(() => {
         sessionStorage.setItem(storageKey, JSON.stringify(messages))
     }, [messages, storageKey])
 
-    // Auto-scroll after messages render
     useEffect(() => {
         const el = viewportRef.current
         if (!el) return
@@ -68,8 +113,6 @@ export function Chat({
 
         const userText = input.trim()
         const userMessage: Message = {role: "user", content: userText}
-
-        // compute nextMessages synchronously so fetch uses the latest
         const nextMessages = [...messages, userMessage]
 
         setMessages(nextMessages)
@@ -83,9 +126,6 @@ export function Chat({
                 body: JSON.stringify({
                     messages: nextMessages,
                     orgId: null,
-                    // you currently require personaSystem in your ChatBody type;
-                    // either send it here or make it optional server-side.
-                    // personaSystem: "You are a helpful assistant.",
                 }),
             })
 
@@ -105,7 +145,6 @@ export function Chat({
     return (
         <div className="py-4 space-y-4 w-full max-w-6xl mx-auto flex flex-col items-center justify-center">
             <ScrollArea className="h-[calc(100vh-136px)] p-4">
-                {/* this is the scrollable viewport */}
                 <div ref={viewportRef}>
                     {messages.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
@@ -120,6 +159,7 @@ export function Chat({
                                     className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                                 >
                                     {msg.role === "assistant" && <span className="text-lg shrink-0">🤖</span>}
+
                                     <div
                                         className={`rounded-lg px-3 py-2 max-w-[80%] ${
                                             msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
@@ -127,7 +167,10 @@ export function Chat({
                                     >
                                         <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                                     </div>
-                                    {msg.role === "user" && <User className="h-5 w-5 shrink-0 text-muted-foreground" />}
+
+                                    {msg.role === "user" && (
+                                        <Avatar src={userImage} name={userName} size={40} />
+                                    )}
                                 </div>
                             ))}
 
