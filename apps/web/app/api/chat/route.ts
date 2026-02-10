@@ -233,7 +233,7 @@ async function listOrganizations(opts: { page: number; perPage: number }) {
 }
 
 /**
- * Your existing multi_search, but:
+ * multi_search, but:
  * - allow more per collection
  * - return more than 20 (cap higher)
  * - include collectionName reliably

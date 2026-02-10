@@ -6,7 +6,7 @@ import Image from "next/image"
 import {Button} from "./ui/button"
 import {Input} from "./ui/input"
 import {ScrollArea} from "./ui/scroll-area"
-import {Loader2, Send} from "lucide-react"
+import {Loader2, Send, Plus} from "lucide-react"
 
 interface Message {
     role: "user" | "assistant"
@@ -91,7 +91,22 @@ export function Chat({
     const [messages, setMessages] = useState<Message[]>(initialMessages)
     const [input, setInput] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+
     const viewportRef = useRef<HTMLDivElement | null>(null)
+    const inputRef = useRef<HTMLInputElement | null>(null)
+
+    const exampleCards = [
+        {
+            title: "How many research plans",
+            subtitle: "does AGSAA have?",
+            query: "How many research plans does AGSAA have?"
+        },
+        {
+            title: "How many patient groups",
+            subtitle: "are on Comend?",
+            query: "How many patient groups are on Comend?"
+        },
+    ] as const
 
     useEffect(() => {
         const saved = safeParseMessages(sessionStorage.getItem(storageKey))
@@ -142,17 +157,30 @@ export function Chat({
         }
     }
 
+    const applyExample = (q: string) => {
+        setInput(q)
+        requestAnimationFrame(() => inputRef.current?.focus())
+    }
+
+    const isEmpty = messages.length === 0
+
     return (
-        <div className="py-4 space-y-4 w-full max-w-6xl mx-auto flex flex-col items-center justify-center">
-            <ScrollArea className="h-[calc(100vh-136px)] p-4">
-                <div ref={viewportRef}>
-                    {messages.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                            <span className="text-4xl mb-2">🤖</span>
-                            <p className="text-sm">Start chatting</p>
+        <div className="w-full h-[calc(100vh-100px)] max-w-7xl mx-auto flex flex-col px-8">
+            <ScrollArea className="flex-1">
+                <div ref={viewportRef} className="py-10">
+                    {isEmpty ? (
+                        <div className="flex flex-col">
+                            <div className="pt-24">
+                                <h1 className="text-5xl font-semibold tracking-tight text-foreground">
+                                    Welcome to Comend Assistant
+                                </h1>
+                                <p className="mt-3 text-3xl text-muted-foreground">
+                                    How can I help you today?
+                                </p>
+                            </div>
                         </div>
                     ) : (
-                        <div className="space-y-4">
+                        <div className="space-y-4 pb-6">
                             {messages.map((msg, i) => (
                                 <div
                                     key={i}
@@ -161,7 +189,7 @@ export function Chat({
                                     {msg.role === "assistant" && <span className="text-lg shrink-0">🤖</span>}
 
                                     <div
-                                        className={`rounded-lg px-3 py-2 max-w-[80%] ${
+                                        className={`rounded-2xl px-4 py-3 max-w-[80%] ${
                                             msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
                                         }`}
                                     >
@@ -169,7 +197,7 @@ export function Chat({
                                     </div>
 
                                     {msg.role === "user" && (
-                                        <Avatar src={userImage} name={userName} size={40} />
+                                        <Avatar src={userImage} name={userName} size={40}/>
                                     )}
                                 </div>
                             ))}
@@ -177,7 +205,7 @@ export function Chat({
                             {isLoading && (
                                 <div className="flex gap-2 items-center">
                                     <span className="text-lg">🤖</span>
-                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    <Loader2 className="h-4 w-4 animate-spin"/>
                                 </div>
                             )}
                         </div>
@@ -185,19 +213,45 @@ export function Chat({
                 </div>
             </ScrollArea>
 
-            <div className="flex gap-2">
-                <Input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Talk to Comend Assistant"
-                    onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-                    disabled={isLoading}
-                    className="w-[calc(100vw-336px)] h-full"
-                    maxLength={maxTokens * 2}
-                />
-                <Button onClick={handleSend} disabled={isLoading || !input.trim()}>
-                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                </Button>
+            <div className="pb-6">
+                <div className="mt-auto">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4">
+                        {exampleCards.map((c) => (
+                            <button
+                                key={c.query}
+                                type="button"
+                                onClick={() => applyExample(c.query)}
+                                className="text-left rounded-2xl border bg-background hover:bg-muted/40 transition px-6 py-5"
+                            >
+                                <div className="text-xl font-semibold text-foreground">{c.title}</div>
+                                <div className="text-xl text-muted-foreground">{c.subtitle}</div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                <div className="w-full rounded-3xl border bg-background px-4 py-3 flex items-center justify-between gap-3">
+                    <Input
+                        ref={(el) => {
+                            inputRef.current = el
+                        }}
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Send a message..."
+                        onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
+                        disabled={isLoading}
+                        className="w-[calc(100vw-404px)] border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
+                        maxLength={maxTokens * 2}
+                    />
+
+                    <Button
+                        onClick={handleSend}
+                        disabled={isLoading || !input.trim()}
+                        size="icon"
+                        className="rounded-full h-10 w-10 shrink-0"
+                    >
+                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4"/>}
+                    </Button>
+                </div>
             </div>
         </div>
     )
