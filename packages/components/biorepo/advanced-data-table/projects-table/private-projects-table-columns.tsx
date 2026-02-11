@@ -67,223 +67,31 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
             ),
             enableSorting: false,
         },
-        // {
-        //     id: "modalities",
-        //     accessorKey: "modalities",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader 
-        //             className="min-w-fit text-nowrap"
-        //             column={column} 
-        //             title="Research strategy"
-        //         />
-        //     ),
-        //     cell: ({row}) => {
-        //         const options = RESEARCH_PLAN_TYPES.filter(option => row.original.modalities?.includes(option.value))
-        //         return (
-        //             (options && options.length > 0)
-        //                 ? (options.map(option => <Badge variant={'lightBlue'}>{option?.label}</Badge>))
-        //                 : (<p>{'--'}</p>)
-        //         )
-        //     },
-        //     enableSorting: false,
-        // },
-        // {
-        //     id: "stages",
-        //     accessorKey: "stages",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader 
-        //             className="min-w-fit text-nowrap"
-        //             column={column} 
-        //             title="Stage"
-        //         />
-        //     ),
-        //     cell: ({row}) => {
-        //         const options = RESEARCH_STAGE.filter(option => row.original.stages?.includes(option.value))
-        //         return (
-        //             (options && options.length > 0)
-        //                 ? (options.map(option => <Badge variant={option?.variant || 'secondary'}>{option?.label}</Badge>))
-        //                 : (<p>{'--'}</p>)
-        //         )
-        //     },
-        //     enableSorting: false,
-        // },
-        // {
-        //     id: "statuses",
-        //     accessorKey: "statuses",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader 
-        //             className="min-w-fit text-nowrap"
-        //             column={column} 
-        //             title="Status"
-        //         />
-        //     ),
-        //     cell: ({row}) => {
-        //         const options = RESEARCH_PLAN_STATUS.filter(option => row.original.statuses?.includes(option.value))
-        //         return (
-        //             (options && options.length > 0)
-        //                 ? (options.map(option => <Badge>{option?.label}</Badge>))
-        //                 : (<p>{'--'}</p>)
-        //         )
-        //     },
-        //     enableSorting: false,
-        // },
-        // {
-        //     id: "partners",
-        //     accessorKey: "partners",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader 
-        //             className="min-w-fit text-nowrap"
-        //             column={column} 
-        //             title="Partners"
-        //         />
-        //     ),
-        //     cell: ({row}) => {
-        //         const partners = row.original.partners
-        //         return (
-        //             (partners && partners.length > 0)
-        //                 ? (
-        //                     <ul className="flex flex-col gap-2">
-        //                         {partners.map((partner: any, index: number) => (
-        //                             <li key={index} className="flex items-center gap-2">
-        //                                 <Building className="h-4 min-h-4 w-4 min-w-4"/>
-        //                                 {partner.affiliation}
-        //                             </li>
-        //                         ))}
-        //                     </ul>
-        //                 )
-        //                 : (<p>{'--'}</p>)
-        //         )
-        //     },
-        //     enableSorting: false,
-        // },
-        // {
-        //     id: "description",
-        //     accessorKey: "description",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader 
-        //             className="min-w-fit text-nowrap"
-        //             column={column} 
-        //             title="Description"
-        //         />
-        //     ),
-        //     cell: ({row}) => {
-        //         const description = row.original.description
-        //         return (
-        //             (description && description.length > 0)
-        //                 ? (<div className="w-fit min-w-[500px]"><SeeMoreDescription description={row.original.description}/></div>)
-        //                 : (<p>{'--'}</p>)
-        //         )
-        //     },
-        //     enableSorting: false,
-        // },
-        // {
-        //     id: "links",
-        //     accessorKey: "links",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader 
-        //             className="min-w-fit text-nowrap"
-        //             column={column} 
-        //             title="Links"
-        //         />
-        //     ),
-        //     cell: ({row}) => {
-        //         const links = row.original.links
-        //         return (
-        //             (links && links.length > 0)
-        //                 ? (
-        //                     <ul className="flex flex-col gap-2">
-        //                         {links?.map((attachment: any, index: number) => (
-        //                             <li key={index} className="flex items-center gap-2">
-        //                                 <LinkIcon className="h-4 min-h-4 w-4 min-w-4"/>
-        //                                 <Link 
-        //                                     className="line-clamp-2 underline" 
-        //                                     href={attachment.link || "/"}
-        //                                     target="_blank"
-        //                                     onClick={(e) => e.stopPropagation()}
-        //                                 >
-        //                                 {attachment.name || attachment.link}
-        //                                 </Link>
-        //                                 <ExternalLink className="h-4 min-h-4 w-4 min-w-4"/>
-        //                             </li>
-        //                         ))}
-        //                     </ul>
-        //                 )
-        //                 : (<p>{'--'}</p>)
-        //         )
-        //     },
-        //     enableSorting: false,
-        // },
-        // {
-        //     id: "milestones",
-        //     accessorKey: "milestones",
-        //     header: ({column}) => (
-        //         <DataTableColumnHeader 
-        //             className="min-w-fit text-nowrap"
-        //             column={column} 
-        //             title="Number of projects"
-        //         />
-        //     ),
-        //     cell: ({row}) => {
-        //         // const featuredProjectTypes = ['BIOMARKER', 'EFFICASYSTUDY', 'NATURALHISTORYSTUDY', 'GPMANUFACTURING', 'TOXICOLOGYSTUDY', 'INDSUBMISSION']
-        //         // const milestoneTypes = row.original.milestones?.flatMap((milestone: any) => milestone?.types)?.map((type: any) => type?.milestoneType?.id)?.filter((typeVal: string) => featuredProjectTypes.includes(typeVal))
-        //         const numPrivateProjects = row.original.milestones.filter((milestone: Milestone) => milestone.private).length
-        //         const numPublishedProjects = row.original.milestones.filter((milestone: Milestone) => !milestone.private).length
-        //         return (
-        //             (numPrivateProjects > 0 || numPublishedProjects > 0)
-        //                 ? (
-        //                     <div className="flex gap-6">
-        //                     <div className="flex flex-col gap-2 justify-center text-nowrap">
-        //                         {numPrivateProjects > 0 && (
-        //                             <Tooltip>
-        //                                 <TooltipTrigger>
-        //                                     <PropertyBadge 
-        //                                         className="text-nowrap border-red-200 text-red-900 font-semibold" 
-        //                                         icon={Lock}
-        //                                     >
-        //                                         {numPrivateProjects}
-        //                                     </PropertyBadge>
-        //                                 </TooltipTrigger>
-        //                                 <TooltipContent>
-        //                                     <p>{numPrivateProjects === 1 ? `${numPrivateProjects} private project` : `${numPrivateProjects} private projects`}</p>
-        //                                 </TooltipContent>
-        //                             </Tooltip>
-        //                         )}
-        //                         {numPublishedProjects > 0 && (
-        //                             <Tooltip>
-        //                                 <TooltipTrigger>
-        //                                     <PropertyBadge 
-        //                                         className="text-nowrap border-green-200 text-green-900 font-semibold" 
-        //                                         icon={Globe}
-        //                                     >
-        //                                         {numPublishedProjects}
-        //                                     </PropertyBadge>
-        //                                 </TooltipTrigger>
-        //                                 <TooltipContent>
-        //                                     <p>{numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}</p>
-        //                                 </TooltipContent>
-        //                             </Tooltip>
-        //                         )}
-        //                     </div>
-        //                     {/* <div className="flex flex-col gap-2">
-        //                         {MILESTONE_TYPE_OPTIONS.filter(option => milestoneTypes.includes(option.id)).map(option => <Badge variant="lightBlue">{option.label}</Badge>)}
-        //                     </div> */}
-        //                     </div>
-        //                 )
-        //                 : (<p>{'--'}</p>)
-        //         )
-        //     },
-        //     enableSorting: false,
-        // },
-        // {
-        //     id: "actions",
-        //     size: 1,        // smallest possible width
-        //     minSize: 1,
-        //     maxSize: 1,
-        //     enableResizing: false,
-        //     cell: ({row}) => <ResearchPlanActionsMenu researchPlan={row.original}/>,
-        //     enableHiding: false,
-        //     enableSorting: false,
-        // },
+        {
+            id: "types",
+            accessorKey: "types",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Project type"
+                />
+            ),
+            cell: ({row}) => {
+                console.log(`types`, row.original.types)
+                const options = MILESTONE_TYPE_OPTIONS.filter(option => row.original.types?.map((type: any) => type.milestoneTypeId).includes(option.value))
+                return (
+                    (options && options.length > 0)
+                        ? (
+                            <div className="flex flex-col gap-2">
+                                {options.map(option => <Badge variant={'lightBlue'} className="w-fit">{option?.label}</Badge>)}
+                            </div>
+                        )
+                        : (<p>{'--'}</p>)
+                )
+            },
+            enableSorting: false,
+        },
     ]
 
     return columns

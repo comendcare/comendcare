@@ -96,7 +96,7 @@ export default function RoadmapsPage({ orgId, organization, researchPlansData, r
                     <TabsTrigger value="projects">My projects</TabsTrigger>
                 </TabsList>
                 <TabsContent value="researchPlans" className="w-full">
-                    <div className="p-6 w-full onborda-existing-research-plans-section">
+                    <div className="w-full onborda-existing-research-plans-section">
                         <div className="w-full flex justify-between items-center gap-4">
                             <h2 className="col-span-full font-semibold text-2xl">My research plans</h2>
                             <div className="flex gap-4">
@@ -179,7 +179,7 @@ export default function RoadmapsPage({ orgId, organization, researchPlansData, r
                     </div>
                 </TabsContent>
                 <TabsContent value="projects" className="w-full">
-                    <div className="p-6 w-full">
+                    <div className="w-full">
                         <div className="w-full flex justify-between items-center gap-4">
                             <h2 className="col-span-full font-semibold text-2xl">My Projects</h2>
                         </div>
