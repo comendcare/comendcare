@@ -1,5 +1,5 @@
 import type {ColumnDef} from "@tanstack/react-table";
-import {Globe, Lock} from "lucide-react";
+import {CircleDashed, DollarSign, Globe, Lock} from "lucide-react";
 import * as React from "react";
 import {DataTableColumnHeader} from "../data-table/data-table-column-header";
 import {MILESTONE_TYPE_OPTIONS, StatusType} from "@comend/lib/types";
@@ -7,6 +7,10 @@ import { Badge } from "../../../ui/badge";
 import { Session } from "next-auth";
 import { SeeMoreDescription } from "../../../see-more-description";
 import StatusButton from "../../../milestone-status-button";
+import { ExtendedColumnFilter } from "@comend/lib/types/data-table";
+import { generateId } from "@comend/lib/id";
+import { filterColumns } from "@comend/lib/filter-columns";
+import { formatMoney, handleAsyncCompanyAndInstitutionSearch } from "@comend/lib/utils";
 
 export function useProjectsTableColumns({session}: {session: Session | null}): ColumnDef<any>[] {
     const columns: ColumnDef<any>[] = [
@@ -137,6 +141,101 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                     onStatusChange={() => {}}
                 />
             ),
+            enableSorting: false,
+        },
+        {
+            id: 'institution.name',
+            accessorKey: "institution.name",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Partners"
+                />
+            ),
+            cell: ({row}) => {
+                const institutions = (row.original.institutions || []).map((institution: any) => institution.institution.name)
+                const companies = (row.original.companies || []).map((company: any) => company.company.title)
+                console.log(`institutions`, row.original.institutions)
+                console.log(`companies`, row.original.companies)
+                return (
+                    (institutions.length > 0 || companies.length > 0)
+                        ? (
+                            <span className={"flex flex-col gap-2"}>
+                                {institutions.concat(companies).map((partner: string) => <Badge>{partner}</Badge>)}
+                            </span>
+                        )
+                        : (<p>{'--'}</p>)
+                )
+            },
+            enableHiding: true,
+            enableSorting: false,
+            enableColumnFilter: true,
+            meta: {
+                label: "Stored with",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: true,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        filter,
+                        {
+                            ...filter,
+                            id: 'company.title',
+                            filterId: generateId({length: 8})
+                        }
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
+                onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
+            }
+        },
+        {
+            id: "budget",
+            accessorKey: "budget",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Budget"
+                />
+            ),
+            cell: ({row}) => {
+                return (
+                    (typeof row.original.budget === 'number')
+                        ? (
+                            <span className="flex gap-1 items-center">
+                                <DollarSign className="h-4 w-4"/>
+                                <p>{formatMoney(row.original.budget)}</p>
+                            </span>
+                        )
+                        : (<p>{'--'}</p>)
+                )
+            },
+            enableSorting: false,
+        },
+        {
+            id: "updateAt",
+            accessorKey: "updatedAt",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Last edited"
+                />
+            ),
+            cell: ({row}) => {
+                return (
+                    (row.original.updatedAt)
+                        ? (<p>{row.original.updatedAt?.toDateString()}</p>)
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
         },
     ]
