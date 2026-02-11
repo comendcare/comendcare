@@ -3013,7 +3013,7 @@ export const getProjects = async (
     return (await withOrganizationAuth(
         async (
             organization: Organization,
-            select: Prisma.RoadmapSelect<InternalArgs & {
+            select: Prisma.MilestoneSelect<InternalArgs & {
                 result: {};
                 model: {};
                 query: {};
@@ -3022,7 +3022,7 @@ export const getProjects = async (
             input?: GetResearchPlansSchema,
             publicOnly: boolean = false
         ) => {
-            return await fetchResearchPlans(
+            return await fetchProjects(
                 organization,
                 select,
                 columns,

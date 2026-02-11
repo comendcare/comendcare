@@ -21,6 +21,9 @@ import { useResearchPlansTableColumns } from "@comend/components/biorepo/advance
 import { useSession } from "next-auth/react";
 import { Row } from "@tanstack/react-table";
 import { NoResultsTemplate } from "@comend/components/no-results";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@comend/components/ui/tabs";
+import { DatabaseProjectsTable } from "@comend/components/biorepo/advanced-data-table/projects-table/database-projects-table"
+import { useProjectsTableColumns } from "@comend/components/biorepo/advanced-data-table/projects-table/private-projects-table-columns";
 
 const CreateResearchPlanDialog = dynamic(
     () => import("./create-research-plan-dialog"),
@@ -50,7 +53,8 @@ export default function RoadmapsPage({ orgId, organization, researchPlansData, r
     const [isLoading, setIsLoading] = useState(false)
     const [shareIsOpen, setShareIsOpen] = useState(false)
     const {data: session} = useSession()
-    const columns = useResearchPlansTableColumns({session})
+    const researchPlanColumns = useResearchPlansTableColumns({session})
+    const projectColumns = useProjectsTableColumns({session})
 
     useEffect(() => {
         // un-initialize any active research plans
@@ -86,94 +90,141 @@ export default function RoadmapsPage({ orgId, organization, researchPlansData, r
     return (
         <main className="flex flex-col items-center h-full w-full mx-auto p-4 gap-4">
             <ResearchPlanTemplatesCard orgId={orgId} setIsLoading={setIsLoading}/>
-            <div className="p-6 w-full onborda-existing-research-plans-section">
-                <div className="w-full flex justify-between items-center gap-4">
-                    <h2 className="col-span-full font-semibold text-2xl">My research plans</h2>
-                    <div className="flex gap-4">
-                        {researchPlansData.length > 0 
-                            ? (
-                                <CreateResearchPlanDialog 
-                                    trigger={
-                                    <Button variant="cta">
-                                        <Plus />
-                                        Create an empty research plan
-                                    </Button>
+            <Tabs defaultValue="researchPlans" className="w-full">
+                <TabsList>
+                    <TabsTrigger value="researchPlans">My research plans</TabsTrigger>
+                    <TabsTrigger value="projects">My projects</TabsTrigger>
+                </TabsList>
+                <TabsContent value="researchPlans" className="w-full">
+                    <div className="p-6 w-full onborda-existing-research-plans-section">
+                        <div className="w-full flex justify-between items-center gap-4">
+                            <h2 className="col-span-full font-semibold text-2xl">My research plans</h2>
+                            <div className="flex gap-4">
+                                {researchPlansData.length > 0 
+                                    ? (
+                                        <CreateResearchPlanDialog 
+                                            trigger={
+                                            <Button variant="cta">
+                                                <Plus />
+                                                Create an empty research plan
+                                            </Button>
+                                            }
+                                        />
+                                    ) 
+                                    : (
+                                        <CreateResearchPlanDialog 
+                                            trigger={
+                                                <PulsatingButton
+                                                    className={cn(buttonVariants({variant: 'cta'}))}
+                                                >
+                                                    <Plus />
+                                                    Create an empty research plan
+                                                </PulsatingButton>
+                                            }
+                                        />
+                                    )
+                                }
+                                <Button
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        handleShare()
+                                    }}
+                                    variant={'secondary'}
+                                    className="onborda-share-research-plan"
+                                >
+                                    <Share />
+                                    Share
+                                </Button>
+                            </div>
+                        </div>
+                        <Shell className="gap-2 w-full max-w-full">
+                            <FeatureFlagsProvider showFilters={false}>
+                                <Suspense
+                                    fallback={
+                                        <DataTableSkeleton
+                                            columnCount={7}
+                                            filterCount={2}
+                                            cellWidths={[
+                                                "10rem",
+                                                "30rem",
+                                                "10rem",
+                                                "10rem",
+                                                "6rem",
+                                                "6rem",
+                                                "6rem",
+                                            ]}
+                                            shrinkZero
+                                        />
                                     }
-                                />
-                            ) 
-                            : (
-                                <CreateResearchPlanDialog 
-                                    trigger={
-                                        <PulsatingButton
-                                            className={cn(buttonVariants({variant: 'cta'}))}
-                                        >
-                                            <Plus />
-                                            Create an empty research plan
-                                        </PulsatingButton>
-                                    }
-                                />
-                            )
-                        }
-                        <Button
-                            onClick={(e) => {
-                                e.preventDefault()
-                                handleShare()
-                            }}
-                            variant={'secondary'}
-                            className="onborda-share-research-plan"
-                        >
-                            <Share />
-                            Share
-                        </Button>
-                    </div>
-                </div>
-                {/* <RoadmapsTable 
-                    isPrivate={true}
-                    roadmaps={roadmaps} 
-                    rowClickCallback={() => {
-                        setIsLoading(true)
-                    }}
-                /> */}
-                <Shell className="gap-2 w-full max-w-full">
-                    <FeatureFlagsProvider showFilters={false}>
-                        <Suspense
-                            fallback={
-                                <DataTableSkeleton
-                                    columnCount={7}
-                                    filterCount={2}
-                                    cellWidths={[
-                                        "10rem",
-                                        "30rem",
-                                        "10rem",
-                                        "10rem",
-                                        "6rem",
-                                        "6rem",
-                                        "6rem",
-                                    ]}
-                                    shrinkZero
-                                />
-                            }
-                        >
-                            <DatabaseResearchPlansTable 
-                                data={researchPlansData} 
-                                pageCount={researchPlansPageCount} 
-                                columns={columns}
-                                searchParams={searchParams}
-                                onRowClickCallback={(e: any, row: Row<any> | undefined) => row?.original.id && router.push(`/app/research-plan/${row.original.id}`)}
-                                showPagination={true}
-                                noResultsOverride={(
-                                    <NoResultsTemplate
-                                        imgAlt="No research plans"
-                                        src="https://illustrations.popsy.co/gray/studying.svg"
-                                        title="No research plans yet!"
-                                        description="Your organization does not have any research plans yet."
+                                >
+                                    <DatabaseResearchPlansTable 
+                                        data={researchPlansData} 
+                                        pageCount={researchPlansPageCount} 
+                                        columns={researchPlanColumns}
+                                        searchParams={searchParams}
+                                        onRowClickCallback={(e: any, row: Row<any> | undefined) => row?.original.id && router.push(`/app/research-plan/${row.original.id}`)}
+                                        showPagination={true}
+                                        noResultsOverride={(
+                                            <NoResultsTemplate
+                                                imgAlt="No research plans"
+                                                src="https://illustrations.popsy.co/gray/studying.svg"
+                                                title="No research plans yet!"
+                                                description="Your organization does not have any research plans yet."
+                                            />
+                                        )}
                                     />
-                                )}
-                            />
-                        </Suspense>
-                    </FeatureFlagsProvider>
-                </Shell>
-            </div>
+                                </Suspense>
+                            </FeatureFlagsProvider>
+                        </Shell>
+                    </div>
+                </TabsContent>
+                <TabsContent value="projects" className="w-full">
+                    <div className="p-6 w-full">
+                        <div className="w-full flex justify-between items-center gap-4">
+                            <h2 className="col-span-full font-semibold text-2xl">My Projects</h2>
+                        </div>
+                        <Shell className="gap-2 w-full max-w-full">
+                            <FeatureFlagsProvider showFilters={false}>
+                                <Suspense
+                                    fallback={
+                                        <DataTableSkeleton
+                                            columnCount={7}
+                                            filterCount={2}
+                                            cellWidths={[
+                                                "10rem",
+                                                "30rem",
+                                                "10rem",
+                                                "10rem",
+                                                "6rem",
+                                                "6rem",
+                                                "6rem",
+                                            ]}
+                                            shrinkZero
+                                        />
+                                    }
+                                >
+                                    <DatabaseProjectsTable 
+                                        data={projectsData} 
+                                        pageCount={projectsPageCount} 
+                                        columns={projectColumns}
+                                        searchParams={searchParams}
+                                        onRowClickCallback={(e: any, row: Row<any> | undefined) => row?.original.id && router.push(`/app/research-plan/${row.original.roadmapId}?project=${row.original.nodeId}`)}
+                                        showPagination={true}
+                                        noResultsOverride={(
+                                            <NoResultsTemplate
+                                                imgAlt="No projects"
+                                                src="https://illustrations.popsy.co/gray/studying.svg"
+                                                title="No projects yet!"
+                                                description="Your organization does not have any projects yet."
+                                            />
+                                        )}
+                                    />
+                                </Suspense>
+                            </FeatureFlagsProvider>
+                        </Shell>
+                    </div>
+                </TabsContent>
+            </Tabs>
             
             <Dialog open={shareIsOpen} onOpenChange={setShareIsOpen}>
                 <DialogContent className="min-w-fit">

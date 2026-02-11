@@ -60,6 +60,8 @@ export default async function RoadmapPage(props: IndexPageProps) {
                 description: true,
                 organizationId: true,
                 organization: true,
+                roadmapId: true,
+                nodeId: true,
             },
             {...search, q: globalFilter, filters: validFilters},
             false,
