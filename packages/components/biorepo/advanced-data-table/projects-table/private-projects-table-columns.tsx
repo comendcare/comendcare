@@ -1,21 +1,12 @@
 import type {ColumnDef} from "@tanstack/react-table";
-import {Globe, Lock, Link as LinkIcon, ExternalLink, Building} from "lucide-react";
+import {Globe, Lock} from "lucide-react";
 import * as React from "react";
 import {DataTableColumnHeader} from "../data-table/data-table-column-header";
-import {
-    MILESTONE_TYPE_OPTIONS,
-    RESEARCH_PLAN_STATUS,
-    RESEARCH_PLAN_TYPES,
-    RESEARCH_STAGE,
-} from "@comend/lib/types";
+import {MILESTONE_TYPE_OPTIONS, StatusType} from "@comend/lib/types";
 import { Badge } from "../../../ui/badge";
-import Link from "next/link";
 import { Session } from "next-auth";
-import { ResearchPlanActionsMenu } from "comend-pag-platform/components/research-plans-actions-menu";
-import { PropertyBadge } from "../../../property-badge";
-import { Milestone } from "@prisma/client";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../../../ui/tooltip";
 import { SeeMoreDescription } from "../../../see-more-description";
+import StatusButton from "../../../milestone-status-button";
 
 export function useProjectsTableColumns({session}: {session: Session | null}): ColumnDef<any>[] {
     const columns: ColumnDef<any>[] = [
@@ -68,6 +59,23 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
             enableSorting: false,
         },
         {
+            id: "roadmap.title",
+            accessorKey: "roadmap.title",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Research plan title"
+                />
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{row.original.roadmap?.title || 'Untitled research plan'}</p>
+                </div>
+            ),
+            enableSorting: false,
+        },
+        {
             id: "types",
             accessorKey: "types",
             header: ({column}) => (
@@ -78,7 +86,6 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                 />
             ),
             cell: ({row}) => {
-                console.log(`types`, row.original.types)
                 const options = MILESTONE_TYPE_OPTIONS.filter(option => row.original.types?.map((type: any) => type.milestoneTypeId).includes(option.value))
                 return (
                     (options && options.length > 0)
@@ -90,6 +97,47 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                         : (<p>{'--'}</p>)
                 )
             },
+            enableSorting: false,
+        },
+        {
+            id: "description",
+            accessorKey: "description",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Description"
+                />
+            ),
+            cell: ({row}) => {
+                const description = row.original.description
+                return (
+                    (description && description.length > 0)
+                        ? (<div className="w-fit min-w-[500px]"><SeeMoreDescription description={row.original.description}/></div>)
+                        : (<p>{'--'}</p>)
+                )
+            },
+            enableSorting: false,
+        },
+        {
+            id: "status",
+            accessorKey: "status",
+            header: ({column}) => (
+                <DataTableColumnHeader 
+                    className="min-w-fit text-nowrap"
+                    column={column} 
+                    title="Status"
+                />
+            ),
+            cell: ({row}) => (
+                <StatusButton
+                    disabled={true}
+                    minimal={true}
+                    className="h-[16px]"
+                    status={row.original.status as StatusType || undefined}
+                    onStatusChange={() => {}}
+                />
+            ),
             enableSorting: false,
         },
     ]
