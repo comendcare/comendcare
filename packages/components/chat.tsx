@@ -94,6 +94,7 @@ export function Chat({
 
     const viewportRef = useRef<HTMLDivElement | null>(null)
     const inputRef = useRef<HTMLInputElement | null>(null)
+    const bottomRef = useRef<HTMLDivElement | null>(null)
 
     const exampleCards = [
         {
@@ -118,9 +119,7 @@ export function Chat({
     }, [messages, storageKey])
 
     useEffect(() => {
-        const el = viewportRef.current
-        if (!el) return
-        el.scrollTop = el.scrollHeight
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" })
     }, [messages, isLoading])
 
     const handleSend = async () => {
@@ -165,8 +164,8 @@ export function Chat({
     const isEmpty = messages.length === 0
 
     return (
-        <div className="w-full h-[calc(100vh-100px)] max-w-7xl mx-auto flex flex-col px-8">
-            <ScrollArea className="flex-1">
+        <div className="w-full h-[calc(100vh-100px)] max-w-7xl mx-auto flex flex-col px-4">
+            <ScrollArea className="flex-1 px-4">
                 <div ref={viewportRef} className="py-10">
                     {isEmpty ? (
                         <div className="flex flex-col">
@@ -186,7 +185,7 @@ export function Chat({
                                     key={i}
                                     className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                                 >
-                                    {msg.role === "assistant" && <span className="text-lg shrink-0">🤖</span>}
+                                    {msg.role === "assistant" && <span className="text-lg shrink-0 sixe-50">🤖</span>}
 
                                     <div
                                         className={`rounded-2xl px-4 py-3 max-w-[80%] ${
@@ -197,7 +196,7 @@ export function Chat({
                                     </div>
 
                                     {msg.role === "user" && (
-                                        <Avatar src={userImage} name={userName} size={40}/>
+                                        <Avatar src={userImage} name={userName} size={50}/>
                                     )}
                                 </div>
                             ))}
@@ -208,27 +207,32 @@ export function Chat({
                                     <Loader2 className="h-4 w-4 animate-spin"/>
                                 </div>
                             )}
+
+                            <div ref={bottomRef} />
                         </div>
                     )}
                 </div>
             </ScrollArea>
 
             <div className="pb-6">
-                <div className="mt-auto">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4">
-                        {exampleCards.map((c) => (
-                            <button
-                                key={c.query}
-                                type="button"
-                                onClick={() => applyExample(c.query)}
-                                className="text-left rounded-2xl border bg-background hover:bg-muted/40 transition px-6 py-5"
-                            >
-                                <div className="text-xl font-semibold text-foreground">{c.title}</div>
-                                <div className="text-xl text-muted-foreground">{c.subtitle}</div>
-                            </button>
-                        ))}
+                {isEmpty && (
+                    <div className="mt-auto">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4">
+                            {exampleCards.map((c) => (
+                                <button
+                                    key={c.query}
+                                    type="button"
+                                    onClick={() => applyExample(c.query)}
+                                    className="text-left rounded-2xl border bg-background hover:bg-muted/40 transition px-6 py-5"
+                                >
+                                    <div className="text-xl font-semibold text-foreground">{c.title}</div>
+                                    <div className="text-xl text-muted-foreground">{c.subtitle}</div>
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
+
                 <div className="w-full rounded-3xl border bg-background px-4 py-3 flex items-center justify-between gap-3">
                     <Input
                         ref={(el) => {

@@ -1,6 +1,7 @@
 // app/api/chat/route.ts
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
+import prisma from "@comend/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -90,6 +91,60 @@ export function publicItemUrl(collection: CollectionName, doc: any) {
     }
 }
 
+type Rewritten = {
+    q: string;                     // the query string for Typesense
+    intent?: "count" | "list" | "search";
+    entity?: { orgName?: string }; // extracted org name if any
+    targetCollections?: CollectionName[]; // optional narrowing
+};
+
+function sanitizeTypesenseQ(q: string) {
+    return (q ?? "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 200); // keep it short
+}
+
+async function rewriteForTypesense(userText: string) : Promise<Rewritten> {
+    const prompt = `
+You rewrite user questions into a Typesense-searchable query string.
+
+Rules:
+- Output MUST be valid JSON only (no markdown).
+- "q" MUST be a short string of 2-8 keywords / phrases.
+- Remove filler words like: how, many, does, have, show, list, tell me, please.
+- Keep proper nouns, acronyms, and disease/org names intact.
+- If an organization name is present, put it into entity.orgName exactly as it appears in the user text.
+- Do NOT invent ids, filters, or facts. Do NOT guess collections unless obvious.
+- If user asks "how many research plans does X have", set intent="count" and targetCollections=["research-plans"] and include X in q.
+- Otherwise intent="search".
+
+User text:
+${JSON.stringify(userText)}
+`;
+
+    const r = await openai.responses.create({
+        model: "gpt-5-nano",
+        input: [{ role: "system", content: prompt }],
+    });
+
+    const raw = r.output_text?.trim() ?? "";
+    try {
+        const parsed = JSON.parse(raw) as Rewritten;
+        const q = sanitizeTypesenseQ(parsed.q);
+        if (!q) throw new Error("empty q");
+        return { ...parsed, q };
+    } catch {
+        // fallback: cheap heuristic
+        const fallback = userText
+            .replace(/[?.,!]/g, " ")
+            .replace(/\b(how|many|does|do|have|show|list|tell|me|please|what|is|are|the|a|an)\b/gi, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+        return { q: sanitizeTypesenseQ(fallback) || sanitizeTypesenseQ(userText), intent: "search" };
+    }
+}
+
 type MultiSearchHit = {
     document?: any;
     highlights?: Array<{ field: string; snippet?: string; snippets?: string[] }>;
@@ -128,18 +183,17 @@ function getTypesenseConfig() {
 type Intent =
     | { kind: "count_orgs" }
     | { kind: "list_orgs"; page: number; perPage: number }
+    | { kind: "count_research_plans_for_org"; orgName?: string; orgId?: string | null }
     | { kind: "normal_search"; q: string };
 
 function detectIntent(userText: string, body: ChatBody): Intent {
     const q = (userText ?? "").trim();
     const lower = q.toLowerCase();
 
-    // count organizations
     if (/\bhow many\b/.test(lower) && (/\borgs?\b/.test(lower) || /\borganizations?\b/.test(lower))) {
         return { kind: "count_orgs" };
     }
 
-    // list all organizations / show orgs
     if (
         (/\b(list|show|all)\b/.test(lower) && (/\borgs?\b/.test(lower) || /\borganizations?\b/.test(lower))) ||
         lower === "organizations" ||
@@ -147,11 +201,33 @@ function detectIntent(userText: string, body: ChatBody): Intent {
     ) {
         const page = Number.isFinite(body.page) && (body.page as number) > 0 ? (body.page as number) : 1;
         const perPageRaw = Number.isFinite(body.perPage) && (body.perPage as number) > 0 ? (body.perPage as number) : 25;
-        const perPage = Math.max(1, Math.min(perPageRaw, 100)); // safety cap
+        const perPage = Math.max(1, Math.min(perPageRaw, 100));
         return { kind: "list_orgs", page, perPage };
     }
 
+    // NEW: count research plans
+    if (/\bhow many\b/.test(lower) && /\bresearch plans?\b/.test(lower)) {
+        // if client already set orgId, use it
+        if (body.orgId) return { kind: "count_research_plans_for_org", orgId: body.orgId };
+
+        // otherwise try to extract org name with your rewrite step later (don’t guess here)
+        return { kind: "count_research_plans_for_org" };
+    }
+
     return { kind: "normal_search", q };
+}
+
+async function resolveOrgFromQuery(q: string) {
+    const results = await typesenseMultiSearch({ q });
+    const orgHit = results.find((r) => r.collection === "organizations");
+    if (!orgHit) return null;
+    return { orgId: orgHit.id, orgUrl: orgHit.url, orgTitle: orgHit.title ?? "(untitled org)" };
+}
+
+async function countResearchPlansForOrg(orgId: string) {
+    return prisma.roadmap.count({
+        where: { organizationId: orgId },
+    });
 }
 
 async function getOrganizationsCountNoAdmin() {
@@ -364,6 +440,11 @@ If Comend's data has relevant items:
    - Item: <title> (<collection>/<id>)
      Where to view: <url>
      About: <1-3 sentences grounded in Comend data>
+     
+If Comend data has a "kind" that is a count:
+- Respond with 1-2 sentences stating the count.
+- If an organization is involved, include its "Where to view" link when available.
+- Do not list unrelated items.
 
 If Comend data has no relevant items:
 Respond ONLY with:
@@ -387,15 +468,48 @@ export async function POST(req: Request) {
 
     let contextPayload: any = null;
 
-    if (intent.kind === "count_orgs") {
+    if (intent.kind === "count_research_plans_for_org") {
+        // Step 1: find orgId
+        let orgId = intent.orgId ?? null;
+
+        if (!orgId) {
+            const rewritten = await rewriteForTypesense(lastUser);
+
+            // if the rewriter extracted orgName, prefer that for org resolution
+            const orgQuery = rewritten.entity?.orgName ? rewritten.entity.orgName : rewritten.q;
+
+            const resolved = await resolveOrgFromQuery(orgQuery);
+            orgId = resolved?.orgId ?? null;
+
+            if (!orgId) {
+                contextPayload = {
+                    kind: "count_research_plans_for_org",
+                    error: "org_not_found",
+                    orgQuery,
+                };
+            } else {
+                const count = await countResearchPlansForOrg(orgId);
+                contextPayload = {
+                    kind: "count_research_plans_for_org",
+                    orgId,
+                    org: resolved,
+                    count,
+                };
+            }
+        } else {
+            const count = await countResearchPlansForOrg(orgId);
+            contextPayload = { kind: "count_research_plans_for_org", orgId, count };
+        }
+    } else if (intent.kind === "count_orgs") {
         const count = await getOrganizationsCountNoAdmin();
         contextPayload = { kind: "count_orgs", count };
     } else if (intent.kind === "list_orgs") {
         const list = await listOrganizations({ page: intent.page, perPage: intent.perPage });
         contextPayload = { kind: "list_orgs", ...list };
     } else {
-        const results = await typesenseMultiSearch({ q: intent.q });
-        contextPayload = { kind: "search", q: intent.q, results };
+        const rewritten = await rewriteForTypesense(lastUser);
+        const results = await typesenseMultiSearch({ q: rewritten.q });
+        contextPayload = { kind: "search", q: rewritten.q, rewritten, results };
     }
 
     const context = buildContextBlockJson(contextPayload);
