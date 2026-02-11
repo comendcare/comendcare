@@ -17,7 +17,7 @@ type ChatBody = {
     perPage?: number;
 };
 
-export type CollectionName =
+type CollectionName =
     | "organizations"
     | "milestones"
     | "companies"
@@ -48,7 +48,7 @@ function absoluteUrl(path: string, orgSubdomain?: string) {
     return `${PUBLIC_PROTOCOL}://${hostForOrg(orgSubdomain)}${p}`;
 }
 
-export function publicItemUrl(collection: CollectionName, doc: any) {
+function publicItemUrl(collection: CollectionName, doc: any) {
     const id = String(doc?.id ?? "");
     const slug = String(doc?.slug ?? "");
     const orgSubdomain =
