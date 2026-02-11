@@ -23,6 +23,25 @@ export function useResearchPlansTableColumns(
 
     const columns: ColumnDef<any>[] = [
         {
+            id: "title",
+            accessorKey: "title",
+            header: ({column}) => (
+                <DataTableColumnHeader
+                    column={column}
+                    title="Title"
+                    className="min-w-fit text-nowrap"
+                    // tooltip="Unique ID assigned to this sample. This ID is public and appears in the marketplace."
+                />
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{row.original.title || 'Untitled research plan'}</p>
+                </div>
+            ),
+            enableSorting,
+            enableHiding,
+        },
+        {
             id: "organization.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "organization.name",
             header: ({column}) => (
@@ -53,25 +72,6 @@ export function useResearchPlansTableColumns(
                         organizationId={row.original?.organization?.id}
                         mini={true}
                     />
-                </div>
-            ),
-            enableSorting,
-            enableHiding,
-        },
-        {
-            id: "title",
-            accessorKey: "title",
-            header: ({column}) => (
-                <DataTableColumnHeader
-                    column={column}
-                    title="Title"
-                    className="min-w-fit text-nowrap"
-                    // tooltip="Unique ID assigned to this sample. This ID is public and appears in the marketplace."
-                />
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 items-center">
-                    <p>{row.original.title || 'Untitled research plan'}</p>
                 </div>
             ),
             enableSorting,
