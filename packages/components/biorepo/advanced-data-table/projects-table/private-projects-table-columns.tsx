@@ -162,7 +162,7 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                     (institutions.length > 0 || companies.length > 0)
                         ? (
                             <span className={"flex flex-col gap-2"}>
-                                {institutions.concat(companies).map((partner: string) => <Badge>{partner}</Badge>)}
+                                {institutions.concat(companies).map((partner: string) => <Badge className="w-fit">{partner}</Badge>)}
                             </span>
                         )
                         : (<p>{'--'}</p>)
