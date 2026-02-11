@@ -46,9 +46,8 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
             header: ({column}) => (
                 <DataTableColumnHeader 
                     column={column} 
-                    title="Title"
+                    title="Project title"
                     className="min-w-fit text-nowrap"
-                    // tooltip="Unique ID assigned to this sample. This ID is public and appears in the marketplace."
                 />
             ),
             cell: ({row}) => (
