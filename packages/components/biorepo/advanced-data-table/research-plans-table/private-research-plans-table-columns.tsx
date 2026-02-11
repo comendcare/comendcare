@@ -224,8 +224,8 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                 />
             ),
             cell: ({row}) => {
-                const featuredProjectTypes = ['BIOMARKER', 'EFFICASYSTUDY', 'NATURALHISTORYSTUDY', 'GPMANUFACTURING', 'TOXICOLOGYSTUDY', 'INDSUBMISSION']
-                const milestoneTypes = row.original.milestones?.flatMap((milestone: any) => milestone?.types)?.map((type: any) => type?.milestoneType?.id)?.filter((typeVal: string) => featuredProjectTypes.includes(typeVal))
+                // const featuredProjectTypes = ['BIOMARKER', 'EFFICASYSTUDY', 'NATURALHISTORYSTUDY', 'GPMANUFACTURING', 'TOXICOLOGYSTUDY', 'INDSUBMISSION']
+                // const milestoneTypes = row.original.milestones?.flatMap((milestone: any) => milestone?.types)?.map((type: any) => type?.milestoneType?.id)?.filter((typeVal: string) => featuredProjectTypes.includes(typeVal))
                 const numPrivateProjects = row.original.milestones.filter((milestone: Milestone) => milestone.private).length
                 const numPublishedProjects = row.original.milestones.filter((milestone: Milestone) => !milestone.private).length
                 return (
@@ -264,9 +264,9 @@ export function useResearchPlansTableColumns({session}: {session: Session | null
                                     </Tooltip>
                                 )}
                             </div>
-                            <div className="flex flex-col gap-2">
+                            {/* <div className="flex flex-col gap-2">
                                 {MILESTONE_TYPE_OPTIONS.filter(option => milestoneTypes.includes(option.id)).map(option => <Badge variant="lightBlue">{option.label}</Badge>)}
-                            </div>
+                            </div> */}
                             </div>
                         )
                         : (<p>{'--'}</p>)
