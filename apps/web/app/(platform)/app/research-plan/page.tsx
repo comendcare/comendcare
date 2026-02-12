@@ -4,7 +4,7 @@ import RoadmapsPage from "~web/components/roadmaps-page";
 import prisma from "@comend/lib/prisma";
 import { getProjects, getResearchPlans } from "@comend/lib/fetchers";
 import { SearchParams } from "@comend/components/types";
-import { researchPlanSearchParamsCache } from "@comend/lib/validations";
+import { projectSearchParamsCache, researchPlanSearchParamsCache } from "@comend/lib/validations";
 import { getValidFilters } from "@comend/lib/data-table";
 
 interface IndexPageProps {
@@ -15,9 +15,12 @@ export default async function RoadmapPage(props: IndexPageProps) {
     const session = await getSession()
     const orgId = session?.user.organizationId
     const searchParams = await props.searchParams;
-    const search = researchPlanSearchParamsCache.parse(searchParams);
-    const validFilters = getValidFilters(search.filters);
-    const globalFilter = search.q ?? "";
+    const researchPlansSearch = researchPlanSearchParamsCache.parse(searchParams);
+    const projectsSearch = projectSearchParamsCache.parse(searchParams);
+    const researchPlanValidFilters = getValidFilters(researchPlansSearch.filters);
+    const researchPlanGlobalFilter = researchPlansSearch.q ?? "";
+    const projectValidFilters = getValidFilters(projectsSearch.filters);
+    const projectGlobalFilter = projectsSearch.q ?? "";
 
     const [organization, researchPlansDataResponse, projectsDataResponse] = await Promise.all([
         prisma.organization.findUnique({
@@ -48,7 +51,7 @@ export default async function RoadmapPage(props: IndexPageProps) {
                     include: {types: {include: {milestoneType: true}}}
                 }
             },
-            {...search, q: globalFilter, filters: validFilters},
+            {...researchPlansSearch, q: researchPlanGlobalFilter, filters: researchPlanValidFilters},
             false,
         ),
         getProjects(
@@ -70,7 +73,7 @@ export default async function RoadmapPage(props: IndexPageProps) {
                 updatedAt: true,
                 budget: true,
             },
-            {...search, q: globalFilter, filters: validFilters},
+            {...projectsSearch, q: projectGlobalFilter, filters: projectValidFilters},
             false,
         )
     ])

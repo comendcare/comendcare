@@ -41,7 +41,7 @@ import {getPubMedSearchResultData, getPubMedSearchResultIds} from "./pubmed";
 import {filterColumns} from "./filter-columns";
 import {nanoid} from "nanoid";
 import {mergeResearcherData, mergeResearcherDataAdvanced} from "./../../apps/researcher/lib/utils";
-import {GetBiosamplesSchema, GetClinicalDatasetsSchema, GetDiseaseModelSchema, GetResearchPlansSchema} from "./validations";
+import {GetBiosamplesSchema, GetClinicalDatasetsSchema, GetDiseaseModelSchema, GetProjectSchema, GetResearchPlansSchema} from "./validations";
 import {notFound, redirect} from "next/navigation";
 import {switchOrganization} from "./actions";
 import {ColumnDef} from "@tanstack/react-table";
@@ -2980,7 +2980,7 @@ export const getProjects = async (
         query: {};
         client: {};
     }>,
-    input?: GetResearchPlansSchema,
+    input?: GetProjectSchema,
     publicOnly: boolean = false,
     columns?: ColumnDef<any>[],
 ): Promise<{ data: Milestone[], pageCount: number }> => {
@@ -3020,7 +3020,7 @@ export const getProjects = async (
                 query: {};
                 client: {};
             }>,
-            input?: GetResearchPlansSchema,
+            input?: GetProjectSchema,
             publicOnly: boolean = false
         ) => {
             return await fetchProjects(
@@ -3105,7 +3105,7 @@ const fetchProjects = async (
         client: {};
     }>,
     columns?: ColumnDef<any>[] | undefined,
-    input?: GetResearchPlansSchema,
+    input?: GetProjectSchema,
     publicOnly: boolean = false
 ) => {
     try {
@@ -3136,6 +3136,8 @@ const fetchProjects = async (
 
         let where: any = {};
 
+        console.log(`INPUT`, input)
+
         if (advancedTable) {
             where = filterColumns({
                 filters: input.filters,
@@ -3154,12 +3156,35 @@ const fetchProjects = async (
                 })
             }
 
+            if (input.private.length == 1) {
+                // private only has two options, we only filter if ONE of them
+                // is selected...
+                filters.push({
+                    id: 'private',
+                    value: input.private[0],
+                    variant: 'select',
+                    operator: 'eq',
+                    filterId: nanoid()
+                })
+            }
+
+            if (input.status.length > 0) {
+                filters.push({
+                    id: 'status',
+                    value: input.status,
+                    variant: 'multiSelect',
+                    operator: 'inArray',
+                    filterId: nanoid()
+                })
+            }
+
             where = filterColumns({
                 filters,
                 joinOperator: "and"
             }) || {}
 
-            console.log(`where filter`, where)
+            console.log(`where filter: projects`, filters)
+            console.log(`where filter`, JSON.stringify(where))
         }
 
         // add global filter

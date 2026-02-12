@@ -2,7 +2,7 @@ import type {ColumnDef} from "@tanstack/react-table";
 import {CircleDashed, DollarSign, Globe, Lock} from "lucide-react";
 import * as React from "react";
 import {DataTableColumnHeader} from "../data-table/data-table-column-header";
-import {MILESTONE_TYPE_OPTIONS, StatusType} from "@comend/lib/types";
+import {MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS, StatusType} from "@comend/lib/types";
 import { Badge } from "../../../ui/badge";
 import { Session } from "next-auth";
 import { SeeMoreDescription } from "../../../see-more-description";
@@ -42,7 +42,37 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                     }
                 </div>
             ),
-            enableSorting: false,
+            enableHiding: true,
+            enableColumnFilter: true,
+            meta: {
+                label: "Visibility",
+                variant: "select",
+                options: [
+                    {
+                        label: "Private",
+                        value: "true",
+                    }, {
+                        label: "Published",
+                        value: "false",
+                    }
+                ],
+                icon: CircleDashed,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        {
+                            ...filter,
+                            ...({value: filter.value === "true" ? true : false}),
+                        } as any
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        // join operator doesn't matter in this case because there will only be one entry in the list
+                        joinOperator: 'or'
+                    })
+
+                    return results
+                },
+            },
         },
         {
             id: "title",
@@ -59,7 +89,8 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                     <p>{row.original.title || 'Untitled research plan'}</p>
                 </div>
             ),
-            enableSorting: false,
+            enableSorting: true,
+            enableHiding: true,
         },
         {
             id: "roadmap.title",
@@ -76,7 +107,8 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                     <p>{row.original.roadmap?.title || 'Untitled research plan'}</p>
                 </div>
             ),
-            enableSorting: false,
+            enableSorting: true,
+            enableHiding: true,
         },
         {
             id: "types",
@@ -100,7 +132,14 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                         : (<p>{'--'}</p>)
                 )
             },
-            enableSorting: false,
+            enableHiding: true,
+            enableColumnFilter: true,
+            // meta: {
+            //     label: "Project type",
+            //     variant: "multiSelect",
+            //     options: MILESTONE_TYPE_OPTIONS,
+            //     icon: CircleDashed,
+            // },
         },
         {
             id: "description",
@@ -120,7 +159,8 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                         : (<p>{'--'}</p>)
                 )
             },
-            enableSorting: false,
+            enableSorting: true,
+            enableHiding: true,
         },
         {
             id: "status",
@@ -141,7 +181,14 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                     onStatusChange={() => {}}
                 />
             ),
-            enableSorting: false,
+            enableHiding: true,
+            enableColumnFilter: true,
+            meta: {
+                label: "Status",
+                variant: "multiSelect",
+                options: MILESTONE_STATUS_OPTIONS,
+                icon: CircleDashed,
+            },
         },
         {
             id: 'institution.name',
@@ -169,7 +216,7 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                 )
             },
             enableHiding: true,
-            enableSorting: false,
+            enableSorting: true,
             enableColumnFilter: true,
             meta: {
                 label: "Stored with",
@@ -217,7 +264,8 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                         : (<p>{'--'}</p>)
                 )
             },
-            enableSorting: false,
+            enableSorting: true,
+            enableHiding: true,
         },
         {
             id: "updateAt",
@@ -236,7 +284,8 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                         : (<p>{'--'}</p>)
                 )
             },
-            enableSorting: false,
+            enableSorting: true,
+            enableHiding: true
         },
     ]
 
