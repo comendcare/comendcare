@@ -50,6 +50,7 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
             price: true,
             priceUnit: true,
             notes: true,
+            bsiId: true,
 
             milestones: {include: {milestone: true}},
             donorId: true,

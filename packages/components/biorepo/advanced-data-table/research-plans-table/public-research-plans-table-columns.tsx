@@ -1,23 +1,21 @@
 import type {ColumnDef} from "@tanstack/react-table";
 import * as React from "react";
 import {DataTableColumnHeader} from "./../data-table/data-table-column-header";
-import {DIAGNOSIS_SEVERITY_OPTIONS, Milestone, QUANTITY_OPTIONS, RESEARCH_PLAN_STATUS, RESEARCH_PLAN_TYPES, RESEARCH_STAGE} from "./../../../../../packages/lib/types";
-import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
+import {Milestone, MILESTONE_TYPE_OPTIONS, RESEARCH_PLAN_STATUS, RESEARCH_PLAN_TYPES, RESEARCH_STAGE} from "./../../../../../packages/lib/types";
 import { ProfilePhoto } from "./../../../profile-photo";
 import Link from "next/link";
 import { Badge } from "./../../../ui/badge";
-import { CircleDashed, Globe } from "lucide-react";
-import { handleAsyncCompanyAndInstitutionSearch, handleAsyncConditionSearch, handleAsyncDiagnosesSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncOrganizationSearch } from "@comend/lib/utils";
-import { ExtendedColumnFilter, ExtendedColumnSort } from "@comend/lib/types/data-table";
-import { filterColumns } from "@comend/lib/filter-columns";
-import { generateId } from "@comend/lib/id";
+import { Building, ExternalLink, Globe, Link as LinkIcon } from "lucide-react";
 import { PropertyBadge } from "./../../../../../packages/components/property-badge";
+import ClaimedBadge from "comend-pag-platform/components/claimed-badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./../../../ui/tooltip";
+import { SeeMoreDescription } from "./../../../../../packages/components/see-more-description";
 
 type Preset = "default" | "profile";
 
 export function useResearchPlansTableColumns(
-    enableSorting: boolean = true, 
-    enableHiding: boolean = true, 
+    enableSorting: boolean = true,
+    enableHiding: boolean = true,
     typesenseSearch: boolean = true,
     presetName?: Preset,
 ): ColumnDef<any>[] {
@@ -25,12 +23,31 @@ export function useResearchPlansTableColumns(
 
     const columns: ColumnDef<any>[] = [
         {
+            id: "title",
+            accessorKey: "title",
+            header: ({column}) => (
+                <DataTableColumnHeader
+                    column={column}
+                    title="Title"
+                    className="min-w-fit text-nowrap"
+                    // tooltip="Unique ID assigned to this sample. This ID is public and appears in the marketplace."
+                />
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{row.original.title || 'Untitled research plan'}</p>
+                </div>
+            ),
+            enableSorting,
+            enableHiding,
+        },
+        {
             id: "organization.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "organization.name",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Associated patient group"
                 />
             ),
@@ -51,25 +68,10 @@ export function useResearchPlansTableColumns(
                     >
                         {row.original.organization?.name}
                     </Link>
-                </div>
-            ),
-            enableSorting,
-            enableHiding,
-        },
-        {
-            id: "title",
-            accessorKey: "title",
-            header: ({column}) => (
-                <DataTableColumnHeader 
-                    column={column} 
-                    title="Title"
-                    className="min-w-fit text-nowrap"
-                    // tooltip="Unique ID assigned to this sample. This ID is public and appears in the marketplace."
-                />
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 items-center">
-                    <p>{row.original.title || 'Untitled research plan'}</p>
+                    <ClaimedBadge
+                        organizationId={row.original?.organization?.id}
+                        mini={true}
+                    />
                 </div>
             ),
             enableSorting,
@@ -79,22 +81,20 @@ export function useResearchPlansTableColumns(
             id: "modalities",
             accessorKey: "modalities",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Research strategy"
                 />
             ),
-            cell: ({row}) => (
-                <>
-                    {(row.original.modalities || []).map((type: string, index: number) => {
-                        const typeOption = RESEARCH_PLAN_TYPES.find(t => t.value === type)
-                        return (
-                            <Badge>{typeOption?.label}</Badge>
-                        )
-                    })}
-                </>
-            ),
+            cell: ({row}) => {
+                const options = RESEARCH_PLAN_TYPES.filter(option => row.original.modalities?.includes(option.value))
+                return (
+                    (options && options.length > 0)
+                        ? (options.map(option => <Badge variant={'lightBlue'}>{option?.label}</Badge>))
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
             enableHiding,
         },
@@ -102,22 +102,20 @@ export function useResearchPlansTableColumns(
             id: "stages",
             accessorKey: "stages",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Stage"
                 />
             ),
-            cell: ({row}) => (
-                <>
-                    {(row.original.stages || []).map((type: string, index: number) => {
-                        const typeOption = RESEARCH_STAGE.find(t => t.value === type)
-                        return (
-                            <Badge>{typeOption?.label}</Badge>
-                        )
-                    })}
-                </>
-            ),
+            cell: ({row}) => {
+                const options = RESEARCH_STAGE.filter(option => row.original.stages?.includes(option.value))
+                return (
+                    (options && options.length > 0)
+                        ? (options.map(option => <Badge variant={option?.variant || 'secondary'}>{option?.label}</Badge>))
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
             enableHiding,
         },
@@ -125,22 +123,20 @@ export function useResearchPlansTableColumns(
             id: "statuses",
             accessorKey: "statuses",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Status"
                 />
             ),
-            cell: ({row}) => (
-                <>
-                    {(row.original.statuses || []).map((type: string, index: number) => {
-                        const typeOption = RESEARCH_PLAN_STATUS.find(t => t.value === type)
-                        return (
-                            <Badge>{typeOption?.label}</Badge>
-                        )
-                    })}
-                </>
-            ),
+            cell: ({row}) => {
+                const options = RESEARCH_PLAN_STATUS.filter(option => row.original.statuses?.includes(option.value))
+                return (
+                    (options && options.length > 0)
+                        ? (options.map(option => <Badge>{option?.label}</Badge>))
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
             enableHiding,
         },
@@ -148,50 +144,88 @@ export function useResearchPlansTableColumns(
             id: "partners",
             accessorKey: "partners",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Partners"
                 />
             ),
-            cell: ({row}) => (
-                <ul className="flex flex-col gap-2">
-                    {row.original.partners?.map((partner: any, index: number) => (
-                        <li key={index}>
-                            {partner.affiliation}
-                        </li>
-                    ))}
-                </ul>
-            ),
+            cell: ({row}) => {
+                const partners = row.original.partners
+                return (
+                    (partners && partners.length > 0)
+                        ? (
+                            <ul className="flex flex-col gap-2">
+                                {partners.map((partner: any, index: number) => (
+                                    <li key={index} className="flex items-center gap-2">
+                                        <Building className="h-4 min-h-4 w-4 min-w-4"/>
+                                        {partner.affiliation}
+                                    </li>
+                                ))}
+                            </ul>
+                        )
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
+            enableHiding,
+        },
+        {
+            id: "description",
+            accessorKey: "description",
+            header: ({column}) => (
+                <DataTableColumnHeader
+                    className="min-w-fit text-nowrap min-w-[200px]"
+                    column={column}
+                    title="Description"
+                />
+            ),
+            cell: ({row}) => {
+                const description = row.original.description
+                return (
+                    (description && description.length > 0)
+                        ? (<div className="w-fit min-w-[500px]"><SeeMoreDescription description={row.original.description}/></div>)
+                        : (<p>{'--'}</p>)
+                )
+            },
+            enableSorting,
             enableHiding,
         },
         {
             id: "links",
             accessorKey: "links",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Links"
                 />
             ),
-            cell: ({row}) => (
-                <ul className="flex flex-col gap-2">
-                    {row.original.links?.map((attachment: any, index: number) => (
-                        <li key={index}>
-                            <Link 
-                                className="line-clamp-2 underline" 
-                                href={attachment.link || "/"}
-                                target="_blank"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                            {attachment.name || attachment.link}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            ),
+            cell: ({row}) => {
+                const links = row.original.links
+                return (
+                    (links && links.length > 0)
+                        ? (
+                            <ul className="flex flex-col gap-2">
+                                {links?.map((attachment: any, index: number) => (
+                                    <li key={index} className="flex items-center gap-2">
+                                        <LinkIcon className="h-4 min-h-4 w-4 min-w-4"/>
+                                        <Link 
+                                            className="line-clamp-2 underline" 
+                                            href={attachment.link || "/"}
+                                            target="_blank"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                        {attachment.name || attachment.link}
+                                        </Link>
+                                        <ExternalLink className="h-4 min-h-4 w-4 min-w-4"/>
+                                    </li>
+                                ))}
+                            </ul>
+                        )
+                        : (<p>{'--'}</p>)
+                )
+            },
             enableSorting: false,
             enableHiding,
         },
@@ -199,46 +233,43 @@ export function useResearchPlansTableColumns(
             id: "milestones",
             accessorKey: "milestones",
             header: ({column}) => (
-                <DataTableColumnHeader 
+                <DataTableColumnHeader
                     className="min-w-fit text-nowrap"
-                    column={column} 
+                    column={column}
                     title="Number of projects"
                 />
             ),
             cell: ({row}) => {
+                // const featuredProjectTypes = ['BIOMARKER', 'EFFICASYSTUDY', 'NATURALHISTORYSTUDY', 'GPMANUFACTURING', 'TOXICOLOGYSTUDY', 'INDSUBMISSION']
+                // const milestoneTypes = row.original.milestones?.flatMap((milestone: any) => milestone?.types)?.map((type: any) => type?.milestoneType?.id)?.filter((typeVal: string) => featuredProjectTypes.includes(typeVal))
                 const numPublishedProjects = row.original.milestones.filter((milestone: Milestone) => !milestone.private).length
-
                 return (
-                    <div className="flex flex-col gap-2 justify-center text-nowrap">
-                        {numPublishedProjects > 0 && (
-                            <PropertyBadge 
-                                className="text-nowrap border-green-200 text-green-900 font-semibold" 
-                                icon={Globe}
-                            >
-                                {numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}
-                            </PropertyBadge>
-                        )}
-                    </div>
+                    (numPublishedProjects > 0)
+                        ? (
+                            <div className="flex gap-6">
+                            <div className="flex flex-col gap-2 justify-center text-nowrap">
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <PropertyBadge 
+                                            className="text-nowrap border-green-200 text-green-900 font-semibold" 
+                                            icon={Globe}
+                                        >
+                                            {numPublishedProjects}
+                                        </PropertyBadge>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{numPublishedProjects === 1 ? `${numPublishedProjects} published project` : `${numPublishedProjects} published projects`}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </div>
+                            {/* <div className="flex flex-col gap-2">
+                                {MILESTONE_TYPE_OPTIONS.filter(option => milestoneTypes.includes(option.id)).map(option => <Badge variant="lightBlue">{option.label}</Badge>)}
+                            </div> */}
+                            </div>
+                        )
+                        : (<p>{'--'}</p>)
                 )
             },
-            enableSorting,
-            enableHiding,
-        },
-        {
-            id: "description",
-            accessorKey: "description",
-            header: ({column}) => (
-                <DataTableColumnHeader 
-                    className="min-w-fit text-nowrap"
-                    column={column} 
-                    title="Description"
-                />
-            ),
-            cell: ({row}) => (
-                <div className="line-clamp-3">
-                    {row.original.description}
-                </div>
-            ),
             enableSorting,
             enableHiding,
         },
@@ -247,12 +278,12 @@ export function useResearchPlansTableColumns(
     const presets: Record<Preset, string[]> = {
         default: columns.map((c) => c.id as string),
         profile: [
-            "title", 
-            "modalities", 
+            "title",
+            "modalities",
             "stages",
-            "statuses", 
-            "partners", 
-            "links", 
+            "statuses",
+            "partners",
+            "links",
             "milestones",
             "description"
         ],

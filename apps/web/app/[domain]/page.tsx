@@ -27,6 +27,161 @@ import { biosampleSearchParamsCache } from "@comend/lib/validations";
 import { getValidFilters } from "@comend/lib/data-table";
 import { RFPSort } from "@comend/lib/utils";
 import {TaggableType} from "@prisma/client";
+import type { Metadata, ResolvingMetadata } from "next"
+
+type Props = {
+    params: { domain: string }
+    searchParams: Record<string, string | string[] | undefined>
+}
+
+function absoluteUrl(pathOrUrl: string) {
+    // If it's already absolute, keep it
+    if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl
+
+    const root = `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+
+    return `${root.replace(/\/$/, "")}/${String(pathOrUrl).replace(/^\//, "")}`
+}
+
+function safeText(input: unknown, fallback = "") {
+    if (typeof input !== "string") return fallback
+    return input.trim()
+}
+
+export async function generateMetadata(
+    { params }: Props,
+    _parent: ResolvingMetadata
+): Promise<Metadata> {
+    const domain = decodeURIComponent(params.domain)
+
+    // If you want to avoid duplicating logic with getOrganizationData, you can do a minimal prisma query instead.
+    const organization = await getOrganizationData(domain, {
+        id: true,
+        name: true,
+        description: true,
+        statedGoal: true,
+        website: true,
+        logo: true,
+        image: true,
+        headerImage: true,
+        verified: true,
+        published: true,
+        subdomain: true,
+        customDomain: true,
+    })
+
+    if (!organization) notFound()
+
+    // If you want unverified/unpublished pages to have different metadata, handle here.
+    if (!organization.verified) {
+        return {
+            title: "Organization not verified",
+            description: "This organization profile is not verified yet.",
+            robots: { index: false, follow: false },
+        }
+    }
+
+    if (!organization.published) {
+        return {
+            title: "Organization not published",
+            description: "This organization profile is not published yet.",
+            robots: { index: false, follow: false },
+        }
+    }
+
+    const name = safeText(organization.name, "Organization")
+    const description =
+        safeText(organization.description) ||
+        safeText(organization.statedGoal) ||
+        `Learn about ${name} and its research priorities.`
+
+    // Canonical URL for this profile
+    const canonical = `https://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+
+    const url = absoluteUrl(canonical)
+
+    // Choose best share image
+    const ogImage =
+        safeText(organization.headerImage) ||
+        safeText(organization.image) ||
+        safeText(organization.logo)
+
+    const images = ogImage
+        ? [
+            {
+                url: absoluteUrl(ogImage),
+                width: 1200,
+                height: 630,
+                alt: `${name} — Organization profile`,
+            },
+        ]
+        : undefined
+
+    const iconUrl = safeText(organization.logo) || safeText(organization.image)
+
+    const schema = {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: organization.name,
+        url,
+        logo: organization.logo || undefined,
+        image: organization.image || undefined,
+        description:
+            organization.description ||
+            organization.statedGoal ||
+            undefined,
+        foundingDate: organization.yearFounded
+            ? String(organization.yearFounded)
+            : undefined,
+        contactPoint: organization.contactEmail
+            ? {
+                "@type": "ContactPoint",
+                contactType: "general",
+                email: organization.contactEmail,
+            }
+            : undefined,
+        sameAs: organization.website ? [organization.website] : undefined,
+    }
+
+    return {
+        metadataBase: new URL(`https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`),
+        title: {
+            default: name,
+            template: `%s | ${name}`,
+        },
+        description,
+        alternates: {
+            canonical: url,
+        },
+        openGraph: {
+            type: "website",
+            url,
+            title: name,
+            description,
+            images,
+            siteName: name,
+        },
+        twitter: {
+            card: images ? "summary_large_image" : "summary",
+            title: name,
+            description,
+            images: images?.map((i) => i.url),
+        },
+        icons: iconUrl
+            ? {
+                icon: absoluteUrl(iconUrl),
+                apple: absoluteUrl(iconUrl),
+            }
+            : undefined,
+        robots: {
+            index: true,
+            follow: true,
+        },
+        other: {
+            "script:ld+json": JSON.stringify(schema),
+        },
+    }
+}
 
 interface IndexPageProps {
     params: {domain: string},
@@ -37,7 +192,6 @@ export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
         select: {
             subdomain: true,
-            customDomain: true
         }
         // feel free to remove this filter if you want to generate paths for all organizations
         // where: {
@@ -46,13 +200,10 @@ export async function generateStaticParams() {
     })
 
     const allPaths = allOrganizations
-        .flatMap(({subdomain, customDomain}) => [
+        .flatMap(({subdomain}) => [
             subdomain && {
                 domain: `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
             },
-            customDomain && {
-                domain: customDomain
-            }
         ])
         .filter(Boolean)
     return allPaths
@@ -275,7 +426,10 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                 statuses: true,
                 partners: true,
                 links: true,
-                milestones: {where: {private: false}}
+                milestones: {
+                    where: {private: false},
+                    include: {types: {include: {milestoneType: true}}}
+                }
             },
             undefined,
             true,

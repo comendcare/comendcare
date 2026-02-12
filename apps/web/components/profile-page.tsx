@@ -88,24 +88,23 @@ const EditPAGProfileHeaderDialog = dynamic(
 );
 
 export default function PAGProfilePage({
-                                           organization,
-                                           conditions,
-                                           researchPlans,
-                                           researchPlansPageCount,
-                                           toolCounts,
-                                           biosamples,
-                                           biosamplesPageCount,
-                                           diseaseModels,
-                                           diseaseModelsPageCount,
-                                           clinicalDatasets,
-                                           clinicalDatasetsPageCount,
-                                           rfps,
-                                           isOwner,
-                                           rootDomain,
-                                           searchParams,
-                                           conditionTags
-                                       }: PAGProfilePageProps) {
-
+    organization,
+    conditions,
+    researchPlans,
+    researchPlansPageCount,
+    toolCounts,
+    biosamples,
+    biosamplesPageCount,
+    diseaseModels,
+    diseaseModelsPageCount,
+    clinicalDatasets,
+    clinicalDatasetsPageCount,
+    rfps,
+    isOwner,
+    rootDomain,
+    searchParams,
+    conditionTags
+}: PAGProfilePageProps) {
     return (
         <div className="grid grid-cols-5 px-4 w-full max-w-7xl my-4 mx-auto gap-4">
             <main className="col-span-5 flex flex-col items-center" data-testid="pag-profile-main">

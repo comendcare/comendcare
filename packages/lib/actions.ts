@@ -3385,24 +3385,78 @@ export const createBiosample = withOrganizationAuth(
                     ...(biosampleData.company
                         ? ({company: {connect: {id: biosampleData.company.id}}}) // if company exists in database, connect
                         : ({company: undefined})), // if company does not exist in database, don't connect
-                    donor: {
-                        connectOrCreate: {
-                            where: {
-                                id: data.donorId || nanoid(),
-                                organizationId: organization.id
+                }
+            })
+
+            const existingDonor = await prisma.donor.findFirst({
+                where: {
+                    internalId: data.internalDonorId,
+                    organizationId: organization.id
+                }
+            })
+
+            if (existingDonor) {
+                await prisma.biosample.update({
+                    where: {id: response?.id},
+                    include: {
+                        contacts: true,
+                        attachments: true,
+                        milestones: {
+                            include: {
+                                milestone: {include: {types: {include: {milestoneType: true}}}},
                             },
+                        },
+                        donor: true,
+                        institution: true,
+                        company: true,
+                    },
+                    data: {
+                        donor: {connect: {id: existingDonor.id}}
+                    }
+                    // data: {
+                    //     donor: {
+                    //         // id: data.donorId || generateDonorNanoid(),
+                    //         internalId: data.internalDonorId,
+                    //         sex: data.sex,
+                    //         gender: data.gender,
+                    //         race: data.race,
+                    //         ethnicity: data.ethnicity,
+                    //         treatments: data.treatments,
+                    //         medications: data.medications,
+                    //         organization: {connect: {id: organization.id}},
+                    //         diagnoses: {
+                    //             create: (data.diagnoses || []).map((diagnosis: {
+                    //                 diagnosis: Option[],
+                    //                 severity?: string
+                    //             }) => ({
+                    //                 severity: diagnosis.severity,
+                    //                 type: {
+                    //                     connectOrCreate: {
+                    //                         where: {id: diagnosis.diagnosis[0].value},
+                    //                         create: {
+                    //                             id: diagnosis.diagnosis[0].value,
+                    //                             label: diagnosis.diagnosis[0].label
+                    //                         }
+                    //                     }
+                    //                 }
+                    //             }))
+                    //         }
+                    //     }
+                    // }
+                })
+            } else {
+                await prisma.biosample.update({
+                    where: {id: response?.id},
+                    data: {
+                        donor: {
                             create: {
                                 id: data.donorId || generateDonorNanoid(),
                                 internalId: data.internalDonorId,
-                                // age: typeof data.age === 'string' ? parseInt(data.age, 10) : data.age,
                                 sex: data.sex,
                                 gender: data.gender,
                                 race: data.race,
                                 ethnicity: data.ethnicity,
                                 treatments: data.treatments,
-                                // height: typeof data.height === 'string' ? parseInt(data.height, 10) : data.height,
-                                // weight: typeof data.weight === 'string' ? parseInt(data.weight, 10) : data.weight,
-                                // bmi: typeof data.bmi === 'string' ? parseInt(data.bmi, 10) : data.bmi,
                                 medications: data.medications,
                                 organization: {connect: {id: organization.id}},
                                 diagnoses: {
@@ -3425,8 +3479,8 @@ export const createBiosample = withOrganizationAuth(
                             }
                         }
                     }
-                }
-            })
+                })
+            }
 
             if (!response.private) {
                 await writeRawEvent({

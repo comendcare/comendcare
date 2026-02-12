@@ -49,6 +49,7 @@ const PAGFiltersDialog = dynamic(
 
 // Sort menu (mirrors store-supported sort keys)
 const SORT_ITEMS: { value: string; label: string }[] = [
+    { value: "default", label: "Default" },
     { value: "recently-updated", label: "Recently Updated" },
     { value: "alphabetical", label: "Alphabetical (A-Z)" },
     { value: "money-raised-low-high", label: "$ Raised (Low-High)" },
