@@ -31,14 +31,15 @@ type CollectionName =
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 // ===== URL BUILDING =====
-const PUBLIC_HOST =
-    (process.env.NEXT_PUBLIC_APP_HOST ||
-        process.env.NEXT_PUBLIC_APP_URL?.replace(/^https?:\/\//, "").replace(/\/$/, "") ||
-        "localhost:3000") as string;
+const BASE_URL =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXTAUTH_URL ||
+    "http://localhost:3000"
 
-const PUBLIC_PROTOCOL =
-    (process.env.NEXT_PUBLIC_APP_PROTOCOL ||
-        (PUBLIC_HOST.includes("localhost") ? "http" : "https")) as string;
+const url = new URL(BASE_URL)
+
+const PUBLIC_PROTOCOL = url.protocol.replace(":", "")
+const PUBLIC_HOST = url.host
 
 function hostForOrg(orgSubdomain?: string) {
     return orgSubdomain ? `${orgSubdomain}.${PUBLIC_HOST}` : PUBLIC_HOST;
