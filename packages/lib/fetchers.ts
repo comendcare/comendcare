@@ -6,6 +6,7 @@ import {
     BIOSAMPLE_TYPE_OPTIONS,
     DISEASE_MODEL_TYPE_OPTIONS,
     GLOBAL_FEED_TYPES,
+    MILESTONE_TYPE_OPTIONS,
     Option,
     RequestFiltersType,
     RESEARCH_PLAN_TYPES,
@@ -3165,14 +3166,19 @@ const fetchProjects = async (
         if (input.q) {
             // custom filtering for types - if any of the type labels include the query, include biosamples
             // with these types
-            const queriedTypes = RESEARCH_PLAN_TYPES.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
+            const queriedTypes = MILESTONE_TYPE_OPTIONS.filter(type => type.label.toLocaleLowerCase().includes(input.q.toLocaleLowerCase()))
 
             where.OR = [
                 {id: {contains: input.q, mode: "insensitive"}},
+                {title: {contains: input.q, mode: "insensitive"}},
+                {roadmap: {title: {contains: input.q, mode: "insensitive"}}},
+                {description: {contains: input.q, mode: "insensitive"}},
+                {companies: {some: {company: {title: {contains: input.q, mode: "insensitive"}}}}},
+                {institutions: {some: {institution: {name: {contains: input.q, mode: "insensitive"}}}}}
             ];
 
             if (queriedTypes) {
-                where.OR = where.OR.concat([{types: {hasSome: queriedTypes.map(t => t.value)}}])
+                where.OR = where.OR.concat([{types: {some: {milestoneTypeId: {in: queriedTypes.map(t => t.value)}}}}])
             }
         }
 

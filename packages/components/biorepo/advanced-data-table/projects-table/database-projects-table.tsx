@@ -73,7 +73,21 @@ export function DatabaseProjectsTable({
                         : undefined
                 }
             >
-                <></>
+                {showFilters && (
+                    enableAdvancedFilter ? (
+                        <DataTableAdvancedToolbar table={table}>
+                            <DataTableFilterList
+                                table={table}
+                                shallow={shallow}
+                                debounceMs={debounceMs}
+                                throttleMs={throttleMs}
+                                align="start"
+                            />
+                        </DataTableAdvancedToolbar>
+                    ) : (
+                        <DataTableToolbar table={table} enableSearch={true}/>
+                    )
+                )}
             </DataTable>
 
             {!!interactiveDialog && interactiveDialog}
