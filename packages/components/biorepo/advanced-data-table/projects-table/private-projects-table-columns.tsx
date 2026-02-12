@@ -134,6 +134,7 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
             },
             enableHiding: true,
             enableColumnFilter: true,
+            enableSorting: false,
             meta: {
                 label: "Project type",
                 variant: "multiSelect",
@@ -216,31 +217,31 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                 )
             },
             enableHiding: true,
-            enableSorting: true,
+            enableSorting: false,
             enableColumnFilter: true,
-            meta: {
-                label: "Stored with",
-                variant: "select",
-                icon: CircleDashed,
-                showInAdvancedOnly: true,
-                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
-                    const filters = [
-                        filter,
-                        {
-                            ...filter,
-                            id: 'company.title',
-                            filterId: generateId({length: 8})
-                        }
-                    ]
-                    const results = filterColumns({
-                        filters,
-                        joinOperator: 'or'
-                    })
+            // meta: {
+            //     label: "Stored with",
+            //     variant: "select",
+            //     icon: CircleDashed,
+            //     showInAdvancedOnly: false,
+            //     dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+            //         const filters = [
+            //             filter,
+            //             {
+            //                 ...filter,
+            //                 id: 'company.title',
+            //                 filterId: generateId({length: 8})
+            //             }
+            //         ]
+            //         const results = filterColumns({
+            //             filters,
+            //             joinOperator: 'or'
+            //         })
 
-                    return results
-                },
-                onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
-            }
+            //         return results
+            //     },
+            //     onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
+            // }
         },
         {
             id: "budget",
@@ -268,7 +269,7 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
             enableHiding: true,
         },
         {
-            id: "updateAt",
+            id: "updatedAt",
             accessorKey: "updatedAt",
             header: ({column}) => (
                 <DataTableColumnHeader 
@@ -285,7 +286,14 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
                 )
             },
             enableSorting: true,
-            enableHiding: true
+            enableHiding: true,
+            enableColumnFilter: true,
+            meta: {
+                label: "Last edited",
+                variant: "dateRange",
+                icon: CircleDashed,
+                showInAdvancedOnly: false,
+            }
         },
     ]
 

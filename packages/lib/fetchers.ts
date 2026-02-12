@@ -3188,6 +3188,16 @@ const fetchProjects = async (
                 })
             }
 
+            if (input.updatedAt.length > 0) {
+                filters.push({
+                    id: 'updatedAt',
+                    value: input.updatedAt,
+                    variant: 'date',
+                    operator: 'isBetween',
+                    filterId: nanoid()
+                })
+            }
+
             where = filterColumns({
                 filters,
                 joinOperator: "and"

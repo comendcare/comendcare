@@ -2,6 +2,7 @@ import {
   createSearchParamsCache,
   parseAsArrayOf,
   parseAsInteger,
+  parseAsIsoDate,
   parseAsString,
   parseAsStringEnum,
 } from "nuqs/server";
@@ -100,6 +101,7 @@ export const projectSearchParamsCache = createSearchParamsCache({
   quantity: parseAsArrayOf(z.coerce.string()).withDefault([]),
   private: parseAsArrayOf(z.string().toLowerCase().transform((x) => x === 'true').pipe(z.boolean())).withDefault([]),
   createdAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
+  updatedAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
   // advanced filter
   filters: getFiltersStateParser().withDefault([]),
   joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and"),
