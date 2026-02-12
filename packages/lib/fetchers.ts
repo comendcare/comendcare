@@ -3136,8 +3136,6 @@ const fetchProjects = async (
 
         let where: any = {};
 
-        console.log(`INPUT`, input)
-
         if (advancedTable) {
             where = filterColumns({
                 filters: input.filters,
@@ -3212,9 +3210,6 @@ const fetchProjects = async (
                 filters,
                 joinOperator: "and"
             }) || {}
-
-            console.log(`where filter: projects`, filters)
-            console.log(`where filter`, JSON.stringify(where))
         }
 
         // add global filter

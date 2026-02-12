@@ -204,8 +204,6 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
             cell: ({row}) => {
                 const institutions = (row.original.institutions || []).map((institution: any) => institution.institution.name)
                 const companies = (row.original.companies || []).map((company: any) => company.company.title)
-                console.log(`institutions`, row.original.institutions)
-                console.log(`companies`, row.original.companies)
                 return (
                     (institutions.length > 0 || companies.length > 0)
                         ? (
@@ -219,29 +217,29 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
             enableHiding: true,
             enableSorting: false,
             enableColumnFilter: true,
-            // meta: {
-            //     label: "Stored with",
-            //     variant: "select",
-            //     icon: CircleDashed,
-            //     showInAdvancedOnly: false,
-            //     dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
-            //         const filters = [
-            //             filter,
-            //             {
-            //                 ...filter,
-            //                 id: 'company.title',
-            //                 filterId: generateId({length: 8})
-            //             }
-            //         ]
-            //         const results = filterColumns({
-            //             filters,
-            //             joinOperator: 'or'
-            //         })
+            meta: {
+                label: "Stored with",
+                variant: "select",
+                icon: CircleDashed,
+                showInAdvancedOnly: false,
+                dbAccessor: (filter: ExtendedColumnFilter<unknown>) => {
+                    const filters = [
+                        filter,
+                        {
+                            ...filter,
+                            id: 'company.title',
+                            filterId: generateId({length: 8})
+                        }
+                    ]
+                    const results = filterColumns({
+                        filters,
+                        joinOperator: 'or'
+                    })
 
-            //         return results
-            //     },
-            //     onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
-            // }
+                    return results
+                },
+                onAsyncSearch: handleAsyncCompanyAndInstitutionSearch
+            }
         },
         {
             id: "budget",
