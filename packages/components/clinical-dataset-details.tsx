@@ -68,67 +68,69 @@ export const ClinicalDatasetDetails = ({clinicalDataset}: { clinicalDataset: any
                     </a>
                 )}
 
-                {clinicalDataset?.description && <Separator />}
+                <CaretAccordion 
+                    title={'Notes'}
+                    content={
+                        <p className="text-sm">{clinicalDataset?.description || '--'}</p>
+                    }
+                />
 
-                {clinicalDataset?.description && (
-                    <CaretAccordion 
-                        title={'Notes'}
-                        content={
-                            <p className="text-sm">{clinicalDataset.description}</p>
-                        }
-                    />
-                )}
+                <Separator />
+                
+                <div className="flex flex-col gap-2 w-full">
+                    <h3 className="text-lg font-semibold">Contacts</h3>
+                    {clinicalDataset?.contacts && clinicalDataset.contacts?.length > 0 
+                        ? (
+                            clinicalDataset?.contacts?.map((contact: ExternalContact) => (
+                                <span className="flex items-center gap-2 text-wrap w-full text-sm">
+                                    <Mail className="h-4 w-4 min-h-4 min-w-4"/>
+                                    <a
+                                        className={cn(contact?.email && "underline")}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                        }}
+                                        href={contact?.email ? `mailto:${contact?.email}` : undefined}
+                                    >
+                                        {contact?.name ||
+                                            contact?.email ||
+                                            contact?.affiliation || "No primary contacts"}
+                                    </a>
+                                </span>
+                            ))
+                        )
+                        : (<p>{'--'}</p>)
+                    }
+                </div>
 
-                {((clinicalDataset?.contacts && clinicalDataset.contacts.length > 0) || (clinicalDataset?.attachments && clinicalDataset.attachments.length > 0)) && <Separator />}
-
-                {clinicalDataset?.contacts && clinicalDataset.contacts.length > 0 && (
-                    <div className="flex flex-col gap-2 w-full">
-                        <h3 className="text-lg font-semibold">Contacts</h3>
-                        {clinicalDataset?.contacts?.map((contact: ExternalContact) => (
-                            <span className="flex items-center gap-2 text-wrap w-full text-sm">
-                                <Mail className="h-4 w-4 min-h-4 min-w-4"/>
-                                <a
-                                    className={cn(contact?.email && "underline")}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                    }}
-                                    href={contact?.email ? `mailto:${contact?.email}` : undefined}
-                                >
-                                    {contact?.name ||
-                                        contact?.email ||
-                                        contact?.affiliation || "No primary contacts"}
-                                </a>
-                            </span>
-                        ))}
-                    </div>
-                )}
-
-                {clinicalDataset?.attachments && clinicalDataset.attachments.length > 0 && (
-                    <div className="flex flex-col gap-2 w-full">
-                        <h3 className="text-lg font-semibold">Attachments</h3>
-                        {clinicalDataset?.attachments?.map((attachment: ExternalAttachment) => (
-                            <span className="flex items-center gap-2 text-wrap w-full text-sm">
-                                <LinkIcon className="h-4 w-4 min-h-4 min-w-4"/>
-                                <a
-                                    className={cn(
-                                        attachment?.link && "underline", 
-                                        "text-wrap",
-                                        // allow text break in middle of word for long links
-                                        !attachment.name && attachment.link && "break-all"
-                                    )}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                    }}
-                                    href={attachment?.link}
-                                    target="_blank"
-                                >
-                                    {attachment?.name || attachment?.link || "No attachments"}
-                                </a>
-                                <ExternalLink className="h-4 w-4 min-h-4 min-w-4"/>
-                            </span>
-                        ))}
-                    </div>
-                )}
+                <div className="flex flex-col gap-2 w-full">
+                    <h3 className="text-lg font-semibold">Attachments</h3>
+                    {clinicalDataset?.attachments && clinicalDataset.attachments?.length > 0 
+                        ? (
+                            clinicalDataset?.attachments?.map((attachment: ExternalAttachment) => (
+                                <span className="flex items-center gap-2 text-wrap w-full text-sm">
+                                    <LinkIcon className="h-4 w-4 min-h-4 min-w-4"/>
+                                    <a
+                                        className={cn(
+                                            attachment?.link && "underline", 
+                                            "text-wrap",
+                                            // allow text break in middle of word for long links
+                                            !attachment.name && attachment.link && "break-all"
+                                        )}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                        }}
+                                        href={attachment?.link}
+                                        target="_blank"
+                                    >
+                                        {attachment?.name || attachment?.link || "No attachments"}
+                                    </a>
+                                    <ExternalLink className="h-4 w-4 min-h-4 min-w-4"/>
+                                </span>
+                            ))
+                        ) 
+                        : (<p>{'--'}</p>)
+                    }
+                </div>
             </div>
         </ScrollArea>
     )
