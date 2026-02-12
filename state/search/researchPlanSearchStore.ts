@@ -6,6 +6,7 @@ import { ASSOCIATED_CATEGORIES, Milestone } from '@comend/lib/types'
 import { getExclusiveToFirstGroup, sleep, typesenseSortByFromColumnId } from '@comend/lib/utils';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { SearchResponse } from 'typesense/lib/Typesense/Documents';
+import { BadgeVariantType } from '@comend/components/ui/badge';
 
 export type ViewType = 'grid' | 'list'
 
@@ -14,16 +15,19 @@ export type FiltersType = {
         label: string,
         value: string,
         disable?: boolean,
+        variant?: BadgeVariantType
     }[],
     statuses: {
         label: string,
         value: string,
         disable?: boolean,
+        variant?: BadgeVariantType
     }[],
     modalities: {
         label: string,
         value: string,
         disable?: boolean,
+        variant?: BadgeVariantType
     }[],
 }
 
@@ -70,7 +74,7 @@ function generateFiltersString(filters: FiltersType): string {
 }
 
 const sortByFilters: { [key: string]: string } = {
-    "default": "updatedAt:desc",
+    "default": "fieldsFilled:desc,updatedAt:desc",
 }
 
 async function withRetry<T>(
@@ -95,7 +99,7 @@ const getUpdatedSearchResults = async (
         state: any,
         isNewSearch: boolean = true
     ) => {
-        let sortByList = []
+        let sortByList: string[] = []
         const filtersString = generateFiltersString(state.filters)
 
         if (state.sortBy) {
@@ -108,7 +112,7 @@ const getUpdatedSearchResults = async (
             }
         }
 
-        sortByList.push(`updatedAt:desc`)
+        if (sortByList.length === 0) sortByList.push(`fieldsFilled:desc,updatedAt:desc`)
         const sortBy = sortByList.join(`,`)
 
         const searchParameters = {

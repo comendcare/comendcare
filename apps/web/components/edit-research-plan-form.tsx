@@ -50,6 +50,7 @@ import { DialogFooter } from "@comend/components/ui/dialog"
 import { PrivatePublicFormField } from "./edit-milestone-form"
 import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
 import LoadingDots from "@comend/components/icons/loading-dots"
+import { badgeVariants } from "@comend/components/ui/badge"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -223,11 +224,13 @@ export function EditResearchPlanForm({
                                     defaultOptions={RESEARCH_PLAN_TYPES}
                                     placeholder="Select a strategy..."
                                     hidePlaceholderWhenSelected={true}
+                                    badgeClassName={badgeVariants({variant: "lightBlue"})}
                                     emptyIndicator={
                                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                             no results found.
                                         </p>
                                     }
+                                    
                                     maxSelected={1}
                                     showHoverCard={false}
                                     groupBy="type"
@@ -358,6 +361,7 @@ export function EditResearchPlanForm({
                                     defaultOptions={RESEARCH_STAGE}
                                     placeholder="Select a stage..."
                                     hidePlaceholderWhenSelected={true}
+                                    // badgeClassName={badgeVariants({variant: field.value?.[0]?.variant as any || "secondary"})}
                                     emptyIndicator={
                                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                             no results found.

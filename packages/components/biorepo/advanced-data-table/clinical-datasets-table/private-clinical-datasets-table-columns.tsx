@@ -1,10 +1,13 @@
 import type { ColumnDef, Row } from "@tanstack/react-table";
 import {
   CircleDashed,
+  ExternalLink,
   FileText,
   Globe,
   Lock,
   Text,
+  User,
+  Link as LinkIcon
 } from "lucide-react";
 import * as React from "react";
 import { DataTableColumnHeader } from "./../data-table/data-table-column-header";
@@ -20,6 +23,7 @@ import { Session } from "next-auth";
 import { ExtendedColumnFilter } from "@comend/lib/types/data-table";
 import { filterColumns } from "@comend/lib/filter-columns";
 import { generateId } from "@comend/lib/id";
+import { SeeMoreDescription } from "./../../../../../packages/components/see-more-description";
 
 export function getClinicalDatasetsTableColumns({session}: {session: Session | null}): ColumnDef<any>[] {
   const columns: ColumnDef<any>[] = [
@@ -124,7 +128,7 @@ export function getClinicalDatasetsTableColumns({session}: {session: Session | n
         ),
         cell: ({row}) => (
             <div className="flex gap-2 items-center">
-                <p>{row.original.id || 'No Dataset ID'}</p>
+                <p>{row.original.id || '--'}</p>
             </div>
         ),
         enableHiding: true,
@@ -136,6 +140,9 @@ export function getClinicalDatasetsTableColumns({session}: {session: Session | n
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Title" />
         ),
+        cell: ({row}) => (
+            <p>{row.original.title || '--'}</p>
+        ),
         meta: { label: "Title" },
         enableColumnFilter: false,
     },
@@ -145,16 +152,14 @@ export function getClinicalDatasetsTableColumns({session}: {session: Session | n
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Type" />
         ),
-        cell: ({ row }) => (
-          <>
-            {(row.original.types || []).map((type: string, index: number) => {
-              const typeOption = TOOL_TYPE_OPTIONS.find(t => t.value === type)
-              return (
-                <MilestoneTypeBadge key={index} label={typeOption?.label}/>
-              )
-            })}
-          </>
-        ),
+        cell: ({row}) => {
+            const options = TOOL_TYPE_OPTIONS.filter(option => row.original.types?.includes(option.value))
+            return (
+                (options && options.length > 0)
+                    ? (options.map((option, index) => <MilestoneTypeBadge label={option?.label} key={index}/>))
+                    : (<p>{'--'}</p>)
+            )
+        },
         enableHiding: true,
         enableColumnFilter: true,
         meta: {
@@ -171,11 +176,7 @@ export function getClinicalDatasetsTableColumns({session}: {session: Session | n
             <DataTableColumnHeader column={column} title="Cohort size"/>
         ),
         cell: ({row}) => (
-            <>{
-                (row.original.cohortSize !== null && row.original.cohortSize !== undefined)
-                    ? row.original.cohortSize
-                    : ''
-            }</>
+            <p>{row.original.cohortSize || '--'}</p>
         ),
         enableHiding: true,
         meta: { label: "Cohort size" }
@@ -186,9 +187,16 @@ export function getClinicalDatasetsTableColumns({session}: {session: Session | n
         header: ({column}) => (
             <DataTableColumnHeader column={column} title="Genes"/>
         ),
-        cell: ({row}) => (
-            <MultipleGenesCell row={row} />
-        ),
+        cell: ({row}) => {
+            const genes = row.original.genes
+            return (
+                (genes && genes.length > 0)
+                    ? (
+                        <MultipleGenesCell row={row} />
+                    )
+                    : (<p>{'--'}</p>)
+            )
+        },
         enableHiding: true,
         enableColumnFilter: true,
         enableSorting: false,
@@ -207,14 +215,16 @@ export function getClinicalDatasetsTableColumns({session}: {session: Session | n
             <DataTableColumnHeader column={column} title="Stored with"/>
         ),
         cell: ({row}) => {
+            const institution = row.original.institution?.name
+            const company = row.original.company?.title
             return (
-                <>
-                {(row.original.institution?.name || row.original.company?.title) && (
-                    <Badge>
-                        {row.original.institution?.name || row.original.company?.title}
-                    </Badge>
-                )}
-                </>
+                (institution || company)
+                    ? (
+                        <Badge>
+                            {institution || company}
+                        </Badge>
+                    )
+                    : (<p>{'--'}</p>)
             )
         },
         enableHiding: true,
@@ -250,15 +260,23 @@ export function getClinicalDatasetsTableColumns({session}: {session: Session | n
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Point of contact" />
         ),
-        cell: ({ row }) => (
-            <ul className="flex flex-col gap-2">
-                {row.original.contacts?.map((contact: any, index: number) => (
-                    <li key={index}>
-                        {contact.name || contact.email || contact.affiliation}
-                    </li>
-                ))}
-            </ul>
-        ),
+        cell: ({row}) => {
+            const contacts = row.original.contacts
+            return (
+                (contacts && contacts.length > 0)
+                    ? (
+                        <ul className="flex flex-col gap-2">
+                            {row.original.contacts?.map((contact: any, index: number) => (
+                                <li key={index} className="flex items-center gap-2">
+                                    <User className="h-4 min-h-4 w-4 min-w-4"/>
+                                    {contact.name || contact.email || contact.affiliation}
+                                </li>
+                            ))}
+                        </ul>
+                    )
+                    : (<p>{'--'}</p>)
+            )
+        },
         enableSorting: false,
         enableHiding: true,
         meta: { label: "Point of contact" }
@@ -269,22 +287,31 @@ export function getClinicalDatasetsTableColumns({session}: {session: Session | n
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Links" />
         ),
-        cell: ({ row }) => (
-            <ul className="flex flex-col gap-2">
-                {row.original.attachments?.map((attachment: any, index: number) => (
-                    <li key={index}>
-                        <Link 
-                            className="line-clamp-1 underline text-ellipsis text-nowrap max-w-[250px]" 
-                            href={attachment.link || "/"}
-                            target="_blank"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                        {attachment.name || attachment.link}
-                        </Link>
-                    </li>
-                ))}
-            </ul>
-        ),
+        cell: ({row}) => {
+            const attachments = row.original.attachments
+            return (
+                (attachments && attachments.length > 0)
+                    ? (
+                        <ul className="flex flex-col gap-2">
+                            {row.original.attachments?.map((attachment: any, index: number) => (
+                                <li key={index} className="flex items-center gap-2">
+                                    <LinkIcon className="h-4 min-h-4 w-4 min-w-4"/>
+                                    <Link 
+                                        className="line-clamp-2 underline" 
+                                        href={attachment.link || "/"}
+                                        target="_blank"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                    {attachment.name || attachment.link}
+                                    </Link>
+                                    <ExternalLink className="h-4 min-h-4 w-4 min-w-4"/>
+                                </li>
+                            ))}
+                        </ul>
+                    )
+                    : (<p>{'--'}</p>)
+            )
+        },
         meta: { label: "Links" },
         enableSorting: false,
         enableHiding: true,
@@ -294,18 +321,25 @@ export function getClinicalDatasetsTableColumns({session}: {session: Session | n
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Linked projects" />
         ),
-        cell: ({row}) => (
-            <ul className="flex flex-col gap-2">
-                {row.original.milestones?.map((milestone: any, index: number) => (
-                    <li key={index}>
-                        <Badge variant={"purple"}>
-                            <FileText className="h-4 w-4 min-h-4 min-w-4"/>
-                            {milestone.milestone?.title || undefined}
-                        </Badge>
-                    </li>
-                ))}
-            </ul>
-        ),
+        cell: ({row}) => {
+            const milestones = row.original.milestones
+            return (
+                (milestones && milestones.length > 0)
+                    ? (
+                        <ul className="flex flex-col gap-2">
+                            {milestones.map((milestone: any, index: number) => (
+                                <li key={index}>
+                                    <Badge variant={"purple"} className="">
+                                        <FileText className="h-4 w-4 min-h-4 min-w-4"/>
+                                        {milestone.milestone?.title || undefined}
+                                    </Badge>
+                                </li>
+                            ))}
+                        </ul>
+                    )
+                    : (<p>{'--'}</p>)
+            )
+        },
         enableSorting: false,
         enableHiding: true,
         enableColumnFilter: true,
@@ -344,11 +378,14 @@ export function getClinicalDatasetsTableColumns({session}: {session: Session | n
                 title="Notes"
             />
         ),
-        cell: ({row}) => (
-            <div className="line-clamp-3">
-                {row.original.description}
-            </div>
-        ),
+        cell: ({row}) => {
+            const description = row.original.description
+            return (
+                (description && description.length > 0)
+                    ? (<div className="w-fit min-w-[500px]"><SeeMoreDescription description={description}/></div>)
+                    : (<p>{'--'}</p>)
+            )
+        },
         meta: { label: "Notes" },
         enableHiding: true,
     },
@@ -362,11 +399,14 @@ export function getClinicalDatasetsTableColumns({session}: {session: Session | n
                 title="Internal notes"
             />
         ),
-        cell: ({row}) => (
-            <div className="line-clamp-3">
-                {row.original.notes}
-            </div>
-        ),
+        cell: ({row}) => {
+            const internalNotes = row.original.notes
+            return (
+                (internalNotes && internalNotes.length > 0)
+                    ? (<div className="w-fit min-w-[500px]"><SeeMoreDescription description={internalNotes}/></div>)
+                    : (<p>{'--'}</p>)
+            )
+        },
         meta: { label: "Internal notes" },
         enableHiding: true,
     },

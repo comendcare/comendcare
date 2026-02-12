@@ -11,6 +11,12 @@ const links = [
         comingSoon: false
     },
     {
+        name: "Research plans",
+        href: "/marketplace/research-plans",
+        icon: Workflow,
+        comingSoon: false
+    },
+    {
         name: "Patient groups",
         href: "/marketplace/patient-groups",
         icon: Users,
@@ -46,12 +52,6 @@ const links = [
         icon: Building2,
         comingSoon: false
     },
-    {
-        name: "Research plans",
-        href: "/marketplace/research-plans",
-        icon: Workflow,
-        comingSoon: false
-    }
     // {
     //     name: "Researchers",
     //     href: "/marketplace/researchers",
@@ -65,6 +65,12 @@ const publicLinks = [
         name: "Explore",
         href: "/marketplace",
         icon: SearchIcon,
+        comingSoon: false
+    },
+    {
+        name: "Research plans",
+        href: "/marketplace/research-plans",
+        icon: Workflow,
         comingSoon: false
     },
     {
@@ -95,12 +101,6 @@ const publicLinks = [
         name: "RFPs",
         href: "/marketplace/rfps",
         icon: Megaphone,
-        comingSoon: false
-    },
-    {
-        name: "Research plans",
-        href: "/marketplace/research-plans",
-        icon: Workflow,
         comingSoon: false
     }
     // {

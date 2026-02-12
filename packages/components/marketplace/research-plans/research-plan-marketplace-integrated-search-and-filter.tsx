@@ -109,7 +109,7 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
                 {activeCount > 0 && (
                     <div className="flex flex-wrap gap-2 items-center">
                         {(filters.modalities || []).map((item) => (
-                            <Badge key={`modalities-${item.value}`} variant="secondary" className="text-xs">
+                            <Badge key={`modalities-${item.value}`} variant="lightBlue" className="text-xs">
                                 {item.label}
                                 <button
                                     onClick={() => removeFilterItem("modalities", item.value)}
@@ -121,7 +121,7 @@ export function ResearchPlanMarketplaceIntegratedSearchAndFilter() {
                         ))}
 
                         {(filters.stages || []).map((item) => (
-                            <Badge key={`stages-${item.value}`} variant="secondary" className="text-xs">
+                            <Badge key={`stages-${item.value}`} variant={item.variant || "secondary"} className="text-xs">
                                 {item.label}
                                 <button
                                     onClick={() => removeFilterItem("stages", item.value)}
