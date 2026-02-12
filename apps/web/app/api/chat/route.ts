@@ -158,6 +158,63 @@ type MultiSearchResult = {
     search?: { collection?: string };
 };
 
+function normalizeForCompare(s: string) {
+    return (s ?? "")
+        .toLowerCase()
+        .replace(/&/g, " and ")
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function tokenOverlapScore(a: string, b: string) {
+    const A = new Set(normalizeForCompare(a).split(" ").filter(Boolean));
+    const B = new Set(normalizeForCompare(b).split(" ").filter(Boolean));
+    if (!A.size || !B.size) return 0;
+    let inter = 0;
+    A.forEach((t) => {
+        if (B.has(t)) inter++;
+    });
+    // prefer overlap relative to query length
+    return inter / Math.max(1, A.size);
+}
+
+function candidateOrgQueries(raw: string) {
+    const base = (raw ?? "").trim();
+    if (!base) return [];
+
+    // If user asks "How many research plans does X have", X might be a gene token
+    // but orgs are often "X Foundation", "X Association", etc.
+    const suffixes = [
+        "", // original
+        " foundation",
+        " association",
+        " advocacy",
+        " alliance",
+        " research foundation",
+        " syndrome foundation",
+        " connect",
+        " network",
+        " initiative",
+        " group",
+        " org",
+        " organization",
+    ];
+
+    // de-dupe while preserving order
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const suf of suffixes) {
+        const q = sanitizeTypesenseQ(`${base}${suf}`.trim());
+        if (!q) continue;
+        const key = q.toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(q);
+    }
+    return out.slice(0, 8);
+}
+
 function bestSnippet(hit: MultiSearchHit): string | undefined {
     const hs = hit.highlights ?? [];
     const first = hs.find((h) => h.snippet)?.snippet;
@@ -218,11 +275,97 @@ function detectIntent(userText: string, body: ChatBody): Intent {
     return { kind: "normal_search", q };
 }
 
-async function resolveOrgFromQuery(q: string) {
-    const results = await typesenseMultiSearch({ q });
-    const orgHit = results.find((r) => r.collection === "organizations");
-    if (!orgHit) return null;
-    return { orgId: orgHit.id, orgUrl: orgHit.url, orgTitle: orgHit.title ?? "(untitled org)" };
+async function searchOrganizations(opts: { q: string; perPage?: number }) {
+    const { TYPESENSE_URL, searchKey } = getTypesenseConfig();
+
+    const q = (opts.q ?? "").trim();
+    if (!q) return [];
+
+    const url = new URL(`${TYPESENSE_URL}/collections/organizations/documents/search`);
+    url.searchParams.set("q", q);
+    url.searchParams.set("query_by", "name,description");
+    url.searchParams.set("per_page", String(opts.perPage ?? 10));
+
+    // make org lookup forgiving + ranked well
+    url.searchParams.set("prefix", "true");
+    url.searchParams.set("exhaustive_search", "true");
+    url.searchParams.set("num_typos", "2");
+    url.searchParams.set("typo_tokens_threshold", "1");
+    url.searchParams.set("prioritize_exact_match", "true");
+
+    const res = await fetch(url.toString(), {
+        method: "GET",
+        headers: { "X-TYPESENSE-API-KEY": searchKey },
+        cache: "no-store",
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Typesense organizations search failed: ${res.status} ${text}`);
+    }
+
+    const json = await res.json();
+    const hits = (json?.hits ?? []) as Array<{ document?: any; text_match?: number }>;
+
+    return hits
+        .map((h) => {
+            const doc = h.document ?? {};
+            const id = String(doc.id ?? "");
+            if (!id) return null;
+
+            const title = String(doc.name ?? "(untitled)");
+            const orgSubdomain = doc.subdomain || undefined;
+            const url = publicItemUrl("organizations", { ...doc, __orgSubdomain: orgSubdomain });
+
+            return {
+                id,
+                title,
+                url,
+                score: Number(h.text_match ?? 0),
+                doc,
+            };
+        })
+        .filter(Boolean) as Array<{ id: string; title: string; url: string; score: number; doc: any }>;
+}
+
+async function resolveOrgFromQuery(raw: string) {
+    const queries = candidateOrgQueries(raw);
+    if (!queries.length) return null;
+
+    let best:
+        | { orgId: string; orgUrl: string; orgTitle: string; score: number }
+        | null = null;
+
+    for (const q of queries) {
+        const hits = await searchOrganizations({ q, perPage: 10 });
+        if (!hits.length) continue;
+
+        // Choose best by: overlap with the *raw* query + Typesense score
+        // (overlap dominates to avoid "wrong org" surprises)
+        hits.sort((a, b) => {
+            const oa = tokenOverlapScore(raw, a.title);
+            const ob = tokenOverlapScore(raw, b.title);
+            if (ob !== oa) return ob - oa;
+            return b.score - a.score;
+        });
+
+        const top = hits[0];
+        const candidate = {
+            orgId: top.id,
+            orgUrl: top.url,
+            orgTitle: top.title,
+            score: tokenOverlapScore(raw, top.title) * 10_000 + top.score,
+        };
+
+        if (!best || candidate.score > best.score) best = candidate;
+
+        // If it’s an extremely good match, stop early
+        if (tokenOverlapScore(raw, top.title) >= 0.9) break;
+    }
+
+    if (!best) return null;
+    const { orgId, orgUrl, orgTitle } = best;
+    return { orgId, orgUrl, orgTitle };
 }
 
 async function countResearchPlansForOrg(orgId: string) {
@@ -476,8 +619,11 @@ export async function POST(req: Request) {
         if (!orgId) {
             const rewritten = await rewriteForTypesense(lastUser);
 
-            // if the rewriter extracted orgName, prefer that for org resolution
-            const orgQuery = rewritten.entity?.orgName ? rewritten.entity.orgName : rewritten.q;
+            // Prefer extracted orgName, else rewritten.q, else raw user text
+            const orgQuery =
+                rewritten.entity?.orgName?.trim() ||
+                rewritten.q?.trim() ||
+                lastUser.trim();
 
             const resolved = await resolveOrgFromQuery(orgQuery);
             orgId = resolved?.orgId ?? null;
@@ -487,6 +633,7 @@ export async function POST(req: Request) {
                     kind: "count_research_plans_for_org",
                     error: "org_not_found",
                     orgQuery,
+                    rewritten,
                 };
             } else {
                 const count = await countResearchPlansForOrg(orgId);
@@ -497,9 +644,6 @@ export async function POST(req: Request) {
                     count,
                 };
             }
-        } else {
-            const count = await countResearchPlansForOrg(orgId);
-            contextPayload = { kind: "count_research_plans_for_org", orgId, count };
         }
     } else if (intent.kind === "count_orgs") {
         const count = await getOrganizationsCountNoAdmin();
