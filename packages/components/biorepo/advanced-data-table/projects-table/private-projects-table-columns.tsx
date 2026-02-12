@@ -267,6 +267,13 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
             },
             enableSorting: true,
             enableHiding: true,
+            enableColumnFilter: true,
+            meta: {
+                label: "Budget",
+                variant: "range",
+                icon: CircleDashed,
+                showInAdvancedOnly: false,
+            }
         },
         {
             id: "updatedAt",

@@ -3188,6 +3188,16 @@ const fetchProjects = async (
                 })
             }
 
+            if (input.budget.length > 0) {
+                filters.push({
+                    id: 'budget',
+                    value: input.budget,
+                    variant: 'range',
+                    operator: 'isBetween',
+                    filterId: nanoid()
+                })
+            }
+
             if (input.updatedAt.length > 0) {
                 filters.push({
                     id: 'updatedAt',
