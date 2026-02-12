@@ -23,6 +23,25 @@ export function useResearchPlansTableColumns(
 
     const columns: ColumnDef<any>[] = [
         {
+            id: "title",
+            accessorKey: "title",
+            header: ({column}) => (
+                <DataTableColumnHeader
+                    column={column}
+                    title="Title"
+                    className="min-w-fit text-nowrap"
+                    // tooltip="Unique ID assigned to this sample. This ID is public and appears in the marketplace."
+                />
+            ),
+            cell: ({row}) => (
+                <div className="flex gap-2 items-center">
+                    <p>{row.original.title || 'Untitled research plan'}</p>
+                </div>
+            ),
+            enableSorting,
+            enableHiding,
+        },
+        {
             id: "organization.name", // must match typesense accessor key (see biosampleSchema in sync.ts and /apps/web/api/sync/route.ts)
             accessorKey: "organization.name",
             header: ({column}) => (
@@ -53,25 +72,6 @@ export function useResearchPlansTableColumns(
                         organizationId={row.original?.organization?.id}
                         mini={true}
                     />
-                </div>
-            ),
-            enableSorting,
-            enableHiding,
-        },
-        {
-            id: "title",
-            accessorKey: "title",
-            header: ({column}) => (
-                <DataTableColumnHeader
-                    column={column}
-                    title="Title"
-                    className="min-w-fit text-nowrap"
-                    // tooltip="Unique ID assigned to this sample. This ID is public and appears in the marketplace."
-                />
-            ),
-            cell: ({row}) => (
-                <div className="flex gap-2 items-center">
-                    <p>{row.original.title || 'Untitled research plan'}</p>
                 </div>
             ),
             enableSorting,
@@ -240,8 +240,8 @@ export function useResearchPlansTableColumns(
                 />
             ),
             cell: ({row}) => {
-                const featuredProjectTypes = ['BIOMARKER', 'EFFICASYSTUDY', 'NATURALHISTORYSTUDY', 'GPMANUFACTURING', 'TOXICOLOGYSTUDY', 'INDSUBMISSION']
-                const milestoneTypes = row.original.milestones?.flatMap((milestone: any) => milestone?.types)?.map((type: any) => type?.milestoneType?.id)?.filter((typeVal: string) => featuredProjectTypes.includes(typeVal))
+                // const featuredProjectTypes = ['BIOMARKER', 'EFFICASYSTUDY', 'NATURALHISTORYSTUDY', 'GPMANUFACTURING', 'TOXICOLOGYSTUDY', 'INDSUBMISSION']
+                // const milestoneTypes = row.original.milestones?.flatMap((milestone: any) => milestone?.types)?.map((type: any) => type?.milestoneType?.id)?.filter((typeVal: string) => featuredProjectTypes.includes(typeVal))
                 const numPublishedProjects = row.original.milestones.filter((milestone: Milestone) => !milestone.private).length
                 return (
                     (numPublishedProjects > 0)
@@ -262,9 +262,9 @@ export function useResearchPlansTableColumns(
                                     </TooltipContent>
                                 </Tooltip>
                             </div>
-                            <div className="flex flex-col gap-2">
+                            {/* <div className="flex flex-col gap-2">
                                 {MILESTONE_TYPE_OPTIONS.filter(option => milestoneTypes.includes(option.id)).map(option => <Badge variant="lightBlue">{option.label}</Badge>)}
-                            </div>
+                            </div> */}
                             </div>
                         )
                         : (<p>{'--'}</p>)

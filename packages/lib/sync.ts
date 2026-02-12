@@ -140,6 +140,18 @@ export const syncToTypesense = async (env: {
                     type: "string"
                 },
                 {
+                    name: "subdomain",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+                {
                     name: "description",
                     facet: false,
                     index: true,
