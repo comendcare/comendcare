@@ -134,12 +134,12 @@ export function useProjectsTableColumns({session}: {session: Session | null}): C
             },
             enableHiding: true,
             enableColumnFilter: true,
-            // meta: {
-            //     label: "Project type",
-            //     variant: "multiSelect",
-            //     options: MILESTONE_TYPE_OPTIONS,
-            //     icon: CircleDashed,
-            // },
+            meta: {
+                label: "Project type",
+                variant: "multiSelect",
+                options: MILESTONE_TYPE_OPTIONS,
+                icon: CircleDashed,
+            },
         },
         {
             id: "description",

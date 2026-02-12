@@ -3168,6 +3168,16 @@ const fetchProjects = async (
                 })
             }
 
+            if (input.types.length > 0) {
+                filters.push({
+                    id: 'types',
+                    value: [{milestoneTypeId: {in: input.types}}],
+                    variant: 'multiSelect',
+                    operator: 'inArray',
+                    filterId: nanoid()
+                })
+            }
+
             if (input.status.length > 0) {
                 filters.push({
                     id: 'status',
