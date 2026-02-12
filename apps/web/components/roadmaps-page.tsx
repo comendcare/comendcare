@@ -85,15 +85,22 @@ export default function RoadmapsPage({ orgId, organization, researchPlansData, r
         setShareIsOpen(true)
     }
 
+    const currentView = searchParams?.view === "projects" ? "projects" : "researchPlans";
+
     if (isLoading) return <Loading />
 
     return (
         <main className="flex flex-col items-center h-full w-full mx-auto p-4 gap-4">
             <ResearchPlanTemplatesCard orgId={orgId} setIsLoading={setIsLoading}/>
-            <Tabs defaultValue="researchPlans" className="w-full" onValueChange={async () => {
-                const searchParams = new URLSearchParams()
-                router.push(`?${searchParams.toString()}`, {scroll: false})
-            }}>
+            <Tabs 
+                value={currentView}
+                className="w-full" 
+                onValueChange={(value) => {
+                    const params = new URLSearchParams();
+                    params.set("view", value);
+                    router.push(`?${params.toString()}`, { scroll: false });
+                }}
+            >
                 <TabsList>
                     <TabsTrigger value="researchPlans">My research plans</TabsTrigger>
                     <TabsTrigger value="projects">My projects</TabsTrigger>
