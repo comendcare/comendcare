@@ -34,12 +34,12 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const BASE_URL =
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.NEXTAUTH_URL ||
-    "http://localhost:3000"
+    "http://localhost:3000";
 
-const url = new URL(BASE_URL)
+const url = new URL(BASE_URL);
 
-const PUBLIC_PROTOCOL = url.protocol.replace(":", "")
-const PUBLIC_HOST = url.host
+const PUBLIC_PROTOCOL = url.protocol.replace(":", "");
+const PUBLIC_HOST = url.host;
 
 function hostForOrg(orgSubdomain?: string) {
     return orgSubdomain ? `${orgSubdomain}.${PUBLIC_HOST}` : PUBLIC_HOST;
@@ -93,20 +93,17 @@ function publicItemUrl(collection: CollectionName, doc: any) {
 }
 
 type Rewritten = {
-    q: string;                     // the query string for Typesense
+    q: string; // the query string for Typesense
     intent?: "count" | "list" | "search";
     entity?: { orgName?: string }; // extracted org name if any
     targetCollections?: CollectionName[]; // optional narrowing
 };
 
 function sanitizeTypesenseQ(q: string) {
-    return (q ?? "")
-        .replace(/\s+/g, " ")
-        .trim()
-        .slice(0, 200); // keep it short
+    return (q ?? "").replace(/\s+/g, " ").trim().slice(0, 200); // keep it short
 }
 
-async function rewriteForTypesense(userText: string) : Promise<Rewritten> {
+async function rewriteForTypesense(userText: string): Promise<Rewritten> {
     const prompt = `
 You rewrite user questions into a Typesense-searchable query string.
 
@@ -139,10 +136,53 @@ ${JSON.stringify(userText)}
         // fallback: cheap heuristic
         const fallback = userText
             .replace(/[?.,!]/g, " ")
-            .replace(/\b(how|many|does|do|have|show|list|tell|me|please|what|is|are|the|a|an)\b/gi, " ")
+            .replace(
+                /\b(how|many|does|do|have|show|list|tell|me|please|what|is|are|the|a|an)\b/gi,
+                " "
+            )
             .replace(/\s+/g, " ")
             .trim();
-        return { q: sanitizeTypesenseQ(fallback) || sanitizeTypesenseQ(userText), intent: "search" };
+        return {
+            q: sanitizeTypesenseQ(fallback) || sanitizeTypesenseQ(userText),
+            intent: "search",
+        };
+    }
+}
+
+/**
+ * NEW: Extract an organization query string (or null) from the user’s text.
+ * This keeps org resolution from getting polluted by “research plans”, etc.
+ */
+async function extractOrgQuery(userText: string): Promise<string | null> {
+    const prompt = `
+You extract a likely organization name (or alias) from a user question, to search an organizations index.
+
+Rules:
+- Output MUST be valid JSON only (no markdown).
+- Return: {"orgQuery": string|null}
+- If the question includes an org name, return it as it appears (preserve casing/spelling).
+- If the question contains only an acronym or gene symbol that could be an org (e.g. "STXBP1"), return that token.
+- If you cannot identify any likely org token/name, return null.
+- Keep it SHORT (1-8 words typically). Do not include generic words like "research plans", "count", "how many".
+
+User text:
+${JSON.stringify(userText)}
+`;
+
+    const r = await openai.responses.create({
+        model: "gpt-5-nano",
+        input: [{ role: "system", content: prompt }],
+    });
+
+    const raw = r.output_text?.trim() ?? "";
+    try {
+        const parsed = JSON.parse(raw) as { orgQuery: string | null };
+        const oq = parsed?.orgQuery;
+        if (!oq) return null;
+        const cleaned = sanitizeTypesenseQ(String(oq));
+        return cleaned || null;
+    } catch {
+        return null;
     }
 }
 
@@ -158,68 +198,13 @@ type MultiSearchResult = {
     search?: { collection?: string };
 };
 
-function normalizeForCompare(s: string) {
-    return (s ?? "")
-        .toLowerCase()
-        .replace(/&/g, " and ")
-        .replace(/[^a-z0-9\s]/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-}
-
-function tokenOverlapScore(a: string, b: string) {
-    const A = new Set(normalizeForCompare(a).split(" ").filter(Boolean));
-    const B = new Set(normalizeForCompare(b).split(" ").filter(Boolean));
-    if (!A.size || !B.size) return 0;
-    let inter = 0;
-    A.forEach((t) => {
-        if (B.has(t)) inter++;
-    });
-    // prefer overlap relative to query length
-    return inter / Math.max(1, A.size);
-}
-
-function candidateOrgQueries(raw: string) {
-    const base = (raw ?? "").trim();
-    if (!base) return [];
-
-    // If user asks "How many research plans does X have", X might be a gene token
-    // but orgs are often "X Foundation", "X Association", etc.
-    const suffixes = [
-        "", // original
-        " foundation",
-        " association",
-        " advocacy",
-        " alliance",
-        " research foundation",
-        " syndrome foundation",
-        " connect",
-        " network",
-        " initiative",
-        " group",
-        " org",
-        " organization",
-    ];
-
-    // de-dupe while preserving order
-    const seen = new Set<string>();
-    const out: string[] = [];
-    for (const suf of suffixes) {
-        const q = sanitizeTypesenseQ(`${base}${suf}`.trim());
-        if (!q) continue;
-        const key = q.toLowerCase();
-        if (seen.has(key)) continue;
-        seen.add(key);
-        out.push(q);
-    }
-    return out.slice(0, 8);
-}
-
 function bestSnippet(hit: MultiSearchHit): string | undefined {
     const hs = hit.highlights ?? [];
     const first = hs.find((h) => h.snippet)?.snippet;
     if (first) return first;
-    const firstFromSnippets = hs.find((h) => Array.isArray(h.snippets) && h.snippets.length)?.snippets?.[0];
+    const firstFromSnippets = hs.find(
+        (h) => Array.isArray(h.snippets) && h.snippets.length
+    )?.snippets?.[0];
     return firstFromSnippets;
 }
 
@@ -228,7 +213,8 @@ function getTypesenseConfig() {
     const searchKey = process.env.NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY;
 
     if (!TYPESENSE_NODE) throw new Error("Missing env NEXT_PUBLIC_TYPESENSE_NODE");
-    if (!searchKey) throw new Error("Missing env NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY");
+    if (!searchKey)
+        throw new Error("Missing env NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY");
 
     const TYPESENSE_URL = `https://${TYPESENSE_NODE}`.replace(/\/$/, "");
     return { TYPESENSE_URL, searchKey };
@@ -241,40 +227,43 @@ function getTypesenseConfig() {
 type Intent =
     | { kind: "count_orgs" }
     | { kind: "list_orgs"; page: number; perPage: number }
-    | { kind: "count_research_plans_for_org"; orgName?: string; orgId?: string | null }
     | { kind: "normal_search"; q: string };
 
 function detectIntent(userText: string, body: ChatBody): Intent {
     const q = (userText ?? "").trim();
     const lower = q.toLowerCase();
 
-    if (/\bhow many\b/.test(lower) && (/\borgs?\b/.test(lower) || /\borganizations?\b/.test(lower))) {
+    if (
+        /\bhow many\b/.test(lower) &&
+        (/\borgs?\b/.test(lower) || /\borganizations?\b/.test(lower))
+    ) {
         return { kind: "count_orgs" };
     }
 
     if (
-        (/\b(list|show|all)\b/.test(lower) && (/\borgs?\b/.test(lower) || /\borganizations?\b/.test(lower))) ||
+        (/\b(list|show|all)\b/.test(lower) &&
+            (/\borgs?\b/.test(lower) || /\borganizations?\b/.test(lower))) ||
         lower === "organizations" ||
         lower === "orgs"
     ) {
-        const page = Number.isFinite(body.page) && (body.page as number) > 0 ? (body.page as number) : 1;
-        const perPageRaw = Number.isFinite(body.perPage) && (body.perPage as number) > 0 ? (body.perPage as number) : 25;
+        const page =
+            Number.isFinite(body.page) && (body.page as number) > 0
+                ? (body.page as number)
+                : 1;
+        const perPageRaw =
+            Number.isFinite(body.perPage) && (body.perPage as number) > 0
+                ? (body.perPage as number)
+                : 25;
         const perPage = Math.max(1, Math.min(perPageRaw, 100));
         return { kind: "list_orgs", page, perPage };
-    }
-
-    // NEW: count research plans
-    if (/\bhow many\b/.test(lower) && /\bresearch plans?\b/.test(lower)) {
-        // if client already set orgId, use it
-        if (body.orgId) return { kind: "count_research_plans_for_org", orgId: body.orgId };
-
-        // otherwise try to extract org name with your rewrite step later (don’t guess here)
-        return { kind: "count_research_plans_for_org" };
     }
 
     return { kind: "normal_search", q };
 }
 
+/**
+ * Dedicated organizations search (Typesense), used to resolve the org for DB fetching.
+ */
 async function searchOrganizations(opts: { q: string; perPage?: number }) {
     const { TYPESENSE_URL, searchKey } = getTypesenseConfig();
 
@@ -286,7 +275,6 @@ async function searchOrganizations(opts: { q: string; perPage?: number }) {
     url.searchParams.set("query_by", "name,description");
     url.searchParams.set("per_page", String(opts.perPage ?? 10));
 
-    // make org lookup forgiving + ranked well
     url.searchParams.set("prefix", "true");
     url.searchParams.set("exhaustive_search", "true");
     url.searchParams.set("num_typos", "2");
@@ -301,7 +289,9 @@ async function searchOrganizations(opts: { q: string; perPage?: number }) {
 
     if (!res.ok) {
         const text = await res.text();
-        throw new Error(`Typesense organizations search failed: ${res.status} ${text}`);
+        throw new Error(
+            `Typesense organizations search failed: ${res.status} ${text}`
+        );
     }
 
     const json = await res.json();
@@ -328,50 +318,294 @@ async function searchOrganizations(opts: { q: string; perPage?: number }) {
         .filter(Boolean) as Array<{ id: string; title: string; url: string; score: number; doc: any }>;
 }
 
-async function resolveOrgFromQuery(raw: string) {
-    const queries = candidateOrgQueries(raw);
-    if (!queries.length) return null;
+/**
+ * Small suffix-expansion to catch “STXBP1” -> “STXBP1 Foundation”, etc.
+ */
+function candidateOrgQueries(raw: string) {
+    const base = (raw ?? "").trim();
+    if (!base) return [];
+
+    const suffixes = [
+        "",
+        " foundation",
+        " association",
+        " advocacy",
+        " alliance",
+        " research foundation",
+        " syndrome foundation",
+        " connect",
+        " network",
+        " initiative",
+        " group",
+        " org",
+        " organization",
+    ];
+
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const suf of suffixes) {
+        const q = sanitizeTypesenseQ(`${base}${suf}`.trim());
+        if (!q) continue;
+        const key = q.toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(q);
+    }
+    return out.slice(0, 8);
+}
+
+async function resolveOrgFromUserText(userText: string) {
+    // If the model can extract an org-ish token, use it; else fall back to rewritten entity.orgName if available.
+    const extracted = await extractOrgQuery(userText);
+    const rewritten = extracted ? null : await rewriteForTypesense(userText);
+    const base =
+        extracted ||
+        rewritten?.entity?.orgName?.trim() ||
+        null;
+
+    const candidates = base ? candidateOrgQueries(base) : [];
+    if (!candidates.length) return { resolved: null as null, debug: { extracted, rewritten } };
 
     let best:
         | { orgId: string; orgUrl: string; orgTitle: string; score: number }
         | null = null;
 
-    for (const q of queries) {
+    for (const q of candidates) {
         const hits = await searchOrganizations({ q, perPage: 10 });
         if (!hits.length) continue;
 
-        // Choose best by: overlap with the *raw* query + Typesense score
-        // (overlap dominates to avoid "wrong org" surprises)
-        hits.sort((a, b) => {
-            const oa = tokenOverlapScore(raw, a.title);
-            const ob = tokenOverlapScore(raw, b.title);
-            if (ob !== oa) return ob - oa;
-            return b.score - a.score;
-        });
-
+        hits.sort((a, b) => b.score - a.score);
         const top = hits[0];
+
         const candidate = {
             orgId: top.id,
             orgUrl: top.url,
             orgTitle: top.title,
-            score: tokenOverlapScore(raw, top.title) * 10_000 + top.score,
+            score: top.score,
         };
 
         if (!best || candidate.score > best.score) best = candidate;
 
-        // If it’s an extremely good match, stop early
-        if (tokenOverlapScore(raw, top.title) >= 0.9) break;
+        // Early exit on strong Typesense match
+        if (top.score >= 8000) break;
     }
 
-    if (!best) return null;
-    const { orgId, orgUrl, orgTitle } = best;
-    return { orgId, orgUrl, orgTitle };
+    if (!best) return { resolved: null as null, debug: { extracted, rewritten } };
+    return {
+        resolved: { orgId: best.orgId, orgUrl: best.orgUrl, orgTitle: best.orgTitle },
+        debug: { extracted, rewritten, candidatesTried: candidates },
+    };
 }
 
-async function countResearchPlansForOrg(orgId: string) {
-    return prisma.roadmap.count({
-        where: { organizationId: orgId },
+/**
+ * Fetch “ALL the organization data and related models” (public-only) for the resolved org.
+ * Respects:
+ * - Organization.public + Organization.published
+ * - Related models with `private` flags -> only `private: false`
+ * - Roadmap published flag -> `published: true` + `private: false`
+ */
+async function fetchOrganizationBundle(orgId: string) {
+    const org = await prisma.organization.findFirst({
+        where: { id: orgId, public: true, published: true },
+        include: {
+            conditions: {
+                include: {
+                    condition: true,
+                },
+            },
+        },
     });
+
+    if (!org) return null;
+
+    const orgSubdomain = org.subdomain || undefined;
+    const orgUrl = publicItemUrl("organizations", { ...org, __orgSubdomain: orgSubdomain });
+
+    // “research plans” in your UI correspond to Roadmap
+    const researchPlans = await prisma.roadmap.findMany({
+        where: {
+            organizationId: orgId,
+            private: false,
+            published: true,
+        },
+        orderBy: { updatedAt: "desc" },
+        select: {
+            id: true,
+            slug: true,
+            title: true,
+            description: true,
+            createdAt: true,
+            updatedAt: true,
+            published: true,
+            private: true,
+            modalities: true,
+            stages: true,
+            statuses: true,
+            organizationId: true,
+        },
+    });
+
+    const milestones = await prisma.milestone.findMany({
+        where: {
+            organizationId: orgId,
+            private: false,
+        },
+        orderBy: { updatedAt: "desc" },
+        select: {
+            id: true,
+            title: true,
+            description: true,
+            status: true,
+            startDate: true,
+            endDate: true,
+            budget: true,
+            private: true,
+            roadmapId: true,
+            organizationId: true,
+            updatedAt: true,
+            createdAt: true,
+        },
+    });
+
+    const tools = await prisma.tool.findMany({
+        where: {
+            organizationId: orgId,
+            private: false,
+        },
+        orderBy: { updatedAt: "desc" },
+        select: {
+            id: true,
+            title: true,
+            description: true,
+            private: true,
+            pinned: true,
+            genes: true,
+            geneId: true,
+            createdAt: true,
+            updatedAt: true,
+            organizationId: true,
+        },
+    });
+
+    const biosamples = await prisma.biosample.findMany({
+        where: {
+            organizationId: orgId,
+            private: false,
+        },
+        orderBy: { updatedAt: "desc" },
+        select: {
+            id: true,
+            description: true,
+            private: true,
+            pinned: true,
+            genes: true,
+            geneId: true,
+            variant: true,
+            availability: true,
+            quantity: true,
+            quantityUnit: true,
+            price: true,
+            priceUnit: true,
+            createdAt: true,
+            updatedAt: true,
+            organizationId: true,
+        },
+    });
+
+    const diseaseModels = await prisma.diseaseModel.findMany({
+        where: {
+            organizationId: orgId,
+            private: false,
+        },
+        orderBy: { updatedAt: "desc" },
+        select: {
+            id: true,
+            description: true,
+            private: true,
+            pinned: true,
+            genes: true,
+            geneId: true,
+            genotype: true,
+            strain: true,
+            createdAt: true,
+            updatedAt: true,
+            organizationId: true,
+            conditionId: true,
+        },
+    });
+
+    const rfps = await prisma.rFP.findMany({
+        where: {
+            organizationId: orgId,
+            private: false,
+        },
+        orderBy: { updatedAt: "desc" },
+        select: {
+            id: true,
+            title: true,
+            description: true,
+            eligibility: true,
+            instructions: true,
+            evaluationProcess: true,
+            openTo: true,
+            startDate: true,
+            endDate: true,
+            budget: true,
+            private: true,
+            pinned: true,
+            createdAt: true,
+            updatedAt: true,
+            organizationId: true,
+        },
+    });
+
+    // Add URLs consistently for the model to cite
+    const researchPlansWithUrls = researchPlans.map((rp) => ({
+        ...rp,
+        url: publicItemUrl("research-plans", { ...rp, __orgSubdomain: orgSubdomain }),
+    }));
+    const milestonesWithUrls = milestones.map((m) => ({
+        ...m,
+        url: publicItemUrl("milestones", { ...m, __orgSubdomain: orgSubdomain }),
+    }));
+    const biosamplesWithUrls = biosamples.map((b) => ({
+        ...b,
+        url: publicItemUrl("biosamples", { ...b, __orgSubdomain: orgSubdomain }),
+    }));
+    const diseaseModelsWithUrls = diseaseModels.map((d) => ({
+        ...d,
+        url: publicItemUrl("disease-models", { ...d, __orgSubdomain: orgSubdomain }),
+    }));
+    const rfpsWithUrls = rfps.map((r) => ({
+        ...r,
+        url: publicItemUrl("rfps", { ...r, __orgSubdomain: orgSubdomain }),
+    }));
+
+    return {
+        org: {
+            id: org.id,
+            name: org.name,
+            description: org.description,
+            website: org.website,
+            subdomain: org.subdomain,
+            public: org.public,
+            published: org.published,
+            verified: org.verified,
+            url: orgUrl,
+            conditions: (org.conditions ?? []).map((c) => ({
+                id: c.id,
+                conditionId: c.conditionId,
+                conditionName: c.condition?.name ?? null,
+                conditionSlug: c.condition?.slug ?? null,
+            })),
+        },
+        researchPlans: researchPlansWithUrls,
+        milestones: milestonesWithUrls,
+        tools, // no public URL mapping defined in your publicItemUrl switch; keep raw
+        biosamples: biosamplesWithUrls,
+        diseaseModels: diseaseModelsWithUrls,
+        rfps: rfpsWithUrls,
+    };
 }
 
 async function getOrganizationsCountNoAdmin() {
@@ -546,10 +780,18 @@ async function typesenseMultiSearch(opts: { q: string }) {
             const id = String(doc.id ?? "");
             if (!id) continue;
 
-            const title = doc.name || doc.title?.title || doc.title || doc.user?.name || doc.organization?.name || undefined;
+            const title =
+                doc.name ||
+                doc.title?.title ||
+                doc.title ||
+                doc.user?.name ||
+                doc.organization?.name ||
+                undefined;
 
             const snippet = bestSnippet(h);
-            const about = String(snippet || doc.description || doc.title?.title || doc.title || doc.name || "").slice(0, 800);
+            const about = String(
+                snippet || doc.description || doc.title?.title || doc.title || doc.name || ""
+            ).slice(0, 800);
 
             const orgSubdomain = doc.subdomain || doc.organization?.subdomain || undefined;
             const url = publicItemUrl(collectionName, { ...doc, __orgSubdomain: orgSubdomain });
@@ -612,49 +854,67 @@ export async function POST(req: Request) {
 
     let contextPayload: any = null;
 
-    if (intent.kind === "count_research_plans_for_org") {
-        // Step 1: find orgId
-        let orgId = intent.orgId ?? null;
-
-        if (!orgId) {
-            const rewritten = await rewriteForTypesense(lastUser);
-
-            // Prefer extracted orgName, else rewritten.q, else raw user text
-            const orgQuery =
-                rewritten.entity?.orgName?.trim() ||
-                rewritten.q?.trim() ||
-                lastUser.trim();
-
-            const resolved = await resolveOrgFromQuery(orgQuery);
-            orgId = resolved?.orgId ?? null;
-
-            if (!orgId) {
-                contextPayload = {
-                    kind: "count_research_plans_for_org",
-                    error: "org_not_found",
-                    orgQuery,
-                    rewritten,
-                };
-            } else {
-                const count = await countResearchPlansForOrg(orgId);
-                contextPayload = {
-                    kind: "count_research_plans_for_org",
-                    orgId,
-                    org: resolved,
-                    count,
-                };
-            }
-        }
-    } else if (intent.kind === "count_orgs") {
+    if (intent.kind === "count_orgs") {
         const count = await getOrganizationsCountNoAdmin();
         contextPayload = { kind: "count_orgs", count };
     } else if (intent.kind === "list_orgs") {
         const list = await listOrganizations({ page: intent.page, perPage: intent.perPage });
         contextPayload = { kind: "list_orgs", ...list };
     } else {
-        const rewritten = await rewriteForTypesense(lastUser);
-        const results = await typesenseMultiSearch({ q: rewritten.q });
-        contextPayload = { kind: "search", q: rewritten.q, rewritten, results };
+        // NEW FLOW:
+        // 1) Resolve org via Typesense (model-extracted org query + suffix expansion)
+        // 2) Fetch org + related public data from DB
+        // 3) Give the DB “datadump” to the model to answer
+        //
+        // Still supports old “search” behavior when no org can be resolved.
+        let orgBundle: any = null;
+
+        if (body.orgId) {
+            orgBundle = await fetchOrganizationBundle(body.orgId);
+            if (!orgBundle) {
+                contextPayload = {
+                    kind: "org_bundle",
+                    error: "org_not_found_or_not_public",
+                    orgId: body.orgId,
+                };
+            } else {
+                contextPayload = {
+                    kind: "org_bundle",
+                    orgId: body.orgId,
+                    org: orgBundle.org,
+                    bundle: orgBundle,
+                };
+            }
+        } else {
+            const { resolved, debug } = await resolveOrgFromUserText(lastUser);
+
+            if (resolved?.orgId) {
+                orgBundle = await fetchOrganizationBundle(resolved.orgId);
+
+                if (!orgBundle) {
+                    contextPayload = {
+                        kind: "org_bundle",
+                        error: "org_not_found_or_not_public",
+                        orgResolved: resolved,
+                        debug,
+                    };
+                } else {
+                    contextPayload = {
+                        kind: "org_bundle",
+                        orgId: resolved.orgId,
+                        orgResolved: resolved,
+                        org: orgBundle.org,
+                        bundle: orgBundle,
+                        debug: process.env.NODE_ENV === "development" ? debug : undefined,
+                    };
+                }
+            } else {
+                // Fallback to previous search behavior
+                const rewritten = await rewriteForTypesense(lastUser);
+                const results = await typesenseMultiSearch({ q: rewritten.q });
+                contextPayload = { kind: "search", q: rewritten.q, rewritten, results, debug };
+            }
+        }
     }
 
     const context = buildContextBlockJson(contextPayload);

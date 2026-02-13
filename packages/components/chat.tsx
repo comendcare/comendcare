@@ -233,7 +233,7 @@ export function Chat({
                     </div>
                 )}
 
-                <div className="w-full rounded-3xl border bg-background px-4 py-3 flex items-center justify-between gap-3">
+                <div className="w-full rounded-3xl border bg-background px-4 py-3 flex items-center gap-3">
                     <Input
                         ref={(el) => {
                             inputRef.current = el
@@ -243,7 +243,7 @@ export function Chat({
                         placeholder="Send a message..."
                         onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
                         disabled={isLoading}
-                        className="w-[calc(100vw-404px)] border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
+                        className="flex-1 min-w-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
                         maxLength={maxTokens * 2}
                     />
 
@@ -253,7 +253,7 @@ export function Chat({
                         size="icon"
                         className="rounded-full h-10 w-10 shrink-0"
                     >
-                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4"/>}
+                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                     </Button>
                 </div>
             </div>
