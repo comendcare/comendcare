@@ -35,7 +35,7 @@ export default async function EmbeddedResearchPlansPage({params}: {params: {doma
             description: true,
             published: true,
             organizationId: true,
-            organization: true,
+            organization: {include: {members: true}},
             modalities: true,
             stages: true,
             statuses: true,

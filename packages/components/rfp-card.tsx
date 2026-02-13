@@ -15,6 +15,7 @@ import { PublicPrivateButton } from "@comend/components/public-private-button";
 import { RFPState, useRFPStore } from "@/state/rfp/rfpStore";
 import { useShallow } from "zustand/react/shallow";
 import { revalidate } from "@comend/lib/revalidate";
+import ClaimedBadge from "comend-pag-platform/components/claimed-badge";
 
 /** Header skeleton that matches the header’s layout/height to prevent reflow */
 function HeaderSkeleton() {
@@ -164,6 +165,10 @@ export const RFPCard = ({
                             <div className="flex flex-row gap-2 items-center">
                                 <ProfilePhoto img={rfp.organization.image} name={rfp.organization.name} className="h-9 w-9 -mt-1"/>
                                 <p className="text-lg font-semibold underline">{rfp.organization.name}</p>
+                                <ClaimedBadge
+                                    organization={rfp.organization}
+                                    mini={true}
+                                />
                             </div>
                         </a>
                     </>

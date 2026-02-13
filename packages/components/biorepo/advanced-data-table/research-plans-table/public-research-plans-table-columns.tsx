@@ -69,7 +69,7 @@ export function useResearchPlansTableColumns(
                         {row.original.organization?.name}
                     </Link>
                     <ClaimedBadge
-                        organizationId={row.original?.organization?.id}
+                        organization={row.original?.organization}
                         mini={true}
                     />
                 </div>
