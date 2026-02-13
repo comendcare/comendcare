@@ -8,44 +8,28 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@comend/components/ui/tooltip"
-import { getIsOrganizationClaimed } from "comend-admin-dashboard/lib/fetchers"
+import { Organization, Prisma } from "@prisma/client"
+import { cn } from "@comend/lib/utils"
 
 type ClaimedBadgeProps = {
-    organizationId?: string | null
-    mini?: boolean
+    organization: Prisma.OrganizationGetPayload<{include: {members: true}}>,
+    mini?: boolean,
+    className?: string,
 }
 
-const ClaimedBadge = ({ organizationId, mini = false }: ClaimedBadgeProps) => {
-    const [claimed, setClaimed] = useState(false)
-
-    useEffect(() => {
-        let cancelled = false
-
-        if (!organizationId) {
-            setClaimed(false)
-            return
-        }
-
-        ;(async () => {
-            const res = await getIsOrganizationClaimed(organizationId)
-            if (!cancelled) setClaimed(Boolean(res))
-        })()
-
-        return () => {
-            cancelled = true
-        }
-    }, [organizationId])
-
+const ClaimedBadge = ({ organization, mini = false, className }: ClaimedBadgeProps) => {
+    // const claimed = (organization.members || []).filter(member => !member.email.includes("@comendcare.com")).length > 0
+    const claimed = (organization.members || []).length > 0
     if (!claimed) return null
 
     const content = mini ? (
         <CheckCircleIcon
-            className="size-3 mr-1 text-green-600 dark:text-green-400"
+            className={cn("size-3 mr-1 text-green-600 dark:text-green-400", className)}
         />
     ) : (
         <Badge
             variant="outline"
-            className="rounded-sm border-green-600 text-green-600 dark:border-green-400 dark:text-green-400"
+            className={cn("rounded-sm border-green-600 text-green-600 dark:border-green-400 dark:text-green-400", className)}
         >
             <CheckCircleIcon className="size-3 mr-1" />
             Claimed

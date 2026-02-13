@@ -962,7 +962,7 @@ export const updateRoadmap = withOrganizationAuth(
                     orderBy: [{createdAt: "desc"}]
                 },
                 edges: true,
-                organization: true,
+                organization: {include: {members: true}},
                 links: true,
                 partners: true,
             }
@@ -4265,7 +4265,7 @@ export const createRoadmap = withOrganizationAuth(
                     },
                     nodes: true,
                     edges: true,
-                    organization: true,
+                    organization: {include: {members: true}},
                 },
             });
 
@@ -4466,7 +4466,7 @@ export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
                 },
                 nodes: true,
                 edges: true,
-                organization: true
+                organization: {include: {members: true}}
             }
         })
 

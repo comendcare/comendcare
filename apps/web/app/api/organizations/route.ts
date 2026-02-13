@@ -35,7 +35,8 @@ export async function POST(req: Request) {
                 biosamples: {where: {private: false}},
                 diseaseModel: {where: {private: false}},
                 tools: {where: {private: false}},
-                rfps: {where: {private: false}}
+                rfps: {where: {private: false}},
+                members: true
             }
         });
 

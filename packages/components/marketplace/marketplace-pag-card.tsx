@@ -78,12 +78,13 @@ export function OrganizationMarketplaceCard({
                             <CardTitle className="text-xl flex flex-row gap-2 items-start h-[56px]">
                                 <ProfilePhoto img={image} name={name} className="h-9 w-9 -mt-1"/>
                                 {name}
-                                <ClaimedBadge
-                                    organizationId={organization.id}
-                                    mini={true}
-                                />
                             </CardTitle>
                         </Link>
+
+                        <ClaimedBadge
+                            organization={organization}
+                            mini={true}
+                        />
                         {/*{!isPublic && <SaveOrganizationDialog savedOrganization={organization} type={"card"}/>}*/}
                         {/*{!isPublic && <SaveOrganizationButton*/}
                         {/*    savedOrganization={organization}*/}
