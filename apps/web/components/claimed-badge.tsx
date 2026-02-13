@@ -18,8 +18,7 @@ type ClaimedBadgeProps = {
 }
 
 const ClaimedBadge = ({ organization, mini = false, className }: ClaimedBadgeProps) => {
-    // const claimed = (organization.members || []).filter(member => !member.email.includes("@comendcare.com")).length > 0
-    const claimed = (organization.members || []).length > 0
+    const claimed = (organization.members || []).filter(member => !member.email.includes("@comendcare.com")).length > 0
     if (!claimed) return null
 
     const content = mini ? (
