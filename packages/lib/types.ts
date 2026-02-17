@@ -2595,6 +2595,13 @@ const moneyField = z.preprocess(
     z.number().min(0).optional()
 );
 
+export const emailCaptureFormSchema = z.object({
+    email: z.preprocess(
+        (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+        z.string().email({ message: "Please enter a valid email address." }).optional()
+    ),
+})
+
 export const editOrgFormSchema = z.object({
     name: z.string().min(2).max(60),
     subdomain: z.string().min(2, {

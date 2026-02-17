@@ -1275,6 +1275,15 @@ model Whitelist {
   metadata  Json?
 }
 
+model EmailCapture {
+  id        String   @id @default(cuid())
+  email     String   @unique /// @encrypted
+  emailHash String?  @unique /// @encryption:hash(email)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  metadata  Json?
+}
+
 model Blacklist {
   id        String   @id @default(cuid())
   email     String   @unique /// @encrypted
