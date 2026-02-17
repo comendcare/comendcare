@@ -1133,7 +1133,7 @@ const syncToTypesense = async (env: {
                 },
                 modalities: true,
                 organization: {
-                    select: {name: true}
+                    select: {name: true, members: true}
                 },
                 milestones: {where: {private: false}},
             }

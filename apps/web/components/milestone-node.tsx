@@ -127,12 +127,16 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                 handleEditClick(e, props.id)
             }}
         >
-            <CardHeader className="py-4">
-                {props.data?.contextMenuRef && (
-                    <div className="absolute top-0 right-0 p-2">
+            <div className="absolute top-0 p-1 w-full flex justify-end gap-1">
+                {/* {savingList.includes(props.data.id) && <p className="flex gap-1 items-center"><RefreshCcw className="h-4 w-4"/> Saving...</p>} */}
+                {savingList.includes(props.data.id) && <p className="flex gap-1 items-center"><RefreshCcw className="h-4 w-4"/></p>}
+                <div>
+                    {props.data?.contextMenuRef && (
                         <ProjectActionsMenu milestone={props.data as Milestone} organization={props?.data?.organization}/>
-                    </div>
-                )}
+                    )}
+                </div>
+            </div>
+            <CardHeader className="pt-8">
                 <CardTitle className="text-gray-900">
                     {!props?.data?.isPublic && (
                         <PublicPrivateButton 
@@ -270,8 +274,6 @@ export function MilestoneNode(props: NodeProps<MilestoneNodeType>) {
                         )}
                     </>
                 )} */}
-
-                {savingList.includes(props.data.id) && <p className="flex gap-1 items-center"><RefreshCcw className="h-4 w-4"/> Saving...</p>}
             </CardContent>
 
             {props.data?.contextMenuRef && props.id !== "preview" ? (

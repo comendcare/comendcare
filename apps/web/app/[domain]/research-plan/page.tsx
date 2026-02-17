@@ -123,7 +123,9 @@ export default async function OrganizationRoadmapPage({
             description: true,
             published: true,
             organizationId: true,
-            organization: true,
+            organization: {include: {
+                members: true
+            }},
             modalities: true,
             stages: true,
             statuses: true,

@@ -7,6 +7,49 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@comend/lib/auth";
 import { MOLECULAR_MECHANISMS } from "@comend/lib/types";
 
+function normalizeForMatch(s: string) {
+    return s
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+async function hpoBestMatch(label: string) {
+    const q = label.trim();
+    if (!q) return null;
+
+    const url = new URL("https://ontology.jax.org/api/hp/search");
+    url.searchParams.set("q", q);
+    url.searchParams.set("page", "0");
+    url.searchParams.set("limit", "10");
+
+    const res = await fetch(url.toString(), {
+        headers: { accept: "application/json" },
+    });
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    const results = (data?.results ?? data?.terms ?? []) as any[];
+
+    if (!Array.isArray(results) || results.length === 0) return null;
+
+    // Prefer an exact (case-insensitive) label match when present
+    const needle = normalizeForMatch(q);
+    const exact =
+        results.find((t) => normalizeForMatch(t?.name ?? t?.label ?? "") === needle) ?? null;
+
+    const best = exact ?? results[0];
+
+    const id = (best?.id ?? best?.curie ?? "") as string;
+    const name = (best?.name ?? best?.label ?? "") as string;
+
+    if (!id || !name) return null;
+
+    return { value: id, label: name };
+}
+
 const mechanismOptionByValue = new Map(
     MOLECULAR_MECHANISMS.map((m) => [m.value, m])
 );
@@ -383,6 +426,24 @@ export async function POST(req: Request) {
             fetched.bundle || `No readable page text fetched for: ${canonical}`
         );
 
+        const rawSymptoms = (out.symptoms ?? [])
+            .map((s) => (typeof s === "string" ? s.trim() : ""))
+            .filter(Boolean)
+            .slice(0, 25); // keep tight to avoid slow calls
+
+        const hpoMatches = await Promise.all(rawSymptoms.map((s) => hpoBestMatch(s)));
+
+        // De-dupe by HPO id
+        const seen = new Set<string>();
+        const symptomsHpo = hpoMatches
+            .filter((x): x is { value: string; label: string } => Boolean(x?.value && x?.label))
+            .filter((x) => {
+                if (seen.has(x.value)) return false;
+                seen.add(x.value);
+                return true;
+            })
+            .slice(0, 50);
+
         const name = (out.name || "").trim() || "";
         const suggestedSubdomain = name ? await ensureUniqueSubdomain(slugify(name)) : "";
 
@@ -416,10 +477,12 @@ export async function POST(req: Request) {
                 causal: (out.causalGenes ?? []).map((x) => opt(x)),
                 genes: (out.associatedGenes ?? []).map((x) => opt(x)),
                 systems: (out.associatedSystems ?? []).map((x) => opt(x)),
-                symptoms: (out.symptoms ?? []).map((x) => opt(x)),
+                symptoms: symptomsHpo.length ? symptomsHpo : undefined,
 
                 // optional metadata for debugging (no research plan content)
                 __agent: {
+                    rawSymptoms: rawSymptoms,
+                    resolvedSymptoms: symptomsHpo,
                     canonicalWebsite: canonical,
                     selectedUrls: s.selectedUrls,
                     fetchedPages: fetched.pages.length,
