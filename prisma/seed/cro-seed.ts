@@ -2,29 +2,33 @@ import prisma from "@comend/lib/prisma"
 import * as fs from "fs/promises";
 import path from "path";
 
-async function main() {
-    console.log('Starting seed script...');
+export async function seed() {
+    console.log('CROs: Starting seed script...');
+
+    // Default CRO/Company
+    let companies: any[] = [
+        {
+            url: 'https://example.com',
+            title: 'Example Company',
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+            yearEstablished: 2026,
+            website: 'https://example.com'
+        }
+    ]
 
     // Load the JSON data
-    const filePath = path.resolve(__dirname, "../../packages/data/new_dataset.json");
-    const companies = JSON.parse(await fs.readFile(filePath, 'utf-8'));
+    try {
+        const filePath = path.resolve(__dirname, "../../packages/data/new_dataset.json");
+        companies = JSON.parse(await fs.readFile(filePath, 'utf-8'));
+    } catch (e) {
+        console.error(`Failed to fech file. Using default seed companies.`)
+    }
 
     console.log(`Total records to process: ${companies.length}`);
 
     let processedCount = 0;
 
     for (const company of companies) {
-        // const hasValidDescription = company.description && company.description.trim() !== "";
-        // const hasNonEmptyServices = Array.isArray(company.services) && company.services.length > 0;
-        // const hasNonEmptySites = Array.isArray(company.sites) && company.sites.length > 0;
-        // const hasNonEmptyCertifications = Array.isArray(company.certifications) && company.certifications.length > 0;
-        // const hasValidWebsite = company.website && company.website.trim() !== "";
-        //
-        // if (!(hasValidDescription && hasNonEmptyServices && hasNonEmptySites && hasNonEmptyCertifications && hasValidWebsite)) {
-        //     console.warn(`Skipping company that does not meet all validation criteria: ${company.title || 'Unknown Title'}`);
-        //     continue;
-        // }
-
         try {
             await prisma.company.create({
                 data: {
@@ -36,14 +40,12 @@ async function main() {
                     website: company.website,
                     headquarters: company.headquarters,
                     companyType: company.companyType,
-
                     sites: {
                         create: company.sites?.map((site: any) => ({
                             name: site.name,
                             address: site.address,
                         })) || [],
                     },
-
                     services: {
                         connectOrCreate: company.services?.map((service: any) => ({
                             where: {
@@ -55,7 +57,6 @@ async function main() {
                             },
                         })) || [],
                     },
-
                     certifications: {
                         connectOrCreate: company.certifications?.map((cert: any) => ({
                             where: {
@@ -72,15 +73,10 @@ async function main() {
                             },
                         })) || [],
                     },
-
                     simplifiedCertifications: company.simplifiedCertifications,
-
                     categories: company.categories,
-
                     milestoneTypes: company.milestoneTypes,
-
                     avgRating: 0,
-
                     rfis: {
                         create: company.rfis?.map((rfi: any) => ({
                             name: rfi.name,
@@ -105,15 +101,15 @@ async function main() {
         }
     }
 
-    console.log(`Seed script completed. Processed ${processedCount} records in total.`);
+    console.log(`CROs: Processed ${processedCount} records in total.`);
 }
 
-main()
+seed()
     .then(() => {
-        console.log('Seeding finished successfully!');
+        console.log('CROs: Seeding finished successfully!');
     })
     .catch((error) => {
-        console.error('Error seeding database:', error);
+        console.error('CROs: Error seeding database:', error);
     })
     .finally(async () => {
         await prisma.$disconnect();
