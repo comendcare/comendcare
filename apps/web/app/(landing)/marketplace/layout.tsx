@@ -110,6 +110,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
 
                                 window.functionalConsentedLocalStorage?.set('emailCaptured', true)
 
+                                toast.success('Successfully submitted email address.')
                                 setLoading(false)
                                 setEmailCaptureOpen(false)
                             }}
