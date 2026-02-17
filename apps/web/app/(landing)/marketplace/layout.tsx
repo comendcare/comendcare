@@ -28,10 +28,12 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
     const [loading, setLoading] = useState(false)
     const [emailCaptureOpen, setEmailCaptureOpen] = useState(false)
 
-    const form = useForm({
-        mode: "onSubmit",
+    const form = useForm<z.infer<typeof emailCaptureFormSchema>>({
+        mode: "onChange",
+        reValidateMode: "onChange",
         resolver: zodResolver(emailCaptureFormSchema),
-    })
+        defaultValues: {email: undefined}
+    });
 
     useEffect(() => {
         const value =
@@ -78,6 +80,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
                         />
                         <Button
                             variant="cta"
+                            disabled={loading || !form.formState.isValid}
                             onClick={async (e) => {
                                 e.preventDefault()
                                 if (!form.formState.isValid) {
@@ -88,6 +91,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
 
                                 try {
                                     await addEmailCapture(form.getValues().email)
+                                    toast.success('Successfully submitted email address.')
                                 }  catch (error) {
                                     toast.error('Error submitting email address.')
                                     console.error(error)
@@ -110,12 +114,10 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
 
                                 window.functionalConsentedLocalStorage?.set('emailCaptured', true)
 
-                                toast.success('Successfully submitted email address.')
                                 setLoading(false)
                                 setEmailCaptureOpen(false)
                             }}
                             className="w-fit"
-                            disabled={loading}
                         >
                             {loading ? (
                                 <LoadingDots color="#000000" />

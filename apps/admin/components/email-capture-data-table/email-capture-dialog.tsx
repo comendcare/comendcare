@@ -12,27 +12,37 @@ import {
     DialogTrigger,
 } from "@comend/components/ui/dialog"
 import {Input} from "@comend/components/ui/input"
-import {Label} from "@comend/components/ui/label"
 import {toast} from "sonner";
 import { addEmailToEmailCapture } from "~admin/lib/actions"
+import { emailCaptureFormSchema } from "@comend/lib/types"
+import { Form, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import z from "zod"
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@comend/components/ui/form"
 
 export function EmailCaptureDialog() {
-    const [email, setEmail] = useState("")
     const [loading, setLoading] = useState(false)
 
-    const handleSubmit = async () => {
+    const form = useForm<z.infer<typeof emailCaptureFormSchema>>({
+        mode: "onChange",
+        reValidateMode: "onChange",
+        resolver: zodResolver(emailCaptureFormSchema),
+        defaultValues: {email: undefined}
+    });
+
+    const handleSubmit = async (values: z.infer<typeof emailCaptureFormSchema>) => {
         setLoading(true)
         try {
-            const response = await addEmailToEmailCapture(email)
+            const response = await addEmailToEmailCapture(values.email)
 
             if (response.success) {
-                toast.success("Successfully added email to email capture list");
+                toast.success("Successfully added email to email capture list")
             } else {
-                toast.error(response.error || "An error occurred while adding email.");
+                toast.error(response.error || "An error occurred while adding email.")
             }
         } catch (error) {
-            console.error("Feedback error:", error);
-            toast.error("An error occurred while adding email.");
+            console.error("Feedback error:", error)
+            toast.error("An error occurred while adding email.")
         } finally {
             setLoading(false)
         }
@@ -52,23 +62,37 @@ export function EmailCaptureDialog() {
                         {`Enter the email address to email capture list. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
-                <div>
-                    <Label htmlFor="email" className="text-right">
-                        Email
-                    </Label>
-                    <Input
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="example@email.com"
-                        className="col-span-3"
-                    />
-                </div>
-                <DialogFooter>
-                    <Button type="button" onClick={handleSubmit} disabled={loading || !email}>
-                        {loading ? "Saving..." : "Save"}
-                    </Button>
-                </DialogFooter>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit((values) => handleSubmit(values))}>
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({field}) => (
+                                <FormItem className="w-full flex gap-4 items-center">
+                                    <FormLabel htmlFor="email" className="text-right">Email</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            id="email"
+                                            placeholder="example@email.com"
+                                            className="col-span-3"
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <DialogFooter>
+                            <Button 
+                                type="submit" 
+                                disabled={loading || !form.formState.isValid}
+                            >
+                                {loading ? "Saving..." : "Save"}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
             </DialogContent>
         </Dialog>
     )

@@ -1,0 +1,11 @@
+{
+  "name": "@comend/test-utils",
+  "version": "0.1.0",
+  "files": [
+    "**/*"
+  ],
+  "private": true,
+  "dependencies": {
+    "@comend/lib": "*"
+  }
+}
