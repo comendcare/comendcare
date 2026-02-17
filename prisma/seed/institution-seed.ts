@@ -1,20 +1,31 @@
 import prisma from "@comend/lib/prisma";
 import * as fs from "fs/promises";
 
-async function main() {
-    console.log("Starting institution seed script...");
+export async function seed() {
+    console.log("Institutions: Starting institution seed script...");
 
-    const raw = await fs.readFile("packages/data/v1.69-2025-08-07-ror-data.json", "utf-8");
-    const institutions = JSON.parse(raw);
+    // Default institution
+    let institutions: any[] = [
+        {
+            name: 'Example Institution',
+            established: 2026,
+            website: 'https://example.com'
+        }
+    ]
+
+    try {
+        const raw = await fs.readFile("./packages/data/v1.69-2025-08-07-ror-data.json", "utf-8");
+        institutions = JSON.parse(raw);
+    } catch (e) {
+        console.error(`Failed to fech file. Using default seed institutions.`)
+    }
 
     let processedCount = 0;
 
     for (const inst of institutions) {
         try {
-            await prisma.institution.upsert({
-                where: { rorId: inst.id },
-                update: {},
-                create: {
+            await prisma.institution.create({
+                data: {
                     rorId: inst.id,
                     name: inst.name,
                     established: inst.established || null,
@@ -39,11 +50,17 @@ async function main() {
 
             processedCount++;
         } catch (error: any) {
-            console.error(`Failed to process institution ${inst.name} (${inst.id}):`, error);
+            if (error.code === 'P2002') {
+                console.error(
+                    `Unique constraint violation for institution ${inst.name}. Skipping.`
+                );
+            } else {
+                console.error(`Failed to process institution ${inst.name}:`, error);
+            }
         }
     }
 
-    console.log(`Created/updated ${processedCount} institutions.`);
+    console.log(`Institutions: Processed ${processedCount} records in total.`);
 
     // Process relationships
     let relationshipCount = 0;
@@ -86,15 +103,15 @@ async function main() {
         }
     }
 
-    console.log(`Created ${relationshipCount} relationships.`);
+    console.log(`Institutions: Created ${relationshipCount} relationships.`);
 }
 
-main()
+seed()
     .then(() => {
-        console.log("Institution seeding complete!");
+        console.log("Institutions: Seeding finished successfully!");
     })
     .catch((err) => {
-        console.error("Error during seeding:", err);
+        console.error("Institutions: Error during seeding:", err);
     })
     .finally(async () => {
         await prisma.$disconnect();
