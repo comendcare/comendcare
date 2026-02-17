@@ -1,7 +1,7 @@
 "use client"
 
 import {Button} from "@comend/components/ui/button";
-import {mixpanelReset, mixpanelTrack} from "@comend/lib/mixpanel";
+import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {signOut} from "next-auth/react";
 import {LogOut} from "lucide-react";
 
@@ -11,7 +11,6 @@ export default function LogoutButton() {
             variant="ghost"
             onClick={() => {
                 mixpanelTrack('User Logout')
-                mixpanelReset()
                 signOut()
             }}
             className="transition-all duration-150 ease-in-out hover:bg-stone-200 active:bg-stone-300 dark:text-white dark:hover:bg-stone-700 dark:active:bg-stone-800"

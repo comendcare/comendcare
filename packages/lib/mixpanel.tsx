@@ -7,6 +7,8 @@ import { useSession } from "next-auth/react"
 import { getOrganizationFromOrganizationId, getUser } from "./fetchers"
 import { getCookie } from "./utils"
 
+const MIXPANEL_ALIAS_KEY = "__mp_aliased_user"
+
 const MixpanelContext = createContext<any>(null)
 
 interface MixpanelExtendedConfig extends Partial<Config> {
@@ -137,170 +139,118 @@ export const MixpanelProvider = ({ children }: { children: any }) => {
     }, [])
 
     useEffect(() => {
-        const identifyUser = async () => {
-            if (isMixpanelInitialized && session?.user?.email && session?.user?.id) {
-                const userData = await getUser(session?.user?.id, {
+        if (!isMixpanelInitialized || status !== "authenticated" || !session?.user?.id || !session?.user?.email) return
+
+        const runIdentify = async () => {
+            try {
+                const userData = await getUser(session.user.id, {
                     id: true,
-                    consentSettings: true
+                    consentSettings: true,
                 })
-                if (userData.success && userData.data) {
 
-                    // handle opt-opt in option
-                    const mixpanelPublicToken = process.env.NEXT_PUBLIC_NODE_ENV === 'production'
-                        ? process.env.NEXT_PUBLIC_MIXPANEL_TOKEN
-                        : process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV
-                    
-                    if (!mixpanelPublicToken) {
-                        console.error(`Error: cannot identify user, mixpanel public token is missing.`)
-                        try {
-                            mixpanel.opt_out_tracking()
-                        } catch (e) {
-                            console.error(`Failed to opt-out of mixpanel tracking:`, e)
-                        }
-                        return
-                    }
- 
-                    if (userData.data.consentSettings === true) {
-                        // if the user has consented to data tracking, but we don't have the mixpanel 'opt-in' flag stored in localstoraga
-                        // set the user's 'opt-in' flag
-                        if (window.analyticsConsentedLocalStorage?.get(`__mp_opt_in_out_${mixpanelPublicToken}`) === null || window.analyticsConsentedLocalStorage?.get(`__mp_opt_in_out_${mixpanelPublicToken}`) === '0') {
-                            console.log(`mixpanel opt-in`)
-                            try {
-                                mixpanel.opt_in_tracking()
-                            } catch (e) {
-                                console.error(`Failed to opt-in to mixpanel tracking:`, e)
-                            }
-                        }
+                if (!userData.success || !userData.data) return
 
-                        // user has consented to data tracking, opt into mixpanel tracking
-                        console.log(`mixpanel identify user`, userData)
-                        if (process.env.NEXT_PUBLIC_NODE_ENV !== "production") mixpanel.identify(session.user.email) // development & preview use email as distinct id
-                        else mixpanel.identify(session.user.id) // production uses userID from DB (fetched from session)
+                const mixpanelToken = process.env.NEXT_PUBLIC_NODE_ENV === "production"
+                    ? process.env.NEXT_PUBLIC_MIXPANEL_TOKEN
+                    : process.env.NEXT_PUBLIC_MIXPANEL_TOKEN_DEV
 
-                        let currentOrg = undefined
-                        if (session?.user?.organizationId) currentOrg = await getOrganizationFromOrganizationId(session?.user?.organizationId, {
+                // no mixpanel token, opt out
+                if (!mixpanelToken) {
+                    mixpanel.opt_out_tracking()
+                    mixpanel.reset()
+                    return
+                }
+
+                // user has not consented to tracking, opt out
+                if (userData.data.consentSettings !== true) {
+                    mixpanel.opt_out_tracking()
+                    mixpanel.reset()
+                    return
+                }
+
+                // if the user has consented to data tracking, but we don't have the mixpanel 'opt-in' flag stored in localstoraga
+                // set the user's 'opt-in' flag
+                const optKey = `__mp_opt_in_out_${mixpanelToken}`
+                if (
+                    window.analyticsConsentedLocalStorage?.get(optKey) === null ||
+                    window.analyticsConsentedLocalStorage?.get(optKey) === "0"
+                ) {
+                    mixpanel.opt_in_tracking()
+                }
+
+                // Alias any previously used anonymous id to the current session ID
+                // This allows mixpanel to merge the user data
+                // Alias should only be called once 
+                const currentId = mixpanel.get_distinct_id()
+                if (currentId !== session.user.id) {
+                    mixpanel.alias(session.user.id, currentId)
+                }
+
+                // Identify and set user & org data for this session
+                mixpanel.identify(session.user.id)
+                mixpanel.people.set({
+                    $email: session.user.email,
+                    $name: session.user.name,
+                })
+                let currentOrg
+                if (session.user.organizationId) {
+                    currentOrg = await getOrganizationFromOrganizationId(
+                        session.user.organizationId,
+                        {
                             id: true,
-                            public: true,
-                            verified: true,
-                            published: true,
                             name: true,
-                            description: true,
-                            contactEmail: true,
-                            logo: true,
-                            image: true,
-                            headerImage: true,
-                            biopharmaConsentSettings: true,
                             subdomain: true,
-                            customDomain: true,
-                            statedGoal: true,
-                            yearFounded: true,
-                            incorporationStatus: true,
-                            therapeuticsOfInterest: true,
-                            therapeuticsInDevelopment: true,
-                            website: true,
-                            moneyRaised: true,
-                            moneyDeployed: true,
-                            researchBudget: true,
-                            // address1                  String?
-                            // address2                  String?
-                            // formattedAddress          String?
-                            // city                      String?
-                            // region                    String?
-                            // postalCode                String?
-                            // country                   String?
-                            // lat                       String?
-                            // lng                       String?
-                            createdAt: true,
-                            updatedAt: true,
-                            user: true,
-                            userId: true,
-                            roadmaps: true,
-                            members: true,
-                            clients: true,
-                            invitations: true,
-                            membershipRequests: true,
-                            conditions: true,
-                            kanban: true,
-                            milestones: true,
-                            platformNotifications: true,
-                            reviews: true,
-                            savedCompanies: true,
-                            tools: true,
-                            rfps: true,
-                            metadata: true
-                        })
-
-                        // Identify in Customer.io Web SDK with the same id
-                        if (process.env.NEXT_PUBLIC_APP_ENV === 'production') {
-                            const cio = (window as any)._cio;
-                            if (cio && session?.user?.id) {
-                                cio.identify(session.user.id, {
-                                    email: session.user.email ?? undefined,
-                                    name: session.user.name ?? undefined,
-                                    // optional: mirror org traits so web-events have them, too
-                                    ...(currentOrg?.success && currentOrg?.data
-                                        ? {
-                                            organization_id: currentOrg.data.id,
-                                            organization_name: currentOrg.data.name,
-                                            organization_subdomain: currentOrg.data.subdomain,
-                                        }
-                                        : undefined),
-                                });
-                            }
                         }
+                    )
+                }
 
-                        // add super properties that will apply to all tracked events
-                        mixpanel.register({
-                            "Environment": process.env.NEXT_PUBLIC_NODE_ENV,
+                // add super properties that will apply to all tracked events
+                mixpanel.register({
+                    Environment: process.env.NEXT_PUBLIC_NODE_ENV,
+                    ...(currentOrg?.success && currentOrg?.data
+                    ? {
+                        "Organization ID": currentOrg.data.id,
+                        "Organization Name": currentOrg.data.name,
+                        }
+                    : undefined),
+                })
+
+                // Identify in Customer.io Web SDK with the same id
+                if (process.env.NEXT_PUBLIC_APP_ENV === "production") {
+                    const cio = (window as any)._cio
+                    if (cio) {
+                        cio.identify(session.user.id, {
+                            email: session.user.email,
+                            name: session.user.name,
+                            // optional: mirror org traits so web-events have them, too
                             ...(currentOrg?.success && currentOrg?.data
                                 ? {
-                                    "Organization ID": currentOrg.data.id,
-                                    "Organization Name": currentOrg.data.name
-                                }
-                                : undefined)
+                                    organization_id: currentOrg.data.id,
+                                    organization_name: currentOrg.data.name,
+                                    }
+                                : undefined),
                         })
-
-                        mixpanel.people.set({
-                            $name: session.user.name,
-                            $email: session.user.email,
-                        })
-
-                        const distinctId = mixpanel.get_distinct_id()
-                        setMixpanelContext({ distinctId })
-                    } else {
-                        // if the user has not consented, make sure they are opted out of mixpanel tracking
-                        console.log(`mixpanel opt-out`)
-                        try {
-                            mixpanel.opt_out_tracking()
-                        } catch (e) {
-                            console.error(`Failed to opt-out of mixpanel tracking:`, e)
-                        }
                     }
                 }
-            }
 
+                setMixpanelContext({
+                    distinctId: mixpanel.get_distinct_id(),
+                })
+            } catch (err) {
+                console.error("Mixpanel identify failed:", err)
+            }
         }
 
-        // console.log(`session:`, session, `\nauthenticated: ${status === "authenticated"}\nsession has changed: ${JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)}`)
+        // Only rerun when user identity actually changes
         if (
-            status == "authenticated" &&
-            session && 
-            JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)
+            JSON.stringify(prevSessionRef.current?.user) !==
+            JSON.stringify(session.user)
         ) {
-            console.log(`session has changed, update mixpanel identify`)
-            if (process.env.NEXT_PUBLIC_NODE_ENV == 'production' || process.env.NEXT_PUBLIC_MIXPANEL_ENABLED == 'true') {
-                try {
-                    identifyUser()
-                } catch(e) {
-                    console.error(`Error tracking mixpanel event: ${e}`)
-                }
-            } else {
-                console.log(`Mixpanel event not tracked: Mixpanel is currently not enabled in your pre-production environment. Update the NEXT_PUBLIC_MIXPANEL_ENABLED flag to enable/disable mixpanel tracking.`)
-            }
+            runIdentify()
         }
 
         prevSessionRef.current = session
-    }, [isMixpanelInitialized, session])
+    }, [isMixpanelInitialized, session, status])
 
     // we can use Mixpanel's built in automatic page tracking instead of tracking manually
     // useEffect(() => {
