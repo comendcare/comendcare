@@ -131,7 +131,10 @@ export default async function ProfilePage(props: IndexPageProps) {
                 attachments: true,
                 milestones: true,
                 organizationId: true,
-                organization: true
+                organization: {include: {
+                    conditions: {include: {condition: true}},
+                    members: true
+                }},
             }),
             getBiosamples(
                 organization.id,
@@ -176,7 +179,10 @@ export default async function ProfilePage(props: IndexPageProps) {
                     gene: true,
                     genes: true,
                     organizationId: true,
-                    organization: true,
+                    organization: {include: {
+                        conditions: {include: {condition: true}},
+                        members: true
+                    }},
                     materialAndDataAccessRequests: true
                 },
                 {...search, q: globalFilter, filters: validFilters},
@@ -209,7 +215,10 @@ export default async function ProfilePage(props: IndexPageProps) {
                     conditionId: true,
                     condition: true,
                     organizationId: true,
-                    organization: {include: {conditions: {include: {condition: true}}}},
+                    organization: {include: {
+                        conditions: {include: {condition: true}},
+                        members: true
+                    }},
                     milestones: {include: {milestone: true}},
                 },
                 {...search, q: globalFilter, filters: validFilters},
@@ -240,7 +249,10 @@ export default async function ProfilePage(props: IndexPageProps) {
                     gene: true,
                     genes: true,
                     organizationId: true,
-                    organization: {include: {conditions: {include: {condition: true}}}},
+                    organization: {include: {
+                        conditions: {include: {condition: true}},
+                        members: true
+                    }},
                     milestones: {include: {milestone: true}},
                 },
                 {...search, q: globalFilter, filters: validFilters},
@@ -254,13 +266,19 @@ export default async function ProfilePage(props: IndexPageProps) {
                     description: true,
                     published: true,
                     organizationId: true,
-                    organization: true,
+                    organization: {include: {
+                        conditions: {include: {condition: true}},
+                        members: true
+                    }},
                     modalities: true,
                     stages: true,
                     statuses: true,
                     partners: true,
                     links: true,
-                    milestones: {where: {private: false}}
+                    milestones: {
+                        where: {private: false},
+                        include: {types: {include: {milestoneType: true}}}
+                    }
                 },
                 undefined,
                 true,

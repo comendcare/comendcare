@@ -61,6 +61,38 @@ export interface BadgeProps
         VariantProps<typeof badgeVariants> {
 }
 
+export type BadgeVariantType = 
+    "default" | 
+    "secondary" | 
+    "destructive" | 
+    "positive" | 
+    "outline" | 
+    "lightBlue" | 
+    "red" | 
+    "orange" | 
+    "amber" | 
+    "yellow" | 
+    "lime" | 
+    "green" | 
+    "emerald" | 
+    "teal" | 
+    "cyan" | 
+    "sky" | 
+    "blue" | 
+    "indigo" | 
+    "violet" | 
+    "purple" | 
+    "fuchsia" | 
+    "pink" | 
+    "rose" | 
+    "slate" | 
+    "gray" | 
+    "zinc" | 
+    "neutral" | 
+    "stone" | 
+    null | 
+    undefined
+
 function Badge({className, variant, size, ...props}: BadgeProps) {
     return (
         <div className={cn(badgeVariants({variant, size}), className)} {...props} />

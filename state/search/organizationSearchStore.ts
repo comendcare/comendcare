@@ -94,6 +94,7 @@ function generateFiltersString(filters: FiltersType) {
 }
 
 const sortByFilters: { [key: string]: string } = {
+    "default": "fieldsFilled:desc,updatedAt:desc",
     "recently-updated": "updatedAt:desc",
     "alphabetical": "name:asc",
     // "patients-low-high": "condition.numberOfIdentifiedPatients:asc",
@@ -237,7 +238,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                 set({
                     featuredOrgs,
                     searchTerm: "",
-                    sortBy: "alphabetical",
+                    sortBy: "default",
                     lastFetchedPage: 1,
                     filters,
                 })
@@ -286,7 +287,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                     totalResults: total,
                 })
             },
-            sortBy: "alphabetical",
+            sortBy: "default",
             setSortBy: async (sortBy: string | undefined) => {
                 const {results: newSearchResults, total} = await getUpdatedSearchResults({
                     ...get(),

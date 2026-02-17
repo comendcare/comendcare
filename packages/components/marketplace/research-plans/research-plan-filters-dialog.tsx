@@ -10,6 +10,7 @@ import MultipleSelector from "@comend/components/ui/multiple-selector"
 
 import { RESEARCH_PLAN_STATUS, RESEARCH_STAGE, RESEARCH_PLAN_TYPES } from "@comend/lib/types"
 import { useResearchPlanSearchStore } from "@/state/search/researchPlanSearchStore"
+import { badgeVariants } from "@comend/components/ui/badge"
 
 export function ResearchPlanFiltersDialog() {
     const { filters, setFilters } = useResearchPlanSearchStore()
@@ -41,6 +42,7 @@ export function ResearchPlanFiltersDialog() {
                         value={filters.modalities ?? []}
                         onChange={(vals) => setFilterKey("modalities", vals)}
                         defaultOptions={RESEARCH_PLAN_TYPES}
+                        badgeClassName={badgeVariants({variant: "lightBlue"})}
                         placeholder="Select strategy..."
                         hidePlaceholderWhenSelected
                         commandProps={{ className: "bg-transparent" }}

@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import prisma from "@comend/lib/prisma"
 import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, MILESTONE_TYPE_OPTIONS, MODALITIES, RESEARCH_PLAN_STATUS, RESEARCH_STAGE, RFP, TOOL_TYPE_OPTIONS } from '@comend/lib/types';
-import { checkDateRangeUTC, getSortRank, handleGetAvailability, stringToSortableInt } from '@comend/lib/utils';
+import { checkDateRangeUTC, getNestedValue, getSortRank, handleGetAvailability, isFilled, stringToSortableInt } from '@comend/lib/utils';
 
 const sendTypeSenseRequest = async (
     url: string,
@@ -226,6 +226,18 @@ const syncToTypesense = async (env: {
                     stem: false,
                     store: true,
                     type: "string[]"
+                },
+                {
+                    name: "fieldsFilled",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "int32"
                 },
             ],
         };
@@ -479,6 +491,12 @@ const syncToTypesense = async (env: {
                     sort: true,
                     optional: true,
                 },
+                {
+                    name: "fieldsFilled",
+                    type: "int32",
+                    sort: true,
+                    optional: true
+                },
             ]
         }
         const diseaseModelSchema = {
@@ -536,7 +554,13 @@ const syncToTypesense = async (env: {
                     type: "string",
                     sort: true,
                     optional: true,
-                }
+                },
+                {
+                    name: "fieldsFilled",
+                    type: "int32",
+                    sort: true,
+                    optional: true
+                },
             ]
         }
         const clinicalDatasetSchema = {
@@ -594,7 +618,13 @@ const syncToTypesense = async (env: {
                     type: "int64",
                     sort: true,
                     optional: true,
-                }
+                },
+                {
+                    name: "fieldsFilled",
+                    type: "int32",
+                    sort: true,
+                    optional: true
+                },
             ]
         }
         const rfpSchema = {
@@ -658,7 +688,13 @@ const syncToTypesense = async (env: {
                     name: "description",
                     type: "string",
                     sort: true,
-                }
+                },
+                {
+                    name: "fieldsFilled",
+                    type: "int32",
+                    sort: true,
+                    optional: true
+                },
             ]
         }
         const researcherSchema = {
@@ -691,7 +727,6 @@ const syncToTypesense = async (env: {
 
         if (organizations.length > 0) {
             console.log('Validating organization data...');
-
             // map orgs to include all required data
             const uploadOrgs = await Promise.all(organizations.map(async (org, index) => {
                 console.log(`Org ${index + 1}:`, org)
@@ -699,10 +734,10 @@ const syncToTypesense = async (env: {
                     where: { id: org.id },
                     include: { 
                         conditions: {include: {condition: true}},
-                        roadmaps: true,
-                        milestones: true,
-                        tools: true,
-                        rfps: true
+                        roadmaps: {where: {private: false}},
+                        milestones: {where: {private: false}},
+                        tools: {where: {private: false}},
+                        rfps: {where: {private: false}},
                     }
                 })
 
@@ -721,11 +756,20 @@ const syncToTypesense = async (env: {
                     organization.rfps.map(rfp => rfp.updatedAt.valueOf())
                 ))
 
-                return {
+                const finalOrg = {
                     ...organization,
                     updatedAt: orgUpdatedAt,
                     createdAt: organization.createdAt.valueOf(),
                     firstConditionPatientsEngaged,
+                    numPatientsEngaged: organization.conditions?.[0]?.condition?.numberOfPatientsEngaged
+                }
+
+                // const orgKeys = Object.keys(finalOrg)
+                const orgKeys = ['title', 'moneyDeployed', 'numPatientsEngaged', 'milestones', 'roadmaps', 'tools', 'rfps', 'conditions']
+                const fieldsFilled = orgKeys.reduce((acc: number, curr: string) => (acc + isFilled(finalOrg[curr as keyof typeof org])), 0)
+                return {
+                    ...finalOrg,
+                    fieldsFilled
                 }
             }))
 
@@ -832,7 +876,7 @@ const syncToTypesense = async (env: {
                 },
                 id: true,
                 // only include public donor ID (no other donor information should be uploaded to typesense)
-                donor: {select: {id: true}},
+                donor: {select: {id: true, diagnoses: true}},
                 types: true,
                 gene: true,
                 genes: true,
@@ -843,10 +887,13 @@ const syncToTypesense = async (env: {
                 description: true,
                 genotype: true,
                 createFacilityRequests: true,
+                attachments: true,
+                contacts: true,
             }
         })
         console.log('Raw biosamples data:', biosamples)
         if (biosamples.length > 0) {
+            const biosampleKeys = ['id', 'donor', 'donor.diagnoses', 'types', 'gene', 'genotype', 'organization', 'quantity', 'company', 'institution', 'contacts', 'attachments']
             const uploadBiosamples = biosamples.map(biosample => ({
                 ...biosample,
                 id_sort: stringToSortableInt(biosample.id),
@@ -859,12 +906,16 @@ const syncToTypesense = async (env: {
                 // special case for conditions to enable sorting include only one condition
                 condition: biosample.organization?.conditions && biosample.organization.conditions.length > 0 && biosample.organization.conditions[0].condition,
                 genotype: {genotype: biosample.genotype},
+                fieldsFilled: biosampleKeys.reduce((acc, path) => {
+                    const value = getNestedValue(biosample, path)
+                    return acc + isFilled(value)
+                }, 0)
             }))
+            
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'biosamples', uploadBiosamples);
         } else {
             console.log('No biosamples to import.');
         }
-
 
         /* UPDATE DISEASE MODELS ---------------------------------------------------------------------------------------- */
         console.log('Disease Model:', JSON.stringify(diseaseModelSchema, null, 2));
@@ -904,10 +955,13 @@ const syncToTypesense = async (env: {
                 genotype: true,
                 strain: true,
                 createFacilityRequests: true,
+                attachments: true,
+                contacts: true,
             }
         })
         console.log('Raw disease models data:', diseaseModels)
         if (diseaseModels.length > 0) {
+            const diseaseModelKeys = ['id', 'types', 'strain', 'gene', 'genotype', 'organization', 'organization.conditions', 'company', 'institution', 'contacts', 'attachments', 'description']
             const uploadDiseaseModels = diseaseModels.map(diseaseModel => ({
                 ...diseaseModel,
                 id_sort: stringToSortableInt(diseaseModel.id),
@@ -921,6 +975,10 @@ const syncToTypesense = async (env: {
                 condition: diseaseModel.organization?.conditions && diseaseModel.organization.conditions.length > 0 && diseaseModel.organization.conditions[0].condition,
                 genotype: {genotype: diseaseModel.genotype},
                 strain: {strain: diseaseModel.strain},
+                fieldsFilled: diseaseModelKeys.reduce((acc, path) => {
+                    const value = getNestedValue(diseaseModel, path)
+                    return acc + isFilled(value)
+                }, 0)
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'disease-models', uploadDiseaseModels);
         } else {
@@ -963,20 +1021,14 @@ const syncToTypesense = async (env: {
                 types: true,
                 cohortSize: true,
                 createFacilityRequests: true,
+                attachments: true,
+                contacts: true,
             }
         })
         console.log('Raw clinical datasets data:', clinicalDatasets)
         if (clinicalDatasets.length > 0) {
+            const clinicalDatasetKeys = ['id', 'title', 'types', 'cohortSize', 'organization.conditions', 'organization', 'genes', 'company', 'institution', 'contacts', 'attachments', 'description']
             const uploadClinicalDatasets = clinicalDatasets.map(dataset => ({
-                // id: dataset.id,
-                // title: dataset.title,
-                // description: dataset.description,
-                // // types: dataset.types,
-                // types: TOOL_TYPE_OPTIONS.filter(option => dataset.types.includes(option.value)),
-                // gene: dataset.gene?.symbol,
-                // conditions: dataset.organization?.conditions?.map(condition => condition.condition?.name) || [],
-                // organization: dataset.organization
-
                 ...dataset,
                 id_sort: stringToSortableInt(dataset.id),
                 createdAt: dataset.createdAt.getTime(), // special case for created at to enable sorting
@@ -988,7 +1040,11 @@ const syncToTypesense = async (env: {
                 // special case for types to enable searching by label & sorting include all info, and only include one type
                 type: TOOL_TYPE_OPTIONS.filter(option => dataset.types.includes(option.value))[0],
                 // special case for conditions to enable sorting include only one condition
-                condition: dataset.organization?.conditions && dataset.organization.conditions.length > 0 && dataset.organization.conditions[0].condition
+                condition: dataset.organization?.conditions && dataset.organization.conditions.length > 0 && dataset.organization.conditions[0].condition,
+                fieldsFilled: clinicalDatasetKeys.reduce((acc, path) => {
+                    const value = getNestedValue(dataset, path)
+                    return acc + isFilled(value)
+                }, 0)
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'clinical-datasets', uploadClinicalDatasets);
         } else {
@@ -1077,13 +1133,14 @@ const syncToTypesense = async (env: {
                 },
                 modalities: true,
                 organization: {
-                    select: {name: true}
+                    select: {name: true, members: true}
                 },
                 milestones: {where: {private: false}},
             }
         })
         console.log('Raw research plan data:', researchPlans)
         if (researchPlans.length > 0) {
+            const researchPlanKeys = ['organization', 'title', 'modalities', 'stages', 'statuses', 'partners', 'description', 'links', 'milestones']
             const uploadResearchPlans = researchPlans.map(researchPlan => ({
                 ...researchPlan,
                 createdAt: researchPlan.createdAt.getTime(), // special case for created at to enable sorting
@@ -1098,6 +1155,10 @@ const syncToTypesense = async (env: {
                 statuses: RESEARCH_PLAN_STATUS
                     .filter((option: any) => researchPlan.statuses.includes(option.value))
                     .map((option: any) => option.label),
+                fieldsFilled: researchPlanKeys.reduce((acc, path) => {
+                    const value = getNestedValue(researchPlan, path)
+                    return acc + isFilled(value)
+                }, 0)
             }))
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'research-plans', uploadResearchPlans);
         } else {

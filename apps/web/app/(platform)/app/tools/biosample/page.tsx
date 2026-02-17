@@ -50,6 +50,7 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
             price: true,
             priceUnit: true,
             notes: true,
+            bsiId: true,
 
             milestones: {include: {milestone: true}},
             donorId: true,
@@ -67,7 +68,9 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
             gene: true,
             genes: true,
             organizationId: true,
-            organization: true,
+            organization: {include: {
+                members: true
+            }},
             materialAndDataAccessRequests: true
         },
         {...search, q: globalFilter, filters: validFilters},

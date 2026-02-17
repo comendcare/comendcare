@@ -370,8 +370,11 @@ export const TimelineItemContent = ({
                 {getDates(milestone)}
             </time>
             {isPrivate && (
-                <div className="absolute top-[12px] right-0 p-2">
+                <div className="flex gap-1">
+                {savingList.includes(milestone.id) && <p className="flex gap-1 items-center"><RefreshCcw className="h-4 w-4"/></p>}
+                <div className="absolute top-0 right-0 p-2">
                     <ProjectActionsMenu milestone={milestone as Milestone} organization={organization}/>
+                </div>
                 </div>
             )}
         </div>
@@ -434,8 +437,6 @@ export const TimelineItemContent = ({
                 onStatusChange={() => {}}
             />
         </li>
-
-        {savingList.includes(milestone.id) && <p className="flex gap-1 items-center"><RefreshCcw className="h-4 w-4"/> Saving...</p>}
         </>
     )
 }

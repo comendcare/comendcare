@@ -78,12 +78,13 @@ export function OrganizationMarketplaceCard({
                             <CardTitle className="text-xl flex flex-row gap-2 items-start h-[56px]">
                                 <ProfilePhoto img={image} name={name} className="h-9 w-9 -mt-1"/>
                                 {name}
-                                <ClaimedBadge
-                                    organizationId={organization.id}
-                                    mini={true}
-                                />
                             </CardTitle>
                         </Link>
+
+                        <ClaimedBadge
+                            organization={organization}
+                            mini={true}
+                        />
                         {/*{!isPublic && <SaveOrganizationDialog savedOrganization={organization} type={"card"}/>}*/}
                         {/*{!isPublic && <SaveOrganizationButton*/}
                         {/*    savedOrganization={organization}*/}
@@ -110,6 +111,7 @@ export function OrganizationMarketplaceCard({
                     <div className="w-full flex flex-row gap-2 min-h-[24px]">
                         <TruncatedList 
                             items={Array.from(therapeuticStrategiesList)}
+                            showNum={1}
                         />
                     </div>
                     <div className="flex flex-wrap w-full gap-4 min-h-[20px]">
@@ -158,6 +160,7 @@ export function OrganizationMarketplaceCard({
                             <TruncatedList 
                                 items={(causalGenes || []).concat((associatedGenes || []))} 
                                 badgeProps={{variant: 'teal'}}
+                                showNum={3}
                             />
                         </span>
                     </CardFooter>
@@ -169,54 +172,15 @@ export function OrganizationMarketplaceCard({
 
 export default function TruncatedList({ 
     items, 
+    showNum,
     badgeProps
 }: { 
     items: string[], 
+    showNum: number,
     badgeProps?: BadgeProps
 }) {
     const containerRef = useRef<HTMLDivElement>(null);
-    const [visibleCount, setVisibleCount] = useState(items.length);
-
-    useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
-
-        const updateVisibleItems = () => {
-            const allChildren = Array.from(container.children) as HTMLElement[];
-
-            const itemEls = allChildren.filter(
-                (el) => !el.dataset.moreIndicator
-            );
-
-            let totalWidth = 10;
-            let count = 0;
-
-            for (let i = 0; i < itemEls.length; i++) {
-                const child = itemEls[i];
-                totalWidth += child.offsetWidth;
-                if (totalWidth <= container.offsetWidth) {
-                    count++;
-                } else {
-                    break;
-                }
-            }
-
-            const overflow = count < itemEls.length;
-
-            const visible = overflow ? Math.max(1, count - 1) : count;
-            setVisibleCount(visible);
-        };
-
-        const raf = requestAnimationFrame(updateVisibleItems);
-        window.addEventListener("resize", updateVisibleItems);
-
-        return () => {
-            cancelAnimationFrame(raf);
-            window.removeEventListener("resize", updateVisibleItems);
-        };
-    }, [items]);
-
-    const hiddenCount = items.length - visibleCount;
+    const hiddenCount = items.length - showNum;
 
     return (
         <div
@@ -224,7 +188,7 @@ export default function TruncatedList({
             className="flex items-center gap-2 overflow-hidden whitespace-nowrap"
             style={{ width: "100%" }}
         >
-        {items.slice(0, visibleCount).map((item) => (
+        {items.slice(0, showNum).map((item) => (
             <Badge key={item} className="text-xs flex" {...badgeProps}>
                 {item}
             </Badge>

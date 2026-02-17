@@ -123,13 +123,18 @@ export default async function OrganizationRoadmapPage({
             description: true,
             published: true,
             organizationId: true,
-            organization: true,
+            organization: {include: {
+                members: true
+            }},
             modalities: true,
             stages: true,
             statuses: true,
             partners: true,
             links: true,
-            milestones: {where: {private: false}}
+            milestones: {
+                where: {private: false},
+                include: {types: {include: {milestoneType: true}}}
+            }
         },
         undefined,
         true,
