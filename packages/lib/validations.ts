@@ -2,12 +2,13 @@ import {
   createSearchParamsCache,
   parseAsArrayOf,
   parseAsInteger,
+  parseAsIsoDate,
   parseAsString,
   parseAsStringEnum,
 } from "nuqs/server";
 import * as z from "zod";
 import { flagConfig } from "./config/flag";
-import { type Task, Status, Priority, Label, Tool } from "@prisma/client";
+import { type Task, Status, Priority, Label, Tool, MilestoneTypeOnMilestone } from "@prisma/client";
 import {
   getFiltersStateParser,
   getSortingStateParser,
@@ -76,6 +77,32 @@ export const researchPlanSearchParamsCache = createSearchParamsCache({
   quantity: parseAsArrayOf(z.coerce.string()).withDefault([]),
   private: parseAsArrayOf(z.string().toLowerCase().transform((x) => x === 'true').pipe(z.boolean())).withDefault([]),
   createdAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
+  // advanced filter
+  filters: getFiltersStateParser().withDefault([]),
+  joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and"),
+});
+
+export const projectSearchParamsCache = createSearchParamsCache({
+  q: parseAsString.withDefault(""),
+  filterFlag: parseAsStringEnum(
+      flagConfig.featureFlags.map((flag) => flag.value),
+  ),
+  page: parseAsInteger.withDefault(1),
+  perPage: parseAsInteger.withDefault(10),
+  sort: getSortingStateParser<Tool>().withDefault([
+    { id: "createdAt", desc: true },
+  ]),
+  title: parseAsString.withDefault(""),
+  types: parseAsArrayOf(z.custom<MilestoneTypeOnMilestone>()).withDefault([]),
+  status: parseAsArrayOf(z.string()).withDefault([]),
+  availability: parseAsArrayOf(z.string()).withDefault([]),
+  currentCountry: parseAsString.withDefault(""),
+  countryOfCollection: parseAsString.withDefault(""),
+  quantity: parseAsArrayOf(z.coerce.string()).withDefault([]),
+  private: parseAsArrayOf(z.string().toLowerCase().transform((x) => x === 'true').pipe(z.boolean())).withDefault([]),
+  createdAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
+  updatedAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
+  budget: parseAsArrayOf(z.coerce.number()).withDefault([]),
   // advanced filter
   filters: getFiltersStateParser().withDefault([]),
   joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and"),
@@ -172,6 +199,9 @@ export type GetTasksSchema = Awaited<
 >
 export type GetResearchPlansSchema = Awaited<
     ReturnType<typeof researchPlanSearchParamsCache.parse>
+>
+export type GetProjectSchema = Awaited<
+    ReturnType<typeof projectSearchParamsCache.parse>
 >
 export type GetDiseaseModelSchema = Awaited<
     ReturnType<typeof diseaseModelSearchParamsCache.parse>
