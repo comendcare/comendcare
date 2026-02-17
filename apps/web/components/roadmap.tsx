@@ -744,7 +744,7 @@ const RoadmapHeader = ({
                 </Button>
                 <div className="p-[6px] h-[40px]">
                     {RESEARCH_STAGE.filter(stage => researchPlanDetails.stages?.includes(stage.value || stage.label)).map(stage => (
-                        <Badge variant={'secondary'} className="text-sm text-nowrap">{stage.label}</Badge>
+                        <Badge variant={stage.variant} className="text-sm text-nowrap">{stage.label}</Badge>
                     ))}
                 </div>
                 <div className="p-[6px] h-[40px]">
