@@ -2,9 +2,9 @@ import {getSession} from "@comend/lib/auth"
 import NoOrganization from "~web/components/no-organization";
 import RoadmapsPage from "~web/components/roadmaps-page";
 import prisma from "@comend/lib/prisma";
-import { getResearchPlans } from "@comend/lib/fetchers";
+import { getProjects, getResearchPlans } from "@comend/lib/fetchers";
 import { SearchParams } from "@comend/components/types";
-import { researchPlanSearchParamsCache } from "@comend/lib/validations";
+import { projectSearchParamsCache, researchPlanSearchParamsCache } from "@comend/lib/validations";
 import { getValidFilters } from "@comend/lib/data-table";
 
 interface IndexPageProps {
@@ -15,11 +15,14 @@ export default async function RoadmapPage(props: IndexPageProps) {
     const session = await getSession()
     const orgId = session?.user.organizationId
     const searchParams = await props.searchParams;
-    const search = researchPlanSearchParamsCache.parse(searchParams);
-    const validFilters = getValidFilters(search.filters);
-    const globalFilter = search.q ?? "";
+    const researchPlansSearch = researchPlanSearchParamsCache.parse(searchParams);
+    const projectsSearch = projectSearchParamsCache.parse(searchParams);
+    const researchPlanValidFilters = getValidFilters(researchPlansSearch.filters);
+    const researchPlanGlobalFilter = researchPlansSearch.q ?? "";
+    const projectValidFilters = getValidFilters(projectsSearch.filters);
+    const projectGlobalFilter = projectsSearch.q ?? "";
 
-    const [organization, {data, pageCount}] = await Promise.all([
+    const [organization, researchPlansDataResponse, projectsDataResponse] = await Promise.all([
         prisma.organization.findUnique({
             where: {id: orgId},
             select: {
@@ -50,7 +53,29 @@ export default async function RoadmapPage(props: IndexPageProps) {
                     include: {types: {include: {milestoneType: true}}}
                 }
             },
-            {...search, q: globalFilter, filters: validFilters},
+            {...researchPlansSearch, q: researchPlanGlobalFilter, filters: researchPlanValidFilters},
+            false,
+        ),
+        getProjects(
+            session?.user.organizationId,
+            {
+                id: true,
+                private: true,
+                title: true,
+                description: true,
+                organizationId: true,
+                organization: true,
+                roadmapId: true,
+                roadmap: {select: {title: true}},
+                nodeId: true,
+                types: true,
+                status: true,
+                companies: {include: {company: true}},
+                institutions: {include: {institution: true}},
+                updatedAt: true,
+                budget: true,
+            },
+            {...projectsSearch, q: projectGlobalFilter, filters: projectValidFilters},
             false,
         )
     ])
@@ -61,8 +86,10 @@ export default async function RoadmapPage(props: IndexPageProps) {
         <RoadmapsPage
             orgId={orgId}
             organization={organization}
-            data={[...data]} 
-            pageCount={pageCount} 
+            researchPlansData={[...researchPlansDataResponse.data]} 
+            researchPlansPageCount={researchPlansDataResponse.pageCount} 
+            projectsData={[...projectsDataResponse.data]} 
+            projectsPageCount={projectsDataResponse.pageCount} 
             searchParams={searchParams}
         />
     )
