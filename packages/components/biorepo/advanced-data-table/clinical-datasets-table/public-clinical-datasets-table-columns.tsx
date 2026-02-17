@@ -19,6 +19,7 @@ import { ExtendedColumnFilter } from "@comend/lib/types/data-table";
 import { filterColumns } from "@comend/lib/filter-columns";
 import { generateId } from "@comend/lib/id";
 import { SeeMoreDescription } from "./../../../../../packages/components/see-more-description";
+import ClaimedBadge from "comend-pag-platform/components/claimed-badge";
 
 type Preset = "default" | "profile";
 
@@ -220,6 +221,10 @@ export function useClinicalDatasetsTableColumns(
                 >
                     {row.original.organization?.name}
                 </Link>
+                <ClaimedBadge
+                    organization={row.original?.organization}
+                    mini={true}
+                />
             </div>
         ),
         enableHiding,

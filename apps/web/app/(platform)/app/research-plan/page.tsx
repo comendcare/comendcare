@@ -41,7 +41,9 @@ export default async function RoadmapPage(props: IndexPageProps) {
                 description: true,
                 published: true,
                 organizationId: true,
-                organization: true,
+                organization: {include: {
+                    members: true
+                }},
                 modalities: true,
                 stages: true,
                 statuses: true,

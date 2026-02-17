@@ -36,7 +36,17 @@ export default async function PlatformLayout({children}: PlatformLayoutProps) {
 
     // Precedence: blacklist > whitelist
     if (isBlacklisted) redirect("/signed-out?reason=blacklisted");
-    if (!isWhitelisted) redirect("/signed-out?reason=not_whitelisted");
+
+    // if (!isWhitelisted) redirect("/signed-out?reason=not_whitelisted");
+    if (!isWhitelisted) {
+        // user is not whitelisted, add to whitelist
+        // Upsert so that if it already is whitelisted, nothing changes, and if not, they are whitelisted
+        await prisma.whitelist.upsert({
+            where: {email: email},
+            update: {}, // No fields to update
+            create: {email: email},
+        })
+    }
 
     // Custom flags on the session (type these on your Session object)
     if ((session as any).terminate) redirect("/signed-out?reason=terminated");

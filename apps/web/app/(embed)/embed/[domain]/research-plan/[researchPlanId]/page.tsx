@@ -67,7 +67,7 @@ export default async function EmbeddedResearchPlanPage({params}: {params: {domai
             edges: true,
             milestones: true,
             nodes: true,
-            modalities: true
+            modalities: true,
         }),
     ])
 
