@@ -72,10 +72,10 @@ export const PAGProfileToolsCard = ({
                                         href={pathname === "/app/profile" 
                                             ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/biosamples?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}` 
                                             : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/biosamples?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}`}
-                                        className="flex gap-1 items-center"
+                                        className="flex gap-1 items-center text-sm font-normal hover:font-semibold"
                                     >
-                                        <Badge variant={"blue"} className="text-sm">{type.label}</Badge>
-                                        <p className="text-sm font-medium">{`x ${biosamples.filter(biosample => biosample.types.includes(type.value)).length}`}</p>
+                                        <Badge variant={"blue"}>{type.label}</Badge>
+                                        <p>{`x ${biosamples.filter(biosample => biosample.types.includes(type.value)).length}`}</p>
                                     </Link>
                                 ))}
                         </div>
@@ -118,7 +118,7 @@ export const PAGProfileToolsCard = ({
                                         href={pathname === "/app/profile" 
                                             ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/disease-models?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}` 
                                             : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/disease-models?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}`}
-                                        className="flex gap-1 items-center"
+                                        className="flex gap-1 items-center text-sm font-normal hover:font-semibold"
                                     >
                                         <Badge variant={"blue"} className="text-sm" onClick={() => {}}>{type.label}</Badge>
                                         <p className="text-sm font-medium">{`x ${diseaseModels.filter(diseaseModel => diseaseModel.types.includes(type.value)).length}`}</p>
@@ -164,7 +164,7 @@ export const PAGProfileToolsCard = ({
                                         href={pathname === "/app/profile" 
                                             ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/clinical-datasets?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}` 
                                             : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/clinical-datasets?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}`}
-                                        className="flex gap-1 items-center"
+                                        className="flex gap-1 items-center text-sm font-normal hover:font-semibold"
                                     >
                                         <Badge variant={"blue"} className="text-sm">{type.label}</Badge>
                                         <p className="text-sm font-medium">{`x ${clinicalDatasets.filter(clinicalDataset => clinicalDataset.types.includes(type.value)).length}`}</p>
