@@ -1,12 +1,12 @@
 "use client"
+
 import { Suspense, useEffect, useState } from "react";
 import dynamic from "next/dynamic"
-import type { Organization, Roadmap } from "@prisma/client";
+import type { Organization } from "@prisma/client";
 import { ResearchPlanTemplatesCard } from "./roadmap-templates";
 import Loading from "./../../../loading";
 import { initializeRoadmapState } from "@comend/lib/initialize-client-state";
 import { useRouter } from "next/navigation";
-import { RoadmapsTable } from "./public-roadmap-card";
 import { Button, buttonVariants } from "@comend/components/ui/button";
 import { Plus, Share } from "lucide-react";
 import { Dialog, DialogContent } from "@comend/components/ui/dialog";
@@ -16,7 +16,6 @@ import { cn } from "@comend/lib/utils";
 import { Shell } from "@comend/components/biorepo/advanced-data-table/lib/shell";
 import { FeatureFlagsProvider } from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import { DatabaseResearchPlansTable } from "@comend/components/biorepo/advanced-data-table/research-plans-table/database-research-plans-table"
 import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/private-research-plans-table-columns";
 import { useSession } from "next-auth/react";
 import { Row } from "@tanstack/react-table";
@@ -24,6 +23,7 @@ import { NoResultsTemplate } from "@comend/components/no-results";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@comend/components/ui/tabs";
 import { DatabaseProjectsTable } from "@comend/components/biorepo/advanced-data-table/projects-table/database-projects-table"
 import { useProjectsTableColumns } from "@comend/components/biorepo/advanced-data-table/projects-table/private-projects-table-columns";
+import {ResearchPlanCard} from "@comend/components/research-plan-card"
 
 const CreateResearchPlanDialog = dynamic(
     () => import("./create-research-plan-dialog"),
@@ -147,7 +147,7 @@ export default function RoadmapsPage({ orgId, organization, researchPlansData, r
                                 </Button>
                             </div>
                         </div>
-                        <Shell className="gap-2 w-full max-w-full">
+                        {/* <Shell className="gap-2 w-full max-w-full">
                             <FeatureFlagsProvider showFilters={false}>
                                 <Suspense
                                     fallback={
@@ -185,7 +185,18 @@ export default function RoadmapsPage({ orgId, organization, researchPlansData, r
                                     />
                                 </Suspense>
                             </FeatureFlagsProvider>
-                        </Shell>
+                        </Shell> */}
+                        <div className="w-full h-full grid grid-cols-3 gap-4">
+                            {researchPlansData.map((researchPlan: any) => (
+                                <div
+                                    onClick={() => {
+                                        router.push(`/app/research-plan/${researchPlan.id}`)
+                                    }}
+                                >
+                                    <ResearchPlanCard researchPlan={researchPlan}/>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </TabsContent>
                 <TabsContent value="projects" className="w-full">

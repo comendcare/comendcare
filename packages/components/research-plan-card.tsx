@@ -1,27 +1,29 @@
 "use client"
 
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
 import {Badge} from "@comend/components/ui/badge";
 import {Skeleton} from "@comend/components/ui/skeleton";
 import { Separator } from "@comend/components/ui/separator";
 import { ProfilePhoto } from "@comend/components/profile-photo";
 import { RESEARCH_PLAN_STATUS, RESEARCH_PLAN_TYPES, RESEARCH_STAGE } from "@comend/lib/types";
-import { FileText } from "lucide-react";
+import { Building, ExternalLink, LinkIcon, Lock, Globe } from "lucide-react";
+import ClaimedBadge from "comend-pag-platform/components/claimed-badge";
+import Link from "next/link";
 
-/** Header skeleton that matches the header’s layout/height to prevent reflow */
-function HeaderSkeleton() {
-    return (
-        <div className="gap-2 relative">
-            <div className="flex items-center gap-2">
-                <Skeleton className="h-6 w-6 rounded"/>
-                <Skeleton className="h-6 w-48 rounded"/>
-                <Skeleton className="h-5 w-16 rounded"/>
-            </div>
-            <Skeleton className="mt-2 w-3/4 rounded"/>
-        </div>
-    );
-}
+// /** Header skeleton that matches the header’s layout/height to prevent reflow */
+// function HeaderSkeleton() {
+//     return (
+//         <div className="gap-2 relative">
+//             <div className="flex items-center gap-2">
+//                 <Skeleton className="h-6 w-6 rounded"/>
+//                 <Skeleton className="h-6 w-48 rounded"/>
+//                 <Skeleton className="h-5 w-16 rounded"/>
+//             </div>
+//             <Skeleton className="mt-2 w-3/4 rounded"/>
+//         </div>
+//     );
+// }
 
 export const ResearchPlanCard = ({
     researchPlan, 
@@ -30,68 +32,122 @@ export const ResearchPlanCard = ({
     researchPlan: any; 
     showOrganization?: boolean; 
 }) => {
-    // Gate the header (and actions menu) until after hydration
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => setMounted(true), []);
+    // // Gate the header (and actions menu) until after hydration
+    // const [mounted, setMounted] = useState(false);
+    // useEffect(() => setMounted(true), []);
 
     return (
-        <Card className="h-full w-full text-left flex flex-col">
-            <CardHeader className="gap-2 relative pb-2">
-                {/* Before hydration: render a stable skeleton to prevent any flash. After hydration: render the real header. */}
-                {!mounted ? (
-                    <HeaderSkeleton/>
-                ) : (
+        <Card className="relative flex flex-col gap-0">
+            <div className="absolute top-0 w-full p-6 flex gap-2 justify-between">
+                {researchPlan.private 
+                    ? (
+                        <div className="flex gap-1 items-center">
+                            <Lock className="h-4 w-4"/>
+                            Private
+                        </div>
+                    )
+                    : (
+                        <div className="flex gap-1 items-center">
+                            <Globe className="h-4 w-4"/>
+                            Published
+                        </div>
+                    )
+                }
+                {RESEARCH_PLAN_STATUS
+                    .filter(option => researchPlan.statuses.includes(option.value))
+                    .map(status => <Badge className="text-sm" variant={"secondary"}>{status.label}</Badge>)}
+            </div>
+            <CardHeader className="mt-10">
+                <CardTitle>{researchPlan.title || 'Untitled research plan'}</CardTitle>
+                <CardDescription className="line-clamp-4">{researchPlan.description}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+                <div className="w-full flex gap-4">
+                    <div className="w-full p-2 flex flex-col gap-2">
+                        <h2>Research strategy</h2>
+                        {RESEARCH_PLAN_TYPES
+                            .filter(option => researchPlan.modalities.includes(option.value))
+                            .map(strategy => (
+                                <Badge className="text-sm w-fit" variant="blue">{strategy.label}</Badge>
+                            ))}
+                    </div>
+
+                    <div className="w-full p-2 flex flex-col gap-2">
+                        <h2>Stage</h2>
+                        {RESEARCH_STAGE
+                            .filter(option => researchPlan.stages.includes(option.value))
+                            .map(stage => (
+                                <Badge className="text-sm w-fit" variant={stage.variant}>{stage.label}</Badge>
+                            ))}
+                    </div>
+                </div>
+
+                {(researchPlan.partners.length > 0 || researchPlan.links.length > 0) && (
                     <>
-                        {showOrganization && researchPlan.organization && (
+                    <Separator />
+                    <div className="flex flex-col gap-4">
+                        {researchPlan.partners.length > 0 && (
                             <>
-                                <a
-                                    href={`http://${researchPlan.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
-                                    onClick={(e) => e.stopPropagation()}
-                                    target="_blank"
-                                >
-                                    <div className="flex flex-row gap-2 items-center">
-                                        <ProfilePhoto img={researchPlan.organization.image} name={researchPlan.organization.name} className="h-9 w-9 -mt-1"/>
-                                        <p className="text-lg font-semibold underline">{researchPlan.organization.name}</p>
-                                    </div>
-                                </a>
-                                <Separator className="mt-auto" />
+                            <h2>Partners</h2>
+                            <div className="flex gap-2">
+                                <ul className="flex gap-2">
+                                    {researchPlan.partners.map((partner: any, index: number) => (
+                                        <li key={index} className="flex items-center gap-2">
+                                            <Building className="h-4 min-h-4 w-4 min-w-4"/>
+                                            {partner.affiliation}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                             </>
                         )}
-                        <div className="flex gap-2 items-center">
-                            <CardTitle className="text-lg max-w-full leading-normal">
-                                {researchPlan.title}
-                            </CardTitle>
-                        </div>
+                    
+                        {researchPlan.links.length > 0 && (
+                            <>
+                            <h2>Links</h2>
+                            <div className="flex gap-2">
+                                <ul className="flex flex-col gap-2">
+                                    {researchPlan.links?.map((attachment: any, index: number) => (
+                                        <li key={index} className="flex items-center gap-2">
+                                            <LinkIcon className="h-4 min-h-4 w-4 min-w-4"/>
+                                            <Link 
+                                                className="line-clamp-2 underline" 
+                                                href={attachment.link || "/"}
+                                                target="_blank"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                            {attachment.name || attachment.link}
+                                            </Link>
+                                            <ExternalLink className="h-4 min-h-4 w-4 min-w-4"/>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                            </>
+                        )}
+                    </div>
                     </>
                 )}
-            </CardHeader>
 
-            <CardContent className="h-full flex flex-col gap-4">
-
-                <CardDescription className="line-clamp-3 overflow-hidden">
-                    {researchPlan.description}
-                </CardDescription>
-                
-                <div className="flex gap-2 flex-wrap">
-                    {RESEARCH_PLAN_TYPES.filter(modality => researchPlan.modalities.includes(modality.value)).map(m => (
-                        <Badge variant={"secondary"} className="text-sm">{m.label}</Badge>
-                    ))}
-
-                    {RESEARCH_STAGE.filter(stage => researchPlan.stages.includes(stage.value)).map(s => (
-                        <Badge variant={"secondary"} className="text-sm">{s.label}</Badge>
-                    ))}
-
-                    {RESEARCH_PLAN_STATUS.filter(status => researchPlan.statuses.includes(status.value)).map(s => (
-                        <Badge variant={"secondary"} className="text-sm">{s.label}</Badge>
-                    ))}
-
-                    {(researchPlan.milestones && researchPlan.milestones.length > 0) && (
-                        <Badge variant={"secondary"} className="text-sm">
-                            <FileText className="h-4 w-4" />
-                            {researchPlan.milestones.length == 1 ? `1 project` : `${researchPlan.milestones.length} projects`}
-                        </Badge>
-                    )}
-                </div>
+                {(showOrganization && researchPlan.organization) && (
+                    <>
+                    <Separator className="mt-auto" />
+                    <a
+                        href={`http://${researchPlan.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                        onClick={(e) => e.stopPropagation()}
+                        target="_blank"
+                    >
+                        <div className="flex flex-row gap-2 items-center">
+                            <ProfilePhoto img={researchPlan.organization.image} name={researchPlan.organization.name} className="h-9 w-9 -mt-1"/>
+                            <p className="text-lg font-semibold underline">{researchPlan.organization.name}</p>
+                            <ClaimedBadge
+                                organization={researchPlan.organization}
+                                mini={true}
+                            />
+                        </div>
+                    </a>
+                    </>
+                )}
 
             </CardContent>
         </Card>
