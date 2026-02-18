@@ -133,7 +133,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "name,description,conditions.condition.name,conditions.condition.causalGenes,conditions.condition.associatedGenes",
+            query_by: "name,description,subdomain,conditions.condition.name,conditions.condition.causalGenes,conditions.condition.associatedGenes",
             per_page: 12,
             page: state.lastFetchedPage,
             ...(filtersString ? { filter_by: filtersString } : undefined),
