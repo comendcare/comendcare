@@ -1,69 +1,30 @@
 "use client"
+
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
 import { Database, ExternalLink, Rat, TestTubeDiagonal } from "lucide-react";
-import { cn, sleep } from "@comend/lib/utils";
-import { useEffect, useState } from "react";
-import { DatabaseBiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/database-biosamples-table";
-import { useBiosamplesTableColumns } from "@comend/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
-import { useClinicalDatasetsTableColumns } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns";
-import { useDiseaseModelsTableColumns } from "@comend/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
-import { DatabaseDiseaseModelsTable } from "@comend/components/biorepo/advanced-data-table/disease-models-table/database-disease-models-table";
-import { DatabaseClinicalDatasetsTable } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/database-clinical-datasets-table";
-import { SearchParams } from "@comend/components/types";
 import type { Organization, Biosample, DiseaseModel, Tool } from "@prisma/client";
-import { FeatureFlagsProvider } from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import { ToolCounts } from "./profile-page";
-import { useRouter } from "next/navigation";
-import Image from "next/image"
+import { usePathname } from "next/navigation";
 import {NoResultsTemplate} from "@comend/components/no-results"
-import { Row } from "@tanstack/react-table";
-import { Dialog, DialogContent } from "@comend/components/ui/dialog";
-import {BiosampleDetails} from "@comend/components/biosample-details"
-import {DiseaseModelDetails} from "@comend/components/disease-model-details"
-import {ClinicalDatasetDetails} from "@comend/components/clinical-dataset-details"
-import { BIOSAMPLE_TYPE_OPTIONS, DIAGNOSIS_SEVERITY_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, TOOL_TYPE_OPTIONS } from "@comend/lib/types";
+import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, TOOL_TYPE_OPTIONS } from "@comend/lib/types";
 import { Badge } from "@comend/components/ui/badge";
 import { buttonVariants } from "@comend/components/ui/button";
 import Link from "next/link";
 
-const getInitState = (
-    counts: {
-        biosampleCount: number, 
-        diseaseModelCount: number, 
-        clinicalDatasetCount: number
-    }, 
-    searchParams: SearchParams | undefined
-): string => {
-    if (searchParams && searchParams.view && typeof searchParams.view === 'string') return  searchParams.view
-
-    if (counts.biosampleCount > 0) return 'biosamples'
-    if (counts.diseaseModelCount > 0) return 'disease-models'
-    if (counts.clinicalDatasetCount > 0) return 'clinical-datasets'
-
-    return 'biosamples'
-}
-
 export const PAGProfileToolsCard = ({
     organization, 
-    searchParams,
     toolCounts,
     biosamples,
-    biosamplesPageCount,
     diseaseModels,
-    diseaseModelsPageCount,
     clinicalDatasets,
-    clinicalDatasetsPageCount,
 } : {
     organization: Partial<Organization>,
-    searchParams?: SearchParams | undefined,
     toolCounts: ToolCounts,
     biosamples: Biosample[];
-    biosamplesPageCount: number;
     diseaseModels: DiseaseModel[];
-    diseaseModelsPageCount: number;
     clinicalDatasets: Tool[];
-    clinicalDatasetsPageCount: number;
 }) => {
+    const pathname = usePathname()
 
     return (
         <Card className="organization-profile-tour-step5">
@@ -81,7 +42,10 @@ export const PAGProfileToolsCard = ({
                                 Patient biosamples
                             </span>
                             <Link
-                                href={"/app/marketplace/biosamples"}
+                                target="_blank"
+                                href={pathname === "/app/profile" 
+                                    ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/biosamples?filters={"organizations":["${organization.id}"]}` 
+                                    : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/biosamples?filters={"organizations":["${organization.id}"]}`}
                                 className={buttonVariants({
                                     variant: "ghost",
                                     size: "icon",
@@ -97,14 +61,22 @@ export const PAGProfileToolsCard = ({
                     </div>
 
                     {biosamples.length > 0 && (
-                        <div className="w-full flex gap-4 flex-wrap justify-start">
+                        <div 
+                            className="w-full flex gap-4 flex-wrap justify-start"
+                        >
                             {BIOSAMPLE_TYPE_OPTIONS
                                 .filter(option => biosamples.flatMap(biosample => biosample.types).includes(option.value))
                                 .map(type => (
-                                    <div className="flex gap-1 items-center">
+                                    <Link 
+                                        target="_blank"
+                                        href={pathname === "/app/profile" 
+                                            ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/biosamples?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}` 
+                                            : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/biosamples?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}`}
+                                        className="flex gap-1 items-center"
+                                    >
                                         <Badge variant={"blue"} className="text-sm">{type.label}</Badge>
                                         <p className="text-sm font-medium">{`x ${biosamples.filter(biosample => biosample.types.includes(type.value)).length}`}</p>
-                                    </div>
+                                    </Link>
                                 ))}
                         </div>
                     )}
@@ -118,7 +90,10 @@ export const PAGProfileToolsCard = ({
                                 Disease models
                             </span>
                             <Link
-                                href={"/app/marketplace/disease-models"}
+                                target="_blank"
+                                href={pathname === "/app/profile" 
+                                    ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/disease-models?filters={"organizations":["${organization.id}"]}` 
+                                    : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/disease-models?filters={"organizations":["${organization.id}"]}`}
                                 className={buttonVariants({
                                     variant: "ghost",
                                     size: "icon",
@@ -138,10 +113,16 @@ export const PAGProfileToolsCard = ({
                             {DISEASE_MODEL_TYPE_OPTIONS
                                 .filter(option => diseaseModels.flatMap(diseaseModel => diseaseModel.types).includes(option.value))
                                 .map(type => (
-                                    <div className="flex gap-1 items-center">
-                                        <Badge variant={"blue"} className="text-sm">{type.label}</Badge>
+                                    <Link
+                                        target="_blank"
+                                        href={pathname === "/app/profile" 
+                                            ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/disease-models?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}` 
+                                            : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/disease-models?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}`}
+                                        className="flex gap-1 items-center"
+                                    >
+                                        <Badge variant={"blue"} className="text-sm" onClick={() => {}}>{type.label}</Badge>
                                         <p className="text-sm font-medium">{`x ${diseaseModels.filter(diseaseModel => diseaseModel.types.includes(type.value)).length}`}</p>
-                                    </div>
+                                    </Link>
                                 ))}
                         </div>
                     )}
@@ -155,7 +136,10 @@ export const PAGProfileToolsCard = ({
                                 Clinical datasets
                             </span>
                             <Link
-                                href={"/app/marketplace/clinical-datasets"}
+                                target="_blank"
+                                href={pathname === "/app/profile" 
+                                    ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/clinical-datasets?filters={"organizations":["${organization.id}"]}` 
+                                    : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/clinical-datasets?filters={"organizations":["${organization.id}"]}`}
                                 className={buttonVariants({
                                     variant: "ghost",
                                     size: "icon",
@@ -175,10 +159,16 @@ export const PAGProfileToolsCard = ({
                             {TOOL_TYPE_OPTIONS
                                 .filter(option => clinicalDatasets.flatMap(clinicalDataset => clinicalDataset.types).includes(option.value))
                                 .map(type => (
-                                    <div className="flex gap-1 items-center">
+                                    <Link 
+                                        target="_blank"
+                                        href={pathname === "/app/profile" 
+                                            ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/clinical-datasets?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}` 
+                                            : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/clinical-datasets?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}`}
+                                        className="flex gap-1 items-center"
+                                    >
                                         <Badge variant={"blue"} className="text-sm">{type.label}</Badge>
                                         <p className="text-sm font-medium">{`x ${clinicalDatasets.filter(clinicalDataset => clinicalDataset.types.includes(type.value)).length}`}</p>
-                                    </div>
+                                    </Link>
                                 ))}
                         </div>
                     )}
