@@ -105,7 +105,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
             per_page: 12,
             page: state.lastFetchedPage,
             ...(filtersString ? { filter_by: filtersString } : undefined),
-            sort_by: sortBy,
+            ...(state.sortBy ? {sort_by: sortByFilters[state.sortBy]} : undefined),
         };
 
         const results: SearchResponse<Object> = await typesense
