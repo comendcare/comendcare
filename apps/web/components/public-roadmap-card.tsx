@@ -9,21 +9,15 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@comend/components/ui/ta
 import {Button} from "@comend/components/ui/button";
 import {ChevronsUpDown, FileText, Globe, Lock, Pencil} from "lucide-react";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@comend/components/ui/table";
-import {Milestone, Option, RESEARCH_PLAN_STATUS, RESEARCH_PLAN_TYPES, RESEARCH_STAGE} from "@comend/lib/types";
+import {Milestone, RESEARCH_PLAN_STATUS, RESEARCH_PLAN_TYPES, RESEARCH_STAGE} from "@comend/lib/types";
 import {Badge} from "@comend/components/ui/badge";
 import type {Organization, Roadmap} from "@prisma/client";
 import {NoProjects} from "./no-projects";
-import {Suspense, useState} from "react";
+import {useState} from "react";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/components/ui/tooltip";
 import { PropertyBadge } from "@comend/components/property-badge";
 import { NoResultsTemplate } from "@comend/components/no-results";
-import { Shell } from "@comend/components/biorepo/advanced-data-table/lib/shell";
-import { FeatureFlagsProvider } from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
-import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import { DatabaseResearchPlansTable } from "@comend/components/biorepo/advanced-data-table/research-plans-table/database-research-plans-table";
-import { Row } from "@tanstack/react-table";
 import { SearchParams } from "@comend/components/types";
-import { useSession } from "next-auth/react";
 import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/public-research-plans-table-columns";
 import Link from "next/link";
 import { ResearchPlanCard } from "@comend/components/research-plan-card";
@@ -74,14 +68,6 @@ export const RoadmapsCard = ({
             <CardContent className="px-8">
                 {(researchPlans && researchPlans.length > 0)
                     ? (
-                        // <RoadmapsTable
-                        //     isPrivate={false}
-                        //     roadmaps={roadmaps}
-                        //     rowClickCallback={(roadmap) =>
-                        //         router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap?.id}` : '#')
-                        //     }
-                        // />
-
                         <div className="w-full max-w-full px-16">
                         <Carousel opts={{loop: true}} setApi={setApi} className="w-full">
                             <CarouselContent>
@@ -104,62 +90,6 @@ export const RoadmapsCard = ({
                             <CarouselNext/>
                         </Carousel>
                         </div>
-
-                        // <div className="w-full h-full grid grid-cols-3 gap-4">
-                        //     {researchPlans.map((researchPlan: any) => (
-                        //         <Link href={(
-                        //             organization.subdomain 
-                        //                 ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlan?.id}` 
-                        //                 : '#'
-                        //         )}>
-                        //             <ResearchPlanCard researchPlan={researchPlan}/>
-                        //         </Link>
-                        //     ))}
-                        // </div>
-
-                        // <Shell className="gap-2">
-                        //     <FeatureFlagsProvider showFilters={false}>
-                        //         <Suspense
-                        //             fallback={
-                        //                 <DataTableSkeleton
-                        //                     columnCount={7}
-                        //                     filterCount={2}
-                        //                     cellWidths={[
-                        //                         "10rem",
-                        //                         "30rem",
-                        //                         "10rem",
-                        //                         "10rem",
-                        //                         "6rem",
-                        //                         "6rem",
-                        //                         "6rem",
-                        //                     ]}
-                        //                     shrinkZero
-                        //                 />
-                        //             }
-                        //         >
-                        //             <DatabaseResearchPlansTable 
-                        //                 data={researchPlans} 
-                        //                 pageCount={researchPlansPageCount} 
-                        //                 columns={columns}
-                        //                 searchParams={searchParams}
-                        //                 onRowClickCallback={
-                        //                     (e: any, row: Row<any> | undefined) => {
-                        //                         router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${row?.original.id}` : '#')
-                        //                     }
-                        //                 }
-                        //                 showPagination={false}
-                        //                 noResultsOverride={(
-                        //                     <NoResultsTemplate
-                        //                         imgAlt="No research plans"
-                        //                         src="https://illustrations.popsy.co/gray/studying.svg"
-                        //                         title="No research plans yet!"
-                        //                         description="This organization does not have any public research plans yet."
-                        //                     />
-                        //                 )}
-                        //             />
-                        //         </Suspense>
-                        //     </FeatureFlagsProvider>
-                        // </Shell>
                     )
                     : (pathname === "/app/profile"
                             ? (

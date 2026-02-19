@@ -148,45 +148,6 @@ export default function RoadmapsPage({ orgId, organization, researchPlansData, r
                                 </Button>
                             </div>
                         </div>
-                        {/* <Shell className="gap-2 w-full max-w-full">
-                            <FeatureFlagsProvider showFilters={false}>
-                                <Suspense
-                                    fallback={
-                                        <DataTableSkeleton
-                                            columnCount={7}
-                                            filterCount={2}
-                                            cellWidths={[
-                                                "10rem",
-                                                "30rem",
-                                                "10rem",
-                                                "10rem",
-                                                "6rem",
-                                                "6rem",
-                                                "6rem",
-                                            ]}
-                                            shrinkZero
-                                        />
-                                    }
-                                >
-                                    <DatabaseResearchPlansTable 
-                                        data={researchPlansData} 
-                                        pageCount={researchPlansPageCount} 
-                                        columns={researchPlanColumns}
-                                        searchParams={searchParams}
-                                        onRowClickCallback={(e: any, row: Row<any> | undefined) => row?.original.id && router.push(`/app/research-plan/${row.original.id}`)}
-                                        showPagination={true}
-                                        noResultsOverride={(
-                                            <NoResultsTemplate
-                                                imgAlt="No research plans"
-                                                src="https://illustrations.popsy.co/gray/studying.svg"
-                                                title="No research plans yet!"
-                                                description="Your organization does not have any research plans yet."
-                                            />
-                                        )}
-                                    />
-                                </Suspense>
-                            </FeatureFlagsProvider>
-                        </Shell> */}
                         <div className="w-full h-full grid grid-cols-3 gap-4">
                             {researchPlansData.map((researchPlan: any) => (
                                 <Link href={`/app/research-plan/${researchPlan.id}`}>

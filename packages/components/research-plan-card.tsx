@@ -37,7 +37,7 @@ export const ResearchPlanCard = ({
     // useEffect(() => setMounted(true), []);
 
     return (
-        <Card className="relative flex flex-col gap-4">
+        <Card className="h-full relative flex flex-col gap-4">
             <div className="absolute top-0 w-full p-6 flex gap-2 justify-between">
                 {researchPlan.private 
                     ? (
@@ -61,7 +61,7 @@ export const ResearchPlanCard = ({
                 <CardTitle>{researchPlan.title || 'Untitled research plan'}</CardTitle>
                 <CardDescription className="line-clamp-4">{researchPlan.description}</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col gap-4">
+            <CardContent className="h-full flex flex-col gap-4">
                 <div className="w-full flex gap-4">
                     {researchPlan.modalities.length > 0 && (
                         <div className="w-full flex flex-col gap-2">

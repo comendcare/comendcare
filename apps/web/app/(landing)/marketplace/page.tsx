@@ -31,6 +31,7 @@ import { formatMoney } from "@comend/lib/utils"
 import { ResearchPlanSearchState, useResearchPlanSearchStore } from "@/state/search/researchPlanSearchStore"
 import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/public-research-plans-table-columns"
 import { TypesenseResearchPlansTable } from "@comend/components/biorepo/advanced-data-table/research-plans-table/typesense-research-plans-table"
+import { ResearchPlanCard } from "@comend/components/research-plan-card"
 
 const croSelector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -300,17 +301,13 @@ export default function MarketplacePage() {
                     <ol className="w-full">
                         {(researchPlansInitialized && researchPlanStore.searchResults && researchPlanStore.searchResults.length > 0 )
                             ? (
-                                <>
-                                    <div className="max-w-7xl w-full overflow-auto">
-                                        <TypesenseResearchPlansTable 
-                                            showPagination={false} 
-                                            data={researchPlanStore.searchResults?.slice(0, 3)} 
-                                            pageCount={1} 
-                                            columns={researchPlanColumns} 
-                                            searchParams={{}}
-                                        />
-                                    </div>
-                                </>
+                                <div className="max-w-7xl w-full overflow-auto grid grid-cols-3 gap-4">
+                                    {researchPlanStore.searchResults?.slice(0, 3).map((researchPlan: any) => (
+                                        <Link href={`/app/research-plan/${researchPlan.id}`} className="h-full">
+                                            <ResearchPlanCard researchPlan={researchPlan} showOrganization={true}/>
+                                        </Link>
+                                    ))}
+                                </div>
                             )
                             : (
                                 (researchPlansInitialized && researchPlansInitialized)
