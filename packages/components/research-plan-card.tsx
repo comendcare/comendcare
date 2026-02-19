@@ -63,23 +63,27 @@ export const ResearchPlanCard = ({
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
                 <div className="w-full flex gap-4">
-                    <div className="w-full flex flex-col gap-2">
-                        <h2 className="text-sm">Research strategy</h2>
-                        {RESEARCH_PLAN_TYPES
-                            .filter(option => researchPlan.modalities.includes(option.value))
-                            .map(strategy => (
-                                <Badge className="text-sm w-fit" variant="blue">{strategy.label}</Badge>
-                            ))}
-                    </div>
+                    {researchPlan.modalities.length > 0 && (
+                        <div className="w-full flex flex-col gap-2">
+                            <h2 className="text-sm">Research strategy</h2>
+                            {RESEARCH_PLAN_TYPES
+                                .filter(option => researchPlan.modalities.includes(option.value))
+                                .map(strategy => (
+                                    <Badge className="text-sm w-fit" variant="blue">{strategy.label}</Badge>
+                                ))}
+                        </div>
+                    )}
 
-                    <div className="w-full flex flex-col gap-2">
-                        <h2 className="text-sm">Stage</h2>
-                        {RESEARCH_STAGE
-                            .filter(option => researchPlan.stages.includes(option.value))
-                            .map(stage => (
-                                <Badge className="text-sm w-fit" variant={stage.variant}>{stage.label}</Badge>
-                            ))}
-                    </div>
+                    {researchPlan.stages.length > 0 && (
+                        <div className="w-full flex flex-col gap-2">
+                            <h2 className="text-sm">Stage</h2>
+                            {RESEARCH_STAGE
+                                .filter(option => researchPlan.stages.includes(option.value))
+                                .map(stage => (
+                                    <Badge className="text-sm w-fit" variant={stage.variant}>{stage.label}</Badge>
+                                ))}
+                        </div>
+                    )}
                 </div>
 
                 {(researchPlan.partners.length > 0 || researchPlan.links.length > 0) && (

@@ -24,6 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@comend/components/ui/
 import { DatabaseProjectsTable } from "@comend/components/biorepo/advanced-data-table/projects-table/database-projects-table"
 import { useProjectsTableColumns } from "@comend/components/biorepo/advanced-data-table/projects-table/private-projects-table-columns";
 import {ResearchPlanCard} from "@comend/components/research-plan-card"
+import Link from "next/link";
 
 const CreateResearchPlanDialog = dynamic(
     () => import("./create-research-plan-dialog"),
@@ -188,13 +189,9 @@ export default function RoadmapsPage({ orgId, organization, researchPlansData, r
                         </Shell> */}
                         <div className="w-full h-full grid grid-cols-3 gap-4">
                             {researchPlansData.map((researchPlan: any) => (
-                                <div
-                                    onClick={() => {
-                                        router.push(`/app/research-plan/${researchPlan.id}`)
-                                    }}
-                                >
+                                <Link href={`/app/research-plan/${researchPlan.id}`}>
                                     <ResearchPlanCard researchPlan={researchPlan}/>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     </div>

@@ -26,6 +26,8 @@ import { SearchParams } from "@comend/components/types";
 import { useSession } from "next-auth/react";
 import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/public-research-plans-table-columns";
 import Link from "next/link";
+import { ResearchPlanCard } from "@comend/components/research-plan-card";
+import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@comend/components/ui/carousel";
 
 export const RoadmapsCard = ({
     researchPlans,
@@ -46,6 +48,7 @@ export const RoadmapsCard = ({
         false,
         'profile'
     )
+    const [api, setApi] = useState<CarouselApi>()
 
     return (
         <Card className="organization-profile-tour-step4 w-full" data-testid="roadmaps-card">
@@ -78,49 +81,85 @@ export const RoadmapsCard = ({
                         //         router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmap?.id}` : '#')
                         //     }
                         // />
-                        <Shell className="gap-2">
-                            <FeatureFlagsProvider showFilters={false}>
-                                <Suspense
-                                    fallback={
-                                        <DataTableSkeleton
-                                            columnCount={7}
-                                            filterCount={2}
-                                            cellWidths={[
-                                                "10rem",
-                                                "30rem",
-                                                "10rem",
-                                                "10rem",
-                                                "6rem",
-                                                "6rem",
-                                                "6rem",
-                                            ]}
-                                            shrinkZero
-                                        />
-                                    }
-                                >
-                                    <DatabaseResearchPlansTable 
-                                        data={researchPlans} 
-                                        pageCount={researchPlansPageCount} 
-                                        columns={columns}
-                                        searchParams={searchParams}
-                                        onRowClickCallback={
-                                            (e: any, row: Row<any> | undefined) => {
-                                                router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${row?.original.id}` : '#')
-                                            }
-                                        }
-                                        showPagination={false}
-                                        noResultsOverride={(
-                                            <NoResultsTemplate
-                                                imgAlt="No research plans"
-                                                src="https://illustrations.popsy.co/gray/studying.svg"
-                                                title="No research plans yet!"
-                                                description="This organization does not have any public research plans yet."
-                                            />
+
+                        <div className="w-full max-w-full px-16">
+                        <Carousel opts={{loop: true}} setApi={setApi} className="w-full">
+                            <CarouselContent>
+                                {researchPlans.map((researchPlan: any, index: number) => (
+                                    <CarouselItem key={index}>
+                                    <Link 
+                                        className="h-full p-1"
+                                        href={(
+                                            organization.subdomain 
+                                                ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlan?.id}` 
+                                                : '#'
                                         )}
-                                    />
-                                </Suspense>
-                            </FeatureFlagsProvider>
-                        </Shell>
+                                    >
+                                        <ResearchPlanCard researchPlan={researchPlan}/>
+                                    </Link>
+                                    </CarouselItem>
+                                ))}
+                            </CarouselContent>
+                            <CarouselPrevious/>
+                            <CarouselNext/>
+                        </Carousel>
+                        </div>
+
+                        // <div className="w-full h-full grid grid-cols-3 gap-4">
+                        //     {researchPlans.map((researchPlan: any) => (
+                        //         <Link href={(
+                        //             organization.subdomain 
+                        //                 ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlan?.id}` 
+                        //                 : '#'
+                        //         )}>
+                        //             <ResearchPlanCard researchPlan={researchPlan}/>
+                        //         </Link>
+                        //     ))}
+                        // </div>
+
+                        // <Shell className="gap-2">
+                        //     <FeatureFlagsProvider showFilters={false}>
+                        //         <Suspense
+                        //             fallback={
+                        //                 <DataTableSkeleton
+                        //                     columnCount={7}
+                        //                     filterCount={2}
+                        //                     cellWidths={[
+                        //                         "10rem",
+                        //                         "30rem",
+                        //                         "10rem",
+                        //                         "10rem",
+                        //                         "6rem",
+                        //                         "6rem",
+                        //                         "6rem",
+                        //                     ]}
+                        //                     shrinkZero
+                        //                 />
+                        //             }
+                        //         >
+                        //             <DatabaseResearchPlansTable 
+                        //                 data={researchPlans} 
+                        //                 pageCount={researchPlansPageCount} 
+                        //                 columns={columns}
+                        //                 searchParams={searchParams}
+                        //                 onRowClickCallback={
+                        //                     (e: any, row: Row<any> | undefined) => {
+                        //                         router.push(organization.subdomain ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${row?.original.id}` : '#')
+                        //                     }
+                        //                 }
+                        //                 showPagination={false}
+                        //                 noResultsOverride={(
+                        //                     <NoResultsTemplate
+                        //                         imgAlt="No research plans"
+                        //                         src="https://illustrations.popsy.co/gray/studying.svg"
+                        //                         title="No research plans yet!"
+                        //                         description="This organization does not have any public research plans yet."
+                        //                     />
+                        //                 )}
+                        //             />
+                        //         </Suspense>
+                        //     </FeatureFlagsProvider>
+                        // </Shell>
                     )
                     : (pathname === "/app/profile"
                             ? (
