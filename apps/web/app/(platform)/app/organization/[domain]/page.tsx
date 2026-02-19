@@ -359,13 +359,9 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                                 <PAGProfileToolsCard 
                                     organization={organization as any} 
                                     toolCounts={toolCounts} 
-                                    searchParams={searchParams}
                                     biosamples={biosamples}
-                                    biosamplesPageCount={biosamplesPageCount}
                                     diseaseModels={diseaseModels}
-                                    diseaseModelsPageCount={diseaseModelsPageCount}
                                     clinicalDatasets={clinicalDatasets}
-                                    clinicalDatasetsPageCount={clinicalDatasetsPageCount}
                                 />
                             }
                             <RoadmapsCard 

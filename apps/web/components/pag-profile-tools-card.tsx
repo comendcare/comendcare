@@ -1,98 +1,30 @@
 "use client"
+
 import {Card, CardContent, CardHeader, CardTitle} from "@comend/components/ui/card";
-import { Database, Rat, TestTubeDiagonal } from "lucide-react";
-import { cn, sleep } from "@comend/lib/utils";
-import { useEffect, useState } from "react";
-import { DatabaseBiosamplesTable } from "@comend/components/biorepo/advanced-data-table/biosamples-table/database-biosamples-table";
-import { useBiosamplesTableColumns } from "@comend/components/biorepo/advanced-data-table/biosamples-table/public-biosamples-table-columns";
-import { useClinicalDatasetsTableColumns } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/public-clinical-datasets-table-columns";
-import { useDiseaseModelsTableColumns } from "@comend/components/biorepo/advanced-data-table/disease-models-table/public-disease-models-table-columns";
-import { DatabaseDiseaseModelsTable } from "@comend/components/biorepo/advanced-data-table/disease-models-table/database-disease-models-table";
-import { DatabaseClinicalDatasetsTable } from "@comend/components/biorepo/advanced-data-table/clinical-datasets-table/database-clinical-datasets-table";
-import { SearchParams } from "@comend/components/types";
+import { Database, ExternalLink, Rat, TestTubeDiagonal } from "lucide-react";
 import type { Organization, Biosample, DiseaseModel, Tool } from "@prisma/client";
-import { FeatureFlagsProvider } from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import { ToolCounts } from "./profile-page";
-import { useRouter } from "next/navigation";
-import Image from "next/image"
+import { usePathname } from "next/navigation";
 import {NoResultsTemplate} from "@comend/components/no-results"
-import { Row } from "@tanstack/react-table";
-import { Dialog, DialogContent } from "@comend/components/ui/dialog";
-import {BiosampleDetails} from "@comend/components/biosample-details"
-import {DiseaseModelDetails} from "@comend/components/disease-model-details"
-import {ClinicalDatasetDetails} from "@comend/components/clinical-dataset-details"
-
-const getInitState = (
-    counts: {
-        biosampleCount: number, 
-        diseaseModelCount: number, 
-        clinicalDatasetCount: number
-    }, 
-    searchParams: SearchParams | undefined
-): string => {
-    if (searchParams && searchParams.view && typeof searchParams.view === 'string') return  searchParams.view
-
-    if (counts.biosampleCount > 0) return 'biosamples'
-    if (counts.diseaseModelCount > 0) return 'disease-models'
-    if (counts.clinicalDatasetCount > 0) return 'clinical-datasets'
-
-    return 'biosamples'
-}
+import { BIOSAMPLE_TYPE_OPTIONS, DISEASE_MODEL_TYPE_OPTIONS, TOOL_TYPE_OPTIONS } from "@comend/lib/types";
+import { Badge } from "@comend/components/ui/badge";
+import { buttonVariants } from "@comend/components/ui/button";
+import Link from "next/link";
 
 export const PAGProfileToolsCard = ({
     organization, 
-    searchParams,
     toolCounts,
     biosamples,
-    biosamplesPageCount,
     diseaseModels,
-    diseaseModelsPageCount,
     clinicalDatasets,
-    clinicalDatasetsPageCount,
 } : {
     organization: Partial<Organization>,
-    searchParams?: SearchParams | undefined,
     toolCounts: ToolCounts,
     biosamples: Biosample[];
-    biosamplesPageCount: number;
     diseaseModels: DiseaseModel[];
-    diseaseModelsPageCount: number;
     clinicalDatasets: Tool[];
-    clinicalDatasetsPageCount: number;
 }) => {
-    const [isInitialized, setIsInitialized] = useState<boolean>(false)    
-    const [section, setSection] = useState<string | undefined>(undefined)
-    const [biosample, setBiosample] = useState<Biosample | undefined>(undefined)
-    const [diseaseModel, setDiseaseModel] = useState<DiseaseModel | undefined>(undefined)
-    const [clinicalDataset, setClinicalDataset] = useState<Tool | undefined>(undefined)
-    const biosampleColumns = useBiosamplesTableColumns(
-        true, // enable sorting
-        true, // enable hiding
-        false,
-        "profile",
-    )
-    const diseaseModelColumns = useDiseaseModelsTableColumns(
-        true, // enable sorting
-        true, // enable hiding
-        false,
-        "profile"
-    )
-    const clinicalDatasetColumns = useClinicalDatasetsTableColumns(
-        true, // enable sorting
-        true, // enable hiding
-        false,
-        "profile"
-    )
-    const router = useRouter();
-
-    useEffect(() => {
-        setSection(getInitState(toolCounts, searchParams))
-        setIsInitialized(true)
-    }, [])
-
-    useEffect(() => {
-        setIsInitialized(true)
-    }, [biosamples, diseaseModels, clinicalDatasets])
+    const pathname = usePathname()
 
     return (
         <Card className="organization-profile-tour-step5">
@@ -101,131 +33,146 @@ export const PAGProfileToolsCard = ({
                     Toolkit
                 </CardTitle>
             </CardHeader>
-            <CardContent className="w-full max-w-full flex flex-col justify-center items-center">
-                <div className="w-full text-muted-foreground text-sm flex flex-wrap gap-2 justify-end pb-4">
-                    {(toolCounts.biosampleCount > 0) && (
-                        <div
-                            onClick={async () => {
-                                setIsInitialized(false)
-                                const searchParams = new URLSearchParams()
-                                searchParams.set("sort", "")
-                                searchParams.set("page", "1")
-                                searchParams.set("view", "biosamples")
-                                router.push(`?${searchParams.toString()}`, {scroll: false})
-                                setSection("biosamples");
-                                // await sleep(1000)
-                                // setIsInitialized(true)
-                            }}
-                            className={cn(
-                                "min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-base transition-colors hover:text-primary cursor-pointer",
-                                section === 'biosamples'
-                                    ? "bg-blue-light font-medium text-primary"
-                                    : "text-muted-foreground",
-                            )}
-                        >
-                            {<TestTubeDiagonal className="mr-2 h-6 w-6"/>}
-                            Patient biosamples ({toolCounts.biosampleCount})
+            <CardContent className="w-full max-w-full flex flex-col gap-4">
+                <div className="flex flex-col gap-2 p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <TestTubeDiagonal className="h-4 w-4 text-muted-foreground"/>
+                            <span className="text-sm font-medium">
+                                Patient biosamples
+                            </span>
+                            <Link
+                                target="_blank"
+                                href={pathname === "/app/profile" 
+                                    ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/biosamples?filters={"organizations":["${organization.id}"]}` 
+                                    : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/biosamples?filters={"organizations":["${organization.id}"]}`}
+                                className={buttonVariants({
+                                    variant: "ghost",
+                                    size: "icon",
+                                    className: "p-0 h-auto w-auto",
+                                })}
+                            >
+                                <ExternalLink className="h-4 w-4 text-muted-foreground"/>
+                            </Link>
                         </div>
-                    )}
-                    {(toolCounts.diseaseModelCount > 0) && (
-                        <div
-                            onClick={async () => {
-                                setIsInitialized(false)
-                                const searchParams = new URLSearchParams()
-                                searchParams.set("sort", "")
-                                searchParams.set("page", "1")
-                                searchParams.set("view", "disease-models")
-                                router.push(`?${searchParams.toString()}`, {scroll: false})
-                                setSection("disease-models");
-                                // await sleep(1000)
-                                // setIsInitialized(true)
-                            }}
-                            className={cn(
-                                "min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-base transition-colors hover:text-primary cursor-pointer",
-                                section === 'disease-models'
-                                    ? "bg-blue-light font-medium text-primary"
-                                    : "text-muted-foreground",
-                            )}
-                        >
-                            {<Rat className="mr-2 h-6 w-6"/>}
-                            Disease models ({toolCounts.diseaseModelCount})
+                        <div className="text-lg font-semibold">
+                            {biosamples.length}
                         </div>
-                    )}
-                    {(toolCounts.clinicalDatasetCount > 0) && (
-                        <div
-                            onClick={async () => {
-                                setIsInitialized(false)
-                                const searchParams = new URLSearchParams()
-                                searchParams.set("sort", "")
-                                searchParams.set("page", "1")
-                                searchParams.set("view", "clinical-datasets")
-                                router.push(`?${searchParams.toString()}`, {scroll: false})
-                                setSection('clinical-datasets')
-                                // await sleep(1000)
-                                // setIsInitialized(true)
-                            }}
-                            className={cn(
-                                "min-h-fit py-2 flex h-7 items-center justify-center rounded-full px-4 text-center text-base transition-colors hover:text-primary cursor-pointer",
-                                section === 'clinical-datasets'
-                                    ? "bg-blue-light font-medium text-primary"
-                                    : "text-muted-foreground",
-                            )}
+                    </div>
+
+                    {biosamples.length > 0 && (
+                        <div 
+                            className="w-full flex gap-4 flex-wrap justify-start"
                         >
-                            {<Database className="mr-2 h-6 w-6"/>}
-                            Clinical datasets ({toolCounts.clinicalDatasetCount})
+                            {BIOSAMPLE_TYPE_OPTIONS
+                                .filter(option => biosamples.flatMap(biosample => biosample.types).includes(option.value))
+                                .map(type => (
+                                    <Link 
+                                        target="_blank"
+                                        href={pathname === "/app/profile" 
+                                            ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/biosamples?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}` 
+                                            : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/biosamples?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}`}
+                                        className="flex gap-1 items-center text-sm font-normal hover:font-semibold"
+                                    >
+                                        <Badge variant={"blue"}>{type.label}</Badge>
+                                        <p>{`x ${biosamples.filter(biosample => biosample.types.includes(type.value)).length}`}</p>
+                                    </Link>
+                                ))}
                         </div>
                     )}
                 </div>
 
-                {!isInitialized 
-                    ? (<div className="bg-gray-100 rounded-md w-full h-[200px]" />) 
-                    : (
-                        <>
-                            {(section === 'biosamples' && toolCounts.biosampleCount > 0) && (
-                                <div className="max-w-7xl w-full overflow-auto">
-                                    <FeatureFlagsProvider showFilters={false}>
-                                        <DatabaseBiosamplesTable
-                                            data={biosamples as any[] || []}
-                                            pageCount={biosamplesPageCount}
-                                            columns={biosampleColumns}
-                                            searchParams={{}}
-                                            showPagination={toolCounts.biosampleCount > 10}
-                                            onRowClickCallback={(e: any, row: Row<any> | undefined) => setBiosample(row?.original as Biosample)}
-                                        />
-                                    </FeatureFlagsProvider>
-                                </div>
-                            )}
-                            {(section === 'disease-models' && toolCounts.diseaseModelCount > 0) && (
-                                <div className="max-w-7xl w-full overflow-auto">
-                                    <FeatureFlagsProvider showFilters={false}>
-                                        <DatabaseDiseaseModelsTable
-                                            data={diseaseModels as any[] || []}
-                                            pageCount={diseaseModelsPageCount}
-                                            columns={diseaseModelColumns}
-                                            searchParams={{}}
-                                            showPagination={toolCounts.diseaseModelCount > 10}
-                                            onRowClickCallback={(e: any, row: Row<any> | undefined) => setDiseaseModel(row?.original as DiseaseModel)}
-                                        />
-                                    </FeatureFlagsProvider>
-                                </div>
-                            )}
-                            {(section === 'clinical-datasets' && toolCounts.clinicalDatasetCount > 0) && (
-                                <div className="max-w-7xl w-full overflow-auto">
-                                    <FeatureFlagsProvider showFilters={false}>
-                                        <DatabaseClinicalDatasetsTable
-                                            data={clinicalDatasets || []}
-                                            pageCount={clinicalDatasetsPageCount}
-                                            columns={clinicalDatasetColumns}
-                                            searchParams={{}}
-                                            showPagination={toolCounts.clinicalDatasetCount > 10}
-                                            onRowClickCallback={(e: any, row: Row<any> | undefined) => setClinicalDataset(row?.original as Tool)}
-                                        />
-                                    </FeatureFlagsProvider>
-                                </div>
-                            )}
-                        </>
-                    )
-                }
+                <div className="flex flex-col gap-2 p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Rat className="h-4 w-4 text-muted-foreground"/>
+                            <span className="text-sm font-medium">
+                                Disease models
+                            </span>
+                            <Link
+                                target="_blank"
+                                href={pathname === "/app/profile" 
+                                    ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/disease-models?filters={"organizations":["${organization.id}"]}` 
+                                    : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/disease-models?filters={"organizations":["${organization.id}"]}`}
+                                className={buttonVariants({
+                                    variant: "ghost",
+                                    size: "icon",
+                                    className: "p-0 h-auto w-auto",
+                                })}
+                            >
+                                <ExternalLink className="h-4 w-4 text-muted-foreground"/>
+                            </Link>
+                        </div>
+                        <div className="text-lg font-semibold">
+                            {diseaseModels.length}
+                        </div>
+                    </div>
+
+                    {diseaseModels.length > 0 && (
+                        <div className="w-full flex gap-4 flex-wrap justify-start">
+                            {DISEASE_MODEL_TYPE_OPTIONS
+                                .filter(option => diseaseModels.flatMap(diseaseModel => diseaseModel.types).includes(option.value))
+                                .map(type => (
+                                    <Link
+                                        target="_blank"
+                                        href={pathname === "/app/profile" 
+                                            ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/disease-models?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}` 
+                                            : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/disease-models?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}`}
+                                        className="flex gap-1 items-center text-sm font-normal hover:font-semibold"
+                                    >
+                                        <Badge variant={"blue"} onClick={() => {}}>{type.label}</Badge>
+                                        <p>{`x ${diseaseModels.filter(diseaseModel => diseaseModel.types.includes(type.value)).length}`}</p>
+                                    </Link>
+                                ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex flex-col gap-2 p-3 bg-muted/50 rounded-lg">
+                    <div className="flex itemx-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Database className="h-4 w-4 text-muted-foreground"/>
+                            <span className="text-sm font-medium">
+                                Clinical datasets
+                            </span>
+                            <Link
+                                target="_blank"
+                                href={pathname === "/app/profile" 
+                                    ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/clinical-datasets?filters={"organizations":["${organization.id}"]}` 
+                                    : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/clinical-datasets?filters={"organizations":["${organization.id}"]}`}
+                                className={buttonVariants({
+                                    variant: "ghost",
+                                    size: "icon",
+                                    className: "p-0 h-auto w-auto",
+                                })}
+                            >
+                                <ExternalLink className="h-4 w-4 text-muted-foreground"/>
+                            </Link>
+                        </div>
+                        <div className="text-lg font-semibold">
+                            {clinicalDatasets.length}
+                        </div>
+                    </div>
+
+                    {clinicalDatasets.length > 0 && (
+                        <div className="w-full flex gap-4 flex-wrap justify-start">
+                            {TOOL_TYPE_OPTIONS
+                                .filter(option => clinicalDatasets.flatMap(clinicalDataset => clinicalDataset.types).includes(option.value))
+                                .map(type => (
+                                    <Link 
+                                        target="_blank"
+                                        href={pathname === "/app/profile" 
+                                            ? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/clinical-datasets?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}` 
+                                            : `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/marketplace/clinical-datasets?filters={"types":["${type.value}"],"organizations":["${organization.id}"]}`}
+                                        className="flex gap-1 items-center text-sm font-normal hover:font-semibold"
+                                    >
+                                        <Badge variant={"blue"}>{type.label}</Badge>
+                                        <p>{`x ${clinicalDatasets.filter(clinicalDataset => clinicalDataset.types.includes(type.value)).length}`}</p>
+                                    </Link>
+                                ))}
+                        </div>
+                    )}
+                </div>
 
                 {(toolCounts.biosampleCount === 0 && toolCounts.diseaseModelCount === 0 && toolCounts.clinicalDatasetCount == 0) && (
                     <NoResultsTemplate 
@@ -236,48 +183,6 @@ export const PAGProfileToolsCard = ({
                     />
                 )}
             </CardContent>
-
-            {/* Biosample details dialog */}
-            <Dialog 
-                open={!!biosample} 
-                onOpenChange={
-                    (open) => {
-                        if (!open) setBiosample(undefined)
-                    }
-                }
-            >
-                <DialogContent>
-                    <BiosampleDetails biosample={biosample} />
-                </DialogContent>
-            </Dialog>
-
-            {/* Disease model details dialog */}
-            <Dialog 
-                open={!!diseaseModel} 
-                onOpenChange={
-                    (open) => {
-                        if (!open) setDiseaseModel(undefined)
-                    }
-                }
-            >
-                <DialogContent>
-                    <DiseaseModelDetails diseaseModel={diseaseModel} />
-                </DialogContent>
-            </Dialog>
-
-            {/* Clinical dataset details dialog */}
-            <Dialog 
-                open={!!clinicalDataset} 
-                onOpenChange={
-                    (open) => {
-                        if (!open) setClinicalDataset(undefined)
-                    }
-                }
-            >
-                <DialogContent>
-                    <ClinicalDatasetDetails clinicalDataset={clinicalDataset} />
-                </DialogContent>
-            </Dialog>
         </Card>
     );
 }
