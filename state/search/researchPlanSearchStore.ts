@@ -1,9 +1,6 @@
 import { typesense } from '@comend/lib/typesense';
-import { nanoid } from 'nanoid';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
-import { ASSOCIATED_CATEGORIES, Milestone } from '@comend/lib/types'
-import { getExclusiveToFirstGroup, sleep, typesenseSortByFromColumnId } from '@comend/lib/utils';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { SearchResponse } from 'typesense/lib/Typesense/Documents';
 import { BadgeVariantType } from '@comend/components/ui/badge';
@@ -91,35 +88,22 @@ async function withRetry<T>(
   }
 }
 
-const getUpdatedSearchResults = async (
-    state: any,
-    isNewSearch: boolean = true
-): Promise<{results: any[], total: number, totalPages: number}> => {
-    const getResults = async (
-        state: any,
-        isNewSearch: boolean = true
-    ) => {
-        let sortByList: string[] = []
+const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true): Promise<{results: any[], total: number}> => {
+    try {
+        const TAG_PRIORITY_SORT = "";
         const filtersString = generateFiltersString(state.filters)
 
-        if (state.sortBy) {
-            const parsedSort = JSON.parse(state.sortBy)
-
-            if (parsedSort && Array.isArray(parsedSort)) {
-                parsedSort.map((sort: any) => {
-                    sortByList.push(`${typesenseSortByFromColumnId(sort.id, sort.desc)}`)
-                })
-            }
+        // Merge tag-priority sort with user-chosen sort
+        let sortBy = TAG_PRIORITY_SORT;
+        if (state.sortBy && sortByFilters[state.sortBy]) {
+            sortBy += `,${sortByFilters[state.sortBy]}`;
         }
-
-        if (sortByList.length === 0) sortByList.push(`fieldsFilled:desc,updatedAt:desc`)
-        const sortBy = sortByList.join(`,`)
 
         const searchParameters = {
             q: state.searchTerm,
             query_by: "organization.name,title,description,modalities,links.name,links.link,partners.affiliation,stages,statuses",
-            per_page: state.resultsPerPage,
-            page: state.page,
+            per_page: 12,
+            page: state.lastFetchedPage,
             ...(filtersString ? { filter_by: filtersString } : undefined),
             sort_by: sortBy,
         };
@@ -133,14 +117,10 @@ const getUpdatedSearchResults = async (
         // @ts-ignore
         const ids = typeSenseHits.map(hit => hit.document.id);
 
-        const totalResults = results.found || 0;
-        const totalPages = Math.ceil(totalResults / state.resultsPerPage);
-
         if (ids.length === 0) {
             return {
                 results: isNewSearch ? [] : state.searchResults,
-                total: results.found || 0,
-                totalPages: Math.ceil(results.out_of/12)
+                total: results.found || 0
             }
         }
 
@@ -157,16 +137,19 @@ const getUpdatedSearchResults = async (
 
         const prismaResults = await prismaResponse.json();
 
-        const enrichedResults = ids.map((id: string) => prismaResults.find((company: any) => company.id === id) || null).filter(Boolean);
+        const enrichedResults = ids.map((id: string) => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
 
         return {
-            results: enrichedResults,
+            results: isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults],
             total: results.found || 0,
-            totalPages: totalPages || 0
         };
+    } catch (error) {
+        console.error("Search error:", error);
+        return {
+            results: [],
+            total: 0
+        }
     }
-
-    return await withRetry(() => getResults(state, isNewSearch))
 };
 
 export interface ResearchPlanSearchState {
@@ -177,11 +160,13 @@ export interface ResearchPlanSearchState {
     setSearchTerm: (newSearch: string) => void,
     sortBy: string | string[] | undefined,
     setSortBy: (sortBy: string | string[] | undefined) => void,
-    resultsPerPage: number,
-    setResultsPerPage: (numResults: number) => void,
-    page: number,
-    setPage: (page: number) => void,
-    totalPages: number,
+    lastFetchedPage: number,
+    setLastFetchedPage: (page: number) => void,
+    // resultsPerPage: number,
+    // setResultsPerPage: (numResults: number) => void,
+    // page: number,
+    // setPage: (page: number) => void,
+    // totalPages: number,
     view: ViewType,
     setView: (view: ViewType) => void,
     allResults: any[],
@@ -201,27 +186,33 @@ export const useResearchPlanSearchStore = create<ResearchPlanSearchState>()(
                 set({initialized: initState})
             },
             initState: async (filters: FiltersType, sortBy?: string | string[] | undefined) => {
-                set({ 
-                    filters,
+                set({
                     searchTerm: "",
-                    sortBy,
-                    page: 1,
+                    sortBy: "default",
+                    lastFetchedPage: 1,
+                    filters,
                 })
 
-                const { results, total, totalPages } = await getUpdatedSearchResults(get(), true)
+                const {results: newSearchResults, total} = await getUpdatedSearchResults({
+                    ...get(),
+                    searchTerm: "",
+                    lastFetchedPage: 1,
+                }, true)
 
                 set({
-                    searchResults: results,
-                    totalPages,
+                    searchTerm: "",
+                    searchResults: newSearchResults,
+                    lastFetchedPage: 1,
                     totalResults: total,
                     initialized: true,
                 })
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
-                const { results, total, totalPages } = await getUpdatedSearchResults({
+                const {results: newSearchResults, total} = await getUpdatedSearchResults({
                     ...get(),
                     searchTerm: newSearch,
+                    lastFetchedPage: 1,
                 }, true)
 
                 if (newSearch.length > 0) {
@@ -242,40 +233,27 @@ export const useResearchPlanSearchStore = create<ResearchPlanSearchState>()(
 
                 set({
                     searchTerm: newSearch,
-                    searchResults: results,
-                    totalPages,
-                    page: 1,
+                    searchResults: newSearchResults,
+                    lastFetchedPage: 1,
                     totalResults: total,
                 })
             },
             sortBy: undefined,
             setSortBy: async (sortBy: string | string[] | undefined) => {
-                // if new sort by value == previous sort by value, don't update
-                if (JSON.stringify(get().sortBy) === JSON.stringify(sortBy)) return
-
-                const { results, total, totalPages } = await getUpdatedSearchResults({
+                const {results: newSearchResults, total} = await getUpdatedSearchResults({
                     ...get(),
                     sortBy,
+                    lastFetchedPage: 1,
                 }, true)
-                set({ sortBy, searchResults: results, totalPages, page: 1, totalResults: total })
+                set({sortBy, searchResults: newSearchResults, lastFetchedPage: 1, totalResults: total})
             },
-            resultsPerPage: 10,
-            setResultsPerPage: async (numResults: number) => {
-                const {results: updateSearchResults, totalPages} = await getUpdatedSearchResults({
+            lastFetchedPage: 1, // page numbers in TypeSense start at 1
+            setLastFetchedPage: async (page: number) => {
+                const {results: updateSearchResults} = await getUpdatedSearchResults({
                     ...get(),
-                    resultsPerPage: numResults,
-                    page: 1
+                    lastFetchedPage: page
                 }, false)
-                set({ resultsPerPage: numResults, page: 1, totalPages, searchResults: updateSearchResults })
-            },
-            totalPages: 1,
-            page: 1, // page numbers in TypeSense start at 1
-            setPage: async (page: number) => {
-                const {results: updateSearchResults, totalPages} = await getUpdatedSearchResults({
-                    ...get(),
-                    page,
-                }, false)
-                set({ page, totalPages, searchResults: updateSearchResults })
+                set({lastFetchedPage: page, searchResults: updateSearchResults})
             },
             view: 'grid',
             setView: (view: ViewType) => set({ view }),
@@ -289,7 +267,8 @@ export const useResearchPlanSearchStore = create<ResearchPlanSearchState>()(
                     ...get().filters,
                     ...updatedFilters
                 }
-                const { results, total, totalPages } = await getUpdatedSearchResults({
+
+                const {results: newSearchResults, total} = await getUpdatedSearchResults({
                     ...get(),
                     filters: newFilters,
                     lastFetchedPage: 1,
@@ -297,10 +276,9 @@ export const useResearchPlanSearchStore = create<ResearchPlanSearchState>()(
 
                 set({
                     filters: newFilters,
-                    page: 1,
-                    searchResults: results,
+                    lastFetchedPage: 1,
+                    searchResults: newSearchResults,
                     totalResults: total,
-                    totalPages,
                 })
             },
             totalResults: undefined,
