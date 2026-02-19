@@ -5,7 +5,6 @@ import { useShallow } from "zustand/react/shallow";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { NoResultsView } from "../no-results";
 import { ResearchPlanSearchState, useResearchPlanSearchStore } from "@/state/search/researchPlanSearchStore";
-import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/public-research-plans-table-columns";
 import Link from "next/link";
 import { ResearchPlanCard } from "@comend/components/research-plan-card";
 import { LoaderCircle } from "lucide-react";

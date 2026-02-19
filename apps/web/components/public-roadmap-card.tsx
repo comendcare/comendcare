@@ -18,7 +18,6 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@comend/
 import { PropertyBadge } from "@comend/components/property-badge";
 import { NoResultsTemplate } from "@comend/components/no-results";
 import { SearchParams } from "@comend/components/types";
-import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/public-research-plans-table-columns";
 import Link from "next/link";
 import { ResearchPlanCard } from "@comend/components/research-plan-card";
 import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@comend/components/ui/carousel";
@@ -36,13 +35,6 @@ export const RoadmapsCard = ({
 }) => {
     const router = useRouter()
     const pathname = usePathname()
-    const columns = useResearchPlansTableColumns(
-        false,
-        false,
-        false,
-        'profile'
-    )
-    const [api, setApi] = useState<CarouselApi>()
 
     return (
         <Card className="organization-profile-tour-step4 w-full" data-testid="roadmaps-card">
@@ -69,7 +61,7 @@ export const RoadmapsCard = ({
                 {(researchPlans && researchPlans.length > 0)
                     ? (
                         <div className="w-full max-w-full px-16">
-                        <Carousel opts={{loop: true}} setApi={setApi} className="w-full">
+                        <Carousel opts={{loop: true}} className="w-full">
                             <CarouselContent>
                                 {researchPlans.map((researchPlan: any, index: number) => (
                                     <CarouselItem key={index}>

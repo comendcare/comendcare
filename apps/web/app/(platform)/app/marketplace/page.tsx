@@ -24,8 +24,6 @@ import { Dialog, DialogContent, DialogTrigger } from "@comend/components/ui/dial
 import { mixpanelTrack } from "@comend/lib/mixpanel"
 import dynamic from "next/dynamic"
 import { ResearchPlanSearchState, useResearchPlanSearchStore } from "@/state/search/researchPlanSearchStore"
-import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/public-research-plans-table-columns"
-import { TypesenseResearchPlansTable } from "@comend/components/biorepo/advanced-data-table/research-plans-table/typesense-research-plans-table"
 import { ResearchPlanCard } from "@comend/components/research-plan-card"
 
 const TypesenseBiosamplesTable = dynamic(
@@ -109,10 +107,6 @@ export default function MarketplacePage() {
         false, // disable hiding
     )
     const clinicalDatasetColumns = useClinicalDatasetsTableColumns(
-        false, // disable sorting,
-        false, // disable hiding
-    )
-    const researchPlanColumns = useResearchPlansTableColumns(
         false, // disable sorting,
         false, // disable hiding
     )

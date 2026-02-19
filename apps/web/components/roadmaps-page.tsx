@@ -16,7 +16,6 @@ import { cn } from "@comend/lib/utils";
 import { Shell } from "@comend/components/biorepo/advanced-data-table/lib/shell";
 import { FeatureFlagsProvider } from "@comend/components/biorepo/advanced-data-table/lib/feature-flags-provider";
 import { DataTableSkeleton } from "@comend/components/biorepo/advanced-data-table/data-table/data-table-skeleton";
-import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/private-research-plans-table-columns";
 import { useSession } from "next-auth/react";
 import { Row } from "@tanstack/react-table";
 import { NoResultsTemplate } from "@comend/components/no-results";
@@ -54,7 +53,6 @@ export default function RoadmapsPage({ orgId, organization, researchPlansData, r
     const [isLoading, setIsLoading] = useState(false)
     const [shareIsOpen, setShareIsOpen] = useState(false)
     const {data: session} = useSession()
-    const researchPlanColumns = useResearchPlansTableColumns({session})
     const projectColumns = useProjectsTableColumns({session})
 
     useEffect(() => {

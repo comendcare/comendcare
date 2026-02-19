@@ -29,8 +29,6 @@ import { CROMarketplaceCard } from "@comend/components/marketplace/marketplace-c
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@comend/components/ui/dropdown-menu"
 import { formatMoney } from "@comend/lib/utils"
 import { ResearchPlanSearchState, useResearchPlanSearchStore } from "@/state/search/researchPlanSearchStore"
-import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/public-research-plans-table-columns"
-import { TypesenseResearchPlansTable } from "@comend/components/biorepo/advanced-data-table/research-plans-table/typesense-research-plans-table"
 import { ResearchPlanCard } from "@comend/components/research-plan-card"
 
 const croSelector = (state: CROSearchState) => ({
@@ -96,10 +94,6 @@ export default function MarketplacePage() {
         false, // disable hiding
     )
     const clinicalDatasetColumns = useClinicalDatasetsTableColumns(
-        false, // disable sorting,
-        false, // disable hiding
-    )
-    const researchPlanColumns = useResearchPlansTableColumns(
         false, // disable sorting,
         false, // disable hiding
     )
