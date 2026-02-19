@@ -64,9 +64,9 @@ export const RoadmapsCard = ({
                         <Carousel opts={{loop: true}} className="w-full">
                             <CarouselContent>
                                 {researchPlans.map((researchPlan: any, index: number) => (
-                                    <CarouselItem key={index}>
+                                    <CarouselItem key={index} className="h-fit py-[1px]">
                                     <Link 
-                                        className="h-full p-1"
+                                        className="h-fit p-1"
                                         href={(
                                             organization.subdomain 
                                                 ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlan?.id}` 

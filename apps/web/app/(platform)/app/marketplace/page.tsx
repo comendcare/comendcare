@@ -228,7 +228,13 @@ export default function MarketplacePage() {
                             ? (
                                 <div className="max-w-7xl w-full overflow-auto grid grid-cols-2 gap-4">
                                     {researchPlanStore.searchResults?.slice(0, 2).map((researchPlan: any) => (
-                                        <Link href={`/app/research-plan/${researchPlan.id}`} className="h-full">
+                                        <Link
+                                            href={(
+                                                researchPlan.organization.subdomain 
+                                                    ? `http://${researchPlan.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlan?.id}` 
+                                                    : '#'
+                                            )}
+                                        >
                                             <ResearchPlanCard researchPlan={researchPlan} showOrganization={true}/>
                                         </Link>
                                     ))}

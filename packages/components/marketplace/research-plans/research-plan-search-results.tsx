@@ -49,7 +49,13 @@ export function ResearchPlanSearchResults({
                 ): (
                     <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                         {searchResults.map((researchPlan, index) => (
-                            <Link href={`/app/research-plan/${researchPlan.id}`} className="h-full">
+                            <Link
+                                href={(
+                                    researchPlan.organization.subdomain 
+                                        ? `http://${researchPlan.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlan?.id}` 
+                                        : '#'
+                                )}
+                            >
                                 <ResearchPlanCard researchPlan={researchPlan} showOrganization={true}/>
                             </Link>
                         ))}
