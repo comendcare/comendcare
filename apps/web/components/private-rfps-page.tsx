@@ -11,6 +11,7 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { PulsatingButton } from "@comend/components/ui/pulsating-button";
 import { cn } from "@comend/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@comend/components/ui/tabs";
 
 type Props = {
     initialRFPs: any[] // or RFP[] if you have the type locally
@@ -74,22 +75,48 @@ export function PrivateRFPsPage({ initialRFPs }: Props) {
                 </div>
             )}
 
-            {renderRfps.length > 0 && (
-                <div className="w-full gap-4 flex flex-col">
-                    {renderRfps.map((rfp) => (
-                        <EditRFPDialog 
-                            key={rfp.id} 
-                            data={rfp}
-                        >
-                            <RFPCard 
-                                rfp={rfp} 
-                                isPrivate 
-                                actionsMenu={<RFPActionsMenu rfp={rfp}/>} 
-                            />
-                        </EditRFPDialog>
-                    ))}
-                </div>
-            )}
+            <Tabs defaultValue="active" className="w-full">
+                <TabsList>
+                    <TabsTrigger value="active">Active RFPs</TabsTrigger>
+                    <TabsTrigger value="archived">Archived RFPs</TabsTrigger>
+                </TabsList>
+                <TabsContent value="active">
+                    {renderRfps.length > 0 && (
+                        <div className="w-full gap-4 flex flex-col">
+                            {renderRfps.filter(rfp => !rfp.archived).map((rfp) => (
+                                <EditRFPDialog 
+                                    key={rfp.id} 
+                                    data={rfp}
+                                >
+                                    <RFPCard 
+                                        rfp={rfp} 
+                                        isPrivate 
+                                        actionsMenu={<RFPActionsMenu rfp={rfp}/>} 
+                                    />
+                                </EditRFPDialog>
+                            ))}
+                        </div>
+                    )}
+                </TabsContent>
+                <TabsContent value="archived">
+                    {renderRfps.length > 0 && (
+                        <div className="w-full gap-4 flex flex-col">
+                            {renderRfps.filter(rfp => !!rfp.archived).map((rfp) => (
+                                <EditRFPDialog 
+                                    key={rfp.id} 
+                                    data={rfp}
+                                >
+                                    <RFPCard 
+                                        rfp={rfp} 
+                                        isPrivate 
+                                        actionsMenu={<RFPActionsMenu rfp={rfp}/>} 
+                                    />
+                                </EditRFPDialog>
+                            ))}
+                        </div>
+                    )}
+                </TabsContent>
+            </Tabs>
         </main>
     )
 }

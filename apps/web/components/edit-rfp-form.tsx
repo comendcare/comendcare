@@ -35,7 +35,7 @@ import {Popover, PopoverContent, PopoverTrigger} from "@comend/components/ui/pop
 import {cn} from "@comend/lib/utils"
 import {format} from "date-fns"
 import {Calendar} from "@comend/components/ui/calendar"
-import { Calendar as CalendarIcon, Lock } from "lucide-react"
+import { Calendar as CalendarIcon, Info, Lock } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { AttachmentsFormField, ContactsFormField, OpenToFormField, PrivatePublicFormField } from "./edit-milestone-form"
@@ -677,7 +677,7 @@ export function EditRFPForm({
                                 <span>Archived</span>
                                 <Tooltip>
                                     <TooltipTrigger className="pl-2">
-                                    <Lock className="h-4 w-4" />
+                                    <Info className="h-4 w-4" />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left">
                                     <p className="text-normal">
