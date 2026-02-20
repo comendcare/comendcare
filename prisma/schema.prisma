@@ -539,6 +539,7 @@ model RFP {
   pinned            Boolean              @default(false)
   metadata          Json?
   notes             String?
+  archived          Boolean              @default(false)
 
   organizationId             String?
   organization               Organization?                @relation(fields: [organizationId], references: [id], onDelete: Cascade)
