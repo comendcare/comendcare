@@ -246,14 +246,10 @@ export default function PAGProfilePage({
                                     <Suspense fallback={<Skeleton className="h-64 w-full rounded-md border"/>}>
                                         <PAGProfileToolsCardLazy
                                             organization={organization}
-                                            searchParams={searchParams}
                                             toolCounts={toolCounts}
                                             biosamples={biosamples}
-                                            biosamplesPageCount={biosamplesPageCount}
                                             diseaseModels={diseaseModels}
-                                            diseaseModelsPageCount={diseaseModelsPageCount}
                                             clinicalDatasets={clinicalDatasets}
-                                            clinicalDatasetsPageCount={clinicalDatasetsPageCount}
                                         />
                                     </Suspense>
                                 </div>
