@@ -815,6 +815,37 @@ export const getUserChartAnalytics = withAdminAuth(
     }
 )
 
+export const getUserEmailCapture = withAdminAuth(
+    async (
+        select: Prisma.WhitelistSelect<InternalArgs & {
+            result: {};
+            model: {};
+            query: {};
+            client: {};
+        }>
+    ) => {
+        try {
+            const emailCaptureList = await prisma.emailCapture.findMany({
+                orderBy: { createdAt: "desc" },
+                select
+            })
+
+
+            if (!emailCaptureList) {
+                return {success: false, error: "Email Capture list not found"};
+            }
+
+            return {
+                success: true,
+                data: emailCaptureList
+            };
+        } catch (error: any) {
+            logError("Error fetching captured user emails", error);
+            return {success: false, error: "Internal server error"};
+        }
+    }
+)
+
 export const getUserWhitelist = withAdminAuth(
     async (
         select: Prisma.WhitelistSelect<InternalArgs & {

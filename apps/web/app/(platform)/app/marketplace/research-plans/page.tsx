@@ -56,8 +56,8 @@ export default function ResearchPlanPage(props: IndexPageProps) {
     }, [props])
 
     return (
-        <main className="max-w-7xl flex flex-col w-full px-4 pb-20 items-center h-full mx-auto">
-            <div className="flex flex-col gap-4 p-2 w-full">
+        <main className="flex flex-col w-full px-4 pb-20 items-center h-full">
+            <div className="flex flex-col gap-4 p-2 w-full items-center align-center">
                 <ResearchPlanMarketplaceIntegratedSearchAndFilter />
                 <ResearchPlanSearchResults isInitialized={isInitialized}/>
             </div>

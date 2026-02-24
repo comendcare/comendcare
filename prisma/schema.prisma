@@ -539,6 +539,7 @@ model RFP {
   pinned            Boolean              @default(false)
   metadata          Json?
   notes             String?
+  archived          Boolean              @default(false)
 
   organizationId             String?
   organization               Organization?                @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -1272,6 +1273,15 @@ model Whitelist {
   email     String   @unique /// @encrypted
   emailHash String?  @unique /// @encryption:hash(email)
   createdAt DateTime @default(now())
+  metadata  Json?
+}
+
+model EmailCapture {
+  id        String   @id @default(cuid())
+  email     String   @unique /// @encrypted
+  emailHash String?  @unique /// @encryption:hash(email)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
   metadata  Json?
 }
 

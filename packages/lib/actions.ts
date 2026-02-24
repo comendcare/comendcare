@@ -118,6 +118,16 @@ const nanoid = customAlphabet(
     7
 ) // 7-character random string
 
+export const addEmailCapture = async (email: string) => {
+    const lowerCaseEmail = email.toLowerCase()
+
+    await prisma.emailCapture.upsert({
+        where: {email: lowerCaseEmail},
+        update: {}, // No fields to update
+        create: {email: lowerCaseEmail},
+    }); 
+}
+
 export const createMemberRequest = withAuth(
     async (organizationId: string): Promise<ApiResponse<any>> => {
         const session = await getSession()
@@ -4007,6 +4017,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     },
                     budget: rfpData.budget,
                     notes: rfpData.notes,
+                    archived: rfpData.archived,
                 },
                 create: {
                     ...(rfpData.id ? {id: rfpData.id} : undefined),
@@ -4046,6 +4057,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     organization: {connect: {id: organization.id}},
                     budget: rfpData.budget,
                     notes: rfpData.notes,
+                    archived: rfpData.archived,
                 },
             });
 
