@@ -146,24 +146,43 @@ export default function RoadmapsPage({ orgId, organization, researchPlansData, r
                                 </Button>
                             </div>
                         </div>
-                        {researchPlansData.length > 0 ? (
-                            <div className="pt-6 w-full h-full grid grid-cols-3 gap-4">
-                                {researchPlansData.map((researchPlan: any) => (
-                                    <Link href={`/app/research-plan/${researchPlan.id}`}>
-                                        <ResearchPlanCard researchPlan={researchPlan}/>
-                                    </Link>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="w-full h-full flex justify-center items-center">
-                            <NoResultsTemplate
-                                imgAlt="No research plans"
-                                src="https://illustrations.popsy.co/gray/studying.svg"
-                                title="No research plans yet!"
-                                description="Your organization does not have any research plans yet."
-                            />
-                            </div>
-                        )}
+                        <Suspense
+                            fallback={
+                                <DataTableSkeleton
+                                    columnCount={7}
+                                    filterCount={2}
+                                    cellWidths={[
+                                        "10rem",
+                                        "30rem",
+                                        "10rem",
+                                        "10rem",
+                                        "6rem",
+                                        "6rem",
+                                        "6rem",
+                                    ]}
+                                    shrinkZero
+                                />
+                            }
+                        >
+                            {researchPlansData.length > 0 ? (
+                                <div className="pt-6 w-full h-full grid grid-cols-3 gap-4">
+                                    {researchPlansData.map((researchPlan: any) => (
+                                        <Link href={`/app/research-plan/${researchPlan.id}`}>
+                                            <ResearchPlanCard researchPlan={researchPlan}/>
+                                        </Link>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="w-full h-full flex justify-center items-center">
+                                <NoResultsTemplate
+                                    imgAlt="No research plans"
+                                    src="https://illustrations.popsy.co/gray/studying.svg"
+                                    title="No research plans yet!"
+                                    description="Your organization does not have any research plans yet."
+                                />
+                                </div>
+                            )}
+                        </Suspense>
                     </div>
                 </TabsContent>
                 <TabsContent value="projects" className="w-full">
