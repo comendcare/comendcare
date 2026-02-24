@@ -91,8 +91,20 @@ const CustomCarouselControls = ({setIsOpen}: {setIsOpen: Dispatch<React.SetState
 
     return (
         <div className="relative flex justify-between mt-4">
+            <div className="absolute top-0 mt-4 w-full flex justify-center gap-2 ml-auto mr-auto">
+            {introPages.map((_, index) => (
+                <div 
+                    className={cn(
+                        "h-2 w-2 rounded-full",
+                        index <= slideIndex ? "bg-muted-foreground" : "bg-muted"
+                    )}
+                />
+            ))}
+            </div>
+
             {canScrollPrev ? (
                 <Button
+                    className="z-10"
                     variant="outline"
                     onClick={() => {
                         scrollPrev()
@@ -107,19 +119,9 @@ const CustomCarouselControls = ({setIsOpen}: {setIsOpen: Dispatch<React.SetState
                 <span className="transparent w-[85px]"></span>
             )}
 
-            <div className="absolute top-0 mt-4 w-full flex justify-center gap-2 ml-auto mr-auto">
-            {introPages.map((_, index) => (
-                <div 
-                    className={cn(
-                        "h-2 w-2 rounded-full",
-                        index <= slideIndex ? "bg-muted-foreground" : "bg-muted"
-                    )}
-                />
-            ))}
-            </div>
-
             {canScrollNext ? (
                 <Button
+                    className="z-10"
                     variant="outline"
                     onClick={() => {
                         scrollNext()
@@ -131,6 +133,7 @@ const CustomCarouselControls = ({setIsOpen}: {setIsOpen: Dispatch<React.SetState
                 </Button>
             ) : (
                 <Button
+                    className="z-10"
                     variant="outline"
                     onClick={() => {
                         setIsOpen(false)
