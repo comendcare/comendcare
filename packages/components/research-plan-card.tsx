@@ -44,36 +44,48 @@ export const ResearchPlanCard = ({
             </CardHeader>
             <CardContent className="h-full flex flex-col gap-4">
                 <div className="w-full flex gap-4">
-                    {researchPlan.modalities.length > 0 && (
-                        <div className="w-full flex flex-col gap-2">
-                            <h2 className="text-sm">Research strategy</h2>
-                            {RESEARCH_PLAN_TYPES
-                                .filter(option => researchPlan.modalities.includes(option.value))
-                                .map(strategy => (
-                                    <Badge className="text-sm w-fit" variant="blue">{strategy.label}</Badge>
-                                ))}
-                        </div>
-                    )}
+                    <div className="w-full flex flex-col gap-2">
+                    <h2 className="text-sm">Research strategy</h2>
+                    {RESEARCH_PLAN_TYPES.filter(option => researchPlan.modalities.includes(option.value)).length > 0 
+                        ? (
+                            <>
+                                {RESEARCH_PLAN_TYPES
+                                    .filter(option => researchPlan.modalities.includes(option.value))
+                                    .map(strategy => (
+                                        <Badge className="text-sm w-fit" variant="blue">{strategy.label}</Badge>
+                                    ))}
+                            </>
+                        ) : (
+                            <p>---</p>
+                        )
+                    }
+                    </div>
 
-                    {researchPlan.stages.length > 0 && (
-                        <div className="w-full flex flex-col gap-2">
-                            <h2 className="text-sm">Stage</h2>
-                            {RESEARCH_STAGE
-                                .filter(option => researchPlan.stages.includes(option.value))
-                                .map(stage => (
-                                    <Badge className="text-sm w-fit" variant={stage.variant}>{stage.label}</Badge>
-                                ))}
-                        </div>
-                    )}
+                    <div className="w-full flex flex-col gap-2">
+                    <h2 className="text-sm">Stage</h2>
+                    {RESEARCH_STAGE.filter(option => researchPlan.stages.includes(option.value)).length > 0 
+                        ? (
+                            <>
+                                {RESEARCH_STAGE
+                                    .filter(option => researchPlan.stages.includes(option.value))
+                                    .map(stage => (
+                                        <Badge className="text-sm w-fit" variant={stage.variant}>{stage.label}</Badge>
+                                    ))}
+                            </>
+                        ) : (
+                            <p>---</p>
+                        )
+                    }
+                    </div>
                 </div>
 
-                {(researchPlan.partners.length > 0 || researchPlan.links.length > 0) && (
-                    <>
-                    <Separator />
-                    <div className="flex flex-col gap-4">
-                        {researchPlan.partners.length > 0 && (
-                            <div className="w-full flex flex-col gap-2">
-                            <h2 className="text-sm flex gap-1 items-center"><Building className="h-4 min-h-4 w-4 min-w-4"/> Partners</h2>
+                <Separator />
+
+                <div className="flex flex-col gap-4">
+                    <div className="w-full flex flex-col gap-2">
+                    <h2 className="text-sm flex gap-1 items-center"><Building className="h-4 min-h-4 w-4 min-w-4"/> Partners</h2>
+                    {researchPlan.partners.length > 0 
+                        ? (
                             <div className="flex gap-2">
                                 <ul className="flex gap-2">
                                     {researchPlan.partners.map((partner: any, index: number) => (
@@ -83,12 +95,16 @@ export const ResearchPlanCard = ({
                                     ))}
                                 </ul>
                             </div>
-                            </div>
-                        )}
-                    
-                        {researchPlan.links.length > 0 && (
-                            <div className="w-full flex flex-col gap-2">
-                            <h2 className="text-sm flex gap-1 items-center"><LinkIcon className="h-4 min-h-4 w-4 min-w-4"/> Links</h2>
+                        ) : (
+                            <p>---</p>
+                        )
+                    }
+                    </div>
+
+                    <div className="w-full flex flex-col gap-2">
+                    <h2 className="text-sm flex gap-1 items-center"><LinkIcon className="h-4 min-h-4 w-4 min-w-4"/> Links</h2>
+                    {researchPlan.links.length > 0 
+                        ? (
                             <div className="flex gap-2">
                                 <ul className="flex flex-col gap-2">
                                     {researchPlan.links?.map((attachment: any, index: number) => (
@@ -106,11 +122,13 @@ export const ResearchPlanCard = ({
                                     ))}
                                 </ul>
                             </div>
-                            </div>
-                        )}
+                        ) : (
+                            <p>---</p>
+                        )
+                    }
                     </div>
-                    </>
-                )}
+                </div>
+                
 
                 {(showOrganization && researchPlan.organization) && (
                     <>
