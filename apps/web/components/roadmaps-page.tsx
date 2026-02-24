@@ -168,7 +168,7 @@ export default function RoadmapsPage({ orgId, organization, researchPlansData, r
                                 <div className="pt-6 w-full h-full grid grid-cols-2 xl:grid-cols-3 gap-4">
                                     {researchPlansData.map((researchPlan: any) => (
                                         <Link href={`/app/research-plan/${researchPlan.id}`}>
-                                            <ResearchPlanCard researchPlan={researchPlan}/>
+                                            <ResearchPlanCard researchPlan={researchPlan} editable={true}/>
                                         </Link>
                                     ))}
                                 </div>

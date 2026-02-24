@@ -9,26 +9,29 @@ import { RESEARCH_PLAN_STATUS, RESEARCH_PLAN_TYPES, RESEARCH_STAGE } from "@come
 import { Building, ExternalLink, LinkIcon, Lock, Globe } from "lucide-react";
 import ClaimedBadge from "comend-pag-platform/components/claimed-badge";
 import Link from "next/link";
+import {ResearchPlanActionsMenu} from "comend-pag-platform/components/research-plans-actions-menu"
 
 export const ResearchPlanCard = ({
     researchPlan, 
     showOrganization = false, 
+    editable = false,
 }: { 
     researchPlan: any; 
     showOrganization?: boolean; 
+    editable?: boolean;
 }) => {
     return (
         <Card className="h-full relative flex flex-col gap-4">
-            <div className="absolute top-0 w-full p-6 flex gap-2 justify-between">
+            <div className="absolute top-0 w-full p-6 flex gap-2">
                 {researchPlan.private 
                     ? (
-                        <div className="flex gap-1 items-center text-sm text-muted-foreground">
+                        <div className="flex gap-1 items-center text-sm text-muted-foreground mr-auto">
                             <Lock className="h-4 w-4"/>
                             Private
                         </div>
                     )
                     : (
-                        <div className="flex gap-1 items-center text-sm text-muted-foreground">
+                        <div className="flex gap-1 items-center text-sm text-muted-foreground mr-auto">
                             <Globe className="h-4 w-4"/>
                             Published
                         </div>
@@ -37,6 +40,7 @@ export const ResearchPlanCard = ({
                 {RESEARCH_PLAN_STATUS
                     .filter(option => researchPlan.statuses.includes(option.value))
                     .map(status => <Badge className="text-sm" variant={"secondary"}>{status.label}</Badge>)}
+                {editable && <ResearchPlanActionsMenu researchPlan={researchPlan}/>}
             </div>
             <CardHeader className="mt-10 pb-0">
                 <CardTitle>{researchPlan.title || 'Untitled research plan'}</CardTitle>
