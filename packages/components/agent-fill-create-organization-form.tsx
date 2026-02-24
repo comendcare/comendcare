@@ -9,7 +9,6 @@ import LoadingDots from "@comend/components/icons/loading-dots";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import type { UseFormReturn } from "react-hook-form";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type UnifiedFormValues = any;
 
 type Props = {
