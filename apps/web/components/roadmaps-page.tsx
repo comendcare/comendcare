@@ -146,15 +146,7 @@ export default function RoadmapsPage({ orgId, organization, researchPlansData, r
                                 </Button>
                             </div>
                         </div>
-
-                            <div className="pt-6 w-full h-full grid grid-cols-3 gap-4">
-                                {researchPlansData.map((researchPlan: any) => (
-                                    <Link href={`/app/research-plan/${researchPlan.id}`}>
-                                        <ResearchPlanCard researchPlan={researchPlan}/>
-                                    </Link>
-                                ))}
-                            </div>
-                        {/* {researchPlansData.length > 0 ? (
+                        {researchPlansData.length > 0 ? (
                             <div className="pt-6 w-full h-full grid grid-cols-3 gap-4">
                                 {researchPlansData.map((researchPlan: any) => (
                                     <Link href={`/app/research-plan/${researchPlan.id}`}>
@@ -171,7 +163,7 @@ export default function RoadmapsPage({ orgId, organization, researchPlansData, r
                                 description="Your organization does not have any research plans yet."
                             />
                             </div>
-                        )} */}
+                        )}
                     </div>
                 </TabsContent>
                 <TabsContent value="projects" className="w-full">
