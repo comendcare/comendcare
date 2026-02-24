@@ -4017,6 +4017,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     },
                     budget: rfpData.budget,
                     notes: rfpData.notes,
+                    archived: rfpData.archived,
                 },
                 create: {
                     ...(rfpData.id ? {id: rfpData.id} : undefined),
@@ -4056,6 +4057,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     organization: {connect: {id: organization.id}},
                     budget: rfpData.budget,
                     notes: rfpData.notes,
+                    archived: rfpData.archived,
                 },
             });
 

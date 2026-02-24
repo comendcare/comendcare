@@ -1056,7 +1056,8 @@ const syncToTypesense = async (env: {
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'rfps', rfpSchema);
         const rfps = await prisma.rFP.findMany({
             where: {
-                private: false // only sync public biosamples
+                private: false, // only sync public biosamples
+                archived: false, // don't sync archived RFPs
             },
             select: {
                 createdAt: true,
