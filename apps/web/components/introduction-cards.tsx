@@ -19,6 +19,9 @@ import screenshot2 from "@/public/Screenshot 2026-02-24 at 11.15.00 AM.png"
 import screenshot3 from "@/public/Screenshot 2026-02-24 at 11.15.50 AM.png"
 import Image from "next/image";
 import { cn } from "@comend/lib/utils";
+import { useSearchParams } from "next/navigation";
+import { editUser } from "@comend/lib/actions";
+import { useSession } from "next-auth/react";
 
 const introPages = [
     {
@@ -42,15 +45,17 @@ const introPages = [
 ]
 
 export default function IntroductionCards({
+    showIntro,
     invitations,
     claimInvitations,
     children,
 }: {
+    showIntro: boolean,
     invitations: { id: string; organizationId: string, role: string, organization: Organization }[];
     claimInvitations: { id: string; organizationId: string, role: string, organization: Organization }[];
     children: React.ReactNode;
 }) {
-    const [open, setIsOpen] = useState(true); // permanently open until handled
+    const [open, setIsOpen] = useState(showIntro); // if param is in url, permanently open until handled
 
     return (
         <>
@@ -88,6 +93,7 @@ export default function IntroductionCards({
 const CustomCarouselControls = ({setIsOpen}: {setIsOpen: Dispatch<React.SetStateAction<boolean>>}) => {
     const { canScrollPrev, canScrollNext, scrollPrev, scrollNext } = useCarousel();
     const [slideIndex, setSlideIndex] = useState(0)
+    const {data: session}= useSession()
 
     return (
         <div className="relative flex justify-between mt-4">
@@ -137,6 +143,7 @@ const CustomCarouselControls = ({setIsOpen}: {setIsOpen: Dispatch<React.SetState
                     variant="outline"
                     onClick={() => {
                         setIsOpen(false)
+                        if (session?.user?.id) editUser(session.user.id, {viewedIntro: true})
                     }}
                 >
                     Finish
