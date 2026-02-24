@@ -45,7 +45,7 @@ function ResearchPlansSkeleton() {
       </div>
 
       {/* Card Grid */}
-      <div className="grid w-full grid-cols-3 gap-4">
+      <div className="grid w-full grid-cols-2 xl:grid-cols-3 gap-4">
         <ResearchPlanCardSkeleton />
         <ResearchPlanCardSkeleton />
       </div>
@@ -118,7 +118,6 @@ export default function Loading() {
                     <Skeleton className="h-9 w-24 rounded-md" /> {/* Share button */}
                 </div>
 
-                {/* <RoadmapsTableSkeleton /> */}
                 <ResearchPlansSkeleton />
             </div>
         </main>
