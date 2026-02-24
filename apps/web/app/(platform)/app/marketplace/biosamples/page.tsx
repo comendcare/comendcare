@@ -7,6 +7,9 @@ import { SearchParams } from "@comend/components/types";
 import { initializeBiosampleSearch } from "@comend/lib/initialize-client-state";
 import { BiosampleSearchState, useBiosampleSearchStore } from "@/state/search/biosampleSearchStore";
 import { useShallow } from "zustand/react/shallow";
+import { BIOSAMPLE_TYPE_OPTIONS } from "@comend/lib/types";
+import type { Option } from "@comend/lib/types";
+import { Organization } from "@prisma/client";
 
 interface IndexPageProps {
     searchParams: Promise<SearchParams>
@@ -25,14 +28,36 @@ export default function BiosamplesPage(props: IndexPageProps) {
     useEffect(() => {
         const init = async () => {
             const searchParams = await props.searchParams;
-            
+            const filters = JSON.parse(searchParams.filters as string)
+
+            let filterOrgs: Organization[] = []
+            if (filters && filters.organizations) {
+                const prismaResponse = await fetch('/api/organizations', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ids: filters.organizations as any[]}),
+                })
+                filterOrgs = await prismaResponse.json()
+            }
+
             if (!initialized) {
                 await initializeBiosampleSearch(
                     {
-                        types: [] as any[],
-                        genes: [] as any[],
-                        conditions: [] as any[],
-                        organizations: [] as any[],
+                        types: ((filters.types || [])
+                            .map((value: string) => BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === value))
+                            .filter((option: Option | undefined) => !!option)) as any[],
+                        genes: ((filters.genes || []).map((symbol: string) => ({
+                                label: symbol,
+                                value: symbol,
+                            }))) as any[],
+                        conditions: ((filters.conditions || []).map((condition: string) => ({
+                                label: condition,
+                                value: condition,
+                            }))) as any[],
+                        organizations: ((filterOrgs || []).map((org) => ({
+                                label: org.name,
+                                value: org.id,
+                            }))) as any[],
                     },
                     searchParams?.sort
                 )
