@@ -249,7 +249,8 @@ export async function getPublicRFPsForOrganization(
             organization: {
                 subdomain: subdomain
             },
-            private: {equals: false}
+            private: {equals: false},
+            archived: {equals: false}
         },
         orderBy: {createdAt: 'desc'},
         select: {
@@ -296,7 +297,7 @@ export async function getPublicRFP(
     }>
 ) {
     const rfp = await prisma.rFP.findUnique({
-        where: {id, private: {equals: false}},
+        where: {id, private: {equals: false}, archived: {equals: false}},
         select: {
             ...select,
             milestones: select.milestones ? ({
