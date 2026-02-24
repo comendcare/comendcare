@@ -676,7 +676,7 @@ export function EditRFPForm({
                                 <FormLabel className="w-[100px] flex items-center">
                                 <span>Archived</span>
                                 <Tooltip>
-                                    <TooltipTrigger className="pl-2">
+                                    <TooltipTrigger className="pl-2" onClick={(e) => e.preventDefault()}>
                                     <Info className="h-4 w-4" />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left">
