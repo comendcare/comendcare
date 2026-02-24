@@ -66,17 +66,6 @@ export function OrganizationSearchResults({isPublic}: {isPublic: boolean}) {
     }
 
     const ResultsView = () => {
-        if (view === "list") {
-            return (
-                <ol className="w-full flex flex-col gap-4">
-                    {searchResults.map((organization, index) => (
-                        <OrganizationMarketplaceListElement organization={organization} key={index} isPublic={isPublic} />
-                    ))}
-                </ol>
-            )
-        }
-
-        // default to grid view
         return (
             <div className="w-full flex flex-col gap-4">
                 {(!searchResults || searchResults.length === 0) ? (
