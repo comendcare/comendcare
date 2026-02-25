@@ -22,7 +22,7 @@ import { Dialog, DialogPortal, DialogTrigger } from "@comend/components/ui/dialo
 import { Row } from "@tanstack/react-table";
 import { Asset } from "@comend/lib/types";
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog";
-import { cn } from "@comend/lib/utils";
+import { cn, isOnboarded, setOnboarded } from "@comend/lib/utils";
 import { PulsatingButton } from "@comend/components/ui/pulsating-button";
 import {NoResultsTemplate} from "@comend/components/no-results"
 import { useOnborda } from "./onborda/OnbordaContext";
@@ -40,11 +40,13 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     const [editingTool, setEditingTool] = useState<Partial<Asset> | undefined>(undefined)
     const [isClosing, setIsClosing] = useState(false)
     const parentRef = useRef<HTMLDivElement>(null)
-    const { startOnborda, closeOnborda } = useOnborda()
+    const { startOnborda } = useOnborda()
 
     useEffect(() => {
-        console.log(`GOT HERE!!!`)
-        startOnborda("tools-tour")
+        if (!isOnboarded("tools-tour")) {
+            startOnborda("tools-tour")
+            setOnboarded("tools-tour")
+        }
     }, [])
 
     useEffect(() => {
