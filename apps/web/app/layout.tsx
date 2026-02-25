@@ -16,6 +16,7 @@ import { authOptions } from "@comend/lib/auth";
 import CustomerIOSnippet from "@comend/components/customerio";
 import { headers } from 'next/headers';
 import { CookieyesScripts } from "@comend/lib/cookie-yes-scripts";
+import { OnbordaProvider } from "~web/components/onborda/OnbordaContext";
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -116,11 +117,12 @@ export default async function RootLayout({
                     enableSystem={false}
                     disableTransitionOnChange
                 >
+                    <OnbordaProvider>
                     <Onborda steps={onbordaTours} cardComponent={OnboardingCard}>
                         {children}
-                        {/* <FeedbackForm /> */}
                         <Analytics/>
                     </Onborda>
+                    </OnbordaProvider>
                 </ThemeProvider>
             </Providers>
         </Suspense>

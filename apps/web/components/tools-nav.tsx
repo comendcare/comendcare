@@ -1,5 +1,6 @@
 "use client"
 import { TabNav } from "@comend/components/tab-nav";
+import { cn } from "@comend/lib/utils";
 import { Database, Rat, TestTubeDiagonal } from "lucide-react";
 
 const links = [
@@ -26,7 +27,7 @@ const links = [
 export function ToolsNav({className}: React.HTMLAttributes<HTMLDivElement>) {
     return (
         <TabNav
-            className={className}
+            className={cn("types-of-tools", className)}
             baseLink={"/app/tools"}
             links={links}
         />

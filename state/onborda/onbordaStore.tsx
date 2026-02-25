@@ -124,7 +124,7 @@ export const onbordaTours: any[] = [
             // },
         ]
     },
-        {
+    {
         tour: "research-plans-page-tour",
         steps: [
             {
@@ -162,6 +162,61 @@ export const onbordaTours: any[] = [
             }
         ]
     },
+    {
+        tour: "tools-tour",
+        steps: [
+            {
+                icon: <>👋</>,
+                title: "Types of tools",
+                content: <>Comend has 3 types of tools that make up your toolkit, biosamples, disease models, and clinical datasets. You can manage each set of tools in their respective tabs.</>,
+                selector: ".types-of-tools",
+                side: "bottom",
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10,
+            },
+            {
+                icon: <>⭐</>,
+                title: "Create a single tool",
+                content: <>You can create a single tool from the ‘Create’ button in the top right.</>,
+                selector: ".single-tool-create",
+                side: "left",
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10,
+            },
+            {
+                icon: <>⭐</>,
+                title: "Bulk create tools",
+                content: <>You can use our bulk import feature to create many tools at a time via a spreadsheet. Use our template spreadsheet to get started.</>,
+                selector: ".bulk-tool-create",
+                side: "left",
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10,
+            },
+            {
+                icon: <>⭐</>,
+                title: "Manage tools",
+                content: <>You can edit existing tools from the toolkit tables. Try searching or applying a filter to find tools faster.</>,
+                selector: ".manage-tools",
+                side: "top",
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10,
+            },
+            {
+                icon: <>⭐</>,
+                title: "Publishing tools",
+                content: <>By default tools are private, but you can choose to publish them. Published tools will be visible on your organization’s profile, and in the Comend marketplace.</>,
+                selector: ".publish-tools",
+                side: "top",
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10,
+            },
+        ]
+    }
 ]
 
 export type Selector = 

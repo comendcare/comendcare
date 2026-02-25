@@ -122,40 +122,43 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
     }
 
     return (
-        <Card ref={cardRef} className="border-0 rounded-3xl w-max max-w-[400px] pointer-events-auto">
-            <CardHeader>
+        <div>
+        <Card ref={cardRef} className="border-0 rounded-3xl w-max max-w-[400px] pointer-events-auto flex flex-col gap-2 p-4">
+            <CardHeader className="p-0">
                 <div className="flex items-start justify-between w-full">
                     <div>
-                        <CardTitle className="mb-2 text-lg">
+                        <CardTitle className="text-lg">
                             {step.icon} {step.title}
                         </CardTitle>
-                        <CardDescription>
-                            {currentStep + 1} of {totalSteps}
-                        </CardDescription>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => closeOnborda()}>
+                    <Button variant="ghost" className="p-1 h-fit w-fit" onClick={() => closeOnborda()}>
                         <XIcon size={16} />
                     </Button>
                 </div>
             </CardHeader>
-            <CardContent>{step.content}</CardContent>
-            <CardFooter>
-                <div className="flex justify-between w-full space-x-2">
-                    {currentStep !== 0 && <Button onClick={() => prevStep()}>Previous</Button>}
+            <CardContent className="p-0">{step.content}</CardContent>
+            <CardFooter className="p-0">
+                <div className="flex justify-between w-full relative">
+                    <CardDescription className="absolute w-full h-full flex justify-center items-center">
+                        {currentStep + 1} of {totalSteps}
+                    </CardDescription>
+                    {currentStep === 0 && <div className="transparent"/>} 
+                    {currentStep !== 0 && <Button onClick={() => prevStep()} className="z-10">Previous</Button>}
                     {currentStep + 1 !== totalSteps && (
-                        <Button onClick={handleNextStep} className="ml-auto">
+                        <Button onClick={handleNextStep} className="ml-auto z-10">
                             Next
                         </Button>
                     )}
                     {currentStep + 1 === totalSteps && (
-                        <Button onClick={() => handleConfetti()} className="ml-auto">
+                        <Button onClick={() => handleConfetti()} className="ml-auto z-10">
                             🎉 Finish!
                         </Button>
                     )}
                 </div>
             </CardFooter>
-            <span className="text-card">{arrow}</span>
         </Card>
+        <span className="text-card">{arrow}</span>
+        </div>
     )
 }
 

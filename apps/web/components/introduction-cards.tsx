@@ -19,14 +19,13 @@ import screenshot2 from "@/public/Screenshot 2026-02-24 at 11.15.00 AM.png"
 import screenshot3 from "@/public/Screenshot 2026-02-24 at 11.15.50 AM.png"
 import Image from "next/image";
 import { cn } from "@comend/lib/utils";
-import { useSearchParams } from "next/navigation";
 import { editUser } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
 
 const introPages = [
     {
         title: "First, plan your research, end-to-end",
-        description: "Create and organize research projects, tools, and RFPs using interactive planner.",
+        description: "Create and organize research projects, tools, and RFPs the using interactive planner.",
         img: screenshot1,
         imgAlt: ""
     },

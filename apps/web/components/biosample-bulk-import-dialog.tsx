@@ -355,6 +355,7 @@ export function BiosampleBulkImportDialog({
                         <Button 
                             variant={"ghost"}
                             onClick={() => setIsOpen(true)}
+                            className="bulk-tool-create"
                         >
                             <Import />
                             {!isCollapsed && <p>{`Import biosamples`}</p>}
