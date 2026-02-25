@@ -4,7 +4,7 @@ import React, {useCallback, useEffect, useState} from "react";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {z} from "zod";
-import {useForm} from "react-hook-form";
+import {useForm, useWatch} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {
     Form,
@@ -23,16 +23,16 @@ import {Separator} from "@comend/components/ui/separator";
 import LoadingDots from "@comend/components/icons/loading-dots";
 import MoneyInput from "@comend/components/money-input";
 import type {FileWithPreview} from "@comend/components/image-selector";
-import {years, toKebabCase} from "@comend/lib/utils";
+import {years, toKebabCase, formatNumberWithCommas} from "@comend/lib/utils";
 import {Option, optionSchema, MODALITIES, MOLECULAR_MECHANISMS} from "@comend/lib/types";
 import {useDebounce} from "use-debounce";
 import {toast} from "sonner";
 import {
-    createMemberRequest,
     createOrganization,
     updateOrganization,
     connectOrganizationToCondition,
     createCondition,
+    updateEntityTags,
 } from "@comend/lib/actions";
 import {
     checkSubdomainAvailability,
@@ -41,11 +41,10 @@ import {handleImageUpload} from "@comend/lib/upload";
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 import {Textarea} from "@comend/components/ui/textarea";
 import {FormImageSelector} from "@comend/components/form-image-selector";
-import {Invitation, Organization} from "@prisma/client";
-import { badgeVariants } from "@comend/components/ui/badge";
-import { useWatch } from "react-hook-form";
+import {Invitation} from "@prisma/client";
+import {badgeVariants} from "@comend/components/ui/badge";
 import AgentFillCreateOrganizationForm from "@comend/components/agent-fill-create-organization-form";
-
+import {TaggableType} from "@prisma/client";
 
 /**************************************
  * Zod schema (ALL FIELDS IN ONE)
@@ -76,7 +75,6 @@ const unifiedSchema = z.object({
     otherTherapeuticsInDevelopment: z.string().optional(),
     therapeuticsOfInterest: z.array(optionSchema).optional(),
     otherTherapeuticsOfInterest: z.string().optional(),
-    // incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"]).optional(),
     orgImage: z.string().optional(),
 
     // RESEARCH / CONDITION
@@ -90,6 +88,7 @@ const unifiedSchema = z.object({
     global: emptyToUndefined(z.string().regex(/^\d+$/, "Must be a positive integer")),
     prevalenceNumerator: emptyToUndefined(z.string().regex(/^\d+$/, "Must be a positive integer")),
     prevalenceDenominator: emptyToUndefined(z.string().regex(/^\d+$/, "Must be a positive integer")),
+    tags: emptyToUndefined(z.string()),
     mechanisms: z.array(z.string()).optional(),
     causal: z.array(optionSchema).optional(),
     genes: z.array(optionSchema).optional(),
@@ -124,9 +123,9 @@ const refinedSchema = unifiedSchema.superRefine((vals, ctx) => {
 });
 
 export default function NewOrganizationForm({
-    invitations, 
-    organizations
-}: {
+                                                invitations,
+                                                organizations
+                                            }: {
     invitations: Invitation[],
     organizations: Option[]
 }) {
@@ -154,12 +153,14 @@ export default function NewOrganizationForm({
     const therapeuticsOfInterest = useWatch({ control: form.control, name: "therapeuticsOfInterest" });
     const categories = useWatch({ control: form.control, name: "categories" });
     const orgImage = useWatch({ control: form.control, name: "orgImage" });
+    const prevalenceDenominator = useWatch({ control: form.control, name: "prevalenceDenominator" });
 
     // Prefetch for faster navigation after form submission
     useEffect(() => {
         const href = hasInvitations ? "/app/profile" : "/app/dashboard"
         router.prefetch(href)
     }, [hasInvitations, router])
+
     const [debouncedSubdomain] = useDebounce(subdomain, 500);
 
     /**************************************
@@ -193,7 +194,6 @@ export default function NewOrganizationForm({
         setLoading(true);
 
         try {
-
             // Create/update org
             const formData = new FormData();
             if (values.name) formData.append("name", values.name);
@@ -203,7 +203,6 @@ export default function NewOrganizationForm({
             if (values.contactEmail) formData.append("contactEmail", values.contactEmail);
             if (values.title) formData.append("title", values.title);
             if (values.founded) formData.append("founded", values.founded);
-            // if (values.incorporationStatus) formData.append("incorporationStatus", values.incorporationStatus);
 
             // Upload org image only if changed
             if (selectedFile && values.orgImage && values.orgImage !== (form.formState.defaultValues as any)?.orgImage) {
@@ -237,6 +236,11 @@ export default function NewOrganizationForm({
             // 4) Organization: join or create (and possibly update existing)
             let orgId = createRes.organization.id
 
+            const tagStrings = (values.tags || "")
+                .split(",")
+                .map((t) => t.trim())
+                .filter(Boolean);
+
             // 5) Condition (optional; only if disorder selected and we have an org)
             const numOrNull = (s?: string | null) =>
                 s && String(s).trim() !== "" ? parseInt(String(s), 10) : null;
@@ -247,7 +251,6 @@ export default function NewOrganizationForm({
                 // Build the same mapped structure as the editor
                 const mappedData: Record<string, any> = {
                     name: values.disorder?.[0]?.label || "",
-                    // normalize to slugs like the editor
                     associatedConditions: (values.associatedConditions ?? []).map(o =>
                         toKebabCase(String(o.value || o.label || "").trim())
                     ),
@@ -258,12 +261,10 @@ export default function NewOrganizationForm({
                     numberOfPatientsEngaged: numOrNull(values.engaged),
                     nationalEstimatedPopulation: numOrNull(values.national),
                     globalEstimatedPopulation: numOrNull(values.global),
-                    // keep mechanisms consistent with editor: it uses `categories` for UI and leaves `mechanisms` unused
                     relevantDiseaseMechanisms: values.mechanisms ?? [],
                     causalGenes: (values.causal ?? []).map(i => i.label),
                     associatedGenes: (values.genes ?? []).map(i => i.label),
                     associatedSystems: (values.systems ?? []).map(i => i.label),
-                    // wire up optional fields you already have in the schema
                     associatedSignsAndSymptoms: (values.symptoms ?? []).map(i => i.label),
                     existingDatabasesAndStudies: (values.studies ?? []).map(i => i.label),
                     toolsUnderDevelopment: (values.tools ?? []).map(i => i.label),
@@ -274,7 +275,7 @@ export default function NewOrganizationForm({
                 };
 
                 const appendCsv = (fd: FormData, key: string, arr: string[]) => {
-                    if (arr && arr.length) fd.append(key, arr.join(",")); // e.g. "ABCF1,BRCA1"
+                    if (arr && arr.length) fd.append(key, arr.join(","));
                 };
 
                 Object.entries(mappedData).forEach(([key, value]) => {
@@ -292,6 +293,22 @@ export default function NewOrganizationForm({
                 const condRes = await createCondition(cfd);
                 if (condRes?.success && condRes?.data?.id) {
                     await connectOrganizationToCondition(orgId, condRes.data.id);
+
+                    // tags (same behavior as editor)
+                    if (tagStrings.length > 0) {
+                        const tagResult = await updateEntityTags(
+                            TaggableType.CONDITION,
+                            condRes.data.id,
+                            tagStrings
+                        );
+                        if (!tagResult.success) {
+                            console.error(tagResult.error);
+                            toast.error(tagResult.error || "Tags were not saved.");
+                        }
+                    } else {
+                        await updateEntityTags(TaggableType.CONDITION, condRes.data.id, []);
+                    }
+
                     toast.success("Condition saved!");
                 } else if (condRes?.error) {
                     console.error(condRes.error);
@@ -358,11 +375,13 @@ export default function NewOrganizationForm({
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit, (e) => {
-                console.log(e);
-                toast.error("Please fix the highlighted errors.");
-            })} className="space-y-10">
-
+            <form
+                onSubmit={form.handleSubmit(onSubmit, (e) => {
+                    console.log(e);
+                    toast.error("Please fix the highlighted errors.");
+                })}
+                className="space-y-10"
+            >
                 <AgentFillCreateOrganizationForm form={form} />
 
                 <div className="relative flex items-center my-6">
@@ -424,8 +443,10 @@ export default function NewOrganizationForm({
                                         )}
                                     </FormDescription>
                                     <FormControl>
-                                        <Input {...field}
-                                               onChange={(e) => field.onChange(e.target.value.toLowerCase().replace(/\s+/g, "-"))}/>
+                                        <Input
+                                            {...field}
+                                            onChange={(e) => field.onChange(e.target.value.toLowerCase().replace(/\s+/g, "-"))}
+                                        />
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem>
@@ -451,8 +472,13 @@ export default function NewOrganizationForm({
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Contact Email</FormLabel>
-                                        <FormControl><Input type="email"
-                                                            placeholder="name@example.com" {...field} /></FormControl>
+                                        <FormControl>
+                                            <Input
+                                                type="email"
+                                                placeholder="name@example.com"
+                                                {...field}
+                                            />
+                                        </FormControl>
                                         <FormMessage/>
                                     </FormItem>
                                 )}
@@ -477,11 +503,12 @@ export default function NewOrganizationForm({
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Year Founded</FormLabel>
-                                    <Select onValueChange={(v) => field.onChange(`${v}-01-01`)}
-                                            defaultValue={field.value?.split('-')?.[0]}>
+                                    <Select
+                                        onValueChange={(v) => field.onChange(`${v}-01-01`)}
+                                        defaultValue={field.value?.split('-')?.[0]}
+                                    >
                                         <FormControl>
-                                            <SelectTrigger data-testid="founded-select"
-                                                           aria-label="Year Founded">
+                                            <SelectTrigger data-testid="founded-select" aria-label="Year Founded">
                                                 <SelectValue placeholder="Select a year"/>
                                             </SelectTrigger>
                                         </FormControl>
@@ -515,13 +542,11 @@ export default function NewOrganizationForm({
                                                 inputProps={{
                                                     id,
                                                     "aria-labelledby": `${id}-label`,
-                                                    "aria-label": "Therapeutics under development", // keep for a11y
+                                                    "aria-label": "Therapeutics under development",
                                                     "data-testid": id,
                                                 }}
                                                 hidePlaceholderWhenSelected
-                                                emptyIndicator={<p
-                                                    className="text-center text-sm text-muted-foreground">no
-                                                    results found.</p>}
+                                                emptyIndicator={<p className="text-center text-sm text-muted-foreground">no results found.</p>}
                                                 showHoverCard={false}
                                             />
                                         </FormControl>
@@ -537,8 +562,7 @@ export default function NewOrganizationForm({
                                 name="otherTherapeuticsInDevelopment"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormDescription>(Optional) Other details for internal improvement
-                                            only.</FormDescription>
+                                        <FormDescription>(Optional) Other details for internal improvement only.</FormDescription>
                                         <FormControl><Input {...field} /></FormControl>
                                         <FormMessage/>
                                     </FormItem>
@@ -565,13 +589,11 @@ export default function NewOrganizationForm({
                                                 inputProps={{
                                                     id,
                                                     "aria-labelledby": `${id}-label`,
-                                                    "aria-label": "Therapeutics of Interest", // keep for a11y
+                                                    "aria-label": "Therapeutics of Interest",
                                                     "data-testid": id,
                                                 }}
                                                 hidePlaceholderWhenSelected
-                                                emptyIndicator={<p
-                                                    className="text-center text-sm text-muted-foreground">no
-                                                    results found.</p>}
+                                                emptyIndicator={<p className="text-center text-sm text-muted-foreground">no results found.</p>}
                                                 showHoverCard={false}
                                             />
                                         </FormControl>
@@ -587,48 +609,13 @@ export default function NewOrganizationForm({
                                 name="otherTherapeuticsOfInterest"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormDescription>(Optional) Other details for internal improvement
-                                            only.</FormDescription>
+                                        <FormDescription>(Optional) Other details for internal improvement only.</FormDescription>
                                         <FormControl><Input {...field} /></FormControl>
                                         <FormMessage/>
                                     </FormItem>
                                 )}
                             />
                         )}
-
-                        {/*<FormField*/}
-                        {/*    control={form.control}*/}
-                        {/*    name="incorporationStatus"*/}
-                        {/*    render={({field}) => (*/}
-                        {/*        <FormItem className="space-y-3">*/}
-                        {/*            <FormLabel>What is your 501(c)(3) status?</FormLabel>*/}
-                        {/*            <FormControl>*/}
-                        {/*                <RadioGroup onValueChange={field.onChange} value={field.value}*/}
-                        {/*                            className="flex flex-col space-y-1">*/}
-                        {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
-                        {/*                        <FormControl><RadioGroupItem value="YES"/></FormControl>*/}
-                        {/*                        <FormLabel className="font-normal">Yes, I have a*/}
-                        {/*                            501(c)(3)</FormLabel>*/}
-                        {/*                    </FormItem>*/}
-                        {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
-                        {/*                        <FormControl><RadioGroupItem*/}
-                        {/*                            value="INPROGRESS"/></FormControl>*/}
-                        {/*                        <FormLabel className="font-normal">*/}
-                        {/*                            {`No, but I'm working on it`}*/}
-                        {/*                        </FormLabel>*/}
-                        {/*                    </FormItem>*/}
-                        {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
-                        {/*                        <FormControl><RadioGroupItem value="NO"/></FormControl>*/}
-                        {/*                        <FormLabel className="font-normal">*/}
-                        {/*                            {`No, I don't have a 501(c)(3)`}*/}
-                        {/*                        </FormLabel>*/}
-                        {/*                    </FormItem>*/}
-                        {/*                </RadioGroup>*/}
-                        {/*            </FormControl>*/}
-                        {/*            <FormMessage/>*/}
-                        {/*        </FormItem>*/}
-                        {/*    )}*/}
-                        {/*/>*/}
 
                         {/* Org image */}
                         <FormImageSelector
@@ -644,9 +631,9 @@ export default function NewOrganizationForm({
                             isCropping={isCropping}
                             setIsCropping={setIsCropping}
                         />
-
                     </div>
                 </section>
+
                 <>
                     <Separator/>
 
@@ -675,7 +662,7 @@ export default function NewOrganizationForm({
                                                 inputProps={{
                                                     id,
                                                     "aria-labelledby": `${id}-label`,
-                                                    "aria-label": "Name of condition", // keep for a11y
+                                                    "aria-label": "Name of condition",
                                                     "data-testid": id,
                                                 }}
                                                 hidePlaceholderWhenSelected
@@ -711,7 +698,7 @@ export default function NewOrganizationForm({
                                                 inputProps={{
                                                     id,
                                                     "aria-labelledby": `${id}-label`,
-                                                    "aria-label": "Associated Conditions", // keep for a11y
+                                                    "aria-label": "Associated Conditions",
                                                     "data-testid": id,
                                                 }}
                                                 hidePlaceholderWhenSelected
@@ -726,19 +713,23 @@ export default function NewOrganizationForm({
                             }}
                         />
 
-                        <FormField control={form.control} name="summary" render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Describe your condition in a few sentences.</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                        rows={4}
-                                        placeholder="Up to 500 characters"
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}/>
+                        <FormField
+                            control={form.control}
+                            name="summary"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Describe your condition in a few sentences.</FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            rows={4}
+                                            placeholder="Up to 500 characters"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
 
                         <FormField
                             control={form.control}
@@ -751,8 +742,9 @@ export default function NewOrganizationForm({
                                         <FormLabel htmlFor={id} id={`${id}-label`}>
                                             Mechanisms of action
                                         </FormLabel>
-                                        <FormDescription>What types of genetic effects are you investigating?
-                                            Select all that apply.</FormDescription>
+                                        <FormDescription>
+                                            What types of genetic effects are you investigating? Select all that apply.
+                                        </FormDescription>
                                         <FormControl>
                                             <MultipleSelector
                                                 {...field}
@@ -761,13 +753,11 @@ export default function NewOrganizationForm({
                                                 inputProps={{
                                                     id,
                                                     "aria-labelledby": `${id}-label`,
-                                                    "aria-label": "Mechanisms of action", // keep for a11y
+                                                    "aria-label": "Mechanisms of action",
                                                     "data-testid": id,
                                                 }}
                                                 hidePlaceholderWhenSelected
-                                                emptyIndicator={<p
-                                                    className="text-center text-sm text-muted-foreground">no
-                                                    results found.</p>}
+                                                emptyIndicator={<p className="text-center text-sm text-muted-foreground">no results found.</p>}
                                                 showHoverCard={false}
                                             />
                                         </FormControl>
@@ -783,8 +773,7 @@ export default function NewOrganizationForm({
                                 name="otherCategories"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormDescription>(Optional) Other details for internal improvement
-                                            only.</FormDescription>
+                                        <FormDescription>(Optional) Other details for internal improvement only.</FormDescription>
                                         <FormControl><Input {...field} /></FormControl>
                                         <FormMessage/>
                                     </FormItem>
@@ -792,29 +781,107 @@ export default function NewOrganizationForm({
                             />
                         )}
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <FormField control={form.control} name="engaged" render={({field}) => (
+                        <FormField
+                            control={form.control}
+                            name="tags"
+                            render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>Number of patients engaged</FormLabel>
-                                    <FormControl><Input type="number" min={0} {...field} /></FormControl>
+                                    <FormLabel>Tags</FormLabel>
+                                    <FormDescription>
+                                        Enter tags separated by commas. Example: <code>#neuro, #rare, metabolism</code>
+                                    </FormDescription>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            placeholder="#neuro, #ultrarare, #rna"
+                                        />
+                                    </FormControl>
                                     <FormMessage/>
                                 </FormItem>
                             )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="prevalenceNumerator"
+                            render={({field: numeratorField}) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        {`Estimated total prevalence`} –{" "}
+                                        {formatNumberWithCommas(numeratorField.value)}
+                                        {prevalenceDenominator && (
+                                            <> in {formatNumberWithCommas(form.watch("prevalenceDenominator"))}</>
+                                        )}
+                                    </FormLabel>
+                                    <FormDescription>
+                                        {`The estimated global prevalence ratio of your condition.`}
+                                    </FormDescription>
+                                    <FormControl>
+                                        <div className="flex flex-row items-end justify-start space-x-2">
+                                            <Input
+                                                type="number"
+                                                id="prevalenceNumerator"
+                                                {...numeratorField}
+                                                className="w-16"
+                                                min={0}
+                                            />
+                                            <span>in</span>
+                                            <FormField
+                                                control={form.control}
+                                                name="prevalenceDenominator"
+                                                render={({field: denominatorField}) => (
+                                                    <FormControl>
+                                                        <Input
+                                                            type="number"
+                                                            id="prevalenceDenominator"
+                                                            {...denominatorField}
+                                                            className="w-32"
+                                                            min={0}
+                                                        />
+                                                    </FormControl>
+                                                )}
+                                            />
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="engaged"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Number of patients engaged</FormLabel>
+                                        <FormControl><Input type="number" min={0} {...field} /></FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
                             />
-                            <FormField control={form.control} name="national" render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Estimated US patient population</FormLabel>
-                                    <FormControl><Input type="number" min={0} {...field} /></FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}/>
-                            <FormField control={form.control} name="global" render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Estimated global patient population</FormLabel>
-                                    <FormControl><Input type="number" min={0} {...field} /></FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}/>
+                            <FormField
+                                control={form.control}
+                                name="national"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Estimated US patient population</FormLabel>
+                                        <FormControl><Input type="number" min={0} {...field} /></FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="global"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Estimated global patient population</FormLabel>
+                                        <FormControl><Input type="number" min={0} {...field} /></FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
                         </div>
 
                         <FormField
@@ -837,7 +904,7 @@ export default function NewOrganizationForm({
                                                 inputProps={{
                                                     id,
                                                     "aria-labelledby": `${id}-label`,
-                                                    "aria-label": "Causal genes", // keep for a11y
+                                                    "aria-label": "Causal genes",
                                                     "data-testid": id,
                                                 }}
                                                 triggerSearchOnFocus
@@ -873,7 +940,7 @@ export default function NewOrganizationForm({
                                                 inputProps={{
                                                     id,
                                                     "aria-labelledby": `${id}-label`,
-                                                    "aria-label": "Associated genes", // keep for a11y
+                                                    "aria-label": "Associated genes",
                                                     "data-testid": id,
                                                 }}
                                                 triggerSearchOnFocus
@@ -912,7 +979,6 @@ export default function NewOrganizationForm({
                                 </FormItem>
                             )}
                         />
-
                     </section>
 
                     <Separator/>
@@ -942,15 +1008,16 @@ export default function NewOrganizationForm({
                         </div>
                     </section>
                 </>
+
                 <div className="flex justify-between">
                     <div/>
                     <Button type="submit" variant="cta" disabled={loading || isCropping}>
-                        {loading 
+                        {loading
                             ? (
                                 <div className="w-[81px] flex justify-center items-center">
                                     <LoadingDots />
                                 </div>
-                            ) 
+                            )
                             : ("Complete sign-up")
                         }
                     </Button>

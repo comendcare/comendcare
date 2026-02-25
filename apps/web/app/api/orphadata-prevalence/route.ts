@@ -5,11 +5,9 @@ import { z } from "zod";
 // -----------------------------
 // Config
 // -----------------------------
-const ORPHADATA_BASE =
-    process.env.ORPHADATA_BASE_URL || "https://api.orphadata.com";
+const ORPHADATA_BASE = process.env.ORPHADATA_BASE_URL || "https://api.orphadata.com";
 
 // Optional: if your Orphadata access uses an API key in a header.
-// If not needed, leave ORPHADATA_API_KEY unset.
 function orphaHeaders() {
     const h: Record<string, string> = { accept: "application/json" };
     if (process.env.ORPHADATA_API_KEY) h["X-API-KEY"] = process.env.ORPHADATA_API_KEY;
@@ -46,16 +44,21 @@ async function orphaResolveByName(name: string, lang = "en"): Promise<OrphaLooku
     if (!q) return null;
 
     // Orphadata: /rd-cross-referencing/orphacodes/names/{name}?lang=en
-    const url = new URL(
-        `${ORPHADATA_BASE}/rd-cross-referencing/orphacodes/names/${encodeURIComponent(q)}`
-    );
+    const url = new URL(`${ORPHADATA_BASE}/rd-cross-referencing/orphacodes/names/${encodeURIComponent(q)}`);
     url.searchParams.set("lang", lang);
 
     const data = await fetchJsonWithTimeout(url.toString());
     if (!data) return null;
 
+    // Orphadata often returns { data: { results: [...] } }
     const candidates: any[] =
-        (data?.results ?? data?.data ?? data?.orphacodes ?? data?.Orphacodes ?? data?.items ?? []) as any[];
+        (data?.data?.results ??
+            data?.results ??
+            data?.data ??
+            data?.orphacodes ??
+            data?.Orphacodes ??
+            data?.items ??
+            []) as any[];
 
     if (!Array.isArray(candidates) || candidates.length === 0) return null;
 
@@ -64,28 +67,44 @@ async function orphaResolveByName(name: string, lang = "en"): Promise<OrphaLooku
     let best = candidates[0];
     for (const c of candidates) {
         const label =
-            (c?.PreferredTerm ?? c?.preferredTerm ?? c?.label ?? c?.name ?? c?.diseaseName ?? "") as string;
+            (c?.["Preferred term"] ??
+                c?.PreferredTerm ??
+                c?.preferredTerm ??
+                c?.label ??
+                c?.name ??
+                c?.diseaseName ??
+                "") as string;
+
         if (normalizeDiseaseName(label) === needle) {
             best = c;
             break;
         }
     }
 
-    const orphacode = String(best?.ORPHAcode ?? best?.orphacode ?? best?.code ?? "").trim();
-    const label = String(best?.PreferredTerm ?? best?.preferredTerm ?? best?.label ?? best?.name ?? "").trim();
+    const orphacode = String(best?.ORPHAcode ?? best?.ORPHA_code ?? best?.orphacode ?? best?.code ?? "").trim();
+    const label = String(
+        best?.["Preferred term"] ?? best?.PreferredTerm ?? best?.preferredTerm ?? best?.label ?? best?.name ?? ""
+    ).trim();
 
     if (!orphacode) return null;
     return { orphacode, label: label || q };
 }
 
 type ParsedPrevalence = {
-    ratioValue: number;     // numeric value for your ratio field
-    denominator: number;    // numeric value for your "in" field
-    display?: string;       // debug
+    ratioValue: number; // numerator
+    denominator: number; // denominator
+    display?: string;
 };
 
 function parsePrevalenceText(s: string): ParsedPrevalence | null {
-    const t = s.replace(/,/g, "").toLowerCase().trim();
+    // keep original for display, but normalize number formatting:
+    // - remove commas
+    // - collapse spaces that occur BETWEEN digits (so "10 000" -> "10000")
+    const t = s
+        .replace(/,/g, "")
+        .replace(/(\d)\s+(?=\d)/g, "$1")
+        .toLowerCase()
+        .trim();
 
     // X-Y / Z
     let m = t.match(/([<>]?\s*\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
@@ -135,18 +154,20 @@ function parsePrevalenceText(s: string): ParsedPrevalence | null {
 }
 
 async function orphaFetchPrevalence(orphacode: string, lang = "en") {
-    // Orphadata: /rd-epidemiology/orphacodes/{orphacode}?lang=en
+    // Orphadata: /rd-epidemiology/orphacodes/{orphacode}?lang=en  ✅ (your curl confirms)
     const url = new URL(`${ORPHADATA_BASE}/rd-epidemiology/orphacodes/${encodeURIComponent(orphacode)}`);
     url.searchParams.set("lang", lang);
 
     const data = await fetchJsonWithTimeout(url.toString());
     if (!data) return null;
 
-    // response shape varies; search likely containers
-    const epiBlocks: any[] =
-        (data?.results ?? data?.data ?? data?.epidemiology ?? data?.Epidemiology ?? data?.items ?? []) as any[];
+    // Your curl shows: data.data.results is an OBJECT (not array)
+    const results = data?.data?.results ?? null;
+    if (!results) return null;
 
-    const flat: any[] = Array.isArray(epiBlocks) ? epiBlocks : [data];
+    // Prevalence is an array of objects with PrevalenceClass like "1-5 / 10 000"
+    const prevArr = results?.Prevalence ?? results?.prevalence ?? results?.Prevalences ?? results?.prevalences;
+    if (!Array.isArray(prevArr) || prevArr.length === 0) return null;
 
     const scored: {
         score: number;
@@ -156,57 +177,39 @@ async function orphaFetchPrevalence(orphacode: string, lang = "en") {
         source?: string;
     }[] = [];
 
-    for (const block of flat) {
-        const candidates: { raw: string; source?: string; geo?: string }[] = [];
+    for (const e of prevArr) {
+        const raw =
+            String(
+                e?.PrevalenceClass ??
+                e?.prevalenceClass ??
+                e?.Prevalence ??
+                e?.prevalence ??
+                e?.Value ??
+                e?.value ??
+                ""
+            ).trim();
 
-        const geo =
-            String(block?.GeographicArea ?? block?.geographicArea ?? block?.Area ?? block?.area ?? "").trim() ||
-            undefined;
+        if (!raw) continue;
 
-        // common fields
-        for (const key of [
-            "Prevalence",
-            "prevalence",
-            "PrevalenceValue",
-            "prevalenceValue",
-            "ValPrevalence",
-            "valPrevalence",
-            "value",
-        ]) {
-            const v = block?.[key];
-            if (typeof v === "string" && v.trim()) {
-                candidates.push({ raw: v.trim(), source: key, geo });
-            }
-        }
+        const parsed = parsePrevalenceText(raw);
+        if (!parsed) continue;
 
-        // nested arrays
-        const nested = block?.Prevalences ?? block?.prevalences ?? block?.EpidemiologyEntries ?? block?.entries;
-        if (Array.isArray(nested)) {
-            for (const e of nested) {
-                const v =
-                    (e?.Prevalence ?? e?.prevalence ?? e?.value ?? e?.ValPrevalence ?? e?.valPrevalence ?? "") as string;
-                if (typeof v === "string" && v.trim()) {
-                    const eGeo =
-                        String(e?.GeographicArea ?? e?.geographicArea ?? geo ?? "").trim() || geo;
-                    candidates.push({ raw: v.trim(), source: "nested", geo: eGeo });
-                }
-            }
-        }
+        const geo = String(e?.PrevalenceGeographic ?? e?.prevalenceGeographic ?? e?.GeographicArea ?? e?.geo ?? "").trim() || undefined;
+        const g = (geo || "").toLowerCase();
+        const score =
+            (g.includes("world") || g.includes("global") || g.includes("worldwide") ? 10 : 0) +
+            (raw.includes("/") || raw.toLowerCase().includes("per") ? 1 : 0);
 
-        for (const c of candidates) {
-            const parsed = parsePrevalenceText(c.raw);
-            if (!parsed) continue;
-
-            const g = (c.geo ?? "").toLowerCase();
-            const score =
-                (g.includes("world") || g.includes("global") || g.includes("worldwide") ? 10 : 0) +
-                (c.raw.includes("/") || c.raw.toLowerCase().includes("per") ? 1 : 0);
-
-            scored.push({ score, parsed, raw: c.raw, geo: c.geo, source: c.source });
-        }
+        scored.push({
+            score,
+            parsed,
+            raw,
+            geo,
+            source: String(e?.Source ?? e?.source ?? "").trim() || undefined,
+        });
     }
 
-    if (scored.length === 0) return null;
+    if (!scored.length) return null;
     scored.sort((a, b) => b.score - a.score);
     return scored[0];
 }
@@ -215,11 +218,8 @@ async function orphaFetchPrevalence(orphacode: string, lang = "en") {
 // Route
 // -----------------------------
 const BodySchema = z.object({
-    // Provide one of these:
     diseaseName: z.string().min(1).optional(),
     orphacode: z.string().min(1).optional(),
-
-    // Optional:
     lang: z.string().default("en"),
     includeRaw: z.boolean().default(false),
 });
@@ -234,10 +234,7 @@ export async function POST(req: Request) {
     const { diseaseName, orphacode, lang, includeRaw } = parsed.data;
 
     if (!diseaseName && !orphacode) {
-        return NextResponse.json(
-            { success: false, error: "Provide diseaseName or orphacode" },
-            { status: 400 }
-        );
+        return NextResponse.json({ success: false, error: "Provide diseaseName or orphacode" }, { status: 400 });
     }
 
     try {
@@ -267,7 +264,6 @@ export async function POST(req: Request) {
             });
         }
 
-        // sanitize
         const ratio = Number(best.parsed.ratioValue);
         const den = Number(best.parsed.denominator);
         const ok = Number.isFinite(ratio) && Number.isFinite(den) && ratio > 0 && den > 0;
@@ -279,9 +275,9 @@ export async function POST(req: Request) {
             diseaseLabel: resolved.label || diseaseName || null,
             prevalence: ok
                 ? {
-                    prevalenceNumerator: Math.max(1, Math.round(ratio)), // or Math.floor / Math.ceil
+                    prevalenceNumerator: Math.max(1, Math.round(ratio)),
                     prevalenceDenominator: Math.round(den),
-                    prevalenceRatio: ratio / den, // optional convenience float (e.g., 0.00005)
+                    prevalenceRatio: ratio / den,
                 }
                 : null,
             ...(includeRaw
@@ -300,10 +296,7 @@ export async function POST(req: Request) {
                 : {}),
         });
     } catch (e: any) {
-        return NextResponse.json(
-            { success: false, error: e?.message || "Failed to fetch prevalence" },
-            { status: 500 }
-        );
+        return NextResponse.json({ success: false, error: e?.message || "Failed to fetch prevalence" }, { status: 500 });
     }
 }
 

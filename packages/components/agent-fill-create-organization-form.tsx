@@ -95,6 +95,9 @@ export default function AgentFillCreateOrganizationForm({ form }: Props) {
             if (typeof v.founded === "string") form.setValue("founded", v.founded, { shouldDirty: true });
             if (typeof v.subdomain === "string") form.setValue("subdomain", v.subdomain, { shouldDirty: true });
             if (typeof v.orgImage === "string") form.setValue("orgImage", v.orgImage, { shouldDirty: true });
+            if (typeof (v as any).tags === "string") form.setValue("tags", (v as any).tags, { shouldDirty: true });
+            if ((v as any).prevalenceNumerator != null) form.setValue("prevalenceNumerator", String((v as any).prevalenceNumerator), { shouldDirty: true });
+            if ((v as any).prevalenceDenominator != null) form.setValue("prevalenceDenominator", String((v as any).prevalenceDenominator), { shouldDirty: true });
 
             if (Array.isArray(v.therapeuticsInDevelopment)) {
                 form.setValue("therapeuticsInDevelopment", v.therapeuticsInDevelopment, { shouldDirty: true });
