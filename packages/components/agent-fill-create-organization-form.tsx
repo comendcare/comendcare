@@ -13,6 +13,8 @@ type UnifiedFormValues = any;
 
 type Props = {
     form: UseFormReturn<UnifiedFormValues>;
+    agentBusy: boolean;
+    setAgentBusy: (v: boolean) => void;
 };
 
 type AgentFillResponse =
@@ -54,14 +56,14 @@ function isLikelyHttpUrl(s: string) {
     }
 }
 
-export default function AgentFillCreateOrganizationForm({ form }: Props) {
+export default function AgentFillCreateOrganizationForm({ form, agentBusy, setAgentBusy }: Props) {
     const [url, setUrl] = useState("");
     const [loading, setLoading] = useState(false);
 
     const disabled = useMemo(() => {
         const t = url.trim();
-        return loading || !t || !isLikelyHttpUrl(t);
-    }, [url, loading]);
+        return loading || agentBusy || !t || !isLikelyHttpUrl(t);
+    }, [url, loading, agentBusy]);
 
     async function onFill() {
         const inputUrl = url.trim();
@@ -71,6 +73,10 @@ export default function AgentFillCreateOrganizationForm({ form }: Props) {
         }
 
         setLoading(true);
+        setAgentBusy(true);
+
+        const toastId = toast.loading("Filling the form from the website…");
+
         try {
             const res = await fetch("/api/agent-fill-create-organization-form", {
                 method: "POST",
@@ -139,11 +145,12 @@ export default function AgentFillCreateOrganizationForm({ form }: Props) {
                 hasDisorder: Boolean(v.disorder?.length),
             });
 
-            toast.success("Filled form from website. Review and edit, then complete sign-up.");
+            toast.success("Filled form from website. Review and edit, then complete sign-up.", { id: toastId });
         } catch (e: any) {
-            toast.error(e?.message || "Failed to fill form.");
+            toast.error(e?.message || "Failed to fill form.", { id: toastId });
         } finally {
             setLoading(false);
+            setAgentBusy(false);
         }
     }
 
@@ -160,6 +167,7 @@ export default function AgentFillCreateOrganizationForm({ form }: Props) {
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://example.org"
                 aria-label="Organization website"
+                disabled={agentBusy}
             />
 
             <Button type="button" variant="cta" disabled={disabled} onClick={onFill}>
