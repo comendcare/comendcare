@@ -249,69 +249,76 @@ export function AssetBulkImportDialog({
     const [totalErrors, setTotalErrors] = useState<any[]>([])
 
     const handleImport = async (file: File | undefined) => {
-        setImportState('importing')
-        if (file && file.name.endsWith(".csv")) {
-            // parse CSV file
-            try {
-                const result = await ((): Promise<{values: any[], errors: {key: string, message: string, object: any}[]}> => {
-                    return new Promise((resolve, reject) => {
-                        Papa.parse(file, {
-                            header: true, // Adjust based on whether your CSV has headers
-                            skipEmptyLines: true,
-                            complete: (result) => {
-                                const newValues: any[] = []
-                                let errors: {key: string, message: string, object: any}[] = []
+        setImportState("importing");
 
-                                try {
-                                    result.data.forEach((entry: any) => {
-                                        newValues.push(entry)
-                                    })
-                                } catch (e) {
-                                    console.error("Error: failed to import tools", e)
-                                    reject(e)
-                                }
+        try {
+            if (!file || !file.name.endsWith(".csv")) {
+                throw new Error("Please upload a valid CSV file.");
+            }
 
-                                resolve({values: newValues, errors: errors})
-                            },
-                            error: (error) => reject(error),
-                        });
-                    });
-                })()
+            // 1) normalize headers server-side
+            const fd = new FormData();
+            fd.append("file", file);
 
-                setTotalItems(result.values.length)
-                setImportState('importing')
-                setImportCount(0)
-                
-                let errors: any[] = []
+            const normalizeRes = await fetch("/api/clinical-datasets/normalize-import", {
+                method: "POST",
+                body: fd,
+            });
 
-                for (let i = 0; i < result.values.length; i++) {
-                    const {data: formattedClinicalDataset, errors: formattedErrors} = await formatClinicalDatasetData(result.values[i])
+            if (!normalizeRes.ok) {
+                const err = await normalizeRes.json().catch(() => ({}));
+                throw new Error(err?.error ?? "Failed to normalize CSV.");
+            }
 
-                    // only crate if it has all required fields
-                    if (!formattedErrors.map(error => error.key).includes('REQUIRED_MISSING')) {
-                        const newClinicalDataset = await createClinicalDataset(session?.user.organizationId, formattedClinicalDataset)
-                        setImportCount(prev => prev + 1)
-                    }
+            const normalizeJson: {
+                normalizedCsv: string;
+                mapping: Record<string, string>;
+                missingTemplateColumns: string[];
+                unusedInputColumns: string[];
+                notes?: string[];
+            } = await normalizeRes.json();
 
-                    if (formattedErrors.length > 0) errors.push(formattedErrors)
+            // 2) parse normalized CSV client-side (template headers)
+            const parsed = Papa.parse<any>(normalizeJson.normalizedCsv, {
+                header: true,
+                skipEmptyLines: true,
+                dynamicTyping: false,
+            });
+
+            const values = parsed.data ?? [];
+            setTotalItems(values.length);
+            setImportCount(0);
+
+            const errors: any[] = [];
+
+            for (let i = 0; i < values.length; i++) {
+                const { data: formattedClinicalDataset, errors: formattedErrors } =
+                    await formatClinicalDatasetData(values[i]);
+
+                if (!formattedErrors.map((e) => e.key).includes("REQUIRED_MISSING")) {
+                    await createClinicalDataset(session?.user.organizationId, formattedClinicalDataset);
+                    setImportCount((prev) => prev + 1);
                 }
 
-                setTotalErrors(errors)
-            } catch (e) {
-                toast('Error!', {
-                    position: "bottom-left",
-                    duration: 6000,
-                    description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
-                })
-                console.error("Error: failed to import clinical datasets", e)
+                if (formattedErrors.length > 0) errors.push(formattedErrors);
             }
-        } else {
-            console.error("Please upload a valid CSV file.");
+
+            setTotalErrors(errors);
+            // optional: surface normalizeJson.missingTemplateColumns / unusedInputColumns / notes
+        } catch (e: any) {
+            toast("Error!", {
+                position: "bottom-left",
+                duration: 6000,
+                description:
+                    e?.message ??
+                    "Import failed. Please try again to upload using a copy of our template.",
+            });
+            console.error("Error: failed to import clinical datasets", e);
         }
 
-        setImportState('finished')
-    }
-    
+        setImportState("finished");
+    };
+
     return (
         <Dialog open={isOpen} onOpenChange={(open: boolean) => setIsOpen(open)}>
             <Tooltip>
