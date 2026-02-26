@@ -67,7 +67,6 @@ export default async function AppLayoutServer({children}: { children: React.Reac
                 image: true,
                 notificationSettings: true,
                 consentSettings: true,
-                viewedIntro: true,
             },
         }),
         prisma.memberRequest.findMany({
@@ -120,7 +119,7 @@ export default async function AppLayoutServer({children}: { children: React.Reac
     return (
         <InvitationGate invitations={invitations}>
             <ClaimInvitationGate claimInvitations={claimOrgInvitations}>
-                <IntroductionCards showIntro={!user.viewedIntro} invitations={invitations} claimInvitations={claimOrgInvitations}>
+                <IntroductionCards invitations={invitations} claimInvitations={claimOrgInvitations}>
                 <AppClientShell
                     user={user}
                     memberships={memberships}

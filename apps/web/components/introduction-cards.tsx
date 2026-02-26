@@ -1,6 +1,6 @@
 "use client"
 
-import React, { Dispatch, useEffect, useState } from "react";
+import React, { Dispatch, useState } from "react";
 import type {Organization} from "@prisma/client";
 import {
     AlertDialog,
@@ -18,7 +18,7 @@ import screenshot1 from "@/public/Screenshot 2026-02-24 at 11.14.38 AM.png"
 import screenshot2 from "@/public/Screenshot 2026-02-24 at 11.15.00 AM.png"
 import screenshot3 from "@/public/Screenshot 2026-02-24 at 11.15.50 AM.png"
 import Image from "next/image";
-import { cn } from "@comend/lib/utils";
+import { cn, isOnboarded, setOnboarded } from "@comend/lib/utils";
 import { editUser } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
 
@@ -44,17 +44,15 @@ const introPages = [
 ]
 
 export default function IntroductionCards({
-    showIntro,
     invitations,
     claimInvitations,
     children,
 }: {
-    showIntro: boolean,
     invitations: { id: string; organizationId: string, role: string, organization: Organization }[];
     claimInvitations: { id: string; organizationId: string, role: string, organization: Organization }[];
     children: React.ReactNode;
 }) {
-    const [open, setIsOpen] = useState(showIntro); // if param is in url, permanently open until handled
+    const [open, setIsOpen] = useState(!isOnboarded("viewedIntro")); // if param is in url, permanently open until handled
 
     return (
         <>
@@ -142,7 +140,7 @@ const CustomCarouselControls = ({setIsOpen}: {setIsOpen: Dispatch<React.SetState
                     variant="outline"
                     onClick={() => {
                         setIsOpen(false)
-                        if (session?.user?.id) editUser(session.user.id, {viewedIntro: true})
+                        setOnboarded("viewedIntro")
                     }}
                 >
                     Finish
