@@ -38,29 +38,6 @@ export function DataTable<TData>({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const headerRowRef = useRef<any>(null);
-  const [overlayStyle, setOverlayStyle] = useState({height: 0, width: 0, paddingTop: 0, headerRowHeight: 0});
-
-  useEffect(() => {
-    const updateOverlay = () => {
-      if (scrollContainerRef.current && headerRef.current && headerRowRef.current) {
-        const widthRect = scrollContainerRef.current.getBoundingClientRect();
-        const paddingRect = headerRef.current.getBoundingClientRect();
-        const headerRowHeight = headerRowRef.current.getBoundingClientRect();
-
-        setOverlayStyle({
-          // minus an extra 16px to accommodate for bottom scrollbar
-          height: widthRect.height - headerRowHeight.height - 16,
-          width: widthRect.width,  
-          paddingTop: paddingRect.height,
-          headerRowHeight: headerRowHeight.height
-        });
-      }
-    };
-
-    updateOverlay();
-    window.addEventListener("resize", updateOverlay);
-    return () => window.removeEventListener("resize", updateOverlay);
-  }, []);
 
   return (
     <div
@@ -69,6 +46,31 @@ export function DataTable<TData>({
     >
       {children}
       <div className="relative overflow-hidden rounded-md border" ref={scrollContainerRef}>
+        {/* no results overlay */}
+        {!table.getRowModel().rows?.length && (
+          noResults ? (
+            <div
+              className={cn(
+                "h-full w-full flex flex-col justify-center items-center absolute left-0 top-0",
+                `pt-[${headerRef.current?.clientHeight || 48}px]`
+              )}
+            >
+              <div className={"flex flex-col justify-start"}>{noResults}</div>
+            </div>
+          ) : (
+            <div
+              className={cn(
+                "h-full w-full flex flex-col justify-center items-center absolute left-0 top-0",
+                `pt-[${headerRef.current?.clientHeight || 48}px]`
+              )}
+            >
+              <div className="h-full flex flex-col justify-center">
+                <p className="p-6">No results.</p>
+              </div>
+            </div>
+          )
+        )}
+
         <Table>
           <TableHeader ref={headerRef as React.LegacyRef<HTMLTableSectionElement>}>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -133,35 +135,15 @@ export function DataTable<TData>({
                   <TableRow className="invisible">
                     <TableCell
                       colSpan={table.getAllColumns().length}
-                      className="h-4 text-center"
+                      className="h-fit"
                     >
-                      No results.
+                      <p className="p-6">No results.</p>
                     </TableCell>
                   </TableRow>
                 )
             )}
           </TableBody>
         </Table>
-
-        {/* no results overlay */}
-        {!table.getRowModel().rows?.length && (
-          <div
-            className={cn(
-              "flex justify-center items-center",
-              noResults && "absolute left-0 top-0"
-            )}
-            style={{zIndex: 0, height: overlayStyle.height, width: overlayStyle.width, paddingTop: overlayStyle.paddingTop - 32, marginTop: 32}}
-          >
-            {noResults
-              ? (
-                <div className="h-full flex flex-col justify-center">{noResults}</div>
-              )
-              : (
-                <div className="h-full flex flex-col justify-center">No results.</div>
-              )
-            }
-          </div>
-        )}
       </div>
       <div className="flex flex-col gap-2.5">
         {showPagination && (
