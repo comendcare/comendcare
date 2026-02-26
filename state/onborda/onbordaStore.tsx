@@ -58,18 +58,15 @@ export const onbordaTours: any[] = [
                     const orgId = context?.session?.user?.organizationId
                     let existingBiosamplesCount = 0
                     const existingBiosamples = await getBiosamples(orgId, { id: true })
-
-                    if (existingBiosamples.data) {
-                        existingBiosamplesCount = existingBiosamples.data.length
-                    }
+                    if (existingBiosamples.data) existingBiosamplesCount = existingBiosamples.data.length
 
                     // if the organization doesn't have any existing biosamples, we create an example biosample for them
                     // before showing off the table.
                     if (orgId && existingBiosamplesCount === 0) {
-                        const newBiosample = await createBiosample(
+                        await createBiosample(
                             orgId,
                             {
-                                description: "This is a test biosample...",
+                                description: "This is an example biosample...",
                                 types: [BIOSAMPLE_TYPE_OPTIONS[0]]
                             } as z.infer<typeof editBiosampleForm>
                         )
