@@ -57,67 +57,6 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
 
     const handleNextStep = async (e: any) => {
         e.preventDefault()
-        let onboardingNodeId: string | undefined = nodes.sort((a: any, b: any) => b.createdAt - a.createdAt)[0]?.id
-
-        // execute any actions that need to occur before we move to the next step
-        if (step.selector === '.onborda-select-a-template') {
-            // if there are no nodes, we create one to use for the onboarding flow
-            if (nodes.length <= 0) {
-                const newNodes = await addMilestones([{
-                    title: `Basic Science`,
-                    status: "PLANNED",
-                }], "Onborda Tutorial")
-                onboardingNodeId = newNodes?.[0]?.id
-            }
-
-            if (onboardingNodeId) fitView({ nodes: [{ id: onboardingNodeId }], padding: 2, duration: 500 })
-        }
-
-        if (step.selector === '.onborda-select-a-template' && onboardingNodeId) {
-            setSelectedNodeIds([onboardingNodeId])
-            fitView({ nodes: [{ id: onboardingNodeId }], padding: 2, duration: 500 })
-        }
-
-        if (step.selector === '.click-project-step') {
-            const element = document.getElementById("edit-milestone-scroll-area")
-            if (element) {
-                element.scrollIntoView({block: "end", inline: "nearest", behavior: "smooth"}) // scroll to bottom
-            }
-
-            await new Promise(resolve => setTimeout(resolve, 500))
-        }
-
-        if (step.selector === '.organization-profile-tour-step1') {
-            const element = document.getElementsByClassName("organization-profile-tour-step2")[0]
-            if (element) {
-                element.scrollIntoView({block: "end", inline: "nearest", behavior: "smooth"}) // scroll to bottom
-            }
-
-            await new Promise(resolve => setTimeout(resolve, 500))
-        } else if (step.selector === '.organization-profile-tour-step2') {
-            const element = document.getElementsByClassName("organization-profile-tour-step3")[0]
-            if (element) {
-                element.scrollIntoView({block: "start", inline: "nearest", behavior: "smooth"}) // scroll to bottom
-            }
-
-            await new Promise(resolve => setTimeout(resolve, 500))
-        } else if (step.selector === '.organization-profile-tour-step-3') {
-            const element = document.getElementsByClassName("organization-profile-tour-step4")[0]
-            if (element) {
-                element.scrollIntoView({block: "start", inline: "nearest", behavior: "smooth"}) // scroll to bottom
-            }
-
-            await new Promise(resolve => setTimeout(resolve, 500))
-        } else if (step.selector === '.organization-profile-tour-step-4') {
-            const element = document.getElementsByClassName("organization-profile-tour-step5")[0]
-            if (element) {
-                element.scrollIntoView({block: "end", inline: "nearest", behavior: "smooth"}) // scroll to bottom
-            }
-
-            await new Promise(resolve => setTimeout(resolve, 500))
-        }
-        
-        await new Promise(resolve => setTimeout(resolve, 500))
         nextStep()
     }
 
