@@ -86,7 +86,6 @@ model User {
   reviewFeedbacks       ReviewFeedback[]
   metadata              Json?
   researcher            Researcher?
-  viewedIntro Boolean?
 }
 
 model PlatformNotification {
