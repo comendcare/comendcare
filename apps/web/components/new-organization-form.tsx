@@ -397,7 +397,7 @@ export default function NewOrganizationForm({
                     <div className="flex-grow border-t border-border"/>
                 </div>
 
-                <fieldset disabled={agentBusy} className={agentBusy ? "opacity-60 pointer-events-none" : ""}>
+                <fieldset disabled={agentBusy} className={agentBusy ? "opacity-60 pointer-events-none space-y-10" : "space-y-10"}>
 
                     {/* ORGANIZATION */}
                     <section className="space-y-6">
