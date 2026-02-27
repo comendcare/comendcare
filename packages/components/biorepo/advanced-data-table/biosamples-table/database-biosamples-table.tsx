@@ -70,6 +70,7 @@ export function DatabaseBiosamplesTable({
                         : undefined
                 }
                 onRowClickCallback={onRowClickCallback}
+                className="manage-tools"
             >
                 {showFilters && (
                     enableAdvancedFilter ? (

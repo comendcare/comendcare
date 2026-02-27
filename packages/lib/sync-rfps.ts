@@ -191,7 +191,8 @@ export const syncToTypesense = async (env: {
 
         const rfps = await prisma.rFP.findMany({
             where: {
-                private: false // only sync public biosamples
+                private: false, // only sync public biosamples
+                archived: false, // don't sync archived RFPs
             },
             select: {
                 createdAt: true,

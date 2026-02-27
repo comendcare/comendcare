@@ -29,8 +29,7 @@ import { CROMarketplaceCard } from "@comend/components/marketplace/marketplace-c
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@comend/components/ui/dropdown-menu"
 import { formatMoney } from "@comend/lib/utils"
 import { ResearchPlanSearchState, useResearchPlanSearchStore } from "@/state/search/researchPlanSearchStore"
-import { useResearchPlansTableColumns } from "@comend/components/biorepo/advanced-data-table/research-plans-table/public-research-plans-table-columns"
-import { TypesenseResearchPlansTable } from "@comend/components/biorepo/advanced-data-table/research-plans-table/typesense-research-plans-table"
+import { ResearchPlanCard } from "@comend/components/research-plan-card"
 
 const croSelector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -95,10 +94,6 @@ export default function MarketplacePage() {
         false, // disable hiding
     )
     const clinicalDatasetColumns = useClinicalDatasetsTableColumns(
-        false, // disable sorting,
-        false, // disable hiding
-    )
-    const researchPlanColumns = useResearchPlansTableColumns(
         false, // disable sorting,
         false, // disable hiding
     )
@@ -300,17 +295,19 @@ export default function MarketplacePage() {
                     <ol className="w-full">
                         {(researchPlansInitialized && researchPlanStore.searchResults && researchPlanStore.searchResults.length > 0 )
                             ? (
-                                <>
-                                    <div className="max-w-7xl w-full overflow-auto">
-                                        <TypesenseResearchPlansTable 
-                                            showPagination={false} 
-                                            data={researchPlanStore.searchResults?.slice(0, 3)} 
-                                            pageCount={1} 
-                                            columns={researchPlanColumns} 
-                                            searchParams={{}}
-                                        />
-                                    </div>
-                                </>
+                                <div className="max-w-7xl w-full overflow-auto grid grid-cols-2 gap-4">
+                                    {researchPlanStore.searchResults?.slice(0, 2).map((researchPlan: any) => (
+                                        <Link
+                                            href={(
+                                                researchPlan.organization.subdomain 
+                                                    ? `http://${researchPlan.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlan?.id}` 
+                                                    : '#'
+                                            )}
+                                        >
+                                            <ResearchPlanCard researchPlan={researchPlan} showOrganization={true}/>
+                                        </Link>
+                                    ))}
+                                </div>
                             )
                             : (
                                 (researchPlansInitialized && researchPlansInitialized)

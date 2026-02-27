@@ -1859,7 +1859,7 @@ export const RESEARCH_PLAN_STATUS: Option[] = [
     },
     {
         id: 'SEEKINGPARTNERS',
-        label: 'Seeking partners (sponsors, fundraising, licensing, etc.)',
+        label: 'Seeking partners',
         value: 'SEEKINGPARTNERS',
     },
     {

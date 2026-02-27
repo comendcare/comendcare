@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Skeleton } from "@comend/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@comend/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@comend/components/ui/table";
 
 function TemplatesSectionSkeleton() {
     return (
@@ -20,11 +19,11 @@ function TemplatesSectionSkeleton() {
             </CardHeader>
 
             {/* grid of template cards (empty + curated) */}
-            <CardContent className="flex gap-4 flex-row overflow-hidden">
-                {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="size-64">
+            <CardContent className="grid grid-cols-3 gap-4 overflow-hidden">
+                {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="w-full h-64">
                         <div className="h-full bg-white shadow-sm rounded-lg overflow-hidden border">
-                            <div className="flex flex-col justify-center items-center gap-4 p-10">
+                            <div className="flex flex-col justify-start items-start gap-4 p-10">
                                 <Skeleton className="h-5 w-56" />
                                 <Skeleton className="h-6 w-6 rounded" />
                             </div>
@@ -36,64 +35,74 @@ function TemplatesSectionSkeleton() {
     );
 }
 
-function GroupHeaderSkeleton({ labelWidth = "w-28" }: { labelWidth?: string }) {
-    return (
-        <TableRow className="cursor-pointer bg-gray-50">
-            <TableCell colSpan={2} className="p-2">
-                <div className="flex justify-between items-center">
-                    <Skeleton className={`h-4 ${labelWidth}`} />
-                    <Skeleton className="h-4 w-4 rounded" />
-                </div>
-            </TableCell>
-        </TableRow>
-    );
+function ResearchPlansSkeleton() {
+  return (
+    <div className="flex w-full flex-col gap-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-7 w-56" /> {/* "My research plans" */}
+        <Skeleton className="h-10 w-56 rounded-md" /> {/* Create button */}
+      </div>
+
+      {/* Card Grid */}
+      <div className="grid w-full grid-cols-2 xl:grid-cols-3 gap-4">
+        <ResearchPlanCardSkeleton />
+        <ResearchPlanCardSkeleton />
+      </div>
+    </div>
+  );
 }
 
-function RoadmapRowSkeleton() {
-    return (
-        <TableRow>
-            <TableCell>
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-64" /> {/* title */}
-                    <Skeleton className="h-4 w-96 max-w-full" /> {/* description */}
-                </div>
-            </TableCell>
-            <TableCell className="flex justify-end items-center">
-                <Skeleton className="h-6 w-28 rounded-full" /> {/* stage badge */}
-            </TableCell>
-        </TableRow>
-    );
-}
+function ResearchPlanCardSkeleton() {
+  return (
+    <div className="flex w-full flex-col gap-4 rounded-xl border p-6">
+      {/* Top badges row */}
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-5 w-24" /> {/* Published */}
+        <Skeleton className="h-6 w-20 rounded-full" /> {/* Status pill */}
+      </div>
 
-function RoadmapsTableSkeleton() {
-    return (
-        <Table>
-            <TableHeader>
-                <TableRow className="pointer-events-none">
-                    <TableHead className="w-full">
-                        <Skeleton className="h-4 w-40" /> {/* Title & Description */}
-                    </TableHead>
-                    <TableHead className="w-fit text-nowrap">
-                        <Skeleton className="h-4 w-36" /> {/* Stage of Activity */}
-                    </TableHead>
-                </TableRow>
-            </TableHeader>
+      {/* Title */}
+      <Skeleton className="h-6 w-3/4" />
 
-            <TableBody>
-                {/* A few modality groups */}
-                <GroupHeaderSkeleton labelWidth="w-24" />
-                <RoadmapRowSkeleton />
+      {/* Description */}
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-5/6" />
+        <Skeleton className="h-4 w-2/3" />
+      </div>
 
-                <GroupHeaderSkeleton labelWidth="w-32" />
-                <RoadmapRowSkeleton />
-                <RoadmapRowSkeleton />
+      {/* Strategy + Stage row */}
+      <div className="grid grid-cols-2 gap-4 pt-2">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="h-6 w-40 rounded-md" />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-6 w-24 rounded-md" />
+        </div>
+      </div>
 
-                {/* "Other" group */}
-                <GroupHeaderSkeleton labelWidth="w-16" />
-                <RoadmapRowSkeleton />
-            </TableBody>
-        </Table>
-    );
+      {/* Divider */}
+      <div className="border-t pt-4">
+        {/* Partners */}
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-4 w-20" />
+          <div className="flex gap-2">
+            <Skeleton className="h-6 w-20 rounded-md" />
+            <Skeleton className="h-6 w-24 rounded-md" />
+          </div>
+        </div>
+
+        {/* Links */}
+        <div className="mt-4 flex flex-col gap-2">
+          <Skeleton className="h-4 w-14" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function Loading() {
@@ -109,7 +118,7 @@ export default function Loading() {
                     <Skeleton className="h-9 w-24 rounded-md" /> {/* Share button */}
                 </div>
 
-                <RoadmapsTableSkeleton />
+                <ResearchPlansSkeleton />
             </div>
         </main>
     );

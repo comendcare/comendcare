@@ -16,7 +16,7 @@ export const PulsatingButton = React.forwardRef<
             className,
             children,
             pulseColor = "#0096ff",
-            duration = "1.5s",
+            duration = "1.8s",
             ...props
         },
         ref,

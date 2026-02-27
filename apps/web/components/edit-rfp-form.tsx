@@ -35,7 +35,7 @@ import {Popover, PopoverContent, PopoverTrigger} from "@comend/components/ui/pop
 import {cn} from "@comend/lib/utils"
 import {format} from "date-fns"
 import {Calendar} from "@comend/components/ui/calendar"
-import { Calendar as CalendarIcon, Lock } from "lucide-react"
+import { Calendar as CalendarIcon, Info, Lock } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { AttachmentsFormField, ContactsFormField, OpenToFormField, PrivatePublicFormField } from "./edit-milestone-form"
@@ -50,6 +50,7 @@ import { Checkbox } from "@comend/components/ui/checkbox"
 import LoadingDots from "@comend/components/icons/loading-dots"
 import { UnsavedChangesDialog } from "./unsaved-changes-dialog"
 import { first, stubFalse } from "lodash"
+import { Switch } from "@comend/components/ui/switch"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -106,6 +107,7 @@ const editRFPForm = z.object({
     evaluationProcess: z.string().optional(),
     milestones: z.array(z.custom<Milestone>()).optional(),
     attachments: z.array(z.custom<AttachmentType>()).optional(),
+    archived: z.boolean().default(false),
     notes: z.string().optional(),
 })
 
@@ -218,7 +220,8 @@ export function EditRFPForm({
             budget: rfpData?.budget || undefined,
             notes: rfpData?.notes || "",
             isRolling: (rfpData?.id ? !rfpData?.startDate && !rfpData?.endDate : false) as boolean,
-            fundingIsFlexible: rfpData?.id ? !rfpData?.budget : false
+            fundingIsFlexible: rfpData?.id ? !rfpData?.budget : false,
+            archived: rfpData?.archived || false
         }
     })
 
@@ -259,7 +262,8 @@ export function EditRFPForm({
             budget,
             notes,
             isRolling,
-            fundingIsFlexible
+            fundingIsFlexible,
+            archived
         } = values;
 
         const updateData: Partial<RFP> = {
@@ -285,6 +289,7 @@ export function EditRFPForm({
             ...(budget ? {budget} : undefined),
             ...(notes !== undefined && notes !== null ? {notes} : undefined),
             ...(budget && !fundingIsFlexible ? {budget} : {budget: null}),
+            archived
         }
 
         if (!session?.user?.organizationId) {
@@ -663,6 +668,35 @@ export function EditRFPForm({
 
                     <AttachmentsFormField form={form} />
 
+                    <FormField
+                        control={form.control}
+                        name="archived"
+                        render={({field}) => (
+                            <FormItem className="w-full flex gap-4 items-center justify-between">
+                                <FormLabel className="w-[100px] flex items-center">
+                                <span>Archived</span>
+                                <Tooltip>
+                                    <TooltipTrigger className="pl-2" onClick={(e) => e.preventDefault()}>
+                                    <Info className="h-4 w-4" />
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left">
+                                    <p className="text-normal">
+                                        Archived RFPs will be placed in their own section, and hidden on your organization's public profile and marketplace.
+                                    </p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                </FormLabel>
+                                <FormControl>
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
                     <Separator />
         
                     <FormField
@@ -694,6 +728,8 @@ export function EditRFPForm({
                             </FormItem>
                         )}
                     />
+
+
 
                     <div className="absolute right-4 bottom-0 flex gap-2">
                         <Button 
