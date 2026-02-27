@@ -9,11 +9,12 @@ import LoadingDots from "@comend/components/icons/loading-dots";
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import type { UseFormReturn } from "react-hook-form";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type UnifiedFormValues = any;
 
 type Props = {
     form: UseFormReturn<UnifiedFormValues>;
+    agentBusy: boolean;
+    setAgentBusy: (v: boolean) => void;
 };
 
 type AgentFillResponse =
@@ -55,14 +56,14 @@ function isLikelyHttpUrl(s: string) {
     }
 }
 
-export default function AgentFillCreateOrganizationForm({ form }: Props) {
+export default function AgentFillCreateOrganizationForm({ form, agentBusy, setAgentBusy }: Props) {
     const [url, setUrl] = useState("");
     const [loading, setLoading] = useState(false);
 
     const disabled = useMemo(() => {
         const t = url.trim();
-        return loading || !t || !isLikelyHttpUrl(t);
-    }, [url, loading]);
+        return loading || agentBusy || !t || !isLikelyHttpUrl(t);
+    }, [url, loading, agentBusy]);
 
     async function onFill() {
         const inputUrl = url.trim();
@@ -72,6 +73,10 @@ export default function AgentFillCreateOrganizationForm({ form }: Props) {
         }
 
         setLoading(true);
+        setAgentBusy(true);
+
+        const toastId = toast.loading("Filling the form from the website…");
+
         try {
             const res = await fetch("/api/agent-fill-create-organization-form", {
                 method: "POST",
@@ -96,6 +101,9 @@ export default function AgentFillCreateOrganizationForm({ form }: Props) {
             if (typeof v.founded === "string") form.setValue("founded", v.founded, { shouldDirty: true });
             if (typeof v.subdomain === "string") form.setValue("subdomain", v.subdomain, { shouldDirty: true });
             if (typeof v.orgImage === "string") form.setValue("orgImage", v.orgImage, { shouldDirty: true });
+            if (typeof (v as any).tags === "string") form.setValue("tags", (v as any).tags, { shouldDirty: true });
+            if ((v as any).prevalenceNumerator != null) form.setValue("prevalenceNumerator", String((v as any).prevalenceNumerator), { shouldDirty: true });
+            if ((v as any).prevalenceDenominator != null) form.setValue("prevalenceDenominator", String((v as any).prevalenceDenominator), { shouldDirty: true });
 
             if (Array.isArray(v.therapeuticsInDevelopment)) {
                 form.setValue("therapeuticsInDevelopment", v.therapeuticsInDevelopment, { shouldDirty: true });
@@ -137,11 +145,12 @@ export default function AgentFillCreateOrganizationForm({ form }: Props) {
                 hasDisorder: Boolean(v.disorder?.length),
             });
 
-            toast.success("Filled form from website. Review and edit, then complete sign-up.");
+            toast.success("Filled form from website. Review and edit, then complete sign-up.", { id: toastId });
         } catch (e: any) {
-            toast.error(e?.message || "Failed to fill form.");
+            toast.error(e?.message || "Failed to fill form.", { id: toastId });
         } finally {
             setLoading(false);
+            setAgentBusy(false);
         }
     }
 
@@ -158,6 +167,7 @@ export default function AgentFillCreateOrganizationForm({ form }: Props) {
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://example.org"
                 aria-label="Organization website"
+                disabled={agentBusy}
             />
 
             <Button type="button" variant="cta" disabled={disabled} onClick={onFill}>
