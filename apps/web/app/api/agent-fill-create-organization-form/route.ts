@@ -15,6 +15,23 @@ function normalizeForMatch(s: string) {
         .trim();
 }
 
+function normalizeTag(t: string) {
+    const s = (t || "").trim().toLowerCase();
+    if (!s) return null;
+
+    const noHash = s.startsWith("#") ? s.slice(1) : s;
+
+    const normalized = noHash
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9_-]/g, "")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 32);
+
+    if (!normalized || normalized.length < 2) return null;
+
+    return `#${normalized}`; // UI string
+}
+
 async function hpoBestMatch(label: string) {
     const q = label.trim();
     if (!q) return null;
@@ -112,6 +129,7 @@ const FormFillOutSchema = z.object({
     associatedGenes: z.array(z.string()).default([]), // -> form.genes (labels)
     associatedSystems: z.array(z.string()).default([]), // -> form.systems (labels)
     symptoms: z.array(z.string()).default([]), // -> form.symptoms (labels)
+    conditionTags: z.array(z.string()).default([]), // e.g. ["#epilepsy", "#neuro"]
 });
 
 type FormFillOut = z.infer<typeof FormFillOutSchema>;
@@ -327,6 +345,10 @@ function extractUserPrompt(canonicalWebsite: string, pagesBundle: string) {
         "- causalGenes / associatedGenes: gene symbols only if explicitly stated, else [].",
         "- symptoms: short list of symptom labels if explicitly stated, else [].",
         "- associatedSystems: body systems if explicitly stated (e.g. 'neurologic', 'cardiac'), else [].",
+        "Tags guidance:",
+        "- conditionTags: 3–10 short hashtags derived from the condition and symptoms/systems.",
+        "- Use lowercase, no spaces, ascii only (e.g. #epilepsy, #neuro, #developmentaldelay).",
+        "- Only include tags supported by the page text; if unsure, omit.",
         "",
         "Pages (text extracted from fetched URLs):",
         pagesBundle,
@@ -358,6 +380,11 @@ async function extract(openai: OpenAI, canonicalWebsite: string, pagesBundle: st
         associatedGenes: uniqPreserve((raw.associatedGenes ?? []).filter(Boolean)).slice(0, 25),
         associatedSystems: uniqPreserve((raw.associatedSystems ?? []).filter(Boolean)).slice(0, 25),
         symptoms: uniqPreserve((raw.symptoms ?? []).filter(Boolean)).slice(0, 50),
+        conditionTags: uniqPreserve(
+            (raw.conditionTags ?? [])
+                .map((t) => normalizeTag(String(t)))
+                .filter((x): x is string => Boolean(x))
+        ).slice(0, 12),
     };
 
     return FormFillOutSchema.parse(cleaned);
@@ -426,6 +453,35 @@ export async function POST(req: Request) {
             fetched.bundle || `No readable page text fetched for: ${canonical}`
         );
 
+        // -----------------------------
+        // Prevalence fallback (Orphadata) using disorderName
+        // -----------------------------
+        let prevalenceNumerator: number | undefined;
+        let prevalenceDenominator: number | undefined;
+
+        try {
+            const diseaseName = (out.disorderName || "").trim();
+            if (diseaseName) {
+                const r = await fetch(`${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/orphadata-prevalence`, {
+                    method: "POST",
+                    headers: { "content-type": "application/json" },
+                    body: JSON.stringify({ diseaseName }),
+                    // @ts-ignore
+                    cache: "no-store",
+                });
+
+                const j = await r.json().catch(() => null);
+
+                const p = j?.prevalence;
+                if (j?.success && j?.found && p?.prevalenceNumerator && p?.prevalenceDenominator) {
+                    prevalenceNumerator = Number(p.prevalenceNumerator);
+                    prevalenceDenominator = Number(p.prevalenceDenominator);
+                }
+            }
+        } catch {
+            // prevalence is optional; ignore failures
+        }
+
         const rawSymptoms = (out.symptoms ?? [])
             .map((s) => (typeof s === "string" ? s.trim() : ""))
             .filter(Boolean)
@@ -478,6 +534,13 @@ export async function POST(req: Request) {
                 genes: (out.associatedGenes ?? []).map((x) => opt(x)),
                 systems: (out.associatedSystems ?? []).map((x) => opt(x)),
                 symptoms: symptomsHpo.length ? symptomsHpo : undefined,
+
+                // CONDITION (prevalence)
+                prevalenceNumerator: prevalenceNumerator ?? undefined,
+                prevalenceDenominator: prevalenceDenominator ?? undefined,
+
+                conditionTags: out.conditionTags ?? [],
+                tags: (out.conditionTags ?? []).join(", "),
 
                 // optional metadata for debugging (no research plan content)
                 __agent: {
