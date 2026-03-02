@@ -2,21 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
-    // "compilerOptions": {
-    //   "baseUrl": ".",
-    //   "paths": {
-    //   }
-    // }
-      "paths": {
-        // "@comend/lib/*": ["lib/*"],
-        // "@/components/*": ["components/*"],
-        // "@/*": ["packages/*"],
-        "@/state/*": ["state/*"],
-        // "@/data/*": ["data/*"],
-        // "@/public/*": ["public/*"],
-        // "@/loading": ["loading.tsx"],
-    }
+    "paths": {
+      "@/state/*": ["state/*"],
+    },
+    "types": ["jest", "node"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "**/*.test.ts", "**/*.test.tsx"],
   "exclude": ["node_modules", "dist"]
 }
