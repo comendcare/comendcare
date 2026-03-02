@@ -22,9 +22,10 @@ import { Dialog, DialogPortal, DialogTrigger } from "@comend/components/ui/dialo
 import { Row } from "@tanstack/react-table";
 import { Asset } from "@comend/lib/types";
 import { DeleteBiosampleDialog } from "./delete-biosample-dialog";
-import { cn } from "@comend/lib/utils";
+import { cn, isOnboarded, setOnboarded } from "@comend/lib/utils";
 import { PulsatingButton } from "@comend/components/ui/pulsating-button";
 import {NoResultsTemplate} from "@comend/components/no-results"
+import { useOnborda } from "./onborda/OnbordaContext";
 
 export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     data: Biosample[],
@@ -39,6 +40,14 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
     const [editingTool, setEditingTool] = useState<Partial<Asset> | undefined>(undefined)
     const [isClosing, setIsClosing] = useState(false)
     const parentRef = useRef<HTMLDivElement>(null)
+    const { startOnborda } = useOnborda()
+
+    useEffect(() => {
+        if (!isOnboarded("tools-tour")) {
+            startOnborda("tools-tour")
+            setOnboarded("tools-tour")
+        }
+    }, [])
 
     useEffect(() => {
         const el = parentRef.current;
@@ -141,14 +150,14 @@ export const PrivateBiosampleToolsPage = ({data, pageCount, searchParams}: {
                                 trigger={(
                                     data.length > 0 
                                         ? (
-                                            <Button variant="cta">
+                                            <Button variant="cta" className="single-tool-create">
                                                 <Plus/>
                                                 {"Create patient biosample"}
                                             </Button>
                                         )
                                         : (
                                             <PulsatingButton
-                                                className={cn(buttonVariants({variant: 'cta'}))}
+                                                className={cn("single-tool-create", buttonVariants({variant: 'cta'}))}
                                             >
                                                 <Plus/>
                                                 {"Create patient biosample"}

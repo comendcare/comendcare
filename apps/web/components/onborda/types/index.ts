@@ -1,4 +1,5 @@
 import { Transition } from "framer-motion";
+import { Session } from "next-auth";
 
 // Context
 export interface OnbordaContextType {
@@ -25,6 +26,11 @@ export interface Step {
   // Routing
   nextRoute?: string;
   prevRoute?: string;
+
+  // Function to run before the step starts
+  preFunc?: (context: {session: Session | null}) => Promise<void>
+  // Function to run after the step completes
+  postFunc?: (context: {session: Session | null}) => Promise<void>
 }
 
 // Tour

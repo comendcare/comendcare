@@ -10,6 +10,7 @@ import { OnbordaProps } from "./types";
 import { ResearchPlanOnbordaState, Selector, useOnbordaStore } from "@/state/onborda/onbordaStore";
 import { useShallow } from "zustand/react/shallow";
 import { sleep } from "@comend/lib/utils";
+import { useSession } from "next-auth/react";
 
 const selector = (state: ResearchPlanOnbordaState) => ({
     activeTour: state.activeTour,
@@ -25,6 +26,7 @@ const Onborda: React.FC<OnbordaProps> = ({
   cardTransition = { ease: "anticipate", duration: 0.6 },
   cardComponent: CardComponent,
 }) => {
+  const {data: session} = useSession()
   const { currentTour, currentStep, setCurrentStep, isOnbordaVisible } =
     useOnborda();
   const currentTourSteps = steps.find(
@@ -179,6 +181,9 @@ const Onborda: React.FC<OnbordaProps> = ({
         const nextStepIndex = currentStep + 1;
         const route = currentTourSteps[currentStep].nextRoute;
 
+        // Execute pre-function if it exists
+        if (currentTourSteps[nextStepIndex].preFunc) await currentTourSteps[nextStepIndex].preFunc({session})
+
         if (route) {
           await router.push(route);
 
@@ -206,6 +211,9 @@ const Onborda: React.FC<OnbordaProps> = ({
           setCurrentStep(nextStepIndex);
           scrollToElement(nextStepIndex);
         }
+
+        // Execute post-function if it exists
+        if (currentTourSteps[nextStepIndex].postFunc) await currentTourSteps[nextStepIndex].postFunc({session})
       } catch (error) {
         console.error("Error navigating to next route", error);
       }

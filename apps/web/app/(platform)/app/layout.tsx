@@ -10,6 +10,7 @@ import Link from "next/link";
 import * as React from "react";
 import dynamic from "next/dynamic";
 import ClaimInvitationGate from "~web/components/claim-invitation-gate";
+import IntroductionCards from "~web/components/introduction-cards";
 
 const NavUser = dynamic(
     () => import("~web/components/nav-user").then(m => m.NavUser),
@@ -118,6 +119,7 @@ export default async function AppLayoutServer({children}: { children: React.Reac
     return (
         <InvitationGate invitations={invitations}>
             <ClaimInvitationGate claimInvitations={claimOrgInvitations}>
+                <IntroductionCards invitations={invitations} claimInvitations={claimOrgInvitations}>
                 <AppClientShell
                     user={user}
                     memberships={memberships}
@@ -125,6 +127,7 @@ export default async function AppLayoutServer({children}: { children: React.Reac
                 >
                     {children}
                 </AppClientShell>
+                </IntroductionCards>
             </ClaimInvitationGate>
         </InvitationGate>
     );

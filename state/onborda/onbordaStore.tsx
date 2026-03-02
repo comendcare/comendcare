@@ -1,167 +1,90 @@
+"use client"
+
 import Image from 'next/image';
 import gif2 from "@/public/Screen Recording 2025-05-22 at 3.33.16 PM.gif"
 import { temporal } from 'zundo';
 import { create } from 'zustand';
+import { useSession } from 'next-auth/react';
+import { createBiosample } from '@comend/lib/actions';
+import { BIOSAMPLE_TYPE_OPTIONS, editBiosampleForm } from '@comend/lib/types';
+import { Session } from 'next-auth';
+import z from 'zod';
+import { getBiosamples } from '@comend/lib/fetchers';
 
 export const onbordaTours: any[] = [
     {
-        tour: "research-plan-tour",
+        tour: "tools-tour",
         steps: [
             {
                 icon: <>👋</>,
-                title: "Create a Project",
-                content: <>{`Create a project from a Template or import multiple projects simultaneously.`}</>,
-                selector: ".onborda-create-a-project",
-                side: "bottom-right" as any,
+                title: "Types of tools",
+                content: <>Comend has 3 types of tools that make up your toolkit, biosamples, disease models, and clinical datasets. You can manage each set of tools in their respective tabs.</>,
+                selector: ".types-of-tools",
+                side: "bottom",
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10,
             },
             {
                 icon: <>⭐</>,
-                title: "Select a template",
-                content: <>{`To get started, select one of our project templates. You can edit the title and description.`}</>,
-                selector: ".onborda-select-a-template",
-                side:  "bottom-right" as any,
+                title: "Create a single tool",
+                content: <>You can create a single tool from the ‘Create’ button in the top right.</>,
+                selector: ".single-tool-create",
+                side: "left",
                 showControls: true,
                 pointerPadding: 10,
-                pointerRadius: 10
+                pointerRadius: 10,
             },
             {
                 icon: <>⭐</>,
-                title: "Editing Project Details",
-                content: <>{`Once you’ve created a project, you can view and edit its details in the project side panel. Click the save button to submit your changes.`}</>,
-                selector: ".onborda-editing-project-details",
-                side:  "left" as any,
+                title: "Bulk create tools",
+                content: <>You can use our bulk import feature to create many tools at a time via a spreadsheet. Use our template spreadsheet to get started.</>,
+                selector: ".bulk-tool-create",
+                side: "left",
                 showControls: true,
                 pointerPadding: 10,
-                pointerRadius: 10
+                pointerRadius: 10,
             },
             {
                 icon: <>⭐</>,
-                title: "View marketplace recommendations",
-                content: <>{`Once you’ve added some details to your project, check out our marketplace recommendations. Marketplace recommendations include results that may be relevant to your project's contents or goals.`}</>,
-                selector: ".onborda-recommendations",
-                side:  "left" as any,
+                title: "Manage tools",
+                content: <>You can edit existing tools from the toolkit tables. Try searching or applying a filter to find tools faster.</>,
+                selector: ".manage-tools",
+                side: "top",
                 showControls: true,
                 pointerPadding: 10,
-                pointerRadius: 10
+                pointerRadius: 10,
+                preFunc: async (context: {session: Session}) => {
+                    const orgId = context?.session?.user?.organizationId
+                    let existingBiosamplesCount = 0
+                    const existingBiosamples = await getBiosamples(orgId, { id: true })
+                    if (existingBiosamples.data) existingBiosamplesCount = existingBiosamples.data.length
+
+                    // if the organization doesn't have any existing biosamples, we create an example biosample for them
+                    // before showing off the table.
+                    if (orgId && existingBiosamplesCount === 0) {
+                        await createBiosample(
+                            orgId,
+                            {
+                                description: "This is an example biosample...",
+                                types: [BIOSAMPLE_TYPE_OPTIONS[0]]
+                            } as z.infer<typeof editBiosampleForm>
+                        )
+                    }
+                }
             },
             {
                 icon: <>⭐</>,
-                title: "Save service providers",
-                content: <>{`Save service providers and associate them with your project to stay organized.`}</>,
-                selector: ".onborda-save-service-provider",
-                side:  "left" as any,
+                title: "Publishing tools",
+                content: <>By default tools are private, but you can choose to publish them. Published tools will be visible on your organization’s profile, and in the Comend marketplace.</>,
+                selector: ".publish-tools",
+                side: "top",
                 showControls: true,
                 pointerPadding: 10,
-                pointerRadius: 10
-            }
+                pointerRadius: 10,
+            },
         ]
-    },
-    {
-        tour: "organization-profile-tour",
-        steps: [
-            {
-                icon: <>👋</>,
-                title: "About your organization",
-                content: <>{`Your organization's information and members can be found here.`}</>,
-                selector: ".organization-profile-tour-step1",
-                side: "top" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10,
-            },
-            {
-                icon: <>⭐</>,
-                title: "About your condition",
-                content: <>{`Information about your condition will appear here.`}</>,
-                selector: ".organization-profile-tour-step2",
-                side: "top" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            {
-                icon: <>👋</>,
-                title: "Updating your organization",
-                content: <>{`If you'd like to update your organization's information, click the pencil icon near the content you want to edit.`}</>,
-                selector: ".organization-profile-tour-step3",
-                side: "bottom" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10,
-            },
-            {
-                icon: <>⭐</>,
-                title: "Your research plan",
-                content: <>{`A list view of your research plan will be found here. To create and edit your plan, visit the Research Planner.`}</>,
-                selector: ".organization-profile-tour-step4",
-                side: "top-right" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            {
-                icon: <>⭐</>,
-                title: "Your miletones",
-                content: <>{`Highlight your tools (ex/ data and models) and requests for proposals (ex/ funding opportunities) to potential partners. We recommend starting here!`}</>,
-                selector: ".organization-profile-tour-step5",
-                side: "left" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            // {
-            //     icon: <>⭐</>,
-            //     title: "Your organization's activity",
-            //     content: <>{`All posts related to your organization will appear in this tab.`}</>,
-            //     selector: ".organization-profile-tour-step6",
-            //     side: "left" as any,
-            //     showControls: true,
-            //     pointerPadding: 10,
-            //     pointerRadius: 10
-            // },
-        ]
-    },
-        {
-        tour: "research-plans-page-tour",
-        steps: [
-            {
-                icon: <>👋</>,
-                title: "Start a New Research Plan",
-                content: <>{`Begin by creating from a blank template or use a curated template—either way, you’ll be able to fully customize each plan to fit your needs.`}</>,
-                selector: ".onborda-research-plan-templates-section",
-                side: "bottom-left" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10,
-            },
-            {
-                icon: <>⭐</>,
-                title: "View All Your Plans",
-                content: <div>
-                    {`See all your research plans organized in one table. To categorize, open any plan and select its type.`}
-                    <Image className="max-w-64" src={gif2} alt={'Research plan type selection gif.'}/>
-                </div>,
-                selector: ".onborda-existing-research-plans-section",
-                side:  "top-left" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            {
-                icon: <>⭐</>,
-                title: "Share Your Progress",
-                content: <>{`Showcase your work by sharing on social media or embedding your research plan directly on your website!`}</>,
-                selector: ".onborda-share-research-plan",
-                side:  "left" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            }
-        ]
-    },
+    }
 ]
 
 export type Selector = 
