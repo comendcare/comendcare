@@ -50,7 +50,6 @@ export default async function EmbeddedResearchPlanPage({params}: {params: {domai
             invitations: true,
             membershipRequests: true,
             conditions: true,
-            kanban: true,
             milestones: true,
             platformNotifications: true,
             reviews: true,

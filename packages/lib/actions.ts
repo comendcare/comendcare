@@ -3531,54 +3531,54 @@ export const createBiosample = withOrganizationAuth(
     }
 )
 
-// export const setBiosamplesVisibility = withOrganizationAuth(
-//     async (organization: Organization, ids: string[], isPrivate: boolean) => {
-//         try {
-//             if (!organization.id) throw new Error("No organization id provided.");
-
-//             const updatedBiosamples = await prisma.biosample.updateMany({
-//                 where: {
-//                     id: {in: ids}
-//                 },
-//                 data: {
-//                     private: isPrivate
-//                 }
-//             })
-
-//             revalidatePath("/app/tools/biosample")
-
-//             return updatedBiosamples
-//         } catch (error: any) {
-//             console.error("Error updating biosample:", error.message);
-//             throw new Error(error.message || "Failed to create biosample.");
-//         }
-//     }
-// )
-
-export async function setBiosamplesVisibilityCore(
-  organization: Organization,
-  ids: string[],
-  isPrivate: boolean
-) {
-  if (!organization.id) throw new Error("No organization id provided.");
-
-  const updatedBiosamples = await prisma.biosample.updateMany({
-    where: {
-      id: { in: ids },
-    },
-    data: {
-      private: isPrivate,
-    },
-  });
-
-  revalidatePath("/app/tools/biosample");
-
-  return updatedBiosamples;
-}
-
 export const setBiosamplesVisibility = withOrganizationAuth(
-  setBiosamplesVisibilityCore
-);
+    async (organization: Organization, ids: string[], isPrivate: boolean) => {
+        try {
+            if (!organization.id) throw new Error("No organization id provided.");
+
+            const updatedBiosamples = await prisma.biosample.updateMany({
+                where: {
+                    id: {in: ids}
+                },
+                data: {
+                    private: isPrivate
+                }
+            })
+
+            revalidatePath("/app/tools/biosample")
+
+            return updatedBiosamples
+        } catch (error: any) {
+            console.error("Error updating biosample:", error.message);
+            throw new Error(error.message || "Failed to create biosample.");
+        }
+    }
+)
+
+// export async function setBiosamplesVisibilityCore(
+//   organization: Organization,
+//   ids: string[],
+//   isPrivate: boolean
+// ) {
+//   if (!organization.id) throw new Error("No organization id provided.");
+
+//   const updatedBiosamples = await prisma.biosample.updateMany({
+//     where: {
+//       id: { in: ids },
+//     },
+//     data: {
+//       private: isPrivate,
+//     },
+//   });
+
+//   revalidatePath("/app/tools/biosample");
+
+//   return updatedBiosamples;
+// }
+
+// export const setBiosamplesVisibility = withOrganizationAuth(
+//   setBiosamplesVisibilityCore
+// );
 
 export const updateBiosample = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {

@@ -51,14 +51,6 @@ jest.mock("./raw-events", () => ({
   writeRawEvent: jest.fn(),
 }));
 
-jest.mock("./auth", () => ({
-  authOptions: jest.fn(),
-  getSession: jest.fn(),
-  withAuth: jest.fn(),
-  withOrganizationAuth: jest.fn(),
-  withUserAuth: jest.fn(),
-}));
-
 jest.mock("comend-researcher-hub/lib/auth", () => ({
   withResearcherAuth: jest.fn(),
 }))
@@ -70,10 +62,17 @@ jest.mock("./prisma", () => ({
     },
   },
 }));
-// import {cioRemoveOrgMember, cioSyncOrg, cioUpsertOrgMember} from "./customerio/cio-sync-org";
+
+jest.mock("./auth", () => ({
+  authOptions: jest.fn(),
+  getSession: jest.fn(),
+  withAuth: (fn: any) => fn, // bypass authentication (tested separately in auth.test.ts)
+  withOrganizationAuth: (fn: any) => fn, // bypass authentication (tested separately in auth.test.ts)
+  withUserAuth: (fn: any) => fn, // bypass authentication (tested separately in auth.test.ts)
+}));
 
 import prisma from "./prisma"
-import { setBiosamplesVisibilityCore } from "./actions"
+import { setBiosamplesVisibility } from "./actions"
 import { revalidatePath } from "next/cache"
 
 describe("setBiosamplesVisibilityCore", () => {
@@ -88,7 +87,7 @@ describe("setBiosamplesVisibilityCore", () => {
       count: 2,
     })
 
-    const result = await setBiosamplesVisibilityCore(
+    const result = await setBiosamplesVisibility(
       mockOrganization,
       ["bio1", "bio2"],
       true
@@ -110,7 +109,7 @@ describe("setBiosamplesVisibilityCore", () => {
 
   it("throws if organization id is missing", async () => {
     await expect(
-      setBiosamplesVisibilityCore(
+      setBiosamplesVisibility(
         { id: undefined } as any,
         ["bio1"],
         true
@@ -124,7 +123,7 @@ describe("setBiosamplesVisibilityCore", () => {
     )
 
     await expect(
-      setBiosamplesVisibilityCore(mockOrganization, ["bio1"], true)
+      setBiosamplesVisibility(mockOrganization, ["bio1"], true)
     ).rejects.toThrow("DB failed")
   })
 })

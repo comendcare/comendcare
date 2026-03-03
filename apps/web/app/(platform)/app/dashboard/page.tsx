@@ -44,7 +44,6 @@ export default async function AnalyticsPage() {
             clients: true,
             invitations: true,
             membershipRequests: true,
-            kanban: true,
             milestones: true,
             platformNotifications: true,
             reviews: true,

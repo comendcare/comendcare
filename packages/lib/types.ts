@@ -300,7 +300,6 @@ export const orgForAnalyticsInclude = Prisma.validator<Prisma.OrganizationSelect
     clients: true,
     invitations: true,
     membershipRequests: true,
-    kanban: true,
     milestones: true,
     platformNotifications: true,
     reviews: true,
@@ -699,27 +698,6 @@ export type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
 export type NotificationType = 'NEW_TASK' | 'NEW_RECOMMENDATION'
 
 export type NodeType = 'ASSET' | 'PROJECT' | 'RFP'
-
-export const KANBAN_NOTIFICATIONS: NotificationType[] = ["NEW_TASK"]
-
-export const DEFAULT_KANBAN_COLUMNS = [
-    {
-        name: 'Not started',
-        kanbanPosition: 0
-    },
-    {
-        name: 'Stuck',
-        kanbanPosition: 1
-    },
-    {
-        name: 'Working on it',
-        kanbanPosition: 2
-    },
-    {
-        name: 'Done',
-        kanbanPosition: 3
-    }
-]
 
 export const BIOSAMPLE_AVAILABILTIY_OPTIONS: Option[] = [
     {label: 'Available', value: 'AVAILABLE'},
@@ -2540,7 +2518,6 @@ export interface Task {
     description?: string
     checklist?: any[],
     orderPosition: number,
-    kanbanPosition: number,
     stakeholders?: any[],
     endDate: Date,
     priority: PriorityType

@@ -85,22 +85,6 @@ const orgDeepInclude = {
         },
     },
 
-    kanban: {
-        include: {
-            columns: {
-                include: {
-                    tasks: {
-                        include: {
-                            checklist: true,
-                            stakeholders: { include: { user: true } },
-                            milestone: true,
-                        },
-                    },
-                },
-            },
-        },
-    },
-
     tools: {
         include: {
             contacts: true,
