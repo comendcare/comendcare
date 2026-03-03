@@ -3,7 +3,7 @@ import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { mixpanelTrack } from "@comend/lib/mixpanel";
 import { SearchResponse } from 'typesense/lib/Typesense/Documents';
-import { BadgeVariantType } from '@comend/components/ui/badge';
+import { BadgeVariantType } from 'types';
 
 export type ViewType = 'grid' | 'list'
 
