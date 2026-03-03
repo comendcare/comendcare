@@ -1,18 +1,80 @@
-import { setBiosamplesVisibilityCore } from "./actions"
-import prisma from "./prisma"
-import { revalidatePath } from "next/cache"
+jest.mock("@sendgrid/mail", () => ({
+  __esModule: true,
+  default: {
+    setApiKey: jest.fn(),
+    send: jest.fn(),
+  },
+}))
+
+jest.mock("nanoid", () => ({
+  customAlphabet: jest.fn(),
+}))
+
+jest.mock("papaparse", () => ({
+  __esModule: true,
+  default: {
+    parse: jest.fn(),
+  },
+}))
+
+jest.mock("@dicebear/collection", () => ({
+  __esModule: true,
+  default: {
+    identicon: jest.fn(),
+    personas: jest.fn(),
+  },
+}))
+
+jest.mock("@dicebear/core", () => ({
+  __esModule: true,
+  default: {
+    createAvatar: jest.fn(),
+  },
+}))
+
+jest.mock("next/cache", () => ({
+  revalidatePath: jest.fn(),
+  revalidateTag: jest.fn(),
+}));
+
+jest.mock("./emails", () => ({
+  sendInviteEmail: jest.fn(),
+  sendMemberDeletedEmail: jest.fn(),
+  sendMemberRequestApprovedEmail: jest.fn(),
+  sendMemberRequestCreatedEmail: jest.fn(),
+  sendMemberRequestDeniedEmail: jest.fn(),
+  sentNewOrganizationEmail: jest.fn(),
+  sendProviderContactRequestEmail: jest.fn(),
+}));
+
+jest.mock("./raw-events", () => ({
+  writeRawEvent: jest.fn(),
+}));
+
+jest.mock("./auth", () => ({
+  authOptions: jest.fn(),
+  getSession: jest.fn(),
+  withAuth: jest.fn(),
+  withOrganizationAuth: jest.fn(),
+  withUserAuth: jest.fn(),
+}));
+
+jest.mock("comend-researcher-hub/lib/auth", () => ({
+  withResearcherAuth: jest.fn(),
+}))
 
 jest.mock("./prisma", () => ({
-  prisma: {
-    biosample: {
+  default: {
+      biosample: {
       updateMany: jest.fn(),
     },
   },
 }));
+// import {cioRemoveOrgMember, cioSyncOrg, cioUpsertOrgMember} from "./customerio/cio-sync-org";
 
-jest.mock("next/cache", () => ({
-  revalidatePath: jest.fn(),
-}));
+import prisma from "./prisma"
+import { setBiosamplesVisibilityCore } from "./actions"
+import { revalidatePath } from "next/cache"
 
 describe("setBiosamplesVisibilityCore", () => {
   const mockOrganization = { id: "org-123" } as any
@@ -22,7 +84,7 @@ describe("setBiosamplesVisibilityCore", () => {
   })
 
   it("updates biosamples and revalidates path", async () => {
-    ;(prisma.biosample.updateMany as jest.Mock).mockResolvedValue({
+    (prisma.biosample.updateMany as jest.Mock).mockResolvedValue({
       count: 2,
     })
 

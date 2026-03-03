@@ -27,7 +27,6 @@ import type {
 } from "@prisma/client";
 import {Prisma} from "@prisma/client";
 import {z} from "zod";
-import type {BadgeVariantType} from "@comend/components/ui/badge"
 
 export const BIOMARKER_TYPES = [
     { id: "DIAGNOSTIC", label: "Diagnostic Biomarker", value: "diagnostic" },
@@ -586,6 +585,38 @@ export interface Option {
     /** Group the options by providing key. */
     [key: string]: any;
 }
+
+export type BadgeVariantType = 
+    "default" | 
+    "secondary" | 
+    "destructive" | 
+    "positive" | 
+    "outline" | 
+    "lightBlue" | 
+    "red" | 
+    "orange" | 
+    "amber" | 
+    "yellow" | 
+    "lime" | 
+    "green" | 
+    "emerald" | 
+    "teal" | 
+    "cyan" | 
+    "sky" | 
+    "blue" | 
+    "indigo" | 
+    "violet" | 
+    "purple" | 
+    "fuchsia" | 
+    "pink" | 
+    "rose" | 
+    "slate" | 
+    "gray" | 
+    "zinc" | 
+    "neutral" | 
+    "stone" | 
+    null | 
+    undefined
 
 export const optionSchema = z.object({
     label: z.string(),

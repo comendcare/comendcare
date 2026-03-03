@@ -18,7 +18,7 @@ import {
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
-import Papa from "papaparse";
+import {parse} from "papaparse";
 import type {Member, RFP} from "@prisma/client";
 
 /* 
@@ -534,7 +534,7 @@ export const validateImport = (entry: any, expectedValues: ImportField[]) => {
 
 export function parseCSV(file: File, expectedValues: ImportField[]): Promise<{values: any[], errors: {key: string, message: string, object: any}[]}> {
     return new Promise((resolve, reject) => {
-        Papa.parse(file, {
+        parse(file, {
             header: true, // Adjust based on whether your CSV has headers
             skipEmptyLines: true,
             complete: (result) => {

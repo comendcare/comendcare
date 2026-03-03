@@ -8,5 +8,5 @@ export default {
   moduleNameMapper: {
     "^(\\.{1,2}/.*)\\.js$": "$1", // fix for ts-jest + ESM imports
   },
-  globals: {},
+  globals: {}
 }

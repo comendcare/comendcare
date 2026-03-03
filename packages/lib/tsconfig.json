@@ -5,7 +5,7 @@
     "paths": {
       "@/state/*": ["state/*"],
     },
-    "types": ["jest", "node"]
+    "types": ["jest", "node"],
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "**/*.test.ts", "**/*.test.tsx"],
   "exclude": ["node_modules", "dist"]

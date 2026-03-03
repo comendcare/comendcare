@@ -236,8 +236,7 @@ export const authOptions: NextAuthOptions = {
             if (!dbUser) {
                 session.terminate = true;
                 session.expires = new Date().toISOString();
-                // @ts-expect-error
-                session.user = {id: token.sub, organizationId: null, membership: null};
+                session.user = {id: token.sub as string, organizationId: null, membership: null};
                 return session;
             }
 
