@@ -70,6 +70,7 @@ jest.mock("./prisma", () => ({
     },
     organization: {
       create: jest.fn(),
+      update: jest.fn(),
       findUnique: jest.fn(),
     },
     condition: {
@@ -91,7 +92,7 @@ jest.mock("./auth", () => ({
   authOptions: jest.fn(),
   getSession: jest.fn(),
   withAuth: (fn: any) => fn, // bypass authentication (tested separately in auth.test.ts)
-  withOrganizationAuth: (fn: any) => fn, // bypass authentication (tested separately in auth.test.ts)
+  withOrganizationAuth: <T extends (...args: any[]) => any>(fn: T): T => fn, // bypass authentication (tested separately in auth.test.ts)
   withUserAuth: (fn: any) => fn, // bypass authentication (tested separately in auth.test.ts)
 }));
 
@@ -99,10 +100,6 @@ jest.mock("./customerio/cio-sync-org", () => ({
   cioSyncOrg: jest.fn(),
   cioUpsertOrgMember: jest.fn(),
   cioRemoveOrgMember: jest.fn()
-}))
-
-jest.mock("./typesense", () => ({
-  addTypeSenseDocument: jest.fn(),
 }))
 
 jest.mock("./revalidate", () => ({
@@ -126,11 +123,23 @@ jest.mock("./raw-events", () => ({
 }))
 
 import prisma from "./prisma"
-import { addEmailCapture, connectOrganizationToCondition, createCondition, createMemberRequest, createOrganization, setBiosamplesVisibility } from "./actions"
-import { revalidatePath } from "next/cache"
+import { 
+  addEmailCapture, 
+  connectOrganizationToCondition, 
+  createCondition, 
+  createMemberRequest, 
+  createOrganization, 
+  setBiosamplesVisibility,
+  toggleBiopharmaConsentSettings, 
+} from "./actions"
+import { revalidatePath, revalidateTag } from "next/cache"
 import { getSession } from "./auth"
 import { sendMemberRequestCreatedEmail } from "./emails"
 import { Prisma } from "@prisma/client"
+import {
+  addTypeSenseDocument,
+  deleteTypeSenseDocument
+} from "./utils"
 
 // helper to create a FormData mock
 const makeFormData = (fields: Record<string, any>) => {
@@ -570,6 +579,74 @@ describe("createOrganization", () => {
 
     const result = await createOrganization(formData)
     expect(result).toEqual({ error: "DB down" })
+  })
+})
+
+describe("toggleBiopharmaConsentSettings", () => {
+  const mockOrganization = {
+    id: "org-1",
+    name: "Org A",
+    description: "Desc",
+    subdomain: "orga",
+    biopharmaConsentSettings: false,
+  } as any
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("enables biopharmaConsentSettings if it was false", async () => {
+    ;(prisma.organization.update as jest.Mock).mockResolvedValue({
+      ...mockOrganization,
+      biopharmaConsentSettings: true,
+    })
+
+    const result = await toggleBiopharmaConsentSettings(mockOrganization)
+
+    expect(prisma.organization.update).toHaveBeenCalledWith({
+      where: { id: mockOrganization.id },
+      data: { biopharmaConsentSettings: true },
+    })
+    expect(addTypeSenseDocument).toHaveBeenCalled()
+    expect(deleteTypeSenseDocument).not.toHaveBeenCalled()
+    expect(revalidateTag).toHaveBeenCalledWith(
+      `${mockOrganization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+    )
+    expect(result.biopharmaConsentSettings).toBe(true)
+  })
+
+  it("disables biopharmaConsentSettings if it was true", async () => {
+    const org = { ...mockOrganization, biopharmaConsentSettings: true }
+    ;(prisma.organization.update as jest.Mock).mockResolvedValue({
+      ...org,
+      biopharmaConsentSettings: false,
+    })
+
+    const result = await toggleBiopharmaConsentSettings(org)
+
+    expect(prisma.organization.update).toHaveBeenCalledWith({
+      where: { id: org.id },
+      data: { biopharmaConsentSettings: false },
+    })
+    expect(deleteTypeSenseDocument).toHaveBeenCalled()
+    expect(addTypeSenseDocument).not.toHaveBeenCalled()
+    expect(revalidateTag).toHaveBeenCalledWith(
+      `${org.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+    )
+    expect(result.biopharmaConsentSettings).toBe(false)
+  })
+
+  it("returns an error object if prisma update fails", async () => {
+    ;(prisma.organization.update as jest.Mock).mockRejectedValue(
+      new Error("DB down")
+    )
+
+    const result = await toggleBiopharmaConsentSettings(mockOrganization)
+
+    expect(result).toEqual({ error: "DB down" })
+    expect(addTypeSenseDocument).not.toHaveBeenCalled()
+    expect(deleteTypeSenseDocument).not.toHaveBeenCalled()
+    expect(revalidateTag).not.toHaveBeenCalled()
   })
 })
 
