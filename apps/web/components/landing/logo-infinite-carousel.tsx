@@ -135,6 +135,10 @@ export default function LogoInfiniteCarousel() {
             animate={{opacity: 1, y: [50, -10, 0]}}
             transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
             className="overflow-hidden bg-white py-8 sm:py-16"
+            aria-label="Supported by patient groups"
+            role="region"
+            itemScope
+            itemType="https://schema.org/Organization"
         >
             <div className="mx-auto max-w-3xl px-6 lg:px-8">
                 {/* Marquee viewport */}
@@ -149,7 +153,10 @@ export default function LogoInfiniteCarousel() {
                 </div>
 
                 <div className="mt-8 flex justify-center">
-                    <p className="relative rounded-full bg-gray-50 px-4 py-1.5 text-sm/6 text-gray-600 inset-ring inset-ring-gray-900/5 dark:bg-gray-800/75 dark:text-gray-400 dark:inset-ring-white/10">
+                    <p
+                        className="relative rounded-full bg-gray-50 px-4 py-1.5 text-sm/6 text-gray-600 inset-ring inset-ring-gray-900/5 dark:bg-gray-800/75 dark:text-gray-400 dark:inset-ring-white/10"
+                        aria-label="Support statement"
+                    >
                             <span className="hidden md:inline">
                               Built with the support of 20+ patient groups.
                             </span>
