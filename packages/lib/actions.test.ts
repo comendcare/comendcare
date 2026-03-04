@@ -84,7 +84,10 @@ jest.mock("./prisma", () => ({
     },
     user: {
       update: jest.fn(),
-    }
+    },
+    milestone: {
+      updateMany: jest.fn(),
+    },
   },
 }));
 
@@ -130,7 +133,9 @@ import {
   createMemberRequest, 
   createOrganization, 
   setBiosamplesVisibility,
-  toggleBiopharmaConsentSettings, 
+  toggleBiopharmaConsentSettings,
+  toggleOrganizationPublished,
+  toggleOrganizationVerified, 
 } from "./actions"
 import { revalidatePath, revalidateTag } from "next/cache"
 import { getSession } from "./auth"
@@ -647,6 +652,140 @@ describe("toggleBiopharmaConsentSettings", () => {
     expect(addTypeSenseDocument).not.toHaveBeenCalled()
     expect(deleteTypeSenseDocument).not.toHaveBeenCalled()
     expect(revalidateTag).not.toHaveBeenCalled()
+  })
+})
+
+describe("toggleOrganizationPublished", () => {
+  const mockOrganization = {
+    id: "org-123",
+    name: "Test Org",
+    description: "Test Desc",
+    subdomain: "testorg",
+    published: false,
+  } as any
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("publishes an organization if it was unpublished", async () => {
+    (prisma.organization.update as jest.Mock).mockResolvedValue({
+      ...mockOrganization,
+      published: true,
+    })
+
+    const result = await toggleOrganizationPublished(mockOrganization)
+
+    expect(prisma.organization.update).toHaveBeenCalledWith({
+      where: { id: mockOrganization.id },
+      data: { published: true },
+    })
+    expect(addTypeSenseDocument).toHaveBeenCalled()
+    expect(deleteTypeSenseDocument).not.toHaveBeenCalled()
+    expect(revalidateTag).toHaveBeenCalledWith(
+      `${mockOrganization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+    )
+    expect(result.published).toBe(true)
+  })
+
+  it("unpublishes an organization if it was published", async () => {
+    const org = { ...mockOrganization, published: true } as any
+
+    (prisma.organization.update as jest.Mock).mockResolvedValue({
+      ...org,
+      published: false,
+    })
+
+    const result = await toggleOrganizationPublished(org)
+
+    expect(prisma.organization.update).toHaveBeenCalledWith({
+      where: { id: org.id },
+      data: { published: false },
+    })
+    expect(prisma.milestone.updateMany).toHaveBeenCalledWith({
+      where: { organizationId: org.id },
+      data: { private: true },
+    })
+    expect(deleteTypeSenseDocument).toHaveBeenCalled()
+    expect(addTypeSenseDocument).not.toHaveBeenCalled()
+    expect(revalidateTag).toHaveBeenCalledWith(
+      `${org.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+    )
+    expect(result.published).toBe(false)
+  })
+
+  it("returns an error object if prisma.update fails", async () => {
+    (prisma.organization.update as jest.Mock).mockRejectedValue(
+      new Error("DB down")
+    )
+
+    const result = await toggleOrganizationPublished(mockOrganization)
+    expect(result).toEqual({ error: "DB down" })
+  })
+})
+
+describe("toggleOrganizationVerified", () => {
+  const mockOrganization = {
+    id: "org-123",
+    name: "Test Org",
+    description: "Test Desc",
+    subdomain: "testorg",
+    verified: false,
+  } as any
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("verifies an organization if it was unverified", async () => {
+    (prisma.organization.update as jest.Mock).mockResolvedValue({
+      ...mockOrganization,
+      verified: true,
+    })
+
+    const result = await toggleOrganizationVerified(mockOrganization)
+
+    expect(prisma.organization.update).toHaveBeenCalledWith({
+      where: { id: mockOrganization.id },
+      data: { verified: true },
+    })
+    expect(addTypeSenseDocument).not.toHaveBeenCalled()
+    expect(deleteTypeSenseDocument).not.toHaveBeenCalled()
+    expect(revalidateTag).toHaveBeenCalledWith(
+      `${mockOrganization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+    )
+    expect(result.verified).toBe(true)
+  })
+
+  it("unverifies an organization if it was verified", async () => {
+    const org = { ...mockOrganization, verified: true } as any
+
+    (prisma.organization.update as jest.Mock).mockResolvedValue({
+      ...org,
+      verified: false,
+    })
+
+    const result = await toggleOrganizationVerified(org)
+
+    expect(prisma.organization.update).toHaveBeenCalledWith({
+      where: { id: org.id },
+      data: { verified: false },
+    })
+    expect(deleteTypeSenseDocument).not.toHaveBeenCalled()
+    expect(addTypeSenseDocument).not.toHaveBeenCalled()
+    expect(revalidateTag).toHaveBeenCalledWith(
+      `${org.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+    )
+    expect(result.verified).toBe(false)
+  })
+
+  it("returns an error object if prisma.update fails", async () => {
+    (prisma.organization.update as jest.Mock).mockRejectedValue(
+      new Error("DB down")
+    )
+
+    const result = await toggleOrganizationVerified(mockOrganization)
+    expect(result).toEqual({ error: "DB down" })
   })
 })
 
