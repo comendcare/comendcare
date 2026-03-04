@@ -6,7 +6,7 @@ import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "./prisma"
 import {PrismaClient} from "@prisma/client";
-import {setApiKey, send} from "@sendgrid/mail";
+import sgMail from "@sendgrid/mail";
 import {cioIdentify} from "./customerio/customer-io-identify";
 
 const isProd =
@@ -15,7 +15,7 @@ const isProd =
 
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
-setApiKey(process.env.SENDGRID_API_KEY as string)
+sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -78,7 +78,7 @@ export const authOptions: NextAuthOptions = {
                         </p>
                     </div>`;
 
-                await send({
+                await sgMail.send({
                     to: identifier,
                     from: {email: provider.from!, name: "Comend"},
                     trackingSettings: {
