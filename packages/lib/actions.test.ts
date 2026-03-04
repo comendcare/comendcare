@@ -55,6 +55,7 @@ jest.mock("comend-researcher-hub/lib/auth", () => ({
   withResearcherAuth: jest.fn(),
 }))
 
+// Mock the DB calls
 jest.mock("./prisma", () => ({
   default: {
     biosample: {
@@ -68,8 +69,21 @@ jest.mock("./prisma", () => ({
       create: jest.fn(),
     },
     organization: {
+      create: jest.fn(),
       findUnique: jest.fn(),
     },
+    condition: {
+      upsert: jest.fn(),
+    },
+    conditionToOrganization: {
+      create: jest.fn(),
+    },
+    membership: {
+      create: jest.fn(),
+    },
+    user: {
+      update: jest.fn(),
+    }
   },
 }));
 
@@ -81,11 +95,50 @@ jest.mock("./auth", () => ({
   withUserAuth: (fn: any) => fn, // bypass authentication (tested separately in auth.test.ts)
 }));
 
+jest.mock("./customerio/cio-sync-org", () => ({
+  cioSyncOrg: jest.fn(),
+  cioUpsertOrgMember: jest.fn(),
+  cioRemoveOrgMember: jest.fn()
+}))
+
+jest.mock("./typesense", () => ({
+  addTypeSenseDocument: jest.fn(),
+}))
+
+jest.mock("./revalidate", () => ({
+  revalidateTag: jest.fn(),
+  revalidatePath: jest.fn(),
+}))
+
+jest.mock("./utils", () => ({
+  addTypeSenseDocument: jest.fn(),
+  deleteTypeSenseDocument: jest.fn(),
+  getBlurDataURL: jest.fn(),
+  logError: jest.fn(),
+  toKebabCase: jest.fn(),
+  updateTypeSenseDocument: jest.fn(),
+  normalizeTag: jest.fn(),
+  runInProduction: jest.fn(async (fn: any) => fn()),
+}))
+
+jest.mock("./raw-events", () => ({
+  writeRawEvent: jest.fn(),
+}))
+
 import prisma from "./prisma"
-import { addEmailCapture, createMemberRequest, setBiosamplesVisibility } from "./actions"
+import { addEmailCapture, connectOrganizationToCondition, createCondition, createMemberRequest, createOrganization, setBiosamplesVisibility } from "./actions"
 import { revalidatePath } from "next/cache"
 import { getSession } from "./auth"
 import { sendMemberRequestCreatedEmail } from "./emails"
+import { Prisma } from "@prisma/client"
+
+// helper to create a FormData mock
+const makeFormData = (fields: Record<string, any>) => {
+  const formData = {
+    get: (key: string) => fields[key] ?? null,
+  } as unknown as FormData
+  return formData
+}
 
 describe("addEmailCapture", () => {
   beforeEach(() => {
@@ -242,6 +295,281 @@ describe("createMemberRequest", () => {
       success: false,
       error: "Database error. please try again later.",
     })
+  })
+})
+
+describe("createCondition", () => {
+  const mockSession = {
+    user: { id: "user-1", name: "Test User", email: "test@example.com" },
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    ;(getSession as jest.Mock).mockResolvedValue(mockSession)
+  })
+
+  it("returns error if not authenticated", async () => {
+    ;(getSession as jest.Mock).mockResolvedValue(null)
+    const formData = makeFormData({ name: "Condition A" })
+
+    const result = await createCondition(formData)
+
+    expect(result).toEqual({ error: "Not authenticated" })
+  })
+
+  it("successfully upserts a condition with comma-separated arrays", async () => {
+    const formData = makeFormData({
+      name: "Condition A",
+      summary: "A test condition",
+      diseaseCategories: "Category1, Category2",
+      causalGenes: "GENE1, GENE2",
+      numberOfPatientsEngaged: "100",
+    })
+
+    const expectedCondition = { id: "cond-1", name: "Condition A" }
+    ;(prisma.condition.upsert as jest.Mock).mockResolvedValue(expectedCondition)
+
+    const result = await createCondition(formData)
+
+    expect(prisma.condition.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          name: "Condition A",
+          summary: "A test condition",
+          diseaseCategories: ["Category1", "Category2"],
+          causalGenes: ["GENE1", "GENE2"],
+          numberOfPatientsEngaged: 100,
+        }),
+        update: expect.objectContaining({
+          name: "Condition A",
+          summary: "A test condition",
+        }),
+      })
+    )
+
+    expect(result).toEqual({ success: true, data: expectedCondition })
+  })
+
+  it("parses JSON arrays correctly", async () => {
+    const formData = makeFormData({
+      name: "Condition B",
+      summary: "JSON test",
+      diseaseCategories: JSON.stringify(["Cat1", "Cat2"]),
+      associatedConditions: JSON.stringify(["Cond1", "Cond2"]),
+    })
+
+    const expectedCondition = { id: "cond-2", name: "Condition B" }
+    ;(prisma.condition.upsert as jest.Mock).mockResolvedValue(expectedCondition)
+
+    const result = await createCondition(formData)
+
+    expect(result).toEqual({ success: true, data: expectedCondition })
+    expect(prisma.condition.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          diseaseCategories: ["Cat1", "Cat2"],
+          associatedConditions: ["Cond1", "Cond2"],
+        }),
+      })
+    )
+  })
+
+  it("returns database error if upsert returns null", async () => {
+    const formData = makeFormData({ name: "Condition C", summary: "Test" })
+    ;(prisma.condition.upsert as jest.Mock).mockResolvedValue(null)
+
+    const result = await createCondition(formData)
+
+    expect(result).toEqual({
+      success: false,
+      error: "Database error. Please try again later.",
+    })
+  })
+
+  it("returns duplicate error for Prisma P2002", async () => {
+    const formData = makeFormData({ name: "Condition D", summary: "Test" })
+    const error = new Prisma.PrismaClientKnownRequestError(
+      "Unique constraint failed",
+      { code: "P2002", clientVersion: "4.16.1" }
+    )
+
+    ;(prisma.condition.upsert as jest.Mock).mockRejectedValue(error)
+
+    const result = await createCondition(formData)
+
+    expect(result).toEqual({
+      success: false,
+      error: "A condition with this name already exists.",
+    })
+  })
+
+  it("returns generic database error for other errors", async () => {
+    const formData = makeFormData({ name: "Condition E", summary: "Test" })
+    ;(prisma.condition.upsert as jest.Mock).mockRejectedValue(
+      new Error("DB down")
+    )
+
+    const result = await createCondition(formData)
+
+    expect(result).toEqual({
+      success: false,
+      error: "Database error. Please try again later.",
+    })
+  })
+})
+
+describe("connectOrganizationToCondition", () => {
+  const mockSession = {
+    user: { id: "user-1", name: "Test User", email: "test@example.com" },
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    ;(getSession as jest.Mock).mockResolvedValue(mockSession)
+  })
+
+  it("returns error if not authenticated", async () => {
+    ;(getSession as jest.Mock).mockResolvedValue(null)
+
+    const result = await connectOrganizationToCondition("org-1", "cond-1")
+
+    expect(result).toEqual({ error: "Not authenticated" })
+  })
+
+  it("returns error if organizationId is null", async () => {
+    const result = await connectOrganizationToCondition(null, "cond-1")
+
+    expect(result).toEqual({ error: "No organization Id" })
+  })
+
+  it("successfully connects organization to condition", async () => {
+    const createdRecord = { id: "link-1", conditionId: "cond-1", organizationId: "org-1" }
+    ;(prisma.conditionToOrganization.create as jest.Mock).mockResolvedValue(createdRecord)
+
+    const result = await connectOrganizationToCondition("org-1", "cond-1")
+
+    expect(prisma.conditionToOrganization.create).toHaveBeenCalledWith({
+      data: { conditionId: "cond-1", organizationId: "org-1" },
+    })
+
+    expect(result).toEqual({ success: true, data: createdRecord })
+  })
+
+  it("returns database error if create returns null", async () => {
+    ;(prisma.conditionToOrganization.create as jest.Mock).mockResolvedValue(null)
+
+    const result = await connectOrganizationToCondition("org-1", "cond-1")
+
+    expect(result).toEqual({
+      success: false,
+      error: "Database error. please try again later.",
+    })
+  })
+
+  it("returns error message if prisma.create throws", async () => {
+    ;(prisma.conditionToOrganization.create as jest.Mock).mockRejectedValue(
+      new Error("DB down")
+    )
+
+    const result = await connectOrganizationToCondition("org-1", "cond-1")
+
+    expect(result).toEqual({
+      success: false,
+      error: "DB down",
+    })
+  })
+})
+
+describe("createOrganization", () => {
+  const mockSession = {
+    user: { id: "user-1", name: "Test User", email: "test@example.com" },
+  }
+
+  const mockFormData = (fields: Record<string, any>) => ({
+    get: (key: string) => fields[key] ?? null,
+  } as unknown as FormData)
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    ;(getSession as jest.Mock).mockResolvedValue(mockSession)
+  })
+
+  it("returns error if not authenticated", async () => {
+    ;(getSession as jest.Mock).mockResolvedValue(null)
+    const formData = mockFormData({ name: "Org A", subdomain: "orga" })
+
+    const result = await createOrganization(formData)
+    expect(result).toEqual({ error: "Not authenticated" })
+  })
+
+  it("successfully creates an organization", async () => {
+    const formData = mockFormData({
+      name: "Org A",
+      subdomain: "orga",
+      description: "Desc",
+      website: "https://orga.com",
+    })
+
+    // Properly mock $transaction
+    prisma.$transaction = jest.fn().mockImplementation(async (callback: any) => {
+      const tx = {
+        organization: {
+          findUnique: jest.fn().mockResolvedValue(null),
+          create: jest.fn().mockResolvedValue({
+            id: "org-1",
+            name: "Org A",
+            subdomain: "orga",
+            verified: true,
+            published: true,
+          }),
+        },
+        member: {
+          create: jest.fn().mockResolvedValue({
+            id: "mem-1",
+            userId: "user-1",
+            role: "owner",
+            createdAt: new Date(),
+          }),
+        },
+        user: {
+          update: jest.fn().mockResolvedValue({}),
+        },
+      }
+      return callback(tx)
+    }) as any
+
+    const result = await createOrganization(formData)
+    expect(prisma.$transaction).toHaveBeenCalled()
+  })
+
+  it("returns subdomain taken error if findUnique returns a record", async () => {
+    const formData = mockFormData({ name: "Org A", subdomain: "orga" })
+
+    prisma.$transaction = jest.fn().mockImplementation(async (callback: any) => {
+      const tx = {
+        organization: {
+          findUnique: jest.fn().mockResolvedValue({ id: "org-1" }), // simulate taken subdomain
+          create: jest.fn(),
+        },
+        member: { create: jest.fn() },
+        user: { update: jest.fn() },
+      }
+      return callback(tx)
+    }) as any
+
+    const result = await createOrganization(formData)
+    expect(result).toEqual({ error: "This subdomain is already taken" })
+  })
+
+  it("returns generic error for other exceptions", async () => {
+    const formData = mockFormData({ name: "Org A", subdomain: "orga" })
+
+    prisma.$transaction = jest.fn().mockImplementation(() => {
+      throw new Error("DB down")
+    }) as any
+
+    const result = await createOrganization(formData)
+    expect(result).toEqual({ error: "DB down" })
   })
 })
 
