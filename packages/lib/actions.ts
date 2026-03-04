@@ -128,7 +128,7 @@ export const createMemberRequest = withAuth(
             const existingRequest = await prisma.memberRequest.findUnique({
                 where: {
                     userId_organizationId: {
-                        userId: session.user.id,
+                        userId: session?.user.id,
                         organizationId: organizationId,
                     }
                 }
@@ -144,7 +144,7 @@ export const createMemberRequest = withAuth(
                     role: "member",
                     user: {
                         connect: {
-                            id: session.user.id
+                            id: session?.user.id
                         }
                     },
                     organization: {
@@ -184,7 +184,7 @@ export const createMemberRequest = withAuth(
                         organizationName: organization.name || "",
                         organizationImage: organization.image || "",
                     }
-                ).then(() => {
+                )?.then(() => {
                     console.log("email sent")
                 })
             }
