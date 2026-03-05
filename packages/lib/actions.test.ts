@@ -102,11 +102,14 @@ jest.mock("./prisma", () => ({
       findUnique: jest.fn(),
       findFirst: jest.fn() ,
       delete: jest.fn(),
+      count: jest.fn(),
+      update: jest.fn(),
     },
     user: {
       update: jest.fn(),
       findMany: jest.fn(),
-      findUnique: jest.fn()
+      findUnique: jest.fn(),
+      delete: jest.fn()
     },
     milestone: {
       updateMany: jest.fn(),
@@ -182,7 +185,12 @@ jest.mock("./customerio/customer-io-track", () => ({
 jest.mock("./customerio/cio-sync-org", () => ({
   cioSyncOrg: jest.fn(),
   cioUpsertOrgMember: jest.fn(),
+  cioRemoveOrgMember: jest.fn(),
 }));
+
+jest.mock("./customerio/customer-io", () => ({
+  cioDeleteUser: jest.fn(),
+}))
 
 import prisma from "./prisma"
 import { 
@@ -195,23 +203,28 @@ import {
   declineAndDeleteClaimOrganizationInvitation, 
   declineAndDeleteInvitation, 
   deleteInvitation, 
+  deleteMember, 
   deleteMemberRequest, 
   deleteOrganization, 
   deleteRoadmap, 
+  deleteUser, 
   denyMemberRequest, 
   editUser, 
   inviteUser, 
+  leaveOrganization, 
   setBiosamplesVisibility,
   toggleBiopharmaConsentSettings,
   toggleOrganizationPublished,
   toggleOrganizationVerified,
+  updateMemberWithMemberPermission,
+  updateMemberWithOwnerPermission,
   updateOrganization,
   updateRoadmap,
   updateRoadmapMetadata, 
 } from "./actions"
 import { revalidatePath, revalidateTag } from "next/cache"
 import { getSession } from "./auth"
-import { sendInviteEmail, sendMemberRequestApprovedEmail, sendMemberRequestCreatedEmail, sendMemberRequestDeniedEmail } from "./emails"
+import { sendInviteEmail, sendMemberDeletedEmail, sendMemberRequestApprovedEmail, sendMemberRequestCreatedEmail, sendMemberRequestDeniedEmail } from "./emails"
 import { Prisma } from "@prisma/client"
 import {
   addTypeSenseDocument,
@@ -220,7 +233,8 @@ import {
 } from "./utils"
 import { validateEmailDomain } from "./server-utils"
 import { customerIOTrack } from "./customerio/customer-io-track"
-import { cioSyncOrg, cioUpsertOrgMember } from "./customerio/cio-sync-org"
+import { cioRemoveOrgMember, cioSyncOrg, cioUpsertOrgMember } from "./customerio/cio-sync-org"
+import { cioDeleteUser } from "./customerio/customer-io"
 
 // helper to create a FormData mock
 const createFormData = (data: Record<string, any>) => {
@@ -1968,6 +1982,313 @@ describe("declineAndDeleteInvitation", () => {
     consoleErrorSpy.mockRestore();
   });
 })
+
+describe("leaveOrganization", () => {
+  const org = { id: "org-1", subdomain: "testorg" } as any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("returns error if session is missing", async () => {
+    (getSession as jest.Mock).mockResolvedValueOnce(null);
+
+    const result = await leaveOrganization(org);
+    expect(result).toEqual({ success: false, error: "Session not found." });
+  });
+
+  it("returns error if membership not found", async () => {
+    (getSession as jest.Mock).mockResolvedValueOnce({ user: { id: "user-1" } } as any);
+    (prisma.member.findUnique as jest.Mock).mockResolvedValueOnce(null);
+
+    const result = await leaveOrganization(org);
+    expect(result).toEqual({ success: false, error: "Membership not found." });
+  });
+
+  it("prevents last owner from leaving", async () => {
+    (getSession as jest.Mock).mockResolvedValueOnce({ user: { id: "user-1" } } as any);
+    (prisma.member.findUnique as jest.Mock).mockResolvedValueOnce({ id: "m-1", role: "owner" } as any);
+    (prisma.member.count as jest.Mock).mockResolvedValueOnce(1);
+
+    const result = await leaveOrganization(org);
+    expect(result).toEqual({
+      success: false,
+      error: "You are the last owner and cannot leave the organization. Assign another owner first.",
+    });
+  });
+
+  // it("leaves organization successfully for normal member", async () => {
+  //   (getSession as jest.Mock).mockResolvedValueOnce({ user: { id: "user-1" } } as any);
+  //   (prisma.member.findUnique as jest.Mock).mockResolvedValueOnce({ id: "m-1", role: "member" } as any);
+  //   (prisma.user.findUnique as jest.Mock).mockResolvedValueOnce({ activeOrganizationId: "org-1" } as any);
+  //   (prisma.member.findFirst as jest.Mock).mockResolvedValueOnce({ organizationId: "org-2" } as any);
+  //   (prisma.$transaction as jest.Mock).mockResolvedValueOnce([{ id: "m-1" } as any]);
+
+  //   const result = await leaveOrganization(org);
+
+  //   expect(result).toEqual({ success: true, data: { id: "m-1" } });
+  //   expect(cioRemoveOrgMember).toHaveBeenCalledWith({ orgSubdomain: "testorg", userId: "user-1" });
+  //   expect(revalidatePath).toHaveBeenCalled();
+  // });
+
+  // it("logs CIO error but still succeeds", async () => {
+  //   (getSession as jest.Mock).mockResolvedValueOnce({ user: { id: "user-1" } } as any);
+  //   (prisma.member.findUnique as jest.Mock).mockResolvedValueOnce({ id: "m-1", role: "member" } as any);
+  //   (prisma.user.findUnique as jest.Mock).mockResolvedValueOnce({ activeOrganizationId: "org-1" } as any);
+  //   (prisma.member.findFirst as jest.Mock).mockResolvedValueOnce({ organizationId: "org-2" } as any);
+  //   (prisma.$transaction as jest.Mock).mockResolvedValueOnce([{ id: "m-1" } as any]);
+  //   (cioRemoveOrgMember as jest.Mock).mockRejectedValueOnce(new Error("CIO down"));
+
+  //   const result = await leaveOrganization(org);
+  //   expect(result.success).toBe(true);
+  //   expect(cioRemoveOrgMember).toHaveBeenCalled();
+  // });
+
+  // it("logs and returns generic error on internal failure", async () => {
+  //   (getSession as jest.Mock).mockRejectedValueOnce(new Error("unexpected"));
+
+  //   const result = await leaveOrganization(org);
+  //   expect(result).toEqual({ success: false, error: "Internal server error" });
+  // });
+})
+
+describe("updateMemberWithMemberPermission", () => {
+  const org = { id: "org-1" } as any;
+  const membershipId = "member-1";
+  const updateData = { title: "New Title" } as any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("returns error if session is missing", async () => {
+    (getSession as jest.Mock).mockResolvedValueOnce(null);
+
+    const result = await updateMemberWithMemberPermission(org, membershipId, updateData);
+
+    expect(result).toEqual({ success: false, error: "Session not found." });
+  });
+
+  it("returns error if membership not found", async () => {
+    (getSession as jest.Mock).mockResolvedValueOnce({ user: { id: "user-1" } } as any);
+    (prisma.member.findUnique as jest.Mock).mockResolvedValueOnce(null);
+
+    const result = await updateMemberWithMemberPermission(org, membershipId, updateData);
+
+    expect(result).toEqual({ success: false, error: "Membership not found." });
+  });
+
+  it("updates membership successfully", async () => {
+    const mockMember = { id: membershipId, title: "Old Title", user: { id: "user-1" } };
+    (getSession as jest.Mock).mockResolvedValueOnce({ user: { id: "user-1" } } as any);
+    (prisma.member.findUnique as jest.Mock).mockResolvedValueOnce(mockMember as any);
+    (prisma.member.update as jest.Mock).mockResolvedValueOnce({ ...mockMember, title: "New Title" } as any);
+
+    const result = await updateMemberWithMemberPermission(org, membershipId, updateData);
+
+    expect(result).toEqual({
+      success: true,
+      data: { ...mockMember, title: "New Title" },
+    });
+
+    expect(prisma.member.update).toHaveBeenCalledWith({
+      where: { id: membershipId },
+      include: { user: true },
+      data: { title: "New Title" },
+    });
+
+    expect(revalidatePath).toHaveBeenCalledWith("/app/team");
+    expect(revalidatePath).toHaveBeenCalledWith("/app/profile");
+  });
+})
+
+describe("updateMemberWithOwnerPermission", () => {
+  const org = { id: "org-1" } as any;
+  const membershipId = "member-1";
+  const updateData = { title: "New Title", role: "member" } as any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("returns error if session is missing", async () => {
+    (getSession as jest.Mock).mockResolvedValueOnce(null);
+
+    const result = await updateMemberWithOwnerPermission(org, membershipId, updateData);
+
+    expect(result).toEqual({ success: false, error: "Session not found." });
+  });
+
+  it("returns error if membership not found", async () => {
+    (getSession as jest.Mock).mockResolvedValueOnce({ user: { id: "user-1" } } as any);
+    (prisma.member.findUnique as jest.Mock).mockResolvedValueOnce(null);
+
+    const result = await updateMemberWithOwnerPermission(org, membershipId, updateData);
+
+    expect(result).toEqual({ success: false, error: "Membership not found." });
+  });
+
+  it("prevents last owner demotion", async () => {
+    (getSession as jest.Mock).mockResolvedValueOnce({ user: { id: "user-1" } } as any);
+    (prisma.member.findUnique as jest.Mock).mockResolvedValueOnce({ id: membershipId, role: "owner" } as any);
+    (prisma.member.count as jest.Mock).mockResolvedValueOnce(1); // Only 1 owner left
+
+    const result = await updateMemberWithOwnerPermission(org, membershipId, updateData);
+
+    expect(result).toEqual({
+      success: false,
+      error: "You are the last owner. Assign another owner before changing your role.",
+    });
+  });
+
+  it("updates membership successfully", async () => {
+    const mockMember = { id: membershipId, title: "Old Title", role: "owner", user: { id: "user-1" } };
+    (getSession as jest.Mock).mockResolvedValueOnce({ user: { id: "user-1" } } as any);
+    (prisma.member.findUnique as jest.Mock).mockResolvedValueOnce(mockMember as any);
+    (prisma.member.count as jest.Mock).mockResolvedValueOnce(2); // More than 1 owner
+    (prisma.member.update as jest.Mock).mockResolvedValueOnce({ ...mockMember, title: "New Title", role: "member" } as any);
+
+    const result = await updateMemberWithOwnerPermission(org, membershipId, updateData);
+
+    expect(result).toEqual({
+      success: true,
+      data: { ...mockMember, title: "New Title", role: "member" },
+    });
+
+    expect(prisma.member.update).toHaveBeenCalledWith({
+      where: { id: membershipId },
+      include: { user: true },
+      data: updateData,
+    });
+
+    expect(revalidatePath).toHaveBeenCalledWith("/app/team");
+    expect(revalidatePath).toHaveBeenCalledWith("/app/profile");
+  });
+})
+
+describe("deleteMember", () => {
+  const membershipId = "member-1";
+  const member = {
+    id: membershipId,
+    email: "user@example.com",
+    user: { id: "user-1", activeOrganizationId: "org-1", name: "Jane Doe" },
+    organization: { id: "org-1", name: "Acme Corp", image: "logo.png", subdomain: "acme" },
+  } as any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } } as any);
+    (sendMemberDeletedEmail as jest.Mock).mockResolvedValue(undefined as any);
+  });
+
+  it("returns error if session is missing", async () => {
+    (getSession as jest.Mock).mockResolvedValueOnce(null);
+
+    const result = await deleteMember({ id: "org-1" } as any, membershipId);
+
+    expect(result).toEqual({ success: false, error: "Session not found." });
+  });
+
+  it("deletes membership successfully without active org change", async () => {
+    (prisma.member.delete as jest.Mock).mockResolvedValueOnce({ ...member } as any);
+    (prisma.member.findFirst as jest.Mock).mockResolvedValueOnce(null);
+    (prisma.user.update as jest.Mock).mockResolvedValueOnce({ ...member.user });
+
+    const result = await deleteMember({ id: "org-2" } as any, membershipId);
+
+    expect(result).toEqual({ success: true, data: member });
+    expect(prisma.member.delete).toHaveBeenCalledWith({
+      where: { id: membershipId },
+      include: {
+        user: { select: { id: true, activeOrganizationId: true, name: true, email: true } },
+        organization: { select: { id: true, name: true, image: true, subdomain: true } },
+      },
+    });
+    expect(cioRemoveOrgMember).toHaveBeenCalledWith({ orgSubdomain: "acme", userId: "user-1" });
+    expect(sendMemberDeletedEmail).toHaveBeenCalled();
+  });
+
+  it("updates activeOrganizationId if revoked org was active", async () => {
+    (prisma.member.delete as jest.Mock).mockResolvedValueOnce({ ...member } as any);
+    (prisma.member.findFirst as jest.Mock).mockResolvedValueOnce({ organizationId: "org-2" });
+    (prisma.user.update as jest.Mock).mockResolvedValueOnce({ ...member.user, activeOrganizationId: "org-2" });
+
+    await deleteMember({ id: "org-1" } as any, membershipId);
+
+    expect(prisma.user.update).toHaveBeenCalledWith({
+      where: { id: "user-1" },
+      data: { activeOrganizationId: "org-2" },
+    });
+  });
+})
+
+describe("deleteUser", () => {
+  const mockUser = {
+    id: "user-1",
+    name: "Jane Doe",
+    email: "jane@example.com",
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("deletes user successfully", async () => {
+    (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
+    (prisma.user.delete as jest.Mock).mockResolvedValue(mockUser);
+    (cioDeleteUser as jest.Mock).mockResolvedValue(undefined);
+
+    const result = await deleteUser();
+
+    expect(result).toEqual({ success: true, data: mockUser });
+    expect(prisma.user.delete).toHaveBeenCalledWith({ where: { id: "user-1" } });
+    expect(cioDeleteUser).toHaveBeenCalledWith("user-1", { suppress: true });
+  });
+
+  it("returns error if session is missing", async () => {
+    (getSession as jest.Mock).mockResolvedValue(null);
+
+    const result = await deleteUser();
+
+    expect(result).toEqual({ success: false, error: "Internal server error" });
+    expect(prisma.user.delete).not.toHaveBeenCalled();
+    expect(cioDeleteUser).not.toHaveBeenCalled();
+  });
+
+  it("returns error if user not found", async () => {
+    (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
+    (prisma.user.delete as jest.Mock).mockResolvedValue(null);
+
+    const result = await deleteUser();
+
+    expect(result).toEqual({ success: false, error: "user not found" });
+    expect(prisma.user.delete).toHaveBeenCalledWith({ where: { id: "user-1" } });
+    expect(cioDeleteUser).not.toHaveBeenCalled();
+  });
+
+  it("returns error if prisma throws", async () => {
+    (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
+    const error = new Error("DB failure");
+    (prisma.user.delete as jest.Mock).mockRejectedValue(error);
+
+    const result = await deleteUser();
+
+    expect(result).toEqual({ success: false, error: "Internal server error" });
+    expect(cioDeleteUser).not.toHaveBeenCalled();
+  });
+
+  // it("continues even if cioDeleteUser fails", async () => {
+  //   (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
+  //   (prisma.user.delete as jest.Mock).mockResolvedValue(mockUser);
+  //   (cioDeleteUser as jest.Mock).mockRejectedValue(new Error("CIO failed"));
+
+  //   const result = await deleteUser();
+
+  //   expect(result).toEqual({ success: true, data: mockUser });
+  //   expect(prisma.user.delete).toHaveBeenCalled();
+  //   expect(cioDeleteUser).toHaveBeenCalledWith("user-1", { suppress: true });
+  // });
+});
 
 describe("setBiosamplesVisibilityCore", () => {
   const mockOrganization = { id: "org-123" } as any
