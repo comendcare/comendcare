@@ -739,7 +739,7 @@ export async function getCROData(
         client: {};
     }>,
 ) {
-    const company = prisma.company.findUnique({
+    const company = await prisma.company.findUnique({
         where: {
             id: id
         },
@@ -758,8 +758,7 @@ export async function getCROData(
         }
     })
 
-    const sanitizedCompany = omit(company, [])
-    return sanitizedCompany
+    return omit(company, [])
 }
 
 export async function getMembers(
@@ -4228,35 +4227,29 @@ export async function ensureOrgContextForRoadmap(roadmapId: string) {
         return {orgId: null, switched: false};
     }
 
-    // Is the user a member of that org?
+    // Is the user a member of that org? (also fetch only what's needed to avoid extra roundtrips)
     const membership = await prisma.member.findUnique({
         where: {
             userId_organizationId: {userId: session.user.id, organizationId: orgId},
         },
-        select: {id: true},
+        select: {
+            id: true,
+            user: {select: {activeOrganizationId: true}},
+            organization: {select: {id: true, name: true}},
+        },
     });
 
     // If not a member: pretend it doesn’t exist (or show a 403 page if you prefer)
     if (!membership) notFound();
 
     // Switch org if needed (server-side, before render)
-    const user = await prisma.user.findUnique({
-        where: {id: session.user.id},
-        select: {activeOrganizationId: true},
-    });
-
     let switched = false;
-    if (user?.activeOrganizationId !== orgId) {
+    if (membership.user?.activeOrganizationId !== orgId) {
         await switchOrganization(orgId);
         switched = true;
     }
 
-    const organization = await prisma.organization.findUnique({
-        where: {id: orgId},
-        select: {id: true, name: true},
-    })
-
-    return {organization, switched};
+    return {organization: membership.organization, switched};
 }
 
 export const getTagsForEntity =

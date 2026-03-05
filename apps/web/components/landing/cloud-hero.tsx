@@ -141,8 +141,8 @@ export const CloudHeroSection = () => {
             }
         }
 
-        window.addEventListener("mousemove", handleMouseMove)
-        window.addEventListener("resize", updateCenter)
+        window.addEventListener("mousemove", handleMouseMove, {passive: true})
+        window.addEventListener("resize", updateCenter, {passive: true})
 
         updateCenter() // Initial center calculation after mount
 
@@ -195,13 +195,15 @@ export const CloudHeroSection = () => {
         <section
             className="relative container w-full mx-auto"
             aria-labelledby="hero-section"
+            aria-describedby="hero-description"
             role="region"
+            itemScope
+            itemType="https://schema.org/WebPageElement"
         >
             {/* Hero section with a ref to observe visibility */}
-            <div
+            <header
                 ref={heroRef}
                 className="bg-gradient-to-r from-transparent via-white to-transparent relative z-10 flex flex-col h-1/2 justify-center items-center text-center max-w-7xl gap-8 mx-auto px-4 py-8 md:py-24 mt-8"
-                aria-describedby="hero-description"
             >
                 {/* Decorative banner with attribution */}
                 <motion.div
@@ -209,39 +211,29 @@ export const CloudHeroSection = () => {
                     animate={{opacity: 1, y: [50, -10, 0]}}
                     transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
                     className="mt-8 flex justify-center sm:justify-start"
+                    role="note"
+                    aria-label="Attribution"
                 >
                     <div
                         className="bg-white inline-flex flex-wrap items-center text-center rounded-full px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base leading-5 sm:leading-6 text-gray-500 ring-1 ring-gray-900/10 hover:ring-gray-900/20"
-                        // aria-label="From the creators of Librarey and Scimantic"
                     >
                         <span>From the creators of</span>
                         <LinkPreview
                             url={"https://www.librarey.com/"}
                             className="hover:underline inline-flex items-center mx-1 sm:mx-2 gap-x-1"
                             target="_blank"
-                            aria-label="Visit Librarey website"
+                            aria-label="Visit Librarey website (opens in a new tab)"
                         >
                             <Image
                                 src={librareyLogo}
                                 alt="Librarey logo"
                                 className="self-center w-6 sm:w-8 h-6 sm:h-8"
+                                priority
+                                decoding="async"
+                                loading="eager"
                             />
                             <span>Librarey</span>
                         </LinkPreview>
-                        {/*<span>and</span>*/}
-                        {/*<LinkPreview*/}
-                        {/*    url={"https://scimantic.com/"}*/}
-                        {/*    className="hover:underline inline-flex items-center mx-1 sm:mx-2 gap-x-1"*/}
-                        {/*    target="_blank"*/}
-                        {/*    aria-label="Visit Scimantic website"*/}
-                        {/*>*/}
-                        {/*    <Image*/}
-                        {/*        src={scimanticLogo}*/}
-                        {/*        alt="Scimantic logo"*/}
-                        {/*        className="self-center w-5 sm:w-6 h-5 sm:h-6"*/}
-                        {/*    />*/}
-                        {/*    <span>Scimantic</span>*/}
-                        {/*</LinkPreview>*/}
                     </div>
                 </motion.div>
 
@@ -252,6 +244,7 @@ export const CloudHeroSection = () => {
                         animate={{opacity: 1, y: [50, -10, 0]}}
                         transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
                         className="max-w-screen-lg text-3xl md:text-5xl lg:text-6xl font-bold text-neutral-700 dark:text-white leading-relaxed lg:leading-snug"
+                        itemProp="headline"
                     >
                         The research platform for
                         <Highlight className="text-black dark:text-white">
@@ -266,28 +259,25 @@ export const CloudHeroSection = () => {
                     animate={{opacity: 1, y: [50, -10, 0]}}
                     transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
                     className="flex flex-col justify-center items-center mx-auto space-y-4"
+                    itemProp="description"
                 >
                     <p className="max-w-screen-sm text-xl">
                         {`Find projects, tools, and partners all in one place.`}
                     </p>
-                    {/*<PulsatingButton*/}
-                    {/*    className="w-fit"*/}
-                    {/*    onClick={() => {*/}
-                    {/*        window.scrollTo({*/}
-                    {/*            top: document.documentElement.scrollHeight,*/}
-                    {/*            behavior: 'smooth' // Makes it scroll smoothly*/}
-                    {/*        });*/}
-                    {/*    }}*/}
-                    {/*>*/}
-                    {/*    Sign up*/}
-                    {/*</PulsatingButton>*/}
-                    <div className="flex flex-row items-center justify-between space-x-4">
+                    <nav
+                        className="flex flex-row items-center justify-between space-x-4"
+                        aria-label="Primary call to actions"
+                    >
                         <Button
                             variant="cta"
                             className="w-fit"
                             asChild
                         >
-                            <Link href={"/for-researchers"}>
+                            <Link
+                                href={"/for-researchers"}
+                                aria-label="Learn more for researchers"
+                                title="For researchers"
+                            >
                                 {`I'm a researcher`}
                             </Link>
                         </Button>
@@ -296,28 +286,17 @@ export const CloudHeroSection = () => {
                             className="w-fit"
                             asChild
                         >
-                            <Link href={"/for-pags"}>
+                            <Link
+                                href={"/for-pags"}
+                                aria-label="Learn more for patient groups"
+                                title="For patient groups"
+                            >
                                 {`I'm with a patient group`}
                             </Link>
                         </Button>
-                    </div>
-                    {/* <Link
-                        href="/marketplace"
-                        className={cn(
-                            "relative flex cursor-pointer items-center justify-center rounded-lg bg-primary px-4 py-2 text-center text-primary-foreground",
-                        )}
-                        style={
-                            {
-                                "--pulse-color": "#0096ff",
-                                "--duration": "1.5s",
-                            } as React.CSSProperties
-                        }
-                    >
-                        <div className="relative z-10">Start Exploring</div>
-                        <div className="absolute left-1/2 top-1/2 size-full -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-lg bg-inherit" />
-                    </Link> */}
+                    </nav>
                 </motion.div>
-            </div>
+            </header>
 
             {/* Render bubbles whether or not the hero is in view, but hide them until hero is in view */}
             <motion.div
@@ -327,6 +306,7 @@ export const CloudHeroSection = () => {
                 className="hidden sm:block absolute inset-0 z-0 pointer-events-none opacity-50"
                 ref={containerRef}
                 aria-hidden="true"
+                role="presentation"
             >
                 {bubbles.map((bubble, index) => {
                     const {x, y} = CalculateMovement(
@@ -352,7 +332,8 @@ export const CloudHeroSection = () => {
                                 stiffness: 100,
                                 damping: 15
                             }} // Stronger spring effect
-                            aria-label={`Link to ${bubble.title}`}
+                            aria-label={`Explore ${bubble.title}`}
+                            title={bubble.title}
                         >
                             {bubble.title}
                         </motion.a>
