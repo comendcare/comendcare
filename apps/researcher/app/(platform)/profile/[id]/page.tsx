@@ -1,77 +1,82 @@
 import React from "react";
 import ResearcherProfile from "~researcher/components/researcher-profile";
-import {getSession} from "@comend/lib/auth";
+import { getSession } from "@comend/lib/auth";
 import {
-    getResearcherWithMergedDataAdvanced,
-    getResearcherWithMergedData,
     getResearcher,
-    getResearcherPublications, getResearcherMetrics,
+    getResearcherPublications,
+    getResearcherMetrics,
 } from "@comend/lib/fetchers";
 
 export default async function ResearcherProfilePage({
-                                                  params
-                                              }: {
-    params: { id: string }
+                                                        params,
+                                                    }: {
+    params: { id: string };
 }) {
-    const id = decodeURIComponent(params.id)
-    const session = await getSession()
+    const id = decodeURIComponent(params.id);
+    const session = await getSession();
 
-    let researcherData
-    if (session?.user?.id) {
-        const response = await getResearcher(
-            session.user.id, 
-            {
-                id: true,
-                orcid: true,
-                title: true,
-                user: true,
-                country: true,
-                website: true,
-                groupName: true,
-                description: true,
-                researchInterests: true,
-                therapeuticsOfInterest: true,
-                conditionsOfInterest: true,
-                genesOfInterest: true,
-                affiliations: {
-                    select: {
-                        institution: {
-                            select: {
-                                id: true,
-                                name: true,
-                            },
-                        }
-                    }
+    let researcherData: any = undefined;
+    let publications: any = undefined;
+    let metrics: any = undefined;
+
+    const userId = session?.user?.id;
+    if (userId) {
+        const researcherPromise = getResearcher(userId, {
+            id: true,
+            orcid: true,
+            title: true,
+            user: true,
+            country: true,
+            website: true,
+            groupName: true,
+            description: true,
+            researchInterests: true,
+            therapeuticsOfInterest: true,
+            conditionsOfInterest: true,
+            genesOfInterest: true,
+            affiliations: {
+                select: {
+                    institution: {
+                        select: {
+                            id: true,
+                            name: true,
+                        },
+                    },
                 },
-                createdAt: true,
-                updatedAt: true,
-                metadata: true
-            }
-        );
-        if (response.success) {
-            researcherData = response.data
-        } else {
-            console.error(response.error)
-        }
-    }
+            },
+            createdAt: true,
+            updatedAt: true,
+            metadata: true,
+        });
 
-    let publications
-    if (session?.user?.id) {
-        const response = await getResearcherPublications(session.user.id)
-        if (response.success) {
-            publications = response.data
-        } else {
-            console.error(response.error)
-        }
-    }
+        const publicationsPromise = getResearcherPublications(userId);
+        const metricsPromise = getResearcherMetrics(userId);
 
-    let metrics
-    if (session?.user?.id) {
-        const response = await getResearcherMetrics(session.user.id)
-        if (response.success) {
-            metrics = response.data
+        const [researcherRes, publicationsRes, metricsRes] = await Promise.allSettled([
+            researcherPromise,
+            publicationsPromise,
+            metricsPromise,
+        ]);
+
+        if (researcherRes.status === "fulfilled") {
+            if (researcherRes.value.success) researcherData = researcherRes.value.data;
+            else console.error(researcherRes.value.error);
         } else {
-            console.error(response.error)
+            console.error(researcherRes.reason);
+        }
+
+        if (publicationsRes.status === "fulfilled") {
+            if (publicationsRes.value.success) publications = publicationsRes.value.data;
+            else console.error(publicationsRes.value.error);
+        } else {
+            console.error(publicationsRes.reason);
+        }
+
+        if (metricsRes.status === "fulfilled") {
+            if (metricsRes.value.success) metrics = metricsRes.value.data;
+            else console.error(metricsRes.value.error);
+        } else {
+            console.error(metricsRes.reason);
         }
     }
 
@@ -81,5 +86,5 @@ export default async function ResearcherProfilePage({
             publications={publications}
             metrics={metrics}
         />
-    )
+    );
 }
