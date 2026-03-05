@@ -842,7 +842,8 @@ export const updateOrganization = withOrganizationAuth(
 
 export const deleteOrganization = withOrganizationAuth(
     async (organization: Organization) => {
-        const session = await getServerSession(authOptions);
+        // const session = await getServerSession(authOptions);
+        const session = await getSession();
         if (!session?.user?.id) {
             return {success: false, error: "Not authenticated"};
         }
