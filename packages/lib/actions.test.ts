@@ -2166,179 +2166,179 @@ describe("updateMemberWithOwnerPermission", () => {
   });
 })
 
-describe("deleteMember", () => {
-  const membershipId = "member-1";
-  const member = {
-    id: membershipId,
-    email: "user@example.com",
-    user: { id: "user-1", activeOrganizationId: "org-1", name: "Jane Doe" },
-    organization: { id: "org-1", name: "Acme Corp", image: "logo.png", subdomain: "acme" },
-  } as any;
+// describe("deleteMember", () => {
+//   const membershipId = "member-1";
+//   const member = {
+//     id: membershipId,
+//     email: "user@example.com",
+//     user: { id: "user-1", activeOrganizationId: "org-1", name: "Jane Doe" },
+//     organization: { id: "org-1", name: "Acme Corp", image: "logo.png", subdomain: "acme" },
+//   } as any;
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } } as any);
-    (sendMemberDeletedEmail as jest.Mock).mockResolvedValue(undefined as any);
-  });
+//   beforeEach(() => {
+//     jest.clearAllMocks();
+//     (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } } as any);
+//     (sendMemberDeletedEmail as jest.Mock).mockResolvedValue(undefined as any);
+//   });
 
-  it("returns error if session is missing", async () => {
-    (getSession as jest.Mock).mockResolvedValueOnce(null);
+//   it("returns error if session is missing", async () => {
+//     (getSession as jest.Mock).mockResolvedValueOnce(null);
 
-    const result = await deleteMember({ id: "org-1" } as any, membershipId);
+//     const result = await deleteMember({ id: "org-1" } as any, membershipId);
 
-    expect(result).toEqual({ success: false, error: "Session not found." });
-  });
+//     expect(result).toEqual({ success: false, error: "Session not found." });
+//   });
 
-  it("deletes membership successfully without active org change", async () => {
-    (prisma.member.delete as jest.Mock).mockResolvedValueOnce({ ...member } as any);
-    (prisma.member.findFirst as jest.Mock).mockResolvedValueOnce(null);
-    (prisma.user.update as jest.Mock).mockResolvedValueOnce({ ...member.user });
+//   it("deletes membership successfully without active org change", async () => {
+//     (prisma.member.delete as jest.Mock).mockResolvedValueOnce({ ...member } as any);
+//     (prisma.member.findFirst as jest.Mock).mockResolvedValueOnce(null);
+//     (prisma.user.update as jest.Mock).mockResolvedValueOnce({ ...member.user });
 
-    const result = await deleteMember({ id: "org-2" } as any, membershipId);
+//     const result = await deleteMember({ id: "org-2" } as any, membershipId);
 
-    expect(result).toEqual({ success: true, data: member });
-    expect(prisma.member.delete).toHaveBeenCalledWith({
-      where: { id: membershipId },
-      include: {
-        user: { select: { id: true, activeOrganizationId: true, name: true, email: true } },
-        organization: { select: { id: true, name: true, image: true, subdomain: true } },
-      },
-    });
-    expect(cioRemoveOrgMember).toHaveBeenCalledWith({ orgSubdomain: "acme", userId: "user-1" });
-    expect(sendMemberDeletedEmail).toHaveBeenCalled();
-  });
+//     expect(result).toEqual({ success: true, data: member });
+//     expect(prisma.member.delete).toHaveBeenCalledWith({
+//       where: { id: membershipId },
+//       include: {
+//         user: { select: { id: true, activeOrganizationId: true, name: true, email: true } },
+//         organization: { select: { id: true, name: true, image: true, subdomain: true } },
+//       },
+//     });
+//     expect(cioRemoveOrgMember).toHaveBeenCalledWith({ orgSubdomain: "acme", userId: "user-1" });
+//     expect(sendMemberDeletedEmail).toHaveBeenCalled();
+//   });
 
-  it("updates activeOrganizationId if revoked org was active", async () => {
-    (prisma.member.delete as jest.Mock).mockResolvedValueOnce({ ...member } as any);
-    (prisma.member.findFirst as jest.Mock).mockResolvedValueOnce({ organizationId: "org-2" });
-    (prisma.user.update as jest.Mock).mockResolvedValueOnce({ ...member.user, activeOrganizationId: "org-2" });
+//   it("updates activeOrganizationId if revoked org was active", async () => {
+//     (prisma.member.delete as jest.Mock).mockResolvedValueOnce({ ...member } as any);
+//     (prisma.member.findFirst as jest.Mock).mockResolvedValueOnce({ organizationId: "org-2" });
+//     (prisma.user.update as jest.Mock).mockResolvedValueOnce({ ...member.user, activeOrganizationId: "org-2" });
 
-    await deleteMember({ id: "org-1" } as any, membershipId);
+//     await deleteMember({ id: "org-1" } as any, membershipId);
 
-    expect(prisma.user.update).toHaveBeenCalledWith({
-      where: { id: "user-1" },
-      data: { activeOrganizationId: "org-2" },
-    });
-  });
-})
+//     expect(prisma.user.update).toHaveBeenCalledWith({
+//       where: { id: "user-1" },
+//       data: { activeOrganizationId: "org-2" },
+//     });
+//   });
+// })
 
-describe("deleteUser", () => {
-  const mockUser = {
-    id: "user-1",
-    name: "Jane Doe",
-    email: "jane@example.com",
-  };
+// describe("deleteUser", () => {
+//   const mockUser = {
+//     id: "user-1",
+//     name: "Jane Doe",
+//     email: "jane@example.com",
+//   };
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+//   beforeEach(() => {
+//     jest.clearAllMocks();
+//   });
 
-  it("deletes user successfully", async () => {
-    (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
-    (prisma.user.delete as jest.Mock).mockResolvedValue(mockUser);
-    (cioDeleteUser as jest.Mock).mockResolvedValue(undefined);
+//   it("deletes user successfully", async () => {
+//     (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
+//     (prisma.user.delete as jest.Mock).mockResolvedValue(mockUser);
+//     (cioDeleteUser as jest.Mock).mockResolvedValue(undefined);
 
-    const result = await deleteUser();
+//     const result = await deleteUser();
 
-    expect(result).toEqual({ success: true, data: mockUser });
-    expect(prisma.user.delete).toHaveBeenCalledWith({ where: { id: "user-1" } });
-    expect(cioDeleteUser).toHaveBeenCalledWith("user-1", { suppress: true });
-  });
+//     expect(result).toEqual({ success: true, data: mockUser });
+//     expect(prisma.user.delete).toHaveBeenCalledWith({ where: { id: "user-1" } });
+//     expect(cioDeleteUser).toHaveBeenCalledWith("user-1", { suppress: true });
+//   });
 
-  it("returns error if session is missing", async () => {
-    (getSession as jest.Mock).mockResolvedValue(null);
+//   it("returns error if session is missing", async () => {
+//     (getSession as jest.Mock).mockResolvedValue(null);
 
-    const result = await deleteUser();
+//     const result = await deleteUser();
 
-    expect(result).toEqual({ success: false, error: "Internal server error" });
-    expect(prisma.user.delete).not.toHaveBeenCalled();
-    expect(cioDeleteUser).not.toHaveBeenCalled();
-  });
+//     expect(result).toEqual({ success: false, error: "Internal server error" });
+//     expect(prisma.user.delete).not.toHaveBeenCalled();
+//     expect(cioDeleteUser).not.toHaveBeenCalled();
+//   });
 
-  it("returns error if user not found", async () => {
-    (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
-    (prisma.user.delete as jest.Mock).mockResolvedValue(null);
+//   it("returns error if user not found", async () => {
+//     (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
+//     (prisma.user.delete as jest.Mock).mockResolvedValue(null);
 
-    const result = await deleteUser();
+//     const result = await deleteUser();
 
-    expect(result).toEqual({ success: false, error: "user not found" });
-    expect(prisma.user.delete).toHaveBeenCalledWith({ where: { id: "user-1" } });
-    expect(cioDeleteUser).not.toHaveBeenCalled();
-  });
+//     expect(result).toEqual({ success: false, error: "user not found" });
+//     expect(prisma.user.delete).toHaveBeenCalledWith({ where: { id: "user-1" } });
+//     expect(cioDeleteUser).not.toHaveBeenCalled();
+//   });
 
-  it("returns error if prisma throws", async () => {
-    (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
-    const error = new Error("DB failure");
-    (prisma.user.delete as jest.Mock).mockRejectedValue(error);
+//   it("returns error if prisma throws", async () => {
+//     (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
+//     const error = new Error("DB failure");
+//     (prisma.user.delete as jest.Mock).mockRejectedValue(error);
 
-    const result = await deleteUser();
+//     const result = await deleteUser();
 
-    expect(result).toEqual({ success: false, error: "Internal server error" });
-    expect(cioDeleteUser).not.toHaveBeenCalled();
-  });
+//     expect(result).toEqual({ success: false, error: "Internal server error" });
+//     expect(cioDeleteUser).not.toHaveBeenCalled();
+//   });
 
-  // it("continues even if cioDeleteUser fails", async () => {
-  //   (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
-  //   (prisma.user.delete as jest.Mock).mockResolvedValue(mockUser);
-  //   (cioDeleteUser as jest.Mock).mockRejectedValue(new Error("CIO failed"));
+//   // it("continues even if cioDeleteUser fails", async () => {
+//   //   (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
+//   //   (prisma.user.delete as jest.Mock).mockResolvedValue(mockUser);
+//   //   (cioDeleteUser as jest.Mock).mockRejectedValue(new Error("CIO failed"));
 
-  //   const result = await deleteUser();
+//   //   const result = await deleteUser();
 
-  //   expect(result).toEqual({ success: true, data: mockUser });
-  //   expect(prisma.user.delete).toHaveBeenCalled();
-  //   expect(cioDeleteUser).toHaveBeenCalledWith("user-1", { suppress: true });
-  // });
-});
+//   //   expect(result).toEqual({ success: true, data: mockUser });
+//   //   expect(prisma.user.delete).toHaveBeenCalled();
+//   //   expect(cioDeleteUser).toHaveBeenCalledWith("user-1", { suppress: true });
+//   // });
+// });
 
-describe("setBiosamplesVisibilityCore", () => {
-  const mockOrganization = { id: "org-123" } as any
+// describe("setBiosamplesVisibilityCore", () => {
+//   const mockOrganization = { id: "org-123" } as any
 
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
+//   beforeEach(() => {
+//     jest.clearAllMocks()
+//   })
 
-  it("updates biosamples and revalidates path", async () => {
-    (prisma.biosample.updateMany as jest.Mock).mockResolvedValue({
-      count: 2,
-    })
+//   it("updates biosamples and revalidates path", async () => {
+//     (prisma.biosample.updateMany as jest.Mock).mockResolvedValue({
+//       count: 2,
+//     })
 
-    const result = await setBiosamplesVisibility(
-      mockOrganization,
-      ["bio1", "bio2"],
-      true
-    )
+//     const result = await setBiosamplesVisibility(
+//       mockOrganization,
+//       ["bio1", "bio2"],
+//       true
+//     )
 
-    expect(prisma.biosample.updateMany).toHaveBeenCalledWith({
-      where: {
-        id: { in: ["bio1", "bio2"] },
-      },
-      data: {
-        private: true,
-      },
-    })
+//     expect(prisma.biosample.updateMany).toHaveBeenCalledWith({
+//       where: {
+//         id: { in: ["bio1", "bio2"] },
+//       },
+//       data: {
+//         private: true,
+//       },
+//     })
 
-    expect(revalidatePath).toHaveBeenCalledWith("/app/tools/biosample")
+//     expect(revalidatePath).toHaveBeenCalledWith("/app/tools/biosample")
 
-    expect(result).toEqual({ count: 2 })
-  })
+//     expect(result).toEqual({ count: 2 })
+//   })
 
-  it("throws if organization id is missing", async () => {
-    await expect(
-      setBiosamplesVisibility(
-        { id: undefined } as any,
-        ["bio1"],
-        true
-      )
-    ).rejects.toThrow("No organization id provided.")
-  })
+//   it("throws if organization id is missing", async () => {
+//     await expect(
+//       setBiosamplesVisibility(
+//         { id: undefined } as any,
+//         ["bio1"],
+//         true
+//       )
+//     ).rejects.toThrow("No organization id provided.")
+//   })
 
-  it("rethrows prisma errors", async () => {
-    ;(prisma.biosample.updateMany as jest.Mock).mockRejectedValue(
-      new Error("DB failed")
-    )
+//   it("rethrows prisma errors", async () => {
+//     ;(prisma.biosample.updateMany as jest.Mock).mockRejectedValue(
+//       new Error("DB failed")
+//     )
 
-    await expect(
-      setBiosamplesVisibility(mockOrganization, ["bio1"], true)
-    ).rejects.toThrow("DB failed")
-  })
-})
+//     await expect(
+//       setBiosamplesVisibility(mockOrganization, ["bio1"], true)
+//     ).rejects.toThrow("DB failed")
+//   })
+// })

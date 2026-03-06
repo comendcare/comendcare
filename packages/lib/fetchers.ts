@@ -27,7 +27,7 @@ import type {
     User
 } from "@prisma/client";
 import {promises as fs} from "fs";
-import path from "path";
+import {join} from "path";
 import {z} from "zod";
 import {
     biosampleSchema,
@@ -1870,7 +1870,7 @@ export async function getPharmaProjects(
 export async function getBiosampleData() {
     try {
         const data = await fs.readFile(
-            path.join(process.cwd(), "data/pharma-data/biosamples.json")
+            join(process.cwd(), "data/pharma-data/biosamples.json")
         )
 
         const tasks = JSON.parse(data.toString())
@@ -1904,7 +1904,7 @@ export async function getDonorData(id: string) {
 export async function getClinicalData() {
     try {
         const data = await fs.readFile(
-            path.join(process.cwd(), "data/pharma-data/clinical.json")
+            join(process.cwd(), "data/pharma-data/clinical.json")
         )
 
         const tasks = JSON.parse(data.toString())
@@ -1922,7 +1922,7 @@ export async function getClinicalData() {
 export async function getPreclinicalData() {
     try {
         const data = await fs.readFile(
-            path.join(process.cwd(), "data/pharma-data/pre-clinical.json")
+            join(process.cwd(), "data/pharma-data/pre-clinical.json")
         )
 
         const tasks = JSON.parse(data.toString())
@@ -1940,7 +1940,7 @@ export async function getPreclinicalData() {
 export async function getIPData() {
     try {
         const data = await fs.readFile(
-            path.join(process.cwd(), "data/pharma-data/ip.json")
+            join(process.cwd(), "data/pharma-data/ip.json")
         )
 
         const tasks = JSON.parse(data.toString())
