@@ -69,7 +69,25 @@ jest.mock("./typesense", () => ({
 jest.mock("./prisma", () => ({
   default: {
     biosample: {
+      create: jest.fn(),
       updateMany: jest.fn(),
+      deleteMany: jest.fn(),
+      update: jest.fn(),
+      findUnique: jest.fn(),
+    },
+    diseaseModel: {
+      create: jest.fn(),
+      updateMany: jest.fn(),
+      deleteMany: jest.fn(),
+      update: jest.fn(),
+      findUnique: jest.fn(),
+    },
+    tool: {
+      create: jest.fn(),
+      updateMany: jest.fn(),
+      deleteMany: jest.fn(),
+      update: jest.fn(),
+      findUnique: jest.fn()
     },
     emailCapture: {
       upsert: jest.fn(),
@@ -89,9 +107,14 @@ jest.mock("./prisma", () => ({
     condition: {
       upsert: jest.fn(),
       deleteMany: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+      create: jest.fn(),
     },
     conditionToOrganization: {
       create: jest.fn(),
+      findFirst: jest.fn(),
+      upsert: jest.fn(),
     },
     membership: {
       create: jest.fn(),
@@ -132,6 +155,20 @@ jest.mock("./prisma", () => ({
       findUnique: jest.fn(),
       delete: jest.fn(),
     },
+    company: {
+      findUnique: jest.fn(),
+    },
+    institution: {
+      findUnique: jest.fn(),
+    },
+    createFacilityRequest: {
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    donor: {
+      findFirst: jest.fn(),
+      update: jest.fn(),
+    },
     $transaction: jest.fn(),
   },
 }));
@@ -168,6 +205,7 @@ jest.mock("./utils", () => ({
   updateTypeSenseDocument: jest.fn(),
   normalizeTag: jest.fn(),
   runInProduction: jest.fn(async (fn: any) => fn()),
+  toBiomarkersNested: jest.fn(),
 }))
 
 jest.mock("./raw-events", () => ({
@@ -194,14 +232,23 @@ jest.mock("./customerio/customer-io", () => ({
 
 import prisma from "./prisma"
 import { 
+  acceptClaimOrganizationInvitation,
+  acceptInvitation,
   addEmailCapture, 
   approveMemberRequestAndCreateMember, 
   connectOrganizationToCondition, 
+  createBiosample, 
+  createClinicalDataset, 
   createCondition, 
+  createCreateFacilityRequest, 
+  createDiseaseModel, 
   createMemberRequest, 
   createOrganization, 
   declineAndDeleteClaimOrganizationInvitation, 
   declineAndDeleteInvitation, 
+  deleteAsset, 
+  deleteBiosamples, 
+  deleteDiseaseModels, 
   deleteInvitation, 
   deleteMember, 
   deleteMemberRequest, 
@@ -213,9 +260,16 @@ import {
   inviteUser, 
   leaveOrganization, 
   setBiosamplesVisibility,
+  setDataToolsVisibility,
+  setDiseaseModelsVisibility,
   toggleBiopharmaConsentSettings,
   toggleOrganizationPublished,
   toggleOrganizationVerified,
+  updateBiosample,
+  updateClinicalDataset,
+  updateCondition,
+  updateCreateFacilityRequest,
+  updateDiseaseModel,
   updateMemberWithMemberPermission,
   updateMemberWithOwnerPermission,
   updateOrganization,
@@ -229,12 +283,14 @@ import { Prisma } from "@prisma/client"
 import {
   addTypeSenseDocument,
   deleteTypeSenseDocument,
+  toBiomarkersNested,
   updateTypeSenseDocument
 } from "./utils"
 import { validateEmailDomain } from "./server-utils"
 import { customerIOTrack } from "./customerio/customer-io-track"
 import { cioRemoveOrgMember, cioSyncOrg, cioUpsertOrgMember } from "./customerio/cio-sync-org"
 import { cioDeleteUser } from "./customerio/customer-io"
+import { writeRawEvent } from "./raw-events"
 
 // helper to create a FormData mock
 const createFormData = (data: Record<string, any>) => {
@@ -2166,179 +2222,982 @@ describe("updateMemberWithOwnerPermission", () => {
   });
 })
 
-// describe("deleteMember", () => {
-//   const membershipId = "member-1";
-//   const member = {
-//     id: membershipId,
-//     email: "user@example.com",
-//     user: { id: "user-1", activeOrganizationId: "org-1", name: "Jane Doe" },
-//     organization: { id: "org-1", name: "Acme Corp", image: "logo.png", subdomain: "acme" },
-//   } as any;
+describe("deleteMember", () => {
+  const mockSession = { user: { id: "user1" } };
+  const mockMembership = {
+    id: "membership1",
+    user: { id: "user1", activeOrganizationId: "org1", name: "Alice", email: "alice@example.com" },
+    organization: { id: "org1", name: "Test Org", image: "image.png", subdomain: "testorg" },
+  };
 
-//   beforeEach(() => {
-//     jest.clearAllMocks();
-//     (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } } as any);
-//     (sendMemberDeletedEmail as jest.Mock).mockResolvedValue(undefined as any);
-//   });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getSession as jest.Mock).mockResolvedValue(mockSession);
+    (prisma.member.delete as jest.Mock).mockResolvedValue(mockMembership);
+    (prisma.member.findFirst as jest.Mock).mockResolvedValue({ organizationId: "org2" });
+    (prisma.user.update as jest.Mock).mockResolvedValue({});
+    (cioRemoveOrgMember as jest.Mock).mockResolvedValue({});
+    (sendMemberDeletedEmail as jest.Mock).mockResolvedValue({});
+    (revalidatePath as jest.Mock).mockImplementation(() => {});
+  });
 
-//   it("returns error if session is missing", async () => {
-//     (getSession as jest.Mock).mockResolvedValueOnce(null);
+  it("deletes the member and updates active organization", async () => {
+    const result = await deleteMember({} as any, "membership1");
 
-//     const result = await deleteMember({ id: "org-1" } as any, membershipId);
+    expect(prisma.member.delete).toHaveBeenCalledWith({
+      where: { id: "membership1" },
+      include: {
+        user: { select: { id: true, activeOrganizationId: true, name: true, email: true } },
+        organization: { select: { id: true, name: true, image: true, subdomain: true } },
+      },
+    });
 
-//     expect(result).toEqual({ success: false, error: "Session not found." });
-//   });
+    expect(prisma.member.findFirst).toHaveBeenCalledWith({
+      where: {
+        userId: "user1",
+        organizationId: { not: "org1" },
+      },
+      orderBy: { createdAt: "asc" },
+      select: { organizationId: true },
+    });
 
-//   it("deletes membership successfully without active org change", async () => {
-//     (prisma.member.delete as jest.Mock).mockResolvedValueOnce({ ...member } as any);
-//     (prisma.member.findFirst as jest.Mock).mockResolvedValueOnce(null);
-//     (prisma.user.update as jest.Mock).mockResolvedValueOnce({ ...member.user });
+    expect(prisma.user.update).toHaveBeenCalledWith({
+      where: { id: "user1" },
+      data: { activeOrganizationId: "org2" },
+    });
 
-//     const result = await deleteMember({ id: "org-2" } as any, membershipId);
+    expect(cioRemoveOrgMember).toHaveBeenCalledWith({
+      orgSubdomain: "testorg",
+      userId: "user1",
+    });
 
-//     expect(result).toEqual({ success: true, data: member });
-//     expect(prisma.member.delete).toHaveBeenCalledWith({
-//       where: { id: membershipId },
-//       include: {
-//         user: { select: { id: true, activeOrganizationId: true, name: true, email: true } },
-//         organization: { select: { id: true, name: true, image: true, subdomain: true } },
-//       },
-//     });
-//     expect(cioRemoveOrgMember).toHaveBeenCalledWith({ orgSubdomain: "acme", userId: "user-1" });
-//     expect(sendMemberDeletedEmail).toHaveBeenCalled();
-//   });
+    expect(revalidatePath).toHaveBeenCalled(); // at least once
+    expect(result).toEqual({ success: true, data: mockMembership });
+  });
 
-//   it("updates activeOrganizationId if revoked org was active", async () => {
-//     (prisma.member.delete as jest.Mock).mockResolvedValueOnce({ ...member } as any);
-//     (prisma.member.findFirst as jest.Mock).mockResolvedValueOnce({ organizationId: "org-2" });
-//     (prisma.user.update as jest.Mock).mockResolvedValueOnce({ ...member.user, activeOrganizationId: "org-2" });
+  it("returns an error if session is missing", async () => {
+    (getSession as jest.Mock).mockResolvedValue(null);
 
-//     await deleteMember({ id: "org-1" } as any, membershipId);
+    const result = await deleteMember({} as any, "membership1");
 
-//     expect(prisma.user.update).toHaveBeenCalledWith({
-//       where: { id: "user-1" },
-//       data: { activeOrganizationId: "org-2" },
-//     });
-//   });
-// })
+    expect(result).toEqual({ success: false, error: "Session not found." });
+  });
 
-// describe("deleteUser", () => {
-//   const mockUser = {
-//     id: "user-1",
-//     name: "Jane Doe",
-//     email: "jane@example.com",
+  it("handles errors gracefully", async () => {
+    (prisma.member.delete as jest.Mock).mockRejectedValue(new Error("DB error"));
+
+    const result = await deleteMember({} as any, "membership1");
+
+    expect(result).toEqual({ success: false, error: "Internal server error" });
+  });
+})
+
+describe("deleteUser", () => {
+  const mockSession = { user: { id: "user1" } };
+  const mockUser = { id: "user1", name: "Alice", email: "alice@example.com" };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getSession as jest.Mock).mockResolvedValue(mockSession);
+    (prisma.user.delete as jest.Mock).mockResolvedValue(mockUser);
+    (cioDeleteUser as jest.Mock).mockResolvedValue({});
+  });
+
+  it("deletes the user successfully", async () => {
+    const result = await deleteUser();
+
+    expect(getSession).toHaveBeenCalled();
+    expect(prisma.user.delete).toHaveBeenCalledWith({
+      where: { id: "user1" },
+    });
+    expect(cioDeleteUser).toHaveBeenCalledWith("user1", { suppress: true });
+    expect(result).toEqual({ success: true, data: mockUser });
+  });
+
+  it("returns error if session is missing", async () => {
+    (getSession as jest.Mock).mockResolvedValue(null);
+
+    const result = await deleteUser();
+
+    expect(result).toEqual({ success: false, error: "Internal server error" });
+    expect(prisma.user.delete).not.toHaveBeenCalled();
+  });
+
+  it("returns error if user not found", async () => {
+    (prisma.user.delete as jest.Mock).mockResolvedValue(null);
+
+    const result = await deleteUser();
+
+    expect(result).toEqual({ success: false, error: "user not found" });
+  });
+
+  it("handles Prisma errors gracefully", async () => {
+    (prisma.user.delete as jest.Mock).mockRejectedValue(new Error("DB error"));
+
+    const result = await deleteUser();
+
+    expect(result).toEqual({ success: false, error: "Internal server error" });
+  });
+})
+
+// describe("acceptClaimOrganizationInvitation", () => {
+//   const mockSession = { user: { id: "user1", email: "alice@example.com", name: "Alice" } };
+//   const mockInvitation = {
+//     id: "inv1",
+//     email: "alice@example.com",
+//     accepted: false,
+//     role: "member",
+//     organization: {
+//       id: "org1",
+//       name: "Org One",
+//       image: "img.png",
+//       subdomain: "orgone",
+//       members: [],
+//       verified: true,
+//     },
 //   };
 
 //   beforeEach(() => {
 //     jest.clearAllMocks();
+//     (getSession as jest.Mock).mockResolvedValue(mockSession);
+//     (prisma.claimOrganizationInvitation.findUnique as jest.Mock).mockResolvedValue(mockInvitation);
+//     (prisma.$transaction as jest.Mock).mockResolvedValue([{}, {}, {}]);
+//     (cioSyncOrg as jest.Mock).mockResolvedValue({});
+//     (cioUpsertOrgMember as jest.Mock).mockResolvedValue({});
 //   });
 
-//   it("deletes user successfully", async () => {
-//     (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
-//     (prisma.user.delete as jest.Mock).mockResolvedValue(mockUser);
-//     (cioDeleteUser as jest.Mock).mockResolvedValue(undefined);
+//   it("accepts a valid claim organization invitation", async () => {
+//     const result = await acceptClaimOrganizationInvitation("inv1");
 
-//     const result = await deleteUser();
-
-//     expect(result).toEqual({ success: true, data: mockUser });
-//     expect(prisma.user.delete).toHaveBeenCalledWith({ where: { id: "user-1" } });
-//     expect(cioDeleteUser).toHaveBeenCalledWith("user-1", { suppress: true });
+//     expect(getSession).toHaveBeenCalled();
+//     expect(prisma.claimOrganizationInvitation.findUnique).toHaveBeenCalledWith({
+//       where: { id: "inv1" },
+//       include: { organization: { select: expect.any(Object) } },
+//     });
+//     expect(prisma.$transaction).toHaveBeenCalled();
+//     expect(cioSyncOrg).toHaveBeenCalledWith({
+//       subdomain: "orgone",
+//       name: "Org One",
+//       description: undefined,
+//     });
+//     expect(cioUpsertOrgMember).toHaveBeenCalledWith({
+//       orgSubdomain: "orgone",
+//       userId: "user1",
+//       role: "member",
+//       joinedAt: expect.any(Date),
+//     });
+//     expect(revalidatePath).toHaveBeenCalledTimes(2);
+//     expect(result).toEqual({ success: true, data: mockInvitation });
 //   });
 
 //   it("returns error if session is missing", async () => {
 //     (getSession as jest.Mock).mockResolvedValue(null);
+//     const result = await acceptClaimOrganizationInvitation("inv1");
 
-//     const result = await deleteUser();
-
-//     expect(result).toEqual({ success: false, error: "Internal server error" });
-//     expect(prisma.user.delete).not.toHaveBeenCalled();
-//     expect(cioDeleteUser).not.toHaveBeenCalled();
+//     expect(result.success).toBe(false);
+//     expect(result.error).toMatch(/must be signed in/);
 //   });
 
-//   it("returns error if user not found", async () => {
-//     (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
-//     (prisma.user.delete as jest.Mock).mockResolvedValue(null);
+//   it("returns error if email does not match", async () => {
+//     (prisma.claimOrganizationInvitation.findUnique as jest.Mock).mockResolvedValue({
+//       ...mockInvitation,
+//       email: "wrong@example.com",
+//     });
+//     const result = await acceptClaimOrganizationInvitation("inv1");
 
-//     const result = await deleteUser();
-
-//     expect(result).toEqual({ success: false, error: "user not found" });
-//     expect(prisma.user.delete).toHaveBeenCalledWith({ where: { id: "user-1" } });
-//     expect(cioDeleteUser).not.toHaveBeenCalled();
+//     expect(result.success).toBe(false);
+//     expect(result.error).toMatch(/active user email does not match/);
 //   });
 
-//   it("returns error if prisma throws", async () => {
-//     (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
-//     const error = new Error("DB failure");
-//     (prisma.user.delete as jest.Mock).mockRejectedValue(error);
+//   it("returns error if invitation is missing or already accepted", async () => {
+//     (prisma.claimOrganizationInvitation.findUnique as jest.Mock).mockResolvedValue({
+//       ...mockInvitation,
+//       accepted: true,
+//     });
+//     const result = await acceptClaimOrganizationInvitation("inv1");
 
-//     const result = await deleteUser();
-
-//     expect(result).toEqual({ success: false, error: "Internal server error" });
-//     expect(cioDeleteUser).not.toHaveBeenCalled();
+//     expect(result.success).toBe(false);
+//     expect(result.error).toMatch(/failed to follow organization/);
 //   });
 
-//   // it("continues even if cioDeleteUser fails", async () => {
-//   //   (getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } });
-//   //   (prisma.user.delete as jest.Mock).mockResolvedValue(mockUser);
-//   //   (cioDeleteUser as jest.Mock).mockRejectedValue(new Error("CIO failed"));
+//   it("logs error if transaction fails", async () => {
+//     (prisma.$transaction as jest.Mock).mockRejectedValue(new Error("DB fail"));
+//     const result = await acceptClaimOrganizationInvitation("inv1");
 
-//   //   const result = await deleteUser();
-
-//   //   expect(result).toEqual({ success: true, data: mockUser });
-//   //   expect(prisma.user.delete).toHaveBeenCalled();
-//   //   expect(cioDeleteUser).toHaveBeenCalledWith("user-1", { suppress: true });
-//   // });
+//     expect(result.success).toBe(false);
+//   });
 // });
 
-// describe("setBiosamplesVisibilityCore", () => {
-//   const mockOrganization = { id: "org-123" } as any
+// describe("acceptInvitation", () => {
+//   const mockSession = { user: { id: "user1", email: "bob@example.com", name: "Bob" } };
+//   const mockInvitation = {
+//     id: "inv2",
+//     email: "bob@example.com",
+//     accepted: false,
+//     role: "member",
+//     organization: {
+//       id: "org2",
+//       name: "Org Two",
+//       image: "img2.png",
+//       subdomain: "orgtwo",
+//     },
+//   };
 
 //   beforeEach(() => {
-//     jest.clearAllMocks()
-//   })
+//     jest.clearAllMocks();
+//     (getSession as jest.Mock).mockResolvedValue(mockSession);
+//     (prisma.invitation.findUnique as jest.Mock).mockResolvedValue(mockInvitation);
+//     (prisma.$transaction as jest.Mock).mockResolvedValue([{}, {}, {}]);
+//     (cioSyncOrg as jest.Mock).mockResolvedValue({});
+//     (cioUpsertOrgMember as jest.Mock).mockResolvedValue({});
+//     (customerIOTrack as jest.Mock).mockResolvedValue({});
+//     (writeRawEvent as jest.Mock).mockResolvedValue({});
+//   });
 
-//   it("updates biosamples and revalidates path", async () => {
-//     (prisma.biosample.updateMany as jest.Mock).mockResolvedValue({
-//       count: 2,
-//     })
+//   it("accepts a valid invitation", async () => {
+//     const result = await acceptInvitation("inv2");
 
-//     const result = await setBiosamplesVisibility(
-//       mockOrganization,
-//       ["bio1", "bio2"],
-//       true
-//     )
+//     expect(getSession).toHaveBeenCalled();
+//     expect(prisma.invitation.findUnique).toHaveBeenCalledWith({
+//       where: { id: "inv2" },
+//       include: { organization: { select: expect.any(Object) } },
+//     });
+//     expect(prisma.$transaction).toHaveBeenCalled();
+//     expect(cioSyncOrg).toHaveBeenCalled();
+//     expect(cioUpsertOrgMember).toHaveBeenCalled();
+//     expect(customerIOTrack).toHaveBeenCalled();
+//     expect(writeRawEvent).toHaveBeenCalled();
+//     expect(revalidatePath).toHaveBeenCalledTimes(2);
+//     expect(result).toEqual({ success: true, data: mockInvitation });
+//   });
 
-//     expect(prisma.biosample.updateMany).toHaveBeenCalledWith({
-//       where: {
-//         id: { in: ["bio1", "bio2"] },
-//       },
-//       data: {
-//         private: true,
-//       },
-//     })
+//   it("returns error if session is missing", async () => {
+//     (getSession as jest.Mock).mockResolvedValue(null);
+//     const result = await acceptInvitation("inv2");
 
-//     expect(revalidatePath).toHaveBeenCalledWith("/app/tools/biosample")
+//     expect(result.success).toBe(false);
+//     expect(result.error).toMatch(/must be signed in/);
+//   });
 
-//     expect(result).toEqual({ count: 2 })
-//   })
+//   it("returns error if email does not match", async () => {
+//     (prisma.invitation.findUnique as jest.Mock).mockResolvedValue({
+//       ...mockInvitation,
+//       email: "wrong@example.com",
+//     });
+//     const result = await acceptInvitation("inv2");
 
-//   it("throws if organization id is missing", async () => {
-//     await expect(
-//       setBiosamplesVisibility(
-//         { id: undefined } as any,
-//         ["bio1"],
-//         true
-//       )
-//     ).rejects.toThrow("No organization id provided.")
-//   })
+//     expect(result.success).toBe(false);
+//     expect(result.error).toMatch(/active user email does not match/);
+//   });
 
-//   it("rethrows prisma errors", async () => {
-//     ;(prisma.biosample.updateMany as jest.Mock).mockRejectedValue(
-//       new Error("DB failed")
-//     )
+//   it("returns error if invitation already accepted", async () => {
+//     (prisma.invitation.findUnique as jest.Mock).mockResolvedValue({
+//       ...mockInvitation,
+//       accepted: true,
+//     });
+//     const result = await acceptInvitation("inv2");
 
-//     await expect(
-//       setBiosamplesVisibility(mockOrganization, ["bio1"], true)
-//     ).rejects.toThrow("DB failed")
-//   })
-// })
+//     expect(result.success).toBe(false);
+//     expect(result.error).toMatch(/failed to follow organization/);
+//   });
+
+//   it("logs error if transaction fails", async () => {
+//     (prisma.$transaction as jest.Mock).mockRejectedValue(new Error("DB fail"));
+//     const result = await acceptInvitation("inv2");
+
+//     expect(result.success).toBe(false);
+//   });
+// });
+
+
+describe("updateCondition", () => {
+  const mockOrg = { id: "org1" };
+  const mockFormData = new FormData();
+  mockFormData.append("name", "Diabetes");
+  mockFormData.append("biomarkers", JSON.stringify([{ name: "Glucose" }]));
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (toBiomarkersNested as jest.Mock).mockReturnValue({
+      createMany: [{ name: "Glucose" }],
+    });
+  });
+
+  it("creates a new condition if no link exists", async () => {
+    (prisma.conditionToOrganization.findFirst as jest.Mock).mockResolvedValue(null);
+    (prisma.condition.findUnique as jest.Mock).mockResolvedValue(null);
+    (prisma.condition.create as jest.Mock).mockResolvedValue({ id: "cond1", name: "Diabetes" });
+    (prisma.conditionToOrganization.create as jest.Mock).mockResolvedValue({});
+
+    const result = await updateCondition(mockOrg as any, mockFormData);
+
+    expect(prisma.condition.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          name: "Diabetes",
+          biomarkers: { createMany: [{ name: "Glucose" }] },
+        }),
+      })
+    );
+
+    expect(prisma.conditionToOrganization.create).toHaveBeenCalledWith({
+      data: { conditionId: "cond1", organizationId: "org1" },
+    });
+
+    expect(revalidatePath).toHaveBeenCalledWith("/app/profile");
+    expect(result).toEqual({ success: true, data: { id: "cond1", name: "Diabetes" } });
+  });
+
+  it("updates an existing condition link", async () => {
+    (prisma.conditionToOrganization.findFirst as jest.Mock).mockResolvedValue({ conditionId: "cond1" });
+    (prisma.condition.findUnique as jest.Mock).mockResolvedValue(null);
+    (prisma.condition.update as jest.Mock).mockResolvedValue({ id: "cond1", name: "Diabetes Updated" });
+
+    const updatedFormData = new FormData();
+    updatedFormData.append("name", "Diabetes Updated");
+
+    const result = await updateCondition(mockOrg as any, updatedFormData);
+
+    expect(prisma.condition.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "cond1" },
+        data: expect.objectContaining({ name: "Diabetes Updated" }),
+      })
+    );
+
+    expect(revalidatePath).toHaveBeenCalledWith("/app/profile");
+    expect(result).toEqual({ success: true, data: { id: "cond1", name: "Diabetes Updated" } });
+  });
+
+  it("handles condition name collision and updates link via upsert", async () => {
+    (prisma.conditionToOrganization.findFirst as jest.Mock).mockResolvedValue({ conditionId: "cond1" });
+    (prisma.condition.findUnique as jest.Mock).mockResolvedValueOnce({ id: "cond2" }); // same name exists
+    (prisma.conditionToOrganization.upsert as jest.Mock).mockResolvedValue({});
+    (prisma.condition.update as jest.Mock).mockResolvedValue({ id: "cond2", name: "Diabetes" });
+
+    const collisionFormData = new FormData();
+    collisionFormData.append("name", "Diabetes");
+
+    const result = await updateCondition(mockOrg as any, collisionFormData);
+
+    expect(prisma.conditionToOrganization.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { conditionId_organizationId: { conditionId: "cond1", organizationId: "org1" } },
+        update: { conditionId: "cond2" },
+        create: { conditionId: "cond2", organizationId: "org1" },
+      })
+    );
+
+    expect(prisma.condition.update).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "cond2" } })
+    );
+
+    expect(result).toEqual({ success: true, data: { id: "cond2", name: "Diabetes" } });
+  });
+
+  it("returns error if prisma call fails", async () => {
+    (prisma.conditionToOrganization.findFirst as jest.Mock).mockRejectedValue(new Error("DB fail"));
+
+    const result = await updateCondition(mockOrg as any, mockFormData);
+
+    expect(result.success).toBe(false);
+    expect(result.error).toMatch(/DB fail/);
+  });
+});
+
+describe("deleteAsset", () => {
+  const mockOrg = { id: "org1" };
+
+  it("deletes tools successfully", async () => {
+    (prisma.tool.deleteMany as jest.Mock).mockResolvedValue({ count: 2 });
+
+    const result = await deleteAsset(mockOrg as any, ["tool1", "tool2"]);
+
+    expect(prisma.tool.deleteMany).toHaveBeenCalledWith({
+      where: { id: { in: ["tool1", "tool2"] } },
+    });
+    expect(result).toEqual({ count: 2 });
+  });
+
+  it("throws error if delete fails", async () => {
+    (prisma.tool.deleteMany as jest.Mock).mockRejectedValue(new Error("DB fail"));
+
+    await expect(deleteAsset(mockOrg as any, ["tool1"])).rejects.toThrow("DB fail");
+  });
+});
+
+describe("deleteBiosamples", () => {
+  const mockOrg = { id: "org1" };
+
+  it("deletes biosamples successfully", async () => {
+    (prisma.biosample.deleteMany as jest.Mock).mockResolvedValue({ count: 3 });
+
+    const result = await deleteBiosamples(mockOrg as any, ["sample1", "sample2", "sample3"]);
+
+    expect(prisma.biosample.deleteMany).toHaveBeenCalledWith({
+      where: { id: { in: ["sample1", "sample2", "sample3"] } },
+    });
+    expect(result).toEqual({ count: 3 });
+  });
+
+  it("throws error if delete fails", async () => {
+    (prisma.biosample.deleteMany as jest.Mock).mockRejectedValue(new Error("DB fail"));
+
+    await expect(deleteBiosamples(mockOrg as any, ["sample1"])).rejects.toThrow("DB fail");
+  });
+});
+
+describe("deleteDiseaseModels", () => {
+  const mockOrg = { id: "org1" };
+
+  it("deletes disease models successfully", async () => {
+    (prisma.diseaseModel.deleteMany as jest.Mock).mockResolvedValue({ count: 1 });
+
+    const result = await deleteDiseaseModels(mockOrg as any, ["model1"]);
+
+    expect(prisma.diseaseModel.deleteMany).toHaveBeenCalledWith({
+      where: { id: { in: ["model1"] } },
+    });
+    expect(result).toEqual({ count: 1 });
+  });
+
+  it("throws error if delete fails", async () => {
+    (prisma.diseaseModel.deleteMany as jest.Mock).mockRejectedValue(new Error("DB fail"));
+
+    await expect(deleteDiseaseModels(mockOrg as any, ["model1"])).rejects.toThrow("DB fail");
+  });
+});
+
+describe("setDiseaseModelsVisibility", () => {
+  const mockOrganization = { id: "org1" } as any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should update disease models visibility and revalidate path", async () => {
+    const mockIds = ["dm1", "dm2"];
+    const mockIsPrivate = true;
+
+    // Mock prisma response
+    (prisma.diseaseModel.updateMany as jest.Mock).mockResolvedValue({
+      count: mockIds.length,
+    });
+
+    const result = await setDiseaseModelsVisibility(mockOrganization, mockIds, mockIsPrivate);
+
+    // Check prisma call
+    expect(prisma.diseaseModel.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: mockIds } },
+      data: { private: mockIsPrivate },
+    });
+
+    // Check revalidatePath call
+    expect(revalidatePath).toHaveBeenCalledWith("/app/tools/disease-models");
+
+    // Check result
+    expect(result).toEqual({ count: mockIds.length });
+  });
+
+  it("should throw an error if organization id is missing", async () => {
+    await expect(
+      setDiseaseModelsVisibility({} as any, ["dm1"], true)
+    ).rejects.toThrow("No organization id provided.");
+  });
+
+  it("should throw an error if prisma.updateMany fails", async () => {
+    (prisma.diseaseModel.updateMany as jest.Mock).mockRejectedValue(new Error("DB error"));
+
+    await expect(
+      setDiseaseModelsVisibility(mockOrganization, ["dm1"], false)
+    ).rejects.toThrow("DB error");
+  });
+});
+
+describe("updateDiseaseModel", () => {
+  const mockOrganization = { id: "org1" } as any;
+  const mockFormData = {
+    id: "dm1",
+    types: [{ value: "type1" }],
+    description: "Test description",
+    genes: [{ value: "GENE1" }],
+    storageFacility: [{ value: "inst1" }],
+    attachments: [{ link: "link1" }],
+    contacts: [{ name: "contact1", email: "test@example.com" }],
+    milestones: [{ id: "ms1" }],
+    isPrivate: true,
+  } as any;
+
+  it("should update disease model successfully", async () => {
+    (prisma.institution.findUnique as jest.Mock).mockResolvedValue({ id: "inst1" });
+    (prisma.company.findUnique as jest.Mock).mockResolvedValue({ id: "comp1" });
+    (prisma.diseaseModel.update as jest.Mock).mockResolvedValue(mockFormData);
+    (prisma.diseaseModel.findUnique as jest.Mock).mockResolvedValue(mockFormData);
+
+    const result = await updateDiseaseModel(mockOrganization, mockFormData);
+
+    expect(prisma.diseaseModel.update).toHaveBeenCalled();
+    expect(prisma.diseaseModel.findUnique).toHaveBeenCalledWith({ where: { id: mockFormData.id } });
+    expect(revalidatePath).toHaveBeenCalledWith("/app/tools/disease-models");
+    expect(result).toEqual(mockFormData);
+  });
+
+  it("should throw if organization id is missing", async () => {
+    await expect(updateDiseaseModel({} as any, mockFormData)).rejects.toThrow("No organization id provided.");
+  });
+
+  it("should throw if disease model id is missing", async () => {
+    await expect(updateDiseaseModel(mockOrganization, { ...mockFormData, id: undefined })).rejects.toThrow(
+      "No biosample id provided."
+    );
+  });
+
+  it("should throw if prisma.update fails", async () => {
+    (prisma.diseaseModel.update as jest.Mock).mockRejectedValue(new Error("DB error"));
+
+    await expect(updateDiseaseModel(mockOrganization, mockFormData)).rejects.toThrow("DB error");
+  });
+});
+
+describe("createDiseaseModel", () => {
+  const mockOrganization = { id: "org1" } as any;
+  const mockFormData = {
+    id: "dm1",
+    types: [{ value: "type1" }],
+    description: "Test description",
+    genes: [{ value: "GENE1" }],
+    storageFacility: [{ value: "inst1" }],
+    attachments: [{ link: "link1" }],
+    contacts: [{ name: "contact1", email: "test@example.com" }],
+    milestones: [{ id: "ms1" }],
+    isPrivate: true,
+  } as any;
+
+  it("should create disease model successfully", async () => {
+    (prisma.institution.findUnique as jest.Mock).mockResolvedValue({ id: "inst1" });
+    (prisma.company.findUnique as jest.Mock).mockResolvedValue({ id: "comp1" });
+    (prisma.diseaseModel.create as jest.Mock).mockResolvedValue(mockFormData);
+
+    const result = await createDiseaseModel(mockOrganization, mockFormData);
+
+    expect(prisma.diseaseModel.create).toHaveBeenCalled();
+    expect(revalidatePath).toHaveBeenCalledWith("/app/tools/disease-models");
+    expect(result).toEqual(mockFormData);
+  });
+
+  it("should throw if organization id is missing", async () => {
+    await expect(createDiseaseModel({} as any, mockFormData)).rejects.toThrow("No organization id provided.");
+  });
+
+  it("should throw if prisma.create fails", async () => {
+    (prisma.diseaseModel.create as jest.Mock).mockRejectedValue(new Error("DB create error"));
+
+    await expect(createDiseaseModel(mockOrganization, mockFormData)).rejects.toThrow("DB create error");
+  });
+});
+
+describe("createClinicalDataset", () => {
+  const mockOrganization = { id: "org1", name: "Org Name", subdomain: "orgsub" } as any;
+  const mockSession = { user: { id: "user1", name: "Test User" } } as any;
+  const mockData = {
+    id: "tool1",
+    title: "Dataset Title",
+    types: [{ value: "type1" }],
+    description: "Test description",
+    storageFacility: [{ value: "inst1" }],
+    attachments: [{ link: "link1", name: "Attachment1" }],
+    contacts: [{ name: "contact1", email: "test@example.com" }],
+    milestones: [{ id: "ms1" }],
+    isPrivate: true,
+    cohortSize: "10",
+    genes: [{ value: "GENE1" }],
+    otherTypeDetails: "other details",
+  } as any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getSession as jest.Mock).mockResolvedValue(mockSession);
+  });
+
+  it("should create a clinical dataset successfully", async () => {
+    (prisma.institution.findUnique as jest.Mock).mockResolvedValue({ id: "inst1" });
+    (prisma.company.findUnique as jest.Mock).mockResolvedValue({ id: "comp1" });
+    (prisma.tool.create as jest.Mock).mockResolvedValue(mockData);
+
+    const result = await createClinicalDataset(mockOrganization, mockData);
+
+    // Prisma create called
+    expect(prisma.tool.create).toHaveBeenCalled();
+
+    // Institution/company findUnique called
+    expect(prisma.institution.findUnique).toHaveBeenCalledWith({ where: { id: "inst1" } });
+    expect(prisma.company.findUnique).toHaveBeenCalledWith({ where: { id: "inst1" } });
+
+    // Revalidate path called
+    expect(revalidatePath).toHaveBeenCalledWith("/app/tools/data");
+
+    // Customer.io tracking called
+    expect(customerIOTrack).toHaveBeenCalledWith(expect.objectContaining({
+      userId: mockSession.user.id,
+      event: 'org_toolkit_item_added',
+      properties: expect.objectContaining({ itemId: mockData.id }),
+    }));
+
+    expect(result).toEqual(mockData);
+  });
+
+  it("should throw if organization id is missing", async () => {
+    await expect(createClinicalDataset({} as any, mockData)).rejects.toThrow("No organization id provided.");
+  });
+
+  it("should throw if prisma.create fails", async () => {
+    (prisma.tool.create as jest.Mock).mockRejectedValue(new Error("DB error"));
+
+    await expect(createClinicalDataset(mockOrganization, mockData)).rejects.toThrow("DB error");
+  });
+});
+
+describe("setDataToolsVisibility", () => {
+  const mockOrganization = { id: "org1" } as any;
+  const mockIds = ["tool1", "tool2"];
+  const mockResult = { count: 2 };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should update visibility of data tools successfully", async () => {
+    (prisma.tool.updateMany as jest.Mock).mockResolvedValue(mockResult);
+
+    const result = await setDataToolsVisibility(mockOrganization, mockIds, true);
+
+    expect(prisma.tool.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: mockIds } },
+      data: { private: true },
+    });
+
+    expect(revalidatePath).toHaveBeenCalledWith("/app/tools/data");
+    expect(result).toEqual(mockResult);
+  });
+
+  it("should throw an error if organization id is missing", async () => {
+    await expect(setDataToolsVisibility({} as any, mockIds, true))
+      .rejects.toThrow("No organization id provided.");
+  });
+
+  it("should throw an error if prisma.updateMany fails", async () => {
+    (prisma.tool.updateMany as jest.Mock).mockRejectedValue(new Error("DB error"));
+
+    await expect(setDataToolsVisibility(mockOrganization, mockIds, true))
+      .rejects.toThrow("DB error");
+  });
+});
+
+describe("updateClinicalDataset", () => {
+  const mockOrganization = { id: "org1" } as any;
+  const mockData = {
+    id: "tool1",
+    title: "Test Dataset",
+    types: [{ value: "type1" }],
+    otherTypeDetails: "details",
+    isPrivate: true,
+    milestones: [{ id: "ms1" }],
+    description: "description",
+    attachments: [{ link: "link1" }],
+    contacts: [{ name: "John Doe", email: "john@example.com" }],
+    genes: [{ value: "gene1" }],
+    cohortSize: "5",
+    storageFacility: [{ value: "inst1" }],
+    notes: "Some notes",
+  };
+
+  const mockUpdatedTool = { id: "tool1", title: "Updated Dataset" };
+  const mockFoundInstitution = { id: "inst1", name: "Institution" };
+  const mockFoundCompany = { id: "comp1", name: "Company" };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should update a clinical dataset successfully", async () => {
+    (prisma.institution.findUnique as jest.Mock).mockResolvedValue(mockFoundInstitution);
+    (prisma.company.findUnique as jest.Mock).mockResolvedValue(mockFoundCompany);
+    (prisma.tool.update as jest.Mock).mockResolvedValue(mockUpdatedTool);
+    (prisma.tool.findUnique as jest.Mock).mockResolvedValue(mockUpdatedTool);
+
+    const result = await updateClinicalDataset(mockOrganization, mockData as any);
+
+    expect(prisma.institution.findUnique).toHaveBeenCalledWith({ where: { id: "inst1" } });
+    expect(prisma.company.findUnique).toHaveBeenCalledWith({ where: { id: "inst1" } });
+    expect(prisma.tool.update).toHaveBeenCalled();
+    expect(prisma.tool.findUnique).toHaveBeenCalledWith({ where: { id: "tool1" } });
+    expect(revalidatePath).toHaveBeenCalledWith("/app/tools/data");
+    expect(result).toEqual(mockUpdatedTool);
+  });
+
+  it("should throw error if organization id is missing", async () => {
+    await expect(updateClinicalDataset({} as any, mockData as any))
+      .rejects.toThrow("No organization id provided.");
+  });
+
+  it("should throw error if data tool id is missing", async () => {
+    const dataWithoutId = { ...mockData, id: undefined };
+    await expect(updateClinicalDataset(mockOrganization, dataWithoutId as any))
+      .rejects.toThrow("No data tool id provided.");
+  });
+
+  it("should throw error if prisma.tool.update fails", async () => {
+    (prisma.institution.findUnique as jest.Mock).mockResolvedValue(mockFoundInstitution);
+    (prisma.company.findUnique as jest.Mock).mockResolvedValue(mockFoundCompany);
+    (prisma.tool.update as jest.Mock).mockRejectedValue(new Error("DB error"));
+
+    await expect(updateClinicalDataset(mockOrganization, mockData as any))
+      .rejects.toThrow("DB error");
+  });
+});
+
+describe("updateCreateFacilityRequest", () => {
+  const mockOrganization = { id: "org1" } as any;
+
+  const mockData = {
+    id: "req1",
+    name: "New Facility Request",
+    milestoneId: "ms1",
+    biosampleId: "bs1",
+    diseaseModelId: "dm1",
+    clinicalDatasetId: "cd1",
+  };
+
+  const mockResponse = {
+    id: "req1",
+    name: "New Facility Request",
+    milestone: { id: "ms1" },
+    biosample: { id: "bs1" },
+    diseaseModel: { id: "dm1" },
+    clinicalDataset: { id: "cd1" },
+  };
+
+  it("should update a facility request successfully", async () => {
+    (prisma.createFacilityRequest.update as jest.Mock).mockResolvedValue(mockResponse);
+
+    const result = await updateCreateFacilityRequest(mockOrganization, mockData);
+
+    expect(prisma.createFacilityRequest.update).toHaveBeenCalledWith({
+      where: { id: mockData.id },
+      include: {
+        milestone: true,
+        biosample: true,
+        diseaseModel: true,
+        clinicalDataset: true,
+      },
+      data: {
+        name: mockData.name,
+        milestone: { connect: { id: mockData.milestoneId } },
+        biosample: { connect: { id: mockData.biosampleId } },
+        diseaseModel: { connect: { id: mockData.diseaseModelId } },
+        clinicalDataset: { connect: { id: mockData.clinicalDatasetId } },
+      },
+    });
+
+    expect(result).toEqual(mockResponse);
+  });
+
+  it("should update without optional ids", async () => {
+    const dataWithoutIds = { id: "req2", name: "Request 2" };
+    const responseWithoutIds = { ...dataWithoutIds, milestone: null, biosample: null, diseaseModel: null, clinicalDataset: null };
+    (prisma.createFacilityRequest.update as jest.Mock).mockResolvedValue(responseWithoutIds);
+
+    const result = await updateCreateFacilityRequest(mockOrganization, dataWithoutIds as any);
+
+    expect(prisma.createFacilityRequest.update).toHaveBeenCalledWith({
+      where: { id: dataWithoutIds.id },
+      include: {
+        milestone: true,
+        biosample: true,
+        diseaseModel: true,
+        clinicalDataset: true,
+      },
+      data: { name: dataWithoutIds.name },
+    });
+
+    expect(result).toEqual(responseWithoutIds);
+  });
+
+  it("should throw if prisma update fails", async () => {
+    (prisma.createFacilityRequest.update as jest.Mock).mockRejectedValue(new Error("DB error"));
+
+    await expect(updateCreateFacilityRequest(mockOrganization, mockData)).rejects.toThrow("DB error");
+  });
+});
+
+describe("createCreateFacilityRequest", () => {  
+  const mockOrganization = { id: "org1" } as any;
+
+  const mockData = {
+    id: "req1",
+    name: "New Facility Request",
+    milestoneId: "ms1",
+    biosampleId: "bs1",
+    diseaseModelId: "dm1",
+    clinicalDatasetId: "cd1",
+  };
+
+  const mockResponse = {
+    id: "req1",
+    name: "New Facility Request",
+    milestone: { id: "ms1" },
+    biosample: { id: "bs1" },
+    diseaseModel: { id: "dm1" },
+    clinicalDataset: { id: "cd1" },
+  };
+
+  it("should create a facility request successfully", async () => {
+    (prisma.createFacilityRequest.create as jest.Mock).mockResolvedValue(mockResponse);
+
+    const result = await createCreateFacilityRequest(mockOrganization, mockData);
+
+    expect(prisma.createFacilityRequest.create).toHaveBeenCalledWith({
+      include: {
+        milestone: true,
+        biosample: true,
+        diseaseModel: true,
+        clinicalDataset: true,
+      },
+      data: {
+        name: mockData.name,
+        milestone: { connect: { id: mockData.milestoneId } },
+        biosample: { connect: { id: mockData.biosampleId } },
+        diseaseModel: { connect: { id: mockData.diseaseModelId } },
+        clinicalDataset: { connect: { id: mockData.clinicalDatasetId } },
+      },
+    });
+
+    expect(result).toEqual(mockResponse);
+  });
+
+  it("should create without optional ids", async () => {
+    const dataWithoutIds = { name: "Request 2" };
+    const responseWithoutIds = { id: "req2", name: "Request 2", milestone: null, biosample: null, diseaseModel: null, clinicalDataset: null };
+    (prisma.createFacilityRequest.create as jest.Mock).mockResolvedValue(responseWithoutIds);
+
+    const result = await createCreateFacilityRequest(mockOrganization, dataWithoutIds as any);
+
+    expect(prisma.createFacilityRequest.create).toHaveBeenCalledWith({
+      include: {
+        milestone: true,
+        biosample: true,
+        diseaseModel: true,
+        clinicalDataset: true,
+      },
+      data: { name: dataWithoutIds.name },
+    });
+
+    expect(result).toEqual(responseWithoutIds);
+  });
+
+  it("should throw if prisma create fails", async () => {
+    (prisma.createFacilityRequest.create as jest.Mock).mockRejectedValue(new Error("DB error"));
+
+    await expect(createCreateFacilityRequest(mockOrganization, mockData)).rejects.toThrow("DB error");
+  });
+});
+
+describe("createBiosample", () => {
+  const mockOrganization = { id: "org1", name: "OrgName", subdomain: "orgsub", image: "image.png" } as any;
+
+  const mockData = {
+    id: "bs1",
+    types: [{ value: "cell_line" }],
+    description: "Test biosample",
+    genes: [{ value: "TP53" }],
+    storageFacility: [{ value: "inst1" }],
+    milestones: [{ id: "ms1" }],
+    attachments: [{ link: "link1", name: "Attachment 1" }],
+    contacts: [{ name: "John", email: "john@test.com" }],
+    internalDonorId: "donor1",
+  } as any;
+
+  const mockSession = { user: { id: "user1", name: "Test User" } } as any;
+  const mockBiosampleResponse = { id: "bs1", private: false, description: "Test biosample" } as any;
+  const mockDonor = { id: "donor123" };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getSession as jest.Mock).mockResolvedValue(mockSession);
+    (prisma.institution.findUnique as jest.Mock).mockResolvedValue({ id: "inst1" });
+    (prisma.company.findUnique as jest.Mock).mockResolvedValue({ id: "comp1" });
+  });
+
+  it("should create a biosample and connect existing donor", async () => {
+    (prisma.biosample.create as jest.Mock).mockResolvedValue(mockBiosampleResponse);
+    (prisma.donor.findFirst as jest.Mock).mockResolvedValue(mockDonor);
+    (prisma.biosample.update as jest.Mock).mockResolvedValue(mockBiosampleResponse);
+
+    const result = await createBiosample(mockOrganization, mockData);
+
+    expect(prisma.biosample.create).toHaveBeenCalled();
+    expect(prisma.donor.findFirst).toHaveBeenCalledWith({
+      where: { internalId: mockData.internalDonorId, organizationId: mockOrganization.id },
+    });
+    expect(prisma.biosample.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: { donor: { connect: { id: mockDonor.id } } },
+      })
+    );
+    expect(result).toEqual(mockBiosampleResponse);
+    expect(writeRawEvent).toHaveBeenCalled();
+    expect(customerIOTrack).toHaveBeenCalled();
+    expect(revalidatePath).toHaveBeenCalledWith("/app/tools/biosample");
+  });
+
+  it("should throw error if organization id is missing", async () => {
+    await expect(
+      createBiosample({} as any, mockData)
+    ).rejects.toThrow("No organization id provided.");
+  });
+
+  it("should throw error if prisma create fails", async () => {
+    (prisma.biosample.create as jest.Mock).mockRejectedValue(new Error("DB error"));
+
+    await expect(createBiosample(mockOrganization, mockData)).rejects.toThrow("DB error");
+  });
+});
+
+describe("setBiosamplesVisibility", () => {
+  const mockOrganization = { id: "org1", name: "OrgName" } as any;
+  const mockIds = ["bs1", "bs2"];
+  const mockIsPrivate = true;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should update biosamples visibility successfully", async () => {
+    const mockResponse = { count: 2 };
+    (prisma.biosample.updateMany as jest.Mock).mockResolvedValue(mockResponse);
+
+    const result = await setBiosamplesVisibility(mockOrganization, mockIds, mockIsPrivate);
+
+    expect(prisma.biosample.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: mockIds } },
+      data: { private: mockIsPrivate },
+    });
+
+    expect(revalidatePath).toHaveBeenCalledWith("/app/tools/biosample");
+    expect(result).toEqual(mockResponse);
+  });
+
+  it("should throw an error if organization id is missing", async () => {
+    await expect(setBiosamplesVisibility({} as any, mockIds, mockIsPrivate)).rejects.toThrow(
+      "No organization id provided."
+    );
+  });
+
+  it("should throw an error if prisma updateMany fails", async () => {
+    (prisma.biosample.updateMany as jest.Mock).mockRejectedValue(new Error("DB error"));
+
+    await expect(setBiosamplesVisibility(mockOrganization, mockIds, mockIsPrivate)).rejects.toThrow(
+      "DB error"
+    );
+  });
+});

@@ -26,7 +26,8 @@ import {
     runInProduction,
     toKebabCase,
     updateTypeSenseDocument,
-    normalizeTag
+    normalizeTag,
+    toBiomarkersNested
 } from "./utils";
 import {validateEmailDomain} from "./server-utils";
 import {getServerSession} from "next-auth";
@@ -74,28 +75,6 @@ const PATHS = [
     "/app/requests",
     "/app/research-plan",
 ]
-
-function toBiomarkersNested(raw: any) {
-    if (raw === undefined) return undefined; // field not sent => don't touch relation
-    if (raw === null) {
-        // explicit clear
-        return { deleteMany: {} as const };
-    }
-
-    if (!Array.isArray(raw)) return undefined;
-
-    const rows = raw
-        .map((b) => ({
-            name: String(b?.name ?? "").trim(),
-            type: String(b?.type ?? "").trim(),
-        }))
-        .filter((b) => b.name && b.type); // IMPORTANT: Biomarker.type is required in schema
-
-    return {
-        deleteMany: {} as const,           // replace-all semantics
-        createMany: { data: rows } as const,
-    };
-}
 
 export type Node = Prisma.NodeGetPayload<{}>
 
@@ -2577,7 +2556,6 @@ export const deleteAsset = withOrganizationAuth(
     }
 )
 
-
 export const deleteBiosamples = withOrganizationAuth(
     async (_: Organization, ids: string[]) => {
         try {
@@ -3555,31 +3533,6 @@ export const setBiosamplesVisibility = withOrganizationAuth(
         }
     }
 )
-
-// export async function setBiosamplesVisibilityCore(
-//   organization: Organization,
-//   ids: string[],
-//   isPrivate: boolean
-// ) {
-//   if (!organization.id) throw new Error("No organization id provided.");
-
-//   const updatedBiosamples = await prisma.biosample.updateMany({
-//     where: {
-//       id: { in: ids },
-//     },
-//     data: {
-//       private: isPrivate,
-//     },
-//   });
-
-//   revalidatePath("/app/tools/biosample");
-
-//   return updatedBiosamples;
-// }
-
-// export const setBiosamplesVisibility = withOrganizationAuth(
-//   setBiosamplesVisibilityCore
-// );
 
 export const updateBiosample = withOrganizationAuth(
     async (organization: Organization, data: z.infer<typeof editBiosampleForm>) => {

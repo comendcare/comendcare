@@ -21,6 +21,28 @@ import {formatDistanceToNowStrict} from "date-fns";
 import {parse} from "papaparse";
 import type {Member, RFP} from "@prisma/client";
 
+export function toBiomarkersNested(raw: any) {
+    if (raw === undefined) return undefined; // field not sent => don't touch relation
+    if (raw === null) {
+        // explicit clear
+        return { deleteMany: {} as const };
+    }
+
+    if (!Array.isArray(raw)) return undefined;
+
+    const rows = raw
+        .map((b) => ({
+            name: String(b?.name ?? "").trim(),
+            type: String(b?.type ?? "").trim(),
+        }))
+        .filter((b) => b.name && b.type); // IMPORTANT: Biomarker.type is required in schema
+
+    return {
+        deleteMany: {} as const,           // replace-all semantics
+        createMany: { data: rows } as const,
+    };
+}
+
 /* 
     Determine if a field on an object has a value (i.e. is filled)
     Used to calculate `filledFields` property for marketplace sort.
