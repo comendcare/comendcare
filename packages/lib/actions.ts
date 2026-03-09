@@ -4886,57 +4886,6 @@ export const updateEdges = withOrganizationAuth(
     }
 )
 
-/* HANDLE MILESTONES, ASSETS & RFPS - create, update, delete ------------------------------------------------------------- */
-// export const syncDBAssets = withOrganizationAuth(
-//     async (_: Organization, {tools}: { tools: Asset[] }) => {
-//         try {
-//             let updateAssets: Asset[] = []
-//             const session = await getSession()
-
-//             if (!session?.user.organizationId) throw new Error("No session available")
-
-//             await Promise.all(
-//                 tools.map(async (tool: Asset) => {
-//                     const previousAsset: Asset | null = await prisma.tool.findUnique({
-//                         where: {id: tool.id},
-//                         include: {
-//                             organization: {include: {conditions: {include: {condition: true}}}},
-//                             contacts: true,
-//                             attachments: true,
-//                             milestones: {
-//                                 include: {
-//                                     milestone: true
-//                                 }
-//                             },
-//                             institution: true,
-//                             gene: true,
-//                         }
-//                     })
-
-//                     if (!previousAsset) {
-//                         // if the tool does not exist, re-create it
-//                         const a = await createClinicalDataset(session.user.organizationId, tool)
-//                         updateAssets = [...updateAssets, a]
-//                     } else {
-//                         // if the tool does exist, update it's properties
-//                         const a = await updateClinicalDataset(session.user.organizationId, tool)
-//                         updateAssets = [...updateAssets, a]
-//                     }
-//                 })
-//             )
-
-//             // delete any tools that no longer exist
-//             // const dbAssetIds = await prisma.tool.findMany({
-//             //     where: {organizationId: session.user.organizationId}
-//             // }).map(tool => )
-
-//             return {success: true, data: updateAssets}
-//         } catch (e) {
-//             return {success: false, error: e}
-//         }
-//     }
-// )
-
 export const syncDBRFPs = withOrganizationAuth(
     async (_: Organization, {rfps}: { rfps: RFP[] }) => {
         try {
@@ -5662,9 +5611,8 @@ export const contactCRO = withOrganizationAuth(
                         organizationName: response.organization.name,
                         organizationImage: response.organization.image,
                     }
-                ).then(() => {
-                    console.log("email sent")
-                })
+                )
+                console.log("email sent")
             }
 
             return {success: true, data: response};
