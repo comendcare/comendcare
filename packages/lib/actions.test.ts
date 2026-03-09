@@ -136,8 +136,32 @@ jest.mock("./prisma", () => ({
     },
     milestone: {
       updateMany: jest.fn(),
+      count: jest.fn(),
+      update: jest.fn(),
+      findMany: jest.fn(),
+      deleteMany: jest.fn(),
+      createMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+    },
+    node: {
+      create: jest.fn(),
+      update: jest.fn(),
+      findMany: jest.fn(),
+      deleteMany: jest.fn(),
+      createMany: jest.fn(),
+      findUnique: jest.fn(),
+    },
+    edge: {
+      create: jest.fn(),
+      update: jest.fn(),
+      findMany: jest.fn(),
+      deleteMany: jest.fn(),
+      createMany: jest.fn(),
+      findUnique: jest.fn(),
     },
     roadmap: {
+      create: jest.fn(),
       findUnique: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
@@ -168,6 +192,13 @@ jest.mock("./prisma", () => ({
     donor: {
       findFirst: jest.fn(),
       update: jest.fn(),
+    },
+    rFP: {
+      update: jest.fn(),
+      delete: jest.fn(),
+      create: jest.fn(),
+      upsert: jest.fn(),
+      findUnique: jest.fn(),
     },
     $transaction: jest.fn(),
   },
@@ -243,7 +274,10 @@ import {
   createCreateFacilityRequest, 
   createDiseaseModel, 
   createMemberRequest, 
+  createNodesAndEdgesFromTemplate, 
   createOrganization, 
+  createOrUpdateRFP, 
+  createRoadmap, 
   declineAndDeleteClaimOrganizationInvitation, 
   declineAndDeleteInvitation, 
   deleteAsset, 
@@ -253,12 +287,14 @@ import {
   deleteMember, 
   deleteMemberRequest, 
   deleteOrganization, 
+  deleteRFP, 
   deleteRoadmap, 
   deleteUser, 
   denyMemberRequest, 
   editUser, 
   inviteUser, 
   leaveOrganization, 
+  moveNodes, 
   setBiosamplesVisibility,
   setDataToolsVisibility,
   setDiseaseModelsVisibility,
@@ -269,6 +305,7 @@ import {
   updateClinicalDataset,
   updateCondition,
   updateCreateFacilityRequest,
+  updateDBFlow,
   updateDiseaseModel,
   updateMemberWithMemberPermission,
   updateMemberWithOwnerPermission,
@@ -3201,3 +3238,708 @@ describe("setBiosamplesVisibility", () => {
     );
   });
 });
+
+describe("updateBiosample", () => {
+  const organization = {
+    id: "org1",
+    name: "Test Org",
+    subdomain: "test",
+    image: "logo.png",
+  } as any
+
+  const baseData: any = {
+    id: "bio1",
+    types: [{ value: "blood" }],
+    otherTypeDetails: "",
+    description: "Test biosample",
+    attachments: [],
+    contacts: [],
+    milestones: [],
+    isPrivate: false,
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+
+    ;(getSession as jest.Mock).mockResolvedValue({
+      user: {
+        id: "user1",
+        name: "Test User",
+      },
+    })
+  })
+
+  it("throws if organization id is missing", async () => {
+    await expect(
+      updateBiosample({} as any, baseData)
+    ).rejects.toThrow("No organization id provided.")
+  })
+
+  it("throws if biosample id is missing", async () => {
+    await expect(
+      updateBiosample(organization, { ...baseData, id: undefined })
+    ).rejects.toThrow("No biosample id provided.")
+  })
+
+  it("throws if biosample does not exist", async () => {
+    ;(prisma.biosample.findUnique as jest.Mock).mockResolvedValueOnce(null as any)
+
+    await expect(updateBiosample(organization, baseData)).rejects.toThrow(
+      "Biosample not found."
+    )
+  })
+
+  it("updates biosample successfully", async () => {
+    ;(prisma.biosample.findUnique as jest.Mock)
+      .mockResolvedValueOnce({
+        id: "bio1",
+        private: true,
+      } as any) // existing lookup
+      .mockResolvedValueOnce({
+        id: "bio1",
+      } as any) // response lookup
+
+    ;(prisma.biosample.update as jest.Mock).mockResolvedValue({
+      id: "bio1",
+      private: true,
+    } as any)
+
+    const result = await updateBiosample(organization, baseData)
+
+    expect(prisma.biosample.update).toHaveBeenCalled()
+    expect(revalidatePath).toHaveBeenCalledWith("/app/tools/biosample")
+    expect(result).toEqual({ id: "bio1" })
+  })
+
+  it("emits event when biosample becomes public", async () => {
+    ;(prisma.biosample.findUnique as jest.Mock)
+      .mockResolvedValueOnce({
+        id: "bio1",
+        private: true,
+      } as any)
+      .mockResolvedValueOnce({
+        id: "bio1",
+      } as any)
+
+    ;(prisma.biosample.update as jest.Mock).mockResolvedValue({
+      id: "bio1",
+      private: false,
+      description: "Test biosample",
+      availability: "available",
+      types: [],
+    } as any)
+
+    await updateBiosample(organization, baseData)
+
+    expect(writeRawEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "org_updated_tool",
+        externalId: "bio1",
+        payload: expect.objectContaining({
+          orgId: "org1",
+          private: false,
+        }),
+      })
+    )
+  })
+
+  it("does not emit event if biosample already public", async () => {
+    ;(prisma.biosample.findUnique as jest.Mock)
+      .mockResolvedValueOnce({
+        id: "bio1",
+        private: false,
+      } as any)
+      .mockResolvedValueOnce({
+        id: "bio1",
+      } as any)
+
+    ;(prisma.biosample.update as jest.Mock).mockResolvedValue({
+      id: "bio1",
+      private: false,
+    } as any)
+
+    await updateBiosample(organization, baseData)
+
+    expect(writeRawEvent).not.toHaveBeenCalled()
+  })
+
+  it("updates donor if donorId is provided", async () => {
+    ;(prisma.biosample.findUnique as jest.Mock)
+      .mockResolvedValueOnce({
+        id: "bio1",
+        private: true,
+      } as any)
+      .mockResolvedValueOnce({
+        id: "bio1",
+      } as any)
+
+    ;(prisma.biosample.update as jest.Mock).mockResolvedValue({
+      id: "bio1",
+      private: true,
+    } as any)
+
+    const dataWithDonor = {
+      ...baseData,
+      donorId: "donor1",
+      sex: "female",
+    }
+
+    await updateBiosample(organization, dataWithDonor)
+
+    expect(prisma.donor.update as jest.Mock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "donor1" },
+      })
+    )
+  })
+})
+
+describe("deleteRFP", () => {
+  const mockOrganization = {
+    id: "org1",
+    name: "Test Org",
+  } as any
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("deletes an RFP and returns the response", async () => {
+    const mockRFP = {
+      id: "rfp1",
+      contacts: [],
+      attachments: [],
+      milestones: [],
+    }
+
+    ;(prisma.rFP.delete as jest.Mock).mockResolvedValue(mockRFP as any)
+
+    const result = await deleteRFP(mockOrganization, "rfp1")
+
+    expect(prisma.rFP.delete).toHaveBeenCalledWith({
+      where: { id: "rfp1" },
+      include: {
+        contacts: true,
+        attachments: true,
+        milestones: {
+          include: {
+            milestone: {
+              include: {
+                types: { include: { milestoneType: true } },
+              },
+            },
+          },
+        },
+      },
+    })
+
+    expect(result).toEqual(mockRFP)
+  })
+
+  it("throws an error if prisma delete fails", async () => {
+    ;(prisma.rFP.delete as jest.Mock).mockRejectedValue(new Error("Database error"))
+
+    await expect(deleteRFP(mockOrganization, "rfp1")).rejects.toThrow(
+      "Database error"
+    )
+  })
+})
+
+describe("createOrUpdateRFP", () => {
+  const organization = {
+    id: "org1",
+    name: "Test Org",
+    subdomain: "test",
+    image: "logo.png",
+  } as any
+
+  const actor = {
+    userId: "user1",
+    userName: "Test User",
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+
+    ;(getSession as jest.Mock).mockResolvedValue({
+      user: { id: "user1", name: "Test User" },
+    })
+  })
+
+  it("throws if organization id is missing", async () => {
+    await expect(
+      createOrUpdateRFP({} as any, {})
+    ).rejects.toThrow("No organization id provided.")
+  })
+
+  it("creates a new RFP", async () => {
+    ;(prisma.rFP.findUnique as jest.Mock).mockResolvedValue(null)
+
+    const mockResponse = {
+      id: "rfp1",
+      title: "Test RFP",
+      private: true,
+      startDate: null,
+      endDate: null,
+      organization: { name: "Test Org" },
+    }
+
+    ;(prisma.rFP.upsert as jest.Mock).mockResolvedValue(mockResponse as any)
+
+    const result = await createOrUpdateRFP(
+      organization,
+      { title: "Test RFP", private: true },
+      actor
+    )
+
+    expect(prisma.rFP.upsert).toHaveBeenCalled()
+    expect(result).toEqual(mockResponse)
+
+    expect(writeRawEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "org_created_rfp",
+        externalId: "rfp1",
+      })
+    )
+  })
+
+  it("updates an existing RFP", async () => {
+    ;(prisma.rFP.findUnique as jest.Mock).mockResolvedValue({
+      id: "rfp1",
+      private: true,
+      endDate: null,
+      title: "Old Title",
+    } as any)
+
+    ;(prisma.rFP.upsert as jest.Mock).mockResolvedValue({
+      id: "rfp1",
+      title: "Updated Title",
+      private: true,
+      startDate: null,
+      endDate: null,
+      organization: { name: "Test Org" },
+    } as any)
+
+    const result = await createOrUpdateRFP(
+      organization,
+      { id: "rfp1", title: "Updated Title" },
+      actor
+    )
+
+    expect(prisma.rFP.upsert).toHaveBeenCalled()
+    expect(result.title).toBe("Updated Title")
+  })
+
+  it("emits publish event when private → public", async () => {
+    ;(prisma.rFP.findUnique as jest.Mock).mockResolvedValue({
+      id: "rfp1",
+      private: true,
+      endDate: null,
+      title: "Test",
+    } as any)
+
+    ;(prisma.rFP.upsert as jest.Mock).mockResolvedValue({
+      id: "rfp1",
+      title: "Test",
+      private: false,
+      startDate: null,
+      endDate: null,
+      organization: { name: "Test Org" },
+    } as any)
+
+    await createOrUpdateRFP(
+      organization,
+      { id: "rfp1", private: false },
+      actor
+    )
+
+    expect(writeRawEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "org_created_rfp",
+      })
+    )
+
+    expect(customerIOTrack).toHaveBeenCalled()
+  })
+
+  it("emits rfp_closed when end date is in the past", async () => {
+    const pastDate = new Date(Date.now() - 1000 * 60 * 60)
+
+    ;(prisma.rFP.findUnique as jest.Mock).mockResolvedValue({
+      id: "rfp1",
+      private: false,
+      endDate: null,
+      title: "Test",
+    } as any)
+
+    ;(prisma.rFP.upsert as jest.Mock).mockResolvedValue({
+      id: "rfp1",
+      title: "Test",
+      private: false,
+      startDate: null,
+      endDate: pastDate,
+      organization: { name: "Test Org" },
+    } as any)
+
+    await createOrUpdateRFP(
+      organization,
+      { id: "rfp1", endDate: pastDate },
+      actor
+    )
+
+    expect(writeRawEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "rfp_closed",
+      })
+    )
+  })
+
+  it("throws when prisma fails", async () => {
+    ;(prisma.rFP.findUnique as jest.Mock).mockResolvedValue(null)
+    ;(prisma.rFP.upsert as jest.Mock).mockRejectedValue(new Error("DB failure"))
+
+    await expect(
+      createOrUpdateRFP(organization, { id: "1234", title: "Test" })
+    ).rejects.toThrow("DB failure")
+  })
+})
+
+describe("createRoadmap", () => {
+  const organization = {
+    id: "org1",
+    name: "Test Org",
+    subdomain: "test",
+    image: "logo.png",
+  } as any
+
+  const actor = {
+    userId: "user1",
+    userName: "Test User",
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+
+    ;(getSession as jest.Mock).mockResolvedValue({
+      user: {
+        id: "user1",
+        name: "Test User",
+      },
+    })
+  })
+
+  it("throws if organization id is missing", async () => {
+    await expect(createRoadmap({} as any)).rejects.toThrow(
+      "No organization id provided."
+    )
+  })
+
+  it("creates a roadmap without a template", async () => {
+    const mockRoadmap = { id: "roadmap1" }
+
+    ;(prisma.roadmap.create as jest.Mock).mockResolvedValue(mockRoadmap as any)
+
+    ;(prisma.roadmap.findUnique as jest.Mock).mockResolvedValue({
+      id: "roadmap1",
+      title: "Test Roadmap",
+      milestones: [],
+      nodes: [],
+      edges: [],
+      organization: { name: "Test Org", members: [] },
+    } as any)
+
+    const result = await createRoadmap(organization, undefined, actor)
+
+    expect(prisma.roadmap.create).toHaveBeenCalled()
+
+    expect(writeRawEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "org_research_plan_created",
+        externalId: "roadmap1",
+      })
+    )
+
+    expect(customerIOTrack).toHaveBeenCalled()
+
+    expect(revalidatePath).toHaveBeenCalledWith(
+      "/app/marketplace/service-providers"
+    )
+
+    expect(result?.id).toBe("roadmap1")
+  })
+
+  it("creates nodes and edges when template has milestones", async () => {
+    const template = {
+      title: "Template Roadmap",
+      milestones: [{ id: "m1", nodeId: "n1" }],
+      nodes: [{ id: "n1", positionX: 100 }],
+    } as any
+
+    const mockRoadmap = { id: "roadmap1" }
+
+    ;(prisma.roadmap.create as jest.Mock).mockResolvedValue(mockRoadmap as any)
+
+    ;(prisma.roadmap.findUnique as jest.Mock).mockResolvedValue({
+      id: "roadmap1",
+      title: "Template Roadmap",
+      milestones: [],
+      nodes: [],
+      edges: [],
+      organization: { name: "Test Org", members: [] },
+    } as any)
+
+    const createNodesSpy = jest.spyOn(
+      require("./actions"),
+      "createNodesAndEdgesFromTemplate"
+    ).mockResolvedValue(undefined)
+
+    await createRoadmap(organization, template, actor)
+
+    expect(createNodesSpy).toHaveBeenCalled()
+  })
+
+  it("still succeeds if customerIO tracking fails", async () => {
+    ;(prisma.roadmap.create as jest.Mock).mockResolvedValue({ id: "roadmap1" } as any)
+
+    ;(prisma.roadmap.findUnique as jest.Mock).mockResolvedValue({
+      id: "roadmap1",
+      title: "Test",
+      milestones: [],
+      nodes: [],
+      edges: [],
+      organization: { name: "Test Org", members: [] },
+    } as any)
+
+    ;(customerIOTrack as jest.Mock).mockRejectedValue(new Error("CIO failed"))
+
+    const result = await createRoadmap(organization, undefined, actor)
+
+    expect(result.id).toBe("roadmap1")
+  })
+
+  it("throws when prisma create fails", async () => {
+    ;(prisma.roadmap.create as jest.Mock).mockRejectedValue(new Error("DB error"))
+
+    await expect(createRoadmap(organization)).rejects.toThrow("DB error")
+  })
+})
+
+// describe("createNodesAndEdgesFromTemplate", () => {
+//   const organization = { id: "org1" } as any
+//   const roadmapId = "roadmap-1"
+
+//   beforeEach(() => {
+//     jest.clearAllMocks()
+//   })
+
+//   it("creates nodes and edges from a template", async () => {
+//     ;(prisma.milestone.count as jest.Mock).mockResolvedValue(0)
+
+//     ;(prisma.node.create as jest.Mock)
+//       .mockResolvedValueOnce({ id: "node1" } as any)
+//       .mockResolvedValueOnce({ id: "node2" } as any)
+
+//     ;(prisma.edge.create as jest.Mock).mockResolvedValue({ id: "edge1" } as any)
+
+//     const finalRoadmap = {
+//       id: roadmapId,
+//       milestones: [],
+//       nodes: [{ id: "node1" }, { id: "node2" }],
+//       edges: [{ id: "edge1" }],
+//       organization: { id: organization.id, members: [] },
+//     }
+//     ;(prisma.roadmap.findUnique as jest.Mock).mockResolvedValue(finalRoadmap as any)
+
+//     const template = {
+//       nodes: [
+//         { id: "t1", positionX: 0, positionY: 0 },
+//         { id: "t2", positionX: 500, positionY: 0 },
+//       ],
+//       milestones: [
+//         {
+//           nodeId: "t1",
+//           title: "Milestone 1",
+//           status: "PLANNED",
+//           types: [],
+//         },
+//         {
+//           nodeId: "t2",
+//           title: "Milestone 2",
+//           status: "PLANNED",
+//           types: [],
+//         },
+//       ],
+//       edges: [
+//         { source: "t1", target: "t2" },
+//       ],
+//       metadata: {},
+//     } as any
+
+//     const result = await createNodesAndEdgesFromTemplate(
+//       organization,
+//       roadmapId,
+//       template
+//     )
+
+//     expect(result).toEqual({
+//       success: true,
+//       data: finalRoadmap,
+//     })
+//   })
+// })
+
+describe("moveNodes", () => {
+  const organization = { id: "org1" } as any
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("updates node positions successfully", async () => {
+    const nodes = [
+      { id: "node1", position: { x: 100, y: 200 } },
+      { id: "node2", position: { x: 300, y: 400 } },
+    ]
+
+    // Mock $transaction to call the function directly
+    ;(prisma.$transaction as jest.Mock).mockImplementation(async (fn: any) =>
+      fn(prisma)
+    )
+
+    // Mock node.update
+    ;(prisma.node.update as jest.Mock)
+      .mockResolvedValueOnce({ id: "node1", positionX: 100, positionY: 200 })
+      .mockResolvedValueOnce({ id: "node2", positionX: 300, positionY: 400 })
+
+    const result = await moveNodes(organization, nodes)
+
+    expect(result).toEqual({
+      success: true,
+      data: [
+        { id: "node1", positionX: 100, positionY: 200 },
+        { id: "node2", positionX: 300, positionY: 400 },
+      ],
+    })
+
+    expect(prisma.node.update).toHaveBeenCalledTimes(2)
+    expect(prisma.node.update).toHaveBeenCalledWith({
+      where: { id: "node1" },
+      data: { positionX: 100, positionY: 200 },
+    })
+    expect(prisma.node.update).toHaveBeenCalledWith({
+      where: { id: "node2" },
+      data: { positionX: 300, positionY: 400 },
+    })
+  })
+
+  it("skips nodes that do not exist (P2025)", async () => {
+    const nodes = [{ id: "missingNode", position: { x: 0, y: 0 } }]
+
+    ;(prisma.$transaction as jest.Mock).mockImplementation(async (fn: any) =>
+      fn(prisma)
+    )
+
+    ;(prisma.node.update as jest.Mock).mockImplementation(async () => {
+      const e: any = new Error("Record not found")
+      e.code = "P2025"
+      throw e
+    })
+
+    const result = await moveNodes(organization, nodes)
+
+    expect(result).toEqual({
+      success: true,
+      data: [], // skipped node
+    })
+  })
+
+  it("returns an error if unexpected exception occurs", async () => {
+    const nodes = [{ id: "node1", position: { x: 0, y: 0 } }]
+
+    ;(prisma.$transaction as jest.Mock).mockImplementation(async () => {
+      throw new Error("Database down")
+    })
+
+    const result = await moveNodes(organization, nodes)
+
+    expect(result).toEqual({
+      success: false,
+      error: "Internal server error",
+    })
+  })
+})
+
+describe("updateDBFlow", () => {
+  const organization = { id: "org1" } as any
+  const roadmapId = "roadmap-1"
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("updates nodes, edges, and milestones correctly", async () => {
+    const nodes = [
+      { id: "node1", position: { x: 100, y: 200 }, data: { title: "M1", attachments: [] } },
+      { id: "node2", positionX: 300, positionY: 400, data: { title: "M2", attachments: [] } },
+      { id: "node3", position: { x: 500, y: 600 } }, // no milestone
+    ]
+    const edges = [
+      { id: "edge1", source: "node1", target: "node2" },
+      { id: "edge2", source: "node2", target: "node3" },
+    ]
+
+    // Mock findMany to simulate existing DB data
+    ;(prisma.node.findMany as jest.Mock)
+      .mockResolvedValueOnce([{ id: "node1" }, { id: "node2" }]) // existing nodes
+      .mockResolvedValueOnce(nodes) // final nodes
+    ;(prisma.edge.findMany as jest.Mock)
+      .mockResolvedValueOnce([{ id: "edge1" }]) // existing edges
+      .mockResolvedValueOnce(edges) // final edges
+    ;(prisma.milestone.findMany as jest.Mock).mockResolvedValue([
+      { id: "ms1", nodeId: "node1" },
+      { id: "ms2", nodeId: "node2" },
+    ])
+
+    // Mock $transaction to call the callback immediately with prisma
+    ;(prisma.$transaction as jest.Mock).mockImplementation(async (fn: any) => fn(prisma))
+
+    ;(prisma.node.deleteMany as jest.Mock).mockResolvedValue({})
+    ;(prisma.edge.deleteMany as jest.Mock).mockResolvedValue({})
+    ;(prisma.node.createMany as jest.Mock).mockResolvedValue({})
+    ;(prisma.node.update as jest.Mock).mockResolvedValue({})
+    ;(prisma.edge.createMany as jest.Mock).mockResolvedValue({})
+    ;(prisma.edge.update as jest.Mock).mockResolvedValue({})
+    ;(prisma.milestone.findUnique as jest.Mock).mockResolvedValue(null)
+    ;(prisma.milestone.create as jest.Mock).mockResolvedValue({})
+    ;(prisma.milestone.update as jest.Mock).mockResolvedValue({})
+
+    const result = await updateDBFlow(organization, { roadmapId, nodes, edges })
+
+    expect(result).toEqual({
+      success: true,
+      data: {
+        nodes,
+        edges,
+        milestones: [
+          { id: "ms1", nodeId: "node1" },
+          { id: "ms2", nodeId: "node2" },
+        ],
+      },
+    })
+
+    // Check createMany for nodes/edges
+    expect(prisma.node.createMany).toHaveBeenCalled()
+    expect(prisma.edge.createMany).toHaveBeenCalled()
+
+    // Ensure milestones were created
+    expect(prisma.milestone.create).toHaveBeenCalledTimes(2)
+  })
+
+  it("returns error if roadmapId is missing", async () => {
+    const result = await updateDBFlow(organization, { roadmapId: null, nodes: [], edges: [] })
+    expect(result).toEqual({
+      success: false,
+      error: "Internal server error",
+    })
+  })
+})

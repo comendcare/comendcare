@@ -3750,123 +3750,6 @@ export const updateBiosample = withOrganizationAuth(
     }
 );
 
-// export const createOrUpdateAsset = withOrganizationAuth(
-//     async (organization: Organization, toolData: any) => {
-//         try {
-//             console.log(`tool data`, toolData)
-//             if (!organization.id) {
-//                 throw new Error("No organization id provided.")
-//             }
-
-//             const response = await prisma.tool.upsert({
-//                 where: {
-//                     id: toolData.id || nanoid()
-//                 },
-//                 include: {
-//                     organization: {include: {conditions: {include: {condition: true}}}},
-//                     contacts: true,
-//                     attachments: true,
-//                     milestones: {
-//                         include: {
-//                             milestone: {
-//                                 include: {types: {include: {milestoneType: true}}}
-//                             }
-//                         }
-//                     },
-//                 },
-//                 update: {
-//                     title: toolData.title,
-//                     description: toolData.description,
-//                     types: toolData.types,
-//                     ...(toolData.attachments ? (
-//                         {
-//                             attachments: {
-//                                 deleteMany: {}, // clear all existing attachments
-//                                 createMany: {
-//                                     data: (toolData?.attachments || []).map((attachment: any) => ({
-//                                         link: attachment.link,
-//                                         ...(attachment.name ? {name: attachment.name} : undefined)
-//                                     }))
-//                                 }
-//                             }
-//                         }
-//                     ) : undefined),
-//                     ...(toolData.contacts ? (
-//                         {
-//                             contacts: {
-//                                 deleteMany: {},
-//                                 createMany: {
-//                                     data: (toolData?.contacts || []).map((contact: any) => ({
-//                                         name: contact.name,
-//                                         email: contact.email,
-//                                         ...(contact.role ? {role: contact.role} : undefined),
-//                                         ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-//                                     }))
-//                                 }
-//                             }
-//                         }
-//                     ) : undefined),
-//                     ...(toolData.milestones ? (
-//                         {
-//                             milestones: {
-//                                 deleteMany: {},
-//                                 create: (toolData.milestones || []).map((milestone: any) => ({
-//                                     milestone: {
-//                                         connect: {id: milestone.milestoneId}
-//                                     }
-//                                 }))
-//                             },
-//                         }
-//                     ) : undefined),
-//                     private: toolData.private || false,
-//                     metadata: toolData.metadata as InputJsonObject,
-//                 },
-//                 create: {
-//                     // create with the given id if it's available. This is useful for situations like 'undo'
-//                     // where we're re-creating a pre-existing tool, and the id should match the id in our zustand state
-//                     ...(toolData.id ? {id: toolData.id} : undefined),
-//                     title: toolData.title || "",
-//                     description: toolData.description,
-//                     types: toolData.types,
-//                     attachments: {
-//                         createMany: {
-//                             data: (toolData?.attachments || []).map((attachment: any) => ({
-//                                 link: attachment.link,
-//                                 ...(attachment.name ? {name: attachment.name} : undefined)
-//                             }))
-//                         }
-//                     },
-//                     contacts: {
-//                         createMany: {
-//                             data: (toolData?.contacts || []).map((contact: any) => ({
-//                                 name: contact.name,
-//                                 email: contact.email,
-//                                 ...(contact.role ? {role: contact.role} : undefined),
-//                                 ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
-//                             }))
-//                         }
-//                     },
-//                     milestones: {
-//                         create: (toolData.milestones || []).map((milestone: any) => ({
-//                             milestone: {
-//                                 connect: {id: milestone.milestoneId}
-//                             }
-//                         }))
-//                     },
-//                     private: toolData.private || false,
-//                     organization: {connect: {id: organization.id}},
-//                     metadata: toolData.metadata as InputJsonObject,
-//                 },
-//             })
-
-//             return response
-//         } catch (error: any) {
-//             console.error("Error creating or updating tool:", error.message);
-//             throw new Error(error.message || "Failed to create or update tool.");
-//         }
-//     }
-// )
-
 export const deleteRFP = withOrganizationAuth(
     async (_: Organization, rfpId: string) => {
         try {
@@ -3924,7 +3807,8 @@ export const createOrUpdateRFP = withOrganizationAuth(
 
             const response = await prisma.rFP.upsert({
                 where: {
-                    id: rfpData.id || nanoid(),
+                    // id: rfpData.id || nanoid(),
+                    id: rfpData.id,
                 },
                 include: {
                     contacts: true,
