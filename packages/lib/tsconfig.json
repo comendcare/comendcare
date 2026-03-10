@@ -6,6 +6,10 @@
       "@/state/*": ["state/*"],
     },
     "types": ["jest", "node"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "**/*.test.ts", "**/*.test.tsx"],
   "exclude": ["node_modules", "dist"]
