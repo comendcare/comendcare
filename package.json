@@ -19,7 +19,6 @@
   "prisma": {
     "seed": "tsx prisma/seed/seed.ts"
   },
-  "type": "module",
   "dependencies": {
     "@ai-sdk/openai": "^1.0.7",
     "@ariakit/react": "^0.4.15",

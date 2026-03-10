@@ -27,4 +27,4 @@ jobs:
         run: npm ci
 
       - name: Run Jest Tests
-        run: npx jest --passWithNoTests --coverage --collectCoverageFrom "packages/lib/*.ts" --maxWorkers=2
+        run: npx jest --passWithNoTests --coverage --collectCoverageFrom "packages/**/*.ts" --maxWorkers=2
