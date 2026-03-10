@@ -27,4 +27,4 @@ jobs:
         run: npm ci
 
       - name: Run Jest Tests (ESM)
-        run: node --experimental-vm-modules $(npm bin)/jest --passWithNoTests --coverage
+        run: npx node --loader ts-node/esm --experimental-vm-modules node_modules/jest/bin/jest.js --passWithNoTests --coverage
