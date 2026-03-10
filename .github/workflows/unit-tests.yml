@@ -33,5 +33,5 @@ jobs:
           --collectCoverageFrom "packages/data/*.ts" 
           --collectCoverageFrom "packages/lib/*.ts" 
           --collectCoverageFrom "packages/types/*.ts" 
-          --collectCoverageFrom "packages/transactional/*.ts" 
+          --collectCoverageFrom "packages/transactional/**/*.ts" 
           --maxWorkers=2
