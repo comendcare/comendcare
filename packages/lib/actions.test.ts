@@ -56,10 +56,6 @@ jest.mock("./raw-events", () => ({
   writeRawEvent: jest.fn(),
 }));
 
-jest.mock("comend-researcher-hub/lib/auth", () => ({
-  withResearcherAuth: jest.fn(),
-}))
-
 jest.mock("./typesense", () => ({
   updateTypeSenseDocument: jest.fn(),
   deleteTypeSenseDocument: jest.fn(),
@@ -104,6 +100,7 @@ jest.mock("./prisma", () => ({
       findUnique: jest.fn(),
       delete: jest.fn(),
       findMany: jest.fn(),
+      findFirst: jest.fn(),
     },
     condition: {
       upsert: jest.fn(),
@@ -244,6 +241,17 @@ jest.mock("./prisma", () => ({
       update: jest.fn(),
       delete: jest.fn(),
     },
+    materialAndDataAccessRequest: {
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    subscription: {
+      findFirst: jest.fn(),
+      create: jest.fn(),
+    },
+    tagAssignment: {
+      deleteMany: jest.fn(),
+    },
     $transaction: jest.fn(),
   },
 }));
@@ -255,6 +263,10 @@ jest.mock("./auth", () => ({
   withOrganizationAuth: <T extends (...args: any[]) => any>(fn: T): T => fn, // bypass authentication (tested separately in auth.test.ts)
   withUserAuth: (fn: any) => fn, // bypass authentication (tested separately in auth.test.ts)
 }));
+
+jest.mock("comend-researcher-hub/lib/auth", () => ({
+  withResearcherAuth: (fn: any) => fn,
+}))
 
 jest.mock("next-auth/next", () => ({
   getServerSession: jest.fn(),
@@ -318,6 +330,7 @@ import {
   createCondition, 
   createCreateFacilityRequest, 
   createDiseaseModel, 
+  createMaterialAndDataAccessRequest, 
   createMemberRequest, 
   createMilestones, 
   createNodes, 
@@ -358,6 +371,8 @@ import {
   setDataToolsVisibility,
   setDiseaseModelsVisibility,
   submitFeedback,
+  subscribeToOrganization,
+  switchOrganization,
   syncDBRFPs,
   toggleBiopharmaConsentSettings,
   toggleOrganizationPublished,
@@ -371,6 +386,8 @@ import {
   updateDBFlow,
   updateDiseaseModel,
   updateEdges,
+  updateEntityTags,
+  updateMaterialAndDataAccessRequestProperty,
   updateMemberWithMemberPermission,
   updateMemberWithOwnerPermission,
   updateMilestones,
@@ -386,6 +403,7 @@ import { Prisma } from "@prisma/client"
 import {
   addTypeSenseDocument,
   deleteTypeSenseDocument,
+  normalizeTag,
   toBiomarkersNested,
   updateTypeSenseDocument
 } from "./utils"
@@ -394,6 +412,7 @@ import { customerIOTrack } from "./customerio/customer-io-track"
 import { cioRemoveOrgMember, cioSyncOrg, cioUpsertOrgMember } from "./customerio/cio-sync-org"
 import { cioDeleteUser } from "./customerio/customer-io"
 import { writeRawEvent } from "./raw-events"
+import { getServerSession } from "next-auth/next"
 
 // helper to create a FormData mock
 const createFormData = (data: Record<string, any>) => {
@@ -5258,4 +5277,582 @@ describe("createPharmaProject", () => {
       error: "Database error. please try again later.",
     })
   })
+});
+
+describe("deletePharmaProject", () => {
+  const mockProjectId = "pharma-project-1"
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("should delete a pharma project and revalidate the path", async () => {
+    const mockResponse = { id: mockProjectId }
+
+    ;(prisma.pharmaProject.delete as jest.Mock).mockResolvedValue(mockResponse)
+
+    const result = await deletePharmaProject(mockProjectId)
+
+    expect(prisma.pharmaProject.delete).toHaveBeenCalledWith({
+      where: { id: mockProjectId },
+    })
+
+    expect(revalidatePath).toHaveBeenCalledWith("/(platform)/pharma")
+
+    expect(result).toEqual({
+      success: true,
+      data: mockResponse,
+    })
+  })
+
+  it("should return an error if prisma returns falsy", async () => {
+    ;(prisma.pharmaProject.delete as jest.Mock).mockResolvedValue(null)
+
+    const result = await deletePharmaProject(mockProjectId)
+
+    expect(prisma.pharmaProject.delete).toHaveBeenCalledWith({
+      where: { id: mockProjectId },
+    })
+
+    expect(result).toEqual({
+      success: false,
+      error: "Database error. please try again later.",
+    })
+
+    expect(revalidatePath).not.toHaveBeenCalled()
+  })
+
+  it("should handle prisma errors", async () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+
+    ;(prisma.pharmaProject.delete as jest.Mock).mockRejectedValue(
+      new Error("Database failure")
+    )
+
+    const result = await deletePharmaProject(mockProjectId)
+
+    expect(prisma.pharmaProject.delete).toHaveBeenCalledWith({
+      where: { id: mockProjectId },
+    })
+
+    expect(consoleSpy).toHaveBeenCalled()
+
+    expect(result).toEqual({
+      success: false,
+      error: "Database error. please try again later.",
+    })
+
+    consoleSpy.mockRestore()
+  })
+})
+
+describe("createMaterialAndDataAccessRequest", () => {
+  const mockUser = { id: "user1" } as any
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+
+    process.env.NEXT_PUBLIC_TYPESENSE_NODE = "typesense-node"
+    process.env.NEXT_PUBLIC_NODE_ENV = "development"
+    process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY = "key"
+  })
+
+  const buildFormData = () => {
+    const formData = new FormData()
+
+    const payload = {
+      name: "Test Request",
+      description: "Test description",
+      organizationId: "org1",
+      openToCollab: true,
+
+      projectDetails: {
+        studyTitle: "Study",
+        studyDescription: "Description",
+        justification: "Justification",
+        hasIrbApproval: true,
+        irbStatus: "approved",
+        hasRisks: false,
+        riskDescription: "",
+        disseminationPlan: "Plan",
+        patientSignificance: "Important",
+      },
+
+      sampleDetails: {
+        sampleTypes: ["blood"],
+        otherSampleType: "",
+        participantCount: 10,
+        processingRequirements: "None",
+      },
+
+      logistics: {
+        timeline: "3 months",
+        logisticsContact: "Jane",
+        providesCollectionKit: true,
+        needsCollectionMaterials: false,
+        participantCompensation: false,
+        compensationDetails: "",
+        shippingAddress: "123 street",
+        fedexAccount: "123",
+        shippingMethod: "FedEx",
+        shippingContact: "John",
+        shippingPhone: "555-5555",
+      },
+
+      commercial: {
+        isCommercial: false,
+        fundingOrganization: "NIH",
+      },
+
+      agreements: {},
+      metadata: {},
+    }
+
+    formData.set("data", JSON.stringify(payload))
+
+    return formData
+  }
+
+  it("should create a request successfully", async () => {
+    const formData = buildFormData()
+
+    const mockRequest = {
+      id: "req1",
+      title: "Test Request",
+      submittedAt: new Date(),
+      organization: {
+        id: "org1",
+        name: "Org",
+        subdomain: "org",
+        image: null,
+      },
+      researcher: {
+        id: "researcher1",
+      },
+    }
+
+    ;(getSession as jest.Mock).mockResolvedValue({
+      user: { id: "user1", name: "Test User" },
+    })
+
+    ;(prisma.materialAndDataAccessRequest.create as jest.Mock).mockResolvedValue(
+      mockRequest
+    )
+
+    const result = await createMaterialAndDataAccessRequest(mockUser, formData)
+
+    expect(prisma.materialAndDataAccessRequest.create).toHaveBeenCalled()
+
+    expect(writeRawEvent).toHaveBeenCalled()
+
+    expect(addTypeSenseDocument).toHaveBeenCalled()
+
+    expect(revalidatePath).toHaveBeenCalledWith("/requests")
+
+    expect(result).toEqual({
+      success: true,
+      data: mockRequest,
+    })
+  })
+
+  it("should return error if not authenticated", async () => {
+    ;(getSession as jest.Mock).mockResolvedValue(null)
+
+    const result = await createMaterialAndDataAccessRequest(
+      mockUser,
+      new FormData()
+    )
+
+    expect(result).toEqual({
+      error: "Not authenticated",
+    })
+  })
+
+  it("should handle prisma unique constraint error", async () => {
+    const formData = buildFormData()
+
+    ;(getSession as jest.Mock).mockResolvedValue({
+      user: { id: "user1" },
+    })
+
+    const prismaError = {
+      code: "P2002",
+      meta: { target: ["title"] },
+    }
+
+    ;(
+      prisma.materialAndDataAccessRequest.create as jest.Mock
+    ).mockRejectedValue(prismaError)
+
+    const result = await createMaterialAndDataAccessRequest(mockUser, formData)
+
+    expect(result).toEqual({
+      error: "Unique constraint failed on title",
+    })
+  })
+
+  it("should handle generic errors", async () => {
+    const formData = buildFormData()
+
+    ;(getSession as jest.Mock).mockResolvedValue({
+      user: { id: "user1" },
+    })
+
+    ;(
+      prisma.materialAndDataAccessRequest.create as jest.Mock
+    ).mockRejectedValue(new Error("Database failure"))
+
+    const result = await createMaterialAndDataAccessRequest(mockUser, formData)
+
+    expect(result).toEqual({
+      error: "Database failure",
+    })
+  })
+})
+
+describe("updateMaterialAndDataAccessRequestProperty", () => {
+  const mockUser = { id: "user1", name: "Test User" };
+  const mockRequestId = "req1";
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    process.env.NEXT_PUBLIC_TYPESENSE_NODE = "typesense-node";
+    process.env.NEXT_PUBLIC_NODE_ENV = "development";
+    process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY = "key";
+  });
+
+  it("should update a property successfully", async () => {
+    const updatedRequest = { id: mockRequestId, title: "Request 1", organizationId: "org1", organization: { id: "org1", name: "Org", subdomain: "org", image: null } };
+    (getSession as jest.Mock).mockResolvedValue({ user: mockUser });
+    (prisma.materialAndDataAccessRequest.update as jest.Mock).mockResolvedValue(updatedRequest);
+
+    const result = await updateMaterialAndDataAccessRequestProperty(mockRequestId, "sampleCount", 10);
+
+    expect(prisma.materialAndDataAccessRequest.update).toHaveBeenCalledWith({
+      where: { id: mockRequestId },
+      include: { organization: true },
+      data: { sampleCount: 10 },
+    });
+    expect(updateTypeSenseDocument).toHaveBeenCalledWith(
+      `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE}`,
+      process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY,
+      updatedRequest,
+      'requests'
+    );
+    expect(revalidatePath).toHaveBeenCalledWith("/requests");
+    expect(result).toEqual({ success: true, data: updatedRequest });
+  });
+
+  it("should return error if not authenticated", async () => {
+    (getSession as jest.Mock).mockResolvedValue(null);
+
+    const result = await updateMaterialAndDataAccessRequestProperty(mockRequestId, "sampleCount", 10);
+
+    expect(result).toEqual({ success: false, error: "Not authenticated" });
+    expect(prisma.materialAndDataAccessRequest.update).not.toHaveBeenCalled();
+  });
+
+  it("should return error for unsupported property", async () => {
+    (getSession as jest.Mock).mockResolvedValue({ user: mockUser });
+
+    const result = await updateMaterialAndDataAccessRequestProperty(mockRequestId, "invalidProp", 123);
+
+    expect(result).toEqual({ success: false, error: "Unsupported property." });
+    expect(prisma.materialAndDataAccessRequest.update).not.toHaveBeenCalled();
+  });
+
+  it("should write event if status is APPROVED", async () => {
+    const updatedRequest = { id: mockRequestId, title: "Request 1", organizationId: "org1", organization: { id: "org1", name: "Org", subdomain: "org", image: null } };
+    (getSession as jest.Mock).mockResolvedValue({ user: mockUser });
+    (prisma.materialAndDataAccessRequest.update as jest.Mock).mockResolvedValue(updatedRequest);
+
+    const result = await updateMaterialAndDataAccessRequestProperty(mockRequestId, "status", "APPROVED");
+
+    expect(writeRawEvent).toHaveBeenCalledWith(expect.objectContaining({
+      eventType: "tool_request_approved",
+      externalId: mockRequestId,
+      payload: expect.objectContaining({
+        requestId: mockRequestId,
+        title: "Request 1",
+        approverUserId: mockUser.id,
+      }),
+    }));
+    expect(result).toEqual({ success: true, data: updatedRequest });
+  });
+
+  it("should handle server errors gracefully", async () => {
+    (getSession as jest.Mock).mockResolvedValue({ user: mockUser });
+    (prisma.materialAndDataAccessRequest.update as jest.Mock).mockRejectedValue(new Error("DB failed"));
+
+    const result = await updateMaterialAndDataAccessRequestProperty(mockRequestId, "sampleCount", 10);
+
+    expect(result).toEqual({ success: false, error: "Server error occurred." });
+  });
+});
+
+describe("switchOrganization", () => {
+  const mockUser = { id: "user1" }
+  const orgId = "org1"
+  const PATHS = [
+      "/app",
+      "/app/profile",
+      "/app/dashboard",
+      "/app/notifications",
+      "/app/team",
+      "/app/settings",
+      "/app/tools/biosample",
+      "/app/tools/disease-models",
+      "/app/tools/data",
+      "/app/rfps",
+      "/app/requests",
+      "/app/research-plan",
+  ]
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should return error if not authenticated", async () => {
+    (getServerSession as jest.Mock).mockResolvedValue(null);
+
+    const result = await switchOrganization(orgId);
+
+    expect(result).toEqual({ success: false, error: "Not authenticated" });
+    expect(prisma.member.findFirst).not.toHaveBeenCalled();
+    expect(prisma.user.update).not.toHaveBeenCalled();
+  });
+
+  it("should return error if user is not a member of the org", async () => {
+    (getServerSession as jest.Mock).mockResolvedValue({ user: mockUser });
+    (prisma.member.findFirst as jest.Mock).mockResolvedValue(null);
+
+    const result = await switchOrganization(orgId);
+
+    expect(result).toEqual({ success: false, error: "Not authorized for this organization" });
+    expect(prisma.user.update).not.toHaveBeenCalled();
+  });
+
+  it("should switch organization successfully and revalidate paths", async () => {
+    (getServerSession as jest.Mock).mockResolvedValue({ user: mockUser });
+    (prisma.member.findFirst as jest.Mock).mockResolvedValue({ id: "membership1" });
+    (prisma.user.update as jest.Mock).mockResolvedValue({ id: mockUser.id, activeOrganizationId: orgId });
+
+    const result = await switchOrganization(orgId);
+
+    expect(prisma.user.update).toHaveBeenCalledWith({
+      where: { id: mockUser.id },
+      data: { activeOrganizationId: orgId },
+    });
+
+    for (const path of PATHS) {
+      expect(revalidatePath).toHaveBeenCalledWith(path);
+    }
+
+    expect(result).toEqual({ success: true });
+  });
+});
+
+describe("subscribeToOrganization", () => {
+  const email = "user@example.com";
+  const host = "org.example.com";
+  const orgId = "org1";
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.NEXT_PUBLIC_ROOT_DOMAIN = "example.com";
+  });
+
+  it("returns error if email domain is invalid", async () => {
+    ;(validateEmailDomain as jest.Mock).mockResolvedValue(false);
+
+    const result = await subscribeToOrganization(email, host);
+
+    expect(result).toEqual({
+      success: false,
+      error: "Email domain is invalid or cannot receive emails.",
+    });
+  });
+
+  it("returns error if host is missing", async () => {
+    ;(validateEmailDomain as jest.Mock).mockResolvedValue(true);
+
+    const result = await subscribeToOrganization(email, null);
+
+    expect(result).toEqual({
+      success: false,
+      error: "Missing host.",
+    });
+  });
+
+  it("returns error if organization not found", async () => {
+    ;(validateEmailDomain as jest.Mock).mockResolvedValue(true);
+    ;(prisma.organization.findFirst as jest.Mock).mockResolvedValue(null);
+
+    const result = await subscribeToOrganization(email, host);
+
+    expect(result).toEqual({
+      success: false,
+      error: "Organization not found.",
+    });
+  });
+
+  it("returns error if already subscribed", async () => {
+    ;(validateEmailDomain as jest.Mock).mockResolvedValue(true);
+    ;(prisma.organization.findFirst as jest.Mock).mockResolvedValue({ id: orgId, subdomain: "org" });
+    ;(prisma.subscription.findFirst as jest.Mock).mockResolvedValue({ id: "sub1" });
+
+    const result = await subscribeToOrganization(email, host);
+
+    expect(result).toEqual({
+      success: false,
+      error: "You're already subscribed to this organization.",
+    });
+  });
+
+  it("creates subscription successfully", async () => {
+    ;(validateEmailDomain as jest.Mock).mockResolvedValue(true);
+    ;(prisma.organization.findFirst as jest.Mock).mockResolvedValue({ id: orgId, subdomain: "org" });
+    ;(prisma.subscription.findFirst as jest.Mock).mockResolvedValue(null);
+    ;(prisma.subscription.create as jest.Mock).mockResolvedValue({ id: "sub123" });
+
+    const result = await subscribeToOrganization(email, host);
+
+    expect(prisma.subscription.create).toHaveBeenCalledWith({
+      data: { organizationId: orgId, email: email.toLowerCase() },
+      select: { id: true },
+    });
+
+    expect(customerIOTrack).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: "user_subscribed_to_organization",
+        traits: expect.objectContaining({ email: email.toLowerCase(), organization_id: orgId }),
+      })
+    );
+
+    expect(result).toEqual({ success: true, data: { id: "sub123" } });
+  });
+
+  it("handles P2002 unique constraint error", async () => {
+    ;(validateEmailDomain as jest.Mock).mockResolvedValue(true);
+    ;(prisma.organization.findFirst as jest.Mock).mockResolvedValue({ id: orgId, subdomain: "org" });
+    ;(prisma.subscription.findFirst as jest.Mock).mockResolvedValue(null);
+    ;(prisma.subscription.create as jest.Mock).mockRejectedValue({ code: "P2002" });
+
+    const result = await subscribeToOrganization(email, host);
+
+    expect(result).toEqual({
+      success: false,
+      error: "You're already subscribed to this organization.",
+    });
+  });
+
+  it("handles generic database errors", async () => {
+    ;(validateEmailDomain as jest.Mock).mockResolvedValue(true);
+    ;(prisma.organization.findFirst as jest.Mock).mockResolvedValue({ id: orgId, subdomain: "org" });
+    ;(prisma.subscription.findFirst as jest.Mock).mockResolvedValue(null);
+    ;(prisma.subscription.create as jest.Mock).mockRejectedValue(new Error("DB failure"));
+
+    const result = await subscribeToOrganization(email, host);
+
+    expect(result).toEqual({
+      success: false,
+      error: "Database error. Please try again later.",
+    });
+  });
+});
+
+describe("updateEntityTags", () => {
+  const userSession = { user: { id: "user1", name: "Test User" } };
+  const taggableType = "MATERIAL_AND_DATA_ACCESS_REQUEST";
+  const taggableId = "entity1";
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("returns error if not authenticated", async () => {
+    (getSession as jest.Mock).mockResolvedValue(null);
+
+    const result = await updateEntityTags(taggableType, taggableId, ["tag1"]);
+
+    expect(result).toEqual({
+      success: false,
+      error: "Not authenticated",
+    });
+  });
+
+  it("returns error if missing taggableId", async () => {
+    (getSession as jest.Mock).mockResolvedValue(userSession);
+
+    const result = await updateEntityTags(taggableType, "", ["tag1"]);
+
+    expect(result).toEqual({
+      success: false,
+      error: "Missing taggableId",
+    });
+  });
+
+  it("clears tags when normalized array is empty", async () => {
+    (getSession as jest.Mock).mockResolvedValue(userSession);
+    (normalizeTag as jest.Mock).mockReturnValue(null);
+    (prisma.tagAssignment.deleteMany as jest.Mock).mockResolvedValue({ count: 0 });
+
+    const result = await updateEntityTags(taggableType, taggableId, [""]);
+
+    expect(prisma.tagAssignment.deleteMany).toHaveBeenCalledWith({
+      where: { taggableType, taggableId },
+    });
+
+    expect(result).toEqual({
+      success: true,
+      data: { assignments: [] },
+    });
+  });
+
+  it("upserts tags and creates assignments successfully", async () => {
+    (getSession as jest.Mock).mockResolvedValue(userSession);
+
+    (normalizeTag as jest.Mock).mockImplementation((t) => ({
+      display: t,
+      normalized: t.toLowerCase(),
+    }));
+
+    const tags = [{ id: "tag1" }, { id: "tag2" }];
+
+    // Mock the transaction
+    (prisma.$transaction as jest.Mock).mockImplementation(async (fn: any) => {
+      return fn({
+        tag: { upsert: jest.fn().mockImplementation(({ create }) => ({ id: create.value })) },
+        tagAssignment: {
+          deleteMany: jest.fn(),
+          createMany: jest.fn(),
+          findMany: jest.fn().mockResolvedValue([
+            { id: "a1", tag: { id: "tag1", value: "Tag1", normalizedValue: "tag1" } },
+            { id: "a2", tag: { id: "tag2", value: "Tag2", normalizedValue: "tag2" } },
+          ]),
+        },
+      });
+    });
+
+    const result = await updateEntityTags(taggableType, taggableId, ["Tag1", "Tag2"]);
+
+    expect(prisma.$transaction).toHaveBeenCalled();
+    expect(result.success).toBe(true);
+    expect(result.data?.assignments.length).toBe(2);
+    expect(result.data?.assignments[0].tag.value).toBe("Tag1");
+    expect(result.data?.assignments[1].tag.value).toBe("Tag2");
+  });
+
+  it("handles errors gracefully", async () => {
+    (getSession as jest.Mock).mockResolvedValue(userSession);
+    (prisma.$transaction as jest.Mock).mockRejectedValue(new Error("Database error"));
+
+    const result = await updateEntityTags(taggableType, taggableId, ["Tag1"]);
+
+    expect(result).toEqual({
+      success: false,
+      error: "Server error occurred.",
+    });
+  });
 });

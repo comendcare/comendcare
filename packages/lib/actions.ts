@@ -5839,7 +5839,7 @@ export const createPharmaProject = withAuth(
 export const deletePharmaProject = withAuth(
     async (pharmaProjectId: string | undefined) => {
         try {
-            const response = prisma.pharmaProject.delete({
+            const response = await prisma.pharmaProject.delete({
                 where: {id: pharmaProjectId},
             });
 
@@ -6115,7 +6115,6 @@ export const updateMaterialAndDataAccessRequestProperty = withAuth(
     }
 );
 
-
 export async function switchOrganization(organizationId: string) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -6193,28 +6192,32 @@ export async function subscribeToOrganization(email: string, host?: string | nul
             select: { id: true },
         });
 
-        await customerIOTrack({
-            userId: null, // public form, no session
-            event: "user_subscribed_to_organization",
-            timestamp: new Date(),
-            traits: {
-                email: lower,
-                organization_id: org.id,
-            },
-            properties: {
-                email: lower,
-                organizationId: org.id,
-                organizationHost: host,
-            },
-        });
+        try {
+            await customerIOTrack({
+                userId: null, // public form, no session
+                event: "user_subscribed_to_organization",
+                timestamp: new Date(),
+                traits: {
+                    email: lower,
+                    organization_id: org.id,
+                },
+                properties: {
+                    email: lower,
+                    organizationId: org.id,
+                    organizationHost: host,
+                },
+            });
+        } catch (e) {
+            console.error('[CIO] track user_subscribed_to_organization failed:', e);
+        }
 
         return { success: true, data: { id: record.id } };
     } catch (err: any) {
         console.error("subscribePublic error", err);
         if (err?.code === "P2002") {
-            return { success: false, error: "You're already subscribed to this organization." };
+            return { success: false, error: `You're already subscribed to this organization.` };
         }
-        return { success: false, error: "Database error. Please try again later." };
+        return { success: false, error: `Database error. Please try again later.` };
     }
 }
 
