@@ -62,20 +62,9 @@ jest.mock("./typesense", () => ({
 }))
 
 jest.mock("./prisma", () => {
-  const biosample = {
-    create: jest.fn(),
-    update: jest.fn(),
-    findUnique: jest.fn(),
-    delete: jest.fn(),
-  }
-  const diseaseModel = {
-    update: jest.fn(),
-    findUnique: jest.fn(),
-  }
-  const tool = {
-    update: jest.fn(),
-    findUnique: jest.fn(),
-  }
+  const biosample = {create: jest.fn(), update: jest.fn(), findUnique: jest.fn(), delete: jest.fn(), updateMany: jest.fn(), deleteMany: jest.fn()}
+  const diseaseModel = {update: jest.fn(), findUnique: jest.fn(), create: jest.fn(), updateMany: jest.fn(), deleteMany: jest.fn()}
+  const tool = {update: jest.fn(), findUnique: jest.fn(), create: jest.fn(), updateMany: jest.fn(), deleteMany: jest.fn()}
   const company = { findUnique: jest.fn() }
   const institution = { findUnique: jest.fn() }
   const emailCapture = { upsert: jest.fn() }
