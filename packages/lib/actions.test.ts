@@ -61,201 +61,198 @@ jest.mock("./typesense", () => ({
   deleteTypeSenseDocument: jest.fn(),
 }))
 
-// Mock the DB calls
-jest.mock("./prisma", () => ({
-  __esModule: true,
-  default: {
-    biosample: {
-      create: jest.fn(),
-      updateMany: jest.fn(),
-      deleteMany: jest.fn(),
-      update: jest.fn(),
-      findUnique: jest.fn(),
+jest.mock("./prisma", () => {
+  const biosample = {
+    create: jest.fn(),
+    update: jest.fn(),
+    findUnique: jest.fn(),
+    delete: jest.fn(),
+  }
+  const diseaseModel = {
+    update: jest.fn(),
+    findUnique: jest.fn(),
+  }
+  const tool = {
+    update: jest.fn(),
+    findUnique: jest.fn(),
+  }
+  const company = { findUnique: jest.fn() }
+  const institution = { findUnique: jest.fn() }
+
+  // Return exactly what your code expects
+  return {
+    __esModule: true,
+    default: {
+      biosample,
+      diseaseModel,
+      tool,
+      company,
+      institution,
+      emailCapture: {
+        upsert: jest.fn(),
+      },
+      memberRequest: {
+        findUnique: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
+      organization: {
+        create: jest.fn(),
+        update: jest.fn(),
+        findUnique: jest.fn(),
+        delete: jest.fn(),
+        findMany: jest.fn(),
+        findFirst: jest.fn(),
+      },
+      condition: {
+        upsert: jest.fn(),
+        deleteMany: jest.fn(),
+        findUnique: jest.fn(),
+        update: jest.fn(),
+        create: jest.fn(),
+      },
+      conditionToOrganization: {
+        create: jest.fn(),
+        findFirst: jest.fn(),
+        upsert: jest.fn(),
+      },
+      membership: {
+        create: jest.fn(),
+      },
+      member: { 
+        create: jest.fn(),
+        findMany: jest.fn(), 
+        findUnique: jest.fn(),
+        findFirst: jest.fn() ,
+        delete: jest.fn(),
+        count: jest.fn(),
+        update: jest.fn(),
+      },
+      user: {
+        update: jest.fn(),
+        findMany: jest.fn(),
+        findUnique: jest.fn(),
+        delete: jest.fn()
+      },
+      milestone: {
+        updateMany: jest.fn(),
+        count: jest.fn(),
+        update: jest.fn(),
+        findMany: jest.fn(),
+        deleteMany: jest.fn(),
+        createMany: jest.fn(),
+        findUnique: jest.fn(),
+        create: jest.fn(),
+        delete: jest.fn(),
+      },
+      node: {
+        create: jest.fn(),
+        update: jest.fn(),
+        findMany: jest.fn(),
+        deleteMany: jest.fn(),
+        createMany: jest.fn(),
+        findUnique: jest.fn(),
+        delete: jest.fn(),
+      },
+      edge: {
+        create: jest.fn(),
+        update: jest.fn(),
+        findMany: jest.fn(),
+        deleteMany: jest.fn(),
+        createMany: jest.fn(),
+        findUnique: jest.fn(),
+        delete: jest.fn(),
+        upsert: jest.fn(),
+      },
+      roadmap: {
+        create: jest.fn(),
+        findUnique: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
+      invitation: { 
+        findFirst: jest.fn(), 
+        create: jest.fn(),
+        delete: jest.fn(),
+        findUnique: jest.fn(),
+      },
+      whitelist: { 
+        upsert: jest.fn() 
+      },
+      claimOrganizationInvitation: {
+        findUnique: jest.fn(),
+        delete: jest.fn(),
+      },
+      createFacilityRequest: {
+        create: jest.fn(),
+        update: jest.fn(),
+      },
+      donor: {
+        findFirst: jest.fn(),
+        update: jest.fn(),
+      },
+      rFP: {
+        update: jest.fn(),
+        delete: jest.fn(),
+        create: jest.fn(),
+        upsert: jest.fn(),
+        findUnique: jest.fn(),
+      },
+      platformNotification: {
+        update: jest.fn(),
+        create: jest.fn(),
+        createMany: jest.fn(),
+        findMany: jest.fn(),
+      },
+      review: {
+        findUnique: jest.fn(),
+        delete: jest.fn(),
+      },
+      reviewFeedback: {
+        findUnique: jest.fn(),
+        update: jest.fn(),
+        create: jest.fn(),
+      },
+      savedCompany: {
+        findFirst: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn()
+      },
+      savedOrganization: {
+        findFirst: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
+      companyContactRequest: {
+        findFirst: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
+      pharmaProject: {
+        findFirst: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
+      materialAndDataAccessRequest: {
+        create: jest.fn(),
+        update: jest.fn(),
+      },
+      subscription: {
+        findFirst: jest.fn(),
+        create: jest.fn(),
+      },
+      tagAssignment: {
+        deleteMany: jest.fn(),
+      },
+      $transaction: jest.fn(),
     },
-    diseaseModel: {
-      create: jest.fn(),
-      updateMany: jest.fn(),
-      deleteMany: jest.fn(),
-      update: jest.fn(),
-      findUnique: jest.fn(),
-    },
-    tool: {
-      create: jest.fn(),
-      updateMany: jest.fn(),
-      deleteMany: jest.fn(),
-      update: jest.fn(),
-      findUnique: jest.fn()
-    },
-    emailCapture: {
-      upsert: jest.fn(),
-    },
-    memberRequest: {
-      findUnique: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-    organization: {
-      create: jest.fn(),
-      update: jest.fn(),
-      findUnique: jest.fn(),
-      delete: jest.fn(),
-      findMany: jest.fn(),
-      findFirst: jest.fn(),
-    },
-    condition: {
-      upsert: jest.fn(),
-      deleteMany: jest.fn(),
-      findUnique: jest.fn(),
-      update: jest.fn(),
-      create: jest.fn(),
-    },
-    conditionToOrganization: {
-      create: jest.fn(),
-      findFirst: jest.fn(),
-      upsert: jest.fn(),
-    },
-    membership: {
-      create: jest.fn(),
-    },
-    member: { 
-      create: jest.fn(),
-      findMany: jest.fn(), 
-      findUnique: jest.fn(),
-      findFirst: jest.fn() ,
-      delete: jest.fn(),
-      count: jest.fn(),
-      update: jest.fn(),
-    },
-    user: {
-      update: jest.fn(),
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-      delete: jest.fn()
-    },
-    milestone: {
-      updateMany: jest.fn(),
-      count: jest.fn(),
-      update: jest.fn(),
-      findMany: jest.fn(),
-      deleteMany: jest.fn(),
-      createMany: jest.fn(),
-      findUnique: jest.fn(),
-      create: jest.fn(),
-      delete: jest.fn(),
-    },
-    node: {
-      create: jest.fn(),
-      update: jest.fn(),
-      findMany: jest.fn(),
-      deleteMany: jest.fn(),
-      createMany: jest.fn(),
-      findUnique: jest.fn(),
-      delete: jest.fn(),
-    },
-    edge: {
-      create: jest.fn(),
-      update: jest.fn(),
-      findMany: jest.fn(),
-      deleteMany: jest.fn(),
-      createMany: jest.fn(),
-      findUnique: jest.fn(),
-      delete: jest.fn(),
-      upsert: jest.fn(),
-    },
-    roadmap: {
-      create: jest.fn(),
-      findUnique: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-    invitation: { 
-      findFirst: jest.fn(), 
-      create: jest.fn(),
-      delete: jest.fn(),
-      findUnique: jest.fn(),
-    },
-    whitelist: { 
-      upsert: jest.fn() 
-    },
-    claimOrganizationInvitation: {
-      findUnique: jest.fn(),
-      delete: jest.fn(),
-    },
-    company: {
-      findUnique: jest.fn(),
-    },
-    institution: {
-      findUnique: jest.fn(),
-    },
-    createFacilityRequest: {
-      create: jest.fn(),
-      update: jest.fn(),
-    },
-    donor: {
-      findFirst: jest.fn(),
-      update: jest.fn(),
-    },
-    rFP: {
-      update: jest.fn(),
-      delete: jest.fn(),
-      create: jest.fn(),
-      upsert: jest.fn(),
-      findUnique: jest.fn(),
-    },
-    platformNotification: {
-      update: jest.fn(),
-      create: jest.fn(),
-      createMany: jest.fn(),
-      findMany: jest.fn(),
-    },
-    review: {
-      findUnique: jest.fn(),
-      delete: jest.fn(),
-    },
-    reviewFeedback: {
-      findUnique: jest.fn(),
-      update: jest.fn(),
-      create: jest.fn(),
-    },
-    savedCompany: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn()
-    },
-    savedOrganization: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-    companyContactRequest: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-    pharmaProject: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-    materialAndDataAccessRequest: {
-      create: jest.fn(),
-      update: jest.fn(),
-    },
-    subscription: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-    },
-    tagAssignment: {
-      deleteMany: jest.fn(),
-    },
-    $transaction: jest.fn(),
-  },
-}));
+  };
+});
 
 jest.mock("./auth", () => ({
   authOptions: jest.fn(),
