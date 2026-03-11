@@ -63,6 +63,7 @@ jest.mock("./typesense", () => ({
 
 // Mock the DB calls
 jest.mock("./prisma", () => ({
+  __esModule: true,
   default: {
     biosample: {
       create: jest.fn(),
