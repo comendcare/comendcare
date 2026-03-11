@@ -318,6 +318,14 @@ jest.mock("./customerio/customer-io", () => ({
   cioDeleteUser: jest.fn(),
 }))
 
+const originalConsoleError = console.error;
+beforeAll(() => {
+  console.error = jest.fn();
+});
+afterAll(() => {
+  console.error = originalConsoleError;
+});
+
 import prisma from "./prisma"
 import { 
   acceptClaimOrganizationInvitation,

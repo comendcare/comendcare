@@ -102,17 +102,18 @@ jest.mock("./auth", () => ({
 }))
 
 jest.mock("./utils", () => ({
-//   addTypeSenseDocument: jest.fn(),
-//   deleteTypeSenseDocument: jest.fn(),
-//   getBlurDataURL: jest.fn(),
   logError: jest.fn(),
-//   toKebabCase: jest.fn(),
-//   updateTypeSenseDocument: jest.fn(),
-//   normalizeTag: jest.fn(),
-//   runInProduction: jest.fn(async (fn: any) => fn()),
 }))
 
 jest.mock("fs/promises")
+
+const originalConsoleError = console.error;
+beforeAll(() => {
+  console.error = jest.fn();
+});
+afterAll(() => {
+  console.error = originalConsoleError;
+});
 
 import { 
     fetchCreateRequests, 
