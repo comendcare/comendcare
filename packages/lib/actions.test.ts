@@ -4551,6 +4551,11 @@ describe("createReview", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+
+    process.env.NEXT_PUBLIC_TYPESENSE_NODE = "typesense.ci.local"
+    process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY = "fake-ci-key"
+    process.env.TYPESENSE_ADMIN_API_KEY = "fake-ci-key"
+    process.env.NEXT_PUBLIC_NODE_ENV = "development"
   })
 
   it("throws error if no session", async () => {
@@ -4590,12 +4595,12 @@ describe("createReview", () => {
 
     expect(result.success).toBe(true)
     expect(result.data).toEqual(createdReview)
-    // expect(updateTypeSenseDocument).toHaveBeenCalledWith(
-    //   expect.stringContaining("https://"),
-    //   expect.any(String),
-    //   updatedCompany,
-    //   'companies'
-    // )
+    expect(updateTypeSenseDocument).toHaveBeenCalledWith(
+      expect.stringContaining("https://"),
+      expect.any(String),
+      updatedCompany,
+      'companies'
+    )
     expect(revalidatePath).toHaveBeenCalledWith(`/app/service-providers/${companyId}`)
   })
 
@@ -4623,6 +4628,11 @@ describe("editReview", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+
+    process.env.NEXT_PUBLIC_TYPESENSE_NODE = "typesense.ci.local"
+    process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY = "fake-ci-key"
+    process.env.TYPESENSE_ADMIN_API_KEY = "fake-ci-key"
+    process.env.NEXT_PUBLIC_NODE_ENV = "development"
   })
 
   it("throws error if no session", async () => {
@@ -4672,12 +4682,12 @@ describe("editReview", () => {
     const result = await editReview(companyId, mockFormData as any)
     expect(result.success).toBe(true)
     expect(result.data).toEqual(updatedReview)
-    // expect(updateTypeSenseDocument).toHaveBeenCalledWith(
-    //   expect.stringContaining("https://"),
-    //   expect.any(String),
-    //   updatedCompany,
-    //   'companies'
-    // )
+    expect(updateTypeSenseDocument).toHaveBeenCalledWith(
+      expect.stringContaining("https://"),
+      expect.any(String),
+      updatedCompany,
+      'companies'
+    )
     expect(revalidatePath).toHaveBeenCalledWith(`/app/service-providers/${companyId}`)
   })
 
