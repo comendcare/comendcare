@@ -129,15 +129,6 @@ export default async function middleware(req: NextRequest) {
         return res
     }
 
-    // special case for `vercel.pub` domain
-    if (hostname === "vercel.pub") {
-        const res = NextResponse.redirect(
-            "https://vercel.com/blog/platforms-starter-kit"
-        )
-        res.headers.set("x-current-path", path);
-        return res
-    }
-
     // DON'T rewrite root application to `/home` folder
     if (
         /^localhost(:\d+)?$/.test(hostname) ||
