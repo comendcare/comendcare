@@ -51,7 +51,6 @@ export async function generateMetadata({
             invitations: true,
             membershipRequests: true,
             conditions: true,
-            kanban: true,
             milestones: true,
             platformNotifications: true,
             reviews: true,

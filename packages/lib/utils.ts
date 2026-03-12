@@ -18,8 +18,30 @@ import {
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
-import Papa from "papaparse";
+import {parse} from "papaparse";
 import type {Member, RFP} from "@prisma/client";
+
+export function toBiomarkersNested(raw: any) {
+    if (raw === undefined) return undefined; // field not sent => don't touch relation
+    if (raw === null) {
+        // explicit clear
+        return { deleteMany: {} as const };
+    }
+
+    if (!Array.isArray(raw)) return undefined;
+
+    const rows = raw
+        .map((b) => ({
+            name: String(b?.name ?? "").trim(),
+            type: String(b?.type ?? "").trim(),
+        }))
+        .filter((b) => b.name && b.type); // IMPORTANT: Biomarker.type is required in schema
+
+    return {
+        deleteMany: {} as const,           // replace-all semantics
+        createMany: { data: rows } as const,
+    };
+}
 
 /* 
     Determine if a field on an object has a value (i.e. is filled)
@@ -534,7 +556,7 @@ export const validateImport = (entry: any, expectedValues: ImportField[]) => {
 
 export function parseCSV(file: File, expectedValues: ImportField[]): Promise<{values: any[], errors: {key: string, message: string, object: any}[]}> {
     return new Promise((resolve, reject) => {
-        Papa.parse(file, {
+        parse(file, {
             header: true, // Adjust based on whether your CSV has headers
             skipEmptyLines: true,
             complete: (result) => {

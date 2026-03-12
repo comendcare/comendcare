@@ -27,7 +27,7 @@ import type {
     User
 } from "@prisma/client";
 import {promises as fs} from "fs";
-import path from "path";
+import {join} from "path";
 import {z} from "zod";
 import {
     biosampleSchema,
@@ -1691,83 +1691,6 @@ export const getAllMembershipsFromUserId = withUserAuth(
     }
 )
 
-export const getKanbanFromOrganizationId = withOrganizationAuth(
-    async (
-        organization: Organization,
-        select: Prisma.KanbanSelect<InternalArgs & {
-            result: {};
-            model: {};
-            query: {};
-            client: {};
-        }>
-    ) => {
-        try {
-            const kanban = await prisma.kanban.findUnique({
-                where: {organizationId: organization.id},
-                select
-            })
-
-            return {success: true, data: kanban}
-        } catch (error: any) {
-            console.error("Database error finding task board details:", error)
-            return {success: false, error: "Database error. please try again later."}
-        }
-    }
-)
-
-export const getColumns = withOrganizationAuth(
-    async (
-        organization: Organization,
-        select: Prisma.ColumnSelect<InternalArgs & {
-            result: {};
-            model: {};
-            query: {};
-            client: {};
-        }>
-    ) => {
-        try {
-            const dbColumns = await prisma.column.findMany({
-                where: {
-                    kanban: {
-                        organization: {
-                            id: organization.id
-                        }
-                    }
-                },
-                orderBy: [
-                    {kanbanPosition: 'asc'},
-                ],
-                // include: {
-                //     tasks: {
-                //         orderBy: [{kanbanPosition: 'asc'}],
-                //         include: {
-                //             checklist: true,
-                //             stakeholders: {include: {user: true}},
-                //             milestone: true
-                //         }
-                //     }
-                // }
-                select: {
-                    ...select,
-                    tasks: select.tasks ? ({
-                        orderBy: [{kanbanPosition: 'asc'}],
-                        include: {
-                            checklist: true,
-                            stakeholders: {include: {user: true}},
-                            milestone: true
-                        }
-                    }) : undefined
-                }
-            })
-
-            return {success: true, data: {columns: dbColumns}}
-        } catch (error: any) {
-            console.error("Database error finding column details:", error)
-            return {success: false, error: "Database error. please try again later."}
-        }
-    }
-)
-
 export const getSavedCompaniesFromOrganizationId = withOrganizationAuth(
     async (
         organization: Organization,
@@ -1947,7 +1870,7 @@ export async function getPharmaProjects(
 export async function getBiosampleData() {
     try {
         const data = await fs.readFile(
-            path.join(process.cwd(), "data/pharma-data/biosamples.json")
+            join(process.cwd(), "data/pharma-data/biosamples.json")
         )
 
         const tasks = JSON.parse(data.toString())
@@ -1981,7 +1904,7 @@ export async function getDonorData(id: string) {
 export async function getClinicalData() {
     try {
         const data = await fs.readFile(
-            path.join(process.cwd(), "data/pharma-data/clinical.json")
+            join(process.cwd(), "data/pharma-data/clinical.json")
         )
 
         const tasks = JSON.parse(data.toString())
@@ -1999,7 +1922,7 @@ export async function getClinicalData() {
 export async function getPreclinicalData() {
     try {
         const data = await fs.readFile(
-            path.join(process.cwd(), "data/pharma-data/pre-clinical.json")
+            join(process.cwd(), "data/pharma-data/pre-clinical.json")
         )
 
         const tasks = JSON.parse(data.toString())
@@ -2017,7 +1940,7 @@ export async function getPreclinicalData() {
 export async function getIPData() {
     try {
         const data = await fs.readFile(
-            path.join(process.cwd(), "data/pharma-data/ip.json")
+            join(process.cwd(), "data/pharma-data/ip.json")
         )
 
         const tasks = JSON.parse(data.toString())

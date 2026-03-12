@@ -1,51 +1,63 @@
-# Scraping, data extraction, and the use of AI or other automated tools on this website is strictly prohibited.
-# Violators may be subject to legal action.
+# Public indexing is allowed.
+# Sensitive areas are disallowed for all crawlers.
+# Some AI/training crawlers are blocked site-wide (compliance-based).
 
 User-agent: *
-Allow: /$
-Allow: /about
-Allow: /contact
-Allow: /faq
-Disallow: /
+Disallow: /api/
+Disallow: /login
+Disallow: /signup
+Disallow: /logout
+Disallow: /reset-password
+Disallow: /verify
+Disallow: /callback
+Disallow: /app/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /account/
+Disallow: /settings/
+Disallow: /billing/
+Disallow: /signed-out/
+Disallow: /_next/
+Disallow: /_vercel/
 
-User-agent: AI2Bot
-User-agent: Ai2Bot-Dolma
-User-agent: Amazonbot
-User-agent: Applebot
-User-agent: Applebot-Extended
-User-agent: Bytespider
-User-agent: CCBot
+# GEO / answer engines (allowed on public pages; still blocked from sensitive paths above)
+User-agent: OAI-SearchBot
 User-agent: ChatGPT-User
-User-agent: Claude-Web
-User-agent: ClaudeBot
-User-agent: Diffbot
-User-agent: FacebookBot
-User-agent: FriendlyCrawler
-User-agent: GPTBot
-User-agent: Google-Extended
-User-agent: GoogleOther
-User-agent: GoogleOther-Image
-User-agent: GoogleOther-Video
-User-agent: ICC-Crawler
-User-agent: ISSCyberRiskCrawler
-User-agent: ImagesiftBot
-User-agent: Kangaroo Bot
+User-agent: PerplexityBot
 User-agent: Meta-ExternalAgent
 User-agent: Meta-ExternalFetcher
-User-agent: OAI-SearchBot
-User-agent: PerplexityBot
-User-agent: PetalBot
-User-agent: Scrapy
-User-agent: Sidetrade indexer bot
-User-agent: Timpibot
-User-agent: VelenPublicWebCrawler
-User-agent: Webzio-Extended
-User-agent: YouBot
+Disallow: /api/
+Disallow: /login
+Disallow: /signup
+Disallow: /logout
+Disallow: /reset-password
+Disallow: /verify
+Disallow: /callback
+Disallow: /app/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /profile/
+Disallow: /settings/
+Disallow: /signed-out/
+Disallow: /_next/
+Disallow: /_vercel/
+
+# Training / dataset / extraction focused bots (blocked site-wide)
+User-agent: GPTBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: ClaudeBot
+User-agent: Claude-Web
 User-agent: anthropic-ai
 User-agent: cohere-ai
-User-agent: facebookexternalhit
-User-agent: iaskspider/2.0
-User-agent: img2dataset
+User-agent: CCBot
+User-agent: Diffbot
+User-agent: Ai2Bot-Dolma
+User-agent: AI2Bot
 User-agent: omgili
 User-agent: omgilibot
+User-agent: img2dataset
+User-agent: Scrapy
+User-agent: Bytespider
+User-agent: Webzio-Extended
 Disallow: /
