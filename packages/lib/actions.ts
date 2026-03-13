@@ -3240,6 +3240,8 @@ export const createBiosample = withOrganizationAuth(
         try {
             const session = await getSession()
 
+            console.log(`create biosample`, data)
+
             if (!organization.id) {
                 throw new Error("No organization id provided.")
             }
@@ -3357,19 +3359,34 @@ export const createBiosample = withOrganizationAuth(
                     ...(biosampleData.company
                         ? ({company: {connect: {id: biosampleData.company.id}}}) // if company exists in database, connect
                         : ({company: undefined})), // if company does not exist in database, don't connect
+                    // donor: undefined
+                    // ...(data.donorId
+                    //     ? {donor: {connect: {id: data.donorId}}}
+                    //     : undefined),
+                    donor: undefined // don't connect donor yet
                 }
             })
 
-            const existingDonor = await prisma.donor.findFirst({
-                where: {
-                    internalId: data.internalDonorId,
-                    organizationId: organization.id
-                }
-            })
+            let existingDonor = undefined
+
+            if (data.donorId || data.internalDonorId) {
+                existingDonor = await prisma.donor.findFirst({
+                    where: {
+                        ...(data.donorId && {id: data.donorId}),
+                        ...(data.internalDonorId && {internalId: data.internalDonorId}),
+                        organizationId: organization.id
+                    }
+                })   
+            }
+
+            console.log(`internal donor id`, data.internalDonorId)
+            console.log(`org`, organization.id)
+            console.log(`existing donor`, existingDonor)
+            console.log(`biosample id`, response.id)
 
             if (existingDonor) {
                 await prisma.biosample.update({
-                    where: {id: response?.id},
+                    where: {id: response.id},
                     include: {
                         contacts: true,
                         attachments: true,
@@ -3385,40 +3402,10 @@ export const createBiosample = withOrganizationAuth(
                     data: {
                         donor: {connect: {id: existingDonor.id}}
                     }
-                    // data: {
-                    //     donor: {
-                    //         // id: data.donorId || generateDonorNanoid(),
-                    //         internalId: data.internalDonorId,
-                    //         sex: data.sex,
-                    //         gender: data.gender,
-                    //         race: data.race,
-                    //         ethnicity: data.ethnicity,
-                    //         treatments: data.treatments,
-                    //         medications: data.medications,
-                    //         organization: {connect: {id: organization.id}},
-                    //         diagnoses: {
-                    //             create: (data.diagnoses || []).map((diagnosis: {
-                    //                 diagnosis: Option[],
-                    //                 severity?: string
-                    //             }) => ({
-                    //                 severity: diagnosis.severity,
-                    //                 type: {
-                    //                     connectOrCreate: {
-                    //                         where: {id: diagnosis.diagnosis[0].value},
-                    //                         create: {
-                    //                             id: diagnosis.diagnosis[0].value,
-                    //                             label: diagnosis.diagnosis[0].label
-                    //                         }
-                    //                     }
-                    //                 }
-                    //             }))
-                    //         }
-                    //     }
-                    // }
                 })
             } else {
                 await prisma.biosample.update({
-                    where: {id: response?.id},
+                    where: {id: response.id},
                     data: {
                         donor: {
                             create: {
@@ -3454,51 +3441,51 @@ export const createBiosample = withOrganizationAuth(
                 })
             }
 
-            if (!response.private) {
-                await writeRawEvent({
-                    provider: "app",
-                    eventType: "org_created_tool",
-                    externalId: response.id,
-                    occurredAt: new Date(),
-                    payload: {
-                        biosampleId: response.id,
-                        orgId: organization.id,
-                        orgName: organization.name,
-                        orgSubdomain: organization.subdomain,
-                        orgImage: organization.image,
-                        title: response.description || `Biosample ${response.id}`,
-                        private: false,
-                        availability: response.availability,
-                        types: response.types ?? [],
-                        geneId: response.geneId ?? undefined,
-                        institutionId: response.institutionId ?? undefined,
-                        userId: session?.user.id,
-                        userName: session?.user.name,
-                    },
-                });
+            // if (!response.private) {
+            //     await writeRawEvent({
+            //         provider: "app",
+            //         eventType: "org_created_tool",
+            //         externalId: response.id,
+            //         occurredAt: new Date(),
+            //         payload: {
+            //             biosampleId: response.id,
+            //             orgId: organization.id,
+            //             orgName: organization.name,
+            //             orgSubdomain: organization.subdomain,
+            //             orgImage: organization.image,
+            //             title: response.description || `Biosample ${response.id}`,
+            //             private: false,
+            //             availability: response.availability,
+            //             types: response.types ?? [],
+            //             geneId: response.geneId ?? undefined,
+            //             institutionId: response.institutionId ?? undefined,
+            //             userId: session?.user.id,
+            //             userName: session?.user.name,
+            //         },
+            //     });
 
-                try {
-                    await customerIOTrack({
-                        userId: session?.user.id,
-                        event: 'org_toolkit_item_added',
-                        timestamp: new Date(),
-                        traits: {
-                            name: session?.user.name,
-                            organization_id: organization.id,
-                            organization_name: organization.name,
-                            organization_subdomain: organization.subdomain,
-                        },
-                        properties: {
-                            orgId: organization.id,
-                            itemId: biosampleData.id,
-                            itemType: biosampleData.types,
-                            itemTitle: biosampleData.title,
-                        },
-                    });
-                } catch (e) {
-                    console.error('[CIO] track org_toolkit_item_added failed:', e);
-                }
-            }
+            //     try {
+            //         await customerIOTrack({
+            //             userId: session?.user.id,
+            //             event: 'org_toolkit_item_added',
+            //             timestamp: new Date(),
+            //             traits: {
+            //                 name: session?.user.name,
+            //                 organization_id: organization.id,
+            //                 organization_name: organization.name,
+            //                 organization_subdomain: organization.subdomain,
+            //             },
+            //             properties: {
+            //                 orgId: organization.id,
+            //                 itemId: biosampleData.id,
+            //                 itemType: biosampleData.types,
+            //                 itemTitle: biosampleData.title,
+            //             },
+            //         });
+            //     } catch (e) {
+            //         console.error('[CIO] track org_toolkit_item_added failed:', e);
+            //     }
+            // }
 
             revalidatePath("/app/tools/biosample")
 
@@ -3856,7 +3843,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     milestones: {
                         deleteMany: {},
                         create: (rfpData.milestones || []).map((milestone: any) => ({
-                            milestone: {connect: {id: milestone.milestoneId}},
+                            milestone: {connect: {id: milestone?.milestoneId}},
                         })),
                     },
                     budget: rfpData.budget,
@@ -3895,7 +3882,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     endDate: rfpData.endDate,
                     milestones: {
                         create: (rfpData.milestones || []).map((milestone: any) => ({
-                            milestone: {connect: {id: milestone.milestoneId}},
+                            milestone: {connect: {id: milestone?.milestoneId}},
                         })),
                     },
                     organization: {connect: {id: organization.id}},
