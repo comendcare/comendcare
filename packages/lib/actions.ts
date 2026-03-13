@@ -3359,10 +3359,6 @@ export const createBiosample = withOrganizationAuth(
                     ...(biosampleData.company
                         ? ({company: {connect: {id: biosampleData.company.id}}}) // if company exists in database, connect
                         : ({company: undefined})), // if company does not exist in database, don't connect
-                    // donor: undefined
-                    // ...(data.donorId
-                    //     ? {donor: {connect: {id: data.donorId}}}
-                    //     : undefined),
                     donor: undefined // don't connect donor yet
                 }
             })
@@ -3378,11 +3374,6 @@ export const createBiosample = withOrganizationAuth(
                     }
                 })   
             }
-
-            console.log(`internal donor id`, data.internalDonorId)
-            console.log(`org`, organization.id)
-            console.log(`existing donor`, existingDonor)
-            console.log(`biosample id`, response.id)
 
             if (existingDonor) {
                 await prisma.biosample.update({
@@ -3441,51 +3432,51 @@ export const createBiosample = withOrganizationAuth(
                 })
             }
 
-            // if (!response.private) {
-            //     await writeRawEvent({
-            //         provider: "app",
-            //         eventType: "org_created_tool",
-            //         externalId: response.id,
-            //         occurredAt: new Date(),
-            //         payload: {
-            //             biosampleId: response.id,
-            //             orgId: organization.id,
-            //             orgName: organization.name,
-            //             orgSubdomain: organization.subdomain,
-            //             orgImage: organization.image,
-            //             title: response.description || `Biosample ${response.id}`,
-            //             private: false,
-            //             availability: response.availability,
-            //             types: response.types ?? [],
-            //             geneId: response.geneId ?? undefined,
-            //             institutionId: response.institutionId ?? undefined,
-            //             userId: session?.user.id,
-            //             userName: session?.user.name,
-            //         },
-            //     });
+            if (!response.private) {
+                await writeRawEvent({
+                    provider: "app",
+                    eventType: "org_created_tool",
+                    externalId: response.id,
+                    occurredAt: new Date(),
+                    payload: {
+                        biosampleId: response.id,
+                        orgId: organization.id,
+                        orgName: organization.name,
+                        orgSubdomain: organization.subdomain,
+                        orgImage: organization.image,
+                        title: response.description || `Biosample ${response.id}`,
+                        private: false,
+                        availability: response.availability,
+                        types: response.types ?? [],
+                        geneId: response.geneId ?? undefined,
+                        institutionId: response.institutionId ?? undefined,
+                        userId: session?.user.id,
+                        userName: session?.user.name,
+                    },
+                });
 
-            //     try {
-            //         await customerIOTrack({
-            //             userId: session?.user.id,
-            //             event: 'org_toolkit_item_added',
-            //             timestamp: new Date(),
-            //             traits: {
-            //                 name: session?.user.name,
-            //                 organization_id: organization.id,
-            //                 organization_name: organization.name,
-            //                 organization_subdomain: organization.subdomain,
-            //             },
-            //             properties: {
-            //                 orgId: organization.id,
-            //                 itemId: biosampleData.id,
-            //                 itemType: biosampleData.types,
-            //                 itemTitle: biosampleData.title,
-            //             },
-            //         });
-            //     } catch (e) {
-            //         console.error('[CIO] track org_toolkit_item_added failed:', e);
-            //     }
-            // }
+                try {
+                    await customerIOTrack({
+                        userId: session?.user.id,
+                        event: 'org_toolkit_item_added',
+                        timestamp: new Date(),
+                        traits: {
+                            name: session?.user.name,
+                            organization_id: organization.id,
+                            organization_name: organization.name,
+                            organization_subdomain: organization.subdomain,
+                        },
+                        properties: {
+                            orgId: organization.id,
+                            itemId: biosampleData.id,
+                            itemType: biosampleData.types,
+                            itemTitle: biosampleData.title,
+                        },
+                    });
+                } catch (e) {
+                    console.error('[CIO] track org_toolkit_item_added failed:', e);
+                }
+            }
 
             revalidatePath("/app/tools/biosample")
 
