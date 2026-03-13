@@ -3240,8 +3240,6 @@ export const createBiosample = withOrganizationAuth(
         try {
             const session = await getSession()
 
-            console.log(`create biosample`, data)
-
             if (!organization.id) {
                 throw new Error("No organization id provided.")
             }
