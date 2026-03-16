@@ -9,36 +9,11 @@ import {MixpanelProvider} from "@comend/lib/mixpanel"
 import {SettingsProvider} from "@comend/components/editor/settings"
 import {NuqsAdapter} from 'nuqs/adapters/next/app'
 import {OnbordaProvider} from "../components/onborda/OnbordaContext"
-import {useWriteQueue} from "~web/state/writeQueue"
-import {beaconFlush} from "~web/lib/flushOps"
-import {usePathname} from "next/navigation"
 import {Session} from "next-auth";
 import { TooltipProvider } from "@comend/components/ui/tooltip"
 
 
 export function Providers({children, session}: { children: React.ReactNode, session: Session | null }) {
-    // useDrainWriteQueue();
-    const pathname = usePathname();
-
-    // route change → visibility often flickers; also drain now
-    useEffect(() => {
-        const {pending} = useWriteQueue.getState();
-        if (pending.length) beaconFlush(pending);
-    }, [pathname]);
-
-    useEffect(() => {
-        const onHide = () => {
-            const {pending} = useWriteQueue.getState();
-            if (pending.length) beaconFlush(pending);
-        };
-        window.addEventListener("pagehide", onHide);
-        document.addEventListener("visibilitychange", onHide);
-        return () => {
-            window.removeEventListener("pagehide", onHide);
-            document.removeEventListener("visibilitychange", onHide);
-        };
-    }, []);
-
     return (
         <SessionProvider session={session}>
             <Toaster

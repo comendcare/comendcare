@@ -82,15 +82,10 @@ export const useRFPStore = create<RFPState>()(
                 console.log(`successfully deleted RFP`)
             },
             saveState: (orgId: string | null | undefined) => {
-                // console.log(`save state`)
                 syncDBRFPs(orgId, { rfps: get().rfps })
             }
         }),
         {
             limit: 1, // limit the stored history states to 1 since we're only using this for the undo button right now
-            // onSave: (pastState, currentState) => {
-            //     console.log(`Saved rfps state: `, currentState)
-            //     return
-            // },
         })
     )

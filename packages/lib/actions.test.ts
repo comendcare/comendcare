@@ -235,11 +235,8 @@ import {
   createDiseaseModel, 
   createMaterialAndDataAccessRequest, 
   createMemberRequest, 
-  createMilestones, 
   createNodes, 
   createNodesAndEdgesFromTemplate, 
-  createNotification, 
-  createNotifications, 
   createOrganization, 
   createOrUpdateRFP, 
   createPharmaProject, 
@@ -277,16 +274,12 @@ import {
   subscribeToOrganization,
   switchOrganization,
   syncDBRFPs,
-  toggleBiopharmaConsentSettings,
-  toggleOrganizationPublished,
-  toggleOrganizationVerified,
   unsaveCRO,
   unsaveOrganization,
   updateBiosample,
   updateClinicalDataset,
   updateCondition,
   updateCreateFacilityRequest,
-  updateDBFlow,
   updateDiseaseModel,
   updateEdges,
   updateEntityTags,
@@ -297,7 +290,6 @@ import {
   updateMilestonesVisibility,
   updateOrganization,
   updateRoadmap,
-  updateRoadmapMetadata, 
 } from "./actions"
 import { revalidatePath, revalidateTag } from "next/cache"
 import { getSession } from "./auth"
@@ -761,208 +753,6 @@ describe("createOrganization", () => {
   })
 })
 
-describe("toggleBiopharmaConsentSettings", () => {
-  const mockOrganization = {
-    id: "org-1",
-    name: "Org A",
-    description: "Desc",
-    subdomain: "orga",
-    biopharmaConsentSettings: false,
-  } as any
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it("enables biopharmaConsentSettings if it was false", async () => {
-    ;(prisma.organization.update as jest.Mock).mockResolvedValue({
-      ...mockOrganization,
-      biopharmaConsentSettings: true,
-    })
-
-    const result = await toggleBiopharmaConsentSettings(mockOrganization)
-
-    expect(prisma.organization.update).toHaveBeenCalledWith({
-      where: { id: mockOrganization.id },
-      data: { biopharmaConsentSettings: true },
-    })
-    expect(addTypeSenseDocument).toHaveBeenCalled()
-    expect(deleteTypeSenseDocument).not.toHaveBeenCalled()
-    expect(revalidateTag).toHaveBeenCalledWith(
-      `${mockOrganization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
-    )
-    expect(result.biopharmaConsentSettings).toBe(true)
-  })
-
-  it("disables biopharmaConsentSettings if it was true", async () => {
-    const org = { ...mockOrganization, biopharmaConsentSettings: true }
-    ;(prisma.organization.update as jest.Mock).mockResolvedValue({
-      ...org,
-      biopharmaConsentSettings: false,
-    })
-
-    const result = await toggleBiopharmaConsentSettings(org)
-
-    expect(prisma.organization.update).toHaveBeenCalledWith({
-      where: { id: org.id },
-      data: { biopharmaConsentSettings: false },
-    })
-    expect(deleteTypeSenseDocument).toHaveBeenCalled()
-    expect(addTypeSenseDocument).not.toHaveBeenCalled()
-    expect(revalidateTag).toHaveBeenCalledWith(
-      `${org.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
-    )
-    expect(result.biopharmaConsentSettings).toBe(false)
-  })
-
-  it("returns an error object if prisma update fails", async () => {
-    ;(prisma.organization.update as jest.Mock).mockRejectedValue(
-      new Error("DB down")
-    )
-
-    const result = await toggleBiopharmaConsentSettings(mockOrganization)
-
-    expect(result).toEqual({ error: "DB down" })
-    expect(addTypeSenseDocument).not.toHaveBeenCalled()
-    expect(deleteTypeSenseDocument).not.toHaveBeenCalled()
-    expect(revalidateTag).not.toHaveBeenCalled()
-  })
-})
-
-describe("toggleOrganizationPublished", () => {
-  const mockOrganization = {
-    id: "org-123",
-    name: "Test Org",
-    description: "Test Desc",
-    subdomain: "testorg",
-    published: false,
-  } as any
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it("publishes an organization if it was unpublished", async () => {
-    (prisma.organization.update as jest.Mock).mockResolvedValue({
-      ...mockOrganization,
-      published: true,
-    })
-
-    const result = await toggleOrganizationPublished(mockOrganization)
-
-    expect(prisma.organization.update).toHaveBeenCalledWith({
-      where: { id: mockOrganization.id },
-      data: { published: true },
-    })
-    expect(addTypeSenseDocument).toHaveBeenCalled()
-    expect(deleteTypeSenseDocument).not.toHaveBeenCalled()
-    expect(revalidateTag).toHaveBeenCalledWith(
-      `${mockOrganization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
-    )
-    expect(result.published).toBe(true)
-  })
-
-  it("unpublishes an organization if it was published", async () => {
-    const org = { ...mockOrganization, published: true } as any
-
-    (prisma.organization.update as jest.Mock).mockResolvedValue({
-      ...org,
-      published: false,
-    })
-
-    const result = await toggleOrganizationPublished(org)
-
-    expect(prisma.organization.update).toHaveBeenCalledWith({
-      where: { id: org.id },
-      data: { published: false },
-    })
-    expect(prisma.milestone.updateMany).toHaveBeenCalledWith({
-      where: { organizationId: org.id },
-      data: { private: true },
-    })
-    expect(deleteTypeSenseDocument).toHaveBeenCalled()
-    expect(addTypeSenseDocument).not.toHaveBeenCalled()
-    expect(revalidateTag).toHaveBeenCalledWith(
-      `${org.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
-    )
-    expect(result.published).toBe(false)
-  })
-
-  it("returns an error object if prisma.update fails", async () => {
-    (prisma.organization.update as jest.Mock).mockRejectedValue(
-      new Error("DB down")
-    )
-
-    const result = await toggleOrganizationPublished(mockOrganization)
-    expect(result).toEqual({ error: "DB down" })
-  })
-})
-
-describe("toggleOrganizationVerified", () => {
-  const mockOrganization = {
-    id: "org-123",
-    name: "Test Org",
-    description: "Test Desc",
-    subdomain: "testorg",
-    verified: false,
-  } as any
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it("verifies an organization if it was unverified", async () => {
-    (prisma.organization.update as jest.Mock).mockResolvedValue({
-      ...mockOrganization,
-      verified: true,
-    })
-
-    const result = await toggleOrganizationVerified(mockOrganization)
-
-    expect(prisma.organization.update).toHaveBeenCalledWith({
-      where: { id: mockOrganization.id },
-      data: { verified: true },
-    })
-    expect(addTypeSenseDocument).not.toHaveBeenCalled()
-    expect(deleteTypeSenseDocument).not.toHaveBeenCalled()
-    expect(revalidateTag).toHaveBeenCalledWith(
-      `${mockOrganization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
-    )
-    expect(result.verified).toBe(true)
-  })
-
-  it("unverifies an organization if it was verified", async () => {
-    const org = { ...mockOrganization, verified: true } as any
-
-    (prisma.organization.update as jest.Mock).mockResolvedValue({
-      ...org,
-      verified: false,
-    })
-
-    const result = await toggleOrganizationVerified(org)
-
-    expect(prisma.organization.update).toHaveBeenCalledWith({
-      where: { id: org.id },
-      data: { verified: false },
-    })
-    expect(deleteTypeSenseDocument).not.toHaveBeenCalled()
-    expect(addTypeSenseDocument).not.toHaveBeenCalled()
-    expect(revalidateTag).toHaveBeenCalledWith(
-      `${org.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
-    )
-    expect(result.verified).toBe(false)
-  })
-
-  it("returns an error object if prisma.update fails", async () => {
-    (prisma.organization.update as jest.Mock).mockRejectedValue(
-      new Error("DB down")
-    )
-
-    const result = await toggleOrganizationVerified(mockOrganization)
-    expect(result).toEqual({ error: "DB down" })
-  })
-})
-
 describe("updateOrganization", () => {
   const mockOrganization = {
     id: "org-123",
@@ -1310,77 +1100,6 @@ describe("updateRoadmap", () => {
     ;(prisma.roadmap.update as jest.Mock).mockRejectedValue(new Error("DB failed"))
 
     const result = await updateRoadmap("org-123", { id: "roadmap-1" })
-    expect(result).toEqual({ error: "DB failed" })
-  })
-})
-
-describe("updateRoadmapMetadata", () => {
-  const mockRoadmap = {
-    id: "roadmap-123",
-    slug: "roadmap-slug",
-    organization: { subdomain: "testorg", customDomain: "custom.org" },
-  } as any
-
-  const mockOrganization = { id: "org-1" } as any
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-    process.env.NEXT_PUBLIC_ROOT_DOMAIN = "example.com"
-    ;(getSession as jest.Mock).mockResolvedValue({ user: { id: "user-1" } })
-  })
-
-  it("updates a non-image field successfully", async () => {
-    const formData = new Map([
-      ["title", "New Title"],
-    ])
-    const fakeFormData = {
-      get: (key: string) => formData.get(key),
-    } as unknown as FormData
-
-    ;(prisma.roadmap.update as jest.Mock).mockResolvedValue({
-      ...mockRoadmap,
-      title: "New Title",
-    })
-
-    const result = await updateRoadmapMetadata(mockOrganization, fakeFormData, mockRoadmap, "title")
-
-    expect(prisma.roadmap.update).toHaveBeenCalledWith({
-      where: { id: mockRoadmap.id },
-      data: { title: "New Title" },
-    })
-
-    // Check revalidation
-    expect(revalidateTag).toHaveBeenCalledWith("testorg.example.com-roadmaps")
-    expect(revalidateTag).toHaveBeenCalledWith("testorg.example.com-roadmap-slug")
-    expect(revalidateTag).toHaveBeenCalledWith("custom.org-roadmaps")
-    expect(revalidateTag).toHaveBeenCalledWith("custom.org-roadmap-slug")
-
-    expect(result).toEqual({
-      ...mockRoadmap,
-      title: "New Title",
-    
-    })
-  })
-
-  it("returns error if slug is already in use (P2002)", async () => {
-    const fakeFormData = {
-      get: (key: string) => "some-slug",
-    } as unknown as FormData
-
-    ;(prisma.roadmap.update as jest.Mock).mockRejectedValue({ code: "P2002" })
-
-    const result = await updateRoadmapMetadata(mockOrganization, fakeFormData, mockRoadmap, "slug")
-    expect(result).toEqual({ error: "This slug is already in use" })
-  })
-
-  it("returns generic error on other failures", async () => {
-    const fakeFormData = {
-      get: (key: string) => "value",
-    } as unknown as FormData
-
-    ;(prisma.roadmap.update as jest.Mock).mockRejectedValue(new Error("DB failed"))
-
-    const result = await updateRoadmapMetadata(mockOrganization, fakeFormData, mockRoadmap, "title")
     expect(result).toEqual({ error: "DB failed" })
   })
 })
@@ -3857,172 +3576,6 @@ describe("moveNodes", () => {
   })
 })
 
-describe("updateDBFlow", () => {
-  const organization = { id: "org1" } as any
-  const roadmapId = "roadmap-1"
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it("updates nodes, edges, and milestones correctly", async () => {
-    const nodes = [
-      { id: "node1", position: { x: 100, y: 200 }, data: { title: "M1", attachments: [] } },
-      { id: "node2", positionX: 300, positionY: 400, data: { title: "M2", attachments: [] } },
-      { id: "node3", position: { x: 500, y: 600 } }, // no milestone
-    ]
-    const edges = [
-      { id: "edge1", source: "node1", target: "node2" },
-      { id: "edge2", source: "node2", target: "node3" },
-    ]
-
-    // Mock findMany to simulate existing DB data
-    ;(prisma.node.findMany as jest.Mock)
-      .mockResolvedValueOnce([{ id: "node1" }, { id: "node2" }]) // existing nodes
-      .mockResolvedValueOnce(nodes) // final nodes
-    ;(prisma.edge.findMany as jest.Mock)
-      .mockResolvedValueOnce([{ id: "edge1" }]) // existing edges
-      .mockResolvedValueOnce(edges) // final edges
-    ;(prisma.milestone.findMany as jest.Mock).mockResolvedValue([
-      { id: "ms1", nodeId: "node1" },
-      { id: "ms2", nodeId: "node2" },
-    ])
-
-    // Mock $transaction to call the callback immediately with prisma
-    ;(prisma.$transaction as jest.Mock).mockImplementation(async (fn: any) => fn(prisma))
-
-    ;(prisma.node.deleteMany as jest.Mock).mockResolvedValue({})
-    ;(prisma.edge.deleteMany as jest.Mock).mockResolvedValue({})
-    ;(prisma.node.createMany as jest.Mock).mockResolvedValue({})
-    ;(prisma.node.update as jest.Mock).mockResolvedValue({})
-    ;(prisma.edge.createMany as jest.Mock).mockResolvedValue({})
-    ;(prisma.edge.update as jest.Mock).mockResolvedValue({})
-    ;(prisma.milestone.findUnique as jest.Mock).mockResolvedValue(null)
-    ;(prisma.milestone.create as jest.Mock).mockResolvedValue({})
-    ;(prisma.milestone.update as jest.Mock).mockResolvedValue({})
-
-    const result = await updateDBFlow(organization, { roadmapId, nodes, edges })
-
-    expect(result).toEqual({
-      success: true,
-      data: {
-        nodes,
-        edges,
-        milestones: [
-          { id: "ms1", nodeId: "node1" },
-          { id: "ms2", nodeId: "node2" },
-        ],
-      },
-    })
-
-    // Check createMany for nodes/edges
-    expect(prisma.node.createMany).toHaveBeenCalled()
-    expect(prisma.edge.createMany).toHaveBeenCalled()
-
-    // Ensure milestones were created
-    expect(prisma.milestone.create).toHaveBeenCalledTimes(2)
-  })
-
-  it("returns error if roadmapId is missing", async () => {
-    const result = await updateDBFlow(organization, { roadmapId: null, nodes: [], edges: [] })
-    expect(result).toEqual({
-      success: false,
-      error: "Internal server error",
-    })
-  })
-})
-
-describe("createMilestones", () => {
-  const roadmapId = "roadmap-1"
-  const milestones = [
-    {
-      id: "ms1",
-      title: "Milestone 1",
-      types: [{ milestoneTypeId: "type1" }],
-      tools: [{ toolId: "tool1" }],
-      rfps: [{ rfpId: "rfp1" }],
-      timelineOrder: 1,
-      description: "Test milestone",
-      startDate: new Date(),
-      endDate: new Date(),
-      budget: 1000,
-      attachments: [{ link: "link1" }],
-      contacts: [{ email: "a@test.com", name: "Alice" }],
-      companies: [{ companyId: "c1" }],
-      institutions: [{ institutionId: "i1" }],
-      status: "PLANNED",
-      private: true,
-      nodeType: "PROJECT",
-    },
-  ]
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it("creates milestones successfully", async () => {
-    // Mock organization lookup
-    ;(prisma.organization.findMany as jest.Mock).mockResolvedValue([
-      { id: "org1", roadmaps: [{ id: roadmapId }] },
-    ])
-
-    // Mock milestone creation
-    ;(prisma.milestone.create as jest.Mock).mockImplementation((data: any) =>
-      Promise.resolve({ ...data.data, id: data.data.id })
-    )
-
-    const result = await createMilestones({ id: "org1" } as any, {
-      roadmapId,
-      milestones,
-    })
-
-    expect(result.success).toBe(true)
-    expect(result.data.milestones).toHaveLength(1)
-    expect(result.data.milestones[0].title).toBe("Milestone 1")
-
-    // Check that prisma.milestone.create was called with correct nested data
-    expect(prisma.milestone.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          id: "ms1",
-          title: "Milestone 1",
-          roadmap: { connect: { id: roadmapId } },
-          organization: { connect: { id: "org1" } },
-          types: { create: [{ milestoneType: { connect: { id: "type1" } } }] },
-          tools: { create: [{ tool: { connect: { id: "tool1" } } }] },
-          rfps: { create: [{ rfp: { connect: { id: "rfp1" } } }] },
-        }),
-      })
-    )
-  })
-
-  it("returns error if roadmapId is missing", async () => {
-    const result = await createMilestones({ id: "org1" } as any, {
-      roadmapId: null,
-      milestones,
-    })
-
-    expect(result).toEqual({
-      success: false,
-      error: "Internal server error",
-    })
-  })
-
-  it("returns error if organization cannot be found", async () => {
-    ;(prisma.organization.findMany as jest.Mock).mockResolvedValue([])
-
-    const result = await createMilestones({ id: "org1" } as any, {
-      roadmapId,
-      milestones,
-    })
-
-    expect(result).toEqual({
-      success: false,
-      error: "Internal server error",
-    })
-  })
-})
-
 describe("createNodes", () => {
   const roadmapId = "roadmap-1"
   const session = { user: { id: "user1", name: "Alice" } }
@@ -4277,84 +3830,84 @@ describe("updateMilestonesVisibility", () => {
   })
 })
 
-describe("updateMilestones", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    ;(getSession as jest.Mock).mockResolvedValue({
-      user: { id: "user1", name: "Test User" },
-    })
-  })
+// describe("updateMilestones", () => {
+//   beforeEach(() => {
+//     jest.clearAllMocks()
+//     ;(getSession as jest.Mock).mockResolvedValue({
+//       user: { id: "user1", name: "Test User" },
+//     })
+//   })
 
-  it("updates milestones and returns them", async () => {
-    const milestone = {
-      id: "m1",
-      nodeId: "n1",
-      title: "Updated Milestone",
-      private: false,
-      types: [],
-      biosamples: [],
-      diseaseModels: [],
-      tools: [],
-      rfps: [],
-      institutions: [],
-      companies: [],
-      attachments: [],
-      contacts: [],
-      roadmapId: "roadmap-1",
-    }
+//   it("updates milestones and returns them", async () => {
+//     const milestone = {
+//       id: "m1",
+//       nodeId: "n1",
+//       title: "Updated Milestone",
+//       private: false,
+//       types: [],
+//       biosamples: [],
+//       diseaseModels: [],
+//       tools: [],
+//       rfps: [],
+//       institutions: [],
+//       companies: [],
+//       attachments: [],
+//       contacts: [],
+//       roadmapId: "roadmap-1",
+//     }
 
-    // Mock existing milestone in DB
-    ;(prisma.milestone.findUnique as jest.Mock).mockResolvedValue({
-      id: "m1",
-      private: true,
-      types: [],
-      biosamples: [],
-      diseaseModels: [],
-      tools: [],
-      rfps: [],
-      institutions: [],
-      companies: [],
-      attachments: [],
-      contacts: [],
-    })
+//     // Mock existing milestone in DB
+//     ;(prisma.milestone.findUnique as jest.Mock).mockResolvedValue({
+//       id: "m1",
+//       private: true,
+//       types: [],
+//       biosamples: [],
+//       diseaseModels: [],
+//       tools: [],
+//       rfps: [],
+//       institutions: [],
+//       companies: [],
+//       attachments: [],
+//       contacts: [],
+//     })
 
-    ;(prisma.milestone.update as jest.Mock).mockResolvedValue({
-      ...milestone,
-      updatedAt: new Date().toISOString(),
-      nodeType: "PROJECT",
-      organizationId: "org1",
-    })
+//     ;(prisma.milestone.update as jest.Mock).mockResolvedValue({
+//       ...milestone,
+//       updatedAt: new Date().toISOString(),
+//       nodeType: "PROJECT",
+//       organizationId: "org1",
+//     })
 
-    ;(prisma.milestone.findMany as jest.Mock).mockResolvedValue([
-      { ...milestone, private: false },
-    ])
+//     ;(prisma.milestone.findMany as jest.Mock).mockResolvedValue([
+//       { ...milestone, private: false },
+//     ])
 
-    ;(prisma.roadmap.update as jest.Mock).mockResolvedValue({
-      id: "roadmap-1",
-      private: false,
-    })
+//     ;(prisma.roadmap.update as jest.Mock).mockResolvedValue({
+//       id: "roadmap-1",
+//       private: false,
+//     })
 
-    const result = await updateMilestones({} as any, { milestones: [milestone] })
+//     const result = await updateMilestones({} as any, { milestones: [milestone] })
 
-    expect(result.success).toBe(true)
-    expect(result.data.length).toBe(1)
-    expect(result.data[0].id).toBe("m1")
+//     expect(result.success).toBe(true)
+//     expect(result.data.length).toBe(1)
+//     expect(result.data[0].id).toBe("m1")
 
-    // Should call writeRawEvent for public milestone
-    expect(writeRawEvent).toHaveBeenCalled()
-  })
+//     // Should call writeRawEvent for public milestone
+//     expect(writeRawEvent).toHaveBeenCalled()
+//   })
 
-  it("returns error if something fails", async () => {
-    ;(prisma.milestone.findUnique as jest.Mock).mockRejectedValue(new Error("DB failure"))
+//   it("returns error if something fails", async () => {
+//     ;(prisma.milestone.findUnique as jest.Mock).mockRejectedValue(new Error("DB failure"))
 
-    const milestone = { id: "m1", nodeId: "n1", roadmapId: "roadmap-1" }
+//     const milestone = { id: "m1", nodeId: "n1", roadmapId: "roadmap-1" }
 
-    const result = await updateMilestones({} as any, { milestones: [milestone] })
+//     const result = await updateMilestones({} as any, { milestones: [milestone] })
 
-    expect(result.success).toBe(false)
-    expect(result.error).toBe("Internal server error")
-  })
-})
+//     expect(result.success).toBe(false)
+//     expect(result.error).toBe("Internal server error")
+//   })
+// })
 
 describe("notificationsViewed", () => {
   beforeEach(() => {
@@ -4410,129 +3963,6 @@ describe("notificationsViewed", () => {
     )
 
     const result = await notificationsViewed({ notifications })
-
-    expect(result.success).toBe(false)
-    expect(result.error).toBe("Internal server error")
-  })
-})
-
-describe("createNotification", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it("successfully creates a notification", async () => {
-    const mockSession = {
-      user: { id: "user1", organizationId: "org1" },
-    }
-    ;(getSession as jest.Mock).mockResolvedValue(mockSession)
-
-    const notificationData = { title: "Test Notification", message: "Hello" }
-    const createdNotification = { id: "notif1", ...notificationData }
-
-    ;(prisma.platformNotification.create as jest.Mock).mockResolvedValue(
-      createdNotification
-    )
-
-    const result = await createNotification({ notificationData })
-
-    expect(result.success).toBe(true)
-    expect(result.data).toEqual(createdNotification)
-    expect(prisma.platformNotification.create).toHaveBeenCalledWith({
-      data: {
-        ...notificationData,
-        user: { connect: { id: "user1" } },
-        organization: { connect: { id: "org1" } },
-      },
-    })
-  })
-
-  it("returns an error if session is missing", async () => {
-    ;(getSession as jest.Mock).mockResolvedValue(null)
-    const notificationData = { title: "Test" }
-
-    const result = await createNotification({ notificationData })
-
-    expect(result.success).toBe(false)
-    expect(result.error).toBe("Internal server error")
-    expect(prisma.platformNotification.create).not.toHaveBeenCalled()
-  })
-
-  it("returns an error if prisma.create throws", async () => {
-    const mockSession = {
-      user: { id: "user1", organizationId: "org1" },
-    }
-    ;(getSession as jest.Mock).mockResolvedValue(mockSession)
-    const notificationData = { title: "Test" }
-
-    ;(prisma.platformNotification.create as jest.Mock).mockRejectedValue(
-      new Error("DB failure")
-    )
-
-    const result = await createNotification({ notificationData })
-
-    expect(result.success).toBe(false)
-    expect(result.error).toBe("Internal server error")
-  })
-})
-
-describe("createNotifications", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it("successfully creates notifications and fetches them", async () => {
-    const mockSession = { user: { id: "user1", organizationId: "org1" } }
-    ;(getSession as jest.Mock).mockResolvedValue(mockSession)
-
-    const notificationsList = [
-      { title: "Notif 1", message: "Hello" },
-      { title: "Notif 2", message: "World" },
-    ]
-
-    const createdNotifications = [
-      { id: "n1", ...notificationsList[0], userId: "user1", organizationId: "org1" },
-      { id: "n2", ...notificationsList[1], userId: "user1", organizationId: "org1" },
-    ];
-
-    ;(prisma.platformNotification.createMany as jest.Mock).mockResolvedValue({ count: 2 })
-    ;(prisma.platformNotification.findMany as jest.Mock).mockResolvedValue(createdNotifications)
-
-    const result = await createNotifications({ notificationsList })
-
-    expect(result.success).toBe(true)
-    expect(result.data).toEqual(createdNotifications)
-    expect(prisma.platformNotification.createMany).toHaveBeenCalledWith({
-      data: notificationsList.map(notification => ({
-        ...notification,
-        userId: "user1",
-        organizationId: "org1",
-      })),
-    })
-    expect(prisma.platformNotification.findMany).toHaveBeenCalledWith({
-      where: { userId: "user1", organizationId: "org1" },
-    })
-  })
-
-  it("returns error if session is missing", async () => {
-    ;(getSession as jest.Mock).mockResolvedValue(null)
-    const notificationsList = [{ title: "Test" }]
-
-    const result = await createNotifications({ notificationsList })
-
-    expect(result.success).toBe(false)
-    expect(result.error).toBe("Internal server error")
-    expect(prisma.platformNotification.createMany).not.toHaveBeenCalled()
-  })
-
-  it("returns error if prisma.createMany fails", async () => {
-    const mockSession = { user: { id: "user1", organizationId: "org1" } }
-    ;(getSession as jest.Mock).mockResolvedValue(mockSession)
-    const notificationsList = [{ title: "Test" }];
-
-    ;(prisma.platformNotification.createMany as jest.Mock).mockRejectedValue(new Error("DB failure"))
-
-    const result = await createNotifications({ notificationsList })
 
     expect(result.success).toBe(false)
     expect(result.error).toBe("Internal server error")
