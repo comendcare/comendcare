@@ -67,7 +67,6 @@ const selector = (state: RoadmapState) => ({
 })
 
 export function Roadmap({
-    milestoneTypes,
     organization,
     orgSubdomain,
     orgIsPublished,
@@ -83,7 +82,6 @@ export function Roadmap({
     urlNode,
     urlView,
 }: {
-    milestoneTypes: MilestoneType[];
     organization?: Organization;
     orgSubdomain?: string;
     orgIsPublished: boolean;
@@ -242,7 +240,6 @@ export function Roadmap({
                         }}
                         setTab={setTab}
                         setNewMilestoneIsOpen={setNewMilestoneIsOpen}
-                        milestoneTypes={milestoneTypes}
                         // setBulkImportIsOpen={setBulkImportIsOpen}
                         orgSubdomain={orgSubdomain}
                     />
@@ -405,7 +402,6 @@ export function Roadmap({
                                 diseaseModelOptions={diseaseModelOptions}
                                 clinicalDatasetOptions={clinicalDatasetOptions}
                                 rfpOptions={rfpOptions}
-                                milestoneTypeOptions={milestoneTypes}
                             />
                         </ResizablePanel>
                     </>
@@ -569,7 +565,6 @@ const MilestoneDetailsPanel = ({
     diseaseModelOptions,
     clinicalDatasetOptions,
     rfpOptions,
-    milestoneTypeOptions,
     handlePanelChange,
     className,
 }: {
@@ -581,7 +576,6 @@ const MilestoneDetailsPanel = ({
     diseaseModelOptions: Partial<DiseaseModel>[],
     clinicalDatasetOptions: Partial<Tool>[],
     rfpOptions: Partial<RFP>[],
-    milestoneTypeOptions: Partial<MilestoneType>[],
     handlePanelChange: (open: boolean) => void,
     className?: string,
 }) => {
@@ -613,7 +607,6 @@ const MilestoneDetailsPanel = ({
                 diseaseModelOptions={diseaseModelOptions}
                 clinicalDatasetOptions={clinicalDatasetOptions}
                 rfpOptions={rfpOptions}
-                milestoneTypeOptions={milestoneTypeOptions}
                 onClose={handleClose}
                 className={className}
             />
@@ -674,16 +667,12 @@ const RoadmapHeader = ({
     researchPlanDetails, 
     setTab, 
     setNewMilestoneIsOpen, 
-    milestoneTypes, 
-    // setBulkImportIsOpen,
     orgSubdomain
 }: {
     researchPlanId: string,
     researchPlanDetails: Partial<RoadmapType>, 
     setTab: any, 
     setNewMilestoneIsOpen: any, 
-    milestoneTypes: any, 
-    // setBulkImportIsOpen: any,
     orgSubdomain: string | undefined
 }) => {
     const {data: session, status} = useSession()

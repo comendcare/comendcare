@@ -21,7 +21,6 @@ import {
 import {toast} from "sonner"
 import {nanoid} from "nanoid"
 import {editResearchPlanForm, Milestone, Roadmap} from "@comend/lib/types"
-import {getMilestoneTypes} from "@comend/lib/fetchers"
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 import z from "zod"
 

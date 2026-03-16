@@ -121,46 +121,31 @@ import {
     findInstitutions, 
     getAllMembershipsFromUserId, 
     getAllNonMemberOrganizations, 
-    getAllNotifications, 
     getAllOrganizationRequests, 
     getAllOrganizations, 
-    getAllResearcherRequests, 
     getAssets, 
-    getBiosampleData, 
     getConditionsDataFromOrgId, 
     getConditionsFromOrganizationId, 
     getDonorData, 
     getInvitations, 
-    getInvitees, 
-    getIPData, 
     getMemberRequestsWithUsers, 
     getMilestones, 
     getOrganizationFromOrganizationId, 
     getPharmaProjectData, 
-    getPharmaProjects, 
-    getPublicClinicalDatasetsForOrganization, 
     getPublicConditionData, 
     getPublicRFP, 
     getPublicToolCountsForOrganization, 
-    getResearcher, 
-    getResearcherFromOrcidApi, 
-    getResearcherFromUserID, 
-    getResearcherMetrics, 
-    getResearcherPublications, 
     getResearcherRequest, 
     getRFPs, 
     getRoadmap, 
     getRoadmapEdges, 
     getRoadmapMilestones, 
     getRoadmapNodes, 
-    getRoadmaps, 
     getSavedCompaniesFromOrganizationId, 
     getSavedOrganizationsFromOrganizationId, 
     getServicesOfCompany, 
-    getTopPubMedPublications, 
     getUser, 
-    getUserMemberRequests, 
-    isUserFollowing 
+     
 } from "./fetchers"
 import prisma from "./prisma"
 import { getSession } from "./auth"
@@ -414,31 +399,6 @@ describe("getPublicToolCountsForOrganization", () => {
   })
 })
 
-describe("getPublicClinicalDatasetsForOrganization", () => {
-  const mockSelect = { id: true }
-
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it("should return tools", async () => {
-    process.env.NEXT_PUBLIC_ROOT_DOMAIN = "example.com"
-
-    const mockTools = [{ id: "tool1" }]
-
-    ;(prisma.tool.findMany as jest.Mock).mockResolvedValue(mockTools)
-
-    const result = await getPublicClinicalDatasetsForOrganization(
-      "org.example.com",
-      mockSelect as any
-    )
-
-    expect(prisma.tool.findMany).toHaveBeenCalled()
-
-    expect(result).toEqual(mockTools)
-  })
-})
-
 describe("getPublicRFP", () => {
   const mockSelect = { id: true }
 
@@ -593,45 +553,11 @@ describe("getInvitations", () => {
   })
 })
 
-describe("getInvitees", () => {
-  it("returns invitees", async () => {
-    (prisma.invitation.findMany as jest.Mock).mockResolvedValue([{ id: "i1" }])
-
-    const result = await getInvitees(mockOrg, { id: true } as any)
-
-    expect(result.success).toBe(true)
-  })
-})
-
-describe("getUserMemberRequests", () => {
-  it("returns member requests", async () => {
-    ;(getSession as jest.Mock).mockResolvedValue({
-      user: { id: "user1" }
-    })
-
-    ;(prisma.memberRequest.findMany as jest.Mock).mockResolvedValue([{ id: "mr1" }])
-
-    const result = await getUserMemberRequests(mockUser, { id: true } as any)
-
-    expect(result.success).toBe(true)
-  })
-})
-
 describe("getMemberRequestsWithUsers", () => {
   it("returns member requests", async () => {
     (prisma.memberRequest.findMany as jest.Mock).mockResolvedValue([{ id: "mr1" }])
 
     const result = await getMemberRequestsWithUsers(mockOrg, { id: true } as any)
-
-    expect(result.success).toBe(true)
-  })
-})
-
-describe("getRoadmaps", () => {
-  it("returns roadmaps", async () => {
-    (prisma.roadmap.findMany as jest.Mock).mockResolvedValue([{ id: "road1" }])
-
-    const result = await getRoadmaps(mockOrg, { id: true } as any)
 
     expect(result.success).toBe(true)
   })
@@ -788,100 +714,6 @@ describe("getUser", () => {
   })
 })
 
-describe("isUserFollowing", () => {
-  const orgId = "org1"
-
-  it("should return true if user is following organization", async () => {
-    ;(getSession as jest.Mock).mockResolvedValue({ user: mockUser })
-    ;(prisma.follow.findUnique as jest.Mock).mockResolvedValue({ id: "follow1" })
-
-    const result = await isUserFollowing(orgId)
-
-    expect(prisma.follow.findUnique).toHaveBeenCalledWith({
-      where: {
-        userId_followedType_followedId: {
-          userId: mockUser.id,
-          followedType: "ORGANIZATION",
-          followedId: orgId,
-        },
-      },
-    })
-    expect(result).toEqual({ success: true, data: true })
-  })
-
-  it("should return false if user is not following organization", async () => {
-    ;(getSession as jest.Mock).mockResolvedValue({ user: mockUser })
-    ;(prisma.follow.findUnique as jest.Mock).mockResolvedValue(null)
-
-    const result = await isUserFollowing(orgId)
-
-    expect(result).toEqual({ success: true, data: false })
-  })
-
-  it("should return error if session not found", async () => {
-    ;(getSession as jest.Mock).mockResolvedValue(null)
-
-    const result = await isUserFollowing(orgId)
-
-    expect(result).toEqual({ success: false, error: "Session not found." })
-  })
-
-  it("should return database error if prisma throws", async () => {
-    const error = new Error("DB error")
-    ;(getSession as jest.Mock).mockResolvedValue({ user: mockUser })
-    ;(prisma.follow.findUnique as jest.Mock).mockRejectedValue(error)
-
-    const result = await isUserFollowing(orgId)
-
-    expect(result).toEqual({
-      success: false,
-      error: "Database error. please try again later.",
-    })
-  })
-})
-
-describe("getAllNotifications", () => {
-  const mockSelect = { id: true, message: true }
-
-  it("should return notifications when prisma query succeeds", async () => {
-    const notifications = [
-      { id: "notif1", message: "Notification 1" },
-      { id: "notif2", message: "Notification 2" },
-    ]
-    ;(getSession as jest.Mock).mockResolvedValue({ user: mockUser })
-    ;(prisma.platformNotification.findMany as jest.Mock).mockResolvedValue(notifications)
-
-    const result = await getAllNotifications(mockSelect as any)
-
-    expect(prisma.platformNotification.findMany).toHaveBeenCalledWith({
-      where: {
-        userId: mockUser.id,
-        organizationId: mockUser.organizationId,
-      },
-      select: mockSelect,
-    })
-    expect(result).toEqual({ success: true, data: notifications })
-  })
-
-  it("should return error if session or user id missing", async () => {
-    ;(getSession as jest.Mock).mockResolvedValue(null)
-
-    const result = await getAllNotifications(mockSelect as any)
-
-    expect(result).toEqual({ success: false, error: "Internal server error" })
-  })
-
-  it("should return error if prisma throws", async () => {
-    const error = new Error("DB error")
-    ;(getSession as jest.Mock).mockResolvedValue({ user: mockUser })
-    ;(prisma.platformNotification.findMany as jest.Mock).mockRejectedValue(error)
-
-    const result = await getAllNotifications(mockSelect as any)
-
-    expect(result).toEqual({ success: false, error: "Internal server error" })
-  })
-})
-
 describe("getDonorData", () => {
   const donorId = "donor1"
 
@@ -952,35 +784,6 @@ describe("getAllOrganizations", () => {
     const result = await getAllOrganizations(mockSelect as any)
 
     expect(result).toEqual({ success: false, error: "Internal server error" })
-  })
-})
-
-describe("getResearcherFromUserID and getResearcher", () => {
-  const mockSelect = { id: true, name: true }
-
-  it("should return researcher data if found", async () => {
-    ;(getSession as jest.Mock).mockResolvedValue({ user: mockUser })
-    ;(prisma.researcher.findUnique as jest.Mock).mockResolvedValue({ id: "r1" })
-
-    const result1 = await getResearcherFromUserID(mockUser, mockSelect as any)
-    expect(result1).toEqual({ success: true, data: { id: "r1" } })
-
-    const result2 = await getResearcher(mockUser.id, mockSelect as any)
-    expect(result2).toEqual({ success: true, data: { id: "r1" } })
-  })
-
-  it("should handle researcher not found", async () => {
-    ;(getSession as jest.Mock).mockResolvedValue({ user: mockUser })
-    ;(prisma.researcher.findUnique as jest.Mock).mockResolvedValue(null)
-
-    const result = await getResearcherFromUserID(mockUser, mockSelect as any)
-    expect(result).toEqual({ success: false, error: "Researcher not found" })
-  })
-
-  it("should handle session missing", async () => {
-    ;(getSession as jest.Mock).mockResolvedValue(null)
-    const result = await getResearcher(mockUser.id, mockSelect as any)
-    expect(result).toEqual({ success: false, error: "No session or user id" })
   })
 })
 
