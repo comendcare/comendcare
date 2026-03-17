@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@comend/compo
 import { Label } from "@comend/components/ui/label"
 import MultipleSelector from "@comend/components/ui/multiple-selector"
 
-import { RESEARCH_PLAN_STATUS, RESEARCH_STAGE, RESEARCH_PLAN_TYPES } from "@comend/lib/types"
+import { RESEARCH_PLAN_STATUS, RESEARCH_STAGE, RESEARCH_PLAN_TYPES, MILESTONE_STATUS_OPTIONS } from "@comend/lib/types"
 import { badgeVariants } from "@comend/components/ui/badge"
 import { useProjectSearchStore } from "@/state/search/projectSearchStore"
 
@@ -74,13 +74,13 @@ export function ProjectFiltersDialog() {
                     />
                 </div> */}
 
-                {/* Statuses */}
-                {/* <div>
+                {/* Status */}
+                <div>
                     <Label>Status</Label>
                     <MultipleSelector
-                        value={filters.statuses ?? []}
-                        onChange={(vals) => setFilterKey("statuses", vals)}
-                        defaultOptions={RESEARCH_PLAN_STATUS}
+                        value={filters.status ?? []}
+                        onChange={(vals) => setFilterKey("status", vals)}
+                        defaultOptions={MILESTONE_STATUS_OPTIONS}
                         placeholder="Select status..."
                         hidePlaceholderWhenSelected
                         commandProps={{ className: "bg-transparent" }}
@@ -91,7 +91,7 @@ export function ProjectFiltersDialog() {
                         }
                         showHoverCard={false}
                     />
-                </div> */}
+                </div>
             </DialogContent>
         </Dialog>
     )

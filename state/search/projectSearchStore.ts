@@ -14,12 +14,12 @@ export type FiltersType = {
     //     disable?: boolean,
     //     variant?: BadgeVariantType
     // }[],
-    // statuses: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    //     variant?: BadgeVariantType
-    // }[],
+    status: {
+        label: string,
+        value: string,
+        disable?: boolean,
+        variant?: BadgeVariantType
+    }[],
     // modalities: {
     //     label: string,
     //     value: string,
@@ -29,9 +29,7 @@ export type FiltersType = {
 }
 
 export const defaultFilters = {
-    stages: [],
-    statuses: [],
-    modalities: []
+    status: [],
 }
 
 function generateFiltersString(filters: FiltersType): string {
@@ -48,12 +46,12 @@ function generateFiltersString(filters: FiltersType): string {
     // }
 
     // statuses
-    // if (filters?.statuses && filters.statuses.length > 0) {
-    //     const statusFilter = filters.statuses
-    //         .map(status => `statuses:=[${escapeValue(status.label)}]`)
-    //         .join(" || ");
-    //         filtersList.push(`(${statusFilter})`);
-    // }
+    if (filters?.status && filters.status.length > 0) {
+        const statusFilter = filters.status
+            .map(status => `status:=[${escapeValue(status.label)}]`)
+            .join(" || ");
+            filtersList.push(`(${statusFilter})`);
+    }
 
     // modalities/therapeutic strategies
     // if (filters?.modalities && filters.modalities.length > 0) {

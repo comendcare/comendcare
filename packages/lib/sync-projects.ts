@@ -122,6 +122,11 @@ export const syncToTypesense = async (env: {
                     type: "string",
                     sort: true,
                 },
+                {
+                    name: "status",
+                    type: "string",
+                    sort: true,
+                }
             ]
         }
         
@@ -138,6 +143,7 @@ export const syncToTypesense = async (env: {
                 updatedAt: true,
                 title: true,
                 description: true,
+                status: true,
                 organization: {
                     select: {name: true}
                 },

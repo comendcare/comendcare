@@ -14,7 +14,7 @@ import { handleAsyncConditionSearch, handleAsyncGeneSearch } from "@comend/lib/u
 import dynamic from "next/dynamic"
 import { ProjectSearchState, useProjectSearchStore } from "@/state/search/projectSearchStore"
 
-const ResearchPlanFiltersDialog = dynamic(
+const ProjectFiltersDialog = dynamic(
     () =>
         import("./project-filters-dialog").then(
             (m) => m.ProjectFiltersDialog
@@ -50,15 +50,15 @@ export function ProjectMarketplaceIntegratedSearchAndFilter() {
     useEffect(() => setQuery(searchTerm), [searchTerm]);
 
     const clearAll = () => {
-        setFilters({ ...filters, stages: [], statuses: [], modalities: [] });
+        setFilters({ ...filters, status: [] });
     }
 
     // helper to update a single filter key from MultipleSelector
-    // const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) =>
-    //     setFilters({...filters, [key]: value})
+    const setFilterKey = (key: keyof typeof filters, value: { label: string; value: string }[]) =>
+        setFilters({...filters, [key]: value})
 
-    // const removeFilterItem = (key: keyof typeof filters, value: string) =>
-    //     setFilters({...filters, [key]: (filters[key] || []).filter((i: any) => i.value !== value)})
+    const removeFilterItem = (key: keyof typeof filters, value: string) =>
+        setFilters({...filters, [key]: (filters[key] || []).filter((i: any) => i.value !== value)})
 
     // keep searchTerm input in sync if the store changes elsewhere
     useEffect(() => setQuery(searchTerm), [searchTerm])
@@ -75,11 +75,7 @@ export function ProjectMarketplaceIntegratedSearchAndFilter() {
         []
     )
 
-    // const activeCount =
-    //     (filters.stages?.length || 0) +
-    //     (filters.statuses?.length || 0) + 
-    //     (filters.modalities?.length || 0)
-    const activeCount = 0
+    const activeCount = (filters.status?.length || 0)
 
     return (
         <div className="w-full mx-auto flex flex-col gap-y-2">
@@ -103,7 +99,7 @@ export function ProjectMarketplaceIntegratedSearchAndFilter() {
                 <Separator orientation="vertical" className="h-8" />
 
                 {/* Mobile and additional filters */}
-                <ResearchPlanFiltersDialog/>
+                <ProjectFiltersDialog/>
             </div>
 
             {/* Active filter badges */}
@@ -134,17 +130,17 @@ export function ProjectMarketplaceIntegratedSearchAndFilter() {
                             </Badge>
                         ))} */}
 
-                        {/* {(filters.statuses || []).map((item) => (
-                            <Badge key={`statuses-${item.value}`} variant="secondary" className="text-xs">
+                        {(filters.status || []).map((item) => (
+                            <Badge key={`status-${item.value}`} variant="secondary" className="text-xs">
                                 {item.label}
                                 <button
-                                    onClick={() => removeFilterItem("statuses", item.value)}
+                                    onClick={() => removeFilterItem("status", item.value)}
                                     className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
                                 >
                                     <X className="h-3 w-3" />
                                 </button>
                             </Badge>
-                        ))} */}
+                        ))}
 
                         <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs">
                             Clear all
