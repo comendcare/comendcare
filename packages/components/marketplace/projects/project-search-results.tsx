@@ -10,6 +10,7 @@ import Link from "next/link";
 import { LoaderCircle } from "lucide-react";
 import { cn } from "@comend/lib/utils";
 import InfiniteScroll from "@comend/components/ui/infinite-scroll";
+import { MilestoneMarketplaceCard } from "@comend/components/marketplace/marketplace-milestone-card";
 
 const selector = (state: ProjectSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -57,6 +58,8 @@ export function ProjectSearchResults({
                                 )}
                             >
                                 {/* <ProjectCard project={project} showOrganization={true}/> */}
+                                {/* <p>{project.organization.name}</p> */}
+                                <MilestoneMarketplaceCard milestone={project}/>
                             </Link>
                         ))}
                     </div>
