@@ -1,6 +1,6 @@
 "use client"
 import { TabNav } from "@comend/components/tab-nav";
-import { Building2, Database, FlaskConical, Megaphone, Rat, SearchIcon, TestTubeDiagonal, Users, Workflow } from "lucide-react";
+import { Building2, Database, FileText, FlaskConical, Megaphone, Rat, SearchIcon, TestTubeDiagonal, Users, Workflow } from "lucide-react";
 import React from "react";
 
 const links = [
@@ -14,6 +14,12 @@ const links = [
         name: "Research plans",
         href: "/marketplace/research-plans",
         icon: Workflow,
+        comingSoon: false
+    },
+    {
+        name: "Projects",
+        href: "/marketplace/projects",
+        icon: FileText,
         comingSoon: false
     },
     {
@@ -71,6 +77,12 @@ const publicLinks = [
         name: "Research plans",
         href: "/marketplace/research-plans",
         icon: Workflow,
+        comingSoon: false
+    },
+    {
+        name: "Projects",
+        href: "/marketplace/projects",
+        icon: FileText,
         comingSoon: false
     },
     {
