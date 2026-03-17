@@ -725,6 +725,16 @@ export const syncToTypesense = async (env: {
                 },
             ]
         }
+        const projectSchema = {
+            name: 'projects',
+            enable_nested_fields: true,
+            fields: [
+                {
+                    name: ".*",
+                    type: "auto",
+                },
+            ]
+        }
         const researcherSchema = {
             name: 'researchers',
             enable_nested_fields: true,
@@ -1193,6 +1203,65 @@ export const syncToTypesense = async (env: {
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'research-plans', uploadResearchPlans);
         } else {
             console.log('No research plans to import.');
+        }
+
+        /* UPDATE PROJECTS ---------------------------------------------------------------------------------- */
+        console.log(`Research Plans`, JSON.stringify(projectSchema, null, 2))
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'projects', projectSchema);
+        const projects = await prisma.milestone.findMany({
+            where: {
+                private: false // only sync public projects
+            },
+            select: {
+                id: true,
+                createdAt: true,
+                updatedAt: true,
+                title: true,
+                description: true,
+                // partners: {
+                //     select: {
+                //         name: true,
+                //         email: true,
+                //         affiliation: true
+                //     }
+                // },
+                // links: {
+                //     select: {
+                //         name: true,
+                //         link: true,
+                //     }
+                // },
+                // modalities: true,
+                organization: {
+                    select: {name: true}
+                },
+            }
+        })
+        console.log('Raw project data:', projects)
+        if (projects.length > 0) {
+            // const projectKeys = ['organization', 'title', 'modalities', 'stages', 'statuses', 'partners', 'description', 'links', 'milestones']
+            // const uploadResearchPlans = researchPlans.map(researchPlan => ({
+            //     ...researchPlan,
+            //     createdAt: researchPlan.createdAt.getTime(), // special case for created at to enable sorting
+            //     updatedAt: researchPlan.updatedAt.getTime(), // special case for created at to enable sorting
+            //     milestones: researchPlan.milestones.filter(milestone => !milestone.private).length, // public project count
+            //     modalities: MODALITIES
+            //         .filter((option: any) => researchPlan.modalities.includes(option.value))
+            //         .map((option: any) => option.label),
+            //     stages: RESEARCH_STAGE
+            //         .filter((option: any) => researchPlan.stages.includes(option.value))
+            //         .map((option: any) => option.label),
+            //     statuses: RESEARCH_PLAN_STATUS
+            //         .filter((option: any) => researchPlan.statuses.includes(option.value))
+            //         .map((option: any) => option.label),
+            //     fieldsFilled: researchPlanKeys.reduce((acc, path) => {
+            //         const value = getNestedValue(researchPlan, path)
+            //         return acc + isFilled(value)
+            //     }, 0)
+            // }))
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'projects', projects);
+        } else {
+            console.log('No projects to import.');
         }
 
         /* UPDATE RESEARCHERS --------------------------------------------------------------------------- */
