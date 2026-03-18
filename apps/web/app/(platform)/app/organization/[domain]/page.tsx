@@ -136,7 +136,10 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
             attachments: true,
             milestones: true,
             organizationId: true,
-            organization: true,
+            organization: {include: {
+                conditions: {include: {condition: true}},
+                members: true
+            }},
         }),
         getConditionsDataFromOrgId(organization?.id, {
             id: true,
@@ -195,7 +198,10 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                 gene: true,
                 genes: true,
                 organizationId: true,
-                organization: true,
+                organization: {include: {
+                    conditions: {include: {condition: true}},
+                    members: true
+                }},
                 materialAndDataAccessRequests: true
             },
             {...search, q: globalFilter, filters: validFilters},
@@ -228,7 +234,10 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                 conditionId: true,
                 condition: true,
                 organizationId: true,
-                organization: {include: {conditions: {include: {condition: true}}}},
+                organization: {include: {
+                    conditions: {include: {condition: true}},
+                    members: true
+                }},
                 milestones: {include: {milestone: true}},
             },
             {...search, q: globalFilter, filters: validFilters},
@@ -257,7 +266,10 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                 gene: true,
                 genes: true,
                 organizationId: true,
-                organization: {include: {conditions: {include: {condition: true}}}},
+                organization: {include: {
+                    conditions: {include: {condition: true}},
+                    members: true,
+                }},
                 milestones: {include: {milestone: true}},
             },
             {...search, q: globalFilter, filters: validFilters},
@@ -271,7 +283,7 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                 description: true,
                 published: true,
                 organizationId: true,
-                organization: true,
+                organization: {include: {members: true}},
                 modalities: true,
                 stages: true,
                 statuses: true,
@@ -347,13 +359,9 @@ export default async function OrganizationHomePage(props: IndexPageProps) {
                                 <PAGProfileToolsCard 
                                     organization={organization as any} 
                                     toolCounts={toolCounts} 
-                                    searchParams={searchParams}
                                     biosamples={biosamples}
-                                    biosamplesPageCount={biosamplesPageCount}
                                     diseaseModels={diseaseModels}
-                                    diseaseModelsPageCount={diseaseModelsPageCount}
                                     clinicalDatasets={clinicalDatasets}
-                                    clinicalDatasetsPageCount={clinicalDatasetsPageCount}
                                 />
                             }
                             <RoadmapsCard 

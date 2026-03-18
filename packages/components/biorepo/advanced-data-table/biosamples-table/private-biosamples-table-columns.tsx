@@ -29,7 +29,7 @@ import { Checkbox } from "./../../../ui/checkbox";
 import { getDiagnosisTypes } from "./../../../../../packages/lib/fetchers";
 import { useEffect, useState } from "react";
 import { Option } from "./../../../../../packages/lib/types";
-import { handleAsyncCompanyAndInstitutionSearch, handleAsyncCompanySearch, handleAsyncDiagnosesSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch, handleGetAvailability } from "./../../../../../packages/lib/utils";
+import { cn, handleAsyncCompanyAndInstitutionSearch, handleAsyncCompanySearch, handleAsyncDiagnosesSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch, handleGetAvailability } from "./../../../../../packages/lib/utils";
 import { getSession, useSession } from "next-auth/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./../../../ui/tooltip";
 import Link from "next/link";
@@ -85,7 +85,7 @@ export function useBiosamplesTableColumns({session}: {session: Session | null}):
                 />
             ),
             cell: ({row}) => (
-                <div>
+                <div className={cn(row.index === 0 ? "publish-tools" : "")}>
                     {row.getValue("private") 
                         ? (
                             <div className="flex gap-1 items-center">

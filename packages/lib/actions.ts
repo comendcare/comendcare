@@ -118,6 +118,16 @@ const nanoid = customAlphabet(
     7
 ) // 7-character random string
 
+export const addEmailCapture = async (email: string) => {
+    const lowerCaseEmail = email.toLowerCase()
+
+    await prisma.emailCapture.upsert({
+        where: {email: lowerCaseEmail},
+        update: {}, // No fields to update
+        create: {email: lowerCaseEmail},
+    }); 
+}
+
 export const createMemberRequest = withAuth(
     async (organizationId: string): Promise<ApiResponse<any>> => {
         const session = await getSession()
@@ -962,7 +972,7 @@ export const updateRoadmap = withOrganizationAuth(
                     orderBy: [{createdAt: "desc"}]
                 },
                 edges: true,
-                organization: true,
+                organization: {include: {members: true}},
                 links: true,
                 partners: true,
             }
@@ -2375,31 +2385,32 @@ export const acceptInvitation = withAuth(
                 });
             }
 
-            await customerIOTrack({
-                userId: session.user.id ?? undefined,   // if you have it
-                event: 'organization_invitation_accepted',
-                timestamp: new Date(),
-                properties: {
-                    invitation_id: invitation.id,        // 🔑 must match the “sent” event
-                    organization_id: invitation.organizationId,
-                    invitee_email: invitation.email,
-                },
-            });
-
-            await writeRawEvent({
-                provider: "app",
-                eventType: "user_accepted_organization_invitation", // batch payload handled by your register
-                occurredAt: new Date(),
-                payload: {
-                    orgId: invitation.organization.id,
-                    orgName: invitation.organization.name,
-                    orgSubdomain: invitation.organization.subdomain,
-                    orgImage: invitation.organization.image,
-                    userId: session.user.id,
-                    userName: session.user.name,
-                    userEmail: session.user.email,
-                },
-            });
+            await Promise.allSettled([
+                customerIOTrack({
+                    userId: session.user.id ?? undefined,   // if you have it
+                    event: 'organization_invitation_accepted',
+                    timestamp: new Date(),
+                    properties: {
+                        invitation_id: invitation.id,        // 🔑 must match the “sent” event
+                        organization_id: invitation.organizationId,
+                        invitee_email: invitation.email,
+                    },
+                }),
+                writeRawEvent({
+                    provider: "app",
+                    eventType: "user_accepted_organization_invitation", // batch payload handled by your register
+                    occurredAt: new Date(),
+                    payload: {
+                        orgId: invitation.organization.id,
+                        orgName: invitation.organization.name,
+                        orgSubdomain: invitation.organization.subdomain,
+                        orgImage: invitation.organization.image,
+                        userId: session.user.id,
+                        userName: session.user.name,
+                        userEmail: session.user.email,
+                    },
+                })
+            ])
 
             revalidatePath("/app/team")
             revalidatePath("/app/profile")
@@ -2744,11 +2755,9 @@ export const updateDiseaseModel = withOrganizationAuth(
                 },
             })
 
-            const response = await prisma.diseaseModel.findUnique({where: {id: data.id}})
-
             revalidatePath("/app/tools/disease-models")
 
-            return response
+            return newDiseaseModel
         } catch (error: any) {
             console.error("Error creating disease model:", error.message);
             throw new Error(error.message || "Failed to create disease model.");
@@ -3171,13 +3180,9 @@ export const updateClinicalDataset = withOrganizationAuth(
 
             console.log(`updated tool`, newDataTool)
 
-            const response = await prisma.tool.findUnique({
-                where: {id: data.id}
-            })
-
             revalidatePath("/app/tools/data")
 
-            return response
+            return newDataTool
         } catch (error: any) {
             console.error("Error creating clinical dataset:", error.message);
             throw new Error(error.message || "Failed to create clinical dataset.");
@@ -3739,8 +3744,6 @@ export const updateBiosample = withOrganizationAuth(
                 });
             }
 
-            const response = await prisma.biosample.findUnique({where: {id: data.id}});
-
             // --- Event emission: private/undefined -> public (first publication)
             const wasPrivate = existing?.private;            // prior state
             const isPrivate = newBiosample.private === true; // current state as boolean
@@ -3772,7 +3775,7 @@ export const updateBiosample = withOrganizationAuth(
 
             revalidatePath("/app/tools/biosample")
 
-            return response;
+            return newBiosample;
         } catch (error: any) {
             console.error("Error creating biosample:", error.message);
             throw new Error(error.message || "Failed to create biosample.");
@@ -4007,6 +4010,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     },
                     budget: rfpData.budget,
                     notes: rfpData.notes,
+                    archived: rfpData.archived,
                 },
                 create: {
                     ...(rfpData.id ? {id: rfpData.id} : undefined),
@@ -4046,6 +4050,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     organization: {connect: {id: organization.id}},
                     budget: rfpData.budget,
                     notes: rfpData.notes,
+                    archived: rfpData.archived,
                 },
             });
 
@@ -4265,7 +4270,7 @@ export const createRoadmap = withOrganizationAuth(
                     },
                     nodes: true,
                     edges: true,
-                    organization: true,
+                    organization: {include: {members: true}},
                 },
             });
 
@@ -4466,7 +4471,7 @@ export const createNodesAndEdgesFromTemplate = withOrganizationAuth(
                 },
                 nodes: true,
                 edges: true,
-                organization: true
+                organization: {include: {members: true}}
             }
         })
 

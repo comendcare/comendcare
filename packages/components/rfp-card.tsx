@@ -2,7 +2,7 @@
 
 import React, {useEffect, useMemo, useState} from "react";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@comend/components/ui/card";
-import {Clock} from "lucide-react";
+import {Archive, Clock} from "lucide-react";
 import {PropertyBadge} from "@comend/components/property-badge";
 import {checkDateRangeUTC, DateStatus, formatDateUTC, formatMoney} from "@comend/lib/utils";
 // import {RFPActionsMenu} from "./rfp-actions-menu";
@@ -15,6 +15,7 @@ import { PublicPrivateButton } from "@comend/components/public-private-button";
 import { RFPState, useRFPStore } from "@/state/rfp/rfpStore";
 import { useShallow } from "zustand/react/shallow";
 import { revalidate } from "@comend/lib/revalidate";
+import ClaimedBadge from "comend-pag-platform/components/claimed-badge";
 
 /** Header skeleton that matches the header’s layout/height to prevent reflow */
 function HeaderSkeleton() {
@@ -34,31 +35,40 @@ const rfpSelector = (state: RFPState) => ({
     updateRFP: state.updateRFP,
 })
 
-export const RFPStatusBadge = ({status}: {status: DateStatus}) => {
+export const RFPStatusBadge = ({status, archived = false}: {status: DateStatus, archived: boolean}) => {
+
+    if (archived) {
+        return (
+            <Badge variant={'yellow'} className="w-full font-normal flex gap-2">
+                <Archive size={18}/>
+                <>{`Archived`}</>
+            </Badge>
+        )
+    }
     return (
         <Badge variant={status?.variant || 'green'} className="w-full font-normal flex gap-2">
-                <Clock size={18}/>
-                <>
-                    {(() => {
-                        switch (status?.status) {
-                            case 'OPEN':
-                                return `${status?.daysRemaining} days remaining to submit proposals`
-                            case 'ROLLING':
-                                return `Open for proposals`
-                            case 'COMINGSOON':
-                                return (status?.daysRemaining === 1 
-                                    ? `Opens in ${status?.daysRemaining} day` 
-                                    : `Opens in ${status?.daysRemaining} days`)
-                            case 'CLOSED':
-                                return (status?.daysRemaining === 1
-                                    ? `Closed ${status?.daysRemaining} day ago`
-                                    : `Closed ${status?.daysRemaining} days ago`)
-                            default:
-                                return <></>
-                        }
-                    })()}
-                </>
-            </Badge>
+            <Clock size={18}/>
+            <>
+                {(() => {
+                    switch (status?.status) {
+                        case 'OPEN':
+                            return `${status?.daysRemaining} days remaining to submit proposals`
+                        case 'ROLLING':
+                            return `Open for proposals`
+                        case 'COMINGSOON':
+                            return (status?.daysRemaining === 1 
+                                ? `Opens in ${status?.daysRemaining} day` 
+                                : `Opens in ${status?.daysRemaining} days`)
+                        case 'CLOSED':
+                            return (status?.daysRemaining === 1
+                                ? `Closed ${status?.daysRemaining} day ago`
+                                : `Closed ${status?.daysRemaining} days ago`)
+                        default:
+                            return <></>
+                    }
+                })()}
+            </>
+        </Badge>
     )
 }
 
@@ -121,7 +131,7 @@ export const RFPCard = ({
             </CardHeader>
 
             <CardContent className="h-full flex flex-col gap-4">
-                <RFPStatusBadge status={status} />
+                <RFPStatusBadge status={status} archived={rfp.archived} />
 
                 <ul className="w-full flex flex-col flex-wrap gap-2 text-sm text-wrap break-words">
                         <li>
@@ -164,6 +174,10 @@ export const RFPCard = ({
                             <div className="flex flex-row gap-2 items-center">
                                 <ProfilePhoto img={rfp.organization.image} name={rfp.organization.name} className="h-9 w-9 -mt-1"/>
                                 <p className="text-lg font-semibold underline">{rfp.organization.name}</p>
+                                <ClaimedBadge
+                                    organization={rfp.organization}
+                                    mini={true}
+                                />
                             </div>
                         </a>
                     </>

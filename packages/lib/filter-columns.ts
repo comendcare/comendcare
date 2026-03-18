@@ -147,7 +147,7 @@ export function filterColumns<TWhere extends object>({
                 ? {
                   AND: [
                     filter.value[0] ? getColumn(columns, { gte: startOfDay(new Date(filter.value[0])) }) : undefined,
-                    filter.value[1] ? getColumn(columns, { lte: endOfDay(new Date(filter.value[1])) }) : undefined,
+                    filter.value[1] ? getColumn(columns, { lte: endOfDay(new Date(filter.value[1])) }) : getColumn(columns, { lte: endOfDay(new Date(filter.value[0])) }),
                   ].filter(Boolean),
                 }
                 : undefined

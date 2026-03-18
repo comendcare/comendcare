@@ -7,6 +7,7 @@ import { Button } from "@comend/components/ui/button";
 import Link from "next/link";
 import type { OrganizationForAnalytics } from "@comend/lib/types";
 import dynamic from "next/dynamic";
+import {StartHereWrapper} from "@comend/components/start-here-button-wrapper"
 
 function DashboardProjectsStatusCardSkeleton() {
     return (
@@ -125,7 +126,7 @@ export default async function PAGDashboardAnalyticsTab({
                 <p className="pt-1 text-sm text-gray-700">{`Here's ${organization.name} at a glance.`}</p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="flex flex-row items-center justify-start gap-x-2">
@@ -168,12 +169,14 @@ export default async function PAGDashboardAnalyticsTab({
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {organization.tools.length > 0 ? (
-                            <p className="text-xl font-semibold">{organization.tools.length}</p>
+                        {(organization.tools.length + organization.biosamples.length + organization.diseaseModel.length) > 0 ? (
+                            <p className="text-xl font-semibold">{(organization.tools.length + organization.biosamples.length + organization.diseaseModel.length)}</p>
                         ) : (
                             <div className="w-full flex justify-center pt-4">
                                 <Link href={"/app/tools/biosample"}>
-                                    <Button variant="cta">Add pre-clinical tools</Button>
+                                    <StartHereWrapper>
+                                        Add pre-clinical tools
+                                    </StartHereWrapper>
                                 </Link>
                             </div>
                         )}

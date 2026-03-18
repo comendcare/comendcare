@@ -11,7 +11,7 @@ import {useFeatureFlags} from "../lib/feature-flags-provider";
 import type {Roadmap, Tool} from "@prisma/client";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
-export function DatabaseResearchPlansTable({
+export function DatabaseProjectsTable({
     data, 
     pageCount, 
     columns, 
@@ -73,7 +73,21 @@ export function DatabaseResearchPlansTable({
                         : undefined
                 }
             >
-                <></>
+                {showFilters && (
+                    enableAdvancedFilter ? (
+                        <DataTableAdvancedToolbar table={table}>
+                            <DataTableFilterList
+                                table={table}
+                                shallow={shallow}
+                                debounceMs={debounceMs}
+                                throttleMs={throttleMs}
+                                align="start"
+                            />
+                        </DataTableAdvancedToolbar>
+                    ) : (
+                        <DataTableToolbar table={table} enableSearch={true}/>
+                    )
+                )}
             </DataTable>
 
             {!!interactiveDialog && interactiveDialog}

@@ -3,20 +3,132 @@
 import {PublicMarketplaceNav} from "@comend/components/marketplace/marketplace-nav"
 import { TooltipProvider } from "@comend/components/ui/tooltip"
 import { Separator } from "@comend/components/ui/separator"
-
-// export const metadata: Metadata = {
-//     title: "Comend",
-//     description: "Check out some examples app built using the components."
-// }
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@comend/components/ui/alert-dialog"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@comend/components/ui/form"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import z from "zod"
+import { Input } from "@comend/components/ui/input"
+import { Button } from "@comend/components/ui/button"
+import { useEffect, useState } from "react"
+import LoadingDots from "@comend/components/icons/loading-dots"
+import { addEmailCapture } from "@comend/lib/actions"
+import { toast } from "sonner"
+import mixpanel from "mixpanel-browser"
 
 interface ProjectLayoutProps {
     children: React.ReactNode
 }
 
+const emailCaptureFormSchema = z.object({
+    email: z.string({required_error: "Email is required"}).email({message: "Invalid email format"}) // Custom error message is optional
+})
+
 export default function ProjectLayout({children}: ProjectLayoutProps) {
+    const [loading, setLoading] = useState(false)
+    const [emailCaptureOpen, setEmailCaptureOpen] = useState(false)
+
+    const form = useForm<z.infer<typeof emailCaptureFormSchema>>({
+        mode: "onChange",
+        reValidateMode: "onChange",
+        resolver: zodResolver(emailCaptureFormSchema),
+        defaultValues: {email: undefined}
+    });
+
+    useEffect(() => {
+        const value =
+            !window.functionalConsentedLocalStorage?.get('emailCaptured')
+
+        setEmailCaptureOpen(Boolean(value))
+    }, [])
+
+
     // Zustand state management
     return (
         <TooltipProvider>
+            <AlertDialog open={emailCaptureOpen}>
+                <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>
+                        Accessing Comend's public marketplace?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Please provide your email address to access Comend's public marketplace content.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+
+                <Form {...form}>
+                    <form className="flex flex-col gap-4 justify-end items-end">
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({field}) => (
+                                <FormItem className="w-full">
+                                    <FormLabel>Email address</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            autoComplete="email"
+                                            required
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <Button
+                            variant="cta"
+                            disabled={loading || !form.formState.isValid}
+                            onClick={async (e) => {
+                                e.preventDefault()
+                                if (!form.formState.isValid) {
+                                    form.trigger()
+                                    return
+                                }
+                                setLoading(true)
+
+                                try {
+                                    await addEmailCapture(form.getValues().email)
+                                    toast.success('Successfully submitted email address.')
+                                }  catch (error) {
+                                    toast.error('Error submitting email address.')
+                                    console.error(error)
+                                }
+
+                                try {
+                                    const anonId = mixpanel?.get_distinct_id()
+                                    // Identify the user on this device
+                                    mixpanel?.identify(anonId)
+                                    mixpanel?.people.set({$email: form.getValues().email})
+
+                                    mixpanel?.track("Email Captured", {
+                                        email: form.getValues().email,
+                                        source: "public_marketplace_gate",
+                                        email_domain: form.getValues().email.split("@")[1],
+                                    })
+                                } catch (error) {
+                                    console.error(`Error identifying mixpanel user. Mixpanel may not be initialized.`)
+                                }
+
+                                window.functionalConsentedLocalStorage?.set('emailCaptured', true)
+
+                                setLoading(false)
+                                setEmailCaptureOpen(false)
+                            }}
+                            className="w-fit"
+                        >
+                            {loading ? (
+                                <LoadingDots color="#000000" />
+                            ): (
+                                <p>{`Submit`}</p>
+                            )}
+                        </Button>
+                    </form>
+                </Form>
+                </AlertDialogContent>
+            </AlertDialog>
             <div className="w-full flex justify-center">
                 <div className="max-w-7xl mt-16 lg:mt-28 h-full w-full flex flex-col items-center p-4 gap-4 md:gap-6">
                     <div className="flex w-full flex-col gap-4">

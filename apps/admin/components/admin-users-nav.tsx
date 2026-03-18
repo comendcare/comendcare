@@ -17,6 +17,11 @@ const links = [
         href: "/blacklist",
         comingSoon: false
     },
+    {
+        name: "Email Capture",
+        href: "/email-capture",
+        comingSoon: false
+    },
 ]
 
 export function AdminUsersNav({className}: React.HTMLAttributes<HTMLDivElement>) {

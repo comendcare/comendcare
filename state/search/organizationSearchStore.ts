@@ -111,19 +111,8 @@ const sortByFilters: { [key: string]: string } = {
 
 const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true): Promise<{results: any[], total: number}> => {
     try {
-        // const searchParameters = {
-        //     q: state.searchTerm,
-        //     query_by: "name,description",
-        //     per_page: 10,
-        //     page: state.lastFetchedPage,
-        //     ...(generateFiltersString(state.filters) ? {filter_by: generateFiltersString(state.filters)} : undefined),
-        //     ...(state.sortBy ? {sort_by: sortByFilters[state.sortBy]} : undefined),
-        // };
         const TAG_PRIORITY_SORT = "";
-
         const filtersString = generateFiltersString(state.filters)
-
-        console.log(`FILTERS STRING`, filtersString)
 
         // Merge tag-priority sort with user-chosen sort
         let sortBy = TAG_PRIORITY_SORT;
@@ -366,10 +355,6 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
             },
             totalResults: undefined,
             setTotalResults: (total: number) => set({totalResults: total}),
-            // resultsPerPage: 10,
-            // setResultsPerPage: (results: number) => {
-            //     set({resultsPerPage: results})
-            // }
         }),
         {
             limit: 100, // limit the stored history states to 100

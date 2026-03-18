@@ -154,6 +154,7 @@
     "notion-client": "^7.3.0",
     "notion-types": "^7.3.0",
     "nuqs": "^2.4.1",
+    "onborda": "^1.2.5",
     "openai-edge": "^1.2.2",
     "papaparse": "^5.5.2",
     "pdf-lib": "^1.17.1",

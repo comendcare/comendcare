@@ -68,7 +68,9 @@ export default async function BiosampleToolsPage(props: IndexPageProps) {
             gene: true,
             genes: true,
             organizationId: true,
-            organization: true,
+            organization: {include: {
+                members: true
+            }},
             materialAndDataAccessRequests: true
         },
         {...search, q: globalFilter, filters: validFilters},

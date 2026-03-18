@@ -1859,7 +1859,7 @@ export const RESEARCH_PLAN_STATUS: Option[] = [
     },
     {
         id: 'SEEKINGPARTNERS',
-        label: 'Seeking partners (sponsors, fundraising, licensing, etc.)',
+        label: 'Seeking partners',
         value: 'SEEKINGPARTNERS',
     },
     {
@@ -2594,6 +2594,13 @@ const moneyField = z.preprocess(
     (v) => (v === "" || v === null || typeof v === "undefined" ? undefined : Number(v)),
     z.number().min(0).optional()
 );
+
+export const emailCaptureFormSchema = z.object({
+    email: z.preprocess(
+        (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+        z.string().email({ message: "Please enter a valid email address." }).optional()
+    ),
+})
 
 export const editOrgFormSchema = z.object({
     name: z.string().min(2).max(60),

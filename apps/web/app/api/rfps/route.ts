@@ -11,7 +11,10 @@ export async function POST(req: Request) {
                 id: { in: ids },
             },
             include: {
-                organization: {include: {conditions: {include: {condition: true}}}},
+                organization: {include: {
+                    conditions: {include: {condition: true}},
+                    members: true,
+                }},
                 milestones: {
                     where: {milestone: {private: false}},
                     include: {milestone: true}

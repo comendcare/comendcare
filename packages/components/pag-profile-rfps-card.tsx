@@ -179,7 +179,7 @@ export const RFPDetails = ({rfp}: { rfp: any }) => {
                 <DialogTitle className="text-2xl font-semibold">{rfp.title}</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-4 pt-4 ">
-                <RFPStatusBadge status={status} />
+                <RFPStatusBadge status={status} archived={rfp.archived}/>
                 
                 <div className="flex gap-4">
                 <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words grow-2">

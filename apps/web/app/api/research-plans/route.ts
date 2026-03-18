@@ -11,7 +11,7 @@ export async function POST(req: Request) {
                 id: { in: ids },
             },
             include: {
-                organization: true,
+                organization: {include: {members: true}},
                 milestones: {
                     where: { private: false }
                 },

@@ -43,7 +43,7 @@ import UserSettings from "~web/components/user-settings";
 import {
     MemberRequestWithUserAndOrganization,
 } from "@comend/lib/types";
-import {mixpanelReset, mixpanelTrack} from "@comend/lib/mixpanel";
+import {mixpanelTrack} from "@comend/lib/mixpanel";
 import Spinner from "@comend/components/ui/spinner";
 import type {User} from "@prisma/client";
 
@@ -149,7 +149,6 @@ export function NavUser({user, memberRequests}: NavUserProps) {
                         <DropdownMenuSeparator/>
                         <DropdownMenuItem onClick={() => {
                             mixpanelTrack('User Logout')
-                            mixpanelReset()
                             signOut()
                         }}>
                             <LogOut/>

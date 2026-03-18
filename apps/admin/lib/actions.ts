@@ -384,6 +384,25 @@ export const deleteFacilityCreateRequest = withAdminAuth(
     }
 )
 
+export const addEmailToEmailCapture = withAdminAuth(
+    async (email: string) => {
+        try {
+            const response = await prisma.emailCapture.create({
+                data: {
+                    email: email
+                },
+            });
+
+            revalidatePath("/admin/users/email-capture")
+
+            return {success: true, data: response};
+        } catch (error: any) {
+            console.error("Error adding email to email capture list:", error);
+            return {success: false, error: "Database error. Please try again later."};
+        }
+    }
+)
+
 export const addEmailToWhitelist = withAdminAuth(
     async (email: string) => {
         try {
@@ -422,6 +441,25 @@ export const addEmailToBlacklist = withAdminAuth(
     }
 )
 
+export const removeEmailFromEmailCapture = withAdminAuth(
+    async (email: string) => {
+        try {
+            const response = await prisma.emailCapture.delete({
+                where: {
+                    email: email
+                }
+            });
+
+            revalidatePath("/admin/users/email-capture")
+
+            return {success: true, data: response};
+        } catch (error: any) {
+            console.error("Error removing email from email capture list:", error);
+            return {success: false, error: "Database error. Please try again later."};
+        }
+    }
+)
+
 export const removeEmailFromWhitelist = withAdminAuth(
     async (email: string) => {
         try {
@@ -435,7 +473,7 @@ export const removeEmailFromWhitelist = withAdminAuth(
 
             return {success: true, data: response};
         } catch (error: any) {
-            console.error("Error removing email to whitelist:", error);
+            console.error("Error removing email from whitelist:", error);
             return {success: false, error: "Database error. Please try again later."};
         }
     }
@@ -454,7 +492,7 @@ export const removeEmailFromBlacklist = withAdminAuth(
 
             return {success: true, data: response};
         } catch (error: any) {
-            console.error("Error removing email to blacklist:", error);
+            console.error("Error removing email from blacklist:", error);
             return {success: false, error: "Database error. Please try again later."};
         }
     }
