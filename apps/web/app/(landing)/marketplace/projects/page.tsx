@@ -29,6 +29,7 @@ export default function ProjectPage(props: IndexPageProps) {
             if (!initialized) {
                 await initializeProjectSearch(
                     {
+                        types: [] as any[],
                         status: [] as any[],
                     },
                     searchParams?.sort
