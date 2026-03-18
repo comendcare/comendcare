@@ -233,29 +233,42 @@ export function Chat({
                     </div>
                 )}
 
-                <div className="w-full rounded-3xl border bg-background px-4 py-3 flex items-center justify-between gap-3">
-                    <Input
-                        ref={(el) => {
-                            inputRef.current = el
-                        }}
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="Send a message..."
-                        onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-                        disabled={isLoading}
-                        className="w-[calc(100vw-404px)] border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
-                        maxLength={maxTokens * 2}
-                    />
+                <div className="w-full mx-auto">
+                    <div className="flex items-center bg-background border rounded-full shadow-sm">
+                        {/* Input block */}
+                        <div className="flex-1 px-6 py-4">
+                            <Input
+                                ref={(el) => {
+                                    inputRef.current = el
+                                }}
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                placeholder="Send a message..."
+                                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
+                                disabled={isLoading}
+                                maxLength={maxTokens * 2}
+                                className="border-0 p-0 text-sm placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+                            />
+                        </div>
 
-                    <Button
-                        onClick={handleSend}
-                        disabled={isLoading || !input.trim()}
-                        size="icon"
-                        className="rounded-full h-10 w-10 shrink-0"
-                    >
-                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4"/>}
-                    </Button>
+                        {/* Submit */}
+                        <div className="px-4">
+                            <Button
+                                onClick={handleSend}
+                                disabled={isLoading || !input.trim()}
+                                size="icon"
+                                className="rounded-full h-10 w-10"
+                            >
+                                {isLoading ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                    <Send className="h-4 w-4" />
+                                )}
+                            </Button>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     )

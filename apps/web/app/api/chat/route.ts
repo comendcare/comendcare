@@ -31,14 +31,15 @@ type CollectionName =
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 // ===== URL BUILDING =====
-const PUBLIC_HOST =
-    (process.env.NEXT_PUBLIC_APP_HOST ||
-        process.env.NEXT_PUBLIC_APP_URL?.replace(/^https?:\/\//, "").replace(/\/$/, "") ||
-        "localhost:3000") as string;
+const BASE_URL =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXTAUTH_URL ||
+    "http://localhost:3000";
 
-const PUBLIC_PROTOCOL =
-    (process.env.NEXT_PUBLIC_APP_PROTOCOL ||
-        (PUBLIC_HOST.includes("localhost") ? "http" : "https")) as string;
+const url = new URL(BASE_URL);
+
+const PUBLIC_PROTOCOL = url.protocol.replace(":", "");
+const PUBLIC_HOST = url.host;
 
 function hostForOrg(orgSubdomain?: string) {
     return orgSubdomain ? `${orgSubdomain}.${PUBLIC_HOST}` : PUBLIC_HOST;
@@ -92,32 +93,26 @@ function publicItemUrl(collection: CollectionName, doc: any) {
 }
 
 type Rewritten = {
-    q: string;                     // the query string for Typesense
+    q: string; // query string for Typesense
     intent?: "count" | "list" | "search";
-    entity?: { orgName?: string }; // extracted org name if any
-    targetCollections?: CollectionName[]; // optional narrowing
+    entity?: { orgName?: string };
+    targetCollections?: CollectionName[];
 };
 
 function sanitizeTypesenseQ(q: string) {
-    return (q ?? "")
-        .replace(/\s+/g, " ")
-        .trim()
-        .slice(0, 200); // keep it short
+    return (q ?? "").replace(/\s+/g, " ").trim().slice(0, 200);
 }
 
-async function rewriteForTypesense(userText: string) : Promise<Rewritten> {
+async function rewriteForTypesense(userText: string): Promise<Rewritten> {
     const prompt = `
 You rewrite user questions into a Typesense-searchable query string.
 
 Rules:
 - Output MUST be valid JSON only (no markdown).
-- "q" MUST be a short string of 2-8 keywords / phrases.
+- "q" MUST be a short string of 2-12 keywords / phrases.
 - Remove filler words like: how, many, does, have, show, list, tell me, please.
 - Keep proper nouns, acronyms, and disease/org names intact.
-- If an organization name is present, put it into entity.orgName exactly as it appears in the user text.
-- Do NOT invent ids, filters, or facts. Do NOT guess collections unless obvious.
-- If user asks "how many research plans does X have", set intent="count" and targetCollections=["research-plans"] and include X in q.
-- Otherwise intent="search".
+- Do NOT invent ids, filters, or facts.
 
 User text:
 ${JSON.stringify(userText)}
@@ -135,13 +130,18 @@ ${JSON.stringify(userText)}
         if (!q) throw new Error("empty q");
         return { ...parsed, q };
     } catch {
-        // fallback: cheap heuristic
         const fallback = userText
             .replace(/[?.,!]/g, " ")
-            .replace(/\b(how|many|does|do|have|show|list|tell|me|please|what|is|are|the|a|an)\b/gi, " ")
+            .replace(
+                /\b(how|many|does|do|have|show|list|tell|me|please|what|is|are|the|a|an|on|in|at|to|for)\b/gi,
+                " "
+            )
             .replace(/\s+/g, " ")
             .trim();
-        return { q: sanitizeTypesenseQ(fallback) || sanitizeTypesenseQ(userText), intent: "search" };
+        return {
+            q: sanitizeTypesenseQ(fallback) || sanitizeTypesenseQ(userText),
+            intent: "search",
+        };
     }
 }
 
@@ -161,7 +161,9 @@ function bestSnippet(hit: MultiSearchHit): string | undefined {
     const hs = hit.highlights ?? [];
     const first = hs.find((h) => h.snippet)?.snippet;
     if (first) return first;
-    const firstFromSnippets = hs.find((h) => Array.isArray(h.snippets) && h.snippets.length)?.snippets?.[0];
+    const firstFromSnippets = hs.find(
+        (h) => Array.isArray(h.snippets) && h.snippets.length
+    )?.snippets?.[0];
     return firstFromSnippets;
 }
 
@@ -170,149 +172,16 @@ function getTypesenseConfig() {
     const searchKey = process.env.NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY;
 
     if (!TYPESENSE_NODE) throw new Error("Missing env NEXT_PUBLIC_TYPESENSE_NODE");
-    if (!searchKey) throw new Error("Missing env NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY");
+    if (!searchKey)
+        throw new Error("Missing env NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY");
 
     const TYPESENSE_URL = `https://${TYPESENSE_NODE}`.replace(/\/$/, "");
     return { TYPESENSE_URL, searchKey };
 }
 
 /**
- * Very lightweight intent detection. Keep it simple and deterministic.
- * You can expand this over time.
- */
-type Intent =
-    | { kind: "count_orgs" }
-    | { kind: "list_orgs"; page: number; perPage: number }
-    | { kind: "count_research_plans_for_org"; orgName?: string; orgId?: string | null }
-    | { kind: "normal_search"; q: string };
-
-function detectIntent(userText: string, body: ChatBody): Intent {
-    const q = (userText ?? "").trim();
-    const lower = q.toLowerCase();
-
-    if (/\bhow many\b/.test(lower) && (/\borgs?\b/.test(lower) || /\borganizations?\b/.test(lower))) {
-        return { kind: "count_orgs" };
-    }
-
-    if (
-        (/\b(list|show|all)\b/.test(lower) && (/\borgs?\b/.test(lower) || /\borganizations?\b/.test(lower))) ||
-        lower === "organizations" ||
-        lower === "orgs"
-    ) {
-        const page = Number.isFinite(body.page) && (body.page as number) > 0 ? (body.page as number) : 1;
-        const perPageRaw = Number.isFinite(body.perPage) && (body.perPage as number) > 0 ? (body.perPage as number) : 25;
-        const perPage = Math.max(1, Math.min(perPageRaw, 100));
-        return { kind: "list_orgs", page, perPage };
-    }
-
-    // NEW: count research plans
-    if (/\bhow many\b/.test(lower) && /\bresearch plans?\b/.test(lower)) {
-        // if client already set orgId, use it
-        if (body.orgId) return { kind: "count_research_plans_for_org", orgId: body.orgId };
-
-        // otherwise try to extract org name with your rewrite step later (don’t guess here)
-        return { kind: "count_research_plans_for_org" };
-    }
-
-    return { kind: "normal_search", q };
-}
-
-async function resolveOrgFromQuery(q: string) {
-    const results = await typesenseMultiSearch({ q });
-    const orgHit = results.find((r) => r.collection === "organizations");
-    if (!orgHit) return null;
-    return { orgId: orgHit.id, orgUrl: orgHit.url, orgTitle: orgHit.title ?? "(untitled org)" };
-}
-
-async function countResearchPlansForOrg(orgId: string) {
-    return prisma.roadmap.count({
-        where: { organizationId: orgId },
-    });
-}
-
-async function getOrganizationsCountNoAdmin() {
-    const { TYPESENSE_URL, searchKey } = getTypesenseConfig();
-
-    const url = new URL(`${TYPESENSE_URL}/collections/organizations/documents/search`);
-    url.searchParams.set("q", "*");
-    url.searchParams.set("query_by", "name,description");
-    url.searchParams.set("per_page", "1");
-
-    const res = await fetch(url.toString(), {
-        method: "GET",
-        headers: {
-            "X-TYPESENSE-API-KEY": searchKey,
-        },
-        cache: "no-store",
-    });
-
-    if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Typesense org count search failed: ${res.status} ${text}`);
-    }
-
-    const json = await res.json();
-    return Number(json?.found ?? 0);
-}
-
-/**
- * List orgs with q="*" (paged). This is for “show me all orgs”.
- */
-async function listOrganizations(opts: { page: number; perPage: number }) {
-    const { TYPESENSE_URL, searchKey } = getTypesenseConfig();
-
-    const url = new URL(`${TYPESENSE_URL}/collections/organizations/documents/search`);
-    url.searchParams.set("q", "*");
-    url.searchParams.set("query_by", "name,description");
-    url.searchParams.set("page", String(opts.page));
-    url.searchParams.set("per_page", String(opts.perPage));
-
-    const res = await fetch(url.toString(), {
-        method: "GET",
-        headers: {
-            "X-TYPESENSE-API-KEY": searchKey,
-        },
-        cache: "no-store",
-    });
-
-    if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Typesense organizations list failed: ${res.status} ${text}`);
-    }
-
-    const json = await res.json();
-    const hits = (json?.hits ?? []) as Array<{ document: any; text_match?: number; highlights?: any }>;
-
-    const items = hits
-        .map((h) => {
-            const doc = h.document ?? {};
-            const id = String(doc.id ?? "");
-            if (!id) return null;
-
-            const title = String(doc.name ?? "(untitled)");
-            const snippet = bestSnippet({ highlights: h.highlights } as any);
-            const about = String(snippet || doc.description || "").slice(0, 800);
-
-            const orgSubdomain = doc.subdomain || undefined;
-            const url = publicItemUrl("organizations", { ...doc, __orgSubdomain: orgSubdomain });
-
-            return { collection: "organizations" as const, id, title, about, url };
-        })
-        .filter(Boolean) as Array<{ collection: "organizations"; id: string; title: string; about: string; url: string }>;
-
-    return {
-        found: Number(json?.found ?? items.length),
-        page: opts.page,
-        perPage: opts.perPage,
-        items,
-    };
-}
-
-/**
- * multi_search, but:
- * - allow more per collection
- * - return more than 20 (cap higher)
- * - include collectionName reliably
+ * Always run Typesense multi_search across collections.
+ * (No intent detection; no special casing.)
  */
 async function typesenseMultiSearch(opts: { q: string }) {
     const { TYPESENSE_URL, searchKey } = getTypesenseConfig();
@@ -339,7 +208,8 @@ async function typesenseMultiSearch(opts: { q: string }) {
         {
             collection: "clinical-datasets",
             q,
-            query_by: "id,title.title,description,organization.name,institution.name,gene.symbol,type.label,condition.name",
+            query_by:
+                "id,title.title,description,organization.name,institution.name,gene.symbol,type.label,condition.name",
         },
         { collection: "rfps", q, query_by: "id,title,description,eligibility,evaluationProcess,organization.name,condition.name" },
         { collection: "research-plans", q, query_by: "id,title,description,organization.name" },
@@ -351,9 +221,7 @@ async function typesenseMultiSearch(opts: { q: string }) {
             collection: s.collection,
             q: s.q,
             query_by: s.query_by,
-
             per_page: 10,
-
             prefix: true,
             exhaustive_search: true,
             num_typos: 2,
@@ -387,6 +255,7 @@ async function typesenseMultiSearch(opts: { q: string }) {
         about: string;
         url: string;
         score: number;
+        tsDoc?: any;
     }> = [];
 
     for (const r of json.results ?? []) {
@@ -402,10 +271,18 @@ async function typesenseMultiSearch(opts: { q: string }) {
             const id = String(doc.id ?? "");
             if (!id) continue;
 
-            const title = doc.name || doc.title?.title || doc.title || doc.user?.name || doc.organization?.name || undefined;
+            const title =
+                doc.name ||
+                doc.title?.title ||
+                doc.title ||
+                doc.user?.name ||
+                doc.organization?.name ||
+                undefined;
 
             const snippet = bestSnippet(h);
-            const about = String(snippet || doc.description || doc.title?.title || doc.title || doc.name || "").slice(0, 800);
+            const about = String(
+                snippet || doc.description || doc.title?.title || doc.title || doc.name || ""
+            ).slice(0, 800);
 
             const orgSubdomain = doc.subdomain || doc.organization?.subdomain || undefined;
             const url = publicItemUrl(collectionName, { ...doc, __orgSubdomain: orgSubdomain });
@@ -417,12 +294,336 @@ async function typesenseMultiSearch(opts: { q: string }) {
                 about,
                 url,
                 score: Number(h.text_match ?? 0),
+                tsDoc: undefined,
             });
         }
     }
 
     out.sort((a, b) => b.score - a.score);
     return out.slice(0, 60);
+}
+
+/**
+ * DB enrichment (public-only). This is the “datadump” you feed the model.
+ */
+async function enrichFromDb(hits: Array<{ collection: CollectionName; id: string }>) {
+    const byCollection = new Map<CollectionName, string[]>();
+    for (const h of hits) {
+        const arr = byCollection.get(h.collection) ?? [];
+        arr.push(h.id);
+        byCollection.set(h.collection, arr);
+    }
+
+    const uniq = (xs: string[]) => Array.from(new Set(xs));
+
+    const organizationsIds = uniq(byCollection.get("organizations") ?? []);
+    const milestonesIds = uniq(byCollection.get("milestones") ?? []);
+    const biosamplesIds = uniq(byCollection.get("biosamples") ?? []);
+    const diseaseModelsIds = uniq(byCollection.get("disease-models") ?? []);
+    const rfpsIds = uniq(byCollection.get("rfps") ?? []);
+    const researchPlansIds = uniq(byCollection.get("research-plans") ?? []);
+    const companiesIds = uniq(byCollection.get("companies") ?? []);
+    const researchersIds = uniq(byCollection.get("researchers") ?? []);
+
+    const [
+        organizations,
+        milestones,
+        biosamples,
+        diseaseModels,
+        rfps,
+        roadmaps,
+        companies,
+        researchers,
+    ] = await Promise.all([
+        organizationsIds.length
+            ? prisma.organization.findMany({
+                where: { id: { in: organizationsIds }, public: true, published: true },
+                select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                    website: true,
+                    subdomain: true,
+                    customDomain: true,
+                    public: true,
+                    published: true,
+                    verified: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
+            })
+            : Promise.resolve([]),
+        milestonesIds.length
+            ? prisma.milestone.findMany({
+                where: { id: { in: milestonesIds }, private: false },
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    status: true,
+                    startDate: true,
+                    endDate: true,
+                    budget: true,
+                    private: true,
+                    roadmapId: true,
+                    organizationId: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
+            })
+            : Promise.resolve([]),
+        biosamplesIds.length
+            ? prisma.biosample.findMany({
+                where: { id: { in: biosamplesIds }, private: false },
+                select: {
+                    id: true,
+                    description: true,
+                    private: true,
+                    pinned: true,
+                    genes: true,
+                    geneId: true,
+                    variant: true,
+                    availability: true,
+                    quantity: true,
+                    quantityUnit: true,
+                    price: true,
+                    priceUnit: true,
+                    organizationId: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
+            })
+            : Promise.resolve([]),
+        diseaseModelsIds.length
+            ? prisma.diseaseModel.findMany({
+                where: { id: { in: diseaseModelsIds }, private: false },
+                select: {
+                    id: true,
+                    description: true,
+                    private: true,
+                    pinned: true,
+                    genes: true,
+                    geneId: true,
+                    genotype: true,
+                    strain: true,
+                    conditionId: true,
+                    organizationId: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
+            })
+            : Promise.resolve([]),
+        rfpsIds.length
+            ? prisma.rFP.findMany({
+                where: { id: { in: rfpsIds }, private: false },
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    eligibility: true,
+                    instructions: true,
+                    evaluationProcess: true,
+                    openTo: true,
+                    startDate: true,
+                    endDate: true,
+                    budget: true,
+                    private: true,
+                    pinned: true,
+                    organizationId: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
+            })
+            : Promise.resolve([]),
+        researchPlansIds.length
+            ? prisma.roadmap.findMany({
+                where: { id: { in: researchPlansIds }, private: false, published: true },
+                select: {
+                    id: true,
+                    slug: true,
+                    title: true,
+                    description: true,
+                    private: true,
+                    published: true,
+                    modalities: true,
+                    stages: true,
+                    statuses: true,
+                    organizationId: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
+            })
+            : Promise.resolve([]),
+        companiesIds.length
+            ? prisma.company.findMany({
+                where: { id: { in: companiesIds } },
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    website: true,
+                    headquarters: true,
+                    companyType: true,
+                    categories: true,
+                    tags: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
+            })
+            : Promise.resolve([]),
+        researchersIds.length
+            ? prisma.researcher.findMany({
+                where: { id: { in: researchersIds } },
+                select: {
+                    id: true,
+                    website: true,
+                    description: true,
+                    country: true,
+                    title: true,
+                    groupName: true,
+                    researchInterests: true,
+                    therapeuticsOfInterest: true,
+                    conditionsOfInterest: true,
+                    genesOfInterest: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    user: { select: { name: true } },
+                },
+            })
+            : Promise.resolve([]),
+    ]);
+
+    const orgIdsFromChildren = uniq(
+        [
+            ...milestones.map((m: any) => m.organizationId).filter(Boolean),
+            ...biosamples.map((b: any) => b.organizationId).filter(Boolean),
+            ...diseaseModels.map((d: any) => d.organizationId).filter(Boolean),
+            ...rfps.map((r: any) => r.organizationId).filter(Boolean),
+            ...roadmaps.map((rp: any) => rp.organizationId).filter(Boolean),
+        ].map(String)
+    );
+
+    const orgLookupRows = orgIdsFromChildren.length
+        ? await prisma.organization.findMany({
+            where: { id: { in: orgIdsFromChildren }, public: true, published: true },
+            select: { id: true, subdomain: true, name: true },
+        })
+        : [];
+
+    const orgById = new Map<string, { id: string; subdomain: string | null; name: string | null }>();
+    for (const o of orgLookupRows) orgById.set(o.id, o);
+
+    const orgDocsById = new Map(organizations.map((o: any) => [o.id, o] as const));
+    const milestoneById = new Map(milestones.map((m: any) => [m.id, m] as const));
+    const biosampleById = new Map(biosamples.map((b: any) => [b.id, b] as const));
+    const diseaseModelById = new Map(diseaseModels.map((d: any) => [d.id, d] as const));
+    const rfpById = new Map(rfps.map((r: any) => [r.id, r] as const));
+    const roadmapById = new Map(roadmaps.map((r: any) => [r.id, r] as const));
+    const companyById = new Map(companies.map((c: any) => [c.id, c] as const));
+    const researcherById = new Map(researchers.map((r: any) => [r.id, r] as const));
+
+    function attachUrlForChild(collection: CollectionName, doc: any) {
+        const orgId = String(doc?.organizationId ?? "");
+        const org = orgById.get(orgId);
+        const __orgSubdomain = org?.subdomain || undefined;
+        return {
+            ...doc,
+            __orgSubdomain,
+            url: publicItemUrl(collection, { ...doc, __orgSubdomain }),
+        };
+    }
+
+    return {
+        organizations: Array.from(orgDocsById.values()).map((o: any) => ({
+            ...o,
+            url: publicItemUrl("organizations", { ...o, __orgSubdomain: o.subdomain || undefined }),
+        })),
+        milestones: Array.from(milestoneById.values()).map((m: any) => attachUrlForChild("milestones", m)),
+        biosamples: Array.from(biosampleById.values()).map((b: any) => attachUrlForChild("biosamples", b)),
+        diseaseModels: Array.from(diseaseModelById.values()).map((d: any) => attachUrlForChild("disease-models", d)),
+        rfps: Array.from(rfpById.values()).map((r: any) => attachUrlForChild("rfps", r)),
+        researchPlans: Array.from(roadmapById.values()).map((rp: any) => attachUrlForChild("research-plans", rp)),
+        companies: Array.from(companyById.values()).map((c: any) => ({
+            ...c,
+            url: publicItemUrl("companies", { ...c }),
+        })),
+        researchers: Array.from(researcherById.values()).map((r: any) => ({
+            ...r,
+            name: r.user?.name ?? null,
+            url: publicItemUrl("researchers", { id: r.id }),
+        })),
+        clinicalDatasets: [],
+    };
+}
+
+// -----------------------------
+// NEW: deterministic link repair
+// -----------------------------
+type ItemKey = `${CollectionName}/${string}`;
+
+function buildUrlIndex(contextPayload: any) {
+    const map = new Map<ItemKey, string>();
+
+    // From Typesense results
+    for (const r of contextPayload.typesenseResults ?? []) {
+        if (r?.collection && r?.id && r?.url) {
+            map.set(`${r.collection}/${String(r.id)}` as ItemKey, String(r.url));
+        }
+    }
+
+    // From DB enrichment (preferred)
+    const e = contextPayload.dbEnrichment ?? {};
+    const pushArr = (collection: CollectionName, arr: any[]) => {
+        for (const d of arr ?? []) {
+            if (d?.id && d?.url) {
+                map.set(`${collection}/${String(d.id)}` as ItemKey, String(d.url));
+            }
+        }
+    };
+
+    pushArr("organizations", e.organizations);
+    pushArr("milestones", e.milestones);
+    pushArr("biosamples", e.biosamples);
+    pushArr("disease-models", e.diseaseModels);
+    pushArr("rfps", e.rfps);
+    pushArr("research-plans", e.researchPlans);
+    pushArr("companies", e.companies);
+    pushArr("researchers", e.researchers);
+    // clinical-datasets: no enrichment here, so Typesense-only already covered
+
+    return map;
+}
+
+function ensureWhereToViewLinks(text: string, urlIndex: Map<string, string>) {
+    const lines = String(text ?? "").split("\n");
+    const out: string[] = [];
+
+    // Matches exactly your required item line:
+    // - Item: <title> (<collection>/<id>)
+    const itemLineRe = /^\s*-\s*Item:\s*(.+)\s+\(([^)]+)\)\s*$/;
+    const whereLineRe = /^\s*Where to view:\s*(\S+)\s*$/;
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        out.push(line);
+
+        const m = line.match(itemLineRe);
+        if (!m) continue;
+
+        const key = m[2].trim(); // "collection/id"
+        const url = urlIndex.get(key);
+        if (!url) continue; // never invent
+
+        // Look ahead to next non-empty line; if it is already Where to view, skip
+        let j = i + 1;
+        while (j < lines.length && lines[j].trim() === "") j++;
+
+        if (j < lines.length && whereLineRe.test(lines[j])) continue;
+
+        out.push(`  Where to view: ${url}`);
+    }
+
+    return out.join("\n");
 }
 
 const LINK_RULES = `
@@ -441,7 +642,7 @@ If Comend's data has relevant items:
      Where to view: <url>
      About: <1-3 sentences grounded in Comend data>
      
-If Comend data has a "kind" that is a count:
+If you can answer with a count:
 - Respond with 1-2 sentences stating the count.
 - If an organization is involved, include its "Where to view" link when available.
 - Do not list unrelated items.
@@ -464,53 +665,21 @@ export async function POST(req: Request) {
     const personaSystem = body.personaSystem ?? "You are a helpful assistant.";
 
     const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
-    const intent = detectIntent(lastUser, body);
 
-    let contextPayload: any = null;
+    const rewritten = await rewriteForTypesense(lastUser);
+    const tsResults = await typesenseMultiSearch({ q: rewritten.q });
 
-    if (intent.kind === "count_research_plans_for_org") {
-        // Step 1: find orgId
-        let orgId = intent.orgId ?? null;
+    const topForEnrichment = tsResults.slice(0, 25).map((r) => ({ collection: r.collection, id: r.id }));
+    const enrichment = await enrichFromDb(topForEnrichment);
 
-        if (!orgId) {
-            const rewritten = await rewriteForTypesense(lastUser);
-
-            // if the rewriter extracted orgName, prefer that for org resolution
-            const orgQuery = rewritten.entity?.orgName ? rewritten.entity.orgName : rewritten.q;
-
-            const resolved = await resolveOrgFromQuery(orgQuery);
-            orgId = resolved?.orgId ?? null;
-
-            if (!orgId) {
-                contextPayload = {
-                    kind: "count_research_plans_for_org",
-                    error: "org_not_found",
-                    orgQuery,
-                };
-            } else {
-                const count = await countResearchPlansForOrg(orgId);
-                contextPayload = {
-                    kind: "count_research_plans_for_org",
-                    orgId,
-                    org: resolved,
-                    count,
-                };
-            }
-        } else {
-            const count = await countResearchPlansForOrg(orgId);
-            contextPayload = { kind: "count_research_plans_for_org", orgId, count };
-        }
-    } else if (intent.kind === "count_orgs") {
-        const count = await getOrganizationsCountNoAdmin();
-        contextPayload = { kind: "count_orgs", count };
-    } else if (intent.kind === "list_orgs") {
-        const list = await listOrganizations({ page: intent.page, perPage: intent.perPage });
-        contextPayload = { kind: "list_orgs", ...list };
-    } else {
-        const rewritten = await rewriteForTypesense(lastUser);
-        const results = await typesenseMultiSearch({ q: rewritten.q });
-        contextPayload = { kind: "search", q: rewritten.q, rewritten, results };
-    }
+    const contextPayload = {
+        kind: "enriched_search",
+        q: rewritten.q,
+        rewritten,
+        typesenseResults: tsResults,
+        dbEnrichment: enrichment,
+        note: "DB enrichment is filtered to public/published orgs and non-private related records.",
+    };
 
     const context = buildContextBlockJson(contextPayload);
 
@@ -519,7 +688,10 @@ export async function POST(req: Request) {
         { role: "system" as const, content: LINK_RULES },
         { role: "system" as const, content: OUTPUT_FORMAT_RULES },
         { role: "system" as const, content: context },
-        ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+        ...messages.map((m) => ({
+            role: m.role as "user" | "assistant",
+            content: m.content,
+        })),
     ];
 
     const response = await openai.responses.create({
@@ -527,8 +699,13 @@ export async function POST(req: Request) {
         input,
     });
 
+    // ✅ NEW: enforce Where to view links deterministically
+    const urlIndex = buildUrlIndex(contextPayload);
+    const rawText = response.output_text ?? "";
+    const repairedText = ensureWhereToViewLinks(rawText, urlIndex);
+
     return NextResponse.json({
-        text: response.output_text,
-        debug: process.env.NODE_ENV === "development" ? { intent, contextPayload } : undefined,
+        text: repairedText,
+        debug: process.env.NODE_ENV === "development" ? { contextPayload } : undefined,
     });
 }
