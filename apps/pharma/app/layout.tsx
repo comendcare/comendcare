@@ -8,25 +8,21 @@ import {useState} from "react";
 import {redirect, usePathname, useSearchParams} from "next/navigation";
 import Loading from "./../../../loading";
 import {
-    getAllNotifications,
     getAssets,
-    getMilestoneTypes,
     getRFPs,
 } from "@comend/lib/fetchers";
 import {toast} from "sonner";
 import {
     initializeAssetsStore,
     initializeCROSearch,
-    initializeNotificationsState,
     initializeOrganizationSearch,
     initializeRFPStore,
 } from "@comend/lib/initialize-client-state";
-import {SidebarInset, SidebarProvider, SidebarTrigger} from "@comend/components/ui/sidebar";
+import {SidebarInset, SidebarProvider} from "@comend/components/ui/sidebar";
 import {useQueryState} from "nuqs"
-import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, TOOL_TYPE_OPTIONS} from "@comend/lib/types";
+import {ASSOCIATED_SYSTEMS, MILESTONE_TYPE_OPTIONS, MODALITIES, MOLECULAR_MECHANISMS} from "@comend/lib/types";
 import {PharmaSidebar} from "comend-pag-platform/components/pharma-sidebar";
 import {PharmaHeader} from "comend-pag-platform/components/pharma-header";
-import { rule } from "postcss";
 
 interface AppLayoutProps {
     children: React.ReactNode
@@ -117,40 +113,12 @@ export default function AppLayout({children}: AppLayoutProps) {
             // Init relevant Zustand stores
             console.log(`Start initialization... for org ${session.user.organizationId}`)
 
-            // Init notifications
-            let notifications = await getAllNotifications({
-                id: true,
-                type: true,
-                title: true,
-                message: true,
-                link: true,
-                createdAt: true,
-                updatedAt: true,
-                lastViewedAt: true,
-            })
-            if (notifications.success && notifications.data) {
-                initializeNotificationsState({
-                    notifications: notifications.data
-                })
-            } else {
-                console.error(notifications.error)
-                toast.error(notifications.error)
-            }
-            console.log(`Notificaions initialized...`)
-
             // init CRO Search store
-            const milestoneTypes = await getMilestoneTypes({
-                id: true,
-                label: true,
-                services: true,
-                categories: true,
-                description: true
-            })
             const parsedCROFilters = {
                 categories: parseQuery(queryCategories),
                 milestoneTypes: parseQuery(queryMilestoneTypes)
                     .map(query => {
-                        const milestoneType = (milestoneTypes.data || []).find(milestone => milestone.id === query.value)
+                        const milestoneType = (MILESTONE_TYPE_OPTIONS || []).find(milestone => ((milestone.id === query.value) || (milestone.value === query.value)))
                         if (!milestoneType) return undefined
                         return {
                             label: milestoneType.label,

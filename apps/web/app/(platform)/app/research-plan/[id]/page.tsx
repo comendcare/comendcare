@@ -5,7 +5,6 @@ import {
     getBiosamples,
     getClinicalDatasets,
     getDiseaseModels,
-    getMilestoneTypes,
     getOrganizationFromOrganizationId,
     getRFPs,
     getRoadmap,
@@ -34,7 +33,6 @@ export default async function RoadmapPage({
 
     // Group fetches: core roadmap data first, then options in parallel
     const [
-        milestoneTypesSettle,
         organizationSettle,
         roadmapSettle,
         milestonesSettle,
@@ -45,10 +43,6 @@ export default async function RoadmapPage({
         clinicalDatasetsSettle,
         rfpSettle,
     ] = await Promise.allSettled([
-        getMilestoneTypes({
-            id: true,
-            label: true,
-        }),
         getOrganizationFromOrganizationId(orgId, {
             id: true,
             name: true,
@@ -134,7 +128,6 @@ export default async function RoadmapPage({
     const ok = <T,>(s: PromiseSettledResult<T>): T | undefined =>
         s.status === "fulfilled" ? s.value : undefined
 
-    const milestoneTypesRes = ok(milestoneTypesSettle)
     const biosamplesRes = ok(biosamplesSettle)
     const diseaseModelsRes = ok(diseaseModelsSettle)
     const clinicalDatasetsRes = ok(clinicalDatasetsSettle)
@@ -149,7 +142,6 @@ export default async function RoadmapPage({
         return <NoOrganization />
     }
 
-    const milestoneTypes = milestoneTypesRes?.success ? milestoneTypesRes.data ?? [] : []
     const biosampleOptions = biosamplesRes?.data ? biosamplesRes.data ?? [] : []
     const diseaseModelOptions = diseaseModelsRes?.data ? diseaseModelsRes.data ?? [] : []
     const clinicalDatasetOptions = clinicalDatasetsRes?.data ? clinicalDatasetsRes.data ?? [] : []
@@ -166,7 +158,6 @@ export default async function RoadmapPage({
 
     return (
         <Roadmap
-            milestoneTypes={milestoneTypes}
             organization={organization}
             orgSubdomain={organization?.subdomain}
             orgIsPublished={!!organization?.published}
