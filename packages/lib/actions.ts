@@ -3357,19 +3357,25 @@ export const createBiosample = withOrganizationAuth(
                     ...(biosampleData.company
                         ? ({company: {connect: {id: biosampleData.company.id}}}) // if company exists in database, connect
                         : ({company: undefined})), // if company does not exist in database, don't connect
+                    donor: undefined // don't connect donor yet
                 }
             })
 
-            const existingDonor = await prisma.donor.findFirst({
-                where: {
-                    internalId: data.internalDonorId,
-                    organizationId: organization.id
-                }
-            })
+            let existingDonor = undefined
+
+            if (data.donorId || data.internalDonorId) {
+                existingDonor = await prisma.donor.findFirst({
+                    where: {
+                        ...(data.donorId && {id: data.donorId}),
+                        ...(data.internalDonorId && {internalId: data.internalDonorId}),
+                        organizationId: organization.id
+                    }
+                })   
+            }
 
             if (existingDonor) {
                 await prisma.biosample.update({
-                    where: {id: response?.id},
+                    where: {id: response.id},
                     include: {
                         contacts: true,
                         attachments: true,
@@ -3385,40 +3391,10 @@ export const createBiosample = withOrganizationAuth(
                     data: {
                         donor: {connect: {id: existingDonor.id}}
                     }
-                    // data: {
-                    //     donor: {
-                    //         // id: data.donorId || generateDonorNanoid(),
-                    //         internalId: data.internalDonorId,
-                    //         sex: data.sex,
-                    //         gender: data.gender,
-                    //         race: data.race,
-                    //         ethnicity: data.ethnicity,
-                    //         treatments: data.treatments,
-                    //         medications: data.medications,
-                    //         organization: {connect: {id: organization.id}},
-                    //         diagnoses: {
-                    //             create: (data.diagnoses || []).map((diagnosis: {
-                    //                 diagnosis: Option[],
-                    //                 severity?: string
-                    //             }) => ({
-                    //                 severity: diagnosis.severity,
-                    //                 type: {
-                    //                     connectOrCreate: {
-                    //                         where: {id: diagnosis.diagnosis[0].value},
-                    //                         create: {
-                    //                             id: diagnosis.diagnosis[0].value,
-                    //                             label: diagnosis.diagnosis[0].label
-                    //                         }
-                    //                     }
-                    //                 }
-                    //             }))
-                    //         }
-                    //     }
-                    // }
                 })
             } else {
                 await prisma.biosample.update({
-                    where: {id: response?.id},
+                    where: {id: response.id},
                     data: {
                         donor: {
                             create: {
@@ -3856,7 +3832,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     milestones: {
                         deleteMany: {},
                         create: (rfpData.milestones || []).map((milestone: any) => ({
-                            milestone: {connect: {id: milestone.milestoneId}},
+                            milestone: {connect: {id: milestone?.milestoneId}},
                         })),
                     },
                     budget: rfpData.budget,
@@ -3895,7 +3871,7 @@ export const createOrUpdateRFP = withOrganizationAuth(
                     endDate: rfpData.endDate,
                     milestones: {
                         create: (rfpData.milestones || []).map((milestone: any) => ({
-                            milestone: {connect: {id: milestone.milestoneId}},
+                            milestone: {connect: {id: milestone?.milestoneId}},
                         })),
                     },
                     organization: {connect: {id: organization.id}},
