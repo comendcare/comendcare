@@ -8,27 +8,22 @@ import { BadgeVariantType } from '@comend/lib/types';
 export type ViewType = 'grid' | 'list'
 
 export type FiltersType = {
-    // stages: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    //     variant?: BadgeVariantType
-    // }[],
+    types: {
+        label: string,
+        value: string,
+        disable?: boolean,
+        variant?: BadgeVariantType
+    }[],
     status: {
         label: string,
         value: string,
         disable?: boolean,
         variant?: BadgeVariantType
     }[],
-    // modalities: {
-    //     label: string,
-    //     value: string,
-    //     disable?: boolean,
-    //     variant?: BadgeVariantType
-    // }[],
 }
 
 export const defaultFilters = {
+    types: [],
     status: [],
 }
 
@@ -37,29 +32,21 @@ function generateFiltersString(filters: FiltersType): string {
 
     const escapeValue = (value: string) => `\`${value}\``;
 
-    // stages
-    // if (filters?.stages && filters.stages.length > 0) {
-    //     const stageFilter = filters.stages
-    //         .map(stage => `stages:=[${escapeValue(stage.label)}]`)
-    //         .join(" || ");
-    //         filtersList.push(`(${stageFilter})`);
-    // }
+    // type
+    if (filters?.types && filters.types.length > 0) {
+        const stageFilter = filters.types
+            .map(type => `types.milestoneTypeId:=[${escapeValue(type.value)}]`)
+            .join(" || ");
+            filtersList.push(`(${stageFilter})`);
+    }
 
     // statuses
     if (filters?.status && filters.status.length > 0) {
         const statusFilter = filters.status
-            .map(status => `status:=[${escapeValue(status.label)}]`)
+            .map(status => `status:=[${escapeValue(status.value)}]`)
             .join(" || ");
             filtersList.push(`(${statusFilter})`);
     }
-
-    // modalities/therapeutic strategies
-    // if (filters?.modalities && filters.modalities.length > 0) {
-    //     const modalitiesFilter = filters.modalities
-    //         .map(status => `modalities:=[${escapeValue(status.label)}]`)
-    //         .join(" || ");
-    //         filtersList.push(`(${modalitiesFilter})`);
-    // }
 
     // Combine all filters with `&&`
     const typesenseFilters = filtersList.length > 0 ? filtersList.join(" && ") : "";

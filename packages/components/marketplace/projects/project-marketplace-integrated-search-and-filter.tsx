@@ -8,9 +8,7 @@ import {Input} from "@comend/components/ui/input"
 import {Label} from "@comend/components/ui/label"
 import {Separator} from "@comend/components/ui/separator"
 import {debounce} from "lodash";
-import { ResearchPlanSearchState, useResearchPlanSearchStore } from "@/state/search/researchPlanSearchStore"
 import { Badge } from "@comend/components/ui/badge"
-import { handleAsyncConditionSearch, handleAsyncGeneSearch } from "@comend/lib/utils"
 import dynamic from "next/dynamic"
 import { ProjectSearchState, useProjectSearchStore } from "@/state/search/projectSearchStore"
 
@@ -50,7 +48,7 @@ export function ProjectMarketplaceIntegratedSearchAndFilter() {
     useEffect(() => setQuery(searchTerm), [searchTerm]);
 
     const clearAll = () => {
-        setFilters({ ...filters, status: [] });
+        setFilters({ ...filters, types: [], status: [] });
     }
 
     // helper to update a single filter key from MultipleSelector
@@ -75,7 +73,9 @@ export function ProjectMarketplaceIntegratedSearchAndFilter() {
         []
     )
 
-    const activeCount = (filters.status?.length || 0)
+    const activeCount = 
+        (filters.status?.length || 0) + 
+        (filters.types?.length || 0)
 
     return (
         <div className="w-full mx-auto flex flex-col gap-y-2">
@@ -106,29 +106,17 @@ export function ProjectMarketplaceIntegratedSearchAndFilter() {
             <div className="flex flex-row gap-2 items-center">
                 {activeCount > 0 && (
                     <div className="flex flex-wrap gap-2 items-center">
-                        {/* {(filters.modalities || []).map((item) => (
-                            <Badge key={`modalities-${item.value}`} variant="lightBlue" className="text-xs">
+                        {(filters.types || []).map((item) => (
+                            <Badge key={`status-${item.value}`} variant="secondary" className="text-xs">
                                 {item.label}
                                 <button
-                                    onClick={() => removeFilterItem("modalities", item.value)}
+                                    onClick={() => removeFilterItem("status", item.value)}
                                     className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
                                 >
                                     <X className="h-3 w-3" />
                                 </button>
                             </Badge>
-                        ))} */}
-
-                        {/* {(filters.stages || []).map((item) => (
-                            <Badge key={`stages-${item.value}`} variant={item.variant || "secondary"} className="text-xs">
-                                {item.label}
-                                <button
-                                    onClick={() => removeFilterItem("stages", item.value)}
-                                    className="ml-1 hover:bg-gray-300 rounded-full w-4 h-4 flex items-center justify-center"
-                                >
-                                    <X className="h-3 w-3" />
-                                </button>
-                            </Badge>
-                        ))} */}
+                        ))}
 
                         {(filters.status || []).map((item) => (
                             <Badge key={`status-${item.value}`} variant="secondary" className="text-xs">
