@@ -57,6 +57,8 @@ function generateFiltersString(filters: FiltersType): string {
 
 const sortByFilters: { [key: string]: string } = {
     "default": "updatedAt:desc",
+    "budget-low-high": "budget:asc",
+    "budget-high-low": "budget:desc"
 }
 
 const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true): Promise<{results: any[], total: number}> => {
@@ -126,11 +128,11 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
 export interface ProjectSearchState {
     initialized: boolean,
     setInit: (initState: boolean) => void,
-    initState: (filters: FiltersType, sortBy?: string | string[] | undefined) => Promise<void>,
+    initState: (filters: FiltersType, sortBy?: string) => Promise<void>,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
-    sortBy: string | string[] | undefined,
-    setSortBy: (sortBy: string | string[] | undefined) => void,
+    sortBy: string
+    setSortBy: (sortBy: string) => void,
     lastFetchedPage: number,
     setLastFetchedPage: (page: number) => void,
     view: ViewType,
@@ -151,7 +153,7 @@ export const useProjectSearchStore = create<ProjectSearchState>()(
             setInit: (initState: boolean) => {
                 set({initialized: initState})
             },
-            initState: async (filters: FiltersType, sortBy?: string | string[] | undefined) => {
+            initState: async (filters: FiltersType, sortBy?: string) => {
                 set({
                     searchTerm: "",
                     sortBy: "default",
@@ -198,8 +200,8 @@ export const useProjectSearchStore = create<ProjectSearchState>()(
                     totalResults: total,
                 })
             },
-            sortBy: undefined,
-            setSortBy: async (sortBy: string | string[] | undefined) => {
+            sortBy: "default",
+            setSortBy: async (sortBy: string) => {
                 const {results: newSearchResults, total} = await getUpdatedSearchResults({
                     ...get(),
                     sortBy,

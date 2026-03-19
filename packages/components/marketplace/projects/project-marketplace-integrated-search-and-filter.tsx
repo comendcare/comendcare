@@ -11,6 +11,7 @@ import {debounce} from "lodash";
 import { Badge } from "@comend/components/ui/badge"
 import dynamic from "next/dynamic"
 import { ProjectSearchState, useProjectSearchStore } from "@/state/search/projectSearchStore"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@comend/components/ui/select"
 
 const ProjectFiltersDialog = dynamic(
     () =>
@@ -77,6 +78,13 @@ export function ProjectMarketplaceIntegratedSearchAndFilter() {
         (filters.status?.length || 0) + 
         (filters.types?.length || 0)
 
+    // Sort menu (mirrors store-supported sort keys)
+    const SORT_ITEMS: { value: string; label: string }[] = [
+        { value: "default", label: "Recently Updated" },
+        { value: "budget-low-high", label: "Budget (Low-High)" },
+        { value: "budget-high-low", label: "Budget (High-Low)" },
+    ];
+
     return (
         <div className="w-full mx-auto flex flex-col gap-y-2">
             <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm">
@@ -142,6 +150,21 @@ export function ProjectMarketplaceIntegratedSearchAndFilter() {
                 <div className="mt-2 text-sm text-muted-foreground">
                     {typeof totalResults === "number" ? `${totalResults} results` : "Loading results..."}
                 </div>
+
+                <Select value={sortBy} onValueChange={(v) => setSortBy(v)}>
+                    <SelectTrigger className="w-[200px] h-full text-xs">
+                        <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent className="text-xs">
+                        <SelectGroup className="text-xs">
+                            {SORT_ITEMS.map((opt) => (
+                                <SelectItem key={opt.value} value={opt.value} className="text-xs">
+                                    {opt.label}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
             </div>
         </div>
     )
