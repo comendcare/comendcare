@@ -44,12 +44,12 @@ export async function initializeResearchPlanSearch(filters: ResearchPlanMarketpl
     }
 }
 
-export async function initializeProjectSearch(filters: ProjectMarketplaceFiltersType, sortBy?: string | string[] | undefined) {
+export async function initializeProjectSearch(filters: ProjectMarketplaceFiltersType) {
     if (typeof window !== "undefined") {
         const initProjectSearchState = useProjectSearchStore.getState().initState;
 
         // Call Zustand's initState directly
-        await initProjectSearchState(filters, sortBy)
+        await initProjectSearchState(filters)
     }
 }
 

@@ -128,7 +128,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
 export interface ProjectSearchState {
     initialized: boolean,
     setInit: (initState: boolean) => void,
-    initState: (filters: FiltersType, sortBy?: string) => Promise<void>,
+    initState: (filters: FiltersType) => Promise<void>,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string
@@ -153,7 +153,7 @@ export const useProjectSearchStore = create<ProjectSearchState>()(
             setInit: (initState: boolean) => {
                 set({initialized: initState})
             },
-            initState: async (filters: FiltersType, sortBy?: string) => {
+            initState: async (filters: FiltersType) => {
                 set({
                     searchTerm: "",
                     sortBy: "default",

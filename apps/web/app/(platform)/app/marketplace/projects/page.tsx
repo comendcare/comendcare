@@ -32,7 +32,6 @@ export default function ProjectPage(props: IndexPageProps) {
                         types: [] as any[],
                         status: [] as any[],
                     },
-                    searchParams?.sort
                 )
                 console.log(`Biosample search initialized...`)
             }
