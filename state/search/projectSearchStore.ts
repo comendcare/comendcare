@@ -74,7 +74,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "organization.name,title,description",
+            query_by: "organization.name,title,description,types.milestoneTypeId,companies.company.title,institutions.institution.name,attachments.name",
             per_page: 12,
             page: state.lastFetchedPage,
             ...(filtersString ? { filter_by: filtersString } : undefined),

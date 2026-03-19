@@ -127,16 +127,6 @@ export const syncToTypesense = async (env: {
                     type: "string",
                     sort: true,
                 },
-                // {
-                //     name: "types.milestoneTypeId",
-                //     type: "string",
-                //     sort: true,
-                // },
-                // {
-                //     name: "budget",
-                //     type: "int64",
-                //     sort: true,
-                // }
             ]
         }
         
@@ -156,6 +146,9 @@ export const syncToTypesense = async (env: {
                 status: true,
                 types: true,
                 budget: true,
+                companies: {include: {company: true}},
+                institutions: {include: {institution: true}},
+                attachments: true,
                 organization: {
                     select: {name: true}
                 },
