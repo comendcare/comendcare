@@ -31,6 +31,7 @@ export default function ProjectPage(props: IndexPageProps) {
                     {
                         types: [] as any[],
                         status: [] as any[],
+                        budgetRange: [] as any[]
                     },
                 )
                 console.log(`Biosample search initialized...`)
