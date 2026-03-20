@@ -120,13 +120,13 @@ export default async function AppLayoutServer({children}: { children: React.Reac
         <InvitationGate invitations={invitations}>
             <ClaimInvitationGate claimInvitations={claimOrgInvitations}>
                 <IntroductionCards invitations={invitations} claimInvitations={claimOrgInvitations}>
-                <AppClientShell
-                    user={user}
-                    memberships={memberships}
-                    memberRequests={memberRequests}
-                >
-                    {children}
-                </AppClientShell>
+                    <AppClientShell
+                        user={user}
+                        memberships={memberships}
+                        memberRequests={memberRequests}
+                    >
+                        {children}
+                    </AppClientShell>
                 </IntroductionCards>
             </ClaimInvitationGate>
         </InvitationGate>

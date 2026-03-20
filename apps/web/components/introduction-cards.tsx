@@ -24,20 +24,20 @@ import { useSession } from "next-auth/react";
 
 const introPages = [
     {
-        title: "First, plan your research, end-to-end",
-        description: "Create and organize research projects, tools, and RFPs the using interactive planner.",
+        title: "Start by mapping out your research efforts",
+        description: "Upload and detail research tools, research plans, and requests for proposals using dedicated features.",
         img: screenshot1,
         imgAlt: ""
     },
     {
-        title: "Next, turn your work into visibility",
-        description: "Showcase your active and published projects, tools, and funding opportunities to your community, researchers, and partners—all in one trusted place.",
+        title: "Next, broadcast your work easily",
+        description: "Showcase your progress, available research tools, and funding opportunities to your  researchers, donors, and community.",
         img: screenshot2,
         imgAlt: ""
     },
     {
-        title: "Finally, connect with the right partners",
-        description: "Discover complementary patient groups, researchers, and service providers matched to your research priorities and research stage.",
+        title: "Finally, connect with relevant partners",
+        description: "Discover complementary patient groups and service providers based on your research interests.",
         img: screenshot3,
         imgAlt: ""
     }
@@ -52,7 +52,8 @@ export default function IntroductionCards({
     claimInvitations: { id: string; organizationId: string, role: string, organization: Organization }[];
     children: React.ReactNode;
 }) {
-    const [open, setIsOpen] = useState(!isOnboarded("viewedIntro")); // if param is in url, permanently open until handled
+    // const [open, setIsOpen] = useState(!isOnboarded("viewedIntro")); // if param is in url, permanently open until handled
+    const [open, setIsOpen] = useState(true); // if param is in url, permanently open until handled
 
     return (
         <>
@@ -96,7 +97,8 @@ const CustomCarouselControls = ({setIsOpen}: {setIsOpen: Dispatch<React.SetState
         <div className="relative flex justify-between mt-4">
             <div className="absolute top-0 mt-4 w-full flex justify-center gap-2 ml-auto mr-auto">
             {introPages.map((_, index) => (
-                <div 
+                <div
+                    key={index}
                     className={cn(
                         "h-2 w-2 rounded-full",
                         index <= slideIndex ? "bg-muted-foreground" : "bg-muted"
