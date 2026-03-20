@@ -2,7 +2,6 @@
 
 import { useRoadmapStore } from "../../apps/web/state/roadmap/roadmapStore";
 import { PlatformNotification, Prisma } from "@prisma/client";
-import { useNotificationsStore } from "../../state/notifications/notificationsStore";
 import { useMilestoneSearchStore } from "../../state/search/milestoneSearchStore";
 import { FiltersType as CROMarketplaceFiltersType, useCROSearchStore} from "../../state/search/croSearchStore";
 import { FiltersType as PAGMarketplaceFiltersType, useOrganizationSearchStore} from "../../state/search/organizationSearchStore";
@@ -123,18 +122,6 @@ export function initializeRoadmapState(initData: {
         // Call Zustand's initState directly
         initRoadmapState(details, newNodes, edges, milestones, selectedView || null, selectedNodeIds, null, roadmapId || "")
         clear() // clear first/uninitialized state from history, so undo doesn't apply the un-initialized state
-    }
-}
-
-export function initializeNotificationsState(initData: {
-    notifications: PlatformNotification[]
-}) {
-    if (typeof window !== "undefined") {
-        const initNotificationsState = useNotificationsStore.getState().initState
-        const { notifications } = initData
-
-        // Call Zustand's initState directly
-        initNotificationsState(notifications)
     }
 }
 

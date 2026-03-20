@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client"
 import { fieldEncryptionExtension } from 'prisma-field-encryption'
 import { tmpdir } from "os"
-import fs from "fs"
+import * as fs from "fs"
 
 // Function to write the decoded content to a file
 function writeDecodedFile(filename: string, base64Content: string) {

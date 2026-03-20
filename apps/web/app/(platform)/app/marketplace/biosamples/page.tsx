@@ -28,10 +28,10 @@ export default function BiosamplesPage(props: IndexPageProps) {
     useEffect(() => {
         const init = async () => {
             const searchParams = await props.searchParams;
-            const filters = JSON.parse(searchParams.filters as string)
+            const filters = searchParams?.filters !== undefined ? JSON.parse(searchParams.filters as string) : undefined
 
             let filterOrgs: Organization[] = []
-            if (filters && filters.organizations) {
+            if (filters && filters?.organizations) {
                 const prismaResponse = await fetch('/api/organizations', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -43,14 +43,14 @@ export default function BiosamplesPage(props: IndexPageProps) {
             if (!initialized) {
                 await initializeBiosampleSearch(
                     {
-                        types: ((filters.types || [])
+                        types: ((filters?.types || [])
                             .map((value: string) => BIOSAMPLE_TYPE_OPTIONS.find(option => option.value === value))
                             .filter((option: Option | undefined) => !!option)) as any[],
-                        genes: ((filters.genes || []).map((symbol: string) => ({
+                        genes: ((filters?.genes || []).map((symbol: string) => ({
                                 label: symbol,
                                 value: symbol,
                             }))) as any[],
-                        conditions: ((filters.conditions || []).map((condition: string) => ({
+                        conditions: ((filters?.conditions || []).map((condition: string) => ({
                                 label: condition,
                                 value: condition,
                             }))) as any[],

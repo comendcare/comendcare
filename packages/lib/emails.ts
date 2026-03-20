@@ -1,6 +1,6 @@
 "use server"
 import {render} from "@react-email/render"
-import sgMail from "@sendgrid/mail"
+import * as sgMail from "@sendgrid/mail"
 import ContactEmail from "./../../packages/transactional/emails/contact/contact-email"
 import PAGContactEmail from "./../../packages/transactional/emails/pag/contact-email";
 import rateLimit from "./rate-limit";

@@ -4,7 +4,6 @@ import BlurImage from "@comend/components/blur-image"
 // import { placeholderBlurhash, random } from "@comend/lib/utils"
 import Placeholder from "@/public/placeholder.png"
 import type {Organization} from "@prisma/client"
-import {FolderKanban} from "lucide-react"
 import Link from "next/link"
 // import prisma from "@comend/lib/prisma";
 
@@ -54,13 +53,6 @@ export function OrganizationCard({ data }: { data: Organization }) {
                 >
                     {url} ↗
                 </a>
-                {/* <Link
-                    href={`/admin/organization/${data.id}/analytics`}
-                    className="flex items-center rounded-md bg-green-100 px-2 py-1 text-sm font-medium text-green-600 transition-colors hover:bg-green-200 dark:bg-green-900 dark:bg-opacity-50 dark:text-green-400 dark:hover:bg-green-800 dark:hover:bg-opacity-50"
-                >
-                    <FolderKanban height={16} />
-                    <p>{projectCount}</p>
-                </Link> */}
             </div>
         </div>
     )

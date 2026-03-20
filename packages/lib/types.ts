@@ -27,7 +27,6 @@ import type {
 } from "@prisma/client";
 import {Prisma} from "@prisma/client";
 import {z} from "zod";
-import type {BadgeVariantType} from "@comend/components/ui/badge"
 
 export const BIOMARKER_TYPES = [
     { id: "DIAGNOSTIC", label: "Diagnostic Biomarker", value: "diagnostic" },
@@ -301,7 +300,6 @@ export const orgForAnalyticsInclude = Prisma.validator<Prisma.OrganizationSelect
     clients: true,
     invitations: true,
     membershipRequests: true,
-    kanban: true,
     milestones: true,
     platformNotifications: true,
     reviews: true,
@@ -587,6 +585,38 @@ export interface Option {
     [key: string]: any;
 }
 
+export type BadgeVariantType = 
+    "default" | 
+    "secondary" | 
+    "destructive" | 
+    "positive" | 
+    "outline" | 
+    "lightBlue" | 
+    "red" | 
+    "orange" | 
+    "amber" | 
+    "yellow" | 
+    "lime" | 
+    "green" | 
+    "emerald" | 
+    "teal" | 
+    "cyan" | 
+    "sky" | 
+    "blue" | 
+    "indigo" | 
+    "violet" | 
+    "purple" | 
+    "fuchsia" | 
+    "pink" | 
+    "rose" | 
+    "slate" | 
+    "gray" | 
+    "zinc" | 
+    "neutral" | 
+    "stone" | 
+    null | 
+    undefined
+
 export const optionSchema = z.object({
     label: z.string(),
     value: z.string(),
@@ -668,27 +698,6 @@ export type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
 export type NotificationType = 'NEW_TASK' | 'NEW_RECOMMENDATION'
 
 export type NodeType = 'ASSET' | 'PROJECT' | 'RFP'
-
-export const KANBAN_NOTIFICATIONS: NotificationType[] = ["NEW_TASK"]
-
-export const DEFAULT_KANBAN_COLUMNS = [
-    {
-        name: 'Not started',
-        kanbanPosition: 0
-    },
-    {
-        name: 'Stuck',
-        kanbanPosition: 1
-    },
-    {
-        name: 'Working on it',
-        kanbanPosition: 2
-    },
-    {
-        name: 'Done',
-        kanbanPosition: 3
-    }
-]
 
 export const BIOSAMPLE_AVAILABILTIY_OPTIONS: Option[] = [
     {label: 'Available', value: 'AVAILABLE'},
@@ -2509,7 +2518,6 @@ export interface Task {
     description?: string
     checklist?: any[],
     orderPosition: number,
-    kanbanPosition: number,
     stakeholders?: any[],
     endDate: Date,
     priority: PriorityType

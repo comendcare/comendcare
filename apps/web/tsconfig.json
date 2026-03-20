@@ -7,7 +7,7 @@
       "~web/*": ["./*"],
       "@/state/*": ["../../state/*"],
       "@/public/*": ["../../public/*"],
-    }
+    },
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../packages/components/milestone-type-badge.tsx", "components/tool-actions-menu.tsx", "../../packages/components/biorepo/advanced-data-table/biosamples-table/biosamples-table-columns.tsx", "../../packages/lib/cookie-yes-scripts.tsx"],
   "exclude": ["node_modules"]

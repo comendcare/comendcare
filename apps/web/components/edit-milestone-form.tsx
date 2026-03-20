@@ -51,6 +51,7 @@ import {
     DISEASE_MODEL_TYPE_OPTIONS,
     // editMilestoneForm,
     optionSchema,
+    MILESTONE_TYPE_OPTIONS,
 } from "@comend/lib/types"
 import {
     Biosample,
@@ -182,7 +183,6 @@ export function EditMilestoneForm({
                                       diseaseModelOptions,
                                       clinicalDatasetOptions,
                                       rfpOptions,
-                                      milestoneTypeOptions,
                                       onClose,
                                       className,
                                   }: {
@@ -193,15 +193,12 @@ export function EditMilestoneForm({
     diseaseModelOptions: Partial<DiseaseModel>[],
     clinicalDatasetOptions: Partial<Tool>[],
     rfpOptions: Partial<RFP>[],
-    milestoneTypeOptions: Partial<MilestoneType>[],
     onClose: () => void,
     className?: string,
 }) {
-    const {setMilestone, savingList, selectedNodeIds} = useRoadmapStore(useShallow(selector))
+    const {setMilestone, savingList} = useRoadmapStore(useShallow(selector))
     const initializing = useRef(true)
-    const [isInitialized, setIsInitialized] = useState(false)
-    const {data: session, status} = useSession()
-    const pathname = usePathname()
+    const {data: session} = useSession()
     const [fetchedTools, setFetchedTools] = useState<Option[]>([])
     const [tab, setTab] = useState<string>("edit")
     const [shareIsOpen, setShareIsOpen] = useState(false)
@@ -665,7 +662,7 @@ export function EditMilestoneForm({
                                         {formData?.types?.length === 3 &&
                                             <FormDescription>{`Maximum selection is 3 types.`}</FormDescription>}
                                     </div>
-                                    <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypeOptions}/>
+                                    <MilestoneTypeFormField form={form}/>
 
                                     <FormLabel>{`Project status`}</FormLabel>
                                     <StatusFormField
@@ -1394,7 +1391,7 @@ export function EditMilestoneForm({
     )
 }
 
-export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTypes: any[] }) => {
+export const MilestoneTypeFormField = ({form}: { form: any}) => {
     const types = form.watch("types")
 
     return (
@@ -1409,8 +1406,8 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                                 {...field}
                                 maxSelected={3}
                                 badgeClassName={badgeVariants({variant: "lightBlue"})}
-                                defaultOptions={milestoneTypes?.map(type => ({...type, value: type.id}))}
-                                options={milestoneTypes?.map(type => ({...type, value: type.id}))}
+                                defaultOptions={MILESTONE_TYPE_OPTIONS}
+                                options={MILESTONE_TYPE_OPTIONS}
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
                                 placeholder="Project type"
