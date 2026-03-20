@@ -51,10 +51,10 @@ function generateFiltersString(filters: FiltersType): string {
     }
 
     // budget range
-    if (filters?.budgetRange) {
-        const budgetFilter = `budget:=[${filters.budgetRange[0]}..${filters.budgetRange[1]}]`
-        filtersList.push(`(${budgetFilter})`)
-    }
+    // if (filters?.budgetRange) {
+    //     const budgetFilter = `budget:=[${filters.budgetRange[0]}..${filters.budgetRange[1]}]`
+    //     filtersList.push(`(${budgetFilter})`)
+    // }
 
     // Combine all filters with `&&`
     const typesenseFilters = filtersList.length > 0 ? filtersList.join(" && ") : "";

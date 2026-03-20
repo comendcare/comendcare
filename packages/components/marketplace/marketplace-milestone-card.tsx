@@ -1,12 +1,15 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@comend/components/ui/card";
 import Link from "next/link";
-import {MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS} from "@comend/lib/types";
+import {MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS, StatusType} from "@comend/lib/types";
 import React from "react";
-import {cn, formatMoney, truncate} from "@comend/lib/utils";
+import {formatMoney} from "@comend/lib/utils";
 import {ProfilePhoto} from "@comend/components/profile-photo";
 import {Separator} from "@comend/components/ui/separator";
-import {Banknote, ExternalLink} from "lucide-react";
+import {Banknote, DollarSign, Microscope, User} from "lucide-react";
 import { TypeBadge } from "@comend/components/type-badge";
+import { Badge } from "@comend/components/ui/badge";
+import { DateView } from "@comend/components/milestone-date-view"
+import StatusButton from "@comend/components/milestone-status-button"
 
 const StatusData: Record<"PLANNED" | "INPROGRESS" | "COMPLETED", { text: string; styling: string }> = {
     PLANNED: {
@@ -53,7 +56,7 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
 
     return (
         <Link href={getLink()}>
-            <Card 
+            {/* <Card 
                 className={cn("text-wrap break-words h-full w-full flex flex-col")}
             >
                 <CardHeader className="flex gap-2 pb-4">
@@ -78,13 +81,95 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
                             {truncate(milestone.description || "", 200)}
                         </CardDescription>
                     </div>
-    
-                    {/* <div className="flex flex-col gap-4 justify-end grow">
-                        <CardContents props={{
-                            type: milestone.nodeType,
-                            data: milestone
-                        } as NodeProps<PublicMilestoneNode>}/>
-                    </div> */}
+                </CardContent>
+            </Card> */}
+
+            <Card 
+                // className={cn(
+                //     "drag-handle border-2 border-gray-300 w-[350px] text-wrap",
+                //     props?.id && selectedNodeIds.includes(props?.id) ? "border-gray-900 border-2 click-project-step" : "",
+                //     props.id === "preview" ? "opacity-50" : "",
+                // )}
+                // style={{
+                //     // transform the node so the 'snap to grid' point is centered in the node
+                //     // this allows edges to be straight, and perfectly align handles no matter the node's card height
+                //     transform: props.id === 'preview' ? 'translate(0%, 50%)' : 'translate(0%, -50%)',
+                // }}
+            >
+                <CardHeader className="pt-8">
+                    <CardTitle className="text-gray-900">
+                        {milestone?.title || "New Milestone"}
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-2">
+                    <ul className="w-full flex flex-row flex-wrap gap-2 text-sm text-wrap break-words">
+                        {(milestone?.types || []).sort((a: any, b: any) => a?.milestoneType?.label && b?.milestoneType?.label ? a?.milestoneType?.label.length - b?.milestoneType?.label.length : 0).map((milestoneType: any, index: number) => (
+                            <li key={index}>
+                                <Badge className="w-fit" variant={'lightBlue'}>
+                                    {milestoneType?.milestoneType?.label || "No type"}
+                                </Badge>
+                            </li>
+                        ))}
+
+                        {(milestone?.contacts || []).map((contact: any, index: number) => {
+                            if (contact.affiliation) {
+                                return (
+                                    <li key={index}>
+                                        <Badge>
+                                            <User size={18}/>
+                                            <p className="w-[90%] text-wrap break-words">{contact.affiliation}</p>
+                                        </Badge>
+                                    </li>
+                                )
+                            }
+                        })}
+
+                        {(milestone?.startDate || milestone?.endDate) && (
+                            <li>
+                                <Badge>
+                                    <DateView startDate={milestone?.startDate || undefined} endDate={milestone?.endDate || undefined}/>
+                                </Badge>
+                            </li>
+                        )}
+
+                        {(!!milestone?.budget) && (
+                            <li>
+                                <Badge>
+                                    <DollarSign size={16}/>
+                                    <p>{formatMoney(milestone?.budget)}</p>
+                                </Badge>
+                            </li>
+                        )}
+
+                        {(milestone?.biosamples?.length > 0 || milestone?.diseaseModels?.length > 0 || milestone?.tools?.length > 0) && (
+                            <li>
+                                <Badge variant={'green'}>
+                                    <Microscope size={16} />
+                                    {(milestone?.biosamples?.length + milestone?.diseaseModels?.length + milestone?.tools?.length) <= 1 
+                                        ? `1 Linked tool` 
+                                        : `${(milestone?.biosamples?.length + milestone?.diseaseModels?.length + milestone?.tools?.length)} Linked tools`}
+                                </Badge>
+                            </li>
+                        )}
+
+                        {(milestone?.rfps?.length > 0) && (
+                            <li>
+                                <Badge variant={'orange'}>
+                                    <Microscope size={16} />
+                                    {(milestone?.rfps?.length) <= 1 
+                                        ? `1 Linked RFP` 
+                                        : `${(milestone?.rfps?.length)} Linked RFPs`}
+                                </Badge>
+                            </li>
+                        )}
+                    </ul>
+
+                    <StatusButton 
+                        status={milestone?.status as StatusType || undefined}
+                        minimal={true}
+                        disabled={true}
+                        onStatusChange={() => {}}
+                    />
                 </CardContent>
             </Card>
         </Link>
