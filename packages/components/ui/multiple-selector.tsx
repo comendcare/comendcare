@@ -5,12 +5,13 @@ import {X} from 'lucide-react';
 import * as React from 'react';
 import {forwardRef, useEffect} from 'react';
 
-import {Badge, BadgeVariantType} from './badge';
+import {Badge} from './badge';
 import {Command, CommandGroup, CommandItem, CommandList} from './command';
 import {cn, sleep} from './../../../packages/lib/utils';
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "./hover-card";
 import {ScrollArea} from './scroll-area';
 import {DynamicIcon, IconName} from 'lucide-react/dynamic'
+import { BadgeVariantType } from '@comend/lib/types';
 
 
 export interface Option {

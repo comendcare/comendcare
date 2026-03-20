@@ -21,7 +21,6 @@ import {
 import {toast} from "sonner"
 import {nanoid} from "nanoid"
 import {editResearchPlanForm, Milestone, Roadmap} from "@comend/lib/types"
-import {getMilestoneTypes} from "@comend/lib/fetchers"
 import {mixpanelTrack} from "@comend/lib/mixpanel";
 import z from "zod"
 
@@ -121,22 +120,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                 console.log(`roadmap data`, roadmap)
                 
                 if (roadmap) set({ details: roadmap as Roadmap })
-
-                // optimistic local
-                // set({details: {...(get().details || {}), ...data} as any});
-                // durable op
-                // const {enqueue} = useWriteQueue.getState();
-                // enqueue({
-                //     kind: "UPDATE_ROADMAP", payload: {
-                //         orgId, data: {
-                //             id,
-                //             title: details.title,
-                //             description: details.description ?? null,
-                //             modalities: details.modalities ?? [],
-                //             metadata: details.metadata ?? null
-                //         }
-                //     }
-                // });
             },
             onboardingActive: true,
             setOnboardingActive: (active: boolean) => {
@@ -180,11 +163,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                 }
                 
                 if (newProperties?.id) get().savingListRemove([newProperties.id])
-                // const {enqueue} = useWriteQueue.getState();
-                // enqueue({
-                //     kind: "UPDATE_MILESTONES",
-                //     payload: {orgId: get().details?.organizationId, milestones}
-                // });
             },
             setMilestonesVisibility: async (milestones: Milestone[], isPrivate: boolean) => {
                 // faster version of set milestones used for updating visibility quickly for many milestones at a time
@@ -244,11 +222,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                 }
 
                 get().savingListRemove(milestones.filter(milestone => !!milestone.id).map(milestone => milestone.id))
-                // const {enqueue} = useWriteQueue.getState();
-                // enqueue({
-                //     kind: "UPDATE_MILESTONES",
-                //     payload: {orgId: get().details?.organizationId, milestones: updatedMilestones}
-                // });
             },
             nodes: [],
             edges: [],
@@ -265,10 +238,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                     toast.error("Could not update edges", {position: "bottom-left"})
                     console.error(`Error updating Flow Edges`, response?.error)
                 }
-                // useWriteQueue.getState().enqueue({
-                //     kind: "UPDATE_EDGES",
-                //     payload: {orgId: get().details?.organizationId, roadmapId: get().roadmapId, edges}
-                // });
             },
             onConnect: async (connection: Connection) => {
                 // don't add edges from preview node
@@ -288,10 +257,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                     toast.error("Could not update edges", {position: "bottom-left"})
                     console.error(`Error updating Flow Edges`, response?.error)
                 }
-                // useWriteQueue.getState().enqueue({
-                //     kind: "UPDATE_EDGES",
-                //     payload: {orgId: get().details?.organizationId, roadmapId: get().roadmapId, edges}
-                // });
             },
             moveNodes: async (nodes: Node[]) => {
                 console.log(`move nodes`)
@@ -333,36 +298,10 @@ export const useRoadmapStore = create<RoadmapState>()(
                 } else {
                     console.error(`Error updating Flow Edges`, response?.error)
                 }
-                // useWriteQueue.getState().enqueue({
-                //     kind: "UPDATE_EDGES",
-                //     payload: {orgId: get().details?.organizationId, roadmapId: get().roadmapId, edges}
-                // });
             },
             addMilestones: async (milestones: Partial<Milestone>[], creationMethod?: string) => {
                 console.log(`add milestones`, milestones)
                 const newNodes: Node[] = []
-
-                // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
-                // const {
-                //     height,
-                //     width,
-                //     transform: [transformX, transformY, zoomLevel]
-                // } = store.getState()
-
-                // const zoomMultiplier = 1 / zoomLevel
-                // let centerX =
-                //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-                // let centerY =
-                //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
-
-                const milestoneTypes = await getMilestoneTypes({
-                    id: true,
-                    label: true,
-                    services: true,
-                    categories: true,
-                    description: true
-                })
-
                 const milestonesAlongXAxis = get().nodes.sort((a, b) => {
                     return a?.position?.x - b?.position?.x
                 })
@@ -395,7 +334,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                     }
 
                     centerX += 500
-                    // centerY += 200
 
                     newNodes.push(newNode)
                 })
@@ -424,10 +362,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                     console.error(`Error adding nodes`, response?.error)
                     toast.error(`Error adding milestones: ${response?.error}`)
                 }
-                // useWriteQueue.getState().enqueue({
-                //     kind: "CREATE_NODES",
-                //     payload: {orgId: get().details?.organizationId, roadmapId: get().roadmapId, nodes, creationMethod}
-                // });
             },
             addNodesFromTemplate: async (template: any) => {
                 const response = await createNodesAndEdgesFromTemplate(get().details?.organizationId, get().roadmapId, template)
@@ -463,28 +397,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                     console.error(`Error deleting nodes`, response?.error)
                     toast.error(`Error deleting milestone: ${response?.error}`)
                 }
-                // useWriteQueue.getState().enqueue({
-                //     kind: "DELETE_NODE",
-                //     payload: {orgId: get().details?.organizationId, nodeId}
-                // });
             },
-            // saveState: () => {
-            //     console.log(`save state`)
-            //     const state = get()
-            //     updateDBFlow(state.details?.organizationId, {
-            //         roadmapId: state.roadmapId,
-            //         nodes: state.nodes,
-            //         edges: state.edges
-            //     })
-            //     updateMilestones(state.details?.organizationId, {milestones: state.milestones})
-
-            //     // const {enqueue} = useWriteQueue.getState();
-            //     // enqueue({
-            //     //     kind: "UPDATE_FLOW",
-            //     //     payload: {orgId: state.details?.organizationId, roadmapId: state.roadmapId, nodes: state.nodes, edges: state.edges}
-            //     // });
-            //     // enqueue({kind: "UPDATE_MILESTONES", payload: {orgId: state.details?.organizationId, milestones: state.milestones}});
-            // },
             savingList: [],
             savingListAdd: (ids: string[]) => {
                 set({savingList: [...get().savingList, ...ids]})
@@ -504,14 +417,5 @@ export const useRoadmapStore = create<RoadmapState>()(
         }),
         {
             limit: 100, // limit the stored history states to 100
-            // onSave: (pastState, currentState) => {
-            //     console.log(`Past state`, pastState)
-            //     console.log(`Saved Roadmap State: `, currentState)
-            //     return
-            // },
-            // partialize: (state) => {
-            //     const {selectedNodeIds, nodes, edges, milestones, details, ...rest} = state;
-            //     return {selectedNodeIds, nodes, edges, milestones, details};
-            // },
         })
 )

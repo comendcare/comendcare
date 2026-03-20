@@ -15,7 +15,7 @@
       // "@/data/*": ["data/*"],
       // "@/public/*": ["public/*"],
       // "@/loading": ["loading.tsx"],
-    }
+    },
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules", "dist"]

@@ -49,7 +49,6 @@ export default async function EmbeddedProjectPage({params}: {params: {domain: st
             invitations: true,
             membershipRequests: true,
             conditions: true,
-            kanban: true,
             milestones: true,
             platformNotifications: true,
             reviews: true,

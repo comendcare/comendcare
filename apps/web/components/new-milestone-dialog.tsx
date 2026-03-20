@@ -4,13 +4,12 @@ import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogT
 import { Button } from "@comend/components/ui/button"
 import { RoadmapState, useRoadmapStore } from "~web/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
-import { getMilestoneTypes } from "@comend/lib/fetchers"
-import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client"
-import { Info, Plus } from "lucide-react"
+import { MilestoneTypeOnMilestone } from "@prisma/client"
+import { Plus } from "lucide-react"
 import { DialogDescription } from "@radix-ui/react-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@comend/components/ui/tabs"
 import { ScrollArea } from "@comend/components/ui/scroll-area"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@comend/components/ui/tooltip"
+import { MILESTONE_TYPE_OPTIONS } from "@comend/lib/types"
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones,
@@ -25,35 +24,12 @@ export type TabType = 'projects' | 'research-plans'
 export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: boolean, setOpen: (open: boolean) => void, tab: TabType, setTab: (tab: TabType) => void}) => {
     const { 
         addMilestones,
-        selectedView,
-        addNodes,
         addNodesFromTemplate,
         setSelectedNodeIds
     } = useRoadmapStore(useShallow(selector))
     const [selectedMilestonesTemplate, setSelectedMilestonesTemplate] = useState<string[]>([])
     const [selectedResearchPlanTemplate, setSelectedResearchPlanTemplate] = useState<any | undefined>(undefined)
-    const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
-    // const [tab, setTab] = useState<TabType>(defaultTab)
     const dialogRef = useRef<HTMLDivElement>(null);
-
-    // Allow update once form is initialized
-    useEffect(() => {
-        const init = async () => {    
-            // get milestone types from database
-            const response = await getMilestoneTypes({
-                id: true,
-                label: true,
-                services: true,
-                categories: true,
-                description: true
-            })
-            if (response.success && response.data) {
-                setMilestoneTypes(response.data || [])
-            }
-        }
-
-        init()
-    }, []);
 
     useEffect(() => {
         setSelectedMilestonesTemplate([])
@@ -140,7 +116,7 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
 
                         <DialogClose>
                             <Button
-                                disabled={(tab === 'research-plans' && !selectedResearchPlanTemplate) || (tab === 'projects' && selectedMilestonesTemplate.length === 0) || milestoneTypes.length === 0}
+                                disabled={(tab === 'research-plans' && !selectedResearchPlanTemplate) || (tab === 'projects' && selectedMilestonesTemplate.length === 0)}
                                 type="button"
                                 variant={"cta"}
                                 onClick={async () => {
@@ -150,7 +126,7 @@ export const NewMilestoneDialogForm = ({open, setOpen, tab, setTab}: {open: bool
                                             title: template?.title,
                                             description: template?.description,
                                             types: template?.types.map((type: string) => {
-                                                const milestoneType = milestoneTypes.find(t => t.id === type)
+                                                const milestoneType = MILESTONE_TYPE_OPTIONS.find(t => t.value === type)
                                                 if (!milestoneType) return // milestone type not found, don't add it to created milestone
                                                 return ({ 
                                                     milestoneTypeId: type,

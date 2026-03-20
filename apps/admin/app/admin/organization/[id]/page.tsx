@@ -1,7 +1,6 @@
 import { getSession } from "@comend/lib/auth"
 import prisma from "@comend/lib/prisma"
 import { notFound, redirect } from "next/navigation"
-import {VerifyOrganizationSwitch} from "~admin/components/verify-organization-switch";
 import OrganizationRoadmaps from "~admin/components/organization-roadmaps";
 import {deleteOrganization} from "@comend/lib/actions";
 import {toast} from "sonner";
@@ -70,7 +69,6 @@ export default async function AdminOrganizationPage({
                     >
                         {url} ↗
                     </a>
-                    {/* <VerifyOrganizationSwitch organization={data}/> */}
                 </div>
                 <div className="flex gap-2">
                     <EditPAGProfileDialog organization={data} />

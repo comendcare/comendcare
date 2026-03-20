@@ -14,24 +14,16 @@ import {
     DataTableColumnHeader
 } from "./../data-table/data-table-column-header";
 import {
-    AVAILABILITY_OPTIONS,
     BIOSAMPLE_TYPE_OPTIONS,
     DIAGNOSIS_SEVERITY_OPTIONS,
     DONOR_RACE_OPTIONS,
     DONOR_SEX_OPTIONS,
-    Milestone,
     QUANTITY_OPTIONS,
 } from "./../../../../../packages/lib/types";
 import {MilestoneTypeBadge} from "./../../../milestone-type-badge";
-import {AssetActionsMenu} from "comend-pag-platform/components/tool-actions-menu";
 import { Badge } from "./../../../ui/badge";
 import { Checkbox } from "./../../../ui/checkbox";
-import { getDiagnosisTypes } from "./../../../../../packages/lib/fetchers";
-import { useEffect, useState } from "react";
-import { Option } from "./../../../../../packages/lib/types";
-import { cn, handleAsyncCompanyAndInstitutionSearch, handleAsyncCompanySearch, handleAsyncDiagnosesSearch, handleAsyncGeneSearch, handleAsyncInstitutionSearch, handleAsyncMilestoneSearch, handleGetAvailability } from "./../../../../../packages/lib/utils";
-import { getSession, useSession } from "next-auth/react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./../../../ui/tooltip";
+import { cn, handleAsyncCompanyAndInstitutionSearch, handleAsyncDiagnosesSearch, handleAsyncGeneSearch, handleAsyncMilestoneSearch } from "./../../../../../packages/lib/utils";
 import Link from "next/link";
 import { filterColumns } from "@comend/lib/filter-columns";
 import { generateId } from "@comend/lib/id";
