@@ -56,7 +56,7 @@ export function useBiosamplesTableColumns(
                 />
             ),
             cell: ({row}) => (
-                <p>{row.original.donor?.internalId || '--'}</p>
+                <p>{row.original.donorId || '--'}</p>
             ),
             enableHiding,
             enableSorting,
