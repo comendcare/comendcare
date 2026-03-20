@@ -5119,6 +5119,7 @@ export const updateMilestones = withOrganizationAuth(
                                     .filter(c => contactsDiff.toAdd.includes(c.id))
                                     .map(c => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
                             },
+                            activelyFundraising: milestone.activelyFundraising,
                         },
                     })
                 })

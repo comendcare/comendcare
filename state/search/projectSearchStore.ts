@@ -20,11 +20,13 @@ export type FiltersType = {
         disable?: boolean,
         variant?: BadgeVariantType
     }[],
+    budgetRange: number[]
 }
 
 export const defaultFilters = {
     types: [],
     status: [],
+    budgetRange: [0, 1000000000],
 }
 
 function generateFiltersString(filters: FiltersType): string {
@@ -46,6 +48,12 @@ function generateFiltersString(filters: FiltersType): string {
             .map(status => `status:=[${escapeValue(status.value)}]`)
             .join(" || ");
             filtersList.push(`(${statusFilter})`);
+    }
+
+    // budget range
+    if (filters?.budgetRange) {
+        const budgetFilter = `budget:=[${filters.budgetRange[0]}..${filters.budgetRange[1]}]`
+        filtersList.push(`(${budgetFilter})`)
     }
 
     // Combine all filters with `&&`

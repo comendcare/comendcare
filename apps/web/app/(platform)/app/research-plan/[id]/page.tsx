@@ -105,7 +105,8 @@ export default async function RoadmapPage({
             rfps: { include: { rfp: true } },
             companies: {include: {company: true}},
             institutions: {include: {institution: true}},
-            createFacilityRequests: true
+            createFacilityRequests: true,
+            activelyFundraising: true
         }),
         getRoadmapNodes(orgId, params.id, {
             id: true,

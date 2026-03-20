@@ -93,6 +93,7 @@ import dynamic from "next/dynamic";
 import { SubmitCreateRequest } from "./create-facility-request-button"
 import { createCreateFacilityRequest } from "@comend/lib/actions"
 import { NewToolDialog } from "./edit-tool-dialog"
+import { Checkbox } from "@comend/components/ui/checkbox"
 
 type PlateEditorProps = {
     value: any[];
@@ -164,6 +165,7 @@ const editMilestoneForm = z.object({
     rfps: z.array(z.custom<RFP>()).optional(),
     notes: z.array(z.record(z.any())),
     partners: z.array(optionSchema).optional(),
+    activelyFundraising: z.boolean().default(false),
 }).refine(
     (m) => m.startDate && m.endDate ? m.startDate?.getTime() <= m.endDate?.getTime() : true,
     {
@@ -287,7 +289,8 @@ export function EditMilestoneForm({
                     label: institution.institution.name || undefined,
                     institution: institution.institution
                 })))
-            ]
+            ],
+            activelyFundraising: milestoneData.activelyFundraising
         }
     })
 
@@ -338,7 +341,8 @@ export function EditMilestoneForm({
             tools,
             rfps,
             notes,
-            partners
+            partners,
+            activelyFundraising
         } = values;
 
         let foundInstitutions = undefined
@@ -425,7 +429,8 @@ export function EditMilestoneForm({
                 milestoneId: milestoneData.id,
                 institutionId: institution.id,
                 institution: institution
-            }))
+            })),
+            activelyFundraising
         }
 
         if (milestoneData?.nodeId) await setMilestone(milestoneData.nodeId, updateData)
@@ -677,6 +682,22 @@ export function EditMilestoneForm({
                                                 "Status": updatedStatus
                                             })
                                         }}
+                                    />
+
+                                    <FormLabel>Actively fundraising</FormLabel>
+                                    <FormField 
+                                        control={form.control}
+                                        name="activelyFundraising"
+                                        render={({field}) => (
+                                            <FormItem className="flex flex-row items-start justify-end space-x-3 space-y-0">
+                                                <FormControl >
+                                                    <Checkbox 
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
                                     />
 
                                     <FormLabel>Linked tools</FormLabel>

@@ -300,6 +300,7 @@ model Milestone {
   contacts         ExternalContact[]
   timelineOrder    Int                        @default(0)
   nodeType         String                     @default("PROJECT")
+  activelyFundraising Boolean @default(false)
 
   tools         ToolToMilestone[]
   biosamples    BiosampleToMilestone[]
