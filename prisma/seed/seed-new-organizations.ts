@@ -230,7 +230,7 @@ async function main() {
             },
             update: {},
             create: {
-                role: "member",
+                role: "support",
                 email: memberUser.email,
                 user: { connect: { id: memberUser.id } },
                 organization: { connect: { id: created.id } },

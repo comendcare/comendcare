@@ -15,12 +15,6 @@ export const testimonials = [
         url: "https://agsaa.comend.io/",
     },
     {
-        name: "The MED13L Foundation",
-        image:
-            "https://storage.googleapis.com/comend-app-public/1745847743769-Screenshot%202025-04-28%20at%208.41.23%E2%80%AFAM.png",
-        url: "https://med13l.comend.io/",
-    },
-    {
         name: "CurePDE",
         image:
             "https://storage.googleapis.com/comend-app-public/1749575307892-Screenshot-2025-06-10-at-12.08.13-PM.png",

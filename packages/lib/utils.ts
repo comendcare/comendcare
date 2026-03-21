@@ -807,7 +807,7 @@ export const isOnboarded = (tutorialName: string) => {
 }
 
 export const setOnboarded = (tutorialName: string) => {
-    window.functionalConsentedLocalStorage?.set(tutorialName, true)
+    window.functionalConsentedLocalStorage?.set(tutorialName, "true")
 }
 
 type DraggableData = ColumnDragData | TaskDragData
