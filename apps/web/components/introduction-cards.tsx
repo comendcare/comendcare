@@ -19,7 +19,6 @@ import screenshot2 from "@/public/Screenshot 2026-02-24 at 11.15.00 AM.png"
 import screenshot3 from "@/public/Screenshot 2026-02-24 at 11.15.50 AM.png"
 import Image from "next/image";
 import { cn, isOnboarded, setOnboarded } from "@comend/lib/utils";
-import { editUser } from "@comend/lib/actions";
 import { useSession } from "next-auth/react";
 
 const introPages = [
@@ -52,8 +51,7 @@ export default function IntroductionCards({
     claimInvitations: { id: string; organizationId: string, role: string, organization: Organization }[];
     children: React.ReactNode;
 }) {
-    // const [open, setIsOpen] = useState(!isOnboarded("viewedIntro")); // if param is in url, permanently open until handled
-    const [open, setIsOpen] = useState(true); // if param is in url, permanently open until handled
+    const [open, setIsOpen] = useState(!isOnboarded("viewedIntro")); // if param is in url, permanently open until handled
 
     return (
         <>
