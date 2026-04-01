@@ -92,7 +92,7 @@ export const addEmailCapture = async (email: string) => {
         where: {email: lowerCaseEmail},
         update: {}, // No fields to update
         create: {email: lowerCaseEmail},
-    }); 
+    });
 }
 
 export const createMemberRequest = withAuth(
@@ -294,21 +294,21 @@ export const createCondition = withAuth(
 
             if (!condition) {
                 console.error("Error creating condition.");
-                return { success: false, error: "Database error. Please try again later." };
+                return {success: false, error: "Database error. Please try again later."};
             }
 
             // all the old relation-sync block is gone
 
-            return { success: true, data: condition };
+            return {success: true, data: condition};
         } catch (error: any) {
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 if (error.code === "P2002") {
-                    return { success: false, error: "A condition with this name already exists." };
+                    return {success: false, error: "A condition with this name already exists."};
                 }
             }
 
             console.error("Error creating condition:", error);
-            return { success: false, error: "Database error. Please try again later." };
+            return {success: false, error: "Database error. Please try again later."};
         }
     }
 );
@@ -804,30 +804,40 @@ export const updateRoadmap = withOrganizationAuth(
                     stages: data.stages,
                     statuses: data.statuses,
                     links: {
-                        deleteMany: linksDiff.toRemove.length ? { id: { in: linksDiff.toRemove } } : undefined,
+                        deleteMany: linksDiff.toRemove.length ? {id: {in: linksDiff.toRemove}} : undefined,
                         update: (data.links || [])
                             .filter((a: any) => linksDiff.toUpdate.includes(a.id))
                             .map((a: any) => ({
                                 where: {id: a.id},
-                                data: { link: a.link, name: a.name ?? undefined }
+                                data: {link: a.link, name: a.name ?? undefined}
                             })),
                         create: (data.links || [])
                             .filter((a: any) => linksDiff.toAdd.includes(a.id))
-                            .map((a: any) => ({ link: a.link, name: a.name ?? undefined })),
+                            .map((a: any) => ({link: a.link, name: a.name ?? undefined})),
                     },
                     partners: {
-                        deleteMany: partnersDiff.toRemove.length ? { id: { in: partnersDiff.toRemove } } : undefined,
+                        deleteMany: partnersDiff.toRemove.length ? {id: {in: partnersDiff.toRemove}} : undefined,
                         update: (data.partners || [])
                             .filter((c: any) => partnersDiff.toUpdate.includes(c.id))
                             .map((c: any) => ({
                                 where: {id: c.id},
-                                data: { name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined }
+                                data: {
+                                    name: c.name,
+                                    email: c.email,
+                                    role: c.role ?? undefined,
+                                    affiliation: c.affiliation ?? undefined
+                                }
                             })),
                         create: (data.partners || [])
                             .filter((c: any) => partnersDiff.toAdd.includes(c.id))
-                            .map((c: any) => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
+                            .map((c: any) => ({
+                                name: c.name,
+                                email: c.email,
+                                role: c.role ?? undefined,
+                                affiliation: c.affiliation ?? undefined
+                            })),
                     },
-                    
+
                     ...(data.metadata ? {metadata: data.metadata} : undefined)
                 }
             })
@@ -841,9 +851,9 @@ export const updateRoadmap = withOrganizationAuth(
 
             // if the organization has a custom domain, we need to revalidate those tags too
             roadmap.organization?.customDomain &&
-                (await revalidateTag(
-                    `${roadmap.organization?.customDomain}-roadmaps`
-                ),
+            (await revalidateTag(
+                `${roadmap.organization?.customDomain}-roadmaps`
+            ),
                 await revalidateTag(
                     `${roadmap.organization?.customDomain}-${roadmap.slug}`
                 ))
@@ -979,20 +989,24 @@ export const inviteUser = withOrganizationAuth(
                 return res
             })
 
-            await customerIOTrack({
-                userId: session.user.id,
-                event: 'organization_invitation_sent',
-                timestamp: new Date(),
-                // Keep org / invite-specific data on the EVENT, not person traits (users can have multiple invites)
-                properties: {
-                    invitation_id: invitation.id,
-                    organization_id: organization.id,
-                    organization_name: organization.name,
-                    invitee_email: lowerCaseEmail,
-                    role: role,
-                    inviter_user_id: session.user.id,
-                },
-            });
+            try {
+                await customerIOTrack({
+                    userId: session.user.id,
+                    event: 'organization_invitation_sent',
+                    timestamp: new Date(),
+                    // Keep org / invite-specific data on the EVENT, not person traits (users can have multiple invites)
+                    properties: {
+                        invitation_id: invitation.id,
+                        organization_id: organization.id,
+                        organization_name: organization.name,
+                        invitee_email: lowerCaseEmail,
+                        role: role,
+                        inviter_user_id: session.user.id,
+                    },
+                });
+            } catch (e) {
+                console.error('[CIO] track organization_invitation_revoked failed:', e);
+            }
 
             // Upsert so that if it already is whitelisted, nothing changes, and if not, they are whitelisted
             await prisma.whitelist.upsert({
@@ -1706,7 +1720,7 @@ export const deleteUser = withAuth(
                 return {success: false, error: "user not found"};
             }
 
-            void cioDeleteUser(user.id, { suppress: true });
+            void cioDeleteUser(user.id, {suppress: true});
 
             return {success: true, data: user};
         } catch (error: any) {
@@ -2077,8 +2091,8 @@ export const updateCondition = withOrganizationAuth(
 
             // find existing org→condition link, if any
             const link = await prisma.conditionToOrganization.findFirst({
-                where: { organizationId: organization.id },
-                select: { conditionId: true },
+                where: {organizationId: organization.id},
+                select: {conditionId: true},
             });
 
             // ---------- CREATE or ATTACH branch ----------
@@ -2090,12 +2104,12 @@ export const updateCondition = withOrganizationAuth(
                 let condition: Condition | null = null;
 
                 if (requestedId) {
-                    condition = await prisma.condition.findUnique({ where: { id: requestedId } });
+                    condition = await prisma.condition.findUnique({where: {id: requestedId}});
                 } else if (requestedSlug) {
-                    condition = await prisma.condition.findUnique({ where: { slug: requestedSlug } });
+                    condition = await prisma.condition.findUnique({where: {slug: requestedSlug}});
                 }
 
-                const { biomarkers, name: incomingName, slug: incomingSlug, ...rest } = data ?? {};
+                const {biomarkers, name: incomingName, slug: incomingSlug, ...rest} = data ?? {};
                 const biomarkersNested = toBiomarkersNested(biomarkers);
 
                 const slug = incomingSlug ?? toKebabCase(String(incomingName || ""));
@@ -2103,10 +2117,10 @@ export const updateCondition = withOrganizationAuth(
 
                 if (condition) {
                     condition = await prisma.condition.update({
-                        where: { id: condition.id },
+                        where: {id: condition.id},
                         data: {
                             ...rest,
-                            ...(biomarkersNested ? { biomarkers: biomarkersNested } : {}),
+                            ...(biomarkersNested ? {biomarkers: biomarkersNested} : {}),
                         },
                     });
                 } else {
@@ -2116,7 +2130,7 @@ export const updateCondition = withOrganizationAuth(
                             slug,
                             name,
                             ...(biomarkersNested?.createMany
-                                ? { biomarkers: { createMany: biomarkersNested.createMany } }
+                                ? {biomarkers: {createMany: biomarkersNested.createMany}}
                                 : {}),
                         },
                     });
@@ -2124,11 +2138,11 @@ export const updateCondition = withOrganizationAuth(
 
                 // link org → condition
                 await prisma.conditionToOrganization.create({
-                    data: { conditionId: condition.id, organizationId: organization.id },
+                    data: {conditionId: condition.id, organizationId: organization.id},
                 });
 
                 revalidatePath("/app/profile");
-                return { success: true, data: condition };
+                return {success: true, data: condition};
             }
 
             // ---------- UPDATE branch ----------
@@ -2147,24 +2161,24 @@ export const updateCondition = withOrganizationAuth(
 
             if (incomingName) {
                 const byName = await prisma.condition.findUnique({
-                    where: { name: incomingName },
-                    select: { id: true },
+                    where: {name: incomingName},
+                    select: {id: true},
                 });
 
                 if (byName && byName.id !== conditionId) {
                     await prisma.conditionToOrganization.upsert({
                         where: {
-                            conditionId_organizationId: { conditionId, organizationId: organization.id },
+                            conditionId_organizationId: {conditionId, organizationId: organization.id},
                         },
-                        update: { conditionId: byName.id },
-                        create: { conditionId: byName.id, organizationId: organization.id },
+                        update: {conditionId: byName.id},
+                        create: {conditionId: byName.id, organizationId: organization.id},
                     });
 
                     targetConditionId = byName.id;
                 }
             }
 
-            const safeScalarData: Record<string, any> = { ...restData };
+            const safeScalarData: Record<string, any> = {...restData};
 
             // ignore incomingSlug unless you explicitly want to allow changing it
             // if (incomingSlug && targetConditionId === conditionId) {
@@ -2180,15 +2194,15 @@ export const updateCondition = withOrganizationAuth(
             }
 
             const updated = await prisma.condition.update({
-                where: { id: targetConditionId },
+                where: {id: targetConditionId},
                 data: safeScalarData,
             });
 
             revalidatePath("/app/profile");
-            return { success: true, data: updated };
+            return {success: true, data: updated};
         } catch (error: any) {
             console.error("Error in updateCondition:", error);
-            return { success: false, error: error.message || "Failed to update or create condition." };
+            return {success: false, error: error.message || "Failed to update or create condition."};
         }
     }
 );
@@ -3001,7 +3015,7 @@ export const createBiosample = withOrganizationAuth(
                     metadata: biosampleData.metadata as InputJsonObject,
                     ...(biosampleData.gene?.value
                         // transform symbol to uppercase because all genes are uppercase in our database
-                        ? ({gene: {connect: {symbol: biosampleData.gene.value.toUpperCase() }}})
+                        ? ({gene: {connect: {symbol: biosampleData.gene.value.toUpperCase()}}})
                         : undefined),
                     ...(biosampleData.institution
                         ? ({institution: {connect: {id: biosampleData.institution.id}}}) // if institution exists in database, connect
@@ -3022,7 +3036,7 @@ export const createBiosample = withOrganizationAuth(
                         ...(data.internalDonorId && {internalId: data.internalDonorId}),
                         organizationId: organization.id
                     }
-                })   
+                })
             }
 
             if (existingDonor) {
@@ -3678,11 +3692,16 @@ export const createRoadmap = withOrganizationAuth(
                     modalities: roadmapTemplate?.modalities,
                     links: {
                         create: (roadmapTemplate?.links || [])
-                            .map((a: any) => ({ link: a.link, name: a.name ?? undefined })),
+                            .map((a: any) => ({link: a.link, name: a.name ?? undefined})),
                     },
                     partners: {
                         create: (roadmapTemplate?.partners || [])
-                            .map((c: any) => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
+                            .map((c: any) => ({
+                                name: c.name,
+                                email: c.email,
+                                role: c.role ?? undefined,
+                                affiliation: c.affiliation ?? undefined
+                            })),
                     },
                     stages: roadmapTemplate?.stages || [],
                     statuses: roadmapTemplate?.statuses || [],
@@ -3932,7 +3951,7 @@ export const moveNodes = withOrganizationAuth(
                 const n = await prisma.$transaction(async tx => {
                     try {
                         return await tx.node.update({
-                            where: { id: node.id },
+                            where: {id: node.id},
                             data: {
                                 positionX: node.position.x ?? node.positionX,
                                 positionY: node.position.y ?? node.positionY,
@@ -4265,16 +4284,16 @@ export const syncDBRFPs = withOrganizationAuth(
 )
 
 export const updateMilestonesVisibility = withOrganizationAuth(
-    async (_: Organization, {milestones, isPrivate}: {milestones: Milestone[], isPrivate: boolean}) => {
+    async (_: Organization, {milestones, isPrivate}: { milestones: Milestone[], isPrivate: boolean }) => {
         try {
             const roadmapId = milestones[0].roadmapId
             const updatedMilestones = await prisma.milestone.updateMany({
-                where: { id: { in: milestones.map(m => m.id) } },
-                data: { private: isPrivate },
+                where: {id: {in: milestones.map(m => m.id)}},
+                data: {private: isPrivate},
             })
 
             const allMilestones = await prisma.milestone.findMany({
-                where: { roadmapId },
+                where: {roadmapId},
             })
             let roadmapPublishStatus = false
             allMilestones.forEach(milestone => {
@@ -4319,18 +4338,18 @@ export const updateMilestones = withOrganizationAuth(
                 const milestoneId = milestone.id
 
                 const existing = await prisma.milestone.findUnique({
-                    where: { id: milestoneId },
+                    where: {id: milestoneId},
                     select: {
                         private: true,
-                        types: { select: { milestoneTypeId: true } },
-                        biosamples: { select: { biosampleId: true } },
-                        diseaseModels: { select: { diseaseModelId: true } },
-                        tools: { select: { toolId: true } },
-                        rfps: { select: { rfpId: true } },
-                        institutions: { select: { institutionId: true } },
-                        companies: { select: { companyId: true } },
-                        attachments: { select: { id: true } },
-                        contacts: { select: { id: true } },
+                        types: {select: {milestoneTypeId: true}},
+                        biosamples: {select: {biosampleId: true}},
+                        diseaseModels: {select: {diseaseModelId: true}},
+                        tools: {select: {toolId: true}},
+                        rfps: {select: {rfpId: true}},
+                        institutions: {select: {institutionId: true}},
+                        companies: {select: {companyId: true}},
+                        attachments: {select: {id: true}},
+                        contacts: {select: {id: true}},
                     },
                 });
 
@@ -4388,7 +4407,7 @@ export const updateMilestones = withOrganizationAuth(
 
                 const m = await prisma.$transaction(async tx => {
                     return await tx.milestone.update({
-                        where: { nodeId: milestone.nodeId || undefined },
+                        where: {nodeId: milestone.nodeId || undefined},
                         data: {
                             title: milestone.title,
                             description: milestone.description,
@@ -4404,52 +4423,57 @@ export const updateMilestones = withOrganizationAuth(
                             metadata: milestone.metadata ?? undefined,
 
                             types: {
-                                deleteMany: typesDiff.toRemove.length ? { milestoneTypeId: { in: typesDiff.toRemove } } : undefined,
-                                create: typesDiff.toAdd.map(id => ({ milestoneType: { connect: { id } } })),
+                                deleteMany: typesDiff.toRemove.length ? {milestoneTypeId: {in: typesDiff.toRemove}} : undefined,
+                                create: typesDiff.toAdd.map(id => ({milestoneType: {connect: {id}}})),
                             },
 
                             biosamples: {
-                                deleteMany: biosamplesDiff.toRemove.length ? { biosampleId: { in: biosamplesDiff.toRemove } } : undefined,
-                                create: biosamplesDiff.toAdd.map(id => ({ biosample: { connect: { id } } })),
+                                deleteMany: biosamplesDiff.toRemove.length ? {biosampleId: {in: biosamplesDiff.toRemove}} : undefined,
+                                create: biosamplesDiff.toAdd.map(id => ({biosample: {connect: {id}}})),
                             },
 
                             diseaseModels: {
-                                deleteMany: diseaseModelsDiff.toRemove.length ? { diseaseModelId: { in: diseaseModelsDiff.toRemove } } : undefined,
-                                create: diseaseModelsDiff.toAdd.map(id => ({ diseaseModel: { connect: { id } } })),
+                                deleteMany: diseaseModelsDiff.toRemove.length ? {diseaseModelId: {in: diseaseModelsDiff.toRemove}} : undefined,
+                                create: diseaseModelsDiff.toAdd.map(id => ({diseaseModel: {connect: {id}}})),
                             },
 
                             tools: {
-                                deleteMany: toolsDiff.toRemove.length ? { toolId: { in: toolsDiff.toRemove } } : undefined,
-                                create: toolsDiff.toAdd.map(id => ({ tool: { connect: { id } } })),
+                                deleteMany: toolsDiff.toRemove.length ? {toolId: {in: toolsDiff.toRemove}} : undefined,
+                                create: toolsDiff.toAdd.map(id => ({tool: {connect: {id}}})),
                             },
 
                             rfps: {
-                                deleteMany: rfpsDiff.toRemove.length ? { rfpId: { in: rfpsDiff.toRemove } } : undefined,
-                                create: rfpsDiff.toAdd.map(id => ({ rfp: { connect: { id } } })),
+                                deleteMany: rfpsDiff.toRemove.length ? {rfpId: {in: rfpsDiff.toRemove}} : undefined,
+                                create: rfpsDiff.toAdd.map(id => ({rfp: {connect: {id}}})),
                             },
 
                             institutions: {
-                                deleteMany: institutionsDiff.toRemove.length ? { institutionId: { in: institutionsDiff.toRemove } } : undefined,
-                                create: institutionsDiff.toAdd.map(id => ({ institution: { connect: { id } } })),
+                                deleteMany: institutionsDiff.toRemove.length ? {institutionId: {in: institutionsDiff.toRemove}} : undefined,
+                                create: institutionsDiff.toAdd.map(id => ({institution: {connect: {id}}})),
                             },
 
                             companies: {
-                                deleteMany: companiesDiff.toRemove.length ? { companyId: { in: companiesDiff.toRemove } } : undefined,
-                                create: companiesDiff.toAdd.map(id => ({ company: { connect: { id } } })),
+                                deleteMany: companiesDiff.toRemove.length ? {companyId: {in: companiesDiff.toRemove}} : undefined,
+                                create: companiesDiff.toAdd.map(id => ({company: {connect: {id}}})),
                             },
 
                             attachments: {
-                                deleteMany: attachmentsDiff.toRemove.length ? { id: { in: attachmentsDiff.toRemove } } : undefined,
+                                deleteMany: attachmentsDiff.toRemove.length ? {id: {in: attachmentsDiff.toRemove}} : undefined,
                                 create: (milestone.attachments || [])
                                     .filter(a => attachmentsDiff.toAdd.includes(a.id))
-                                    .map(a => ({ link: a.link, name: a.name ?? undefined })),
+                                    .map(a => ({link: a.link, name: a.name ?? undefined})),
                             },
 
                             contacts: {
-                                deleteMany: contactsDiff.toRemove.length ? { id: { in: contactsDiff.toRemove } } : undefined,
+                                deleteMany: contactsDiff.toRemove.length ? {id: {in: contactsDiff.toRemove}} : undefined,
                                 create: (milestone.contacts || [])
                                     .filter(c => contactsDiff.toAdd.includes(c.id))
-                                    .map(c => ({ name: c.name, email: c.email, role: c.role ?? undefined, affiliation: c.affiliation ?? undefined })),
+                                    .map(c => ({
+                                        name: c.name,
+                                        email: c.email,
+                                        role: c.role ?? undefined,
+                                        affiliation: c.affiliation ?? undefined
+                                    })),
                             },
                         },
                     })
@@ -4793,19 +4817,19 @@ export const saveCRO = withOrganizationAuth(
             const data: Prisma.SavedCompanyUncheckedCreateInput = {
                 companyId: croId,
                 organizationId: organization.id,
-                ...(milestoneId ? { milestoneId } : {}), // omit if none
+                ...(milestoneId ? {milestoneId} : {}), // omit if none
             };
 
             const response = await prisma.savedCompany.create({
                 data,
                 include: {
                     company: true,
-                    ...(milestoneId ? { milestone: { include: { types: true } } } : {}),
+                    ...(milestoneId ? {milestone: {include: {types: true}}} : {}),
                 },
             });
 
             if (!response) {
-                return { success: false, error: "Database error. Please try again later." };
+                return {success: false, error: "Database error. Please try again later."};
             }
 
             // Revalidate relevant pages
@@ -4813,7 +4837,7 @@ export const saveCRO = withOrganizationAuth(
             revalidatePath(`/app/marketplace`);
             revalidatePath(`/app/marketplace/service-providers`);
 
-            return { success: true, data: response };
+            return {success: true, data: response};
         } catch (error: any) {
             console.error("Error saving company:", error);
 
@@ -4825,7 +4849,7 @@ export const saveCRO = withOrganizationAuth(
                 };
             }
 
-            return { success: false, error: "Database error. Please try again later." };
+            return {success: false, error: "Database error. Please try again later."};
         }
     }
 );
@@ -4943,7 +4967,7 @@ export const saveOrganization = withOrganizationAuth(
 
             if (!response) {
                 console.error("Error saving organization.");
-                return { success: false, error: "Database error. Please try again later." };
+                return {success: false, error: "Database error. Please try again later."};
             }
 
             console.log(`response`, response);
@@ -4951,7 +4975,7 @@ export const saveOrganization = withOrganizationAuth(
             revalidatePath(`/app/marketplace`);
             revalidatePath(`/app/marketplace/patient-groups`);
 
-            return { success: true, data: response };
+            return {success: true, data: response};
         } catch (error: any) {
             console.error("Error saving organization:", error);
 
@@ -4964,7 +4988,7 @@ export const saveOrganization = withOrganizationAuth(
                 };
             }
 
-            return { success: false, error: "Database error. Please try again later." };
+            return {success: false, error: "Database error. Please try again later."};
         }
     }
 );
@@ -5423,7 +5447,9 @@ export async function switchOrganization(organizationId: string) {
     return {success: true};
 }
 
-export async function subscribeToOrganization(email: string, host?: string | null): Promise<ApiResponse<{ id: string }>> {
+export async function subscribeToOrganization(email: string, host?: string | null): Promise<ApiResponse<{
+    id: string
+}>> {
     try {
         const lower = email.trim().toLowerCase();
         const isDomainValid = await validateEmailDomain(lower);
@@ -5432,12 +5458,12 @@ export async function subscribeToOrganization(email: string, host?: string | nul
             return {success: false, error: "Email domain is invalid or cannot receive emails."};
         }
 
-        if (!host) return { success: false, error: "Missing host." };
+        if (!host) return {success: false, error: "Missing host."};
 
         // Try custom domain first
         let org = await prisma.organization.findFirst({
-            where: { customDomain: host, public: true, published: true },
-            select: { id: true, subdomain: true },
+            where: {customDomain: host, public: true, published: true},
+            select: {id: true, subdomain: true},
         });
 
         // If not a custom domain, try subdomain.<ROOT_DOMAIN>
@@ -5448,20 +5474,20 @@ export async function subscribeToOrganization(email: string, host?: string | nul
 
             if (sub) {
                 org = await prisma.organization.findFirst({
-                    where: { subdomain: sub, public: true, published: true },
-                    select: { id: true, subdomain: true },
+                    where: {subdomain: sub, public: true, published: true},
+                    select: {id: true, subdomain: true},
                 });
             }
         }
 
-        if (!org) return { success: false, error: "Organization not found." };
+        if (!org) return {success: false, error: "Organization not found."};
 
         const existing = await prisma.subscription.findFirst({
-            where: { organizationId: org.id, email: lower },
-            select: { id: true },
+            where: {organizationId: org.id, email: lower},
+            select: {id: true},
         });
         if (existing) {
-            return { success: false, error: "You're already subscribed to this organization." };
+            return {success: false, error: "You're already subscribed to this organization."};
         }
 
         const record = await prisma.subscription.create({
@@ -5469,7 +5495,7 @@ export async function subscribeToOrganization(email: string, host?: string | nul
                 organizationId: org.id,
                 email: lower,
             },
-            select: { id: true },
+            select: {id: true},
         });
 
         try {
@@ -5491,13 +5517,13 @@ export async function subscribeToOrganization(email: string, host?: string | nul
             console.error('[CIO] track user_subscribed_to_organization failed:', e);
         }
 
-        return { success: true, data: { id: record.id } };
+        return {success: true, data: {id: record.id}};
     } catch (err: any) {
         console.error("subscribePublic error", err);
         if (err?.code === "P2002") {
-            return { success: false, error: `You're already subscribed to this organization.` };
+            return {success: false, error: `You're already subscribed to this organization.`};
         }
-        return { success: false, error: `Database error. Please try again later.` };
+        return {success: false, error: `Database error. Please try again later.`};
     }
 }
 
@@ -5518,12 +5544,12 @@ export const updateEntityTags = withAuth(
         try {
             const session = await getSession();
             if (!session?.user?.id) {
-                return { success: false, error: "Not authenticated" };
+                return {success: false, error: "Not authenticated"};
             }
 
             // Basic guardrails – up to you how strict you want to be
             if (!taggableId) {
-                return { success: false, error: "Missing taggableId" };
+                return {success: false, error: "Missing taggableId"};
             }
 
             // Normalize + dedupe
@@ -5536,24 +5562,24 @@ export const updateEntityTags = withAuth(
             // If you want to allow “clear all tags” when array is empty:
             if (normalized.length === 0) {
                 await prisma.tagAssignment.deleteMany({
-                    where: { taggableType, taggableId },
+                    where: {taggableType, taggableId},
                 });
 
                 const emptyAssignments: (TagAssignment & { tag: Tag })[] = [];
 
                 return {
                     success: true,
-                    data: { assignments: emptyAssignments },
+                    data: {assignments: emptyAssignments},
                 };
             }
 
             const result = await prisma.$transaction(async (tx) => {
                 // 1. Upsert Tag records
                 const tags = await Promise.all(
-                    normalized.map(({ display, normalized }) =>
+                    normalized.map(({display, normalized}) =>
                         tx.tag.upsert({
-                            where: { normalizedValue: normalized },
-                            update: { value: display },
+                            where: {normalizedValue: normalized},
+                            update: {value: display},
                             create: {
                                 value: display,
                                 normalizedValue: normalized,
@@ -5569,7 +5595,7 @@ export const updateEntityTags = withAuth(
                     where: {
                         taggableType,
                         taggableId,
-                        tagId: { notIn: tagIds },
+                        tagId: {notIn: tagIds},
                     },
                 });
 
@@ -5585,8 +5611,8 @@ export const updateEntityTags = withAuth(
 
                 // 4. Return fresh assignments + tags
                 const assignments = await tx.tagAssignment.findMany({
-                    where: { taggableType, taggableId },
-                    include: { tag: true },
+                    where: {taggableType, taggableId},
+                    include: {tag: true},
                 });
 
                 return assignments;
@@ -5624,11 +5650,11 @@ export const updateEntityTags = withAuth(
 
             return {
                 success: true,
-                data: { assignments: result },
+                data: {assignments: result},
             };
         } catch (error) {
             console.error("Error updating tags:", error);
-            return { success: false, error: "Server error occurred." };
+            return {success: false, error: "Server error occurred."};
         }
     }
 );
