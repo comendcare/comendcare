@@ -29,18 +29,24 @@ const STATUS_LABELS: Record<StatusType, string> = {
     PLANNED: "Planned",
     INPROGRESS: "In progress",
     COMPLETED: "Completed",
+    PAUSED: "Paused",
+    ARCHIVED: "Archived",
 }
 
 const STATUS_COLORS: Record<StatusType, string> = {
-    PLANNED: "var(--chart-1)",
-    INPROGRESS: "var(--chart-2)",
-    COMPLETED: "var(--chart-3)",
+    PLANNED: "hsl(var(--chart-1))",
+    INPROGRESS: "hsl(var(--chart-2))",
+    COMPLETED: "hsl(var(--chart-3))",
+    PAUSED: "hsl(var(---chart-4))",
+    ARCHIVED: "hsl(var(--chart-5))"
 }
 
 const STATUS_COLORS_VAR_MAP: Record<StatusType, string> = {
-    PLANNED: "--chart-1",
-    INPROGRESS: "--chart-2",
-    COMPLETED: "--chart-3",
+    PLANNED: "hsl(var(--chart-1))",
+    INPROGRESS: "hsl(var(--chart-2))",
+    COMPLETED: "hsl(var(--chart-3))",
+    PAUSED: "hsl(var(---chart-4))",
+    ARCHIVED: "hsl(var(--chart-5))"
 }
 
 export function DashboardProjectsStatusCard({organization}: { organization: OrganizationForAnalytics }) {
@@ -52,6 +58,8 @@ export function DashboardProjectsStatusCard({organization}: { organization: Orga
             PLANNED: 0,
             INPROGRESS: 0,
             COMPLETED: 0,
+            PAUSED: 0,
+            ARCHIVED: 0,
         }
 
         for (const m of organization.milestones ?? []) {

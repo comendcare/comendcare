@@ -4475,6 +4475,7 @@ export const updateMilestones = withOrganizationAuth(
                                         affiliation: c.affiliation ?? undefined
                                     })),
                             },
+                            activelyFundraising: milestone.activelyFundraising,
                         },
                     })
                 })

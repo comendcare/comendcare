@@ -29,18 +29,24 @@ const STATUS_LABELS: Record<StatusType, string> = {
     PLANNED: "Planned",
     INPROGRESS: "In progress",
     COMPLETED: "Completed",
+    PAUSED: "Paused",
+    ARCHIVED: "Archived",
 }
 
 const STATUS_COLORS: Record<StatusType, string> = {
     PLANNED: "hsl(var(--chart-1))",
     INPROGRESS: "hsl(var(--chart-2))",
     COMPLETED: "hsl(var(--chart-3))",
+    PAUSED: "hsl(var(---chart-4))",
+    ARCHIVED: "hsl(var(--chart-5))"
 }
 
 const STATUS_COLORS_VAR_MAP: Record<StatusType, string> = {
     PLANNED: "hsl(var(--chart-1))",
     INPROGRESS: "hsl(var(--chart-2))",
     COMPLETED: "hsl(var(--chart-3))",
+    PAUSED: "hsl(var(---chart-4))",
+    ARCHIVED: "hsl(var(--chart-5))"
 }
 
 const researchPlansChartConfig = {

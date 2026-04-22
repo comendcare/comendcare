@@ -68,9 +68,15 @@ export default function StatusButton({
 }) {
     const handleClick = () => {
         if (disabled) return
-        const next: StatusType =
-            status === "PLANNED" ? "INPROGRESS" :
-                status === "INPROGRESS" ? "COMPLETED" : "PLANNED"
+        const next: StatusType = (() => {
+            switch (status) {
+                case 'PLANNED': return 'INPROGRESS' as StatusType
+                case 'INPROGRESS': return 'COMPLETED' as StatusType
+                case 'COMPLETED': return 'PAUSED' as StatusType
+                case 'PAUSED': return 'ARCHIVED' as StatusType
+                default: return 'PLANNED' as StatusType
+            }
+        })()
         onStatusChange?.(next)  // safely no-op if omitted
     }
 
@@ -82,6 +88,10 @@ export default function StatusButton({
                 return 1
             case "COMPLETED":
                 return 2
+            case "PAUSED":
+                return 3
+            case "ARCHIVED": 
+                return 4
             default:
                 return 0
         }
@@ -95,6 +105,10 @@ export default function StatusButton({
                 return "bg-inprogress"
             case "COMPLETED":
                 return "bg-completed"
+            case "PAUSED":
+                return "bg-paused"
+            case "ARCHIVED":
+                return "bg-archived"
             default:
                 return "bg-planned"
         }
@@ -108,21 +122,12 @@ export default function StatusButton({
                 return "text-inprogress-foreground"
             case "COMPLETED":
                 return "text-completed-foreground"
+            case "PAUSED":
+                return "text-paused-foreground"
+            case "ARCHIVED":
+                return "text-archived-foreground"
             default:
                 return "text-planned-foreground"
-        }
-    }
-
-    const getStatusBackgroundColor = (currentStatus: StatusType) => {
-        switch (currentStatus) {
-            case "PLANNED":
-                return "bg-planned-foreground border-[1px] border-planned-foreground"
-            case "INPROGRESS":
-                return "bg-inprogress-foreground border-[1px] border-inprogress-foreground"
-            case "COMPLETED":
-                return "bg-completed-foreground border-[1px] border-completed-foreground"
-            default:
-                return "bg-planned-foreground border-[1px] border-planned-foreground"
         }
     }
 
@@ -209,7 +214,7 @@ export default function StatusButton({
             {/* In Progress Section */}
             <div
                 className={cn(
-                    "flex-1 flex items-center justify-end relative pr-2",
+                    "flex-1 flex items-center justify-end relative pr-2 text-nowrap",
                     currentIndex >= 1 ? getStatusTextColor(status) : "text-gray-600",
                 )}
             >
@@ -224,6 +229,26 @@ export default function StatusButton({
                 )}
             >
                 {currentIndex === 2 && 'Completed'}
+            </div>
+
+            {/* Paused */}
+            <div
+                className={cn(
+                    "right-0 h-full flex justify-center items-center absolute pr-2",
+                    currentIndex >= 3 ? getStatusTextColor(status) : "text-gray-600",
+                )}
+            >
+                {currentIndex === 3 && 'Paused'}
+            </div>
+
+            {/* Archived Section */}
+            <div
+                className={cn(
+                    "right-0 h-full flex justify-center items-center absolute pr-2",
+                    currentIndex >= 4 ? getStatusTextColor(status) : "text-gray-600",
+                )}
+            >
+                {currentIndex === 4 && 'Archived'}
             </div>
         </div>
     )

@@ -2320,12 +2320,14 @@ export const NODE_TYPE_OPTIONS: Option[] = [
     },
 ]
 
-export type StatusType = 'PLANNED' | 'INPROGRESS' | 'COMPLETED'
+export type StatusType = 'PLANNED' | 'INPROGRESS' | 'COMPLETED' | 'PAUSED' | 'ARCHIVED'
 
 export const MILESTONE_STATUS_OPTIONS: Option[] = [
     { label: 'Planned', value: 'PLANNED' },
     { label: 'In-Progress', value: 'INPROGRESS' },
-    { label: 'Completed', value: 'COMPLETED' }
+    { label: 'Completed', value: 'COMPLETED' },
+    { label: 'Paused', value: 'PAUSED' },
+    { label: 'Archived', value: 'ARCHIVED' }
 ]
 
 export interface AddressType {

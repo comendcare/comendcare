@@ -18,14 +18,18 @@ import { StatusType } from "@comend/lib/types";
 
 const STATUS_LABELS: Record<StatusType, string> = {
     PLANNED: "Planned",
-    INPROGRESS: "In Progress",
+    INPROGRESS: "In progress",
     COMPLETED: "Completed",
-};
+    PAUSED: "Paused",
+    ARCHIVED: "Archived",
+}
 
 const STATUS_COLORS: Record<StatusType, string> = {
     PLANNED: "#9D82CA",
     INPROGRESS: "#CA9D82",
     COMPLETED: "#82CA9D",
+    PAUSED: "#9D82CA",
+    ARCHIVED: "#CA9D82",
 };
 
 export const DonutChartCard = ({ organization }: { organization: Organization }) => {
@@ -47,6 +51,8 @@ export const DonutChartCard = ({ organization }: { organization: Organization })
                     PLANNED: 0,
                     INPROGRESS: 0,
                     COMPLETED: 0,
+                    PAUSED: 0,
+                    ARCHIVED: 0,
                 };
 
                 for (const m of result.data) {
