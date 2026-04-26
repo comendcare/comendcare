@@ -295,12 +295,13 @@ export default function MarketplacePage() {
                     <ol className="w-full">
                         {(researchPlansInitialized && researchPlanStore.searchResults && researchPlanStore.searchResults.length > 0 )
                             ? (
-                                <div className="max-w-7xl w-full overflow-auto grid grid-cols-2 gap-4">
+                                <div className="w-full flex flex-row overflow-x-auto gap-4">
                                     {researchPlanStore.searchResults?.slice(0, 2).map((researchPlan: any) => (
                                         <Link
+                                            className="min-w-full md:min-w-[calc(50%-8px)]"
                                             href={(
-                                                researchPlan.organization.subdomain 
-                                                    ? `http://${researchPlan.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlan?.id}` 
+                                                researchPlan.organization.subdomain
+                                                    ? `http://${researchPlan.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${researchPlan?.id}`
                                                     : '#'
                                             )}
                                         >
