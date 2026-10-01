@@ -2,6 +2,7 @@
 
 import {getSession} from "@comend/lib/auth"
 import prisma from "@comend/lib/prisma";
+import type {Prisma} from "@prisma/client";
 
 const orgDeepInclude = {
     members: { include: { user: true } },
@@ -93,7 +94,6 @@ const orgDeepInclude = {
             institution: true,
             company: true,
             gene: true,
-            genes: true,
         },
     },
     biosamples: {
@@ -109,7 +109,6 @@ const orgDeepInclude = {
                 },
             },
             gene: true,
-            genes: true,
         },
     },
     donors: {
@@ -118,7 +117,7 @@ const orgDeepInclude = {
             diagnoses: { include: { type: true } },
         },
     },
-    DiseaseModel: {
+    diseaseModel: {
         include: {
             contacts: true,
             attachments: true,
@@ -126,7 +125,6 @@ const orgDeepInclude = {
             institution: true,
             company: true,
             gene: true,
-            genes: true,
             condition: true,
         },
     },
@@ -156,7 +154,7 @@ const orgDeepInclude = {
     },
 
     user: true,
-};
+} satisfies Prisma.OrganizationInclude;
 
 async function assertOwner(orgId: string) {
     const session = await getSession();
@@ -165,7 +163,7 @@ async function assertOwner(orgId: string) {
         where: { userId: session.user.id, organizationId: orgId },
         select: { role: true },
     });
-    if (!membership || membership.role !== "owner") throw new Error("Forbidden");
+    if (!membership || !["owner", "support"].includes(membership.role)) throw new Error("Forbidden");
 }
 
 export async function exportOrganizationAsJSON(orgId: string) {

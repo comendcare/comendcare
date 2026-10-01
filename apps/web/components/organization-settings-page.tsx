@@ -36,8 +36,8 @@ export default function OrganizationSettingsPage({organization}: { organization:
                 a.remove();
                 URL.revokeObjectURL(url);
             } catch (error) {
-                toast.error("An error occurred while updating your profile.");
-                console.log(error)
+                toast.error("An error occurred while exporting your organization data.");
+                console.error(error);
             }
         });
     };
