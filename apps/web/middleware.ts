@@ -1,6 +1,7 @@
 import { redis } from '@comend/lib/redis'
 import { NextRequest, NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
+import { SUNSET_ENABLED, sunsetResponse } from "~web/lib/sunset"
 
 const RATE_LIMIT = 60        // max requests
 const WINDOW_SECONDS = 60    // per this many seconds
@@ -16,11 +17,20 @@ export const config = {
          * 3. /_static (inside /public)
          * 4. all root files inside /public (e.g. /favicon.ico)
          */
-        "/((?!api/|_next/|_static/|_vercel|[\\w-]+\\.\\w+).*)"
+        "/((?!api/|_next/|_static/|_vercel|[\\w-]+\\.\\w+).*)",
+        // API routes only pass through here so sunset mode can block them
+        "/api/:path*"
     ]
 }
 
 export default async function middleware(req: NextRequest) {
+    // Sunset mode runs first, before any Redis/auth calls, so it works even with those services turned off
+    if (SUNSET_ENABLED) return sunsetResponse(req)
+
+    if (req.nextUrl.pathname.startsWith("/api/")) {
+        return NextResponse.next()
+    }
+
     const forwarded = req.headers.get('x-forwarded-for')
     const ip =
         req.ip ??
