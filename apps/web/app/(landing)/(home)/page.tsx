@@ -26,7 +26,7 @@ import FeatureFeed from "~web/components/landing/feature-feed";
 import {News} from "~web/components/landing/news";
 import LogoInfiniteCarousel from "~web/components/landing/logo-infinite-carousel";
 import {HorizontalTabsFeatures} from "~web/components/landing/horizontal-tabs-feature";
-import MarketplacePage from "../marketplace/page";
+// import MarketplacePage from "../marketplace/page";
 
 export default function App() {
     return (
@@ -34,9 +34,9 @@ export default function App() {
             {/*<HeroSection/>*/}
             <CloudHeroSection/>
             <LogoInfiniteCarousel/>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <MarketplacePage/>
-            </div>
+            {/*<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">*/}
+            {/*    <MarketplacePage/>*/}
+            {/*</div>*/}
             {/*<JoinWaitlistSection*/}
             {/*    isSubscribedCallback={betaSubscribeCallback}*/}
             {/*    isSubscribed={isSubscribed}*/}

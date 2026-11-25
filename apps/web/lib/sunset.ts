@@ -1,16 +1,24 @@
 import { NextRequest, NextResponse } from "next/server"
 
 /*
- * Sunset mode: replaces the entire site (landing, app, sign in/up, org subdomains, embeds, APIs, crons)
- * with a static shutdown notice. Toggle with the SUNSET_MODE env var ("true" to enable) and redeploy.
+ * Sunset mode, controlled by the SUNSET_MODE env var (redeploy after changing it):
+ *   "page" (or "true") - replaces the entire site (landing, app, sign in/up, org subdomains, embeds, APIs, crons)
+ *                        with a static shutdown notice
+ *   "banner"           - site works as normal, with a shutdown banner on every page (see SunsetBanner)
+ *   unset / other      - original site
  *
- * The notice is plain HTML returned straight from middleware so it keeps working even after the
+ * The full-page notice is plain HTML returned straight from middleware so it keeps working even after the
  * database, Redis, auth providers, etc. are turned off.
  */
 
-export const SUNSET_ENABLED = process.env.SUNSET_MODE === "true"
+const SUNSET_MODE = process.env.SUNSET_MODE
 
-const CONTACT_EMAIL = "support@comendcare.com"
+export const SUNSET_ENABLED = SUNSET_MODE === "page" || SUNSET_MODE === "true"
+export const SUNSET_BANNER_ENABLED = SUNSET_MODE === "banner"
+
+export const CONTACT_EMAIL = "support@comendcare.com"
+
+export const BANNER_MESSAGE = "Comend has shut down, and all account and organization data has been permanently deleted."
 
 // Optional, e.g. "November 15, 2026". Leave null to omit the date from the page.
 const SHUTDOWN_DATE: string | null = null

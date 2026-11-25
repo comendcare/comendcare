@@ -17,6 +17,8 @@ import CustomerIOSnippet from "@comend/components/customerio";
 import { headers } from 'next/headers';
 import { CookieyesScripts } from "@comend/lib/cookie-yes-scripts";
 import { OnbordaProvider } from "~web/components/onborda/OnbordaContext";
+import { SunsetBanner } from "~web/components/sunset-banner";
+import { BANNER_MESSAGE, CONTACT_EMAIL, SUNSET_BANNER_ENABLED } from "~web/lib/sunset";
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -120,6 +122,9 @@ export default async function RootLayout({
                     <OnbordaProvider>
                     <Onborda steps={onbordaTours} cardComponent={OnboardingCard}>
                         {children}
+                        {SUNSET_BANNER_ENABLED && !hideCookieBanner && (
+                            <SunsetBanner message={BANNER_MESSAGE} contactEmail={CONTACT_EMAIL}/>
+                        )}
                         <Analytics/>
                     </Onborda>
                     </OnbordaProvider>
